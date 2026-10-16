@@ -442,12 +442,14 @@ fn dialogue_uses_a_greeting_locale_id_instead_of_the_npc_name() {
 }
 
 #[test]
-fn merchant_list_66_42_synthetic_fixture_round_trips_reader_order() {
+fn merchant_list_66_42_matches_the_client_reader_layout() {
+    // Client reader (`00b3d5f0`): the header, one dword, a six-dword record (`00b33020`), the
+    // entry count (`00b2e620`), then 38-byte rows. Synthetic values, no captured frame exists.
     let message = MerchantListV2 {
-        initial_i16s: [-2, 3],
+        initial_i16s: [0, 0],
         initial_dword: 99,
         group: MerchantGroupV2 {
-            fields: [1, 2, 3, 4, 5, 6, 7],
+            fields: [1, 2, 3, 4, 5, 6, 0],
             entries: vec![MerchantEntryV2 {
                 first_six_dwords: [8, 9, 10, 11, 12, 13],
                 flag_after_six: true,
@@ -457,12 +459,21 @@ fn merchant_list_66_42_synthetic_fixture_round_trips_reader_order() {
         },
     };
     let encoded = encode_merchant_list_66_42(&message).unwrap();
-    assert_eq!(
-        &encoded[..12],
-        &[66, 0, 42, 0, 0xfe, 0xff, 3, 0, 99, 0, 0, 0]
-    );
-    assert_eq!(encoded.len(), 12 + 28 + 4 + 38);
+    assert_eq!(&encoded[..8], &[66, 0, 42, 0, 99, 0, 0, 0]);
+    assert_eq!(encoded.len(), 4 + 4 + 24 + 4 + 38);
+    assert_eq!(&encoded[32..36], &1u32.to_le_bytes());
     assert_eq!(decode_merchant_list_66_42(&encoded).unwrap(), message);
+    // Off-wire legacy fields cannot be smuggled in, and the old 8-byte-longer shape is refused.
+    let mut legacy = message.clone();
+    legacy.initial_i16s = [1, 0];
+    assert!(encode_merchant_list_66_42(&legacy).is_err());
+    let mut legacy = message.clone();
+    legacy.group.fields[6] = 1;
+    assert!(encode_merchant_list_66_42(&legacy).is_err());
+    let mut extended = encoded.clone();
+    extended.splice(4..4, [0u8; 4]);
+    assert!(decode_merchant_list_66_42(&extended).is_err());
+    assert!(decode_merchant_list_66_42(&encoded[..encoded.len() - 1]).is_err());
 }
 
 #[test]

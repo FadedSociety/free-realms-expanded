@@ -433,6 +433,7 @@ impl CoinShop {
             RESULT_SUCCESS,
             transaction_id,
             item_id,
+            0,
             quantity,
             unit_price,
             merchant_id,
@@ -445,6 +446,22 @@ impl CoinShop {
             replies,
             changed: true,
         })
+    }
+
+    /// Client-readable 165/6 refusal for a 165/5 sell the NPC layer rejected before the shop saw
+    /// it (closed shop, range, merchant). Echoes the request's fields when it is well formed.
+    /// Nothing is read from or changed in the inventory; the refusal is not recorded as a sale (R).
+    pub fn refuse_sell(&mut self, inner: &[u8], result_code: u32) -> CoinShopOutcome {
+        let (merchant, item, quantity) = match inner {
+            [0xa5, 0, 5, 0, rest @ ..] if rest.len() == 16 => (
+                u64::from_le_bytes(rest[..8].try_into().unwrap()),
+                i32::from_le_bytes(rest[8..12].try_into().unwrap()),
+                u32::from_le_bytes(rest[12..].try_into().unwrap()),
+            ),
+            _ => (0, 0, 0),
+        };
+        let transaction_id = self.allocate_transaction_id();
+        self.failure(2, result_code, transaction_id, item, quantity, 0, merchant)
     }
 
     pub fn sell(&mut self, item_instance_id: i32, quantity: u32) -> io::Result<CoinShopOutcome> {
@@ -498,7 +515,12 @@ impl CoinShop {
                 merchant_id,
             ));
         };
-        if quantity > owned.count {
+        // (R) Only copies that are neither consumed nor stored away can be sold, matching the
+        // trade availability rule; selling into them left stored_count above the stack count.
+        let available = owned
+            .count
+            .saturating_sub(owned.consumed_count.saturating_add(owned.stored_count));
+        if quantity > available {
             return Ok(self.failure(
                 2,
                 RESULT_INVALID_QUANTITY,
@@ -623,6 +645,7 @@ impl CoinShop {
             RESULT_SUCCESS,
             transaction_id,
             sold_item.definition_id,
+            sold_item.tint,
             quantity,
             unit_price,
             merchant_id,
@@ -725,6 +748,7 @@ impl CoinShop {
                 result_code,
                 transaction_id,
                 item_id,
+                0,
                 quantity,
                 unit_price,
                 merchant_id,
@@ -812,23 +836,36 @@ fn transaction_complete(
     result: u32,
     transaction_id: u32,
     item_id: i32,
+    tint: i32,
     quantity: u32,
     unit_price: u32,
     merchant_id: u64,
 ) -> Vec<u8> {
-    // Header and two leading dwords precede the reader's record: kind, u64, u32, u64, block, 3 u32.
-    // The zero-length nested block and field meanings are R because no store traffic was captured.
+    // Client reader `00c74ef0`/`00c71f30` (handler `00c78220`): two dwords, then a record. The first
+    // dword is the result: the handler tests it against 1 and feeds it to the result dispatch
+    // `00c6f300`, so a sell completion that led with its kind (2) read as a failure. Record order:
+    // dword, u64, dword, u64, item pair (`008cb540`: definition, tint), then quantity, price and
+    // quantity remaining (`[0xc]`, `[0xe]`, `[0xd]`). The size pattern is recovered; the field
+    // meanings (kind, merchant, id, timestamp) follow the DS column names and the community packet
+    // order and are (R). The second leading dword is the item the transaction concerns (R); the
+    // timestamp is zero (R).
+    let remaining = if kind == 2 && result == RESULT_SUCCESS {
+        quantity
+    } else {
+        0
+    };
     let mut bytes = header(COIN_FAMILY, 6);
-    put_u32(&mut bytes, kind);
     put_u32(&mut bytes, result);
-    put_u32(&mut bytes, kind);
-    put_u64(&mut bytes, u64::from(transaction_id));
     put_i32(&mut bytes, item_id);
+    put_u32(&mut bytes, kind);
     put_u64(&mut bytes, merchant_id);
-    put_i32(&mut bytes, 0);
+    put_u32(&mut bytes, transaction_id);
+    put_u64(&mut bytes, 0);
+    put_i32(&mut bytes, item_id);
+    put_i32(&mut bytes, tint);
     put_u32(&mut bytes, quantity);
     put_u32(&mut bytes, unit_price);
-    put_u32(&mut bytes, result);
+    put_u32(&mut bytes, remaining);
     bytes
 }
 

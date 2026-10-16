@@ -7,7 +7,10 @@
 //! See `notes/Research/NPC Interaction.md` for recovered fields and limits.
 
 use osfr_tools::{
-    coin_shop::{CoinShop, CoinShopOutcome},
+    coin_shop::{
+        CoinShop, CoinShopOutcome, RESULT_FAILURE, RESULT_INVALID_MERCHANT,
+        RESULT_SERVICE_UNAVAILABLE,
+    },
     content::NpcRole,
     quest_engine::{QuestEngine, QuestOutcome, QuestStatus},
 };
@@ -419,6 +422,10 @@ impl NpcInteraction {
     }
 
     /// Route only active-NPC Coin Store buys/sells through the existing idempotent validator.
+    ///
+    /// A rejected sell (165/5) is answered with a client-readable 165/6 failure completion
+    /// instead of an error, so the native window is told the sale did not happen (W148). Buys keep
+    /// returning the error; their refusals are answered by the 66/43 route.
     pub fn handle_coin_store(
         &mut self,
         shop: &mut CoinShop,
@@ -426,6 +433,26 @@ impl NpcInteraction {
         zone_id: u32,
         position: [f32; 3],
     ) -> Result<CoinShopOutcome, NpcInteractionError> {
+        let is_sell = packet.starts_with(&[COIN_STORE_FAMILY as u8, 0, COIN_STORE_SELL as u8, 0]);
+        let result = self
+            .check_coin_store(packet, zone_id, position)
+            .and_then(|()| {
+                shop.handle(packet)
+                    .map_err(|error| NpcInteractionError::CoinShop(error.kind()))
+            });
+        match result {
+            Err(error) if is_sell => Ok(shop.refuse_sell(packet, sell_refusal_code(&error))),
+            other => other,
+        }
+    }
+
+    /// Session, range, length and merchant checks shared by Coin Store buys and sells.
+    fn check_coin_store(
+        &self,
+        packet: &[u8],
+        zone_id: u32,
+        position: [f32; 3],
+    ) -> Result<(), NpcInteractionError> {
         let active = self
             .active
             .as_ref()
@@ -455,7 +482,14 @@ impl NpcInteraction {
         let merchant_id = u64::from_le_bytes(packet[4..12].try_into().unwrap());
         // (R) Content NPC keys are used as the Coin Store merchant ID until an original binding
         // between runtime actor GUIDs and merchant IDs is recovered.
-        if merchant_id != active.npc_id {
+        // Recovered (W148): the NpcMerchantV2 window sells through `00c77030`, which sends the
+        // session merchant GUID globals `01beea08`/`01beea0c`; no store to them exists in the
+        // client's code, so they stay the null GUID. The legacy window's data source also starts
+        // at the null pair (ctor `00cfef39`, reader `00cf16c0`). A native sell therefore names no
+        // merchant (0). The server's own open-shop session is the authority, so a null merchant
+        // means "the shop this player has open" (R); any other value must match that shop.
+        let null_sell = subtype == COIN_STORE_SELL && merchant_id == 0;
+        if merchant_id != active.npc_id && !null_sell {
             return Err(NpcInteractionError::WrongMerchant);
         }
         if subtype == COIN_STORE_BUY {
@@ -464,8 +498,7 @@ impl NpcInteraction {
                 return Err(NpcInteractionError::InvalidOption);
             }
         }
-        shop.handle(packet)
-            .map_err(|error| NpcInteractionError::CoinShop(error.kind()))
+        Ok(())
     }
 
     /// Parse an in-game 66/43 buy request for an open vendor session.
@@ -692,6 +725,15 @@ fn has_role(npc: &NpcRecord, role: NpcRole) -> bool {
         NpcRole::Ambient => "ambient",
     };
     npc.roles.iter().any(|value| value == name)
+}
+
+/// Result code a refused sell reports to the client (R mapping onto the client's result names).
+fn sell_refusal_code(error: &NpcInteractionError) -> u32 {
+    match error {
+        NpcInteractionError::InvalidPacket => RESULT_FAILURE,
+        NpcInteractionError::CoinShop(_) => RESULT_SERVICE_UNAVAILABLE,
+        _ => RESULT_INVALID_MERCHANT,
+    }
 }
 
 fn check_range(
@@ -1057,13 +1099,26 @@ pub struct MerchantEntryV2 {
     pub final_flag: bool,
 }
 
-/// A merchant group has seven fixed dwords followed by its counted entries (`00b33020`).
+/// The nested merchant record: six dwords (`00b33020`) and the counted entries (`00b2e620`).
+/// `fields[6]` is not on the wire (see `MerchantListV2`).
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantGroupV2 {
     pub fields: [u32; 7],
     pub entries: Vec<MerchantEntryV2>,
 }
 
+/// 66/42 body as the client reads it (`00b48a10` case 0x2a -> `00b40a60` -> `00b3d5f0`).
+///
+/// Recovered (W148): the reader re-reads the 4-byte message header (the signed-16 pair at
+/// `00b2dd60`), so nothing but the header precedes `initial_dword`; the nested record
+/// (`00b3aa30` -> `00b33020`) is exactly six dwords (a scalar, two dword pairs, a scalar) before
+/// the entry count read by `00b2e620`. Earlier versions wrote an extra i16 pair and a seventh
+/// record dword, which shifts every later field and leaves unread bytes, so the client rejects
+/// the whole list. The record's second pair (`fields[3]`, `fields[4]`) is the merchant GUID the
+/// client keeps at manager +0x3e8f0 and copies into every 66/43 request (`00b43310`).
+///
+/// `initial_i16s` and `group.fields[6]` are not on the wire and must be zero; they remain only
+/// until `gameplay.rs::merchant_packet` stops filling the old shape.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantListV2 {
     pub initial_i16s: [i16; 2],
@@ -1075,16 +1130,17 @@ pub struct MerchantListV2 {
 pub fn encode_merchant_list_66_42(
     message: &MerchantListV2,
 ) -> Result<Vec<u8>, NpcInteractionError> {
-    if message.group.entries.len() > MAX_VENDOR_ITEMS {
+    if message.group.entries.len() > MAX_VENDOR_ITEMS
+        || message.initial_i16s != [0; 2]
+        || message.group.fields[6] != 0
+    {
         return Err(NpcInteractionError::InvalidPacket);
     }
     let mut packet = Vec::new();
     packet.extend([66, 0, MERCHANT_LIST as u8, 0]);
-    for value in message.initial_i16s {
-        packet.extend(value.to_le_bytes());
-    }
     put_words(&mut packet, &[message.initial_dword]);
-    put_words(&mut packet, &message.group.fields);
+    let [f0, f1, f2, f3, f4, f5, _] = message.group.fields;
+    put_words(&mut packet, &[f0, f1, f2, f3, f4, f5]);
     put_words(&mut packet, &[message.group.entries.len() as u32]);
     for entry in &message.group.entries {
         put_words(&mut packet, &entry.first_six_dwords);
@@ -1099,16 +1155,15 @@ pub fn encode_merchant_list_66_42(
 }
 
 pub fn decode_merchant_list_66_42(packet: &[u8]) -> Result<MerchantListV2, NpcInteractionError> {
-    if packet.len() < 44
+    if packet.len() < 36
         || packet.len() > MAX_WIRE_PACKET_BYTES
         || packet[..4] != [66, 0, MERCHANT_LIST as u8, 0]
     {
         return Err(NpcInteractionError::InvalidPacket);
     }
     let mut cursor = WireCursor::new(&packet[4..]);
-    let initial_i16s = [cursor.i16()?, cursor.i16()?];
     let initial_dword = cursor.u32()?;
-    let fields = cursor.words::<7>()?;
+    let [f0, f1, f2, f3, f4, f5] = cursor.words::<6>()?;
     let entry_count = cursor.u32()? as usize;
     if entry_count > MAX_VENDOR_ITEMS || entry_count > cursor.remaining() / 38 {
         return Err(NpcInteractionError::InvalidPacket);
@@ -1124,9 +1179,12 @@ pub fn decode_merchant_list_66_42(packet: &[u8]) -> Result<MerchantListV2, NpcIn
     }
     cursor.finish()?;
     Ok(MerchantListV2 {
-        initial_i16s,
+        initial_i16s: [0; 2],
         initial_dword,
-        group: MerchantGroupV2 { fields, entries },
+        group: MerchantGroupV2 {
+            fields: [f0, f1, f2, f3, f4, f5, 0],
+            entries,
+        },
     })
 }
 
@@ -1210,10 +1268,6 @@ impl<'a> WireCursor<'a> {
         let bytes = &self.bytes[self.offset..end];
         self.offset = end;
         Ok(bytes)
-    }
-
-    fn i16(&mut self) -> Result<i16, NpcInteractionError> {
-        Ok(i16::from_le_bytes(self.take(2)?.try_into().unwrap()))
     }
 
     fn u16(&mut self) -> Result<u16, NpcInteractionError> {
