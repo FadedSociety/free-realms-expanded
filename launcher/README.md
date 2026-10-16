@@ -56,6 +56,20 @@ closes. `--settings-page` can also open Settings without capture mode. Existing
 output files are refused. Capture failure, timeout, invalid arguments and
 `run_native` errors return a nonzero exit code.
 
+W86c adds `--window-size WIDTHxHEIGHT` for bounded layout review, using logical
+egui points (640–3840 by 480–2160); default remains 940 x 790. At this PC's 150%
+display scaling, `--window-size 853x533` captures 1280 x 800 physical pixels;
+`--window-size 1280x800` captures 1920 x 1200. Short windows use a smaller banner
+and tighter spacing, with a visible scrollbar when needed. Captures remain
+unable to prepare or launch the game at any size.
+
+The portal skin bundles Lilita One for titles and captions, keeps readable body
+and address fonts, and uses egui geometry for gloss, bevels and focus rings.
+Font notices and the existing banner's licensing status are in DEPENDENCIES.md.
+W86c's final screenshots and before/after audit are under
+`lab/reports/rust-launcher-20261016/`; `notes/Design/Rust Launcher.md` records the
+13-test result and focus-ring canary. Physical controller actions remain open.
+
 `OSFR_LAUNCHER_LOG` enables an exclusive, bounded 1 MiB file of startup/rendering
 diagnostics and panic/error output. Its parent must exist and the file must be
 unused. It does not log launch arguments, tokens or form contents. Omit the

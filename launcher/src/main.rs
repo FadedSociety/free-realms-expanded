@@ -2,9 +2,10 @@
 
 mod controller;
 mod diagnostics;
+mod theme;
 
 use controller::{Controller, Navigation};
-use eframe::egui::{self, Color32, FontId, RichText, Stroke, Vec2};
+use eframe::egui::{self, Color32, RichText, Stroke, Vec2};
 use osfr_launcher::{LaunchPlan, LaunchSettings, LocalLoginStub, LoginProvider};
 use std::{
     cell::Cell,
@@ -15,10 +16,6 @@ use std::{
     sync::mpsc,
     time::{Duration, Instant},
 };
-
-const GREEN: Color32 = Color32::from_rgb(77, 145, 27);
-const INK: Color32 = Color32::from_rgb(36, 57, 28);
-const CREAM: Color32 = Color32::from_rgb(247, 240, 214);
 
 fn load_banner(ctx: &egui::Context) -> Result<egui::TextureHandle, String> {
     // (R) Fit bundled art to the current limit, including before the first frame.
@@ -87,27 +84,7 @@ impl Launcher {
         capture_ok: Rc<Cell<bool>>,
     ) -> Result<Self, String> {
         let banner = load_banner(&cc.egui_ctx)?;
-        let mut style = (*cc.egui_ctx.style()).clone();
-        style.visuals = egui::Visuals::light();
-        style.visuals.override_text_color = Some(INK);
-        style.visuals.panel_fill = CREAM;
-        style.visuals.window_fill = CREAM;
-        style.visuals.selection.bg_fill = GREEN;
-        style.visuals.selection.stroke = Stroke::new(2.0_f32, Color32::WHITE);
-        style.visuals.widgets.active.bg_stroke = Stroke::new(2.0_f32, GREEN);
-        style.visuals.widgets.hovered.bg_stroke = Stroke::new(2.0_f32, GREEN);
-        style.spacing.item_spacing = Vec2::new(12.0, 10.0);
-        style.spacing.button_padding = Vec2::new(18.0, 10.0);
-        style
-            .text_styles
-            .insert(egui::TextStyle::Body, FontId::proportional(17.0));
-        style
-            .text_styles
-            .insert(egui::TextStyle::Button, FontId::proportional(18.0));
-        style
-            .text_styles
-            .insert(egui::TextStyle::Heading, FontId::proportional(27.0));
-        cc.egui_ctx.set_style(style);
+        theme::install(&cc.egui_ctx);
         let (controller, controller_status) = match Controller::new() {
             Ok(controller) => (Some(controller), "Connect a controller to navigate.".into()),
             Err(error) => (None, error),
@@ -227,24 +204,48 @@ impl Launcher {
     }
 
     fn home(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Pick a realm. Start an adventure.");
-        ui.label("Your supplied client, our local revival.");
-        ui.add_space(7.0);
-        egui::Frame::new().fill(Color32::from_rgb(225, 231, 192)).stroke(Stroke::new(2.0_f32, Color32::from_rgb(132, 153, 82))).corner_radius(10).inner_margin(16).show(ui, |ui| {
-            ui.set_width(ui.available_width());
-            ui.horizontal(|ui| { ui.strong("REALMS"); ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| { ui.small("Status / players: not connected yet"); }); });
-            ui.separator();
+        let compact = ui.ctx().content_rect().height() < 650.0;
+        theme::heading(
+            ui,
+            "Your next adventure starts here",
+            "Choose a realm, then jump into Free Realms.",
+        );
+        egui::Frame::new().fill(Color32::from_rgb(235, 231, 179)).corner_radius(12).inner_margin(if compact { 8 } else { 12 }).show(ui, |ui| {
+            ui.set_min_width(ui.available_width());
+            ui.horizontal_wrapped(|ui| {
+                ui.label(RichText::new("Realms").font(theme::display(23.0)));
+                ui.small("Status / players: not connected yet");
+            });
             for (index, server) in self.servers.iter().enumerate() {
+                let selected = index == self.selected;
                 ui.horizontal(|ui| {
-                    if ui.selectable_label(index == self.selected, RichText::new(&server.name).strong()).clicked() { self.selected = index; }
-                    ui.monospace(&server.address);
-                    ui.label(RichText::new("● Status pending").color(Color32::from_rgb(108, 94, 39)));
+                    let mut label = egui::text::LayoutJob::default();
+                    label.append(&format!("{}{}\n", if selected { "Selected: " } else { "" }, server.name), 0.0,
+                        egui::TextFormat { font_id: theme::display(20.0), color: theme::INK, ..Default::default() });
+                    label.append(&server.address, 0.0, egui::TextFormat {
+                        font_id: egui::FontId::monospace(14.0), color: theme::INK, ..Default::default()
+                    });
+                    let row = ui.add(egui::Button::new(label).wrap()
+                        .min_size(Vec2::new((ui.available_width() - 135.0).max(180.0), if compact { 44.0 } else { 52.0 }))
+                        .fill(if selected { Color32::from_rgb(216, 235, 156) } else { theme::PAPER })
+                        .stroke(Stroke::new(if selected { 2.0_f32 } else { 1.0_f32 },
+                            if selected { Color32::from_rgb(85, 127, 30) } else { Color32::from_rgb(160, 146, 86) }))
+                        .corner_radius(10));
+                    if row.has_focus() {
+                        ui.painter().rect_stroke(row.rect.expand(2.0), 12, Stroke::new(3.0_f32, theme::ORANGE), egui::StrokeKind::Outside);
+                    }
+                    if row.clicked() { self.selected = index; }
+                    let (pip, _) = ui.allocate_exact_size(Vec2::splat(12.0), egui::Sense::hover());
+                    ui.painter().circle_filled(pip.center(), 5.0, Color32::from_rgb(187, 116, 14));
+                    ui.painter().circle_filled(pip.center() - Vec2::new(1.0, 1.5), 1.5, theme::PAPER);
+                    ui.small("Status pending");
                 });
             }
             ui.add_space(4.0);
             ui.horizontal(|ui| {
-                ui.add(egui::TextEdit::singleline(&mut self.new_address).hint_text("Add host:port").char_limit(261).desired_width(220.0));
-                if ui.add_enabled(self.servers.len() < 16, egui::Button::new("Add realm")).clicked() {
+                ui.add(egui::TextEdit::singleline(&mut self.new_address).hint_text("Add host:port").char_limit(261)
+                    .desired_width((ui.available_width() - 145.0).max(160.0)));
+                if theme::button(ui, "Add realm", Vec2::new(125.0, 38.0), self.servers.len() < 16, false).clicked() {
                     match osfr_launcher::validate_endpoint(&self.new_address) {
                         Ok(()) => {
                             self.servers.push(Server { name: "Custom realm".into(), address: self.new_address.clone() });
@@ -257,34 +258,33 @@ impl Launcher {
                 }
             });
         });
-        ui.add_space(8.0);
+        ui.add_space(10.0);
         ui.horizontal(|ui| {
-            let play = egui::Button::new(
-                RichText::new(if self.child.is_some() {
-                    "GAME RUNNING"
+            let label = if self.child.is_some() {
+                "GAME RUNNING"
+            } else if self.pending.is_some() {
+                "PREPARING…"
+            } else {
+                "PLAY NOW!"
+            };
+            if theme::button(
+                ui,
+                label,
+                if compact {
+                    Vec2::new(208.0, 56.0)
                 } else {
-                    "PLAY"
-                })
-                .size(30.0)
-                .strong()
-                .color(Color32::WHITE),
+                    Vec2::new(224.0, 64.0)
+                },
+                self.pending.is_none() && self.child.is_none() && self.screenshot.is_none(),
+                false,
             )
-            .fill(GREEN)
-            .stroke(Stroke::new(3.0_f32, Color32::from_rgb(173, 209, 68)))
-            .corner_radius(16)
-            .min_size(Vec2::new(220.0, 64.0));
-            if ui
-                .add_enabled(
-                    self.pending.is_none() && self.child.is_none() && self.screenshot.is_none(),
-                    play,
-                )
-                .clicked()
+            .clicked()
             {
                 self.play();
             }
             ui.vertical(|ui| {
-                ui.strong("Login: local stub · W83 pending");
-                ui.small("Literal loopback only. No keys or passwords collected.");
+                ui.strong("Local login preview");
+                ui.small("Loopback only · key-pair login pending (W83)");
                 if self.screenshot.is_some() {
                     ui.small("Review capture: Play disabled.");
                 }
@@ -293,9 +293,11 @@ impl Launcher {
     }
 
     fn settings_ui(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Make yourself at home");
-        ui.label("Use a separate, writable copy of your supplied client.");
-        ui.add_space(6.0);
+        theme::heading(
+            ui,
+            "Make yourself at home",
+            "Use a separate, writable copy of your supplied client.",
+        );
         ui.strong("Client folder");
         ui.add(
             egui::TextEdit::singleline(&mut self.client)
@@ -310,7 +312,7 @@ impl Launcher {
                 .char_limit(32768)
                 .desired_width(f32::INFINITY),
         );
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.strong("Game window");
             ui.add(
                 egui::DragValue::new(&mut self.settings.width)
@@ -324,22 +326,24 @@ impl Launcher {
                     .suffix(" px"),
             );
             for (label, width, height) in [("1024 × 768", 1024, 768), ("1280 × 720", 1280, 720)] {
-                if ui.button(label).clicked() {
+                if theme::button(ui, label, Vec2::new(134.0, 36.0), true, false).clicked() {
                     self.settings = LaunchSettings { width, height };
                 }
             }
         });
-        ui.checkbox(&mut self.controller_on, "Controller navigation");
+        ui.checkbox(&mut self.controller_on, "Controller navigation").on_hover_text(
+            "Launcher navigation only, using the existing layout's 0.25 deadzone. In-game controls use the separate Python bridge; this launcher does not start it."
+        );
         ui.label(&self.controller_status);
         ui.small("Left stick / D-pad: move · A: select · B: back · LB: next · Start: settings");
-        ui.small("The existing gamepad layout supplies the 0.25 deadzone and button roles.");
-        ui.small("In-game controller input still uses the separate Python bridge; this skeleton does not start it.");
         ui.separator();
-        ui.small("Settings last for this launcher session. Play backs up configuration and any replaced locale files.");
         ui.small(
+            "Settings are session-only. Play backs up configuration and replaced locale files.",
+        )
+        .on_hover_text(
             "Windowed mode, no maximization, muted audio: same defaults as the minimal launcher.",
         );
-        if ui.button("Back to realms").clicked() {
+        if theme::button(ui, "Back to realms", Vec2::new(178.0, 40.0), true, false).clicked() {
             self.settings_page = false;
         }
     }
@@ -384,39 +388,93 @@ impl eframe::App for Launcher {
             }
         }
         egui::CentralPanel::default()
-            .frame(egui::Frame::new().fill(CREAM).inner_margin(22))
+            .frame(egui::Frame::new().fill(theme::FOREST).inner_margin(16))
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
-                    let width = ui.available_width();
-                    ui.add(
-                        egui::Image::new(&self.banner)
-                            .fit_to_exact_size(Vec2::new(width, width / 3.0)),
-                    );
+                    let width = ui.available_width().min(1080.0);
+                    // Keep the whole banner, with space for controls on smaller windows.
+                    ui.set_max_width(width);
+                    let compact = ctx.content_rect().height() < 650.0;
+                    if compact {
+                        ui.spacing_mut().item_spacing.y = 4.0;
+                    }
+                    let height = (width / 3.0).min(if compact {
+                        if self.settings_page { 64.0 } else { 80.0 }
+                    } else if self.settings_page {
+                        (ui.available_height() * 0.18).clamp(80.0, 145.0)
+                    } else {
+                        (ui.available_height() * 0.25).clamp(100.0, 230.0)
+                    });
+                    ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                        ui.add(
+                            egui::Image::new(&self.banner)
+                                .fit_to_exact_size(Vec2::new(height * 3.0, height)),
+                        );
+                    });
                     ui.horizontal(|ui| {
-                        if ui.selectable_label(!self.settings_page, "Realms").clicked() {
+                        if theme::button(
+                            ui,
+                            "Realms",
+                            Vec2::new(126.0, 40.0),
+                            true,
+                            !self.settings_page,
+                        )
+                        .clicked()
+                        {
                             self.settings_page = false;
                         }
-                        if ui
-                            .selectable_label(self.settings_page, "Settings")
-                            .clicked()
+                        if theme::button(
+                            ui,
+                            "Settings",
+                            Vec2::new(126.0, 40.0),
+                            true,
+                            self.settings_page,
+                        )
+                        .clicked()
                         {
                             self.settings_page = true;
                         }
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.small("W86 · launcher preview");
+                            ui.label(
+                                RichText::new("Launcher preview")
+                                    .color(theme::PAPER)
+                                    .size(13.0),
+                            );
                         });
                     });
-                    ui.separator();
-                    if self.settings_page {
-                        self.settings_ui(ui);
-                    } else {
-                        self.home(ui);
-                    }
-                    ui.add_space(12.0);
-                    ui.label(RichText::new(&self.message).strong());
-                    ui.separator();
-                    ui.small(
-                        "A non-commercial fan revival · not affiliated with Daybreak or Sony.",
+                    ui.add_space(4.0);
+                    let panel = theme::panel()
+                        .inner_margin(if compact { 12 } else { 16 })
+                        .show(ui, |ui| {
+                            ui.set_min_width(ui.available_width());
+                            if self.settings_page {
+                                self.settings_ui(ui);
+                            } else {
+                                self.home(ui);
+                            }
+                            ui.add_space(12.0);
+                            egui::Frame::new()
+                                .fill(Color32::from_rgb(244, 225, 169))
+                                .corner_radius(8)
+                                .inner_margin(9)
+                                .show(ui, |ui| {
+                                    ui.set_min_width(ui.available_width());
+                                    ui.label(RichText::new(&self.message).strong());
+                                });
+                        });
+                    ui.painter().rect_stroke(
+                        panel.response.rect.shrink(3.0),
+                        15,
+                        Stroke::new(1.0_f32, Color32::from_rgb(255, 253, 232)),
+                        egui::StrokeKind::Inside,
+                    );
+                    ui.add_space(8.0);
+                    ui.label(
+                        RichText::new(
+                            "A non-commercial fan revival · not affiliated with Daybreak or Sony.",
+                        )
+                        .size(13.0)
+                        .color(Color32::from_rgb(220, 225, 182)),
                     );
                 });
             });
@@ -463,6 +521,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     diagnostics::init()?;
     let mut screenshot = None;
     let mut settings_page = false;
+    let mut window_size = [940.0, 790.0];
     let mut args = std::env::args_os().skip(1);
     while let Some(arg) = args.next() {
         if arg == "--screenshot" {
@@ -472,9 +531,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         } else if arg == "--settings-page" {
             settings_page = true;
+        } else if arg == "--window-size" {
+            let size = args
+                .next()
+                .and_then(|s| s.into_string().ok())
+                .ok_or("--window-size requires WIDTHxHEIGHT in logical points.")?;
+            let (width, height) = size
+                .split_once('x')
+                .ok_or("--window-size requires WIDTHxHEIGHT in logical points.")?;
+            let settings = LaunchSettings {
+                width: width.parse()?,
+                height: height.parse()?,
+            };
+            settings.validate()?;
+            window_size = [settings.width as f32, settings.height as f32];
         } else {
             return Err(
-                "Usage: osfr-launcher [--settings-page] [--screenshot existing-folder/output.png]"
+                "Usage: osfr-launcher [--settings-page] [--window-size WIDTHxHEIGHT] [--screenshot existing-folder/output.png]"
                     .into(),
             );
         }
@@ -493,8 +566,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([940.0, 790.0])
-            .with_min_inner_size([720.0, 620.0])
+            .with_inner_size(window_size)
+            .with_min_inner_size([640.0, 480.0])
             .with_title("Free Realms Expanded — Launcher"),
         renderer: eframe::Renderer::Glow,
         ..Default::default()

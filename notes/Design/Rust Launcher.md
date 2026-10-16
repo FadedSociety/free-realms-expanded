@@ -2,13 +2,17 @@
 type: design
 task: W86
 updated: 2026-10-16
-status: W86b build, tests and window captures proven; full launcher partly proven
+status: W86c skin, build, 13 tests and window captures proven; full launcher partly proven
 plan: Build Plan 3.5 and 1.7
 ---
 
 # Rust Launcher
 
 W86 supplies a standalone `project/launcher/` crate and the toolkit decision.
+**W86c applies the 2008–09 portal skin:** rounded Lilita One display text,
+forest backdrop, warm bevelled panels, glossy green pills, orange selected tabs,
+explicit focus rings and painted status pips. Build, 13 tests and six renderer
+captures pass. The before/after audit and remaining gaps are recorded below.
 **W86b now builds and opens the Rust UI on this Windows machine.** Offline build,
 12 tests and both running-window screenshot gates pass; see the W86b evidence
 below. W86's initial cache failure is retained as historical evidence. No game
@@ -484,3 +488,185 @@ Ponytail: reused Glow, the existing image decoder/PNG encoder, std filesystem an
 process APIs, cached `log`, and the private Cargo wrapper. Deliberately did not
 build a WGPU fallback, custom renderer/capture framework, downloader, installer,
 new auth route or game-client changes.
+
+## W86c portal skin, 2026-10-16
+
+**Verdict: PROVEN for the scoped styling/build/test/capture gates.** Independent
+lead visual review and physical controller acceptance remain open. The existing
+banner has no separate redistribution grant recorded; this remains an inherited
+packaging question, not a new art licence claim. Full Build Plan 3.5 is still
+partly proven.
+
+Owned changes: `launcher/src/main.rs`, new `launcher/src/theme.rs`,
+`launcher/DEPENDENCIES.md`, `launcher/README.md`, six files under
+`launcher/assets/fonts/`, and this note. Requested private evidence is under
+`lab/reports/rust-launcher-20261016/`, including `before-after.md` and
+`receipt.json`. No manifests, launch core, controller mapping, diagnostics,
+gateway, saves, release binaries or shared Plan/Ledger were edited. The lead
+owns their integration updates. No native game client was launched.
+
+### Redesign-skill audit: before and after
+
+Reference before: `lab/reports/rust-launcher-20261015/launcher.png` and
+`settings.png`; project direction: `docs/images/banner.png` and
+`lab/runs/banner/prompt-v6.md:1-16`. Applied redesign-skill's scan, diagnosis and
+targeted fix sequence in the existing egui/eframe stack. the owner's Build Plan
+rule 5 takes precedence over generic advice to reduce saturation or ornaments.
+
+| Audit area | Before | W86c result / evidence |
+|---|---|---|
+| Typography | Thin default heading and body with little hierarchy | Bundled OFL Lilita One at 30/26 pt for display headings and 20/32 pt button captions; existing Ubuntu body at 16 pt, Hack address at 14 pt. Native captures show the distinction. |
+| Colour and surfaces | Cream window behind an otherwise finished banner; flat olive rectangle | Forest green canvas, warm paper panels, gold edge and inner light bevel, tinted lower shadow; saturated green pills with top gloss and caption shadow. Orange selected tabs echo the banner vines. |
+| Layout | Banner dominated the height; settings could become dense | Aspect ratio preserved; banner height capped by available viewport height, smaller on Settings. Content width capped at 1080 logical points. Compact spacing below 650 logical points; solid scrollbar for overflow. |
+| Realm rows | Name-only selection, address beside it, missing dot glyph | Entire name/address button selects the row; name/address wrap inside the row. Selected text and green border supplement colour. Painted amber pip plus “Status pending” avoids font-dependent symbols and does not imply a live server probe. |
+| Hover / pressed / focus / disabled | Toolkit styles and pale disabled Play | 120 ms highlight, pressed bevel offset, explicit orange/cream focus rings, desaturated readable disabled pills. Keyboard/controller confirm still uses egui Button. The new canary proves the focus ring cannot silently disappear. |
+| Forms and readability | Generic text fields and dimension controls | Rounded warm fields, orange active/focus border, readable body-font dimensions, wrapping preset row. Retained endpoint/path limits and window-size bounds. |
+| Content and states | Implementation detail mixed into form body | Local login preview stays explicit; developer explanations moved to existing control tooltips. Session-only settings and backup note remain. Preparing/running labels distinguish those disabled Play states. Existing inline validation messages retained. |
+| Small window | Minimum 720 x 620 logical points | Minimum 640 x 480, scrolling available. At 1280 x 800 physical pixels, Play and Settings' Back are fully visible; bottom status/footer may require scrolling. Default 940 x 790 shows all ordinary controls. |
+
+A first draft showed default headings despite setting the style in AppCreator.
+egui stores separate Light/Dark styles; the OS theme can arrive after creation.
+Setting both styles fixes the cause and is covered by the new test. First
+compact capture clipped Play; the final compact spacing and banner cap correct
+that. Draft captures are retained privately, not acceptance evidence.
+
+### Provenance and licences
+
+No original client function, protocol fact or server rule was recovered for
+W86c. All skin geometry and responsive thresholds are reconstructed launcher
+policy (R), documented in `theme.rs`. The unchanged project banner supplies the
+starburst and orange vines; no additional image generation, real-promo cut-outs
+or asset extraction was used.
+
+Lilita One Regular and its complete SIL OFL 1.1 notice were fetched through the
+connected GitHub reader from `google/fonts/ofl/lilitaone/`. Content-addressed
+blobs are `fdec368cbd478e437f0476a538c3868723aed296` (font) and
+`055594f2f330e835940070f2d5944a2331c7c299` (notice). Font SHA-256:
+`f5b641c45c69d772ee4eda687bc9fda411d5cad6b0b45371491da4580cbc8d59`.
+Shell download attempts failed because its network proxy was unavailable; no
+proxy bypass or tool installation was attempted. All four existing egui font
+notices were copied from cached `epaint_default_fonts-0.33.3/fonts/`. The complete
+font/asset inventory and source links are in `launcher/DEPENDENCIES.md`.
+
+Code memory was checked at generation `2026-10-16T01:56:50Z`; launcher sources
+were `not_tracked`. Direct source reads supplied the evidence instead. No graph
+absence claim or unrelated server-gap claim was made.
+
+### Commands and results
+
+All commands below ran from `project`. The existing build script calls
+`scripts/cargo.ps1`, with its locked offline dependency set, gnullvm target and
+static runtime. Target directory remained `lab/build/w86b/target`.
+
+```text
+./launcher/build.ps1 build
+Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.43s
+exit 0, no warnings
+
+./launcher/build.ps1 test
+src/lib.rs:  test result: ok. 8 passed; 0 failed; 0 ignored
+src/main.rs: test result: ok. 5 passed; 0 failed; 0 ignored
+Doc-tests:   test result: ok. 0 passed; 0 failed
+exit 0
+```
+
+New test: `theme::tests::skin_survives_theme_changes_and_buttons_keep_keyboard_semantics`.
+It switches both themes, requests real egui focus, checks the painted focus ring,
+confirms with the controller's Space event, and verifies disabled buttons ignore
+confirm. Existing controller and eight preparation/security tests still pass.
+
+Canary: temporarily changed `if response.has_focus()` to
+`if false && response.has_focus()`, ran `./launcher/build.ps1 test`, and restored
+the original source in `finally` before rebuilding:
+
+```text
+theme::tests::skin_survives_theme_changes_and_buttons_keep_keyboard_semantics ... FAILED
+controller/keyboard focus must paint its orange ring
+test result: FAILED. 4 passed; 1 failed
+CANARY_EXIT=101
+```
+
+The subsequent final build/test above passed on the restored source.
+
+Running-window captures used this exact executable:
+`lab/build/w86b/target/x86_64-pc-windows-gnullvm/debug/osfr-launcher.exe`.
+For each command, PowerShell `Start-Process -WindowStyle Hidden -PassThru` and
+`WaitForExit(25000)` bounded the owned launcher process; each exited 0. The
+application saved its own framebuffer and closed. No desktop capture was used.
+
+```text
+osfr-launcher.exe --screenshot <report>/launcher.png
+osfr-launcher.exe --settings-page --screenshot <report>/settings.png
+osfr-launcher.exe --window-size 853x533 --screenshot <report>/launcher-1280x800.png
+osfr-launcher.exe --window-size 853x533 --settings-page --screenshot <report>/settings-1280x800.png
+osfr-launcher.exe --window-size 1280x800 --screenshot <report>/launcher-desktop.png
+osfr-launcher.exe --window-size 1280x800 --settings-page --screenshot <report>/settings-desktop.png
+```
+
+`<report>` is the absolute `lab/reports/rust-launcher-20261016` directory. The
+new optional `--window-size` accepts only integer logical dimensions and reuses
+`LaunchSettings::validate`; the default size remains 940 x 790. On this PC's
+150% scaling the first pair is 1410 x 1185 pixels, the compact pair 1280 x 800,
+and the logical-desktop pair 1920 x 1200. All six final captures were opened and
+visually inspected. `receipt.json` pins PNG sizes/hashes, source hashes and the
+executable hash.
+
+```text
+launcher.png          1410 x 1185   934931 bytes
+settings.png          1410 x 1185   749962 bytes
+launcher-1280x800.png  1280 x 800    459998 bytes
+settings-1280x800.png  1280 x 800    421005 bytes
+launcher-desktop.png  1920 x 1200  1014011 bytes
+settings-desktop.png  1920 x 1200   824260 bytes
+
+osfr-launcher.exe --window-size invalid
+exit 1: --window-size requires WIDTHxHEIGHT in logical points.
+osfr-launcher.exe --window-size 1x1
+exit 1: Window size must be 640–3840 by 480–2160.
+osfr-launcher.exe --screenshot <existing launcher.png>
+exit 1: Screenshot needs an unused PNG path in an existing output folder.
+Existing capture SHA-256 unchanged.
+
+private rustfmt.exe --edition 2024 --check launcher/src/main.rs launcher/src/theme.rs
+exit 0
+git diff --check -- launcher "notes/Design/Rust Launcher.md"
+exit 0
+```
+
+### Secure Code Guardian threat model and Security Reviewer self-pass
+
+Scope: presentation, existing local endpoint/path widgets and the new local
+window-size argument. Threats are accidentally enabling Play during capture,
+bypassing field limits while replacing controls, malformed sizes, leaking form
+content, and runtime font/network loading. There is no new network surface.
+`play()` still independently refuses screenshot runs; both Play guards, limits,
+existing endpoint validation, sixteen-realm cap and preparation thread remain.
+
+Automated `rg` searches of the owned diff covered writes, paths, processes,
+network, secrets, tokens and unsafe code before manual review of every changed
+branch. No installed semgrep, gitleaks or cargo-audit was found; this is a self
+review, not a transitive-dependency audit or the lead's independent review.
+
+| Severity | Finding / resolution |
+|---|---|
+| Low, prevented | Presentation-only disabled state could allow keyboard/controller activation. Retained egui `add_enabled`, the existing handler guard, and verified disabled confirm in the new test. |
+| Low, prevented | Arbitrary dimensions could create an unusable/pathological review window. Integer parsing and existing 640–3840 / 480–2160 bounds reject malformed/out-of-range values before UI startup; process checks exit 1. |
+| Info | All fonts are embedded, field contents are never passed to the painter as executable markup, and no new logs, external calls, file writes or listeners were added. Existing exclusive PNG creation/refusal is verified again. |
+| No unresolved security finding in the owned diff | Core login, file preparation and controller implementation are unchanged. Inherited launcher/distribution gaps above remain. |
+
+### Open gaps and handoff
+
+- Lead independent art/focus review and physical controller navigation have not
+  been performed. The connected-device label is enumeration, not button proof.
+- At 1280 x 800 physical pixels with 150% scaling, lower Settings status/footer
+  uses the visible scrollbar; Play and Back remain visible. Real handheld
+  hardware/DPI and unusual accessibility scaling were not tested.
+- Existing banner redistribution rights and the full runtime/transitive
+  packaging audit remain open. All font notices for this binary are included.
+- No client launch, server status implementation, authentication integration,
+  patcher, release or fresh-PC acceptance is claimed by this styling task.
+
+Ponytail: reused the existing banner, egui Button/focus/accessibility/scrolling,
+default body fonts, controller flow, PNG capture, image crate and build script.
+Deliberately did not build a new renderer, navigation manager, asset-generation
+pipeline, theme framework, downloader, auth code or dependency.
