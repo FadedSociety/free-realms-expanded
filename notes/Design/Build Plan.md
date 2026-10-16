@@ -102,6 +102,8 @@ The remaining dungeons, housing (missing scene assets), pets, mounts (including 
 
 ## Update log
 
+- **2026-10-16, quest audit (W92, for 2.4/2.5):** `scripts/quest_audit.py` classifies all 653 regional quests (639 hollow). Talk is the largest class the routed engine already supports (86, 74 hollow); 8 talk referrals staged privately in `lab/reports/quest-audit-20261016/review/`, 3 bot-completed on scratch gateways. Classes are text inference (R). Not merged into the play content; see [[Research/Quest Audit]].
+
 - **2026-10-16, T3 application fuzz (W90), PARTLY:** `tests/app_fuzz.rs` drives ~19k mutated messages through the real gateway (10/10 routed labels, 30/30 selectors); no parser panic. Its one finding (Low: a Mystery Chest Use for an unknown instance cancelled another chest's pending confirmation) is fixed in `mystery_chest_loot.rs`, and the reproducer is now a live test. Open: social parsing through the CLI's private `Session::dispatch_message`.
 - **2026-10-16, scale note (lead):** 1000 concurrent players is not supported. Caps are 16 sessions; `PlayerRegistry` recomputes every visible set (O(N²)) twice per pose update on one receive loop; `ActionBudgets` tracks at most 1,024 accounts. Needs a spatial interest grid, configurable caps and a bot load test before any large playtest.
 
