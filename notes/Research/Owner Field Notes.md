@@ -114,3 +114,8 @@ Observations the owner gathers from original-game videos and screenshots. They a
 - Each job skill unlocks at a job level. Medic: **First Aid at level 1** (the core heal), **Target Vitals at 5**, **Vitamins at 10**, **Shock Paddles at 15**. This matches the Medic job guide and the client's ability text.
 - Weapon abilities (Incision, Triage on the Student Medic Hammer) come with the weapon, not the job level.
 - Build rule: every job skill in `data/content/job_abilities.json` carries a minimum job level, enforced against the player's level for that job before the skill goes on the bar.
+
+### Original launcher look (the owner, 2026-10-16)
+- **Animated title:** the original Free Realms launcher's "Free Realms" wordmark was animated, with vines flowing out of it.
+- **Frames with raised edges:** UI parts were "3D but not completely 3D": frames wrapping text had a raised, bumpy rim ("braille bump style") around their edges.
+- Not in the client files: the client's own `Free_Realms_Logo.dds` is the plain orange wordmark with a glow, and the launcher (SOE LaunchPad) was a separate download. No screenshot found online yet (2026-10-16 search), so this note is the evidence. Lead's reading of "braille bump" is (R) until the owner confirms it.

@@ -2,7 +2,7 @@
 
 ## Now (2026-10-15)
 
-**Active play package (2026-10-16): `lab/reports/round70-native-20261016T061000Z`** (round69 plus W82 starter outfits for 14 jobs and W85 Ninja/Warrior/Wizard basic attacks; Capo's save carried over; account 2 is the test bot "Buddy Botsworth"). Run it with `run-local-baseline.py --rust-reference lab/references/rust-gateway-reference --state-file <pkg>/character.json --content <pkg>/content --native-login --identity-file <pkg>/identity.json --journal-text lab/references/opening-native-lobby-20261009T163603Z --dev-tools [--gamepad]`. round69 stays as the frozen previous package.
+**Active play package (2026-10-16): `lab/reports/round70-native-20261016T061000Z`** (round69 plus W82 starter outfits for 14 jobs and W85 Ninja/Warrior/Wizard basic attacks; since 2026-10-16 also `content/item-catalogue.json` = W84's generated catalogue, sha256 76394d87…, loaded by W88; Capo's save carried over; account 2 is the test bot "Buddy Botsworth"). Run it with `run-local-baseline.py --rust-reference lab/references/rust-gateway-reference --state-file <pkg>/character.json --content <pkg>/content --native-login --identity-file <pkg>/identity.json --journal-text lab/references/opening-native-lobby-20261009T163603Z --dev-tools [--gamepad]`. round69 stays as the frozen previous package.
 
 **Read [[Design/Build Ledger]] for the verified state of every system and [[Design/Build Plan]] for what comes next.** Both were rebuilt on 2026-10-15 from the code and the newest native reviews. Everything below this section is historical, up to 10-10.
 
