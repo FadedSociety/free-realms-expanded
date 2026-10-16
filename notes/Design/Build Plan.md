@@ -13,7 +13,14 @@ The single living plan from **2026-10-15** onward. The verified current state of
 1. **Verify before you plan.** Before scheduling or claiming a gap, check the code (what is routed) and the newest native review. Notes go stale; the 10-13 ledger did.
 2. **Update after every milestone, integration or native run.** Tick the item, add a line to the [[#Update log]], and update the [[Build Ledger]] row. The same goes for [[Current Progress]].
 3. **Every task has gates:** runnable checks that prove it is done, such as a test name, a bot script, or a native check with a run id. "Tests pass" alone is not a gate. A module that isn't routed isn't done.
-4. **Workers:** Sol (`gpt-6.1-sol`, about Astra level) does research, design and review. Luna (`gpt-6-luna`) does tightly scoped builds. Run 6–10 at a time, sized to what the lead can review and integrate. Workers own only the paths named in their task. The lead integrates, wires routes and runs native checks.
+4. **Security gates** (the owner, 2026-10-15: "make sure it's actually secure"). Every task that touches the network, logins, passwords, roles, saves or file paths:
+   - is built with the `secure-code-guardian` skill;
+   - passes a `security-reviewer` audit before integration, with findings fixed or logged;
+   - starts from a threat model.
+
+   Studio and dev tools stay loopback-only and admin-only. Nothing is exposed beyond this PC until M1's threat model ([[Security Model]]) is written and reviewed.
+5. **Look and feel:** project visuals follow the 2008–09 Flash-portal art direction (see the README banner). The `taste-skill` house style bans gradients, shadows and ornaments, which conflicts with that look. Use it only for plain pages such as docs and Studio; use `redesign-skill` audits for launcher readability.
+6. **Workers:** Sol (`gpt-6.1-sol`, about Astra level) does research, design and review. Luna (`gpt-6-luna`) does tightly scoped builds. Run 6–10 at a time, sized to what the lead can review and integrate. Workers own only the paths named in their task. The lead integrates, wires routes and runs native checks.
 
 ## Goal: playtest night (M4)
 
@@ -41,6 +48,7 @@ Gate: two real clients on two PCs see each other move with real appearances, cha
 
 | # | Work | Owner | Gate |
 |---|---|---|---|
+| 1.0 | **Security model first:** a threat model for exposing login and gateway beyond loopback (packet fuzzing and malformed input, login brute force, ticket replay, impersonating another session, flooding, save tampering, Studio exposure). Uses `security-reviewer` plus `secure-code-guardian`. | Sol → lead | `notes/Design/Security Model.md` reviewed; 1.1 to 1.5 cite it |
 | 1.1 | Remote connections: a `--bind` option for non-loopback addresses on login and gateway, plus the matching launcher option | Lead | A second PC on the LAN reaches character select |
 | 1.2 | Login for many players: several concurrent sessions and accounts, simple per-account credentials, a real native test of the HMAC ticket path | Sol design → Luna build → lead | Two clients log in at once with different accounts |
 | 1.3 | Real AddPc: appearance, name, equipment and job from self data; keep the position relay's state bytes | Sol research (AddPc layout from the native map) → Luna | Native: the other player renders correctly and animates |
@@ -87,6 +95,8 @@ Run it, collect bug reports and field notes, and feed them back into this plan.
 The remaining dungeons, housing (missing scene assets), pets, mounts (including the community "Mounts and Pets" update, licence check first), fishing, soccer, chess, derby, the card game, the guild, trade and matchmaking routes, a native Rust 3D editor (whose renderer becomes the Rust client), a database for saves, public hosting, and restarting the native map (6 stuck shards to reset).
 
 ## Update log
+
+- **2026-10-15 (later):** Installed 17 MIT skills for Claude and Codex (security, Rust, review, testing, operations, design; provenance in `lab/downloads/skills-20261015/PROVENANCE.md`). Added the security gates rule and item 1.0 (security model before any non-loopback exposure).
 
 - **2026-10-15 (later):** Confirmed there is no player-facing launcher. Added 1.7 (minimal launcher in M1) and expanded 3.5 (full launcher). README rewritten; the banner art is being redone in real Free Realms promo style using client art as references.
 
