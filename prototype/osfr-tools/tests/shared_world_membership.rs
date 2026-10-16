@@ -31,6 +31,10 @@ use std::{
 };
 const VERSION: &str = "synthetic.1";
 const HANDOFF_KEY: &[u8] = b"synthetic-handoff-key";
+// Upper bound for "the server gets to it", not a pace: waits return as soon as their condition
+// holds. A loaded machine (parallel cargo builds and test binaries) can starve the gateway thread
+// for seconds, so no wait in this file is sized by how long an idle machine takes.
+const PATIENCE: Duration = Duration::from_secs(30);
 
 type HostAction = Box<dyn FnOnce(&mut Server) + Send>;
 struct Fixture {
@@ -131,7 +135,7 @@ impl Fixture {
     }
 
     fn ready(&self, guid: u64, a: &mut bot::Bot, b: &mut bot::Bot) -> [Vec<Vec<u8>>; 2] {
-        let deadline = Instant::now() + Duration::from_secs(3);
+        let deadline = Instant::now() + PATIENCE;
         let mut messages = [Vec::new(), Vec::new()];
         let mut load_sent = false;
         loop {
@@ -174,6 +178,27 @@ fn collect(a: &mut bot::Bot, b: &mut bot::Bot, interval: Duration) -> [Vec<Vec<u
         }
     }
     out
+}
+
+/// Collect into `acc` until `done` holds (or PATIENCE), then keep listening briefly so a
+/// duplicate delivery still shows up in the exact-count assertions that follow.
+fn settle(
+    a: &mut bot::Bot,
+    b: &mut bot::Bot,
+    acc: &mut [Vec<Vec<u8>>; 2],
+    done: impl Fn(&[Vec<Vec<u8>>; 2]) -> bool,
+) {
+    let deadline = Instant::now() + PATIENCE;
+    while !done(acc) && Instant::now() < deadline {
+        let batch = collect(a, b, Duration::from_millis(20));
+        for i in 0..2 {
+            acc[i].extend(batch[i].clone());
+        }
+    }
+    let grace = collect(a, b, Duration::from_millis(500));
+    for i in 0..2 {
+        acc[i].extend(grace[i].clone());
+    }
 }
 
 fn is_sub(message: &[u8], family: u16, sub: u16) -> bool {
@@ -242,17 +267,15 @@ fn group_request(accept: bool) -> Vec<u8> {
     out.extend([0; 20]);
     out
 }
-fn assert_chat(messages: &[Vec<u8>], sequence: u64) {
-    let rows: Vec<_> = messages
+fn chat_count(messages: &[Vec<u8>], sequence: u64) -> usize {
+    messages
         .iter()
         .filter_map(|m| social_chat::decode_packet_chat(m).ok())
-        .collect();
-    assert_eq!(
-        rows.iter()
-            .filter(|row| row.sender_guid == 101 && row.message == sequence.to_string())
-            .count(),
-        1
-    );
+        .filter(|row| row.sender_guid == 101 && row.message == sequence.to_string())
+        .count()
+}
+fn assert_chat(messages: &[Vec<u8>], sequence: u64) {
+    assert_eq!(chat_count(messages, sequence), 1);
 }
 
 #[test]
@@ -272,30 +295,27 @@ fn two_bot_socket_membership_and_transfer() {
             "1",
         )
         .unwrap();
-        bot.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        bot.wait_for(PATIENCE, |_| true).unwrap();
         bot.send_message(&packet(13, &[]), "13").unwrap();
-        bot.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        bot.wait_for(PATIENCE, |_| true).unwrap();
     }
     a.send_message(&packet(10, &[]), "10").unwrap();
     f.ready(101, &mut a, &mut b);
     b.send_message(&packet(10, &[]), "10").unwrap();
     let mut public = f.ready(202, &mut a, &mut b);
-    let tail = collect(&mut a, &mut b, Duration::from_millis(500));
-    for i in 0..2 {
-        public[i].extend(tail[i].clone());
-    }
+    settle(&mut a, &mut b, &mut public, |m| {
+        actor_packets(&m[0], 1, 202) >= 1 && actor_packets(&m[1], 1, 101) >= 1
+    });
     assert_eq!(actor_packets(&public[0], 1, 202), 1);
     assert_eq!(actor_packets(&public[1], 1, 101), 1);
     assert_eq!(f.host(|s| s.test_location(101).unwrap().1), 0);
     // A real family-40 party, not an injected social state.
     a.send_message(&bot::wrap(&group_request(false)), "40/1")
         .unwrap();
-    b.wait_for(Duration::from_secs(3), |m| is_sub(m, 40, 1))
-        .unwrap();
+    b.wait_for(PATIENCE, |m| is_sub(m, 40, 1)).unwrap();
     b.send_message(&bot::wrap(&group_request(true)), "40/4")
         .unwrap();
-    a.wait_for(Duration::from_secs(3), |m| is_sub(m, 40, 2))
-        .unwrap();
+    a.wait_for(PATIENCE, |m| is_sub(m, 40, 2)).unwrap();
     let (i1, i2) = f.host(|s| (s.test_child(), s.test_child()));
     assert_ne!(i1, i2);
     f.host(move |s| s.test_transfer(101, i1, false)).unwrap();
@@ -327,7 +347,12 @@ fn two_bot_socket_membership_and_transfer() {
         "125",
     )
     .unwrap();
-    let moved = collect(&mut a, &mut b, Duration::from_millis(500));
+    // The positions are the server-side proof that both move requests were handled.
+    let mut moved = Default::default();
+    settle(&mut a, &mut b, &mut moved, |_| {
+        f.host(|s| s.test_location(101).unwrap().0.position) == [2.0, 0.0, 0.0]
+            && f.host(|s| s.test_location(202).unwrap().0.position) == [0.0, 0.0, 0.0]
+    });
     assert!(
         !moved[0]
             .iter()
@@ -350,7 +375,10 @@ fn two_bot_socket_membership_and_transfer() {
     );
     a.send_message(&bot::wrap(&chat(ChatChannel::Say, 108001)), "15/1")
         .unwrap();
-    let local = collect(&mut a, &mut b, Duration::from_millis(500));
+    let mut local = Default::default();
+    settle(&mut a, &mut b, &mut local, |m| {
+        chat_count(&m[0], 108001) >= 1
+    });
     assert_chat(&local[0], 108001);
     assert!(!local[1].iter().any(|m| is_sub(m, 15, 1)));
     let quick = social_chat::encode_quick_chat_channel(
@@ -363,18 +391,40 @@ fn two_bot_socket_membership_and_transfer() {
     )
     .unwrap();
     a.send_message(&bot::wrap(&quick), "67/3").unwrap();
-    let local = collect(&mut a, &mut b, Duration::from_millis(500));
+    let mut local = Default::default();
+    settle(&mut a, &mut b, &mut local, |m| {
+        m[0].iter().any(|m| is_sub(m, 67, 3))
+    });
     assert_eq!(local[0].iter().filter(|m| is_sub(m, 67, 3)).count(), 1);
     assert!(!local[1].iter().any(|m| is_sub(m, 67, 3)));
     for (channel, seq) in [(ChatChannel::Group, 222222), (ChatChannel::Tell, 333333)] {
         a.send_message(&bot::wrap(&chat(channel, seq)), "15/1")
             .unwrap();
-        let messages = collect(&mut a, &mut b, Duration::from_millis(500));
+        let mut messages = Default::default();
+        settle(&mut a, &mut b, &mut messages, |m| {
+            chat_count(&m[1], seq) >= 1
+        });
         assert_chat(&messages[1], seq);
     }
     let before = f.host(|s| s.test_location(202).unwrap());
     let save_path = f.root.join("characters/202.json");
-    let saved = fs::read(&save_path).unwrap();
+    // B's move was a pose-only change; the gateway defers that save by up to POSITION_SAVE_MS
+    // ((R), 5 s). Wait for that write first, so `saved` is the settled file and the byte
+    // comparison below can only fail if a rejected transfer wrote something.
+    let flush_deadline = Instant::now() + PATIENCE;
+    let saved = loop {
+        let bytes = fs::read(&save_path).unwrap_or_default();
+        if serde_json::from_slice::<serde_json::Value>(&bytes)
+            .is_ok_and(|doc| doc["character"]["position"] == json!([0.0, 0.0, 0.0]))
+        {
+            break bytes;
+        }
+        assert!(
+            Instant::now() < flush_deadline,
+            "deferred pose save never reached disk"
+        );
+        collect(&mut a, &mut b, Duration::from_millis(50));
+    };
     // A forged encounter reply carrying another instance is not entry authorization.
     let mut forged = vec![41, 0, 103, 0];
     forged.extend(0i32.to_le_bytes());
@@ -397,10 +447,9 @@ fn two_bot_socket_membership_and_transfer() {
     );
     f.host(move |s| s.test_transfer(202, i1, false)).unwrap();
     let mut together = f.ready(202, &mut a, &mut b);
-    let tail = collect(&mut a, &mut b, Duration::from_millis(500));
-    for i in 0..2 {
-        together[i].extend(tail[i].clone());
-    }
+    settle(&mut a, &mut b, &mut together, |m| {
+        actor_packets(&m[0], 1, 202) >= 1 && actor_packets(&m[1], 1, 101) >= 1
+    });
     assert_eq!(actor_packets(&together[0], 1, 202), 1);
     assert_eq!(actor_packets(&together[1], 1, 101), 1);
     let row = f.host(|s| s.test_location(202).unwrap());
@@ -408,7 +457,10 @@ fn two_bot_socket_membership_and_transfer() {
     assert_eq!(row.3, BTreeSet::from([101, 202]));
     a.send_message(&bot::wrap(&chat(ChatChannel::Say, 444444)), "15/1")
         .unwrap();
-    let local = collect(&mut a, &mut b, Duration::from_millis(500));
+    let mut local = Default::default();
+    settle(&mut a, &mut b, &mut local, |m| {
+        chat_count(&m[1], 444444) >= 1
+    });
     assert_chat(&local[1], 444444);
     println!(
         "public mutual AddPc; child isolation; movement/say/quick isolation; cross-instance party/tell; rollback; same-scene reunion: passed"

@@ -20,8 +20,8 @@ use osfr_tools::social_chat::{
     QuickChatRequest, SpamGate,
 };
 use osfr_tools::social_lists::{
-    CharacterIdentity as SocialIdentity, CharacterLookup, SocialLists, SocialMessage, SocialName,
-    SocialService,
+    CharacterIdentity as SocialIdentity, CharacterLookup, LocationRequest, MapSpot, SocialLists,
+    SocialMessage, SocialName, SocialService, parse_location_request,
 };
 use osfr_tools::soe::{
     CUMULATIVE_ACK, Codec, RELIABLE_DATA, RELIABLE_FRAGMENT, ReliableReceiver, SELECTIVE_ACK,
@@ -629,6 +629,27 @@ impl SharedWorld {
             recipient: *recipient,
             bytes: wrap_application(&message.bytes),
         })
+    }
+
+    /// (R) Where each joined character stands, read from the authenticated player registry.
+    /// `in_battle` stays false until the world tracks it; battles run in their own instance.
+    fn map_spots(&self) -> BTreeMap<u64, MapSpot> {
+        self.active_sessions
+            .iter()
+            .filter_map(|(guid, session)| {
+                let player = self.players.get(*session)?;
+                Some((
+                    *guid,
+                    MapSpot {
+                        zone_id: player.zone.zone_id,
+                        instance_id: player.zone.instance_id,
+                        in_battle: false,
+                        x: player.position[0],
+                        z: player.position[2],
+                    },
+                ))
+            })
+            .collect()
     }
 
     fn refresh_group_ids(&mut self) {
@@ -1734,6 +1755,9 @@ impl Session {
         if inner.starts_with(&[67, 0, 2, 0]) || inner.starts_with(&[67, 0, 3, 0]) {
             return self.route_quick_chat(inner, world);
         }
+        if let Some(request) = parse_location_request(inner) {
+            return self.route_location(request, world);
+        }
         let Ok(Some(request)) = parse_social_request(inner) else {
             return Vec::new();
         };
@@ -1794,6 +1818,32 @@ impl Session {
             SocialRequest::GroupKick(guid) => {
                 world.social.kick_from_group(self.character_guid, guid)
             }
+        };
+        messages
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|message| world.social_delivery(message))
+            .collect()
+    }
+
+    /// 26/21, 40/14 and 40/16. The actor is `self.character_guid`; the body never names anyone.
+    fn route_location(
+        &mut self,
+        request: LocationRequest,
+        world: &mut SharedWorld,
+    ) -> Vec<Delivery> {
+        let spots = world.map_spots();
+        let spot_of = |guid| spots.get(&guid).copied();
+        let guid = self.character_guid;
+        let messages = match request {
+            LocationRequest::FriendPositions => world
+                .social
+                .friend_positions(guid, spot_of)
+                .map(|reply| reply.into_iter().collect()),
+            LocationRequest::ChangingJob(changing) => {
+                world.social.group_changing_job(guid, changing)
+            }
+            LocationRequest::MapPing { x, z } => world.social.group_map_ping(guid, x, z, spot_of),
         };
         messages
             .unwrap_or_default()

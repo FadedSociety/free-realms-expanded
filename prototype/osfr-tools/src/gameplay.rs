@@ -95,6 +95,9 @@ pub struct GameplayState {
     /// Attuned warpstones (W142). Absent until the first attunement.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub warpstones: Option<piece_077::WarpState>,
+    /// The four-slot item bar (W146). Absent until something is bound.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub item_bar: Option<crate::item_bar::ItemBar>,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -166,6 +169,7 @@ pub struct Gameplay {
     learned_recipes: BTreeSet<u32>,
     /// Warpstone attunement and travel cooldowns (W142).
     warp: piece_077::WarpRegistry,
+    item_bar: crate::item_bar::ItemBar,
 }
 
 #[derive(Default)]
@@ -396,6 +400,10 @@ impl Gameplay {
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
+        let item_bar = crate::item_bar::ItemBar::load(
+            directory,
+            state.as_ref().and_then(|s| s.item_bar.clone()),
+        )?;
         let (
             inventory,
             quests,
@@ -820,6 +828,7 @@ impl Gameplay {
             recipe_catalog,
             learned_recipes,
             warp,
+            item_bar,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -1896,6 +1905,7 @@ impl Gameplay {
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
+            item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
         }
     }
 
@@ -2195,6 +2205,7 @@ impl Gameplay {
             let mut out = self.initialization(character.position)?;
             self.append_npc_quest_login_sync(&mut out)?;
             self.append_warp_definitions(character, &mut out);
+            self.append_item_bar(now_ms, &mut out)?;
             return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
@@ -2281,6 +2292,7 @@ impl Gameplay {
         self.append_journal_updates(&before, &mut out)?;
         self.append_npc_quest_login_sync(&mut out)?;
         self.append_warp_definitions(character, &mut out);
+        self.append_item_bar(now_ms, &mut out)?;
         Ok(out)
     }
 
@@ -4408,6 +4420,11 @@ impl Gameplay {
             }
             return Ok(out);
         }
+        // Item bar (42/6, 42/9, 42/15 and 42/16 for bar items, 36/10 on bar 2) before the chest
+        // route and the shared 42 branch; a 36/10 on any other bar still reaches unsupported_cast.
+        if let Some(result) = self.handle_item_bar(inner, character, now_ms)? {
+            return Ok(result);
+        }
         if let Some(result) = self.handle_mystery_chest(inner, character.guid)? {
             return Ok(result);
         }
@@ -5473,6 +5490,49 @@ impl Gameplay {
             return None;
         }
         Some(encounter_id)
+    }
+
+    /// W146: the four item-bar slots (38/25 at world entry).
+    fn append_item_bar(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        out.replies
+            .extend(self.item_bar.refresh(&self.inventory, now_ms)?);
+        Ok(())
+    }
+
+    /// W146: item-bar requests. The potion is consumed and the heal applied in this one call, so
+    /// the saved state never holds one without the other. Without an encounter engine the player
+    /// has no tracked health, so nothing is claimed and nothing is spent.
+    fn handle_item_bar(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let Some(encounter) = self.encounter.as_ref() else {
+            return Ok(None);
+        };
+        let player = crate::item_bar::Player {
+            guid: character.guid,
+            alive: encounter.state().player_health > 0,
+        };
+        let Some(reply) = self
+            .item_bar
+            .handle(inner, &mut self.inventory, &player, now_ms)?
+        else {
+            return Ok(None);
+        };
+        let mut out = Outcome {
+            replies: reply.replies,
+            changed: reply.changed,
+            ..Outcome::default()
+        };
+        if reply.heal_percent > 0 {
+            if let Some(encounter) = self.encounter.as_mut() {
+                out.replies
+                    .extend(encounter.heal_player_percent(reply.heal_percent));
+            }
+        }
+        Ok(Some(out))
     }
 
     fn handle_mystery_chest(

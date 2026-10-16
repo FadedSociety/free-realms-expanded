@@ -55,7 +55,10 @@ impl ActionBudgets {
         let sub = u16::from_le_bytes([header[2], header[3]]);
         if !matches!(
             (family, sub),
-            (15, 1) | (67, 2 | 3) | (26, 10 | 14 | 15 | 17 | 19 | 30) | (40, 1 | 3 | 4 | 6)
+            (15, 1)
+                | (67, 2 | 3)
+                | (26, 10 | 14 | 15 | 17 | 19 | 21 | 30)
+                | (40, 1 | 3 | 4 | 6 | 14 | 16)
         ) {
             return true;
         }

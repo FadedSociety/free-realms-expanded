@@ -2268,6 +2268,18 @@ impl EncounterEngine {
         self.god
     }
 
+    /// W146: heal the player by `percent` of maximum health (R), clamped to the maximum.
+    /// A knocked-out player is not healed. Returns the 38/1 health update.
+    pub fn heal_player_percent(&mut self, percent: u32) -> Vec<Vec<u8>> {
+        if self.state.player_health == 0 {
+            return Vec::new();
+        }
+        let gain = u64::from(self.max_health) * u64::from(percent.min(100)) / 100;
+        let health = u64::from(self.state.player_health) + gain;
+        self.state.player_health = health.min(u64::from(self.max_health)) as u32;
+        vec![player_hp(self.state.player_health, self.max_health)]
+    }
+
     /// Developer: full health and energy.
     pub fn heal_full(&mut self) -> Vec<Vec<u8>> {
         let was_down = self.state.player_health == 0;

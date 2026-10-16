@@ -41,7 +41,7 @@ in its active instance, because the production reconnect loader deliberately aba
 | social_chat | 15/1, including explicit invalid UTF-8 |
 | quick_chat | 67/2, 67/3 |
 | npc_interaction | 26/4, 6, 8, 10, 23 |
-| social_router | 26/14, 15, 17, 30; 40/1, 3, 4, 6 |
+| social_router | 26/14, 15, 17, 21, 30; 40/1, 3, 4, 6, 14, 16 |
 | quest_engine | 49/2, 49/14, including pending accept/turn-in and reward replay |
 | kart | 26/42; 33/* (2, 6, 7, 9, 10, 17, 19, 22, 65535); 41/108; 102/1 |
 | combat | 36/10 |

@@ -23,6 +23,11 @@ pub const COMMAND_FAMILY: u16 = 26;
 pub const IGNORE_FAMILY: u16 = 112;
 pub const GROUP_FAMILY: u16 = 40;
 
+/// (R) Map values share the 1,000,000 magnitude bound the other position checks use.
+pub const MAX_MAP_COORD: i32 = 1_000_000;
+/// (R) One 74/5 update never carries more than this many friends (entries are 21 bytes).
+pub const MAX_POSITION_ENTRIES: usize = 512;
+
 /// The original client has no recovered friend-list cap; this module adds no cap.
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -239,6 +244,7 @@ pub enum SocialError {
     NoPendingFriendRequest,
     InvalidGroupLimit,
     NotInGroup,
+    InvalidPosition,
 }
 
 impl std::fmt::Display for SocialError {
@@ -257,6 +263,7 @@ impl std::fmt::Display for SocialError {
             Self::NoPendingFriendRequest => "friend request is not pending",
             Self::InvalidGroupLimit => "group limit must be at least two",
             Self::NotInGroup => "character is not in a group",
+            Self::InvalidPosition => "map position is not finite or is out of bounds",
         })
     }
 }
@@ -292,6 +299,8 @@ pub struct SocialService {
     groups: BTreeMap<u32, Group>,
     member_group: BTreeMap<u64, u32>,
     group_invites: BTreeMap<u64, PendingGroupInvite>,
+    /// Volatile 40/14 state: members whose job picker is open (HUD flag at member +0xc4).
+    changing_job: BTreeSet<u64>,
 }
 
 impl SocialService {
@@ -309,6 +318,7 @@ impl SocialService {
             groups: BTreeMap::new(),
             member_group: BTreeMap::new(),
             group_invites: BTreeMap::new(),
+            changing_job: BTreeSet::new(),
         })
     }
 
@@ -814,6 +824,7 @@ impl SocialService {
         if self.member_group.contains_key(&guid) {
             out.extend(self.remove_group_member(guid, false)?);
         }
+        self.changing_job.remove(&guid);
         // (R) Friend requests are volatile and cleared when either participant disconnects.
         self.friend_requests
             .retain(|(requester, target), _| *requester != guid && *target != guid);
@@ -838,6 +849,120 @@ impl SocialService {
         self.group_invites
             .get(&guid)
             .map(|invite| (invite.group_id, invite.inviter_guid))
+    }
+
+    /// 26/21 -> 74/5 for `requester` only (R scope): mutual, online, non-ignoring friends the
+    /// host can place. Same zone and instance and not in battle gives the coordinates; any
+    /// other online friend is sent hidden so the atlas drops a stale marker. `spot_of` must read
+    /// the host's session registry, never client bytes. `None`: nothing to report.
+    pub fn friend_positions(
+        &self,
+        requester: u64,
+        spot_of: impl Fn(u64) -> Option<MapSpot>,
+    ) -> Result<Option<SocialMessage>, SocialError> {
+        let profile = self
+            .profiles
+            .get(&requester)
+            .ok_or(SocialError::MissingProfile)?;
+        let Some(here) = self
+            .online
+            .contains(&requester)
+            .then(|| spot_of(requester))
+            .flatten()
+        else {
+            return Ok(None);
+        };
+        let mut entries = Vec::new();
+        for guid in profile.friends.keys().copied() {
+            let mutual = self
+                .profiles
+                .get(&guid)
+                .is_some_and(|friend| friend.friends.contains_key(&requester));
+            if !mutual || !self.online.contains(&guid) || self.ignores_either(requester, guid) {
+                continue;
+            }
+            let Some(spot) = spot_of(guid) else { continue };
+            let visible = !spot.in_battle && spot.same_scope(&here) && spot.on_map();
+            entries.push(FriendPosition {
+                guid,
+                location: visible.then_some([spot.x, spot.z]),
+            });
+            if entries.len() == MAX_POSITION_ENTRIES {
+                break;
+            }
+        }
+        if entries.is_empty() {
+            return Ok(None);
+        }
+        Ok(Some(message(requester, encode_friend_positions(&entries)?)))
+    }
+
+    /// 40/14 -> 40/15 to the whole group, sender included (R). The flag is stored so later
+    /// 40/8 and 40/9 snapshots keep it. Repeating the current state sends nothing.
+    pub fn group_changing_job(
+        &mut self,
+        actor: u64,
+        changing: bool,
+    ) -> Result<Vec<SocialMessage>, SocialError> {
+        let group_id = self.group_of(actor).ok_or(SocialError::NotInGroup)?;
+        let members = self
+            .groups
+            .get(&group_id)
+            .ok_or(SocialError::NotInGroup)?
+            .members
+            .clone();
+        let changed = if changing {
+            self.changing_job.insert(actor)
+        } else {
+            self.changing_job.remove(&actor)
+        };
+        if !changed {
+            return Ok(Vec::new());
+        }
+        let packet = encode_group_changing_job(actor, changing);
+        Ok(members
+            .into_iter()
+            .map(|member| message(member, packet.clone()))
+            .collect())
+    }
+
+    /// 40/16 -> 40/16 to group members in the sender's zone and instance (R), sender included.
+    /// The packet's guid is the authenticated `actor`, never the guid the client wrote.
+    pub fn group_map_ping(
+        &self,
+        actor: u64,
+        x: i32,
+        z: i32,
+        spot_of: impl Fn(u64) -> Option<MapSpot>,
+    ) -> Result<Vec<SocialMessage>, SocialError> {
+        let group_id = self.group_of(actor).ok_or(SocialError::NotInGroup)?;
+        if !(coord_ok(x) && coord_ok(z)) {
+            return Err(SocialError::InvalidPosition);
+        }
+        let Some(here) = spot_of(actor) else {
+            return Ok(Vec::new());
+        };
+        let group = self.groups.get(&group_id).ok_or(SocialError::NotInGroup)?;
+        let packet = encode_group_map_ping(actor, x, z);
+        Ok(group
+            .members
+            .iter()
+            .copied()
+            .filter(|member| {
+                !self.ignores_either(actor, *member)
+                    && spot_of(*member).is_some_and(|spot| spot.same_scope(&here))
+            })
+            .map(|member| message(member, packet.clone()))
+            .collect())
+    }
+
+    fn ignores_either(&self, a: u64, b: u64) -> bool {
+        let ignores = |owner: u64, other: u64| {
+            self.profiles
+                .get(&owner)
+                .is_some_and(|profile| profile.ignored.contains_key(&other))
+        };
+        ignores(a, b) || ignores(b, a)
     }
 
     fn create_group(&mut self, leader_guid: u64) -> Result<u32, SocialError> {
@@ -872,8 +997,8 @@ impl SocialService {
             },
             // Client member-record constructor `008dcd60` initializes +0x90..+0xa8 this way.
             opaque_fields: [0, 0, 0, u32::MAX, u32::MAX, 1, 0],
-            // `008dcd60` clears both flags; +0xc8 starts at zero.
-            flags: [false; 2],
+            // `008dcd60` clears both flags; +0xc8 starts at zero. +0xc4 follows 40/14.
+            flags: [self.changing_job.contains(&guid), false],
             minigame_type: 0,
         })
     }
@@ -902,6 +1027,7 @@ impl SocialService {
             .ok_or(SocialError::NotInGroup)?;
         let original_members = group.members.clone();
         group.members.retain(|guid| *guid != member_guid);
+        self.changing_job.remove(&member_guid);
         self.group_invites.retain(|target, invite| {
             *target != member_guid
                 && invite.inviter_guid != member_guid
@@ -922,6 +1048,7 @@ impl SocialService {
             // (R) The client guide says a group with one remaining member dissolves.
             let last = group.members[0];
             self.member_group.remove(&last);
+            self.changing_job.remove(&last);
             out.push(message(
                 last,
                 encode_group_leave(last, &self.profiles[&last].name)?,
@@ -1052,7 +1179,9 @@ fn encode_friend_row(guid: u64, name: &SocialName, online: bool) -> Result<Vec<u
         out.extend_from_slice(&0u32.to_le_bytes());
         out.push(0);
     }
-    out.push(0);
+    // Final byte is row +0xa1 = `Is_In_Static_Zone` (`00cb44c0` case 0x11), the atlas gate.
+    // 74/5 cannot set it, so online rows say true (R); 74/5 hides out-of-scope friends.
+    out.push(u8::from(online));
     Ok(out)
 }
 
@@ -1143,6 +1272,119 @@ fn encode_ignore_remove(guid: u64) -> Vec<u8> {
     let mut out = ignore_header(3);
     out.extend_from_slice(&guid.to_le_bytes());
     out
+}
+
+fn coord_ok(value: i32) -> bool {
+    value.unsigned_abs() <= MAX_MAP_COORD.unsigned_abs()
+}
+
+/// Where the host's session registry says one online character stands (R). Built by the host
+/// from authenticated sessions; nothing here is read from a client packet.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct MapSpot {
+    pub zone_id: u32,
+    pub instance_id: u64,
+    pub in_battle: bool,
+    pub x: f32,
+    pub z: f32,
+}
+
+impl MapSpot {
+    fn same_scope(&self, other: &Self) -> bool {
+        self.zone_id == other.zone_id && self.instance_id == other.instance_id
+    }
+
+    fn on_map(&self) -> bool {
+        [self.x, self.z]
+            .into_iter()
+            .all(|v| v.is_finite() && v.abs() <= MAX_MAP_COORD as f32)
+    }
+}
+
+/// One 74/5 entry. `None` hides the friend on the atlas (client `In_Encounter` flag set).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FriendPosition {
+    pub guid: u64,
+    pub location: Option<[f32; 2]>,
+}
+
+/// 74/5 reader `00c81450` -> `00c80cb0` -> `00c7f620`, applied by `00cb37d0`: `i32` count, then per
+/// entry guid (`u64`), a length-prefixed string the client discards (sent empty), a flag byte
+/// (row +0xa2 = `In_Encounter`) and, only when the flag is 0, X and Z floats (rows +0xa4, +0xa8).
+pub fn encode_friend_positions(entries: &[FriendPosition]) -> Result<Vec<u8>, SocialError> {
+    if entries.len() > MAX_POSITION_ENTRIES {
+        return Err(SocialError::InvalidPosition);
+    }
+    let mut out = friend_header(5);
+    out.extend_from_slice(&(entries.len() as i32).to_le_bytes());
+    for entry in entries {
+        out.extend_from_slice(&entry.guid.to_le_bytes());
+        out.extend_from_slice(&0i32.to_le_bytes());
+        match entry.location {
+            Some(at) => {
+                if at
+                    .iter()
+                    .any(|v| !v.is_finite() || v.abs() > MAX_MAP_COORD as f32)
+                {
+                    return Err(SocialError::InvalidPosition);
+                }
+                out.push(0);
+                out.extend(at.into_iter().flat_map(f32::to_le_bytes));
+            }
+            None => out.push(1),
+        }
+    }
+    Ok(out)
+}
+
+/// 40/15 reader `0093daf0` case 0xf (`008d8f40`): header, member guid (looked up in the group),
+/// flag byte stored at member +0xc4.
+fn encode_group_changing_job(guid: u64, changing: bool) -> Vec<u8> {
+    let mut out = group_header(15);
+    out.extend_from_slice(&guid.to_le_bytes());
+    out.push(u8::from(changing));
+    out
+}
+
+/// 40/16 reader `0093daf0` case 0x10 (`008d9020`): header, guid pair (unused by the client), then
+/// two `i32` handed to Lua `MiniMap:PingReceived(x, z)`.
+fn encode_group_map_ping(sender: u64, x: i32, z: i32) -> Vec<u8> {
+    let mut out = group_header(16);
+    out.extend_from_slice(&sender.to_le_bytes());
+    out.extend_from_slice(&x.to_le_bytes());
+    out.extend_from_slice(&z.to_le_bytes());
+    out
+}
+
+/// The three location requests, as the client writes them. Only the shape is read: the guid the
+/// ping body carries (client `+0x3a0`) is dropped because the sender comes from the session.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LocationRequest {
+    /// 26/21 `00c23e50`: header only.
+    FriendPositions,
+    /// 40/14 `00c0b300` -> `00c0b150`: header and one boolean byte (Lua `SetChangingJob`).
+    ChangingJob(bool),
+    /// 40/16 `00938650` -> `009133c0`: header, guid pair, `i32` x, `i32` z (Lua `Ui.SendMapPing`).
+    MapPing { x: i32, z: i32 },
+}
+
+/// `None` for any other packet and for any length, flag or coordinate that is not exact.
+pub fn parse_location_request(bytes: &[u8]) -> Option<LocationRequest> {
+    let word = |at: usize| Some(u16::from_le_bytes(bytes.get(at..at + 2)?.try_into().ok()?));
+    let int = |at: usize| Some(i32::from_le_bytes(bytes.get(at..at + 4)?.try_into().ok()?));
+    match (word(0)?, word(2)?, bytes.len()) {
+        (COMMAND_FAMILY, 21, 4) => Some(LocationRequest::FriendPositions),
+        (GROUP_FAMILY, 14, 5) => match bytes[4] {
+            0 => Some(LocationRequest::ChangingJob(false)),
+            1 => Some(LocationRequest::ChangingJob(true)),
+            _ => None,
+        },
+        (GROUP_FAMILY, 16, 20) => {
+            let (x, z) = (int(12)?, int(16)?);
+            (coord_ok(x) && coord_ok(z)).then_some(LocationRequest::MapPing { x, z })
+        }
+        _ => None,
+    }
 }
 
 /// Family-40 member row read by `0093daf0` case 9 -> `00921680` -> `008fcb20`.

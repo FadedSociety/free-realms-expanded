@@ -460,10 +460,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         };
         result.push(("npc_interaction", packet));
     }
-    for sub in [14, 15, 17, 30] {
+    for sub in [14, 15, 17, 21, 30] {
         result.push(("social_router", words(26, sub, &[u32::MAX; 5])));
     }
-    for sub in [1, 3, 4, 6] {
+    for sub in [1, 3, 4, 6, 14, 16] {
         result.push(("social_router", words(40, sub, &[u32::MAX; 4])));
     }
     // 26/19 select-player: own guid then target guid (W143); unknown target.
