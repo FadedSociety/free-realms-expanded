@@ -60,10 +60,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000001, 9000000217]; objectives and rewards preserved."
         }
       ],
       "description_string_id": 139749,
-      "end_text_string_id": 139750
+      "end_text_string_id": 139750,
+      "enabled": false
     },
     {
       "id": 3100002,
@@ -171,11 +176,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000217]; objectives and rewards preserved."
         }
       ],
       "description_string_id": 76088,
       "intro_text_string_id": 76086,
-      "end_text_string_id": 76089
+      "end_text_string_id": 76089,
+      "enabled": false
     },
     {
       "id": 3100004,

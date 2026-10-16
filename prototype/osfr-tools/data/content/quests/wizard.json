@@ -927,10 +927,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000164, 9000000190]; objectives and rewards preserved."
         }
       ],
       "description_string_id": 37312,
-      "intro_text_string_id": 37310
+      "intro_text_string_id": 37310,
+      "enabled": false
     },
     {
       "id": 3160020,

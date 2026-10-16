@@ -7,7 +7,19 @@
       "giver_npc_id": 9000000226,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -39,11 +51,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: No regional tutorial giver 9000000226; guards and four tutorial Gloamlings are not field_enemies targets. Existing opening engine is separate and preserved."
         }
       ],
       "description_string_id": 4419552,
@@ -59,7 +71,19 @@
         3000001
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -91,11 +115,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: No regional tutorial giver; ultimate-use/potion steps have no split objective kind; exact tough/more Gloam field targets absent."
         }
       ],
       "description_string_id": 4419556,
@@ -111,7 +135,19 @@
         3000002
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -147,11 +183,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Darkthorne regional placement is poi_anchor; journal interaction/close have no split kind; no catalogue Hero's Journal item. Separate opening works."
         }
       ],
       "description_string_id": 4419560,
@@ -224,6 +260,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Regional giver 9000000068 absent; three Gloam defenders are not defined in field_enemies; prerequisite blocked. Separate opening works."
         }
       ],
       "description_string_id": 4419564,
@@ -288,6 +328,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Well/fill and three ordered fire interactions have no split interaction kind; prerequisite blocked. Do not replace fire extinguishing with talking."
         }
       ],
       "description_string_id": 4420043,
@@ -298,12 +342,88 @@
     {
       "id": 3000006,
       "title_string_id": 4420053,
-      "giver_npc_id": 9000000166,
+      "giver_npc_id": 9000000396,
       "prerequisite_quest_ids": [
         3000005
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "resource_id": 1001,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:71; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "resource_id": 1002,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:71; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000396,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:71; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 4,
+          "recipe_id": 70,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:71; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -323,10 +443,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -335,11 +451,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: giver alias 9000000166 replaced with existing 9000000396 by guide row; no NPC or placement created."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Prerequisite 3000005 blocked; resources and cooking station only usable at one-time opening objectives; regional quest does not start those stages."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: initial talk to Mae is the giver acceptance conversation; only the later return-to-Mae is an objective. content_check forbids duplicate npc_id values in an objective list."
         }
       ],
       "description_string_id": 4420054,
@@ -352,8 +476,68 @@
       "prerequisite_quest_ids": [
         3000006
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "resource_id": 1003,
+          "quantity": 5,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:72; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "recipe_id": 2002,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:72; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000050,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:72; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -369,10 +553,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -381,11 +561,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Prerequisite 3000006 blocked; smelting is one-time opening-stage-gated. Event counts one recipe completion, not five bars."
         }
       ],
       "description_string_id": 4420059,
@@ -397,8 +577,42 @@
       "id": 3000008,
       "title_string_id": 4420066,
       "giver_npc_id": 9000000050,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3000007
+      ],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "recipe_id": 11,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:73; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000050,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:73; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 16,
@@ -435,10 +649,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -448,6 +658,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: narrative ordering mapped to prerequisite keys [3000007]; no retail prerequisite table recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: hammer 30280 is already the forging recipe output; do not grant a duplicate hammer at turn-in. Existing 16 coins retained."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Predecessor Gear Up blocked; forging is one-time opening-stage-gated, not started by regional quest acceptance."
         }
       ],
       "description_string_id": 4420067,
@@ -462,7 +684,39 @@
       "prerequisite_quest_ids": [
         3000008
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "model_id": 3156,
+          "count": 5,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:74; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000050,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:74; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 18,
@@ -499,10 +753,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -512,6 +762,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Predecessor 3000008 blocked; guide requires switching to Brawler, but split Quest cannot express job requirements/selection. Kill targets exist."
         }
       ],
       "description_string_id": 4420075,
@@ -527,7 +781,19 @@
         3000009
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -555,11 +821,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Exact Gloam Creature has no field_enemies definition; opening enemy exists only in separate stage; predecessor blocked."
         }
       ],
       "description_string_id": 4420083,
@@ -570,12 +836,40 @@
     {
       "id": 3000011,
       "title_string_id": 4420090,
-      "giver_npc_id": 9000000167,
+      "giver_npc_id": 9000000165,
       "prerequisite_quest_ids": [
         3000010
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000021,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:76; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -591,10 +885,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -603,11 +893,15 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: giver alias 9000000167 replaced with existing 9000000165 by guide row; no NPC or placement created."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Predecessor 3000010 blocked. Both Pappy and Bartle do spawn; corrected absent giver alias from guide A11."
         }
       ],
       "description_string_id": 4420091,
@@ -623,7 +917,19 @@
         3000011
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -651,11 +957,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Three ordered artifact interactions have no split interaction objective; predecessor blocked. Opening artifact actions are not TalkToNpc events."
         }
       ],
       "description_string_id": 4420099,
@@ -671,7 +977,19 @@
         3000012
       ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -703,11 +1021,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Mac has no field_enemies definition; opening Mac is a separate stage; predecessor blocked."
         }
       ],
       "description_string_id": 4420107,
@@ -718,12 +1036,40 @@
     {
       "id": 3000014,
       "title_string_id": 4420114,
-      "giver_npc_id": 9000000022,
+      "giver_npc_id": 9000000021,
       "prerequisite_quest_ids": [
         3000013
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000519,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:79; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -743,10 +1089,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -755,11 +1097,15 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: giver alias 9000000022 replaced with existing 9000000021 by guide row; no NPC or placement created."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Regional Queen 9500000519 does not spawn; no recovered Palace entry geometry; predecessor blocked. Talk objective is a partial plan only."
         }
       ],
       "description_string_id": 4420115,
@@ -771,9 +1117,55 @@
       "id": 3000015,
       "title_string_id": 5100479,
       "giver_npc_id": 9000000396,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3000006
+      ],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "recipe_id": 70,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:89; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000396,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:89; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -789,10 +1181,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -801,11 +1189,15 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: narrative ordering mapped to prerequisite keys [3000006]; no retail prerequisite table recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Second cooking requires repeatable station entry; existing station refuses after opening recipe objective. Do not count first stew as second helping."
         }
       ],
       "description_string_id": 5100480,
@@ -818,8 +1210,56 @@
       "title_string_id": 5100483,
       "giver_npc_id": 9000000050,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "resource_id": 1003,
+          "quantity": 5,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:90; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: large batch quantity is unknown; proposed five reuses opening mining count and remains disabled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000050,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:90; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -835,10 +1275,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -847,11 +1283,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Opening Copper resource is one-time stage-gated; batch size unspecified. Proposed five is (R), not an exact recovered batch count."
         }
       ],
       "description_string_id": 5100484,
@@ -863,9 +1299,55 @@
       "id": 3000017,
       "title_string_id": 5100487,
       "giver_npc_id": 9000000050,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3000008
+      ],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "recipe_id": 11,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:91; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000050,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:91; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -881,10 +1363,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -893,11 +1371,15 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: narrative ordering mapped to prerequisite keys [3000008]; no retail prerequisite table recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Another hammer requires repeatable forging; opening anvil refuses after its one-time objective."
         }
       ],
       "description_string_id": 5100488,
@@ -911,7 +1393,34 @@
       "giver_npc_id": 9000000225,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 30923,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) W110: item binding by exact catalogue locale name; count from cited guide reward."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:92; 3JXpHghLOTs/00014 shows one Shimmering Air Triangle Shard; catalogue 30923 chosen by exact locale name (R numeric binding)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -943,11 +1452,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: No Peep's Dog Bowl definition in catalogue or runtime world pickup. Reward shard 30923 exists; do not substitute a different bowl."
         }
       ],
       "description_string_id": 37703,
@@ -960,7 +1469,19 @@
       "giver_npc_id": 9000000509,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -996,11 +1517,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Giver 9000000509 absent; exact portal Gloamling population/count unresolved; no matching field_enemies target."
         }
       ],
       "description_string_id": 5101947,
@@ -1012,10 +1533,38 @@
       "title_string_id": 94247,
       "intro_text_string_id": 104097,
       "description_string_id": 104099,
-      "giver_npc_id": 9000000002,
+      "giver_npc_id": 9000000402,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000177,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:101; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1035,10 +1584,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1051,10 +1596,14 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) W110: giver alias 9000000002 replaced with existing 9000000402 by guide row; no NPC or placement created."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: enabled: Merigold and Raina have legacy_data placements; one talk, five coins. Guide C1 gives no numerical level/job gate; none invented."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000021,
@@ -1154,7 +1703,19 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1185,10 +1746,6 @@
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
           "kind": "client",
           "evidence": "(client) title string ID 4206471822 recovered from the guide title ID cell; Adventurer C2/C3 explicitly reuse C1 ID 4206471822."
         },
@@ -1205,7 +1762,19 @@
       "giver_npc_id": 9000000150,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1237,11 +1806,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Retired Sacred Glade tutorial: giver absent; robgoblin/Wilbur escort and job unlock unavailable through split schema."
         }
       ],
       "description_string_id": 45852,
@@ -1311,6 +1880,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Guide has thugawug and video Hooligan Bullies variants (10); field_enemies has generic Hooligan 930050, not a proven exact variant. No exact target or stolen message acquisition route."
         }
       ],
       "description_string_id": 389188,
@@ -1323,8 +1896,36 @@
       "title_string_id": 390255,
       "giver_npc_id": 9000000450,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000519,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:113; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1344,10 +1945,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1356,11 +1953,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Sal Monella giver 9000000450 and regional Queen do not spawn; Wugachug Sal is a different NPC."
         }
       ],
       "description_string_id": 390256,
@@ -1373,8 +1970,36 @@
       "title_string_id": 391030,
       "giver_npc_id": 9000000346,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000519,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:114; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1394,10 +2019,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1406,11 +2027,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Giver 9000000346 absent; Henry alias not proven to be Henry Farnum. Regional Queen does not spawn."
         }
       ],
       "description_string_id": 391031,
@@ -1422,8 +2043,36 @@
       "title_string_id": 391044,
       "giver_npc_id": 9000000477,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000519,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:115; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1443,10 +2092,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1455,11 +2100,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Regional Queen does not spawn. Starshine does spawn."
         }
       ],
       "description_string_id": 391045,
@@ -1471,8 +2116,36 @@
       "title_string_id": 140648,
       "giver_npc_id": 9000000175,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000517,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:116; see exact objective wording in the chain table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1496,10 +2169,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1508,11 +2177,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Giver 9000000175 absent; Pux 9500000517 does not spawn; appointment-slip transfer/consumption lacks exact item id and route. Talk is partial only."
         }
       ],
       "description_string_id": 140649,
@@ -1526,7 +2195,19 @@
       "giver_npc_id": 9000000330,
       "prerequisite_quest_ids": [],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1562,11 +2243,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: DISABLED: Immediate Palace follow-up: Geoffrey does not spawn; Missing Sisters instance and exact sisters/encounter ids unresolved. Rest of Chapter 1 excluded from this starting-region slice."
         }
       ],
       "description_string_id": 90623,
@@ -3160,7 +3841,19 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3203,7 +3896,19 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",

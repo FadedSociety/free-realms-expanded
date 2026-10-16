@@ -5,9 +5,84 @@
       "id": 3080001,
       "title_string_id": 104106,
       "giver_npc_id": 9000000177,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3000020
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000735,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49; fktAs_GRrjM/00070,/00172,/00284,/00308; Frost Ridge NPC variants selected by guide region (R)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000759,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49; fktAs_GRrjM/00070,/00172,/00284,/00308; Frost Ridge NPC variants selected by guide region (R)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000731,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49; fktAs_GRrjM/00070,/00172,/00284,/00308; Frost Ridge NPC variants selected by guide region (R)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9000000177,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49; fktAs_GRrjM/00070,/00172,/00284,/00308; Frost Ridge NPC variants selected by guide region (R)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -27,10 +102,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -39,11 +110,15 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) W110: narrative ordering mapped to prerequisite keys [3000020]; no retail prerequisite table recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Direct Highroad follow-up: Chad, Mustang Alli and Burt have only poi_anchor placements; pen transfer/location entry unresolved. Talk sequence is partial only."
         }
       ],
       "description_string_id": 104107,
@@ -55,9 +130,23 @@
       "id": 3080002,
       "title_string_id": 117323,
       "giver_npc_id": 9000000412,
-      "prerequisite_quest_ids": [],
+      "prerequisite_quest_ids": [
+        3080001
+      ],
       "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -89,7 +178,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) W110: narrative ordering mapped to prerequisite keys [3080001]; no retail prerequisite table recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W110: DISABLED: Direct follow-up: exact racing tutorial minigame id/normal entry unresolved; Mustang giver 9000000412 absent. Do not substitute dev kart race."
         }
       ],
       "enabled": false
