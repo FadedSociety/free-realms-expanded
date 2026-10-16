@@ -36,26 +36,1063 @@
         {
           "slot": 2,
           "definition_id": 4901,
+          "min_level": 1,
           "name_id": 3784,
           "description_id": 3813,
           "icon_id": 260,
+          "animation_id": 1099,
+          "effect_id": 15255,
+          "damage_multiplier": 0,
           "heal": 250,
+          "energy_cost": 0,
           "cooldown_ms": 15000,
-          "source": [
+          "effects": [],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Medic.md:148,153,165",
+            "name_id": "Client locale Global.Text.3784; Jenkins lookup2 3004846349",
+            "description_id": "Client locale Global.Text.3813; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:261 icon_abil_medic_firstaid_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:9134 PFX_crosses_red_head_first-aid-level-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 3,
+          "definition_id": 62001,
+          "min_level": 5,
+          "name_id": 3810,
+          "description_id": 3814,
+          "icon_id": 11639,
+          "animation_id": 1099,
+          "effect_id": 16153,
+          "damage_multiplier": 1.5,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 6000,
+          "effects": [
             {
-              "kind": "client",
-              "evidence": "name 3784 'First Aid', rank 1 text 3813 (heals 250; guide hash 4168670255); icon Images.txt 260 (image set 887)"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "First Aid, level 1 Medic ability: heals yourself and any ally near you for 250"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) definition id 4901 is local; 15 s cooldown and no energy cost; allies are not healed yet (no multiplayer)"
+              "kind": "buff",
+              "recipient": "target",
+              "damage_multiplier": 1,
+              "damage_taken_multiplier": 1.25,
+              "crit_bonus": 0,
+              "crit_damage_bonus": 0,
+              "duration_ms": 10000
             }
           ],
-          "min_level": 1
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Medic.md:149,159,164,222",
+            "name_id": "Client locale Global.Text.3810; Jenkins lookup2 2534604223",
+            "description_id": "Client locale Global.Text.3814; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8177 icon_abil_medic_target_vitals_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:15368 PFX_beam_red_lg_vertical_laser_medic; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 4,
+          "definition_id": 62002,
+          "min_level": 10,
+          "name_id": 24061,
+          "description_id": 24062,
+          "icon_id": 22959,
+          "animation_id": 1099,
+          "effect_id": 16184,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 15000,
+          "effects": [
+            {
+              "kind": "buff",
+              "recipient": "caster",
+              "damage_multiplier": 1,
+              "damage_taken_multiplier": 1,
+              "crit_bonus": 5,
+              "crit_damage_bonus": 0.5,
+              "duration_ms": 9000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Medic.md:150,164,201,222",
+            "name_id": "Client locale Global.Text.24061; Jenkins lookup2 775534621",
+            "description_id": "Client locale Global.Text.24062; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:19024 icon_abil_medic_vitamins_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:15662 PFX_beam_trail_white_skel_medic-vitamins; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
+            "gaps": "Size change not implemented; crit chance and crit damage are implemented."
+          }
+        },
+        {
+          "slot": 5,
+          "definition_id": 62003,
+          "min_level": 15,
+          "name_id": 3800,
+          "description_id": 3815,
+          "icon_id": 269,
+          "animation_id": 1099,
+          "effect_id": 16154,
+          "damage_multiplier": 2,
+          "heal": 0,
+          "energy_cost": 25,
+          "cooldown_ms": 8000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 3,
+              "centered_on_caster": false
+            }
+          ],
+          "range": 12,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Medic.md:151,153,164,222",
+            "name_id": "Client locale Global.Text.3800; Jenkins lookup2 1066134485",
+            "description_id": "Client locale Global.Text.3815; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:270 icon_abil_medic_shockpaddles_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:15382 PFX_lightning_blue_aoe_medic-shockpaddles; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        }
+      ]
+    },
+    {
+      "profile_id": 32,
+      "slots": [
+        {
+          "slot": 1,
+          "definition_id": 62004,
+          "min_level": 1,
+          "name_id": 24540,
+          "description_id": 24541,
+          "icon_id": 11660,
+          "animation_id": 1099,
+          "effect_id": 5315,
+          "damage_multiplier": 1.8,
+          "heal": 0,
+          "energy_cost": 10,
+          "cooldown_ms": 4000,
+          "effects": [
+            {
+              "kind": "stun",
+              "duration_ms": 2000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Warrior.md:144",
+            "name_id": "Client locale Global.Text.24540; Jenkins lookup2 1551604531",
+            "description_id": "Client locale Global.Text.24541; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8198 icon_abil_warrior_kick_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:3577 PFX_hit-flash_red_cog_warrior-kick-land; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 2,
+          "definition_id": 62005,
+          "min_level": 5,
+          "name_id": 4908,
+          "description_id": 6163,
+          "icon_id": 23007,
+          "animation_id": 1099,
+          "effect_id": 5378,
+          "damage_multiplier": 2.5,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 6000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 16,
+              "centered_on_caster": true
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Warrior.md:145,225",
+            "name_id": "Client locale Global.Text.4908; Jenkins lookup2 881367374",
+            "description_id": "Client locale Global.Text.6163; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:19072 icon_abil_warrior_spinning_attack_32.dds; (R) same-job fallback",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:4234 PFX_squares_red_arm-r_warrior-spin-attack-trail; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 3,
+          "definition_id": 62006,
+          "min_level": 10,
+          "name_id": 24694,
+          "description_id": 24695,
+          "icon_id": 11663,
+          "animation_id": 1099,
+          "effect_id": 16072,
+          "damage_multiplier": 2.2,
+          "heal": 0,
+          "energy_cost": 25,
+          "cooldown_ms": 8000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 16,
+              "centered_on_caster": true
+            },
+            {
+              "kind": "stun",
+              "duration_ms": 2000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Warrior.md:146,158,162,212,225",
+            "name_id": "Client locale Global.Text.24694; Jenkins lookup2 471411418",
+            "description_id": "Client locale Global.Text.24695; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8201 icon_abil_warrior_quake_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:14760 PFX_rock-column_brown_warrior-quake; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
+            "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
+          }
+        },
+        {
+          "slot": 4,
+          "definition_id": 62007,
+          "min_level": 15,
+          "name_id": 24706,
+          "description_id": 24708,
+          "icon_id": 11654,
+          "animation_id": 1099,
+          "effect_id": 15226,
+          "damage_multiplier": 1,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 10000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 16,
+              "centered_on_caster": true
+            },
+            {
+              "kind": "stun",
+              "duration_ms": 3000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Warrior.md:147,149,162,225",
+            "name_id": "Client locale Global.Text.24706; Jenkins lookup2 3798615259",
+            "description_id": "Client locale Global.Text.24708; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8192 icon_abil_warrior_commanding_shout_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:8783 PFX_moire-circles_multi_head_commanding-shout-level-1_loop; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
+            "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
+          }
+        }
+      ]
+    },
+    {
+      "profile_id": 12,
+      "slots": [
+        {
+          "slot": 1,
+          "definition_id": 62008,
+          "min_level": 1,
+          "name_id": 17071,
+          "description_id": 35505,
+          "icon_id": 295,
+          "animation_id": 1099,
+          "effect_id": 16305,
+          "damage_multiplier": 1.8,
+          "heal": 0,
+          "energy_cost": 10,
+          "cooldown_ms": 3500,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 4,
+              "max_targets": 3,
+              "centered_on_caster": false
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Wizard.md:148,157,163,200,203,229",
+            "name_id": "Client locale Global.Text.17071; Jenkins lookup2 1838213281",
+            "description_id": "Client locale Global.Text.35505; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:296 icon_abil_wizard_zap_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:16931 PFX_electricity_fwd_circ_lg_wizard-lightning-blast; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 2,
+          "definition_id": 62009,
+          "min_level": 5,
+          "name_id": 35492,
+          "description_id": 35493,
+          "icon_id": 280,
+          "animation_id": 1099,
+          "effect_id": 5331,
+          "damage_multiplier": 1.5,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 7000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 5,
+              "max_targets": 16,
+              "centered_on_caster": false
+            },
+            {
+              "kind": "damage_over_time",
+              "multiplier": 0.25,
+              "duration_ms": 10000,
+              "interval_ms": 2000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Wizard.md:149,221,222,229,240",
+            "name_id": "Client locale Global.Text.35492; Jenkins lookup2 942216331",
+            "description_id": "Client locale Global.Text.35493; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:281 icon_abil_wizard_fireburst_32.dds; (R) same-job fallback",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:3681 PFX_fire_orange_hands_fireball-launch; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 3,
+          "definition_id": 62010,
+          "min_level": 10,
+          "name_id": 23679,
+          "description_id": 35526,
+          "icon_id": 283,
+          "animation_id": 1099,
+          "effect_id": 16172,
+          "damage_multiplier": 0.5,
+          "heal": 0,
+          "energy_cost": 25,
+          "cooldown_ms": 9000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 16,
+              "centered_on_caster": true
+            },
+            {
+              "kind": "stun",
+              "duration_ms": 3000
+            },
+            {
+              "kind": "buff",
+              "recipient": "target",
+              "damage_multiplier": 1,
+              "damage_taken_multiplier": 1.15,
+              "crit_bonus": 0,
+              "crit_damage_bonus": 0,
+              "duration_ms": 3000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Wizard.md:150,157,229,240",
+            "name_id": "Client locale Global.Text.23679; Jenkins lookup2 2147978345",
+            "description_id": "Client locale Global.Text.35526; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:284 icon_abil_wizard_icenova_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:15568 PFX_ice_white_explosion_lg_wizard-ice-nova; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 4,
+          "definition_id": 62011,
+          "min_level": 15,
+          "name_id": 38016,
+          "description_id": 38017,
+          "icon_id": 11669,
+          "animation_id": 1099,
+          "effect_id": 16125,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 10000,
+          "effects": [
+            {
+              "kind": "stun",
+              "duration_ms": 5000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "notes\\Build Guides\\Content\\Jobs\\Wizard.md:151,164,229,240",
+            "name_id": "Client locale Global.Text.38016; Jenkins lookup2 2190134503",
+            "description_id": "Client locale Global.Text.38017; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8207 icon_abil_wizard_chaos_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:15112 PFX_wizard_chaos_explosion_lg_cast_hands; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
+            "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
+          }
+        }
+      ]
+    },
+    {
+      "profile_id": 2,
+      "slots": [
+        {
+          "slot": 1,
+          "definition_id": 62012,
+          "min_level": 1,
+          "name_id": 3085,
+          "description_id": 24491,
+          "icon_id": 990,
+          "animation_id": 1099,
+          "effect_id": 15249,
+          "damage_multiplier": 2,
+          "heal": 0,
+          "energy_cost": 10,
+          "cooldown_ms": 4000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 4,
+              "max_targets": 3,
+              "centered_on_caster": false
+            }
+          ],
+          "range": 20,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.3085; Jenkins lookup2 3234720267",
+            "description_id": "Client locale Global.Text.24491; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:980 icon_abil_ninja_shuriken_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:9093 PFX_hit-flash_blue_head_shuriken-level-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 2,
+          "definition_id": 62013,
+          "min_level": 5,
+          "name_id": 3086,
+          "description_id": 3092,
+          "icon_id": 992,
+          "animation_id": 1099,
+          "effect_id": 5508,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 8000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 2,
+              "centered_on_caster": true
+            },
+            {
+              "kind": "stun",
+              "duration_ms": 4000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.3086; Jenkins lookup2 1398001692",
+            "description_id": "Client locale Global.Text.3092; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:982 icon_abil_ninja_smokebomb_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:4904 PFX_magic-sparkles_purple_skel_ninja_loop; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 3,
+          "definition_id": 62014,
+          "min_level": 10,
+          "name_id": 24516,
+          "description_id": 38435,
+          "icon_id": 11651,
+          "animation_id": 1099,
+          "effect_id": 5508,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 0,
+          "cooldown_ms": 1000,
+          "effects": [],
+          "range": 0,
+          "unavailable": true,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.24516; Jenkins lookup2 3042424340",
+            "description_id": "Client locale Global.Text.38435; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8189 icon_abil_ninja_shadow_minion_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:4904 PFX_magic-sparkles_purple_skel_ninja_loop; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 4,
+          "definition_id": 62015,
+          "min_level": 15,
+          "name_id": 3855,
+          "description_id": 24507,
+          "icon_id": 988,
+          "animation_id": 1099,
+          "effect_id": 5508,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 12000,
+          "effects": [
+            {
+              "kind": "buff",
+              "recipient": "caster",
+              "damage_multiplier": 1.3,
+              "damage_taken_multiplier": 0.7,
+              "crit_bonus": 10,
+              "crit_damage_bonus": 0,
+              "duration_ms": 10000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.3855; Jenkins lookup2 4190623537",
+            "description_id": "Client locale Global.Text.24507; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:978 icon_abil_ninja_shadowmeld_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:4904 PFX_magic-sparkles_purple_skel_ninja_loop; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
+            "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
+          }
+        }
+      ]
+    },
+    {
+      "profile_id": 43,
+      "slots": [
+        {
+          "slot": 1,
+          "definition_id": 62016,
+          "min_level": 1,
+          "name_id": 24097,
+          "description_id": 24096,
+          "icon_id": 22926,
+          "animation_id": 1099,
+          "effect_id": 5252,
+          "damage_multiplier": 2.7,
+          "heal": 0,
+          "energy_cost": 10,
+          "cooldown_ms": 3500,
+          "effects": [],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.24097; Jenkins lookup2 3570676904",
+            "description_id": "Client locale Global.Text.24096; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:18991 icon_abil_brawler_pummel_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:3145 PFX_hit-flash_red_cog_brawler-pummel-land; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 2,
+          "definition_id": 62017,
+          "min_level": 5,
+          "name_id": 21374,
+          "description_id": 24131,
+          "icon_id": 11633,
+          "animation_id": 1099,
+          "effect_id": 16145,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 12000,
+          "effects": [
+            {
+              "kind": "buff",
+              "recipient": "caster",
+              "damage_multiplier": 1.35,
+              "damage_taken_multiplier": 1,
+              "crit_bonus": 5,
+              "crit_damage_bonus": 0,
+              "duration_ms": 10000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.21374; Jenkins lookup2 3723673953",
+            "description_id": "Client locale Global.Text.24131; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8171 icon_abil_brawler_fight_enrage_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:15293 PFX_brawler_enrage_yellow_cast; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 3,
+          "definition_id": 62018,
+          "min_level": 10,
+          "name_id": 24133,
+          "description_id": 24134,
+          "icon_id": 11636,
+          "animation_id": 1099,
+          "effect_id": 5275,
+          "damage_multiplier": 2,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 7000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 16,
+              "centered_on_caster": true
+            },
+            {
+              "kind": "stun",
+              "duration_ms": 2500
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.24133; Jenkins lookup2 3884242169",
+            "description_id": "Client locale Global.Text.24134; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8174 icon_abil_brawler_fight_leg_sweep_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:3283 PFX_hit-flash_blue_foot-r_leg-sweep-land-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        }
+      ]
+    },
+    {
+      "profile_id": 35,
+      "slots": [
+        {
+          "slot": 1,
+          "definition_id": 62019,
+          "min_level": 1,
+          "name_id": 4830,
+          "description_id": 6158,
+          "icon_id": 22798,
+          "animation_id": 1099,
+          "effect_id": 15373,
+          "damage_multiplier": 2.3,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 5000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 5,
+              "max_targets": 16,
+              "centered_on_caster": false
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.4830; Jenkins lookup2 2315245172",
+            "description_id": "Client locale Global.Text.6158; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:18863 icon_abil_archer_explosive_arrows_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:10048 PFX_fire_orange_skel_explosive-arrow-land-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 2,
+          "definition_id": 62020,
+          "min_level": 5,
+          "name_id": 24364,
+          "description_id": 24365,
+          "icon_id": 22914,
+          "animation_id": 1099,
+          "effect_id": 16056,
+          "damage_multiplier": 1.8,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 4500,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 3,
+              "centered_on_caster": false
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.24364; Jenkins lookup2 656147727",
+            "description_id": "Client locale Global.Text.24365; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:18979 icon_abil_archer_splitting_arrow_32.dds; (R) same-job fallback",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:14739 PRJ_archer_multishot_trail; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 3,
+          "definition_id": 62021,
+          "min_level": 10,
+          "name_id": 20015,
+          "description_id": 24325,
+          "icon_id": 22575,
+          "animation_id": 1099,
+          "effect_id": 15384,
+          "damage_multiplier": 3.5,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 7000,
+          "effects": [],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.20015; Jenkins lookup2 2042026306",
+            "description_id": "Client locale Global.Text.24325; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:18640 icon_abil_archer_sniper_shot_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:10155 PFX_hit-flash_red_head_sniper-shot-land-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 4,
+          "definition_id": 62022,
+          "min_level": 15,
+          "name_id": 24397,
+          "description_id": 38242,
+          "icon_id": 11630,
+          "animation_id": 1099,
+          "effect_id": 16054,
+          "damage_multiplier": 1,
+          "heal": 0,
+          "energy_cost": 20,
+          "cooldown_ms": 8000,
+          "effects": [
+            {
+              "kind": "area_damage",
+              "radius": 6,
+              "max_targets": 3,
+              "centered_on_caster": false
+            },
+            {
+              "kind": "stun",
+              "duration_ms": 3000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.24397; Jenkins lookup2 1326375153",
+            "description_id": "Client locale Global.Text.38242; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8168 icon_abil_archer_stunning_shots_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:14718 PFX_hit-flash_stunning_shot_cog_level-4; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
+          }
+        },
+        {
+          "slot": 5,
+          "definition_id": 62023,
+          "min_level": 20,
+          "name_id": 24398,
+          "description_id": 24399,
+          "icon_id": 11627,
+          "animation_id": 1099,
+          "effect_id": 15384,
+          "damage_multiplier": 0,
+          "heal": 0,
+          "energy_cost": 10,
+          "cooldown_ms": 12000,
+          "effects": [
+            {
+              "kind": "buff",
+              "recipient": "caster",
+              "damage_multiplier": 1,
+              "damage_taken_multiplier": 1,
+              "crit_bonus": 0,
+              "crit_damage_bonus": 0.1,
+              "duration_ms": 10000
+            }
+          ],
+          "range": 0,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "min_level": "(R) W101 ladder; unknown original unlock",
+            "name_id": "Client locale Global.Text.24398; Jenkins lookup2 2517867575",
+            "description_id": "Client locale Global.Text.24399; (R) wording-based rank binding; old rank numbers are not runtime balance",
+            "icon_id": "Client Resources/Images/Images.txt:8165 icon_abil_archer_piercing_strikes_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:10155 PFX_hit-flash_red_head_sniper-shot-land-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) multiplier of existing final-era tier-scaled basic damage; Pummel aggregates three blows",
+            "heal": "(R) First Aid baseline 250 scaled by existing HP curve; self only, ally healing gap",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) per-slot monotonic deadline",
+            "range": "(R) explicit metres or 0 to reuse basic-job range",
+            "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
+            "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
+            "gaps": "(R) active self buff at 20, W99 fifth Archer candidate; original party/passive semantics not recovered."
+          }
         }
       ]
     }

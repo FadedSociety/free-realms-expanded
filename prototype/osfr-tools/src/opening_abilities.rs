@@ -39,6 +39,19 @@ pub struct JobAbility {
     #[serde(default)]
     pub description_id: i32,
     pub icon_id: i32,
+    /// Client animation group; zero preserves the legacy content's swing.
+    #[serde(default)]
+    pub animation_id: i32,
+    #[serde(default)]
+    pub effect_id: i32,
+    /// (R) Explicit range, or zero to use the job's existing basic reach.
+    #[serde(default)]
+    pub range: f32,
+    #[serde(default)]
+    pub effects: Vec<crate::abilities::JobEffect>,
+    /// A documented skill whose mechanic is not implemented; casting fails closed.
+    #[serde(default)]
+    pub unavailable: bool,
     /// Strike multiplier of the job's basic attack damage; 0 = no strike.
     #[serde(default)]
     pub damage_multiplier: f32,
@@ -56,6 +69,39 @@ pub struct JobAbility {
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
+}
+
+impl JobAbility {
+    pub fn valid(&self) -> bool {
+        (1..=7).contains(&self.slot)
+            && self.definition_id > 0
+            && self.name_id > 0
+            && self.description_id >= 0
+            && self.icon_id > 0
+            && self.animation_id >= 0
+            && self.effect_id >= 0
+            && (0.0..=30.0).contains(&self.range)
+            && (0.0..=10.0).contains(&self.damage_multiplier)
+            && self.heal <= 10_000
+            && (0..=100).contains(&self.energy_cost)
+            && self.cooldown_ms <= 600_000
+            && (1..=20).contains(&self.min_level)
+            && self.effects.len() <= 4
+            && self.effects.iter().all(crate::abilities::JobEffect::valid)
+            && self
+                .effects
+                .iter()
+                .filter(|e| matches!(e, crate::abilities::JobEffect::AreaDamage { .. }))
+                .count()
+                <= 1
+            && (self.unavailable
+                || self.damage_multiplier > 0.0
+                || self.heal > 0
+                || self
+                    .effects
+                    .iter()
+                    .any(|e| !matches!(e, crate::abilities::JobEffect::AreaDamage { .. })))
+    }
 }
 
 #[derive(Deserialize)]
@@ -121,8 +167,8 @@ impl OpeningAbilities {
         })
     }
 
-    /// Load job abilities (slots 1.. after a job's basic attack). Slots must
-    /// run 1, 2, ... without gaps and the job must have a basic attack.
+    /// Load the full roster independently of a campaign's basic-attack subset.
+    /// Slots run 1, 2, ...; a job needs a loaded basic before activation/casting.
     pub fn load_job_abilities(&mut self, path: &Path) -> io::Result<()> {
         let file = File::open(path)?;
         let mut bytes = Vec::new();
@@ -136,21 +182,19 @@ impl OpeningAbilities {
             return Err(invalid("unsupported job ability content"));
         }
         let mut jobs = BTreeMap::new();
+        let mut ids = std::collections::BTreeSet::new();
         for row in content.jobs {
-            let valid = self.basics.contains_key(&row.profile_id)
+            let valid = row.profile_id > 0
                 && !row.slots.is_empty()
                 && row.slots.len() <= 7
                 && row.slots.iter().enumerate().all(|(i, a)| {
                     a.slot == i as i32 + 1
-                        && a.definition_id > 0
-                        && a.name_id > 0
-                        && a.icon_id > 0
-                        && (0.0..=10.0).contains(&a.damage_multiplier)
-                        && a.heal <= 10_000
-                        && (0..=100).contains(&a.energy_cost)
-                        && a.cooldown_ms <= 600_000
-                        && (1..=20).contains(&a.min_level)
-                        && (a.damage_multiplier > 0.0 || a.heal > 0)
+                        && a.valid()
+                        && ids.insert(a.definition_id)
+                        && !self
+                            .basics
+                            .values()
+                            .any(|b| b.definition_id == a.definition_id)
                 });
             if !valid || jobs.insert(row.profile_id, row.slots).is_some() {
                 return Err(invalid("invalid or duplicate job abilities"));
@@ -163,6 +207,7 @@ impl OpeningAbilities {
     /// The job ability on toolbar `slot` (1..) for this profile, if the job
     /// level has unlocked it.
     pub fn job_slot(&self, profile_id: i32, slot: i32, level: u32) -> Option<&JobAbility> {
+        self.basics.get(&profile_id)?;
         self.jobs.get(&profile_id).and_then(|slots| {
             slots
                 .iter()

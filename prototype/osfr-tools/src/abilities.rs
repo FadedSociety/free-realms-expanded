@@ -52,6 +52,80 @@ pub enum EffectRecipient {
     Target,
 }
 
+/// Extra effects consumed by the routed encounter executor. All numeric
+/// tuning and stacking rules are reconstructed (R), documented in content.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+pub enum JobEffect {
+    AreaDamage {
+        radius: f32,
+        max_targets: usize,
+        centered_on_caster: bool,
+    },
+    DamageOverTime {
+        multiplier: f32,
+        duration_ms: u64,
+        interval_ms: u64,
+    },
+    Stun {
+        duration_ms: u64,
+    },
+    Buff {
+        recipient: EffectRecipient,
+        duration_ms: u64,
+        damage_multiplier: f32,
+        damage_taken_multiplier: f32,
+        crit_bonus: u32,
+        crit_damage_bonus: f32,
+    },
+}
+
+impl JobEffect {
+    pub fn valid(&self) -> bool {
+        match *self {
+            Self::AreaDamage {
+                radius,
+                max_targets,
+                ..
+            } => (0.1..=30.0).contains(&radius) && (1..=16).contains(&max_targets),
+            Self::DamageOverTime {
+                multiplier,
+                duration_ms,
+                interval_ms,
+            } => {
+                (0.01..=10.0).contains(&multiplier)
+                    && (500..=30_000).contains(&duration_ms)
+                    && (500..=duration_ms).contains(&interval_ms)
+            }
+            Self::Stun { duration_ms } => (1..=10_000).contains(&duration_ms),
+            Self::Buff {
+                duration_ms,
+                damage_multiplier,
+                damage_taken_multiplier,
+                crit_bonus,
+                crit_damage_bonus,
+                ..
+            } => {
+                (1..=30_000).contains(&duration_ms)
+                    && (0.1..=3.0).contains(&damage_multiplier)
+                    && (0.1..=3.0).contains(&damage_taken_multiplier)
+                    && crit_bonus <= 50
+                    && (0.0..=1.0).contains(&crit_damage_bonus)
+            }
+        }
+    }
+
+    pub fn needs_target(&self) -> bool {
+        !matches!(
+            self,
+            Self::Buff {
+                recipient: EffectRecipient::Caster,
+                ..
+            }
+        )
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct AbilityEffect {

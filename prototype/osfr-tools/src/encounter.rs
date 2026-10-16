@@ -4,7 +4,11 @@
 //! health, waves, damage, timing and rewards are explicitly reconstructed local
 //! rules. Callers stage a clone, save it with inventory/progression, then commit.
 
-use crate::{character_store::CharacterState, terrain::Terrain};
+use crate::{
+    abilities::{EffectRecipient, JobEffect},
+    character_store::CharacterState,
+    terrain::Terrain,
+};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
@@ -294,10 +298,10 @@ fn resolve_behaviour(
     presets: &BTreeMap<String, Behaviour>,
 ) -> Result<Behaviour, String> {
     let named = |name: &str| {
-        presets
-            .get(name)
-            .cloned()
-            .ok_or(format!("{} ({}): unknown behaviour preset '{name}'", actor.name, actor.guid))
+        presets.get(name).cloned().ok_or(format!(
+            "{} ({}): unknown behaviour preset '{name}'",
+            actor.name, actor.guid
+        ))
     };
     let base = if actor.skittish {
         presets.get("skittish").cloned().unwrap_or(Behaviour {
@@ -323,9 +327,16 @@ fn resolve_behaviour(
             serde_json::from_value(merged)
                 .map_err(|e| format!("{} ({}): behaviour {e}", actor.name, actor.guid))
         }
-        Some(_) => Err(format!("{}: behaviour must be a preset name or an object", actor.name)),
+        Some(_) => Err(format!(
+            "{}: behaviour must be a preset name or an object",
+            actor.name
+        )),
     }
-    .and_then(|b| b.check().map(|()| b).map_err(|e| format!("{} ({}): {e}", actor.name, actor.guid)))
+    .and_then(|b| {
+        b.check()
+            .map(|()| b)
+            .map_err(|e| format!("{} ({}): {e}", actor.name, actor.guid))
+    })
 }
 
 impl Behaviour {
@@ -566,6 +577,13 @@ pub struct EncounterEngine {
     god: bool,
     fight_log: Vec<FightEvent>,
     ability_ready: BTreeMap<i32, u64>,
+    // (R) Session-only skill state. Reapplication refreshes one entry per
+    // target/definition; no unbounded stacks or persistent wall-clock timers.
+    skill_dots: BTreeMap<(u64, i32), SkillDot>,
+    skill_stuns: BTreeMap<u64, u64>,
+    skill_buffs: BTreeMap<(u64, i32), SkillBuff>,
+    player_profile: i32,
+    job_level: u32,
     // Overworld battle markers walking their loop, by battle id.
     wander: BTreeMap<u32, Wander>,
     // Where a dropped saved battle started; the gateway moves the character
@@ -596,6 +614,37 @@ pub struct EncounterEngine {
     behaviour_of: BTreeMap<u64, Behaviour>,
 }
 
+#[derive(Clone)]
+struct SkillDot {
+    damage: u32,
+    next_ms: u64,
+    until_ms: u64,
+    interval_ms: u64,
+}
+
+#[derive(Clone)]
+struct SkillBuff {
+    until_ms: u64,
+    damage: f32,
+    taken: f32,
+    crit: u32,
+    crit_damage: f32,
+}
+
+fn merge_skill_outcome(out: &mut EncounterOutcome, other: EncounterOutcome) {
+    out.changed |= other.changed;
+    out.replies.extend(other.replies);
+    out.rewards.extend(other.rewards);
+    out.defeated.extend(other.defeated);
+    out.completed = other.completed.or(out.completed);
+    if other.feedback.is_some() {
+        out.feedback = other.feedback;
+    }
+    if other.zoning.is_some() {
+        out.zoning = other.zoning;
+    }
+}
+
 /// Terrain heights for the zone the encounter runs in.
 #[derive(Clone)]
 struct Ground(Option<(Arc<Terrain>, u32)>);
@@ -609,7 +658,11 @@ impl Ground {
     /// Snap a position onto the ground; off the grid, or where the ground is
     /// far away (a bridge), it keeps its height.
     fn snap(&self, p: &mut [f32; 3]) {
-        if let Some(h) = self.0.as_ref().and_then(|(t, zone)| t.height_at(*zone, p[0], p[2])) {
+        if let Some(h) = self
+            .0
+            .as_ref()
+            .and_then(|(t, zone)| t.height_at(*zone, p[0], p[2]))
+        {
             if (h - p[1]).abs() <= MAX_SNAP {
                 p[1] = h;
             }
@@ -797,6 +850,11 @@ impl EncounterEngine {
             god: false,
             fight_log: Vec::new(),
             ability_ready: BTreeMap::new(),
+            skill_dots: BTreeMap::new(),
+            skill_stuns: BTreeMap::new(),
+            skill_buffs: BTreeMap::new(),
+            player_profile: 0,
+            job_level: 1,
             armed: false,
             results_presented: false,
             field: Vec::new(),
@@ -818,8 +876,8 @@ impl EncounterEngine {
         if bytes.len() > 256 * 1024 {
             return Err(invalid("behaviour presets too large"));
         }
-        let file: BehaviourFile =
-            serde_json::from_slice(&bytes).map_err(|e| invalid(&format!("behaviours.json: {e}")))?;
+        let file: BehaviourFile = serde_json::from_slice(&bytes)
+            .map_err(|e| invalid(&format!("behaviours.json: {e}")))?;
         let previous = std::mem::replace(&mut self.behaviour_presets, file.presets);
         if let Err(error) = self.rebuild_behaviours() {
             self.behaviour_presets = previous;
@@ -1065,12 +1123,21 @@ impl EncounterEngine {
             replies: vec![build_failure(id)],
             ..Default::default()
         };
-        if self.state.player_health == 0 {
-            return Ok(EncounterOutcome::default());
+        if !ability.valid() || ability.unavailable {
+            return Ok(refuse(286));
+        }
+        if self.state.player_health == 0
+            || self
+                .state
+                .active
+                .as_ref()
+                .is_some_and(|a| a.phase != EncounterPhase::Fighting)
+        {
+            return Ok(refuse(286));
         }
         if self
             .ability_ready
-            .get(&ability.slot)
+            .get(&ability.definition_id)
             .is_some_and(|ready| now_ms < *ready)
         {
             return Ok(refuse(287));
@@ -1078,49 +1145,130 @@ impl EncounterEngine {
         if self.energy < ability.energy_cost {
             return Ok(refuse(285));
         }
+        self.expire_skill_buffs(now_ms);
         let mut out = EncounterOutcome::default();
-        if ability.damage_multiplier > 0.0 {
-            let (range, base) = profile_stats(profile_id, 0);
-            let base = (base as f32 * self.damage_scale).round() as u32;
-            let damage = (base as f32 * ability.damage_multiplier).round() as u32;
-            let target = if self.enemy(target).is_some() {
-                Some(target)
-            } else {
-                let states: Vec<&EnemyState> = match &self.state.active {
-                    Some(a) => a.enemies.iter().collect(),
-                    None => self
-                        .state
-                        .world_enemies
+        let offensive =
+            ability.damage_multiplier > 0.0 || ability.effects.iter().any(JobEffect::needs_target);
+        let (basic_range, base) = profile_stats(profile_id, 0);
+        let range = if ability.range > 0.0 {
+            ability.range
+        } else {
+            basic_range
+        };
+        let base = (base as f32 * self.damage_scale).round() as u32;
+        let mut targets = Vec::new();
+        if offensive {
+            let area = ability.effects.iter().find_map(|e| match *e {
+                JobEffect::AreaDamage {
+                    radius,
+                    max_targets,
+                    centered_on_caster,
+                } => Some((radius, max_targets, centered_on_caster)),
+                _ => None,
+            });
+            let states: Vec<&EnemyState> = match &self.state.active {
+                Some(a) => a.enemies.iter().collect(),
+                None => self
+                    .state
+                    .world_enemies
+                    .iter()
+                    .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
+                    .collect(),
+            };
+            let mut nearby: Vec<_> = states
+                .into_iter()
+                .filter(|s| self.enemy(s.guid).is_some() && s.health > 0 && !s.dormant)
+                .collect();
+            let caster_area = area.is_some_and(|(_, _, caster)| caster);
+            let select_range = if caster_area { area.unwrap().0 } else { range };
+            // (R) A non-hostile/self target selects the nearest enemy; an explicit
+            // hostile target out of reach fails instead of silently hitting another.
+            let selected = nearby
+                .iter()
+                .find(|s| s.guid == target)
+                .copied()
+                .or_else(|| {
+                    nearby
                         .iter()
-                        .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
-                        .collect(),
-                };
-                states
-                    .into_iter()
-                    .filter(|s| {
-                        self.enemy(s.guid).is_some()
-                            && s.health > 0
-                            && distance(position, s.position) <= range
-                    })
-                    .min_by(|a, b| {
-                        (self.shielded(a.guid), distance(position, a.position))
-                            .partial_cmp(&(self.shielded(b.guid), distance(position, b.position)))
-                            .unwrap_or(std::cmp::Ordering::Equal)
-                    })
-                    .map(|s| s.guid)
-            };
-            let Some(target) = target else {
+                        .copied()
+                        .filter(|s| distance(position, s.position) <= select_range)
+                        .min_by(|a, b| {
+                            (self.shielded(a.guid), distance(position, a.position))
+                                .partial_cmp(&(
+                                    self.shielded(b.guid),
+                                    distance(position, b.position),
+                                ))
+                                .unwrap_or(std::cmp::Ordering::Equal)
+                        })
+                });
+            let Some(selected) = selected else {
                 return Ok(refuse(288));
             };
-            out = self.strike(target, position, range, damage, now_ms)?;
-            if out.replies.is_empty() {
-                // Out of reach or between swings: nothing spent.
+            if distance(position, selected.position) > select_range {
                 return Ok(refuse(288));
+            }
+            if self
+                .last_attack
+                .is_some_and(|last| now_ms.saturating_sub(last) < 600)
+            {
+                return Ok(refuse(287));
+            }
+            let center = if caster_area {
+                position
+            } else {
+                selected.position
+            };
+            let (radius, limit, _) = area.unwrap_or((0.0, 1, false));
+            nearby.retain(|s| {
+                if area.is_some() {
+                    distance(center, s.position) <= radius
+                } else {
+                    s.guid == selected.guid
+                }
+            });
+            nearby.sort_by(|a, b| {
+                (
+                    a.guid != selected.guid,
+                    distance(center, a.position),
+                    a.guid,
+                )
+                    .partial_cmp(&(
+                        b.guid != selected.guid,
+                        distance(center, b.position),
+                        b.guid,
+                    ))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
+            targets.extend(nearby.into_iter().take(limit).map(|s| s.guid));
+            if targets.is_empty() {
+                return Ok(refuse(288));
+            }
+            if self.active() && !self.armed {
+                self.armed = true;
+                self.last_tick = Some(now_ms);
+            }
+            self.last_attack = Some(now_ms);
+            // All hits reuse the existing authoritative shield/summon/defeat/reward
+            // path; secondary hits and later DoT ticks do not consume swing time.
+            if ability.damage_multiplier > 0.0 {
+                let damage = (base as f32 * ability.damage_multiplier).round() as u32;
+                for &guid in &targets {
+                    if let Some(at) = self.enemy(guid).map(|(_, s)| s.position) {
+                        merge_skill_outcome(
+                            &mut out,
+                            self.strike_damage(guid, at, f32::MAX, damage, now_ms, false)?,
+                        );
+                    }
+                }
             }
         }
         if ability.heal > 0 {
             let before = self.state.player_health;
-            self.state.player_health = (before + ability.heal).min(self.max_health);
+            // (R) Keep the native-tested 250 at level one, scale by the existing
+            // HP curve at later levels. Healing never revives a knocked-out actor.
+            let heal = (u64::from(ability.heal) * u64::from(level_health(self.job_level))
+                / u64::from(PLAYER_MAX)) as u32;
+            self.state.player_health = before.saturating_add(heal).min(self.max_health);
             let healed = (self.state.player_health - before) as i32;
             self.log_fight(now_ms, "heal", "you", "you", i64::from(healed));
             out.replies.push(build_hitpoint_delta(1, 1, healed));
@@ -1128,17 +1276,185 @@ impl EncounterEngine {
                 .push(player_hp(self.state.player_health, self.max_health));
             out.changed = true;
         }
+        for effect in &ability.effects {
+            match *effect {
+                JobEffect::AreaDamage { .. } => {} // target list already resolved above
+                JobEffect::DamageOverTime {
+                    multiplier,
+                    duration_ms,
+                    interval_ms,
+                } => {
+                    for &guid in &targets {
+                        if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
+                            && !self.shielded(guid)
+                        {
+                            self.skill_dots.insert(
+                                (guid, ability.definition_id),
+                                SkillDot {
+                                    damage: (base as f32 * multiplier).round() as u32,
+                                    next_ms: now_ms.saturating_add(interval_ms),
+                                    until_ms: now_ms.saturating_add(duration_ms),
+                                    interval_ms,
+                                },
+                            );
+                        }
+                    }
+                }
+                JobEffect::Stun { duration_ms } => {
+                    for &guid in &targets {
+                        if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
+                            && !self.shielded(guid)
+                        {
+                            self.skill_stuns
+                                .entry(guid)
+                                .and_modify(|until| {
+                                    *until = (*until).max(now_ms.saturating_add(duration_ms))
+                                })
+                                .or_insert(now_ms.saturating_add(duration_ms));
+                            self.moving.remove(&guid);
+                            out.replies.push(animation(guid, 1, true));
+                            out.replies.push(animation(guid, 1401, false)); // client com_stunned
+                        }
+                    }
+                }
+                JobEffect::Buff {
+                    recipient,
+                    duration_ms,
+                    damage_multiplier,
+                    damage_taken_multiplier,
+                    crit_bonus,
+                    crit_damage_bonus,
+                } => {
+                    let recipients = if recipient == EffectRecipient::Caster {
+                        vec![0]
+                    } else {
+                        targets.clone()
+                    };
+                    for guid in recipients {
+                        if guid != 0
+                            && (!self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
+                                || self.shielded(guid))
+                        {
+                            continue;
+                        }
+                        self.skill_buffs.insert(
+                            (guid, ability.definition_id),
+                            SkillBuff {
+                                until_ms: now_ms.saturating_add(duration_ms),
+                                damage: damage_multiplier,
+                                taken: damage_taken_multiplier,
+                                crit: crit_bonus,
+                                crit_damage: crit_damage_bonus,
+                            },
+                        );
+                    }
+                }
+            }
+        }
+        // (R) Reuse verified same-job swing where exact clips are unrecovered.
+        out.replies.push(animation(
+            1,
+            if ability.animation_id > 0 {
+                ability.animation_id
+            } else {
+                1099
+            },
+            false,
+        ));
+        if ability.effect_id > 0 {
+            out.replies
+                .push(composite_effect(1, ability.effect_id, position));
+        }
         self.energy -= ability.energy_cost;
         if ability.energy_cost > 0 {
             out.replies.push(build_energy(self.energy, ENERGY_MAX));
             self.energy_regen_at = now_ms.saturating_add(ENERGY_STEP_MS);
         }
-        self.ability_ready
-            .insert(ability.slot, now_ms.saturating_add(ability.cooldown_ms));
+        self.ability_ready.insert(
+            ability.definition_id,
+            now_ms.saturating_add(ability.cooldown_ms),
+        );
         Ok(out)
     }
 
     /// Energy comes back over time; reported when it changes.
+    fn expire_skill_buffs(&mut self, now_ms: u64) {
+        self.skill_buffs.retain(|_, b| now_ms < b.until_ms);
+        self.skill_stuns.retain(|_, until| now_ms < *until);
+    }
+
+    /// (R) Strongest modifier wins; repeated casts refresh instead of stacking.
+    fn skill_damage(&self, target: u64, damage: u32) -> u32 {
+        let outgoing = self
+            .skill_buffs
+            .iter()
+            .filter(|((guid, _), _)| *guid == 0)
+            .map(|(_, b)| b.damage)
+            .fold(1.0_f32, f32::max);
+        let taken = self
+            .skill_buffs
+            .iter()
+            .filter(|((guid, _), _)| *guid == target)
+            .map(|(_, b)| b.taken)
+            .fold(1.0_f32, f32::max);
+        (damage as f32 * outgoing * taken).round() as u32
+    }
+
+    fn skill_mitigation(&self) -> f32 {
+        self.skill_buffs
+            .iter()
+            .filter(|((guid, _), _)| *guid == 0)
+            .map(|(_, b)| b.taken)
+            .fold(1.0_f32, f32::min)
+    }
+
+    fn tick_job_effects(&mut self, now_ms: u64, out: &mut EncounterOutcome) -> io::Result<()> {
+        self.expire_skill_buffs(now_ms);
+        // At most 60 ticks per definition/target (30 s / 500 ms); delayed
+        // calls catch up only the authored window, never extend its lifetime.
+        let pending = std::mem::take(&mut self.skill_dots);
+        for (key, mut dot) in pending {
+            let (guid, _) = key;
+            while dot.next_ms <= now_ms && dot.next_ms <= dot.until_ms {
+                let Some(at) = self
+                    .enemy(guid)
+                    .filter(|(_, s)| s.health > 0)
+                    .map(|(_, s)| s.position)
+                else {
+                    break;
+                };
+                merge_skill_outcome(
+                    out,
+                    self.strike_damage(guid, at, f32::MAX, dot.damage, now_ms, false)?,
+                );
+                let Some(next) = dot.next_ms.checked_add(dot.interval_ms) else {
+                    dot.until_ms = 0; // no repeat forever at a saturated deadline
+                    break;
+                };
+                dot.next_ms = next;
+                if self
+                    .state
+                    .active
+                    .as_ref()
+                    .is_some_and(|a| a.phase != EncounterPhase::Fighting)
+                {
+                    break;
+                }
+            }
+            if dot.next_ms <= dot.until_ms
+                && self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
+                && self
+                    .state
+                    .active
+                    .as_ref()
+                    .is_none_or(|a| a.phase == EncounterPhase::Fighting)
+            {
+                self.skill_dots.insert(key, dot);
+            }
+        }
+        Ok(())
+    }
+
     fn regenerate_energy(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
         if self.energy < ENERGY_MAX && now_ms >= self.energy_regen_at {
             self.energy = (self.energy + ENERGY_STEP).min(ENERGY_MAX);
@@ -1164,6 +1480,13 @@ impl EncounterEngine {
     /// The active job's level: max health and weapon damage follow it. A
     /// player at full health stays full; health never exceeds the new max.
     pub fn set_player_job(&mut self, profile: i32, level: u32) -> Vec<Vec<u8>> {
+        if profile != self.player_profile {
+            self.skill_dots.clear();
+            self.skill_stuns.clear();
+            self.skill_buffs.clear();
+        }
+        self.player_profile = profile;
+        self.job_level = level.clamp(1, 20);
         let (health, crit) = job_identity(profile);
         self.crit_percent = crit;
         let max = (level_health(level) as f32 * health).round() as u32;
@@ -1186,7 +1509,14 @@ impl EncounterEngine {
             .crit_seed
             .wrapping_mul(6_364_136_223_846_793_005)
             .wrapping_add(1_442_695_040_888_963_407);
-        ((self.crit_seed >> 33) % 100) < u64::from(self.crit_percent)
+        let bonus = self
+            .skill_buffs
+            .iter()
+            .filter(|((guid, _), _)| *guid == 0)
+            .map(|(_, b)| b.crit)
+            .max()
+            .unwrap_or(0);
+        ((self.crit_seed >> 33) % 100) < u64::from((self.crit_percent + bonus).min(100))
     }
 
     fn log_fight(
@@ -1522,6 +1852,9 @@ impl EncounterEngine {
                     .map_or(self.content.world.zone_id, |d| d.zone.zone_id)
     }
     pub fn reset_session(&mut self) {
+        self.skill_dots.clear();
+        self.skill_stuns.clear();
+        self.skill_buffs.clear();
         self.armed = false;
         self.results_presented = false;
         self.last_attack = None;
@@ -1996,6 +2329,19 @@ impl EncounterEngine {
         damage: u32,
         now_ms: u64,
     ) -> io::Result<EncounterOutcome> {
+        self.strike_damage(guid, position, range, damage, now_ms, true)
+    }
+
+    fn strike_damage(
+        &mut self,
+        guid: u64,
+        position: [f32; 3],
+        range: f32,
+        damage: u32,
+        now_ms: u64,
+        swing: bool,
+    ) -> io::Result<EncounterOutcome> {
+        self.expire_skill_buffs(now_ms);
         if self.state.player_health == 0 {
             return Ok(EncounterOutcome::default());
         }
@@ -2004,9 +2350,10 @@ impl EncounterEngine {
         };
         if s.health == 0
             || distance(position, s.position) > range
-            || self
-                .last_attack
-                .is_some_and(|last| now_ms.saturating_sub(last) < 600)
+            || swing
+                && self
+                    .last_attack
+                    .is_some_and(|last| now_ms.saturating_sub(last) < 600)
         {
             return Ok(EncounterOutcome::default());
         }
@@ -2014,10 +2361,22 @@ impl EncounterEngine {
         let target_name = a.name.clone();
         let health = s.health;
         // A summoner is shielded while its minions stand: clear them first.
-        let damage = if self.shielded(guid) { 0 } else { damage };
+        let damage = if self.shielded(guid) {
+            0
+        } else {
+            self.skill_damage(guid, damage)
+        };
         let critical = damage > 0 && self.roll_crit();
         let damage = if critical {
-            damage * CRIT_NUMERATOR / CRIT_DENOMINATOR
+            let bonus = self
+                .skill_buffs
+                .iter()
+                .filter(|((guid, _), _)| *guid == 0)
+                .map(|(_, b)| b.crit_damage)
+                .fold(0.0_f32, f32::max);
+            (f64::from(damage)
+                * (f64::from(CRIT_NUMERATOR) / f64::from(CRIT_DENOMINATOR) + f64::from(bonus)))
+                as u32
         } else {
             damage
         };
@@ -2029,7 +2388,9 @@ impl EncounterEngine {
             }
             self.armed = true;
         }
-        self.last_attack = Some(now_ms);
+        if swing {
+            self.last_attack = Some(now_ms);
+        }
         let field_index = if self.state.active.is_none() {
             self.field
                 .iter()
@@ -2060,16 +2421,21 @@ impl EncounterEngine {
         let mut out = EncounterOutcome {
             changed: true,
             replies: vec![
-                animation(1, 1099, false), // Original com_swing group resolves the active wield type.
                 attack_processed(1, guid, dealt, hp, max_health, critical),
                 enemy_hp(guid, hp, max_health),
             ],
             ..Default::default()
         };
+        if swing {
+            out.replies.insert(0, animation(1, 1099, false));
+        }
         if hp > 0 && self.active() {
             self.summon(guid, hp, max_health, &mut out);
         }
         if hp == 0 {
+            self.skill_dots.retain(|(target, _), _| *target != guid);
+            self.skill_buffs.retain(|(target, _), _| *target != guid);
+            self.skill_stuns.remove(&guid);
             out.replies.push(remove(guid));
             if boss {
                 out.replies.push(boss_display(guid, false));
@@ -2237,7 +2603,17 @@ impl EncounterEngine {
         }
         self.last_tick = Some(now_ms);
         let mut energy = EncounterOutcome::default();
+        self.tick_job_effects(now_ms, &mut energy)?;
+        if self
+            .state
+            .active
+            .as_ref()
+            .is_some_and(|a| a.phase != EncounterPhase::Fighting)
+        {
+            return Ok(energy);
+        }
         self.regenerate_energy(now_ms, &mut energy);
+        let mitigation = self.skill_mitigation();
         let ground = self.ground();
         let actors: Vec<Actor> = if let Some(d) = self.dungeon() {
             d.enemies.clone()
@@ -2255,6 +2631,9 @@ impl EncounterEngine {
             &mut self.state.world_enemies
         };
         let mut out = EncounterOutcome::default();
+        out.changed = energy.changed;
+        out.rewards.append(&mut energy.rewards);
+        out.defeated.append(&mut energy.defeated);
         let mut total_damage = 0_u32;
         out.replies.append(&mut energy.replies);
         // Summoned minions still standing: the summoner fights alongside them.
@@ -2269,7 +2648,18 @@ impl EncounterEngine {
             if s.health == 0 || s.dormant {
                 continue;
             }
-            let b = self.behaviour_of.get(&actor.guid).cloned().unwrap_or_default();
+            if self
+                .skill_stuns
+                .get(&actor.guid)
+                .is_some_and(|until| now_ms < *until)
+            {
+                continue;
+            }
+            let b = self
+                .behaviour_of
+                .get(&actor.guid)
+                .cloned()
+                .unwrap_or_default();
             if b.mode == Mode::Skittish {
                 if backup {
                     self.kiting.remove(&actor.guid);
@@ -2304,7 +2694,8 @@ impl EncounterEngine {
                 ];
                 // Stop inside reach so f32 rounding at world coordinates cannot
                 // strand a pursuer just outside the attack threshold.
-                let step = (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
+                let step =
+                    (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
                 for (coord, to) in s.position.iter_mut().zip(position) {
                     *coord += (to - *coord) / delta * step;
                 }
@@ -2328,9 +2719,9 @@ impl EncounterEngine {
                 }
                 self.enemy_attacks.insert(actor.guid, now_ms);
                 out.replies.push(animation(actor.guid, 1001, false));
-                let damage = actor
-                    .damage
-                    .min(self.state.player_health.saturating_sub(total_damage));
+                let attack_damage = (actor.damage as f32 * mitigation).round() as u32;
+                let damage =
+                    attack_damage.min(self.state.player_health.saturating_sub(total_damage));
                 out.replies.push(attack_processed(
                     actor.guid,
                     1,
@@ -2342,7 +2733,7 @@ impl EncounterEngine {
                     self.max_health,
                     false,
                 ));
-                total_damage = total_damage.saturating_add(actor.damage);
+                total_damage = total_damage.saturating_add(attack_damage);
             }
         }
         if !self.active() {
@@ -2364,6 +2755,9 @@ impl EncounterEngine {
             out.replies
                 .push(player_hp(self.state.player_health, self.max_health));
             if self.state.player_health == 0 {
+                self.skill_dots.clear();
+                self.skill_stuns.clear();
+                self.skill_buffs.clear();
                 if let Some(a) = &mut self.state.active {
                     a.phase = EncounterPhase::Lost;
                     out.replies
@@ -2489,6 +2883,7 @@ impl EncounterEngine {
         total_damage: &mut u32,
     ) {
         let ground = self.ground();
+        let mitigation = self.skill_mitigation();
         let mut engaged = false;
         let mut respawned = Vec::new();
         for (i, f) in self.field.iter_mut().enumerate() {
@@ -2505,6 +2900,14 @@ impl EncounterEngine {
                 continue;
             }
             let b = self.behaviour_of.get(&guid).cloned().unwrap_or_default();
+            if self
+                .skill_stuns
+                .get(&guid)
+                .is_some_and(|until| now_ms < *until)
+            {
+                engaged = true;
+                continue;
+            }
             let delta = distance(position, f.state.position);
             if delta > f.aggro_range || now_ms < self.field_grace_until {
                 let home = ground.snapped(f.actor.position);
@@ -2537,7 +2940,8 @@ impl EncounterEngine {
                     0.0,
                     (position[2] - f.state.position[2]) / delta,
                 ];
-                let step = (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
+                let step =
+                    (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
                 for (coord, to) in f.state.position.iter_mut().zip(position) {
                     *coord += (to - *coord) / delta * step;
                 }
@@ -2562,7 +2966,8 @@ impl EncounterEngine {
                 self.enemy_attacks.insert(guid, now_ms);
                 out.replies.push(animation(guid, 1001, false));
                 let left = self.state.player_health.saturating_sub(*total_damage);
-                let damage = f.actor.damage.min(left);
+                let attack_damage = (f.actor.damage as f32 * mitigation).round() as u32;
+                let damage = attack_damage.min(left);
                 out.replies.push(attack_processed(
                     guid,
                     1,
@@ -2571,7 +2976,7 @@ impl EncounterEngine {
                     self.max_health,
                     false,
                 ));
-                *total_damage = total_damage.saturating_add(f.actor.damage);
+                *total_damage = total_damage.saturating_add(attack_damage);
             }
         }
         for i in respawned {

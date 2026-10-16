@@ -233,6 +233,9 @@ class Checker:
     # -- tables ------------------------------------------------------------
     def load_tables(self, client: Path):
         self.locale = self.images = self.image_sets = self.anims = None
+        # Job ability animations may use a wield animation GROUP (e.g. 1099),
+        # not an AnimationSlot. Validate those against the client's job table.
+        self.ability_animation_groups = set()
         self.models = None
         if client.is_dir():
             loc = client / "locale" / "en_us_data.dat"
@@ -259,6 +262,12 @@ class Checker:
             if anim.is_file():
                 self.anims = load_animation_slots(anim)
                 self.tables["animations"] = {"path": str(anim), "rows": len(self.anims)}
+            wield = client / "Resources" / "WieldTypeAnimationMappings.txt"
+            if wield.is_file():
+                for line in wield.read_text().splitlines():
+                    fields = line.split("^")
+                    if len(fields) >= 3 and fields[0].isdigit() and 9 <= int(fields[0]) <= 14 and fields[2].isdigit():
+                        self.ability_animation_groups.add(int(fields[2]))
             models = client / "Resources" / "Models.txt"
             if models.is_file():
                 self.models = load_caret_ids(models)
@@ -402,6 +411,9 @@ class Checker:
                      "item id in no item definition table (runtime inventory.json, content, Legacy)")
 
     def check_anim(self, sev, file, path, field, value):
+        if file == "job_abilities.json" and value in self.ability_animation_groups:
+            self.stats["animation"] += 1
+            return
         if self.anims is None or not isinstance(value, int) or isinstance(value, bool) or value <= 0:
             return
         self.stats["animation"] += 1
@@ -425,6 +437,32 @@ class Checker:
                         self.add("error", "ability_level_invalid", rel,
                                  f"jobs[{j}].slots[{i}].min_level", "min_level", level,
                                  "ability requires an explicit integer job level in 1..20")
+                    effects = ability.get("effects", [])
+                    if not isinstance(effects, list) or len(effects) > 4:
+                        self.add("error", "ability_effect_invalid", rel,
+                                 f"jobs[{j}].slots[{i}].effects", "effects", effects,
+                                 "ability requires at most four bounded effects")
+                        continue
+                    def number(effect, key, low, high, integer=False):
+                        value = effect.get(key)
+                        return (type(value) is int if integer else type(value) in (int, float)) and low <= value <= high
+                    for n, effect in enumerate(effects):
+                        valid = isinstance(effect, dict)
+                        kind = effect.get("kind") if valid else None
+                        if kind == "area_damage":
+                            valid = number(effect, "radius", .1, 30) and number(effect, "max_targets", 1, 16, True) and type(effect.get("centered_on_caster")) is bool
+                        elif kind == "damage_over_time":
+                            valid = number(effect, "multiplier", .01, 10) and number(effect, "duration_ms", 500, 30000, True) and number(effect, "interval_ms", 500, effect.get("duration_ms", 0), True)
+                        elif kind == "stun":
+                            valid = number(effect, "duration_ms", 1, 10000, True)
+                        elif kind == "buff":
+                            valid = effect.get("recipient") in ("caster", "target") and number(effect, "duration_ms", 1, 30000, True) and number(effect, "damage_multiplier", .1, 3) and number(effect, "damage_taken_multiplier", .1, 3) and number(effect, "crit_bonus", 0, 50, True) and number(effect, "crit_damage_bonus", 0, 1)
+                        else:
+                            valid = False
+                        if not valid:
+                            self.add("error", "ability_effect_invalid", rel,
+                                     f"jobs[{j}].slots[{i}].effects[{n}]", "effects", effect,
+                                     "unknown effect or invalid numeric/target/timer bounds")
         unresolved = "unresolved" in rel
         ev = {"entries": collections.Counter(), "raw_kinds": collections.Counter(), "r_tags": 0,
               "records": 0, "records_by_kind": collections.Counter(), "records_without_evidence": 0}

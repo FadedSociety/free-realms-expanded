@@ -10,6 +10,42 @@ const TARGET: u64 = 0x1112_1314_1516_1718;
 const ABILITY_ID: i32 = 77;
 const EFFECT_ID: i32 = 9001;
 
+#[test]
+fn job_effect_bounds_reject_zero_timers_unbounded_targets_and_nonfinite_numbers() {
+    use abilities::JobEffect;
+    for value in [
+        serde_json::json!({"kind":"damage_over_time","multiplier":1,"duration_ms":1000,"interval_ms":0}),
+        serde_json::json!({"kind":"damage_over_time","multiplier":1,"duration_ms":30001,"interval_ms":1000}),
+        serde_json::json!({"kind":"area_damage","radius":6,"max_targets":17,"centered_on_caster":true}),
+        serde_json::json!({"kind":"stun","duration_ms":10001}),
+        serde_json::json!({"kind":"buff","recipient":"caster","duration_ms":1000,"damage_multiplier":100,"damage_taken_multiplier":1,"crit_bonus":0,"crit_damage_bonus":0}),
+    ] {
+        assert!(!serde_json::from_value::<JobEffect>(value).unwrap().valid());
+    }
+    assert!(
+        !JobEffect::AreaDamage {
+            radius: f32::NAN,
+            max_targets: 1,
+            centered_on_caster: true
+        }
+        .valid()
+    );
+    assert!(
+        !JobEffect::DamageOverTime {
+            multiplier: f32::INFINITY,
+            duration_ms: 1000,
+            interval_ms: 1000
+        }
+        .valid()
+    );
+    assert!(
+        serde_json::from_value::<JobEffect>(
+            serde_json::json!({"kind":"stun","duration_ms":1000,"extra":true})
+        )
+        .is_err()
+    );
+}
+
 fn sourced<T>(value: T) -> Sourced<T> {
     Sourced {
         value,

@@ -7,6 +7,139 @@ use std::{
 };
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
+
+#[allow(dead_code)]
+#[path = "../src/bin/osfr-bot.rs"]
+mod bot_client;
+
+#[test]
+#[ignore = "requires W101's owned scratch gateway and reference manifest"]
+fn scratch_warrior_level_five_bot_reads_kick_and_spinning_blade_bar() {
+    use std::time::Duration;
+    let reference = PathBuf::from(std::env::var_os("OSFR_W101_REFERENCE").unwrap());
+    let manifest: Value =
+        serde_json::from_slice(&fs::read(reference.join("manifest.json")).unwrap()).unwrap();
+    let config = bot_client::BotConfig {
+        gateway: std::env::var("OSFR_W101_GATEWAY").unwrap().parse().unwrap(),
+        name: String::new(),
+        connection_id: std::process::id(),
+        guid: manifest["initial_state"]["guid"].as_u64().unwrap(),
+        ticket: osfr_tools::login::DEFAULT_GATEWAY_TICKET.to_owned(),
+        version: manifest["client_version"].as_str().unwrap().to_owned(),
+        expect_timeout_ms: 10000,
+        quiet: true,
+    };
+    let mut bot = bot_client::Bot::connect(config).unwrap();
+    bot.login().unwrap();
+    bot.run_step(
+        &bot_client::parse_step("chat realm level 5")
+            .unwrap()
+            .unwrap(),
+    )
+    .unwrap();
+    let timeout = Duration::from_secs(10);
+    let mut definitions = Vec::new();
+    for (id, name) in [(62004_i32, 24540), (62005, 4908)] {
+        let packet = bot
+            .wait_for(timeout, |p| {
+                p.starts_with(&[36, 0, 13, 0]) && p[4..8] == id.to_le_bytes()
+            })
+            .unwrap();
+        assert_eq!(i32::from_le_bytes(packet[10..14].try_into().unwrap()), name);
+        definitions.push(json!({"definition_id":id,"name_id":name}));
+    }
+    let packet = bot
+        .wait_for(timeout, |p| p.starts_with(&[36, 0, 5, 0]))
+        .unwrap();
+    assert_eq!(i32::from_le_bytes(packet[4..8].try_into().unwrap()), 32);
+    assert_eq!(i32::from_le_bytes(packet[8..12].try_into().unwrap()), 8);
+    let mut at = 12;
+    let mut ids = Vec::new();
+    for _ in 0..8 {
+        let kind = i32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
+        assert!(kind == 0 || kind == 3);
+        ids.push(if kind == 3 {
+            i32::from_le_bytes(packet[at + 4..at + 8].try_into().unwrap())
+        } else {
+            0
+        });
+        at += if kind == 3 { 41 } else { 4 };
+    }
+    assert_eq!(at, packet.len());
+    assert_eq!(ids, [4895, 62004, 62005, 0, 0, 0, 0, 0]);
+    let receipt = json!({"profile":32,"level":5,"definitions":definitions,"toolbar_definition_ids":ids,"toolbar_bytes":packet.len(),"full_toolbar_decoded":true});
+    fs::write(
+        std::env::var_os("OSFR_W101_BOT_RECEIPT").unwrap(),
+        serde_json::to_vec_pretty(&receipt).unwrap(),
+    )
+    .unwrap();
+    println!("W101 bot: Warrior 5 toolbar [4895, 62004 Kick, 62005 Spinning Blade, 0, 0, 0, 0, 0]");
+    bot.disconnect();
+}
+
+// Independent expected levels: changing a content lock alone must fail this test.
+#[test]
+fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
+    let mut fixture = Fixture::new();
+    fixture.content["basics"] = json!([11, 32, 12, 2, 43, 35].map(
+        |profile| json!({"profile_id":profile,"definition_id":4895,"name_id":1,
+            "description_id":0,"icon_id":1,"weapon_name_id":1})
+    ));
+    fixture.write();
+    let jobs: Value =
+        serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
+    let abilities = load_jobs(&fixture, &jobs).unwrap();
+    for (profile, expected) in [
+        (11, vec![(1, 1), (2, 1), (3, 5), (4, 10), (5, 15)]),
+        (32, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
+        (12, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
+        (2, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
+        (43, vec![(1, 1), (2, 5), (3, 10)]),
+        (35, vec![(1, 1), (2, 5), (3, 10), (4, 15), (5, 20)]),
+    ] {
+        for (slot, minimum) in expected {
+            let ability = abilities.job_slot(profile, slot, minimum).unwrap();
+            assert_eq!(ability.min_level, minimum, "profile {profile}, slot {slot}");
+            let id = ability.definition_id;
+            assert!(abilities.job_slot(profile, slot, minimum - 1).is_none());
+            for level in [minimum - 1, minimum, 20] {
+                let packets = abilities.activation(profile, level).unwrap();
+                let defined = packets.iter().any(|p| {
+                    p.starts_with(&[36, 0, 13, 0])
+                        && i32::from_le_bytes(p[4..8].try_into().unwrap()) == id
+                });
+                assert_eq!(
+                    defined,
+                    level >= minimum,
+                    "profile {profile}, slot {slot}, level {level}"
+                );
+                let bar = packets.last().unwrap();
+                let mut at = 12;
+                for index in 0..8 {
+                    let kind = i32::from_le_bytes(bar[at..at + 4].try_into().unwrap());
+                    if index == slot {
+                        assert_eq!(kind == 3, level >= minimum);
+                    }
+                    at += if kind == 3 { 41 } else { 4 };
+                }
+                assert_eq!(at, bar.len());
+            }
+        }
+    }
+}
+
+#[test]
+fn full_roster_preserves_campaigns_with_only_some_basic_attacks() {
+    let fixture = Fixture::new(); // Brawler basic only
+    let jobs: Value =
+        serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
+    let abilities = load_jobs(&fixture, &jobs).unwrap();
+    assert!(abilities.job_slot(43, 1, 1).is_some());
+    assert!(abilities.job_slot(32, 1, 20).is_none());
+    let bar = abilities.activation(32, 20).unwrap();
+    assert_eq!(bar.len(), 1);
+    assert_eq!(&bar[0][12..], &[0; 32]);
+}
 struct Fixture {
     path: PathBuf,
     content: Value,
