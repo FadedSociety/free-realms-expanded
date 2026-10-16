@@ -104,7 +104,7 @@ fn roles_allow_only_the_documented_commands() {
 }
 
 #[test]
-fn schema_one_accounts_load_as_players_and_save_as_schema_two() {
+fn schema_one_accounts_load_as_players_and_save_as_schema_three() {
     let store = AccountStore::load(&legacy_fixture()).unwrap();
     assert_eq!(store.account_role(1), Some(AccountRole::Player));
 
@@ -112,7 +112,7 @@ fn schema_one_accounts_load_as_players_and_save_as_schema_two() {
     let path = temp.0.join("accounts.json");
     store.save(&path).unwrap();
     let document: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
-    assert_eq!(document["schema_version"], 2);
+    assert_eq!(document["schema_version"], 3);
     assert_eq!(document["store"]["roles"]["1"], "player");
     assert_eq!(
         AccountStore::load(&path).unwrap().account_role(1),

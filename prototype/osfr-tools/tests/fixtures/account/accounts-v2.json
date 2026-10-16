@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "store": {
+    "next_account_id": 2,
+    "next_character_guid": 1,
+    "accounts": {
+      "1": {
+        "id": 1,
+        "login_name_hash": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "flags": { "membership": false, "underage": false, "open_chat": false },
+        "slots": { "max_characters": 2 },
+        "character_guids": []
+      }
+    },
+    "characters": {},
+    "roles": { "1": "admin" }
+  }
+}

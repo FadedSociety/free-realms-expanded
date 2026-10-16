@@ -4,21 +4,25 @@
 use crate::{
     account::{Account, AccountFlags, CharacterRecord, SlotPolicy},
     character_store::{self, CharacterState},
+    login_auth::validate_public_key,
 };
 use osfr_tools::identity::{self, CharacterIdentity};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    fs::File,
-    io::{self, Read},
-    path::Path,
+    fs::{File, OpenOptions},
+    io::{self, Read, Write},
+    path::{Path, PathBuf},
 };
 
 // (R) Local envelope version; no original account save format was recovered.
-const SCHEMA_VERSION: u32 = 2;
+const SCHEMA_VERSION: u32 = 3;
+const ROLE_SCHEMA_VERSION: u32 = 2;
 const LEGACY_SCHEMA_VERSION: u32 = 1;
 // (R) Local defensive file bound.
 pub const MAX_FILE_BYTES: usize = 1024 * 1024;
+// (R) A small rotation/recovery allowance per account; no historical key model.
+pub const MAX_PUBLIC_KEYS: usize = 4;
 
 /// Local account authority. No original Free Realms role model was recovered.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -83,6 +87,10 @@ struct StoreData {
     /// (R) Authority is local policy, stored by account ID outside the recovered account record.
     #[serde(default)]
     roles: BTreeMap<u64, AccountRole>,
+    /// (R) Launcher public keys only. Empty means disabled, never passwordless.
+    /// Kept outside Account to preserve its recovered pre-game record shape.
+    #[serde(default)]
+    public_keys: BTreeMap<u64, Vec<[u8; 32]>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -107,6 +115,33 @@ pub struct AccountStore {
     data: StoreData,
 }
 
+/// (R) Cooperative single-writer lock for the login owner and offline CLI.
+/// All writers must acquire this same lock before loading the store. A stale
+/// lock is an operator recovery decision, never removed on age/PID alone.
+pub struct AccountStoreLock(PathBuf);
+
+impl AccountStoreLock {
+    pub fn acquire(store_path: &Path) -> io::Result<Self> {
+        let mut name = store_path.as_os_str().to_os_string();
+        name.push(".lock");
+        let path = PathBuf::from(name);
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)?;
+        let guard = Self(path);
+        writeln!(file, "pid={}", std::process::id())?;
+        file.sync_all()?;
+        Ok(guard)
+    }
+}
+
+impl Drop for AccountStoreLock {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.0);
+    }
+}
+
 impl AccountStore {
     pub fn new() -> Self {
         Self {
@@ -116,6 +151,7 @@ impl AccountStore {
                 accounts: BTreeMap::new(),
                 characters: BTreeMap::new(),
                 roles: BTreeMap::new(),
+                public_keys: BTreeMap::new(),
             },
         }
     }
@@ -155,6 +191,7 @@ impl AccountStore {
         // auto-creates accounts from client-selected names, so first-login admin
         // would let a client race to seize authority. Bootstrap an admin locally.
         self.data.roles.insert(id, AccountRole::Player);
+        self.data.public_keys.insert(id, Vec::new());
         Ok(id)
     }
 
@@ -164,6 +201,56 @@ impl AccountStore {
 
     pub fn account_role(&self, id: u64) -> Option<AccountRole> {
         self.data.roles.get(&id).copied()
+    }
+
+    pub fn account_ids(&self) -> impl Iterator<Item = u64> + '_ {
+        self.data.accounts.keys().copied()
+    }
+
+    pub fn public_keys(&self, id: u64) -> Option<&[[u8; 32]]> {
+        self.data.public_keys.get(&id).map(Vec::as_slice)
+    }
+
+    /// (R) Operator provisioning, not a client-authorized mutation. The owner
+    /// must serialize and persist this change, or use the offline CLI lock.
+    pub fn add_public_key(&mut self, id: u64, bytes: &[u8]) -> io::Result<()> {
+        let key = validate_public_key(bytes).map_err(invalid_data)?;
+        let keys = self
+            .data
+            .public_keys
+            .get(&id)
+            .ok_or_else(|| invalid_data("unknown account"))?;
+        if keys.len() >= MAX_PUBLIC_KEYS
+            || self
+                .data
+                .public_keys
+                .values()
+                .any(|known| known.contains(&key))
+        {
+            return Err(invalid_data("public key is duplicate or key limit reached"));
+        }
+        self.data
+            .public_keys
+            .get_mut(&id)
+            .ok_or_else(|| invalid_data("unknown account"))?
+            .push(key);
+        Ok(())
+    }
+
+    /// (R) Removing the last key disables login; it does not delete the account.
+    pub fn remove_public_key(&mut self, id: u64, bytes: &[u8]) -> io::Result<()> {
+        let key = validate_public_key(bytes).map_err(invalid_data)?;
+        let keys = self
+            .data
+            .public_keys
+            .get_mut(&id)
+            .ok_or_else(|| invalid_data("unknown account"))?;
+        let index = keys
+            .iter()
+            .position(|known| *known == key)
+            .ok_or_else(|| invalid_data("public key is not enrolled"))?;
+        keys.remove(index);
+        Ok(())
     }
 
     /// Change a role only when `actor_account_id` is already an admin.
@@ -180,6 +267,17 @@ impl AccountStore {
                 "admin role required",
             ));
         }
+        self.set_account_role_offline(target_account_id, role)
+    }
+
+    /// (R) Local operator bootstrap/recovery only. Never route this method from
+    /// a remote packet. Network role changes use the admin-checked method above.
+    /// The offline CLI holds AccountStoreLock; host filesystem ACLs are authority.
+    pub fn set_account_role_offline(
+        &mut self,
+        target_account_id: u64,
+        role: AccountRole,
+    ) -> io::Result<()> {
         if !self.data.accounts.contains_key(&target_account_id) {
             return Err(io::Error::new(
                 io::ErrorKind::NotFound,
@@ -356,6 +454,13 @@ impl AccountStore {
         }
         let document: Document = serde_json::from_slice(&bytes).map_err(invalid_data)?;
         let mut data = document.store;
+        if document.schema_version < SCHEMA_VERSION {
+            if !data.public_keys.is_empty() {
+                return Err(invalid_data("legacy account store contains public keys"));
+            }
+            // (R) Migration never enrols keys implicitly or changes existing IDs.
+            data.public_keys = data.accounts.keys().map(|id| (*id, Vec::new())).collect();
+        }
         match document.schema_version {
             LEGACY_SCHEMA_VERSION => {
                 if !data.roles.is_empty() {
@@ -367,7 +472,7 @@ impl AccountStore {
                     .map(|id| (*id, AccountRole::Player))
                     .collect();
             }
-            SCHEMA_VERSION => {}
+            ROLE_SCHEMA_VERSION | SCHEMA_VERSION => {}
             _ => return Err(invalid_data("unsupported account store schema version")),
         }
         let store = Self { data };
@@ -412,6 +517,25 @@ impl AccountStore {
                 .any(|account_id| !self.data.accounts.contains_key(account_id))
         {
             return Err(invalid_data("account role records do not match accounts"));
+        }
+        if self.data.public_keys.len() != self.data.accounts.len()
+            || self
+                .data
+                .public_keys
+                .keys()
+                .any(|id| !self.data.accounts.contains_key(id))
+        {
+            return Err(invalid_data("public key records do not match accounts"));
+        }
+        let mut all_keys = BTreeSet::new();
+        for keys in self.data.public_keys.values() {
+            if keys.len() > MAX_PUBLIC_KEYS
+                || keys
+                    .iter()
+                    .any(|key| validate_public_key(key).is_err() || !all_keys.insert(*key))
+            {
+                return Err(invalid_data("invalid, duplicate or excessive public keys"));
+            }
         }
         let mut hashes = BTreeSet::new();
         let mut owned = BTreeSet::new();
@@ -501,4 +625,135 @@ fn read_legacy_state(path: &Path) -> io::Result<CharacterState> {
 
 fn invalid_data(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn schema_two_migrates_to_three_without_changing_roles_or_identity() {
+        let fixture =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/account/accounts-v2.json");
+        let before = std::fs::read(&fixture).unwrap();
+        let store = AccountStore::load(&fixture).unwrap();
+        assert_eq!(store.account_role(1), Some(AccountRole::Admin));
+        assert_eq!(store.public_keys(1), Some([].as_slice()));
+        let path =
+            std::env::temp_dir().join(format!("osfr-w83-migrate-{}.json", std::process::id()));
+        store.save(&path).unwrap();
+        let saved: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        assert_eq!(saved["schema_version"], 3);
+        assert_eq!(saved["store"]["public_keys"]["1"], serde_json::json!([]));
+        assert_eq!(AccountStore::load(&path).unwrap(), store);
+        let original: serde_json::Value = serde_json::from_slice(&before).unwrap();
+        for field in [
+            "accounts",
+            "characters",
+            "roles",
+            "next_account_id",
+            "next_character_guid",
+        ] {
+            assert_eq!(saved["store"][field], original["store"][field]);
+        }
+        assert_eq!(std::fs::read(fixture).unwrap(), before);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn public_keys_are_valid_unique_bounded_and_persisted() {
+        use ed25519_dalek::SigningKey;
+        let mut store = AccountStore::new();
+        let first = store
+            .create_account(
+                [1; 32],
+                AccountFlags::default(),
+                SlotPolicy { max_characters: 2 },
+            )
+            .unwrap();
+        let second = store
+            .create_account(
+                [2; 32],
+                AccountFlags::default(),
+                SlotPolicy { max_characters: 2 },
+            )
+            .unwrap();
+        let key = SigningKey::from_bytes(&[1; 32]).verifying_key().to_bytes();
+        store.add_public_key(first, &key).unwrap();
+        assert!(store.add_public_key(first, &key).is_err());
+        assert!(store.add_public_key(second, &key).is_err());
+        for seed in 2..=MAX_PUBLIC_KEYS as u8 {
+            store
+                .add_public_key(
+                    first,
+                    &SigningKey::from_bytes(&[seed; 32])
+                        .verifying_key()
+                        .to_bytes(),
+                )
+                .unwrap();
+        }
+        let before = store.clone();
+        let extra = SigningKey::from_bytes(&[99; 32]).verifying_key().to_bytes();
+        assert!(store.add_public_key(first, &extra).is_err());
+        for bytes in [vec![], vec![0; 31], vec![0; 32], vec![0; 33]] {
+            assert!(store.add_public_key(second, &bytes).is_err());
+        }
+        assert!(store.add_public_key(99, &extra).is_err());
+        assert_eq!(store, before);
+        let path = std::env::temp_dir().join(format!("osfr-w83-keys-{}.json", std::process::id()));
+        store.save(&path).unwrap();
+        assert_eq!(AccountStore::load(&path).unwrap(), store);
+        store.remove_public_key(first, &key).unwrap();
+        assert!(store.remove_public_key(first, &key).is_err());
+        assert_eq!(store.public_keys(first).unwrap().len(), MAX_PUBLIC_KEYS - 1);
+        store.add_public_key(second, &key).unwrap();
+        assert!(store.remove_public_key(99, &key).is_err());
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn schema_three_fails_closed_on_missing_or_invalid_key_records() {
+        let fixture: serde_json::Value =
+            serde_json::from_str(include_str!("../tests/fixtures/account/accounts-v2.json"))
+                .unwrap();
+        let path =
+            std::env::temp_dir().join(format!("osfr-w83-invalid-{}.json", std::process::id()));
+        for keys in [
+            serde_json::json!({}),
+            serde_json::json!({"2": []}),
+            serde_json::json!({"1": [vec![0u8; 32]]}),
+        ] {
+            let mut document = fixture.clone();
+            document["schema_version"] = serde_json::json!(3);
+            document["store"]["public_keys"] = keys;
+            let bytes = serde_json::to_vec(&document).unwrap();
+            std::fs::write(&path, &bytes).unwrap();
+            assert_eq!(
+                AccountStore::load(&path).unwrap_err().kind(),
+                io::ErrorKind::InvalidData
+            );
+            assert_eq!(std::fs::read(&path).unwrap(), bytes);
+        }
+        // Schema 2 must not smuggle in key enrolment during migration.
+        let mut document = fixture;
+        document["store"]["public_keys"] = serde_json::json!({"1": []});
+        std::fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
+        assert!(AccountStore::load(&path).is_err());
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn account_store_lock_excludes_other_writers_without_removing_the_owner() {
+        let path = std::env::temp_dir().join(format!("osfr-w83-lock-{}.json", std::process::id()));
+        let guard = AccountStoreLock::acquire(&path).unwrap();
+        assert!(
+            matches!(AccountStoreLock::acquire(&path), Err(error) if error.kind() == io::ErrorKind::AlreadyExists)
+        );
+        assert!(
+            matches!(AccountStoreLock::acquire(&path), Err(error) if error.kind() == io::ErrorKind::AlreadyExists)
+        );
+        drop(guard);
+        drop(AccountStoreLock::acquire(&path).unwrap());
+    }
 }
