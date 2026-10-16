@@ -94,8 +94,8 @@ fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
         (32, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
         (12, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
         (2, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
-        (43, vec![(1, 1), (2, 5), (3, 10)]),
-        (35, vec![(1, 1), (2, 5), (3, 10), (4, 15), (5, 20)]),
+        (43, vec![(1, 10), (2, 15), (3, 1)]), // W125: 2009 Brawler guide
+        (35, vec![(1, 5), (2, 1), (3, 15), (4, 10), (5, 20)]), // W125: 2009 Archer guide
     ] {
         for (slot, minimum) in expected {
             let ability = abilities.job_slot(profile, slot, minimum).unwrap();
@@ -134,7 +134,7 @@ fn full_roster_preserves_campaigns_with_only_some_basic_attacks() {
     let jobs: Value =
         serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
     let abilities = load_jobs(&fixture, &jobs).unwrap();
-    assert!(abilities.job_slot(43, 1, 1).is_some());
+    assert!(abilities.job_slot(43, 3, 1).is_some()); // Leg Sweep, the level-1 Brawler skill (W125)
     assert!(abilities.job_slot(32, 1, 20).is_none());
     let bar = abilities.activation(32, 20).unwrap();
     assert_eq!(bar.len(), 1);
