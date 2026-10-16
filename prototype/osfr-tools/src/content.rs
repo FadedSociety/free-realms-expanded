@@ -212,6 +212,12 @@ pub struct Quest {
     pub title_string_id: Option<u32>,
     pub giver_npc_id: u64,
     pub prerequisite_quest_ids: Vec<u32>,
+    /// (R) Authored offer gate; with `job`, applies to that job's level.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_level: Option<u8>,
+    /// Numeric profile id from jobs.json; no inferred gate from the quest file name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job: Option<i32>,
     pub objectives: Vec<ContentGoal>,
     pub rewards: Vec<RewardGrant>,
     pub source: Vec<SourceTag>,
@@ -545,6 +551,17 @@ impl ContentDb {
         for row in &self.quests {
             let owner = format!("quest {}", row.id);
             check_sources(&owner, &row.source)?;
+            if row
+                .min_level
+                .is_some_and(|level| !(1..=20).contains(&level))
+                || row.job.is_some_and(|profile| profile <= 0)
+            {
+                return Err(ContentError::InvalidRecord {
+                    record: owner,
+                    detail: "quest requirements need min_level 1..=20 and a positive job profile"
+                        .into(),
+                });
+            }
             for goal in &row.objectives {
                 check_goal_sources(&owner, goal)?;
             }
@@ -635,6 +652,14 @@ impl ContentDb {
         }
         for row in &self.quests {
             let owner = format!("quest {}", row.id);
+            if let Some(profile) = row.job {
+                reference(
+                    &owner,
+                    "job",
+                    profile,
+                    job_profiles.contains(&profile.to_string()),
+                )?;
+            }
             reference(
                 &owner,
                 "giver_npc_id",

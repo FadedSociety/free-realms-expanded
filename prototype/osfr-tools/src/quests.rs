@@ -14,6 +14,7 @@ use std::path::{Component, Path};
 
 const MAX_CONTENT: usize = 131_072;
 const MAX_JOURNAL: usize = 1_048_576;
+const MAX_SAVED_QUESTS: usize = 1024;
 const LOCAL_COMPONENT_BOUND: f32 = 1_000_000.0;
 
 fn invalid(text: &str) -> io::Error {
@@ -254,13 +255,26 @@ impl QuestEngine {
             trial_completions: 0,
         });
         if state.version != 1
-            || state.quests.len() > content.definitions.len()
-            || state.quests.keys().any(|id| !ids.contains(id))
+            || state.quests.len() > MAX_SAVED_QUESTS
             || state
                 .trial_best_ms
                 .is_some_and(|ms| ms == 0 || ms > content.trial.time_limit_ms)
         {
             return Err(invalid("unsupported or inconsistent saved quests"));
+        }
+        // (R) Retain completion history when an authored definition is removed.
+        state.quests.retain(|id, progress| {
+            if ids.contains(id) {
+                return true;
+            }
+            if !progress.counts.is_empty() || !progress.completed {
+                eprintln!("quest_save_repair quest={id} action=drop_legacy_counters");
+            }
+            progress.counts.clear();
+            progress.completed
+        });
+        if state.quests.values().any(|p| p.completed && !p.accepted) {
+            return Err(invalid("completed quest was never accepted"));
         }
         for definition in &content.definitions {
             let progress = state
@@ -272,6 +286,26 @@ impl QuestEngine {
                     completed: false,
                     rewarded: false,
                 });
+            // (R) Objective edits must not prevent login or pay completed rewards again.
+            if progress.counts.len() != definition.goals.len()
+                || progress
+                    .counts
+                    .iter()
+                    .zip(&definition.goals)
+                    .any(|(count, goal)| {
+                        *count > goal.required || (progress.completed && *count != goal.required)
+                    })
+            {
+                progress.counts = definition
+                    .goals
+                    .iter()
+                    .map(|goal| if progress.completed { goal.required } else { 0 })
+                    .collect();
+                eprintln!(
+                    "quest_save_repair quest={} action=reset_legacy_counters",
+                    definition.id
+                );
+            }
             if progress.counts.len() != definition.goals.len()
                 || progress
                     .counts

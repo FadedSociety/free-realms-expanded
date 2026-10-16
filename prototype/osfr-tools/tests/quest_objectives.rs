@@ -406,7 +406,12 @@ fn former_hollow_save_preserves_completion_and_resets_only_unearned_progress() {
         QuestStatus::Completed
     );
     old.quests.get_mut(&3_000_021).unwrap().counts = vec![1, 1];
-    assert!(QuestEngine::from_split_content(&path, 1, eligibility, Some(old)).is_err());
+    let repaired = QuestEngine::from_split_content(&path, 1, eligibility, Some(old)).unwrap();
+    assert_eq!(repaired.progress(3_000_021).unwrap().counts, [2]);
+    assert_eq!(
+        repaired.progress(3_000_021).unwrap().status,
+        QuestStatus::Completed
+    );
 }
 
 #[test]

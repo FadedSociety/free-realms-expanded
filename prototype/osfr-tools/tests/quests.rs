@@ -77,6 +77,43 @@ impl Drop for Reference {
 }
 
 #[test]
+fn legacy_objective_drift_resets_active_counts_and_preserves_reward_history() {
+    let reference = Reference::new();
+    let initial = reference.engine().state().clone();
+    for counts in [vec![], vec![1, 1], vec![21]] {
+        let mut saved = initial.clone();
+        saved.quests.get_mut(&1617).unwrap().counts = counts;
+        let repaired = QuestEngine::load(&reference.directory, Some(saved)).unwrap();
+        assert_eq!(repaired.state().quests[&1617].counts, [0]);
+        assert!(repaired.state().quests[&1617].accepted);
+    }
+    let mut saved = initial;
+    let progress = saved.quests.get_mut(&1617).unwrap();
+    progress.counts = vec![20, 20];
+    progress.completed = true;
+    progress.rewarded = true;
+    let repaired = QuestEngine::load(&reference.directory, Some(saved)).unwrap();
+    assert_eq!(repaired.state().quests[&1617].counts, [20]);
+    assert!(repaired.state().quests[&1617].completed);
+    assert!(repaired.state().quests[&1617].rewarded);
+    let mut content = reference.content.clone();
+    content["definitions"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|q| q["id"] != 1617);
+    content["journal"]["bindings"] = json!([]);
+    fs::write(
+        reference.directory.join("quests.json"),
+        serde_json::to_vec(&content).unwrap(),
+    )
+    .unwrap();
+    let removed = QuestEngine::load(&reference.directory, Some(repaired.state().clone())).unwrap();
+    assert!(removed.state().quests[&1617].completed);
+    assert!(removed.state().quests[&1617].rewarded);
+    assert!(removed.state().quests[&1617].counts.is_empty());
+}
+
+#[test]
 fn local_quest_requires_acceptance_and_grants_reward_exactly_once_after_reload() {
     let reference = Reference::new();
     let mut engine = reference.engine();
@@ -253,12 +290,19 @@ fn trial_rejects_teleport_clock_abuse_timeouts_and_reconnect_replays() {
 }
 
 #[test]
-fn invalid_saved_progress_and_private_content_fail_without_silent_reset() {
+fn counter_drift_repairs_but_invalid_reward_flags_and_private_content_fail() {
     let mut reference = Reference::new();
     let engine = reference.engine();
     let mut state = engine.state().clone();
     state.quests.get_mut(&900001).unwrap().counts[0] = 99;
-    assert!(QuestEngine::load(&reference.directory, Some(state)).is_err());
+    assert_eq!(
+        QuestEngine::load(&reference.directory, Some(state))
+            .unwrap()
+            .state()
+            .quests[&900001]
+            .counts,
+        [0]
+    );
     let mut state = engine.state().clone();
     state.quests.get_mut(&900001).unwrap().rewarded = true;
     assert!(QuestEngine::load(&reference.directory, Some(state)).is_err());

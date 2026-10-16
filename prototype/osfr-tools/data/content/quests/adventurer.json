@@ -679,6 +679,7 @@
     },
     {
       "id": 3000009,
+      "job": 43,
       "title_string_id": 4420074,
       "giver_npc_id": 9000000050,
       "prerequisite_quest_ids": [

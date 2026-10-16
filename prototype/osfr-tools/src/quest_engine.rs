@@ -23,10 +23,6 @@ const MAX_QUESTS: usize = 1024;
 const MAX_COUNT: u32 = 1_000_000;
 const MAX_SPLIT_CONTENT_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_SPLIT_TOTAL_BYTES: u64 = 32 * 1024 * 1024;
-// W92's eight objective-only replacements; all previously had empty lists.
-const REAUTHORED_HOLLOW_QUESTS: &[u32] = &[
-    3000021, 3000022, 3020014, 3030008, 3110012, 3120010, 3120022, 3120024,
-];
 
 #[derive(Deserialize)]
 struct SplitNpcFile {
@@ -246,7 +242,10 @@ fn invalid(message: &'static str) -> io::Error {
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CharacterEligibility {
+    /// Caller supplies the real active job level, never a client claim.
     pub player_level: u8,
+    /// (R) Jobs eligible for offers and their real levels. Supply only the active job
+    /// when enforcing a switch-job requirement; the engine does not infer profiles.
     pub job_levels: BTreeMap<String, u8>,
     pub member: bool,
     pub nonmember_quest_limit: usize,
@@ -651,7 +650,7 @@ impl QuestEngine {
         directory: &Path,
         character_id: u64,
         eligibility: CharacterEligibility,
-        mut state: Option<QuestState>,
+        state: Option<QuestState>,
     ) -> io::Result<Self> {
         let quest_dir = directory.join("quests");
         let npc_dir = directory.join("npcs");
@@ -762,7 +761,7 @@ impl QuestEngine {
         if jobs.schema_version != crate::content::SCHEMA_VERSION {
             return Err(invalid("unsupported split job schema"));
         }
-        let job_profile_ids = jobs
+        let job_profile_ids: BTreeMap<String, i32> = jobs
             .records
             .iter()
             .filter_map(|job| {
@@ -842,7 +841,7 @@ impl QuestEngine {
         }
         let mut definitions = quests
             .iter()
-            .map(|quest| definition_from_content(quest, character_id))
+            .map(|quest| definition_from_content(quest, character_id, &job_profile_ids))
             .collect::<io::Result<Vec<_>>>()?;
         for definition in &mut definitions {
             if let Some(extras) = runtime_goals.remove(&definition.id) {
@@ -876,32 +875,8 @@ impl QuestEngine {
                 })
             })
             .collect();
-        // (R) Split-catalogue rollout: a formerly hollow quest has no saved
-        // counters. Preserve historical completions without paying again;
-        // unfinished quests must earn the newly authored objectives. Other
-        // counter mismatches still fail validation instead of resetting saves.
-        if let Some(saved) = &mut state {
-            for definition in &definitions {
-                if let Some(progress) = saved.quests.get_mut(&definition.id) {
-                    if progress.counts.is_empty()
-                        && !definition.objectives.is_empty()
-                        && REAUTHORED_HOLLOW_QUESTS.contains(&definition.id)
-                    {
-                        let completed = progress.status == QuestStatus::Completed;
-                        progress.counts = definition
-                            .objectives
-                            .iter()
-                            .map(|goal| if completed { goal.required } else { 0 })
-                            .collect();
-                        if !completed && saved.pending_turnin == Some(definition.id) {
-                            saved.pending_turnin = None;
-                        }
-                    }
-                }
-            }
-        }
-        let mut engine = Self::new(character_id, definitions, eligibility, state)?;
-        engine.disabled = disabled;
+        let mut engine =
+            Self::new_with_disabled(character_id, definitions, eligibility, state, disabled)?;
         engine.poi_locations = poi_locations;
         engine.index_location_quests();
         if let Some(id) = engine
@@ -923,10 +898,15 @@ impl QuestEngine {
         eligibility: CharacterEligibility,
         state: Option<QuestState>,
     ) -> io::Result<Self> {
+        let job_profile_ids = content
+            .jobs
+            .iter()
+            .filter_map(|job| job.profile_id.map(|profile| (job.id.clone(), profile)))
+            .collect();
         let definitions = content
             .quests
             .iter()
-            .map(|quest| definition_from_content(quest, character_id))
+            .map(|quest| definition_from_content(quest, character_id, &job_profile_ids))
             .collect::<io::Result<Vec<_>>>()?;
         Self::new(character_id, definitions, eligibility, state)
     }
@@ -1002,6 +982,22 @@ impl QuestEngine {
         eligibility: CharacterEligibility,
         state: Option<QuestState>,
     ) -> io::Result<Self> {
+        Self::new_with_disabled(
+            character_id,
+            definitions,
+            eligibility,
+            state,
+            BTreeSet::new(),
+        )
+    }
+
+    fn new_with_disabled(
+        character_id: u64,
+        definitions: Vec<QuestDefinition>,
+        eligibility: CharacterEligibility,
+        state: Option<QuestState>,
+        disabled: BTreeSet<u32>,
+    ) -> io::Result<Self> {
         if character_id == 0 || definitions.is_empty() || definitions.len() > MAX_QUESTS {
             return Err(invalid(
                 "unsupported quest engine identity or definition count",
@@ -1025,7 +1021,7 @@ impl QuestEngine {
                 ));
             }
         }
-        let state = state.unwrap_or_else(|| QuestState {
+        let mut state = state.unwrap_or_else(|| QuestState {
             version: 1,
             character_id,
             quests: BTreeMap::new(),
@@ -1034,7 +1030,14 @@ impl QuestEngine {
             selected_quest_id: None,
             auto_switch_selected: false,
         });
-        validate_state(&state, character_id, &indexed)?;
+        if state.version != 1
+            || state.character_id != character_id
+            || state.quests.len() > MAX_QUESTS
+        {
+            return Err(invalid("saved quest identity, version or count is invalid"));
+        }
+        repair_counters(&mut state, &indexed, &disabled);
+        validate_state(&state, character_id, &indexed, &disabled)?;
         let mut engine = Self {
             character_id,
             eligibility,
@@ -1043,7 +1046,7 @@ impl QuestEngine {
             step_dialogue: BTreeMap::new(),
             job_profile_ids: BTreeMap::new(),
             dev_offer: None,
-            disabled: BTreeSet::new(),
+            disabled,
             location_quests: BTreeMap::new(),
             poi_locations: BTreeMap::new(),
             state,
@@ -1874,7 +1877,25 @@ impl QuestEngine {
 fn definition_from_content(
     quest: &crate::content::Quest,
     character_id: u64,
+    job_profile_ids: &BTreeMap<String, i32>,
 ) -> io::Result<QuestDefinition> {
+    if quest
+        .min_level
+        .is_some_and(|level| !(1..=20).contains(&level))
+    {
+        return Err(invalid("quest min_level must be in 1..=20"));
+    }
+    // (R) An explicit job gate uses that job's level, not another job/avatar level.
+    let job = quest
+        .job
+        .map(|profile| {
+            job_profile_ids
+                .iter()
+                .find(|(_, id)| **id == profile && profile > 0)
+                .map(|(job, _)| (job.clone(), quest.min_level.unwrap_or(1)))
+                .ok_or_else(|| invalid("quest job must reference a known positive profile id"))
+        })
+        .transpose()?;
     let objectives = quest
         .objectives
         .iter()
@@ -1965,7 +1986,11 @@ fn definition_from_content(
         giver_npc_id: quest.giver_npc_id,
         turnin_npc_id: quest.giver_npc_id,
         prerequisite_quest_ids: quest.prerequisite_quest_ids.clone(),
-        requirements: QuestRequirements::default(),
+        requirements: QuestRequirements {
+            player_level: quest.min_level.filter(|_| quest.job.is_none()),
+            job,
+            members_only: false,
+        },
         // Steps run in order, one active at a time, as the quest helper shows them.
         // Unordered, "report back to the giver" steps (Call the Crew!: Shakey, then
         // Ricky) would complete on the accepting conversation.
@@ -2024,22 +2049,81 @@ fn validate_definition(definition: &QuestDefinition) -> io::Result<()> {
     Ok(())
 }
 
+/// (R) Content-edit migration, including W92's formerly hollow records. No grants
+/// run here: completed status is authoritative history, never a new reward claim.
+fn repair_counters(
+    state: &mut QuestState,
+    definitions: &BTreeMap<u32, QuestDefinition>,
+    disabled: &BTreeSet<u32>,
+) {
+    state.quests.retain(|id, progress| {
+        let available = definitions.get(id).filter(|_| !disabled.contains(id));
+        let reason = if let Some(definition) = available {
+            if progress.counts.len() == definition.objectives.len()
+                && !progress
+                    .counts
+                    .iter()
+                    .zip(&definition.objectives)
+                    .any(|(count, goal)| {
+                        *count > goal.required
+                            || (progress.status == QuestStatus::Completed
+                                && *count != goal.required)
+                    })
+            {
+                return true;
+            }
+            progress.counts = definition
+                .objectives
+                .iter()
+                .map(|goal| {
+                    if progress.status == QuestStatus::Completed {
+                        goal.required
+                    } else {
+                        0
+                    }
+                })
+                .collect();
+            "reset_counters"
+        } else {
+            if progress.status == QuestStatus::Completed && progress.counts.is_empty() {
+                return true;
+            }
+            progress.counts.clear();
+            "drop_unavailable_counters"
+        };
+        // Only fixed text and a u32 id: one bounded line per repaired quest, no identity/chat.
+        eprintln!("quest_save_repair quest={id} action={reason}");
+        if state.pending_offer == Some(*id) && available.is_none() {
+            state.pending_offer = None;
+        }
+        if state.pending_turnin == Some(*id) {
+            state.pending_turnin = None;
+        }
+        if state.selected_quest_id == Some(*id) && available.is_none() {
+            state.selected_quest_id = None;
+        }
+        available.is_some() || progress.status == QuestStatus::Completed
+    });
+}
+
 fn validate_state(
     state: &QuestState,
     character_id: u64,
     definitions: &BTreeMap<u32, QuestDefinition>,
+    disabled: &BTreeSet<u32>,
 ) -> io::Result<()> {
-    if state.version != 1
-        || state.character_id != character_id
-        || state.quests.len() > definitions.len()
-        || state.quests.keys().any(|id| !definitions.contains_key(id))
-    {
+    if state.version != 1 || state.character_id != character_id || state.quests.len() > MAX_QUESTS {
         return Err(invalid(
             "saved quest state does not match definitions or character",
         ));
     }
     for (id, progress) in &state.quests {
-        let definition = &definitions[id];
+        let Some(definition) = definitions.get(id).filter(|_| !disabled.contains(id)) else {
+            if progress.status != QuestStatus::Completed || !progress.counts.is_empty() {
+                return Err(invalid("unavailable quest has nonhistorical progress"));
+            }
+            continue;
+        };
         if progress.counts.len() != definition.objectives.len()
             || progress
                 .counts
@@ -2075,7 +2159,9 @@ fn validate_state(
         || state.pending_turnin.is_some_and(|id| {
             state.quests.get(&id).is_none_or(|progress| {
                 progress.status != QuestStatus::Active
-                    || !is_complete(&definitions[&id], &progress.counts)
+                    || definitions
+                        .get(&id)
+                        .is_none_or(|definition| !is_complete(definition, &progress.counts))
             })
         })
     {
