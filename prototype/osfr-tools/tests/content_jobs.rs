@@ -21,6 +21,27 @@ fn write_json(path: &Path, value: &Value) {
     fs::write(path, serde_json::to_vec_pretty(value).unwrap()).unwrap();
 }
 
+/// Item rows for every item the quests reference (W110 rewards come from the
+/// generated catalogue, which this scratch content does not include).
+fn referenced_items(quests: &[Value]) -> Value {
+    let mut ids = std::collections::BTreeSet::new();
+    for quest in quests {
+        for reward in quest["rewards"].as_array().into_iter().flatten() {
+            for item in reward["items"].as_array().into_iter().flatten() {
+                ids.extend(item["definition_id"].as_i64());
+            }
+        }
+        for goal in quest["objectives"].as_array().into_iter().flatten() {
+            ids.extend(goal["item_id"].as_i64().or(goal["definition_id"].as_i64()));
+        }
+    }
+    let source = json!([{"kind": "reconstructed", "evidence": "(R) test fixture: a quest-referenced catalogue item"}]);
+    json!({"schema_version": 1, "records": ids.iter().map(|id| json!({
+        "id": id, "name_string_id": 0, "description_string_id": null,
+        "category_id": null, "source": source,
+    })).collect::<Vec<_>>()})
+}
+
 fn empty_file() -> Value {
     json!({"schema_version": 1, "records": []})
 }
@@ -122,7 +143,7 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
         &json!({"schema_version": 1, "records": quest_records}),
     );
     write_json(&scratch.join("pois.json"), &empty_file());
-    write_json(&scratch.join("items.json"), &empty_file());
+    write_json(&scratch.join("items.json"), &referenced_items(&quest_records));
     write_json(&scratch.join("dungeons.json"), &empty_file());
     write_json(&scratch.join("minigames.json"), &empty_file());
 

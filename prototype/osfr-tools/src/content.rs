@@ -184,11 +184,49 @@ pub enum ContentGoal {
     ReachPoi {
         id: u32,
         poi_id: u32,
+        // W104 explicit reach geometry (quest_engine::RuntimeGoal::ReachPoi).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        zone_id: Option<u32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        position: Option<[f32; 3]>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        radius: Option<f32>,
         source: Vec<SourceTag>,
     },
     VisitZone {
         id: u32,
         zone_id: u32,
+        source: Vec<SourceTag>,
+    },
+    // W104 runtime kinds; same fields as quest_engine::RuntimeGoal.
+    GatherResource {
+        id: u32,
+        resource_id: u32,
+        quantity: u32,
+        source: Vec<SourceTag>,
+    },
+    CraftRecipe {
+        id: u32,
+        recipe_id: u32,
+        quantity: u32,
+        source: Vec<SourceTag>,
+    },
+    FinishMinigame {
+        id: u32,
+        minigame_id: u32,
+        count: u32,
+        source: Vec<SourceTag>,
+    },
+    EquipItem {
+        id: u32,
+        definition_id: i32,
+        source: Vec<SourceTag>,
+    },
+    VisitPosition {
+        id: u32,
+        zone_id: u32,
+        position: [f32; 3],
+        radius: f32,
         source: Vec<SourceTag>,
     },
 }
@@ -200,7 +238,12 @@ impl ContentGoal {
             | Self::TalkToNpc { id, .. }
             | Self::CollectItem { id, .. }
             | Self::ReachPoi { id, .. }
-            | Self::VisitZone { id, .. } => *id,
+            | Self::VisitZone { id, .. }
+            | Self::GatherResource { id, .. }
+            | Self::CraftRecipe { id, .. }
+            | Self::FinishMinigame { id, .. }
+            | Self::EquipItem { id, .. }
+            | Self::VisitPosition { id, .. } => *id,
         }
     }
 }
@@ -218,9 +261,16 @@ pub struct Quest {
     /// Numeric profile id from jobs.json; no inferred gate from the quest file name.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub job: Option<i32>,
+    /// W104 publication flag: hollow quests are `false` and never offered.
+    #[serde(default = "enabled_by_default")]
+    pub enabled: bool,
     pub objectives: Vec<ContentGoal>,
     pub rewards: Vec<RewardGrant>,
     pub source: Vec<SourceTag>,
+}
+
+fn enabled_by_default() -> bool {
+    true
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -762,7 +812,12 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::TalkToNpc { id, source, .. }
         | ContentGoal::CollectItem { id, source, .. }
         | ContentGoal::ReachPoi { id, source, .. }
-        | ContentGoal::VisitZone { id, source, .. } => (id, source),
+        | ContentGoal::VisitZone { id, source, .. }
+        | ContentGoal::GatherResource { id, source, .. }
+        | ContentGoal::CraftRecipe { id, source, .. }
+        | ContentGoal::FinishMinigame { id, source, .. }
+        | ContentGoal::EquipItem { id, source, .. }
+        | ContentGoal::VisitPosition { id, source, .. } => (id, source),
     };
     check_sources(&format!("{owner} goal {id}"), source)
 }
@@ -825,6 +880,17 @@ fn validate_goal(
             zone_id,
             zones.contains(&zone_id.to_string()),
         ),
+        ContentGoal::EquipItem { definition_id, .. } => reference(
+            owner,
+            "goal.definition_id",
+            definition_id,
+            items.contains(&definition_id.to_string()),
+        ),
+        // The quest engine validates resource, recipe, minigame and geometry bindings.
+        ContentGoal::GatherResource { .. }
+        | ContentGoal::CraftRecipe { .. }
+        | ContentGoal::FinishMinigame { .. }
+        | ContentGoal::VisitPosition { .. } => Ok(()),
     }
 }
 

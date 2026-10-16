@@ -1943,6 +1943,72 @@ fn definition_from_content(
                 description: format!("Objective {}", id),
                 kind: ObjectiveKind::EnterArea { area_id: *zone_id },
             },
+            // W104 kinds, mapped exactly as `runtime_objective` maps them.
+            ContentGoal::GatherResource {
+                id,
+                resource_id,
+                quantity,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *quantity,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::GatherResource {
+                    resource_id: *resource_id,
+                },
+            },
+            ContentGoal::CraftRecipe {
+                id,
+                recipe_id,
+                quantity,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *quantity,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::CraftRecipe {
+                    recipe_id: *recipe_id,
+                },
+            },
+            ContentGoal::FinishMinigame {
+                id,
+                minigame_id,
+                count,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *count,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::FinishMinigame {
+                    minigame_id: *minigame_id,
+                },
+            },
+            ContentGoal::EquipItem {
+                id, definition_id, ..
+            } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::EquipItem {
+                    definition_id: *definition_id,
+                },
+            },
+            ContentGoal::VisitPosition {
+                id,
+                zone_id,
+                position,
+                radius,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::VisitPosition {
+                    zone_id: *zone_id,
+                    position: *position,
+                    radius: *radius,
+                },
+            },
         })
         .collect::<Vec<_>>();
     let mut reward = RewardGrant {
