@@ -172,6 +172,742 @@
           "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
         }
       ]
+    },
+    {
+      "guid": 131000102001,
+      "definition_id": 3156,
+      "model_id": 3284,
+      "name_id": 5100200,
+      "name": "Hooligan Wolf",
+      "texture_alias": "",
+      "position": [
+        -1899.204,
+        -50.59,
+        307.902
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Farnum outskirts",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-F1",
+        "centre": [
+          -1899.204,
+          -50.59,
+          307.902
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000004164,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 2470: model 3284 = wolf_generic.adr; lab/reports/locale-id-to-text.json row 83073: locale 5100200 = Hooligan Wolf. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2830, NPC row 4164, position [-1923.204, -49.37827, 295.9019]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 26.83 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102002,
+      "definition_id": 3156,
+      "model_id": 3284,
+      "name_id": 5100200,
+      "name": "Hooligan Wolf",
+      "texture_alias": "",
+      "position": [
+        -1887.867,
+        -51.14,
+        291.159
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Farnum outskirts",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-F2",
+        "centre": [
+          -1887.867,
+          -51.14,
+          291.159
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000004165,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 2470: model 3284 = wolf_generic.adr; lab/reports/locale-id-to-text.json row 83073: locale 5100200 = Hooligan Wolf. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2831, NPC row 4165, position [-1923.867, -48.80265, 299.1591]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102003,
+      "definition_id": 3156,
+      "model_id": 3284,
+      "name_id": 5100200,
+      "name": "Hooligan Wolf",
+      "texture_alias": "",
+      "position": [
+        -1962.89,
+        -46.92,
+        284.723
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Farnum outskirts",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-F3",
+        "centre": [
+          -1962.89,
+          -46.92,
+          284.723
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000004166,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 2470: model 3284 = wolf_generic.adr; lab/reports/locale-id-to-text.json row 83073: locale 5100200 = Hooligan Wolf. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2832, NPC row 4166, position [-1926.89, -50.08986, 292.7234]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102004,
+      "definition_id": 930050,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1779.455,
+        -28.88,
+        562.833
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "level_band": [
+        3,
+        4
+      ],
+      "level": 3,
+      "spawn_area": {
+        "id": "W102-H1",
+        "centre": [
+          -1779.455,
+          -28.88,
+          562.833
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000004159,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 204: model 203 = human_m_hooligan_brawler_01.agr; lab/reports/locale-id-to-text.json row 83257: locale 5100401 = Hooligan. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2825, NPC row 4159, position [-1779.455, -28.78084, 562.8329]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102005,
+      "definition_id": 930050,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1792.921,
+        -29.33,
+        579.55
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "level_band": [
+        3,
+        4
+      ],
+      "level": 3,
+      "spawn_area": {
+        "id": "W102-H2",
+        "centre": [
+          -1792.921,
+          -29.33,
+          579.55
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000004160,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 204: model 203 = human_m_hooligan_brawler_01.agr; lab/reports/locale-id-to-text.json row 83257: locale 5100401 = Hooligan. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2826, NPC row 4160, position [-1792.921, -29.21154, 571.5501]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102006,
+      "definition_id": 930050,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1789.626,
+        -30.24,
+        616.51
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "level_band": [
+        3,
+        4
+      ],
+      "level": 3,
+      "spawn_area": {
+        "id": "W102-H3",
+        "centre": [
+          -1789.626,
+          -30.24,
+          616.51
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000004161,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 204: model 203 = human_m_hooligan_brawler_01.agr; lab/reports/locale-id-to-text.json row 83257: locale 5100401 = Hooligan. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2827, NPC row 4161, position [-1793.626, -30.36199, 556.51]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 60.13 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102007,
+      "definition_id": 940102,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -664.762,
+        2.4,
+        299.608
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Sanctuary / Queensfields",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-Q1",
+        "centre": [
+          -664.762,
+          2.4,
+          299.608
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000002920,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 221: model 220 = bixie_m_warrior.adr; lab/reports/locale-id-to-text.json row 79860: locale 440711 = Bixie Soldier. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1663, NPC row 2920, position [-672.7616, 2.510802, 299.6082]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102008,
+      "definition_id": 940102,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -692.141,
+        2.4,
+        220.373
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Sanctuary / Queensfields",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-Q2",
+        "centre": [
+          -692.141,
+          2.4,
+          220.373
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000002932,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 221: model 220 = bixie_m_warrior.adr; lab/reports/locale-id-to-text.json row 79860: locale 440711 = Bixie Soldier. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1675, NPC row 2932, position [-696.1415, 2.447089, 216.3727]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 5.66 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102009,
+      "definition_id": 940102,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -651.667,
+        2.4,
+        231.947
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Sanctuary / Queensfields",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-Q3",
+        "centre": [
+          -651.667,
+          2.4,
+          231.947
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000002933,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 221: model 220 = bixie_m_warrior.adr; lab/reports/locale-id-to-text.json row 79860: locale 440711 = Bixie Soldier. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1676, NPC row 2933, position [-651.6667, 2.445076, 231.9467]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102010,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -347.084,
+        0.61,
+        1068.348
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Lakeshore / northeast Wilds",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-T1",
+        "centre": [
+          -347.084,
+          0.61,
+          1068.348
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000003149,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 169: model 168 = troll_shaman.adr; lab/reports/locale-id-to-text.json row 27287: locale 72269 = Troll Bone Shaman. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 112.07 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102011,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -351.103,
+        2.33,
+        1048.674
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Lakeshore / northeast Wilds",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-T2",
+        "centre": [
+          -351.103,
+          2.33,
+          1048.674
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000003150,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 169: model 168 = troll_shaman.adr; lab/reports/locale-id-to-text.json row 27287: locale 72269 = Troll Bone Shaman. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1893, NPC row 3150, position [-259.1032, 0.5111136, 1120.674]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.82 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        }
+      ]
+    },
+    {
+      "guid": 131000102012,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -447.084,
+        3.03,
+        1128.348
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [],
+      "behaviour": {
+        "reach": 2.5,
+        "chase_limit": 12.0,
+        "leash": 12.0
+      },
+      "zone_id": 0,
+      "region": "Lakeshore / northeast Wilds",
+      "level_band": [
+        1,
+        2
+      ],
+      "level": 1,
+      "spawn_area": {
+        "id": "W102-T3",
+        "centre": [
+          -447.084,
+          3.03,
+          1128.348
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "leash_radius": 12.0,
+      "reference_spawn_guid": 100000003149,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 169: model 168 = troll_shaman.adr; lab/reports/locale-id-to-text.json row 27287: locale 72269 = Troll Bone Shaman. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.28 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Third troll is an additional actor using NPC 3149 as a location anchor, not a third recovered community spawn. Friendly troll patrollers, Troll Summoner battle 96 and its small summoned trolls are unchanged."
+        }
+      ]
     }
   ]
 }
