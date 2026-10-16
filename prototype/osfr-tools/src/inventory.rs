@@ -314,22 +314,22 @@ pub struct Inventory {
 /// or per purchase cost seconds and ~50 MiB each. The key includes each file's
 /// size and modification time, so edited content is parsed again.
 fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
-    type Key = (
-        PathBuf,
-        Option<(u64, SystemTime)>,
-        Option<(u64, SystemTime)>,
-    );
+    type Key = (PathBuf, Option<[u8; 32]>, Option<(u64, SystemTime)>);
     static CACHE: OnceLock<Mutex<HashMap<Key, Arc<Content>>>> = OnceLock::new();
-    let stamp = |name: &str| {
-        fs::metadata(directory.join(name))
-            .ok()
-            .and_then(|m| Some((m.len(), m.modified().ok()?)))
-    };
-    let key = (
-        directory.to_path_buf(),
-        stamp("inventory.json"),
-        stamp("item-catalogue.json"),
-    );
+    // inventory.json (~2 MB) is keyed by its content: a same-size rewrite inside
+    // one timestamp tick must not return the old definitions. The ~50 MB
+    // catalogue keeps the cheap size + time stamp (R: it is generated, not edited).
+    const MAX_HASHED: u64 = 64 * 1024 * 1024;
+    let inventory = directory.join("inventory.json");
+    let digest = fs::metadata(&inventory)
+        .ok()
+        .filter(|m| m.len() <= MAX_HASHED)
+        .and_then(|_| fs::read(&inventory).ok())
+        .map(|bytes| <[u8; 32]>::from(Sha256::digest(&bytes)));
+    let stamp = fs::metadata(directory.join("item-catalogue.json"))
+        .ok()
+        .and_then(|m| Some((m.len(), m.modified().ok()?)));
+    let key = (directory.to_path_buf(), digest, stamp);
     let cache = CACHE.get_or_init(Default::default);
     if let Some(content) = cache.lock().unwrap_or_else(|e| e.into_inner()).get(&key) {
         return Ok(content.clone());

@@ -452,7 +452,63 @@ class Checker:
                      "animation id not an AnimationSlot id in AnimationTypes.xml")
 
     # -- walk ---------------------------------------------------------------
+    def check_power_ups(self, rel, data):
+        """power_ups.json sanity bounds; mirrors src/power_ups.rs (values stay tunable inside them)."""
+        def bad(path, value, why):
+            self.add("error", "power_up_invalid", rel, path, path.split(".")[-1], value, why)
+        def num(v, lo, hi, integer=False):
+            return (type(v) is int if integer else type(v) in (int, float)) and lo <= v <= hi
+        if not isinstance(data, dict) or data.get("schema_version") != 1:
+            return bad("schema_version", None, "power_ups.json needs schema_version 1")
+        kinds = data.get("kinds") if isinstance(data.get("kinds"), dict) else {}
+        for name, k in kinds.items():
+            where = f"kinds.{name}"
+            if not isinstance(k, dict) or not num(k.get("model_id"), 1, 2**31, True) or not isinstance(k.get("auto"), bool):
+                bad(where, k, "kind needs a positive model_id and a boolean auto")
+                continue
+            if not isinstance(k.get("source"), str) or not k["source"].strip():
+                bad(f"{where}.source", None, "kind needs a source note")
+            for key, lo, hi in (("heal_pct_max", 1, 100), ("energy", 1, 100), ("stun_ms", 500, 10000),
+                                ("duration_ms", 500, 30000), ("speed_pct", 0, 100)):
+                if key in k and not num(k[key], lo, hi, True):
+                    bad(f"{where}.{key}", k[key], f"{key} must be an integer in {lo}..{hi}")
+            if "scale" in k and not num(k["scale"], .25, 4):
+                bad(f"{where}.scale", k["scale"], "scale must be in 0.25..4")
+            a = k.get("area")
+            if a is not None and not (isinstance(a, dict) and num(a.get("radius"), .5, 30) and num(a.get("max_targets"), 1, 16, True)):
+                bad(f"{where}.area", a, "area needs radius 0.5..30 and max_targets 1..16")
+            b = k.get("burn")
+            if b is not None and not (isinstance(b, dict) and num(b.get("multiplier"), .01, 10)
+                                      and num(b.get("duration_ms"), 500, 30000, True)
+                                      and num(b.get("interval_ms"), 500, b.get("duration_ms") if type(b.get("duration_ms")) is int else 0, True)):
+                bad(f"{where}.burn", b, "burn needs multiplier 0.01..10, duration 500..30000 ms, interval 500..duration")
+            t = k.get("damage_by_tier")
+            if t is not None and not (isinstance(t, list) and len(t) == 5 and all(num(x, .01, 1000) for x in t)):
+                bad(f"{where}.damage_by_tier", t, "damage_by_tier needs exactly 5 numbers in 0.01..1000")
+        for name, t in (data.get("tables") or {}).items():
+            where = f"tables.{name}"
+            if not isinstance(t, dict) or not isinstance(t.get("source"), str) or not t["source"].strip():
+                bad(where, t, "table needs a source note")
+                continue
+            g = t.get("guaranteed", [])
+            if not isinstance(g, list) or len(g) > 8 or any(x not in kinds for x in g):
+                bad(f"{where}.guaranteed", g, "guaranteed must list at most 8 existing kinds")
+            for roll in ("health_roll", "other_roll"):
+                r = t.get(roll)
+                if r is None:
+                    continue
+                pool = r.get("pool") if isinstance(r, dict) else None
+                if not (isinstance(r, dict) and num(r.get("chance"), 0, .5) and isinstance(pool, dict) and 0 < len(pool) <= 64
+                        and all(n in kinds and num(w, 0, 1000, True) for n, w in pool.items()) and any(w > 0 for w in pool.values())):
+                    bad(f"{where}.{roll}", r, "roll needs chance 0..0.5 and a pool of existing kinds, weights 0..1000, one non-zero")
+        p = data.get("pickup")
+        if not (isinstance(p, dict) and num(p.get("ttl_ms"), 5000, 120000, True) and num(p.get("radius"), .5, 5)
+                and num(p.get("max_alive_per_instance"), 1, 32, True)):
+            bad("pickup", p, "pickup needs ttl_ms 5000..120000, radius 0.5..5, max_alive_per_instance 1..32")
+
     def check_file(self, rel: str, data):
+        if rel == "power_ups.json":
+            self.check_power_ups(rel, data)
         if rel == "job_abilities.json" and isinstance(data, dict):
             # Every skill must opt into its job level. Omission must never
             # silently turn a later skill into a level-one unlock.

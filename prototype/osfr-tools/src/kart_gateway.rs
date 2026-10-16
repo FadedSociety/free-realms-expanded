@@ -1,5 +1,11 @@
 //! Optional private race entry binding. Captured templates remain in the lab.
 //! Entry alone never awards anything; the race authority owns completion.
+//!
+//! Ordinary entry (W149, brief #3): a player starts a race by choosing the race option in the
+//! 26/9 menu of a gate NPC, which the client answers with 26/10 (`npc_interaction`). The gate NPCs
+//! come from the optional `kart_gates.json` beside `kart_entry.json`; that file is deliberately
+//! outside the content hash, so editing the gate list never invalidates a saved race. 102/1 stays
+//! a catalogue request and never starts a race. Every gate rule is reconstructed policy (R).
 use crate::{
     character_store::CharacterState,
     kart_entry::{EntryGate, EntryOutcome, KartEntryHandler, RaceEntryContent, RaceEntryContext},
@@ -28,6 +34,60 @@ pub struct KartGatewayContent {
     pub race: Option<crate::kart_service::KartServiceContent>,
 }
 
+/// (R) Client locale 3052 is the exact text "Kart Race Lobby"; the menu label for the race option
+/// until a better recovered label exists. Overridable in `kart_gates.json`.
+pub const DEFAULT_MENU_STRING_ID: u32 = 3052;
+/// (R) Upper bound on gate NPCs.
+pub const MAX_GATES: usize = 16;
+const MAX_GATES_FILE: usize = 16 * 1024;
+
+/// (R) The NPCs whose menu offers the race. Ids are NPC content keys, like `npc_interaction`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct KartGates {
+    pub schema_version: u32,
+    #[serde(default = "default_menu_string_id")]
+    pub menu_string_id: u32,
+    pub npcs: Vec<u64>,
+    /// (R) Seconds after a paid race before a gate NPC starts another; 0 is off.
+    /// Solo races pay on every finish, so without it racing can be farmed.
+    #[serde(default)]
+    pub reward_cooldown_s: u64,
+}
+
+/// (R) Sanity bound on the gate cooldown: one day.
+pub const MAX_REWARD_COOLDOWN_S: u64 = 86_400;
+
+fn default_menu_string_id() -> u32 {
+    DEFAULT_MENU_STRING_ID
+}
+
+/// Why an ordinary entry was refused. Nothing moved; the player is told with [`Self::message`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EntryDenied {
+    /// The chosen NPC is not a listed gate (a forged choice, or the list changed).
+    NotAGate,
+    /// The package has no race content, so a started race could never finish or pay.
+    NoRace,
+    AlreadyRacing,
+    /// Another activity (crafting, gathering, a battle) is running.
+    Busy,
+    /// The gate cooldown after a paid race has not passed (R).
+    Cooldown,
+}
+
+impl EntryDenied {
+    pub fn message(self) -> &'static str {
+        match self {
+            Self::NotAGate => "You can't start a race here.",
+            Self::NoRace => "Racing isn't open yet.",
+            Self::AlreadyRacing => "You are already in a race.",
+            Self::Busy => "Finish the active activity before racing.",
+            Self::Cooldown => "The track is being reset. Come back for another race soon.",
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ActiveKartEntry {
@@ -47,6 +107,10 @@ pub struct KartGatewayState {
     pub active: Option<ActiveKartEntry>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub race: Option<crate::kart_service::ServiceSnapshot>,
+    /// Unix seconds of the last paid race, for the gate cooldown (saved, so a
+    /// relog does not reset it).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_paid_unix: Option<u64>,
 }
 
 #[derive(Clone)]
@@ -56,6 +120,7 @@ pub struct KartGateway {
     entry: Option<KartEntryHandler>,
     race: Option<crate::kart_service::KartService>,
     rewards: Arc<crate::kart_rewards::KartRewardRegistry>,
+    gates: Option<Arc<KartGates>>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -77,6 +142,43 @@ pub(crate) fn player_status(guid: u64, flags: u32) -> Vec<u8> {
     bytes.extend(guid.to_le_bytes());
     bytes.extend(flags.to_le_bytes());
     bytes
+}
+
+fn now_unix() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs())
+}
+
+/// Reads the optional gate list. Absent means no NPC offers the race.
+fn load_gates(directory: &Path) -> io::Result<Option<KartGates>> {
+    let path = directory.join("kart_gates.json");
+    let metadata = match std::fs::symlink_metadata(&path) {
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(e),
+        Ok(m) => m,
+    };
+    if !metadata.is_file() {
+        return Err(invalid("kart gates must be a regular file"));
+    }
+    let mut bytes = Vec::new();
+    std::fs::File::open(path)?
+        .take((MAX_GATES_FILE + 1) as u64)
+        .read_to_end(&mut bytes)?;
+    if bytes.len() > MAX_GATES_FILE {
+        return Err(invalid("kart gates exceed 16 KiB"));
+    }
+    let gates: KartGates = serde_json::from_slice(&bytes).map_err(invalid)?;
+    let mut seen = std::collections::BTreeSet::new();
+    if gates.schema_version != 1
+        || gates.menu_string_id == 0
+        || gates.npcs.len() > MAX_GATES
+        || gates.reward_cooldown_s > MAX_REWARD_COOLDOWN_S
+        || !gates.npcs.iter().all(|npc| *npc != 0 && seen.insert(*npc))
+    {
+        return Err(invalid("invalid kart gates"));
+    }
+    Ok(Some(gates))
 }
 
 impl KartGateway {
@@ -147,6 +249,7 @@ impl KartGateway {
             next_instance: 48_000_001,
             active: None,
             race: None,
+            last_paid_unix: None,
         });
         if state.version != 1
             || state.content_sha256 != hash
@@ -229,6 +332,7 @@ impl KartGateway {
             entry: None,
             race,
             rewards,
+            gates: load_gates(directory)?.map(Arc::new),
         };
         if result.state.active.is_some() {
             result.rebuild_entry()?;
@@ -237,6 +341,56 @@ impl KartGateway {
     }
     pub fn state(&self) -> &KartGatewayState {
         &self.state
+    }
+    /// NPC content keys whose menu may list the race. Empty unless the package carries race
+    /// content: an NPC must never offer a race that cannot finish.
+    pub fn gate_npcs(&self) -> &[u64] {
+        match (&self.gates, &self.content.race) {
+            (Some(gates), Some(_)) => &gates.npcs,
+            _ => &[],
+        }
+    }
+    /// Locale id of the race option's menu label.
+    pub fn menu_string_id(&self) -> u32 {
+        self.gates
+            .as_ref()
+            .map_or(DEFAULT_MENU_STRING_ID, |g| g.menu_string_id)
+    }
+    /// Ordinary-entry admission for a 26/10 race choice at `npc_id` (already range-checked by the
+    /// NPC service). `busy` is true while another activity is running. Mutates nothing; on `Ok`
+    /// the caller runs the same job switch + [`Self::begin`] + [`Self::set_previous_job`] as the
+    /// developer command.
+    pub fn admit(&self, npc_id: u64, busy: bool) -> Result<(), EntryDenied> {
+        self.admit_at(npc_id, busy, now_unix())
+    }
+
+    /// [`Self::admit`] at a given time (unix seconds), for tests.
+    pub fn admit_at(&self, npc_id: u64, busy: bool, now_unix: u64) -> Result<(), EntryDenied> {
+        if !self
+            .gates
+            .as_ref()
+            .is_some_and(|g| g.npcs.contains(&npc_id))
+        {
+            return Err(EntryDenied::NotAGate);
+        }
+        if self.content.race.is_none() {
+            return Err(EntryDenied::NoRace);
+        }
+        if self.active() {
+            return Err(EntryDenied::AlreadyRacing);
+        }
+        if busy {
+            return Err(EntryDenied::Busy);
+        }
+        let cooldown = self.gates.as_ref().map_or(0, |g| g.reward_cooldown_s);
+        if self
+            .state
+            .last_paid_unix
+            .is_some_and(|paid| now_unix < paid.saturating_add(cooldown))
+        {
+            return Err(EntryDenied::Cooldown);
+        }
+        Ok(())
     }
     fn sync_race(&mut self) {
         self.state.race = self.race.as_ref().and_then(|r| r.snapshot());
@@ -516,6 +670,7 @@ impl KartGateway {
             // Keep the unpaid finish intact and release its progress frame.
             Err(_) => return Ok(Vec::new()),
         };
+        staged.state.last_paid_unix = Some(now_unix());
         staged.sync_race();
         *self = staged;
         *inventory = staged_inventory;

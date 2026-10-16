@@ -103,6 +103,8 @@ pub struct GameplayState {
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
 /// Farm (MiniGameData 111) under the recovered Chef job (45).
 const HARVESTING_GAME_ID: i32 = 111;
+/// (R) Minimum gap between answered activity-portal refreshes (167/1/4).
+const PORTAL_REFRESH_MS: u64 = 250;
 
 #[derive(Clone)]
 pub struct Gameplay {
@@ -142,6 +144,11 @@ pub struct Gameplay {
     stock_text: Option<Arc<HashSet<u32>>>,
     /// Optional native five-table test catalogue. Not character progression.
     kart_lobby_reply: Option<Arc<[u8]>>,
+    /// W150 (R): battles published in the activity portal (167/1/1). Not persisted.
+    activities: crate::activity_portal::Catalogue,
+    /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
+    /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
+    portal_refreshed_ms: Option<u64>,
     kart_entry: Option<crate::kart_gateway::KartGateway>,
     /// The authored content directory (data/content), for developer reloads.
     content_dir: PathBuf,
@@ -693,6 +700,12 @@ impl Gameplay {
                 }
             }
         }
+        let battle_file = npc_content.join("field_battles.json");
+        let activities = if battle_file.is_file() {
+            crate::activity_portal::Catalogue::load(&battle_file)?
+        } else {
+            Default::default()
+        };
         let npc_interaction = if npc_content.join("npcs").is_dir()
             && npc_content.join("stores.json").is_file()
             && npc_content.join("vendors.json").is_file()
@@ -807,6 +820,17 @@ impl Gameplay {
         };
         let mystery_chests = MysteryChests::load(directory, &inventory)?.map(Arc::new);
         let kart_entry = crate::kart_gateway::KartGateway::load(directory, kart_entry)?;
+        if let (Some(kart), Some(interaction)) = (&kart_entry, &npc_interaction) {
+            let unknown = interaction
+                .lock()
+                .map_err(|_| invalid("NPC interaction state is unavailable"))?
+                .set_race_gates(kart.gate_npcs(), kart.menu_string_id());
+            for npc in unknown {
+                npc_event(
+                    serde_json::json!({"event": "kart_gate_unknown_npc", "content_key": npc}),
+                );
+            }
+        }
         Ok(Self {
             mystery_chests,
             pending_chest: None,
@@ -856,6 +880,8 @@ impl Gameplay {
             role: crate::account_store::AccountRole::Player,
             role_commands: false,
             kart_lobby_reply,
+            activities,
+            portal_refreshed_ms: None,
             kart_entry,
             content_dir: npc_content.to_path_buf(),
         })
@@ -1272,6 +1298,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Talk => "talk",
                         npc_interaction::NpcAction::TurnInQuest { .. } => "turn_in_quest",
                         npc_interaction::NpcAction::Shop => "shop",
+                        npc_interaction::NpcAction::Race => "race",
                     };
                     serde_json::json!({
                         "id": option.id,
@@ -1336,6 +1363,7 @@ impl Gameplay {
                 self.npc_quests.as_mut(),
             );
             let mut out = Outcome::default();
+            let mut race_gate = None;
             match selected {
                 Ok(NpcSelection::Talk(mut context)) => {
                     if let Some(engine) = &mut self.npc_quests {
@@ -1481,6 +1509,16 @@ impl Gameplay {
                         "item_count": window.items.len()
                     }));
                 }
+                Ok(NpcSelection::Race) => {
+                    race_gate = Some(key);
+                    npc_event(serde_json::json!({
+                        "event": "npc_select",
+                        "guid": runtime_guid,
+                        "content_key": key,
+                        "option": option_id,
+                        "outcome": "race"
+                    }));
+                }
                 Ok(NpcSelection::Quest(quest)) => {
                     let has_offer = quest.outbound.iter().any(|message| {
                         matches!(
@@ -1522,6 +1560,24 @@ impl Gameplay {
                         "reason": "selection_rejected"
                     }));
                     return Err(invalid("NPC menu choice is unavailable"));
+                }
+            }
+            drop(interaction);
+            if let Some(gate) = race_gate {
+                // (R) Ordinary entry: the NPC service proved range and that this exact option
+                // was offered; the kart service decides admission. Staged, so a failure after
+                // the job switch leaves the player exactly as they were.
+                let busy = self.activity_busy();
+                match self.kart_entry.as_ref().map(|kart| kart.admit(gate, busy)) {
+                    Some(Ok(())) => {
+                        let mut staged = self.clone();
+                        out = staged.begin_kart_race(character)?;
+                        *self = staged;
+                    }
+                    Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
+                    None => out.replies.push(chat::system(
+                        crate::kart_gateway::EntryDenied::NoRace.message(),
+                    )),
                 }
             }
             return Ok(Some(out));
@@ -2205,6 +2261,7 @@ impl Gameplay {
             let mut out = self.initialization(character.position)?;
             self.append_npc_quest_login_sync(&mut out)?;
             self.append_warp_definitions(character, &mut out);
+            self.append_activity_list(&mut out);
             self.append_item_bar(now_ms, &mut out)?;
             return Ok(out);
         }
@@ -2292,6 +2349,7 @@ impl Gameplay {
         self.append_journal_updates(&before, &mut out)?;
         self.append_npc_quest_login_sync(&mut out)?;
         self.append_warp_definitions(character, &mut out);
+        self.append_activity_list(&mut out);
         self.append_item_bar(now_ms, &mut out)?;
         Ok(out)
     }
@@ -2520,6 +2578,9 @@ impl Gameplay {
                 }
             }
         }
+        if let Some(outcome) = self.handle_activity_portal(inner, character, now_ms)? {
+            return Ok(outcome);
+        }
         if let Some(outcome) = self.handle_warp(inner, character, now_ms)? {
             return Ok(outcome);
         }
@@ -2617,6 +2678,42 @@ impl Gameplay {
         Ok(out)
     }
 
+    /// True while a crafting, gathering or battle activity is running.
+    fn activity_busy(&self) -> bool {
+        self.forging.as_ref().is_some_and(Forging::active)
+            || self.smelting.as_ref().is_some_and(Smelting::active)
+            || self.cooking.as_ref().is_some_and(Cooking::active)
+            || self.mining.as_ref().is_some_and(Type8Engine::active)
+            || self.harvesting.as_ref().is_some_and(Type8Engine::active)
+            || self.encounter.as_ref().is_some_and(EncounterEngine::active)
+    }
+
+    /// Switches to Kart Driver and enters the track. Shared by the developer `realm race` command
+    /// and the ordinary NPC menu choice; the caller has already checked admission and `busy`.
+    fn begin_kart_race(&mut self, character: &CharacterState) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        let profiles = self
+            .profiles
+            .as_mut()
+            .ok_or_else(|| invalid("kart entry requires class content"))?;
+        // (R) Reconstructed starter unlock: the first race unlocks Kart Driver (no trainer
+        // unlock exists yet). The prior job is restored on exit.
+        let previous_job = profiles.active();
+        let first_time = profiles.unlock(48)?;
+        out.replies.push(profiles.select(48, &self.inventory)?);
+        if first_time {
+            self.give_starter_outfit(48, false, &mut out)?;
+        }
+        self.ensure_outfit(48, &mut out)?;
+        let kart = self.kart_entry.as_mut().unwrap();
+        let (replies, scene) = kart.begin(character)?;
+        kart.set_previous_job(previous_job);
+        out.replies.extend(replies);
+        out.scene_zoning = Some(scene);
+        out.changed = true;
+        Ok(out)
+    }
+
     fn handle_kart_entry(
         &mut self,
         inner: &[u8],
@@ -2627,36 +2724,13 @@ impl Gameplay {
         let mut out = Outcome::default();
         let active = self.kart_entry.as_ref().unwrap().active();
         if !active {
-            if self.forging.as_ref().is_some_and(Forging::active)
-                || self.smelting.as_ref().is_some_and(Smelting::active)
-                || self.cooking.as_ref().is_some_and(Cooking::active)
-                || self.mining.as_ref().is_some_and(Type8Engine::active)
-                || self.harvesting.as_ref().is_some_and(Type8Engine::active)
-                || self.encounter.as_ref().is_some_and(EncounterEngine::active)
-            {
-                out.replies
-                    .push(chat::system("Finish the active activity before racing."));
+            if self.activity_busy() {
+                out.replies.push(chat::system(
+                    crate::kart_gateway::EntryDenied::Busy.message(),
+                ));
                 return Ok(out);
             }
-            let profiles = self
-                .profiles
-                .as_mut()
-                .ok_or_else(|| invalid("kart entry requires class content"))?;
-            // Reconstructed local starter unlock, confined to the opt-in test campaign.
-            let previous_job = profiles.active();
-            let first_time = profiles.unlock(48)?;
-            out.replies.push(profiles.select(48, &self.inventory)?);
-            if first_time {
-                self.give_starter_outfit(48, false, &mut out)?;
-            }
-            self.ensure_outfit(48, &mut out)?;
-            let kart = self.kart_entry.as_mut().unwrap();
-            let (replies, scene) = kart.begin(character)?;
-            kart.set_previous_job(previous_job);
-            out.replies.extend(replies);
-            out.scene_zoning = Some(scene);
-            out.changed = true;
-            return Ok(out);
+            return self.begin_kart_race(character);
         }
         let exit = command.is_some_and(|c| c.trim().eq_ignore_ascii_case("realm exit"))
             || inner == [26, 0, 42, 0]
@@ -3043,6 +3117,7 @@ impl Gameplay {
             if path.is_file() {
                 if let Some(encounter) = self.encounter.as_mut() {
                     encounter.reload_field_battles(&path)?;
+                    self.activities = crate::activity_portal::Catalogue::load(&path)?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         for (guid, name, name_id, model_id, position, icon) in
                             encounter.battle_spawners()
@@ -3322,6 +3397,73 @@ impl Gameplay {
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
             || self.kart_entry.as_ref().is_some_and(|k| k.active());
         busy.then_some(piece_077::Blocker::Busy)
+    }
+
+    /// W150: the portal list for this player (167/1/1).
+    fn append_activity_list(&self, out: &mut Outcome) {
+        out.replies
+            .push(self.activities.list_packet(self.activity_viewer()));
+    }
+
+    fn activity_viewer(&self) -> crate::activity_portal::Viewer {
+        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
+        crate::activity_portal::Viewer {
+            combat_job: self
+                .abilities
+                .as_ref()
+                .is_some_and(|a| a.supports_basic(profile)),
+            level: self.job_level(profile),
+        }
+    }
+
+    /// W150 (R): 167/1/4 re-sends the list; 167/1/2 Play starts the published battle through the
+    /// same `begin()` as the battle start screen's Go. Unknown ids, a busy player, a non-combat
+    /// job or a low level get a chat line and change nothing; only the battle itself awards.
+    fn handle_activity_portal(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        use crate::activity_portal::Request;
+        let Some(request) = crate::activity_portal::parse(inner)? else {
+            return Ok(None);
+        };
+        let mut out = Outcome::default();
+        let viewer = self.activity_viewer();
+        match request {
+            Request::Refresh => {
+                // (R) Amplification bound: the client asks on job-level and
+                // membership changes, never in a burst.
+                if self
+                    .portal_refreshed_ms
+                    .is_none_or(|last| now_ms >= last.saturating_add(PORTAL_REFRESH_MS))
+                {
+                    self.portal_refreshed_ms = Some(now_ms);
+                    self.append_activity_list(&mut out);
+                }
+            }
+            Request::Play { activity } => {
+                let busy = self.warp_blocker().is_some() || self.encounter.is_none();
+                match self.activities.admit(activity, viewer, busy).map(|a| a.id) {
+                    Err(refusal) => out.replies.push(chat::system(&refusal.message())),
+                    Ok(battle) => {
+                        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
+                        let begun = self
+                            .encounter
+                            .as_mut()
+                            .map(|encounter| encounter.begin(battle, character.clone(), profile));
+                        match begun {
+                            Some(Ok(result)) => self.apply_encounter(result, &mut out)?,
+                            _ => out
+                                .replies
+                                .push(chat::system("You cannot start that activity here.")),
+                        }
+                    }
+                }
+            }
+        }
+        Ok(Some(out))
     }
 
     /// The client replaces its whole destination table with each 57.
@@ -7726,6 +7868,31 @@ mod w64_regional_quest_tests {
             level_five.last().unwrap().len()
         );
         std::fs::remove_dir_all(dir).ok();
+    }
+
+    /// Lead: a 4-byte 167/1/4 refresh returns the whole activity list, so it is
+    /// answered at most every 250 ms (amplification bound, R). The client's own
+    /// re-asks (job change, membership) are further apart than that.
+    #[test]
+    fn activity_portal_refresh_is_throttled() {
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        let who = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [-440.0, 0.8, 1292.0],
+            rotation: [1.0, 0.0, 0.0],
+        };
+        let refresh = [167, 0, 1, 4];
+        let first = game.handle_in_world(&refresh, &who, 10_000).unwrap();
+        assert!(!first.replies.is_empty(), "the first refresh is answered");
+        let burst = game.handle_in_world(&refresh, &who, 10_100).unwrap();
+        assert!(burst.replies.is_empty(), "a burst refresh is dropped");
+        let later = game.handle_in_world(&refresh, &who, 10_250).unwrap();
+        assert_eq!(
+            later.replies, first.replies,
+            "after 250 ms it is answered again"
+        );
     }
 
     /// W143: Inspect shows only unlocked jobs with ranks and the active job's

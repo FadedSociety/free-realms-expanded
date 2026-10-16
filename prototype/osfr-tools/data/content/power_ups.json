@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "kinds": {
+    "health_small": {
+      "model_id": 736,
+      "auto": true,
+      "heal_pct_max": 15,
+      "group": false,
+      "source": "Model 736 powerup_health_buff.adr (Models.txt); 15% from locale dev note 'combat - 15% health power up' (103703). Used automatically (client tutorial 388124). (R) small vs big share one model; pickup scale is reconstructed."
+    },
+    "health_big": {
+      "model_id": 736,
+      "auto": true,
+      "heal_pct_max": 50,
+      "group": true,
+      "scale": 1.5,
+      "source": "Model 736; 50% from locale dev note 'Heals 50% max hp, works across all tiers' (419605/419620); wiki: the big heart heals the whole group. (R) the 1.5 pickup scale."
+    },
+    "energy": {
+      "model_id": 737,
+      "auto": true,
+      "energy": 100,
+      "source": "Model 737 powerup_mana_buff.adr; locale dev note 'Mana Power up. Heals 100 mana' (hash 1788006282). Used automatically."
+    },
+    "flame_wave": {
+      "model_id": 1949,
+      "auto": false,
+      "name_id": 419611,
+      "icon_id": 27632,
+      "area": { "radius": 10.0, "max_targets": 16 },
+      "damage_by_tier": [1.0, 1.75, 3.06, 5.36, 9.38],
+      "burn": { "multiplier": 0.25, "duration_ms": 4000, "interval_ms": 1000 },
+      "source": "Model 1949 powerup_flame_wave.adr; name 419611, icon 27632 (Images.txt); description 419615 says burn plus slow. (R) radius 10, 16 targets, burn tuning; damage_by_tier is the x1.75 weapon-tier curve (final-era balance); the slow half is not built yet."
+    },
+    "earth_shard": {
+      "model_id": 1950,
+      "auto": false,
+      "name_id": 419625,
+      "icon_id": 27633,
+      "area": { "radius": 10.0, "max_targets": 16 },
+      "damage_by_tier": [1.0, 1.75, 3.06, 5.36, 9.38],
+      "stun_ms": 2500,
+      "source": "Model 1950 powerup_quake.adr; name 419625, icon 27633; description 419624 'damaging opponents near you and stunning opponents around you'. (R) radius, 16 targets, 2.5 s stun ('briefly'), damage curve."
+    },
+    "super_shield": {
+      "model_id": 1951,
+      "auto": false,
+      "name_id": 103799,
+      "icon_id": 27634,
+      "duration_ms": 5000,
+      "invulnerable": true,
+      "speed_pct": 30,
+      "source": "Model 1951 powerup_super_shield.adr; name 103799; description 103800 'prevents you from being hurt and increases your run speed for a few seconds'. (R) 5 s and +30% speed; mesh and icon are missing from the extracted pack set."
+    }
+  },
+  "tables": {
+    "standard": {
+      "health_roll": { "chance": 0.12, "pool": { "health_small": 85, "health_big": 15 } },
+      "other_roll": {
+        "chance": 0.10,
+        "pool": { "energy": 30, "flame_wave": 25, "earth_shard": 25, "super_shield": 20 }
+      },
+      "source": "(R) Chances and weights are reconstructed: no source holds them (the original 'standard weights' lived on the server). Two independent rolls mirror the two reactive procs 420826/420828."
+    },
+    "elite": {
+      "health_roll": { "chance": 0.25, "pool": { "health_small": 70, "health_big": 30 } },
+      "other_roll": {
+        "chance": 0.25,
+        "pool": { "energy": 25, "flame_wave": 25, "earth_shard": 25, "super_shield": 25 }
+      },
+      "source": "(R) Tougher enemies drop more often; chances and weights are reconstructed."
+    },
+    "boss": {
+      "guaranteed": ["health_big"],
+      "source": "(R) Bosses always drop a big heart (locale 'garunteed to drop a power up'); the choice of kind is reconstructed."
+    }
+  },
+  "pickup": {
+    "ttl_ms": 30000,
+    "radius": 1.5,
+    "max_alive_per_instance": 16,
+    "source": "(R) 30 s despawn so actors cannot pile up, 1.5 m walk-over radius, 16 alive per instance."
+  }
+}

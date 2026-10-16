@@ -63,8 +63,12 @@ const MAX_QUEST_BUNDLE_BYTES: usize = 1024 * 1024;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum NpcAction {
     Talk,
-    TurnInQuest { quest_id: u32 },
+    TurnInQuest {
+        quest_id: u32,
+    },
     Shop,
+    /// (R) Start the solo kart race (W149). Offered only by NPCs named in `kart_gates.json`.
+    Race,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -125,6 +129,8 @@ pub enum NpcSelection {
     Talk(DialogueContext),
     Quest(QuestOutcome),
     Shop(MerchantWindow),
+    /// The caller decides whether the race may start (`KartGateway::admit`).
+    Race,
 }
 
 #[derive(Deserialize)]
@@ -208,6 +214,9 @@ pub struct NpcInteraction {
     npcs: BTreeMap<u64, NpcRecord>,
     prices: BTreeMap<i32, StorePrice>,
     vendor_items: BTreeMap<u64, BTreeSet<i32>>,
+    /// (R) NPCs whose menu lists the kart race, and the label's locale id.
+    race_gates: BTreeSet<u64>,
+    race_string_id: u32,
     active: Option<ActiveInteraction>,
 }
 
@@ -310,8 +319,20 @@ impl NpcInteraction {
             npcs,
             prices,
             vendor_items,
+            race_gates: BTreeSet::new(),
+            race_string_id: 0,
             active: None,
         })
+    }
+
+    /// (R) List the kart race in these NPCs' menus. Returns the ids that are not NPC content, so a
+    /// stale gate list degrades to a logged no-op instead of failing the world load.
+    pub fn set_race_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
+        let (known, unknown): (Vec<u64>, Vec<u64>) =
+            npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
+        self.race_gates = known.into_iter().collect();
+        self.race_string_id = string_id;
+        unknown
     }
 
     /// Supply an explicit item-ID mapping for a vendor. (R) Current NPC content records stock
@@ -411,6 +432,11 @@ impl NpcInteraction {
                 active.shop_open = true;
                 active.shop_items = self.vendor_items.get(&npc_id).cloned().unwrap_or_default();
                 Ok(NpcSelection::Shop(self.merchant_window(npc)))
+            }
+            NpcAction::Race => {
+                // Choosing a race is not a conversation: drop the open menu.
+                self.active = None;
+                Ok(NpcSelection::Race)
             }
             NpcAction::TurnInQuest { quest_id } => {
                 let engine = quests
@@ -661,6 +687,9 @@ impl NpcInteraction {
         }
         if has_role(npc, NpcRole::Vendor) {
             options.push((NpcAction::Shop, SHOP_STRING_ID));
+        }
+        if self.race_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Race, self.race_string_id));
         }
         if options.len() > MAX_MENU_OPTIONS {
             return Err(NpcInteractionError::InvalidOption);
