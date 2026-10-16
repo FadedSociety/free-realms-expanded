@@ -102,6 +102,8 @@ The remaining dungeons, housing (missing scene assets), pets, mounts (including 
 
 ## Update log
 
+- **2026-10-15 (late night), first native two-player attempt (1.6):** the bot could not enter the world. Two single-character assumptions found and fixed: the encounter system only accepted a character with GUID 1 (`EncounterEngine::supports_location`), and a basic attack only counted when it targeted GUID 1 (now the attacker's own GUID). Canary: `tests/encounter.rs::any_character_guid_may_load_and_basic_attack`; suite 2088 passed. the owner's controller feedback: left stick now strafes (Q/E) instead of turning; camera drags keep the pointer inside the game window.
+
 - **2026-10-15 (late night):** Controller support for testing. The PC client has no gamepad driver (no XInput or DirectInput import; its gamepad and rumble types are shared PS3 code with nothing feeding them on PC). Added `scripts/launcher/gamepad_bridge.py`: XInput in, the client's own default keys and right-mouse camera out, only while the client window is in front; layout in `gamepad.json`, re-read live; `run-local-baseline.py --gamepad`. 6 mapping tests; not yet tried in game. For the Rust launcher (3.5), port it to `gilrs` (MIT/Apache, the owner's suggestion).
 
 - **2026-10-15 (late night):** Item 1.3 wired: the gateway builds each player's AddPc look from the same identity, profile and inventory as their own self data, and relays the two movement bytes (flags-only changes too). Next is the native two-player run (1.6).

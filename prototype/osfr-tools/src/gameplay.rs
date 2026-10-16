@@ -3976,6 +3976,7 @@ impl Gameplay {
         }
         let result = self.encounter.as_mut().unwrap().handle(
             inner,
+            character.guid,
             character.position,
             self.profiles.as_ref().unwrap().active(),
             now_ms,

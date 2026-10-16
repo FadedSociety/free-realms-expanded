@@ -4,7 +4,7 @@
   "cursor_speed": 700,
   "invert_y": false,
   "cursor_mode": "LT",
-  "left_stick": {"up": "W", "down": "S", "left": "A", "right": "D"},
+  "left_stick": {"up": "W", "down": "S", "left": "Q", "right": "E"},
   "buttons": {
     "A": "SPACE",
     "B": "X",

@@ -27,9 +27,10 @@ class Mapping(unittest.TestCase):
     def test_idle_pad_holds_nothing(self):
         self.assertEqual(bridge.plan(pad(lx=3000, ry=-3000), CFG), (set(), set(), (0.0, 0.0)))
 
-    def test_left_stick_walks_with_the_clients_wasd(self):
+    def test_left_stick_walks_with_the_configured_keys(self):
         keys, _, _ = bridge.plan(pad(lx=-32768, ly=32767), CFG)
-        self.assertEqual(keys, {ord("W"), ord("A")})
+        stick = CFG["left_stick"]
+        self.assertEqual(keys, {bridge.vk(stick["up"]), bridge.vk(stick["left"])})
 
     def test_buttons_and_triggers_press_their_keys(self):
         keys, mouse, _ = bridge.plan(pad(buttons=A | bridge.BUTTONS["LB"], rt=255), CFG)
@@ -46,6 +47,13 @@ class Mapping(unittest.TestCase):
         keys, mouse, (dx, _) = bridge.plan(pad(buttons=A | B, lt=255, rx=32767), CFG)
         self.assertEqual((keys, mouse), (set(), {"left", "right"}))
         self.assertAlmostEqual(dx, CFG["cursor_speed"])
+
+    def test_pointer_is_kept_inside_the_window(self):
+        rect = (100, 50, 1100, 850)
+        self.assertEqual(bridge.keep_inside((600, 400), rect), (600, 400))
+        self.assertEqual(bridge.keep_inside((5000, -20), rect), (1000, 130))
+        anchor = bridge.drag_anchor(rect)
+        self.assertEqual(bridge.keep_inside(anchor, rect), anchor)
 
 
 if __name__ == "__main__":

@@ -63,7 +63,7 @@ fn start(e: &mut EncounterEngine, guid: u64, position: [f32; 3], now: u64) {
         104_i32.to_le_bytes().to_vec(),
     ]
     .concat();
-    e.handle(&packet, position, 43, now).unwrap();
+    e.handle(&packet, 1, position, 43, now).unwrap();
 }
 
 fn close_packet(encounter: i32, instance: i32) -> Vec<u8> {
@@ -260,7 +260,7 @@ fn terminal_results_wait_for_native_close_and_remove_ack_never_returns_to_world(
         (-1_i32).to_le_bytes().repeat(2),
     ]
     .concat();
-    let acknowledged = e.handle(&ack, [0.0; 3], 43, 601).unwrap();
+    let acknowledged = e.handle(&ack, 1, [0.0; 3], 43, 601).unwrap();
     assert!(acknowledged.zoning.is_none());
     assert!(!acknowledged.changed && acknowledged.replies.is_empty());
     assert_eq!(e.state(), &before);
@@ -272,13 +272,13 @@ fn terminal_results_wait_for_native_close_and_remove_ack_never_returns_to_world(
             .rewards
             .is_empty()
     );
-    let exit = e.handle(&close_packet(0, 1), [0.0; 3], 43, 10002).unwrap();
+    let exit = e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 10002).unwrap();
     assert_eq!(exit.completed, Some(411));
     assert_eq!(exit.zoning.as_ref().unwrap().position, location().position);
     assert!(results_lifecycle(&exit).is_empty()); // The same native state is removed only once.
     assert!(exit.rewards.is_empty() && !e.active());
     assert!(
-        !e.handle(&close_packet(0, 1), [0.0; 3], 43, 10003)
+        !e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 10003)
             .unwrap()
             .changed
     );
@@ -292,7 +292,7 @@ fn native_close_requires_exact_current_instance_and_malformed_requests_preserve_
     e.on_zone_ready(43, 0).unwrap();
     let before = e.state().clone();
     for p in [close_packet(0, 0), close_packet(0, 2), close_packet(999, 1)] {
-        let result = e.handle(&p, [0.0; 3], 43, 0).unwrap();
+        let result = e.handle(&p, 1, [0.0; 3], 43, 0).unwrap();
         assert!(!result.changed && result.zoning.is_none());
         assert_eq!(e.state(), &before);
     }
@@ -301,22 +301,22 @@ fn native_close_requires_exact_current_instance_and_malformed_requests_preserve_
     let mut long = close_packet(0, 1);
     long.push(0);
     for p in [short, long] {
-        assert!(e.handle(&p, [0.0; 3], 43, 0).is_err());
+        assert!(e.handle(&p, 1, [0.0; 3], 43, 0).is_err());
         assert_eq!(e.state(), &before);
     }
     // Ui.QuitMiniGame uses the same real header while fighting. It leaves
     // without claiming dungeon completion or rewards.
-    let quit = e.handle(&close_packet(0, 1), [0.0; 3], 43, 1).unwrap();
+    let quit = e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 1).unwrap();
     assert!(quit.zoning.is_some() && quit.completed.is_none() && quit.rewards.is_empty());
     e.begin(411, location(), 43).unwrap();
     e.on_zone_ready(43, 2).unwrap();
     assert!(
-        !e.handle(&close_packet(0, 1), [0.0; 3], 43, 3)
+        !e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 3)
             .unwrap()
             .changed
     );
     assert!(
-        e.handle(&close_packet(0, 2), [0.0; 3], 43, 4)
+        e.handle(&close_packet(0, 2), 1, [0.0; 3], 43, 4)
             .unwrap()
             .zoning
             .is_some()
@@ -343,7 +343,7 @@ fn loss_presents_results_without_zoning_and_retry_resets_presentation() {
     start(&mut e, 200, [0.0; 3], 1000);
     let again = e.tick([0.0; 3], 43, 1100).unwrap();
     assert_eq!(results_lifecycle(&again), [18, 47, 19]);
-    let exit = e.handle(&close_packet(0, 1), [0.0; 3], 43, 1200).unwrap();
+    let exit = e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 1200).unwrap();
     assert!(exit.zoning.is_some() && exit.completed.is_none() && exit.rewards.is_empty());
     assert!(results_lifecycle(&exit).is_empty());
 }
@@ -366,19 +366,43 @@ fn native_bar_one_self_centered_basic_resolves_only_a_live_enemy_in_reach() {
     };
     for (bar, slot, position) in [(43, 0, [0.0; 3]), (1, 1, [0.0; 3]), (1, 0, [10.0; 3])] {
         assert!(
-            !e.handle(&packet(bar, slot), position, 43, 1000)
+            !e.handle(&packet(bar, slot), 1, position, 43, 1000)
                 .unwrap()
                 .changed
         );
     }
     assert!(!e.tick([0.0; 3], 43, 2000).unwrap().changed); // Invalid casts never arm.
-    assert!(e.handle(&packet(1, 0), [0.0; 3], 43, 2100).unwrap().changed);
+    assert!(e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2100).unwrap().changed);
     assert_eq!(e.state().active.as_ref().unwrap().enemies[0].health, 40);
-    assert!(!e.handle(&packet(1, 0), [0.0; 3], 43, 2699).unwrap().changed);
-    let win = e.handle(&packet(1, 0), [0.0; 3], 43, 2700).unwrap();
+    assert!(!e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2699).unwrap().changed);
+    let win = e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2700).unwrap();
     assert_eq!(win.defeated, vec![500]);
     assert_eq!(win.rewards.len(), 1);
-    assert!(!e.handle(&packet(1, 0), [0.0; 3], 43, 4000).unwrap().changed);
+    assert!(!e.handle(&packet(1, 0), 1, [0.0; 3], 43, 4000).unwrap().changed);
+}
+
+/// Build Plan 1.6: a second character (GUID 2) can stand in the world and its
+/// self-centred basic attack counts; another player's GUID does not.
+#[test]
+fn any_character_guid_may_load_and_basic_attack() {
+    let f = Fixture::new();
+    let mut e = f.load();
+    let second = CharacterState { guid: 2, ..location() };
+    assert!(e.supports_location(&second));
+    e.begin(411, second, 43).unwrap();
+    e.on_zone_ready(43, 0).unwrap();
+    let basic = |target: u64| {
+        [
+            vec![36, 0, 10, 0],
+            1_i32.to_le_bytes().to_vec(),
+            0_i32.to_le_bytes().to_vec(),
+            0_i32.to_le_bytes().to_vec(),
+            target.to_le_bytes().to_vec(),
+        ]
+        .concat()
+    };
+    assert!(!e.handle(&basic(1), 2, [0.0; 3], 43, 2000).unwrap().changed);
+    assert!(e.handle(&basic(2), 2, [0.0; 3], 43, 2100).unwrap().changed);
 }
 
 #[test]
@@ -634,7 +658,7 @@ fn malformed_requests_are_non_mutating_and_cooldown_cannot_burst() {
         vec![41, 0, 109, 0],
         vec![39, 0, 5],
     ] {
-        assert!(e.handle(&p, [0.0; 3], 1, 0).is_err());
+        assert!(e.handle(&p, 1, [0.0; 3], 1, 0).is_err());
         assert_eq!(e.state(), &before);
     }
     let hit = e.attack(201, [0.0; 3], 1, 0, 0).unwrap();
@@ -809,7 +833,7 @@ fn native_results_close_and_terminal_packets_match_compiled_community_writers() 
         assert_eq!(results_lifecycle(&result), [18, 47, 19]);
         assert!(result.zoning.is_none());
         assert!(
-            e.handle(&native_close, [0.0; 3], 43, 1000)
+            e.handle(&native_close, 1, [0.0; 3], 43, 1000)
                 .unwrap()
                 .zoning
                 .is_some()

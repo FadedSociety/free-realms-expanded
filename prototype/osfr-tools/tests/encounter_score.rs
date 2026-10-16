@@ -97,7 +97,7 @@ fn start(engine: &mut EncounterEngine, guid: u64, position: [f32; 3], now: u64) 
         104_i32.to_le_bytes().to_vec(),
     ]
     .concat();
-    engine.handle(&packet, position, 43, now).unwrap();
+    engine.handle(&packet, 1, position, 43, now).unwrap();
 }
 
 fn close_packet(encounter: i32, instance: i32) -> Vec<u8> {
@@ -250,20 +250,20 @@ fn duplicate_presentation_and_removal_ack_do_not_exit() {
         engine.active(),
         "the terminal state is held until a real close"
     );
-    let ack = engine.handle(&[39, 0, 7, 0], [0.0; 3], 43, now).unwrap();
+    let ack = engine.handle(&[39, 0, 7, 0], 1, [0.0; 3], 43, now).unwrap();
     assert!(
         ack.zoning.is_none() && engine.active(),
         "the client removal ACK must not exit"
     );
     let wrong = engine
-        .handle(&close_packet(0, 2), [0.0; 3], 43, now)
+        .handle(&close_packet(0, 2), 1, [0.0; 3], 43, now)
         .unwrap();
     assert!(
         wrong.zoning.is_none() && engine.active(),
         "a close for another instance is refused"
     );
     let bound = engine
-        .handle(&close_packet(0, 1), [0.0; 3], 43, now)
+        .handle(&close_packet(0, 1), 1, [0.0; 3], 43, now)
         .unwrap();
     assert!(bound.zoning.is_some(), "the bound instance close exits");
     assert!(!engine.active(), "the run clears only on the real close");

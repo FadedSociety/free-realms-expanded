@@ -96,6 +96,20 @@ def plan(pad: tuple[int, int, int, int, int, int, int], cfg: dict):
     return keys, mouse, velocity
 
 
+def keep_inside(point, rect, margin=0.1):
+    """Clamp a screen point into rect (left, top, right, bottom), inset by margin."""
+    left, top, right, bottom = rect
+    dx, dy = (right - left) * margin, (bottom - top) * margin
+    return (int(min(max(point[0], left + dx), right - dx)),
+            int(min(max(point[1], top + dy), bottom - dy)))
+
+
+def drag_anchor(rect):
+    """Where a camera drag starts: centred, above the character (R)."""
+    left, top, right, bottom = rect
+    return (left + right) // 2, top + (bottom - top) * 3 // 10
+
+
 # ---- Windows I/O -----------------------------------------------------------
 
 class XINPUT_GAMEPAD(ctypes.Structure):
@@ -184,6 +198,22 @@ def client_in_front(pid: int | None) -> bool:
         kernel32.CloseHandle(process)
 
 
+def client_rect() -> tuple[int, int, int, int]:
+    """The front window's client area in screen coordinates."""
+    window = user32.GetForegroundWindow()
+    rect = wintypes.RECT()
+    user32.GetClientRect(window, ctypes.byref(rect))
+    corner = wintypes.POINT(0, 0)
+    user32.ClientToScreen(window, ctypes.byref(corner))
+    return corner.x, corner.y, corner.x + rect.right, corner.y + rect.bottom
+
+
+def cursor() -> tuple[int, int]:
+    point = wintypes.POINT()
+    user32.GetCursorPos(ctypes.byref(point))
+    return point.x, point.y
+
+
 def exited(pid: int) -> bool:
     process = kernel32.OpenProcess(0x00100000, False, pid)  # SYNCHRONIZE
     if not process:
@@ -212,6 +242,11 @@ def run(pid: int | None):
             dt, last = now - last, now
             pad = read_pad(get_state) if client_in_front(pid) else None
             want_keys, want_mouse, velocity = plan(pad, cfg) if pad else (set(), set(), (0, 0))
+            pointing = bool(pad) and held(cfg["cursor_mode"], pad[0], pad[1], pad[2])
+            dragging = "right" in want_mouse and not pointing
+            rect = client_rect() if pad else None
+            if dragging and "right" not in mouse:
+                user32.SetCursorPos(*drag_anchor(rect))  # start every turn inside the game
 
             send(*[key_input(k, True) for k in keys - want_keys],
                  *[key_input(k, False) for k in want_keys - keys],
@@ -224,6 +259,17 @@ def run(pid: int | None):
             if any(step):
                 send(mouse_input(0x0001, *step))
                 carry = [carry[0] - step[0], carry[1] - step[1]]
+            if rect and (dragging or pointing):
+                here = cursor()
+                if keep_inside(here, rect) != here:
+                    if dragging:
+                        # Let go, jump back, grab again: the game keeps turning
+                        # and the pointer never leaves its window.
+                        send(mouse_input(MOUSE_FLAGS["right"][1]))
+                        user32.SetCursorPos(*drag_anchor(rect))
+                        send(mouse_input(MOUSE_FLAGS["right"][0]))
+                    else:
+                        user32.SetCursorPos(*keep_inside(here, rect))
             time.sleep(1 / 120)
     finally:
         send(*[key_input(k, True) for k in keys],

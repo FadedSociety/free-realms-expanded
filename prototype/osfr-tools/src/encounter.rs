@@ -1515,8 +1515,7 @@ impl EncounterEngine {
         self.dungeon().map(|d| d.zone.clone())
     }
     pub fn supports_location(&self, location: &CharacterState) -> bool {
-        location.guid == 1
-            && location.validate().is_ok()
+        location.validate().is_ok()
             && location.zone_id
                 == self
                     .dungeon()
@@ -1731,6 +1730,7 @@ impl EncounterEngine {
     pub fn handle(
         &mut self,
         inner: &[u8],
+        player_guid: u64,
         position: [f32; 3],
         profile_id: i32,
         now_ms: u64,
@@ -1867,7 +1867,7 @@ impl EncounterEngine {
                     return Ok(EncounterOutcome::default());
                 }
                 let guid = u64::from_le_bytes(inner[16..24].try_into().unwrap());
-                if target_type == 0 && guid == 1 {
+                if target_type == 0 && guid == player_guid {
                     // The original basic toolbar requests a self-centered attack.
                     // This supported slice resolves one nearby enemy on the server;
                     // original multi-target sweep effects remain unrecovered.
