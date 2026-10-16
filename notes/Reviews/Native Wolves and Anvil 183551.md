@@ -1,0 +1,32 @@
+# Native Wolves and Anvil — 183551
+
+**Accepted:** the continuing character defeated all five Hooligan Wolves through normal key1 attacks, returned to Cleetus, and received the quest reward. Recorded frames show real wolves pursuing and lunging, the character swinging the forged hammer, damage, and the wolves disappearing after defeat. The relocated anvil is visible and responds through the ordinary interaction menu.
+
+Startup preserved the character, inventory, equipment, quests and economy. The new save changed exactly one content hash to use the reviewed anvil placement; the anvil moved to `[-2088,-54.79,200]`. The complete 154,396-byte player payload matches the unchanged original community serializer, including 146 coins, Brawler, equipped forged hammer and the active wolf quest. Wolf art was unchanged. [Startup proof](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/analysis-live/native-opening-continuation-self-proof.json>) · [Migration review](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/anvil-migration-independent-review.json>)
+
+The first melee attempt was a testing failure: unsupported input commands did not deliver attacks; corrected commands arrived after knockout and the News panel reopened. The actual network capture shows no attack rejection or session error. A later valid batch delivered ten attacks. Each wolf took 100 + 80 damage; five distinct wolves died and were removed once. Live quest counts advanced 1 → 5, then completed. The winning attempt dealt 475 damage to the character, leaving 525 HP. Observed attack distances stayed below 2.41 units for the player and 2.45 for enemies; these are measurements from the last network positions, not an exact collision-model proof. [Combat checkpoint proof](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/analysis-live/native-five-wolves-checkpoint-proof.json>) · [Independent input review](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/native-five-wolves-input-independent-review.json>)
+
+The visual gate is independently checked from the stopped recording. The retained sequence shows four-legged gray/brown wolves approaching at video 955.5–956 seconds, changing into open-mouth lunge poses beside the player's hammer swing, then disappearing by 964 seconds with 5/5 in chat. No model substitution was required. The briefly older count in the top toast is a queued presentation update; the saved count and chat already reached 5/5. [Focused motion contact sheet](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/analysis/wolf-video-955.5-8-4fps/contact-sheet.jpg>) · [Independent visual review](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/stage7-native-wolf-visual-183551.json>)
+
+Cleetus's ordinary menu and Interact choice produced one reward emission: 18 coins (146 → 164) and 25 Brawler XP (125 → 150). A whole-gameplay comparison permits only those changes, quest 7 completion/reward flags and outdoor encounter deactivation. Inventory, hammer/equipment, materials, other quests, the five dead wolves and 525 HP remain exact. Quest 8 is still unaccepted at this checkpoint. [Turn-in proof](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/analysis-live/native-five-wolves-turnin-proof.json>) · [Winning checkpoint](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/state/opening-after-native-five-wolves-183551.json>) · [Rewarded checkpoint](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/state/opening-after-native-wolf-turnin-183551.json>)
+
+The new anvil is unobstructed in the returned farm scene. Normal X/menu/Interact requests reached it; because the character remained Brawler, the server correctly answered “Switch to Blacksmith before forging.” No crafting session started or materials changed. This accepts visibility and the ordinary job-gated interaction; forging from the new position has not been replayed. [Visible anvil](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/farm-return-anvil.png>) · [Interaction menu](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/anvil-new-interact-menu.png>) · [Job-gate message](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/anvil-new-offer.png>)
+
+The stopped run's final capture validation passed, and restart 193318 preserved all inventory/equipment, five dead wolves, earlier rewards and discoveries exactly alongside the later Gloam/Pappy progress. [Authoritative final proof](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T183551Z/analysis/native-wolves-gloam-final-proof.json>), SHA256 `95f0fea3aeb25fc5f56bed2aeb22a2b2d2c26065db7c743391ae41e88e5493bc`. [Restart proof](<%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T193318Z/analysis-live/native-gloam-restart-proof.json>), SHA256 `c2fc63162da569262e503459d9716b42ff906dc11c39a4c3887f9132edbc665c`. Full packet/pose limitations and later Gloam progress are recorded in [[Native Gloam Combat 183551]].
+
+**Still pending:** repeated Cleetus interaction and forging from the new anvil position. The reviewer changed only private evidence helpers and review notes; no native input, source, content, campaign save or original media was changed.
+
+## Evidence hashes
+
+| Evidence | SHA256 |
+| --- | --- |
+| Startup player proof | `56378b4f8a4eeb2a629913a6108618fdad98bd02a2cf825961e716decd85932b` |
+| Exact winning checkpoint | `68b2f561cba5745dddec374a3f75ed6fee51946f02db3587c771b2d43097cafd` |
+| Combat checkpoint proof | `0333220edee46d4521fb4f37942dc96282c6ae34c2920c1d065b613065014a52` |
+| Independent input review | `a4da1cb2d7dc500529afc792f1f2f455ec1c2c00b8ca0cc6763a7e3d252c14d8` |
+| Original wolf recording | `6561d1cd149dbaea53d684ae423deb89891d571d00a1a20260261f3a57d10ca3` |
+| Independent visual review | `492ef43f0decd13f3b909aeb028518d4cc8624bb8c731e500f46800d56fa073d` |
+| Exact rewarded checkpoint | `c24b9d8dbabe68335b29cc1a1be2b2061786b95d05fe079b8753103788d7347d` |
+| Turn-in whole-state proof | `4033c2d6f0b9b73b975a85e445ff85aab86f875c2682c522ec6b6d5590dc1bf2` |
+
+Video labels are nominal media times; no embedded UTC start tag is present. Original audio is retained separately. These frames establish the observed encounter, not every terrain/animation or the complete original game's combat mechanics.

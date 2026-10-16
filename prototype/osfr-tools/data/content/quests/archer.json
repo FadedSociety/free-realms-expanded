@@ -1,0 +1,1680 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3010001,
+      "title_string_id": 442268,
+      "giver_npc_id": 9000000514,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Entry quests (optional, before the line), row E1; name 'Being a Better Archer'; title id cell ucdt 3975471143 / ugdt 79072769"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3010002,
+      "title_string_id": 117607,
+      "giver_npc_id": 9000000515,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Entry quests (optional, before the line), row E2; name 'Aiming For Archery'; title id cell ucdt 525918602 (no ugdt twin found)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3010003,
+      "title_string_id": 22075,
+      "giver_npc_id": 9000000387,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 1; name 'Path of the Archer'; title id cell ucdt 346916944 / ugdt 956709502"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 1; name 'Path of the Archer'; title id cell ucdt 346916944 / ugdt 956709502"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22076,
+      "intro_text_string_id": 22074
+    },
+    {
+      "id": 3010004,
+      "title_string_id": 22102,
+      "giver_npc_id": 9000000387,
+      "prerequisite_quest_ids": [
+        3010003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 2; name 'Archer: Test of Agility'; title id cell ucdt 2872736102 / ugdt 698740440"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 2; name 'Archer: Test of Agility'; title id cell ucdt 2872736102 / ugdt 698740440"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22103,
+      "intro_text_string_id": 22101
+    },
+    {
+      "id": 3010005,
+      "title_string_id": 76956,
+      "giver_npc_id": 9000000387,
+      "prerequisite_quest_ids": [
+        3010004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 3; name 'Archer: Taking Aim'; title id cell ucdt 1592318659 / ugdt 1621075573"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 3; name 'Archer: Taking Aim'; title id cell ucdt 1592318659 / ugdt 1621075573"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76957,
+      "intro_text_string_id": 76955,
+      "end_text_string_id": 76958
+    },
+    {
+      "id": 3010006,
+      "title_string_id": 77036,
+      "giver_npc_id": 9000000387,
+      "prerequisite_quest_ids": [
+        3010005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 4; name 'Archer: Oath of Honor'; title id cell ucdt 1282410106 / ugdt 3515266682"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 4; name 'Archer: Oath of Honor'; title id cell ucdt 1282410106 / ugdt 3515266682"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77037,
+      "intro_text_string_id": 77035,
+      "end_text_string_id": 77038
+    },
+    {
+      "id": 3010007,
+      "title_string_id": 383045,
+      "giver_npc_id": 9000000106,
+      "prerequisite_quest_ids": [
+        3010006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 1: level 1 to 5 (Hilforn, northern Greenwood Forest), row 5; name 'Archer: Pondblaster Target Practice'; title id cell ucdt 3050272564 / ugdt 1629451368"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 1: level 1 to 5 (Hilforn, northern Greenwood Forest), row 5; name 'Archer: Pondblaster Target Practice'; title id cell ucdt 3050272564 / ugdt 1629451368"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 383046,
+      "intro_text_string_id": 383044,
+      "end_text_string_id": 383047
+    },
+    {
+      "id": 3010008,
+      "title_string_id": 77081,
+      "giver_npc_id": 9000000106,
+      "prerequisite_quest_ids": [
+        3010007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 1: level 1 to 5 (Hilforn, northern Greenwood Forest), row 6; name 'Archer: Explosive Expedition'; title id cell ucdt 601287164 / ugdt 989407822"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 1: level 1 to 5 (Hilforn, northern Greenwood Forest), row 6; name 'Archer: Explosive Expedition'; title id cell ucdt 601287164 / ugdt 989407822"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77082,
+      "intro_text_string_id": 77080,
+      "end_text_string_id": 77083
+    },
+    {
+      "id": 3010009,
+      "title_string_id": 387302,
+      "giver_npc_id": 9000000106,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 1: level 1 to 5 (Hilforn, northern Greenwood Forest), row 7; name 'Archer: Achieve Level 5'; title id cell ucdt 2765208117 / ugdt 492972920"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 1: level 1 to 5 (Hilforn, northern Greenwood Forest), row 7; name 'Archer: Achieve Level 5'; title id cell ucdt 2765208117 / ugdt 492972920"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387303,
+      "intro_text_string_id": 387301,
+      "end_text_string_id": 387304
+    },
+    {
+      "id": 3010010,
+      "title_string_id": 388246,
+      "giver_npc_id": 9500000245,
+      "prerequisite_quest_ids": [
+        3010009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 8; name 'Contract: All Around Win'; title id cell ucdt 1895177276 / ugdt 4190326292"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 8; name 'Contract: All Around Win'; title id cell ucdt 1895177276 / ugdt 4190326292"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388247,
+      "intro_text_string_id": 388245,
+      "end_text_string_id": 388248
+    },
+    {
+      "id": 3010011,
+      "title_string_id": 383170,
+      "giver_npc_id": 9000000106,
+      "prerequisite_quest_ids": [
+        3010009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 9; name 'Archer: Pondblaster Payback'; title id cell ucdt 561841327 / ugdt 1334304219"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 9; name 'Archer: Pondblaster Payback'; title id cell ucdt 561841327 / ugdt 1334304219"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 383171,
+      "intro_text_string_id": 383169,
+      "end_text_string_id": 383172
+    },
+    {
+      "id": 3010012,
+      "title_string_id": 77597,
+      "giver_npc_id": 9000000106,
+      "prerequisite_quest_ids": [
+        3010011
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 10; name 'Archer: Archer Departure'; title id cell ucdt 2502414492 / ugdt 2647469128"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 10; name 'Archer: Archer Departure'; title id cell ucdt 2502414492 / ugdt 2647469128"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77598,
+      "intro_text_string_id": 77596
+    },
+    {
+      "id": 3010013,
+      "title_string_id": 77653,
+      "giver_npc_id": 9000000230,
+      "prerequisite_quest_ids": [
+        3010012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 11; name 'Archer: No Arrows, No Work! (wiki: \"No Arrows, No Work\")'; title id cell ucdt 3770549603 / ugdt 3739512891"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 11; name 'Archer: No Arrows, No Work! (wiki: \"No Arrows, No Work\")'; title id cell ucdt 3770549603 / ugdt 3739512891"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77654,
+      "intro_text_string_id": 77652,
+      "end_text_string_id": 77655
+    },
+    {
+      "id": 3010014,
+      "title_string_id": 77660,
+      "giver_npc_id": 9000000230,
+      "prerequisite_quest_ids": [
+        3010013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 12; name 'Archer: No Bow, No Work! (wiki: \"No Bow, No Work\")'; title id cell ucdt 1515033996 / ugdt 1702398452"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 12; name 'Archer: No Bow, No Work! (wiki: \"No Bow, No Work\")'; title id cell ucdt 1515033996 / ugdt 1702398452"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77661,
+      "intro_text_string_id": 77659,
+      "end_text_string_id": 77662
+    },
+    {
+      "id": 3010015,
+      "title_string_id": 77667,
+      "giver_npc_id": 9000000230,
+      "prerequisite_quest_ids": [
+        3010014
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 13; name 'Archer: I Quit!'; title id cell ucdt 1441846825 / ugdt 2943553852"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 13; name 'Archer: I Quit!'; title id cell ucdt 1441846825 / ugdt 2943553852"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77668,
+      "intro_text_string_id": 77666,
+      "end_text_string_id": 77669
+    },
+    {
+      "id": 3010016,
+      "title_string_id": 77709,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [
+        3010015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 14; name 'Archer: Archer Test'; title id cell ucdt 2217794271 / ugdt 2346134924"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 14; name 'Archer: Archer Test'; title id cell ucdt 2217794271 / ugdt 2346134924"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77710,
+      "intro_text_string_id": 77708,
+      "end_text_string_id": 77711
+    },
+    {
+      "id": 3010017,
+      "title_string_id": 387314,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 15; name 'Archer: Achieve Level 10'; title id cell ucdt 3403789278 / ugdt 634959686"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 2: level 5 to 10 (Eddie, Hilforn, Vicki, Bullseye), row 15; name 'Archer: Achieve Level 10'; title id cell ucdt 3403789278 / ugdt 634959686"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387315,
+      "intro_text_string_id": 387313,
+      "end_text_string_id": 387316
+    },
+    {
+      "id": 3010018,
+      "title_string_id": 388258,
+      "giver_npc_id": 9000000314,
+      "prerequisite_quest_ids": [
+        3010017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 16; name 'Contract: Bowman for Hire'; title id cell ucdt 1833277519 / ugdt 632790390"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 16; name 'Contract: Bowman for Hire'; title id cell ucdt 1833277519 / ugdt 632790390"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3010019,
+      "title_string_id": 77734,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [
+        3010017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 17; name 'Archer: Paralyzing Poison'; title id cell ucdt 3380294928 / ugdt 3347039846"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 17; name 'Archer: Paralyzing Poison'; title id cell ucdt 3380294928 / ugdt 3347039846"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77735,
+      "intro_text_string_id": 77733,
+      "end_text_string_id": 77736
+    },
+    {
+      "id": 3010020,
+      "title_string_id": 77807,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [
+        3010019
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 18; name 'Archer: A Piercing Attack (wiki: \"A Stunning Effect\")'; title id cell ucdt 2811831921 / ugdt 1865438696"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 18; name 'Archer: A Piercing Attack (wiki: \"A Stunning Effect\")'; title id cell ucdt 2811831921 / ugdt 1865438696"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 17; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77808,
+      "intro_text_string_id": 77806,
+      "end_text_string_id": 77809
+    },
+    {
+      "id": 3010021,
+      "title_string_id": 77822,
+      "giver_npc_id": 9000000029,
+      "prerequisite_quest_ids": [
+        3010020
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 19; name 'Archer: Suspicious Smugglers (wiki: \"Suspicious Smuggler\")'; title id cell ucdt 4097537595 / ugdt 3020845930"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 19; name 'Archer: Suspicious Smugglers (wiki: \"Suspicious Smuggler\")'; title id cell ucdt 4097537595 / ugdt 3020845930"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77823,
+      "intro_text_string_id": 77821,
+      "end_text_string_id": 77824
+    },
+    {
+      "id": 3010022,
+      "title_string_id": 77827,
+      "giver_npc_id": 9000000029,
+      "prerequisite_quest_ids": [
+        3010021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 20; name 'Archer: Animal Investigation'; title id cell ucdt 1848912738 / ugdt 3814721178"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 20; name 'Archer: Animal Investigation'; title id cell ucdt 1848912738 / ugdt 3814721178"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77828,
+      "intro_text_string_id": 77826,
+      "end_text_string_id": 77829
+    },
+    {
+      "id": 3010023,
+      "title_string_id": 78404,
+      "giver_npc_id": 9000000156,
+      "prerequisite_quest_ids": [
+        3010022
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3010024,
+      "title_string_id": 387333,
+      "giver_npc_id": 9000000029,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 22; name 'Archer: Achieve Level 15'; title id cell ucdt 3603948762 / ugdt 1034120767"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 22; name 'Archer: Achieve Level 15'; title id cell ucdt 3603948762 / ugdt 1034120767"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387334,
+      "intro_text_string_id": 387332,
+      "end_text_string_id": 387335
+    },
+    {
+      "id": 3010025,
+      "title_string_id": 388331,
+      "giver_npc_id": 9000000314,
+      "prerequisite_quest_ids": [
+        3010024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 23; name 'Contract: No Boundaries on Bounties'; title id cell ucdt 3543505001 / ugdt 996705745"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 23; name 'Contract: No Boundaries on Bounties'; title id cell ucdt 3543505001 / ugdt 996705745"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3010026,
+      "title_string_id": 78436,
+      "giver_npc_id": 9000000029,
+      "prerequisite_quest_ids": [
+        3010024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 24; name 'Archer: Cutting Out the Buyers'; title id cell ucdt 3513207258 / ugdt 1884714280"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 24; name 'Archer: Cutting Out the Buyers'; title id cell ucdt 3513207258 / ugdt 1884714280"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78437,
+      "intro_text_string_id": 78435,
+      "end_text_string_id": 78438
+    },
+    {
+      "id": 3010027,
+      "title_string_id": 78443,
+      "giver_npc_id": 9000000163,
+      "prerequisite_quest_ids": [
+        3010026
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 25; name 'Archer: Finding Vicki'; title id cell ucdt 2452881847 / ugdt 1133665529"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 25; name 'Archer: Finding Vicki'; title id cell ucdt 2452881847 / ugdt 1133665529"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 24; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78444,
+      "intro_text_string_id": 78442,
+      "end_text_string_id": 78445
+    },
+    {
+      "id": 3010028,
+      "title_string_id": 78448,
+      "giver_npc_id": 9000000163,
+      "prerequisite_quest_ids": [
+        3010027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 26; name 'Archer: Remain Vigilant'; title id cell ucdt 464590162 / ugdt 3602893203"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 26; name 'Archer: Remain Vigilant'; title id cell ucdt 464590162 / ugdt 3602893203"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 25; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78449,
+      "intro_text_string_id": 78447,
+      "end_text_string_id": 78450
+    },
+    {
+      "id": 3010029,
+      "title_string_id": 78460,
+      "giver_npc_id": 9000000163,
+      "prerequisite_quest_ids": [
+        3010028
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 27; name 'Archer: New Challenges'; title id cell ucdt 580722156 / ugdt 818880508"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 27; name 'Archer: New Challenges'; title id cell ucdt 580722156 / ugdt 818880508"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 26; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78461,
+      "intro_text_string_id": 78459,
+      "end_text_string_id": 78462
+    },
+    {
+      "id": 3010030,
+      "title_string_id": 387345,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 28; name 'Archer: Achieve Level 20'; title id cell ucdt 3314188350 / ugdt 2997982990"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 4: level 15 to 20 (Eddie, Bowman Bilter, Orson), row 28; name 'Archer: Achieve Level 20'; title id cell ucdt 3314188350 / ugdt 2997982990"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387346,
+      "intro_text_string_id": 387344,
+      "end_text_string_id": 387347
+    },
+    {
+      "id": 3010031,
+      "title_string_id": 388483,
+      "giver_npc_id": 9000000314,
+      "prerequisite_quest_ids": [
+        3010030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 29; name \"Contract: That'll Teach 'Em\"; title id cell ucdt 3160196899 / ugdt 2076386523"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 29; name \"Contract: That'll Teach 'Em\"; title id cell ucdt 3160196899 / ugdt 2076386523"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 28; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3010032,
+      "title_string_id": 78468,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [
+        3010030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 30; name 'Archer: Building a Better Bow'; title id cell ucdt 3077039433 / ugdt 1052783941"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 30; name 'Archer: Building a Better Bow'; title id cell ucdt 3077039433 / ugdt 1052783941"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 28; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78469,
+      "intro_text_string_id": 78467,
+      "end_text_string_id": 78470
+    },
+    {
+      "id": 3010033,
+      "title_string_id": 78485,
+      "giver_npc_id": 9000000037,
+      "prerequisite_quest_ids": [
+        3010032
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 31; name 'Archer: Can You Hit a Bullseye? (wiki: \"Can You Hit a Bullseye\")'; title id cell ucdt 3469506590 / ugdt 2129446919"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 31; name 'Archer: Can You Hit a Bullseye? (wiki: \"Can You Hit a Bullseye\")'; title id cell ucdt 3469506590 / ugdt 2129446919"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 30; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78486,
+      "intro_text_string_id": 78484,
+      "end_text_string_id": 78487
+    },
+    {
+      "id": 3010034,
+      "title_string_id": 78494,
+      "giver_npc_id": 9000000029,
+      "prerequisite_quest_ids": [
+        3010033
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 32; name 'Archer: Attack From Above (wiki: \"Attack from Above\")'; title id cell ucdt 1961266450 / ugdt 2059630731"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 5: level 20 (the Bullseye finale), row 32; name 'Archer: Attack From Above (wiki: \"Attack from Above\")'; title id cell ucdt 1961266450 / ugdt 2059630731"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3010034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 31; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78495,
+      "intro_text_string_id": 78493,
+      "end_text_string_id": 78496
+    }
+  ]
+}

@@ -1,0 +1,2207 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "chugawump",
+        "name_string_id": 2898888135,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Chugawump."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key chugawump comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Chugawump; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Chugawump",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 2898888135,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 5,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Chugawump difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Briarwood (Briarheart)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 13,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "any combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": "Test Your Mettle",
+            "reason": null,
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Unlocking quest; cited [video] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Unlocking quest; cited [video] [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Not tagged on the wiki. Wiki shows a members coin bonus. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Briarwood (Briarheart)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "npc",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+                }
+              ]
+            },
+            "name": {
+              "value": "Chugawump",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Started by clicking Chugawump in Briarheart, Briarwood. Accepting shows his dialog: \"So you have decided to accept my challenge. Good! I'm pretty sure I'll win but give it your best try anyway!\" The game's own text for the NPC: \"Stand tall, soldier! This is no time to be dozin' off. I'm always on the lookout for someone to fight, so test my skills in combat and maybe teach them a thing or two.\" | [wiki] [video Huk5snVvXMI/00006, 00008]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (only goal listed)",
+              "value": "\"Defeat Chugawump\" (loc 3748953664). The goals panel shows \"Goals (1)\". No bonus goal. | [client] [video Huk5snVvXMI/00006, 00054] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Goals > Main (only goal listed); cited [client] [video Huk5snVvXMI/00006, 00054] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Goals > Main (only goal listed); cited [client] [video Huk5snVvXMI/00006, 00054] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Goals > Main (only goal listed); cited [client] [video Huk5snVvXMI/00006, 00054] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Related client text",
+              "value": "\"Knock out Chugawump in single combat.\" (loc 534594484), \"Defeated Chugawump in single combat!\" (loc 430567491), \"Defeat Chugawump in Briarwood.\" (loc 2152178449), \"Speak to Chugawump when the battle is over.\" (loc 3149972022), \"Return to Chugawump\" (loc 1701600098) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Goals > Related client text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": [
+            {
+              "label": "Shield phase",
+              "value": "System messages: \"Chugawump put up a shield and is taking less damage!\" (loc 4284143774) and \"Chugawump lowers his shield and is causing more damage!\" (loc 483534915). So he alternates a defence phase and an offence phase. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Shield phase; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Chugawump"
+              ],
+              "description": {
+                "value": "Chugawump, a large creature with a nameplate. No other enemies are named. | [video Huk5snVvXMI/00008] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Chugawump"
+              ],
+              "description": {
+                "value": "Chugawump, a large creature with a nameplate. No other enemies are named. | [video Huk5snVvXMI/00008] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Chugawump.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"13 Stars\" | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel",
+                "value": "One wheel per job: 5 items plus a 33 Coins slot | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members bonus",
+                "value": "\"Members Only Bonus: 68 Coins\" | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Members bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Quest-run chat line",
+                "value": "\"You receive 11 stars and 13 coins\" when Test Your Mettle's \"Defeat Chugawump\" goal completed | [video Huk5snVvXMI/00054]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Quest-run chat line; cited [video Huk5snVvXMI/00054]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 33,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Members bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 68,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Members bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Members bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "reported_coin_reward",
+                "conditions": {
+                  "value": "Quest-run chat line",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Quest-run chat line; cited [video Huk5snVvXMI/00054]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 13,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Quest-run chat line; cited [video Huk5snVvXMI/00054]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Quest-run chat line; cited [video Huk5snVvXMI/00054]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Raptor Bow of Ricochet",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Upshot Archer Quiver",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Bare-Knuckle Brawler Shoulderpads",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Atlas Hammer of Rage",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Energy Transfer Medic Backpack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Shockrod of Antibodies",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Chunin Ninja Shoulderguard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Shadow Blade of Soul Power",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Action Power Warrior Pauldrons",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Warlord Axe of Command",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Adept Wizard Talisman",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Disciple Wizard Long Cloak",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ornate Wand of Chaos",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "chugawump",
+            "kind": "quest",
+            "target_name": "Test Your Mettle",
+            "target_id": null,
+            "reason": "Guide gives a quest title but no resolved quest record ID.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Unlocking quest; cited [video] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Requirements > Unlocking quest; cited [video] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "zone",
+            "target_name": "Briarwood (Briarheart)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Entrance; cited [wiki] [video Huk5snVvXMI/00006, 00008]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "npc",
+            "target_name": "Chugawump",
+            "target_id": 9500000103,
+            "reason": "Exact name matches reconstructed NPC content key in briarwood.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/briarwood.json npc_id 9500000103; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Archer's Raptor Bow of Ricochet",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Archer's Ring of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Upshot Archer Quiver",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Bare-Knuckle Brawler Shoulderpads",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Brawler's Atlas Hammer of Rage",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Energy Transfer Medic Backpack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Medic's Ring of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Medic's Shockrod of Antibodies",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Chunin Ninja Shoulderguard",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Ninja's Shadow Blade of Soul Power",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Action Power Warrior Pauldrons",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Warrior's Warlord Axe of Command",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Adept Wizard Talisman",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Disciple Wizard Long Cloak",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Wizard's Ornate Wand of Chaos",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "chugawump",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key chugawump comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Chugawump; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Chugawump",
+            "definition_id": 930003,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 72862 resolves 'Chugawump'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930003 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Chugawump",
+            "definition_id": 930003,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Chugawump.md > Enemies and boss > Boss; cited [video Huk5snVvXMI/00008] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 72862 resolves 'Chugawump'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930003 is a W58 local projection."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

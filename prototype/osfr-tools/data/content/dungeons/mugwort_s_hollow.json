@@ -1,0 +1,2452 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "mugwort_s_hollow",
+        "name_string_id": 1339804009,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Mugwort's Hollow."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key mugwort_s_hollow comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Mugwort's Hollow; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Mugwort's Hollow",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 1339804009,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 4,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Mugwort's Hollow difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Northern Wilds (near Shrouded Glade)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 9,
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Requirements > Combat job level; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Requirements > Combat job level; cited [client] [wiki]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Requirements > Combat job level; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Requirements > Combat job level; cited [client] [wiki]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None found. Quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Northern Wilds (near Shrouded Glade)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "barrier",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the barrier in the northeast Wilds, \"along the mountain face between Snowhill and Shrouded Glade\". It has an Atlas icon. Client wording: \"Find Mugwort's Hollow outside of Shrouded Glade\" (loc 2107188895), \"west of Shrouded Glade\" (loc 2867760776, 4097395734). | [wiki] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat the druid, Mugwort!\" (loc 2793325066). Also quest text \"Defeat Mugwort in Mugwort's Hollow outside of Shrouded Glade\" (loc 2216126723). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Goals > Main; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Goals > Main; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Defeat all enemies!\" (wiki). The client has no exact string; the nearest is \"All enemies are defeated\" (loc 733152254). The bonus group exists: \"Mugwort's Hollow Bonus Objective\" (loc 863942879). | [wiki] [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Goals > Bonus; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Goals > Bonus; cited [wiki] [client]"
+                }
+              ]
+            },
+            {
+              "label": "Quest-side goals",
+              "value": "\"Pass the test of courage by exploring all of Mugwort's Hollow!\" (loc 1623844062) and \"See how far you can get through Mugwort's Hollow!\" (loc 1677061632) belong to a scouting dare, not the battle. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Goals > Quest-side goals; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Elder Mugwort"
+              ],
+              "description": {
+                "value": "Elder Mugwort (loc 3500909485, game data 1294913866) | Wiki boss name and client name agree. Quest text just says \"Mugwort\". | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (wiki)",
+              "names": [],
+              "description": {
+                "value": "Ravens, Battle Warthogs, Snakes, Giant Toads, Warthog Chargers, Toad Bouncers, Ghost Ravens, Ghost Snakes, Ghost Warthogs, Ghost Toads | Wiki list: living animals plus ghost versions. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not map Enemies (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not source stats for Enemies (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (client)",
+              "names": [],
+              "description": {
+                "value": "\"Warthog Charger\" (loc 2692431127), \"Toad Bouncer\" (loc 3060579901), \"Giant Toad\" (loc 128633574), \"Battle Warthogs\" (loc 1057237145), \"Forest Snakes\" (quest text loc 2646277932), \"Ghost Toad\" (loc 4168755251: toad_ghost), \"ghost raven\" (loc 3186883069) | \"Ghost Toad Immunity\" (loc 259364180) and \"Ghost Toad Belch\" (loc 444172207) are ability names. The client has no \"Ghost Warthog\" or \"Ghost Snake\" string by those words. Quest hints: \"They tend to be found in groups at Mugwort's Hollow.\" (loc 2953544010), \"They're slithering around Mugwort's Hollow.\" (loc 3708244266). | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Enemies (client); cited [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not map Enemies (client) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not source stats for Enemies (client)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Enemies (client); cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Elder Mugwort"
+              ],
+              "description": {
+                "value": "Elder Mugwort (loc 3500909485, game data 1294913866) | Wiki boss name and client name agree. Quest text just says \"Mugwort\". | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"370 Stars or less\" (wiki wording). No video. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "97 Coins slot on each job's wheel | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "264 Coins | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "One piece of clothing from a set for the player's job, random colour and body slot, for everyone in the instance | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "\"Complete the Mugwort's Hollow encounter.\" (loc 2950930613), full-group version (1339572619), \"Win Combat Encounter Mugwort's Hollow\" (939677309), \"Group: Mugwort's Hollow\" (118381270) | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Achievements; cited [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"IV\", matching difficulty 4. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 97,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 264,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Recurve Bow of Splintering",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Bodkin Archer Leggings",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Drill Hammer of Roundhouse",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Stick and Move Brawler Pants",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Megasaw of Immunization",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Pressure Wave Medic Fatigues (wiki: \"Pants\")",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Jagged Scythe of Flame Wave",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Sensei Ninja Hakama",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Threat Range Warrior Breeches (wiki: \"Greaves\")",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Double Axe of Warcry",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Disciple Wizard Slacks or Disciple Wizard Skirt",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Jewel Wand of Tsunami",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "zone",
+            "target_name": "Northern Wilds (near Shrouded Glade)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "object",
+            "target_name": "barrier",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "npc",
+            "target_name": "Elder Mugwort",
+            "target_id": 9500000895,
+            "reason": "Exact name matches reconstructed NPC content key in wilds.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/wilds.json npc_id 9500000895; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Archer's Recurve Bow of Splintering",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Archer's Ring of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Bodkin Archer Leggings",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Brawler's Drill Hammer of Roundhouse",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Stick and Move Brawler Pants",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Medic's Megasaw of Immunization",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Medic's Ring of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Pressure Wave Medic Fatigues (wiki: \"Pants\")",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Ninja's Jagged Scythe of Flame Wave",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Sensei Ninja Hakama",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Threat Range Warrior Breeches (wiki: \"Greaves\")",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Warrior's Double Axe of Warcry",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Disciple Wizard Slacks or Disciple Wizard Skirt",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Wizard's Jewel Wand of Tsunami",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "mugwort_s_hollow",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key mugwort_s_hollow comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Mugwort's Hollow; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Elder Mugwort",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Elder Mugwort",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

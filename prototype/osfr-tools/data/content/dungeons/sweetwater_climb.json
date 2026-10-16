@@ -1,0 +1,2726 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "sweetwater_climb",
+        "name_string_id": 2099088689,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Sweetwater Climb."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key sweetwater_climb comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Sweetwater Climb; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Sweetwater Climb",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 2099088689,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 2,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Sweetwater Climb difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Wugachug",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). The lobby panel shows no \"Requires a level\" line. No level-3 string exists in the client. | [wiki: Dungeons] [video l-KJnbZShSk/00018] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Sweetwater Climb minimum combat level; cited guide source index"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": 3,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Sweetwater Climb recommended level; cited guide source index"
+              }
+            ]
+          },
+          "job": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). The lobby panel shows no \"Requires a level\" line. No level-3 string exists in the client. | [wiki: Dungeons] [video l-KJnbZShSk/00018] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Requirements > Combat job level; cited [wiki: Dungeons] [video l-KJnbZShSk/00018] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Requirements > Combat job level; cited [wiki: Dungeons] [video l-KJnbZShSk/00018] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Requirements > Combat job level; cited [wiki: Dungeons] [video l-KJnbZShSk/00018] [client]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None. Many Wugachug and Tugaboom quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "No. Members get a coin bonus. Wiki: 135 Coins. A non-member result screen reads \"If you were a member, you'd receive this special bonus!\" with an Upgrade button and a number read as \"x185?\" (unclear). | [wiki] [video l-KJnbZShSk/00180]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Requirements > Members only; cited [wiki] [video l-KJnbZShSk/00180]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Requirements > Members only; cited [wiki] [video l-KJnbZShSk/00180]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Wugachug",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+                }
+              ]
+            },
+            "name": {
+              "value": "gate",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the gate in Wugachug. The prompt reads \"Sweetwater Climb\" with \"Press X or\" (a Wizard level 2 frame). On the world map it appears as a red marker beside the Sasparilla Brewery. The client says \"north of Wugachug\" (loc 58657603), \"the top of Sweetwater Climb\" (loc 742742451), \"Scale the heights of Sweetwater Climb\" (loc 2758965107). Atlas icon exists. | [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Save the Sasparilla!\" (loc 63281229). The video panel reads \"Save the S?perilla\" and \"Save the Serpentail\" (OCR misreads). Related client objectives: \"Defeat Rebel Mage Pollentine\" (loc 2532212357), \"Enter Sweetwater Climb and defeat Rebel Mage Pollentine.\" (loc 3701390561). | [client] [video l-KJnbZShSk/00064, 00152, 00156] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Main; cited [client] [video l-KJnbZShSk/00064, 00152, 00156] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Main; cited [client] [video l-KJnbZShSk/00064, 00152, 00156] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Main; cited [client] [video l-KJnbZShSk/00064, 00152, 00156] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Bonus: Defeat the Big Hungry Bear!\" (loc 2428234846; shorter 4115816633). Video reads \"Defeat the Big Hungry Bear\" and, once, \"Big Hungry Beast\". It is a single-target bonus with no counter. | [client] [video l-KJnbZShSk/00064, 00130, 00152] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Bonus; cited [client] [video l-KJnbZShSk/00064, 00130, 00152] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Bonus; cited [client] [video l-KJnbZShSk/00064, 00130, 00152] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Bonus; cited [client] [video l-KJnbZShSk/00064, 00130, 00152] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Panel shows",
+              "value": "\"Goals (2)\". Frame 00156 shows \"Goal Complete!\" on the main goal while the bonus is still open. Frame 00130 shows the bonus ticked and the main goal open. The order is free. | [video l-KJnbZShSk/00064, 00130, 00152, 00156]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Panel shows; cited [video l-KJnbZShSk/00064, 00130, 00152, 00156]"
+                }
+              ]
+            },
+            {
+              "label": "Internal group",
+              "value": "\"Sweetwater Climb Bonus Objective\" (loc 3273374895) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Internal group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Sweetwater Climb\" (loc 1227812529); \"Complete Sweetwater Climb\" (loc 1824201025) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Goals > Win text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Rebel Mage Pollentine"
+              ],
+              "description": {
+                "value": "Rebel Mage Pollentine (loc 3177946267, 2059468116) | Has a name bar at the top. Her line when the fight starts: \"Who are you? What have you done!\" Ability: \"Sweetwater - Pollentine's Sonic Blast\" (loc 3392390387). | [client] [video l-KJnbZShSk/00152, 00156] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Bonus target",
+              "names": [
+                "Big Hungry Bear"
+              ],
+              "description": {
+                "value": "Big Hungry Bear (loc 1639549639, 3262515666) | Red nameplate. Client text: \"The Big Hungry Bear has been scaring off picnicers and stealing their lunches! Teach him a lesson in manners!\" (loc 113976637). Damage number 1,566 seen on it. | [client] [video l-KJnbZShSk/00064] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not map Bonus target to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not source stats for Bonus target."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [
+                "Rebel Bixie Elites"
+              ],
+              "description": {
+                "value": "Rebel Bixie Elites (loc 4480112), Bixie Soldiers, Bixie Battlemages, Bears | Wiki list. The same bixie names appear in [[Bixie Hive]] (a \"Rebel Bixie Elite\" and a \"Bixie Battlemage\" there too). \"Bears\" and \"The bears are in Sweetwater Climb, but be careful; they are very aggressive!\" (loc 3711333813). | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Rebel Mage Pollentine"
+              ],
+              "description": {
+                "value": "Rebel Mage Pollentine (loc 3177946267, 2059468116) | Has a name bar at the top. Her line when the fight starts: \"Who are you? What have you done!\" Ability: \"Sweetwater - Pollentine's Sonic Blast\" (loc 3392390387). | [client] [video l-KJnbZShSk/00152, 00156] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sweetwater Climb.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "Wiki: \"242 Stars or less\". Video: \"Stars x119\" on one Archer 14 result screen. | [wiki] [video l-KJnbZShSk/00180]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Stars; cited [wiki] [video l-KJnbZShSk/00180]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Stars; cited [wiki] [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins",
+                "value": "Wiki: 80 Coins slot on every job's wheel. Video result screen: \"Coins x82\" in \"Your Rewards\". | [wiki] [video l-KJnbZShSk/00180]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              },
+              {
+                "label": "Total score",
+                "value": "1,614,500 on that run | [video l-KJnbZShSk/00180]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Total score; cited [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              },
+              {
+                "label": "Items on the result screen",
+                "value": "\"Point Blank Archer Cap\" and \"Roving Archer Boots\". The cap belongs to the Point Blank bonus clothing set, so it is the bonus-goal piece. The boots are on the wiki Archer wheel. | [video l-KJnbZShSk/00180] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Items on the result screen; cited [video l-KJnbZShSk/00180] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Items on the result screen; cited [video l-KJnbZShSk/00180] [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "Wiki: 135 Coins. Video unreadable (\"x185?\"). | [wiki] [video l-KJnbZShSk/00180]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "One piece of clothing from a set for the player's job, random colour and body slot, for everyone in the instance | [wiki] [video l-KJnbZShSk/00180]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Bonus-goal clothing; cited [wiki] [video l-KJnbZShSk/00180]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Bonus-goal clothing; cited [wiki] [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "\"Complete the Sweetwater Climb encounter.\" (loc 2955764924), full-group version (2944935037) | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Achievements; cited [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"II\", matching difficulty 2. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 80,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Coins; cited [wiki] [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 135,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Members-only bonus; cited [wiki] [video l-KJnbZShSk/00180]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Horse Bow of Blizzards",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Roving Archer Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Hammer of Rumbling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Bum Rush Brawler Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Antibiotic Medic Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Scalpel of Vitals",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Blade of 1000 Storms",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Sekkou Ninja Tabi Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Second Wind Warrior Hightops",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Axe of Cleaving",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Journeyman Wizard Shoes",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Wand of Glaciers",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "sweetwater_climb",
+            "kind": "zone",
+            "target_name": "Wugachug",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "object",
+            "target_name": "gate",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Entrance; cited [wiki] [client] [video eV2B20AJRkg/00008, OHuwchqU5V0/00174, 00198, 00222]"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "npc",
+            "target_name": "Rebel Mage Pollentine",
+            "target_id": 9500000994,
+            "reason": "Exact name matches reconstructed NPC content key in wugachug.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/wugachug.json npc_id 9500000994; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "npc",
+            "target_name": "Big Hungry Bear",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "npc",
+            "target_name": "Rebel Bixie Elites",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Archer's Horse Bow of Blizzards",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Roving Archer Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Brawler's Hammer of Rumbling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Bum Rush Brawler Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Antibiotic Medic Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Medic's Scalpel of Vitals",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Ninja's Blade of 1000 Storms",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Sekkou Ninja Tabi Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Second Wind Warrior Hightops",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Warrior's Axe of Cleaving",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Journeyman Wizard Shoes",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "sweetwater_climb",
+            "kind": "item",
+            "target_name": "Wizard's Wand of Glaciers",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key sweetwater_climb comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Sweetwater Climb; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Rebel Mage Pollentine",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Big Hungry Bear",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Bonus target; cited [client] [video l-KJnbZShSk/00064] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Rebel Bixie Elites",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Rebel Mage Pollentine",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sweetwater Climb.md > Enemies and boss > Boss; cited [client] [video l-KJnbZShSk/00152, 00156] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+// Find code in .text that auto-analysis left outside every function, define functions there (in memory
+// only: run with -readOnly so nothing is saved) and export them in ExportNativeMap's format.
+// A candidate start is the first non-padding byte of an uncovered run (padding = CC/90/00), or the first
+// non-padding byte after a RET inside such a run. Defined data is skipped. A created function is kept only if
+// its body is disjoint from earlier functions and the decompiler succeeds; repeated passes pick up new starts.
+// Args: <new output dir>. Writes functions.jsonl, define-report.tsv, summary.json.
+// These are Ghidra inferences, not original source; mappers must cite them as such.
+// @category OSFR
+import ghidra.app.script.GhidraScript;
+import ghidra.app.decompiler.DecompInterface;
+import ghidra.app.decompiler.DecompileResults;
+import ghidra.program.model.address.Address;
+import ghidra.program.model.listing.*;
+import ghidra.program.model.symbol.*;
+import java.io.BufferedWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
+public class DefineGapFunctions extends GhidraScript {
+    private static final int MAX_LIST = 200, MAX_STR = 300;
+
+    private static String q(String s) {
+        if (s == null) return "null";
+        StringBuilder b = new StringBuilder("\"");
+        for (char c : s.toCharArray()) {
+            switch (c) {
+                case '"': b.append("\\\""); break;
+                case '\\': b.append("\\\\"); break;
+                case '\n': b.append("\\n"); break;
+                case '\r': b.append("\\r"); break;
+                case '\t': b.append("\\t"); break;
+                default:
+                    if (c < 0x20) b.append(String.format("\\u%04x", (int) c)); else b.append(c);
+            }
+        }
+        return b.append('"').toString();
+    }
+
+    private static String arr(Collection<String> items) {
+        StringJoiner j = new StringJoiner(",", "[", "]");
+        int n = 0;
+        for (String s : items) { if (n++ >= MAX_LIST) break; j.add(q(s)); }
+        return j.toString();
+    }
+
+    private static String fnRef(Function f) { return f.getEntryPoint().toString() + " " + f.getName(true); }
+
+
+    private boolean bodyHasRet(Function f) {
+        Function t = f.isThunk() ? f.getThunkedFunction(true) : f;
+        if (t == null) return false;
+        for (Instruction ins : currentProgram.getListing().getInstructions(t.getBody(), true)) {
+            if (ins.getFlowType().isTerminal() && ins.getMnemonicString().toUpperCase().startsWith("RET")) return true;
+        }
+        return false;
+    }
+
+    /** Same repair as FixNoReturn.java: un-mark wrongly no-return functions and re-derive their callers' bodies. */
+    private int repairNoReturn() throws Exception {
+        FunctionManager fm = currentProgram.getFunctionManager();
+        Listing listing = currentProgram.getListing();
+        ReferenceManager refs = currentProgram.getReferenceManager();
+        List<Function> wrong = new ArrayList<>();
+        for (Function f : fm.getFunctions(true)) if (f.hasNoReturn() && bodyHasRet(f)) wrong.add(f);
+        Set<Function> touched = new LinkedHashSet<>();
+        for (Function f : wrong) {
+            f.setNoReturn(false);
+            for (Reference r : refs.getReferencesTo(f.getEntryPoint())) {
+                if (!r.getReferenceType().isCall()) continue;
+                Instruction ins = listing.getInstructionAt(r.getFromAddress());
+                if (ins == null) continue;
+                ins.setFlowOverride(FlowOverride.NONE);
+                ins.clearFallThroughOverride();
+                Address next = ins.getMaxAddress().next();
+                if (next != null && listing.getInstructionAt(next) == null) disassemble(next);
+                Function host = fm.getFunctionContaining(ins.getAddress());
+                if (host != null) touched.add(host);
+            }
+        }
+        for (Function f : touched) ghidra.app.cmd.function.CreateFunctionCmd.fixupFunctionBody(currentProgram, f, monitor);
+        println("OSFR_GAP noreturn repaired=" + wrong.size() + " touched=" + touched.size());
+        return wrong.size();
+    }
+
+    @Override
+    public void run() throws Exception {
+        String[] args = getScriptArgs();
+        if (args.length != 1) throw new IllegalArgumentException("Expected a new output directory");
+        Path output = Path.of(args[0]);
+        Files.createDirectory(output);
+        repairNoReturn();
+        FunctionManager fm = currentProgram.getFunctionManager();
+        ghidra.program.model.mem.Memory mem = currentProgram.getMemory();
+        ghidra.program.model.mem.MemoryBlock text = mem.getBlock(".text");
+        List<Function> created = new ArrayList<>();
+        StringBuilder report = new StringBuilder();
+        int rejected = 0;
+        for (int pass = 1; pass <= 6 && !monitor.isCancelled(); pass++) {
+            int before = created.size();
+            Address a = text.getStart();
+            Address end = text.getEnd();
+            while (a != null && a.compareTo(end) < 0 && !monitor.isCancelled()) {
+                Function host = fm.getFunctionContaining(a);
+                if (host != null) { a = host.getBody().getMaxAddress().next(); continue; }
+                Data dd = getDataContaining(a);
+                if (dd != null) { a = dd.getMaxAddress().next(); continue; }
+                byte b = mem.getByte(a);
+                if (b == (byte) 0xCC || b == (byte) 0x90 || b == 0) { a = a.next(); continue; }
+                // a = first non-padding byte of an uncovered stretch: try a function here
+                Address start = a;
+                Function f = null;
+                try {
+                    if (getInstructionAt(start) == null) disassemble(start);
+                    if (getInstructionAt(start) != null) f = createFunction(start, null);
+                } catch (Exception e) { f = null; }
+                boolean ok = f != null;
+                if (ok) {
+                    Iterator<Function> ov = fm.getFunctionsOverlapping(f.getBody());
+                    while (ov.hasNext()) {
+                        if (!ov.next().equals(f)) { ok = false; break; }
+                    }
+                }
+                if (ok) {
+                    created.add(f);
+                    report.append(start).append("\tcreated\t").append(f.getBody().getNumAddresses()).append("\t").append(pass).append("\n");
+                    a = f.getBody().getMaxAddress().next();
+                } else {
+                    if (f != null) { removeFunction(f); }
+                    rejected++;
+                    report.append(start).append("\trejected\t0\t").append(pass).append("\n");
+                    // skip to after the next RET/padding so the rest of the stretch is still examined
+                    Instruction ins = getInstructionAt(start);
+                    a = ins != null ? ins.getMaxAddress().next() : start.next();
+                }
+            }
+            println("OSFR_GAP pass=" + pass + " created_total=" + created.size() + " rejected_total=" + rejected);
+            if (created.size() == before) break;
+        }
+        Files.writeString(output.resolve("define-report.tsv"), report.toString(), StandardCharsets.UTF_8);
+        DecompInterface decompiler = new DecompInterface();
+        decompiler.toggleCCode(true);
+        decompiler.toggleSyntaxTree(false);
+        if (!decompiler.openProgram(currentProgram)) throw new IllegalStateException("Cannot open program in decompiler");
+        Listing listing = currentProgram.getListing();
+        ReferenceManager refs = currentProgram.getReferenceManager();
+        SymbolTable symbols = currentProgram.getSymbolTable();
+        long started = System.nanoTime();
+        int done = 0, failed = 0;
+        try (BufferedWriter out = Files.newBufferedWriter(output.resolve("functions.jsonl"), StandardCharsets.UTF_8)) {
+            Iterator<Function> it = created.iterator();
+            while (it.hasNext() && !monitor.isCancelled()) {
+                Function f = it.next();
+                if (f.isExternal()) continue;
+                TreeSet<String> callees = new TreeSet<>(), callers = new TreeSet<>();
+                for (Function c : f.getCalledFunctions(monitor)) callees.add(fnRef(c));
+                for (Function c : f.getCallingFunctions(monitor)) callers.add(fnRef(c));
+                LinkedHashSet<String> strings = new LinkedHashSet<>(), data = new LinkedHashSet<>(), vtables = new LinkedHashSet<>();
+                for (Instruction ins : listing.getInstructions(f.getBody(), true)) {
+                    for (Reference r : refs.getReferencesFrom(ins.getAddress())) {
+                        Address to = r.getToAddress();
+                        if (!to.isMemoryAddress() || r.getReferenceType().isFlow()) continue;
+                        Data d = listing.getDataContaining(to);
+                        Symbol s = symbols.getPrimarySymbol(to);
+                        String sname = s == null ? null : s.getName(true);
+                        if (d != null && d.hasStringValue()) {
+                            String v = String.valueOf(d.getValue());
+                            if (v.length() > MAX_STR) v = v.substring(0, MAX_STR) + "...";
+                            strings.add(to + "=" + v);
+                        } else if (sname != null && sname.contains("vftable")) {
+                            vtables.add(to + " " + sname);
+                        } else if (sname != null) {
+                            data.add(to + " " + sname);
+                        }
+                    }
+                }
+                Function thunked = f.isThunk() ? f.getThunkedFunction(false) : null;
+                DecompileResults res = decompiler.decompileFunction(f, 60, monitor);
+                boolean ok = res.decompileCompleted() && res.getDecompiledFunction() != null;
+                if (!ok) failed++;
+                StringBuilder b = new StringBuilder(4096);
+                b.append("{\"addr\":").append(q(f.getEntryPoint().toString()))
+                 .append(",\"name\":").append(q(f.getName()))
+                 .append(",\"namespace\":").append(q(f.getParentNamespace().getName(true)))
+                 .append(",\"signature\":").append(q(f.getPrototypeString(false, false)))
+                 .append(",\"convention\":").append(q(f.getCallingConventionName()))
+                 .append(",\"source\":").append(q(f.getSymbol().getSource().toString()))
+                 .append(",\"bytes\":").append(f.getBody().getNumAddresses())
+                 .append(",\"thunk_of\":").append(thunked == null ? "null" : q(fnRef(thunked)))
+                 .append(",\"callees\":").append(arr(callees))
+                 .append(",\"callers\":").append(arr(callers))
+                 .append(",\"n_callers\":").append(callers.size())
+                 .append(",\"strings\":").append(arr(strings))
+                 .append(",\"vtables\":").append(arr(vtables))
+                 .append(",\"data\":").append(arr(data))
+                 .append(",\"decompiled\":").append(ok)
+                 .append(",\"error\":").append(ok ? "null" : q(res.getErrorMessage()))
+                 .append(",\"c\":").append(ok ? q(res.getDecompiledFunction().getC()) : "null")
+                 .append("}\n");
+                out.write(b.toString());
+                if (++done % 2000 == 0) { println("OSFR_MAP exported=" + done + " failed=" + failed); out.flush(); }
+            }
+        } finally { decompiler.dispose(); }
+        String summary = "{\"program\":" + q(currentProgram.getName()) + ",\"exported\":" + done + ",\"decompile_failed\":" + failed
+            + ",\"cancelled\":" + monitor.isCancelled() + ",\"elapsed_seconds\":" + ((System.nanoTime() - started) / 1000000000L) + "}";
+        Files.writeString(output.resolve("summary.json"), summary, StandardCharsets.UTF_8);
+        println("OSFR_MAP_COMPLETE " + summary);
+    }
+}

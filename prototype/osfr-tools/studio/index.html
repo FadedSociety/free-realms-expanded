@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OSFR Studio</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2330; --muted: #5e6778;
+    --line: #dde1e8; --accent: #2f6fde; --accent-ink: #ffffff; --bad: #c0392b; --good: #1e8a4c; --warn: #b7791f;
+    --chip: #eef2fb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #98a2b3;
+      --line: #2b3240; --accent: #5b8ef0; --accent-ink: #0b1020; --bad: #ef6b5b; --good: #4cc483; --warn: #e0b04a;
+      --chip: #232b3a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 18px; flex-wrap: wrap;
+           border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
+  header h1 { margin: 0; font-size: 17px; }
+  nav { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav button { background: transparent; color: var(--muted); border-color: transparent; }
+  nav button.on { background: var(--chip); color: var(--ink); border-color: var(--line); }
+  #status { color: var(--muted); margin-left: auto; }
+  main { padding: 16px; }
+  .grid { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 16px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+  h2 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+  dt { color: var(--muted); } dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
+  input, select, textarea { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px;
+          background: var(--bg); color: var(--ink); font: inherit; }
+  input.grow { flex: 1; min-width: 160px; }
+  textarea { width: 100%; min-height: 360px; font: 12px/1.4 ui-monospace, Consolas, monospace; }
+  button { padding: 6px 11px; border: 1px solid var(--accent); border-radius: 6px;
+           background: var(--accent); color: var(--accent-ink); font: inherit; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--accent); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--panel); }
+  td.num { font-variant-numeric: tabular-nums; }
+  td input { width: 100%; min-width: 60px; padding: 3px 5px; }
+  .scroll { max-height: 70vh; overflow: auto; }
+  .mono { font: 12px/1.4 ui-monospace, Consolas, monospace; word-break: break-all; }
+  #map-wrap { position: relative; height: 68vh; min-height: 320px; overflow: hidden; border: 1px solid var(--line);
+              border-radius: 6px; background: #0d1a2a; cursor: crosshair; touch-action: none; }
+  #map-canvas { display: block; width: 100%; height: 100%; }
+  .muted { color: var(--muted); }
+  #log { margin: 8px 0 0; max-height: 200px; overflow: auto; font: 12px/1.4 ui-monospace, Consolas, monospace; color: var(--muted); }
+  .bad { color: var(--bad); } .good { color: var(--good); } .warn { color: var(--warn); }
+  .files { max-height: 70vh; overflow: auto; }
+  .files button { display: block; width: 100%; text-align: left; margin-bottom: 2px;
+                  background: transparent; color: var(--ink); border-color: transparent; }
+  .files button.on { background: var(--chip); border-color: var(--line); }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); font-size: 12px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>OSFR Studio</h1>
+  <nav id="tabs">
+    <button data-tab="live" class="on">Live</button>
+    <button data-tab="content">Content</button>
+    <button data-tab="assets">Assets</button>
+    <button data-tab="map">Map</button>
+    <button data-tab="inspector">Inspector</button>
+    <button data-tab="packets">Packets</button>
+    <button data-tab="fight">Fight</button>
+    <button data-tab="saves">Saves</button>
+    <button data-tab="report">Report</button>
+    <button data-tab="clientlog">Client log</button>
+  </nav>
+  <span id="status">connecting…</span>
+</header>
+<main>
+
+<!-- LIVE -->
+<div data-pane="live" class="grid">
+  <div>
+    <section>
+      <h2>Character</h2>
+      <dl id="character"><dt>State</dt><dd>—</dd></dl>
+    </section>
+    <section>
+      <h2>Console</h2>
+      <div class="row">
+        <button class="ghost" data-cmd="here">here</button>
+        <button class="ghost" data-cmd="heal">heal</button>
+        <button class="ghost" data-cmd="god">god</button>
+        <button class="ghost" data-cmd="win">win</button>
+        <button class="ghost" data-cmd="exit">exit</button>
+        <button class="ghost" data-cmd="reload">reload</button>
+        <button class="ghost" data-cmd="battle 96">battle 96</button>
+        <button class="ghost" data-cmd="sim 96">sim 96</button>
+      </div>
+      <div class="row">
+        <label class="muted">Level</label>
+        <input id="level" type="number" min="1" max="20" value="10" style="width:70px">
+        <button class="ghost" id="set-level">set</button>
+        <label class="muted">Give</label>
+        <input id="give-item" placeholder="item id" style="width:90px">
+        <input id="give-count" type="number" value="1" style="width:60px">
+        <button class="ghost" id="give">give</button>
+      </div>
+      <form class="row" id="command-form">
+        <input class="grow" id="command" placeholder="any realm command, e.g. goto Troll Summoner" autocomplete="off">
+        <button type="submit">Run</button>
+      </form>
+      <div id="log"></div>
+    </section>
+  </div>
+  <section>
+    <h2>Nearby actors</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Name</th><th>Kind</th><th>Distance</th><th>Position</th><th></th></tr></thead>
+        <tbody id="actors"><tr><td colspan="5">—</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- CONTENT -->
+<div data-pane="content" class="grid" hidden>
+  <section>
+    <h2>Content files</h2>
+    <input class="grow" id="file-filter" placeholder="filter" style="width:100%; margin-bottom:8px">
+    <div class="files" id="files"></div>
+  </section>
+  <section>
+    <h2 id="file-title">Pick a file</h2>
+    <div class="row">
+      <select id="array-pick" hidden></select>
+      <button class="ghost" id="view-table" hidden>table</button>
+      <button class="ghost" id="view-raw" hidden>raw JSON</button>
+      <span class="pill" id="dirty" hidden>unsaved</span>
+      <span style="flex:1"></span>
+      <button id="save-file" hidden>Save</button>
+      <button class="ghost" id="save-reload" hidden>Save + reload</button>
+    </div>
+    <div class="scroll" id="table-view"></div>
+    <textarea id="raw-view" hidden spellcheck="false"></textarea>
+  </section>
+</div>
+
+<!-- ASSETS -->
+<div data-pane="assets" hidden>
+  <section>
+    <h2>Asset browser</h2>
+    <form class="row" id="asset-form">
+      <select id="asset-kind">
+        <option value="images">images</option><option value="models">models</option>
+        <option value="text">text</option><option value="animations">animations</option>
+        <option value="effects">effects</option>
+      </select>
+      <input class="grow" id="asset-q" placeholder="search words, e.g. troll summoner">
+      <button type="submit">Search</button>
+      <span class="muted" id="asset-count"></span>
+    </form>
+    <div class="scroll"><table id="asset-table"></table></div>
+  </section>
+</div>
+
+<!-- INSPECTOR -->
+<div data-pane="inspector" hidden>
+  <section>
+    <h2>Asset graph inspector</h2>
+    <form class="row" id="inspect-form">
+      <button type="button" class="ghost" id="inspect-back" title="back">←</button>
+      <input class="grow" id="inspect-q" placeholder="name or key, e.g. ice axe · item:78711 · effect:15449 · model:168 · wield_type:12">
+      <button type="submit">Inspect</button>
+      <span class="muted" id="inspect-status">graph not loaded</span>
+    </form>
+    <div id="inspect-matches"></div>
+  </section>
+  <section id="inspect-node" hidden>
+    <h2 id="inspect-title"></h2>
+    <dl id="inspect-attrs"></dl>
+    <div class="grid" style="margin-top:12px">
+      <div><h2>Uses (outgoing)</h2><div id="inspect-out"></div></div>
+      <div><h2>Used by (incoming)</h2><div id="inspect-in"></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- PACKETS -->
+<div data-pane="packets" hidden>
+  <section>
+    <h2>Packet inspector</h2>
+    <div class="row">
+      <input class="grow" id="packet-filter" placeholder="filter: family/sub (e.g. 41), name, or direction (in/out)">
+      <label class="muted"><input type="checkbox" id="packet-live" checked> live</label>
+    </div>
+    <div class="scroll"><table>
+      <thead><tr><th>Time</th><th>Dir</th><th>Family/sub</th><th>Name</th><th>Len</th><th>Body (hex)</th></tr></thead>
+      <tbody id="packets"></tbody>
+    </table></div>
+  </section>
+  <section>
+    <h2>Poke (send a game message to the client)</h2>
+    <form class="row" id="poke-form">
+      <input class="grow mono" id="poke-hex" placeholder="inner message hex, e.g. 26000400 (EndDialog)">
+      <button type="submit">Send</button>
+    </form>
+    <p class="muted">Sent as-is inside the normal tunnel. Use for reverse engineering: try a field value and watch the client react.</p>
+  </section>
+</div>
+
+<!-- FIGHT -->
+<div data-pane="fight" hidden>
+  <section>
+    <h2>Balance simulator</h2>
+    <form class="row" id="sim-form">
+      <label class="muted">Battle</label><input id="sim-battle" value="96" style="width:80px">
+      <button type="submit">Simulate (active job, levels 1–20)</button>
+      <span class="muted">Results arrive in game chat and the console log.</span>
+    </form>
+  </section>
+  <section>
+    <h2>Fight log <span class="pill" id="fight-summary"></span></h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Time</th><th>Kind</th><th>Source</th><th>Target</th><th>Amount</th></tr></thead>
+      <tbody id="fight"></tbody>
+    </table></div>
+  </section>
+</div>
+
+<!-- SAVES -->
+<div data-pane="saves" hidden>
+  <section>
+    <h2>Save states</h2>
+    <form class="row" id="save-form">
+      <input id="save-name" placeholder="name, e.g. summoner-medic10" pattern="[A-Za-z0-9_-]+">
+      <button type="submit">Save current</button>
+    </form>
+    <p class="muted">Loading ends the session; log in again to enter the saved state.</p>
+    <table><tbody id="saves"></tbody></table>
+  </section>
+</div>
+
+<!-- REPORT -->
+<div data-pane="report" hidden>
+  <section>
+    <h2>Content check</h2>
+    <p class="muted" id="report-meta">Run <span class="mono">python -I project/scripts/content_check.py</span> to (re)generate.</p>
+    <dl id="report-summary"></dl>
+  </section>
+  <section>
+    <h2>Evidence</h2>
+    <div id="evidence"></div>
+  </section>
+  <section>
+    <h2>Findings</h2>
+    <div class="row">
+      <select id="finding-kind"><option value="errors">errors</option><option value="warnings">warnings</option></select>
+      <input class="grow" id="finding-filter" placeholder="filter by file, field or code">
+    </div>
+    <div class="scroll"><table>
+      <thead><tr><th>File</th><th>Path</th><th>Value</th><th>Problem</th></tr></thead>
+      <tbody id="findings"></tbody>
+    </table></div>
+  </section>
+</div>
+
+<!-- CLIENT LOG -->
+<div data-pane="clientlog" hidden>
+  <section>
+    <h2>Client errors and warnings (newest first)</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>File</th><th>Line</th></tr></thead>
+      <tbody id="clientlog"></tbody>
+    </table></div>
+  </section>
+</div>
+
+<!-- MAP -->
+<div data-pane="map" hidden>
+  <section>
+    <h2>World map</h2>
+    <div class="row">
+      <button class="ghost" id="map-center">centre on me</button>
+      <button class="ghost" id="map-zoom-in" title="zoom in">+</button>
+      <button class="ghost" id="map-zoom-out" title="zoom out">&minus;</button>
+      <label class="muted"><input type="checkbox" id="map-npcs" checked> all NPCs</label>
+      <input id="map-mark-name" placeholder="mark name">
+      <button class="ghost" id="map-mark">mark where I stand</button>
+      <span class="muted" id="map-status">terrain not loaded</span>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="map-place-mode"> place NPCs on click</label>
+      <input id="map-place-model" placeholder="model id (e.g. 168)" size="16">
+      <input id="map-place-name" placeholder="name text id (optional)" size="20">
+      <span class="muted">Find ids in the Assets tab: models, and text for names.</span>
+    </div>
+    <div id="map-wrap">
+      <canvas id="map-canvas"></canvas>
+    </div>
+    <div class="row muted" style="margin-top:6px">
+      <span id="map-cursor" class="mono">&nbsp;</span>
+    </div>
+    <div class="muted">Click: teleport there, onto the ground. Drag: pan. Wheel: zoom.
+      <span style="color:#ffd84a">&#9650;</span> you &middot;
+      <span style="color:#ff5a4a">&#9679;</span> enemies and battles &middot;
+      <span style="color:#7fd3ff">&#9679;</span> NPCs nearby &middot;
+      <span style="color:#c6a4ff">&#9670;</span> marks &middot;
+      <span style="color:#5fe08a">&#9632;</span> placed NPCs</div>
+  </section>
+  <section>
+    <h2>Placed NPCs <span class="muted">(live world: npc_placements.json)</span></h2>
+    <div id="map-placed" class="muted">none yet</div>
+  </section>
+  <section>
+    <h2>Marks</h2>
+    <div id="map-marks" class="muted">none yet</div>
+  </section>
+</div>
+
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = (v) => (typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(1)) : v);
+let tab = 'live';
+try { tab = localStorage.getItem('studio-tab') || 'live'; } catch (e) {}
+
+function log(text, cls) {
+  const line = document.createElement('div');
+  line.textContent = new Date().toLocaleTimeString() + '  ' + text;
+  if (cls) line.className = cls;
+  $('log').prepend(line);
+}
+async function api(path, options) {
+  const response = await fetch(path, options);
+  let body = {};
+  try { body = await response.json(); } catch (e) {}
+  return { ok: response.ok, body };
+}
+async function run(text) {
+  const { ok, body } = await api('/api/command', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+  log(ok ? body.command + '  (reply in game chat)' : 'error: ' + body.error, ok ? 'good' : 'bad');
+  refreshLive();
+}
+
+/* tabs */
+function showTab(name) {
+  tab = name;
+  try { localStorage.setItem('studio-tab', name); } catch (e) {}
+  document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
+  document.querySelectorAll('[data-pane]').forEach((p) => (p.hidden = p.dataset.pane !== name));
+  if (name === 'content') loadFiles();
+  if (name === 'saves') loadSaves();
+  if (name === 'report') loadReport();
+  if (name === 'clientlog') loadClientLog();
+  if (name === 'fight') loadFight();
+  if (name === 'packets') loadPackets();
+  if (name === 'map') loadMap();
+}
+$('tabs').addEventListener('click', (e) => { if (e.target.dataset.tab) showTab(e.target.dataset.tab); });
+
+/* live */
+async function refreshLive() {
+  try {
+    const { ok, body } = await api('/api/state');
+    if (!ok) { $('status').textContent = body.error || 'no character'; return; }
+    $('status').textContent = 'live';
+    const c = body.character, s = body.summary || {}, enc = s.encounter || {}, prof = s.profiles || {};
+    const rows = [['Zone', c.zone_id], ['Position', c.position.map(fmt).join(', ')],
+      ['Job', prof.active ?? '—'], ['Health', enc.player_health ?? '—'], ['Coins', s.coins ?? '—'],
+      ['Encounter', enc.active ? `${enc.active.encounter_id} (${enc.active.phase})` : 'none']];
+    $('character').innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+    $('actors').innerHTML = (body.actors || []).map((a) =>
+      `<tr><td>${esc(a.name)}</td><td>${esc(a.kind)}</td><td class="num">${fmt(a.distance)}</td>` +
+      `<td class="num">${a.position.map(fmt).join(', ')}</td>` +
+      `<td><button class="ghost" data-cmd="goto ${esc(a.guid)}">go to</button> ` +
+      `<button class="ghost" data-inspect-name="${esc(a.name)}">inspect</button></td></tr>`).join('') ||
+      '<tr><td colspan="5">none</td></tr>';
+  } catch (e) { $('status').textContent = 'server offline'; }
+}
+document.addEventListener('click', (e) => {
+  if (e.target.dataset.cmd) run(e.target.dataset.cmd);
+  if (e.target.dataset.inspectName) { showTab('inspector'); $('inspect-q').value = e.target.dataset.inspectName; inspect(e.target.dataset.inspectName); }
+});
+$('command-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = $('command').value.trim().replace(/^realm\s+/i, '');
+  if (text) run(text);
+});
+$('set-level').addEventListener('click', () => run('level ' + $('level').value));
+$('give').addEventListener('click', () => run(`give ${$('give-item').value} ${$('give-count').value}`));
+
+/* content */
+let files = [], current = null, data = null, arrays = [];
+async function loadFiles() {
+  const { body } = await api('/api/content');
+  files = body.files || [];
+  renderFiles();
+}
+function renderFiles() {
+  const f = $('file-filter').value.toLowerCase();
+  $('files').innerHTML = files.filter((n) => n.toLowerCase().includes(f)).map((n) =>
+    `<button data-file="${esc(n)}" class="${n === current ? 'on' : ''}">${esc(n)}</button>`).join('');
+}
+$('file-filter').addEventListener('input', renderFiles);
+$('files').addEventListener('click', (e) => { if (e.target.dataset.file) openFile(e.target.dataset.file); });
+function findArrays(value, path, out) {
+  if (Array.isArray(value)) {
+    if (value.length && value.every((x) => x && typeof x === 'object' && !Array.isArray(x))) out.push(path);
+    value.forEach((x, i) => { if (out.length < 40 && x && typeof x === 'object') findArrays(x, path + '[' + i + ']', out); });
+  } else if (value && typeof value === 'object') {
+    for (const k of Object.keys(value)) findArrays(value[k], path ? path + '.' + k : k, out);
+  }
+  return out;
+}
+function getPath(root, path) {
+  if (!path) return root;
+  return path.split(/\.|(?=\[)/).reduce((o, part) => {
+    const m = part.match(/^\[(\d+)\]$/);
+    return o == null ? o : m ? o[+m[1]] : o[part];
+  }, root);
+}
+async function openFile(name) {
+  const response = await fetch('/api/content/' + encodeURIComponent(name).replace(/%2F/g, '/'));
+  const text = await response.text();
+  current = name; renderFiles();
+  $('file-title').textContent = name;
+  try { data = JSON.parse(text); } catch (e) { data = null; }
+  $('raw-view').value = text;
+  arrays = data ? findArrays(data, '', []).filter((p) => !/\]\./.test(p) || true).slice(0, 40) : [];
+  $('array-pick').innerHTML = arrays.map((p) => `<option>${esc(p || '(root)')}</option>`).join('');
+  ['array-pick', 'view-table', 'view-raw', 'save-file', 'save-reload'].forEach((id) => ($(id).hidden = false));
+  $('dirty').hidden = true;
+  if (arrays.length) { renderTable(); showRaw(false); } else showRaw(true);
+}
+function showRaw(on) {
+  if (!on && data) $('raw-view').value = JSON.stringify(data, null, 2);
+  if (on && data) $('raw-view').value = JSON.stringify(data, null, 2);
+  $('raw-view').hidden = !on; $('table-view').hidden = on;
+}
+function scalarKeys(rows) {
+  const keys = [];
+  rows.slice(0, 200).forEach((r) => Object.keys(r).forEach((k) => {
+    if (!keys.includes(k) && (r[k] === null || typeof r[k] !== 'object')) keys.push(k);
+  }));
+  return keys.slice(0, 16);
+}
+function renderTable() {
+  const path = arrays[$('array-pick').selectedIndex] ?? '';
+  const rows = getPath(data, path) || [];
+  const keys = scalarKeys(rows);
+  $('table-view').innerHTML = `<table><thead><tr><th>#</th>${keys.map((k) => `<th>${esc(k)}</th>`).join('')}</tr></thead><tbody>` +
+    rows.slice(0, 500).map((r, i) => `<tr><td class="muted">${i}</td>` + keys.map((k) =>
+      `<td><input data-row="${i}" data-key="${esc(k)}" value="${esc(r[k] ?? '')}"></td>`).join('') + '</tr>').join('') +
+    `</tbody></table>${rows.length > 500 ? '<p class="muted">first 500 rows shown; use raw JSON for the rest</p>' : ''}`;
+}
+$('array-pick').addEventListener('change', renderTable);
+$('view-table').addEventListener('click', () => { syncRaw(); renderTable(); showRaw(false); });
+$('view-raw').addEventListener('click', () => showRaw(true));
+$('table-view').addEventListener('input', (e) => {
+  const input = e.target; if (!input.dataset.key) return;
+  const rows = getPath(data, arrays[$('array-pick').selectedIndex] ?? '');
+  const row = rows[+input.dataset.row], key = input.dataset.key, old = row[key];
+  let v = input.value;
+  if (typeof old === 'number' && v.trim() !== '' && !isNaN(+v)) v = +v;
+  else if (typeof old === 'boolean') v = v === 'true';
+  else if (old === null && v === '') v = null;
+  row[key] = v; $('dirty').hidden = false;
+});
+$('raw-view').addEventListener('input', () => ($('dirty').hidden = false));
+function syncRaw() {
+  if (!$('raw-view').hidden) {
+    try { data = JSON.parse($('raw-view').value); } catch (e) { log('raw JSON does not parse: ' + e.message, 'bad'); return false; }
+  }
+  return true;
+}
+async function saveFile(reload) {
+  if (!syncRaw()) return;
+  const { ok, body } = await api('/api/content/' + encodeURIComponent(current).replace(/%2F/g, '/'), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data, null, 2) + '\n' });
+  log(ok ? 'saved ' + current : 'save failed: ' + body.error, ok ? 'good' : 'bad');
+  if (ok) { $('dirty').hidden = true; if (reload) run('reload'); }
+}
+$('save-file').addEventListener('click', () => saveFile(false));
+$('save-reload').addEventListener('click', () => saveFile(true));
+
+/* assets */
+$('asset-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const kind = $('asset-kind').value, q = $('asset-q').value;
+  const { ok, body } = await api(`/api/assets?kind=${kind}&q=${encodeURIComponent(q)}`);
+  if (!ok) { $('asset-count').textContent = body.error; $('asset-table').innerHTML = ''; return; }
+  $('asset-count').textContent = `${body.count} shown`;
+  const heads = { images: ['id', 'file', 'description'], models: ['id', 'model', 'description'],
+    text: ['id', 'text'], animations: ['id', 'slot', 'branch'], effects: ['id', 'name'] }[kind];
+  $('asset-table').innerHTML = `<thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>` +
+    body.rows.map((r) => '<tr>' + heads.map((_, i) => `<td class="${i ? '' : 'num'}">${esc(r[i])}</td>`).join('') + '</tr>').join('') + '</tbody>';
+});
+
+/* inspector */
+let graph = null, outEdges = null, inEdges = null, inspectHistory = [];
+async function loadGraph() {
+  if (graph) return true;
+  $('inspect-status').textContent = 'loading graph (~40 MB)…';
+  const response = await fetch('/api/asset-file/graph.json');
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    $('inspect-status').textContent = body.error || 'graph missing';
+    return false;
+  }
+  graph = await response.json();
+  outEdges = new Map(); inEdges = new Map();
+  for (const [a, rel, b] of graph.edges) {
+    if (!outEdges.has(a)) outEdges.set(a, []); outEdges.get(a).push([rel, b]);
+    if (!inEdges.has(b)) inEdges.set(b, []); inEdges.get(b).push([rel, a]);
+  }
+  $('inspect-status').textContent = `${Object.keys(graph.nodes).length.toLocaleString()} nodes · ${graph.edges.length.toLocaleString()} links`;
+  return true;
+}
+const nodeLabel = (k) => { const n = graph.nodes[k]; return n && n.name ? `${k}  ${n.name}` : k; };
+const nodeLink = (k) => `<a href="#" data-inspect="${esc(k)}" class="mono">${esc(nodeLabel(k))}${graph.nodes[k] ? '' : ' [missing]'}</a>`;
+function groups(list) {
+  const by = new Map();
+  for (const [rel, k] of list || []) { if (!by.has(rel)) by.set(rel, []); by.get(rel).push(k); }
+  return [...by.entries()].map(([rel, keys]) =>
+    `<div style="margin-bottom:8px"><span class="pill">${esc(rel)} (${keys.length})</span><div>` +
+    keys.slice(0, 60).map((k) => `<div>${nodeLink(k)}</div>`).join('') +
+    (keys.length > 60 ? `<div class="muted">…and ${keys.length - 60} more</div>` : '') + '</div></div>').join('') ||
+    '<p class="muted">none</p>';
+}
+function showNode(key, remember = true) {
+  if (remember && $('inspect-node').dataset.key) inspectHistory.push($('inspect-node').dataset.key);
+  const n = graph.nodes[key] || {};
+  $('inspect-node').hidden = false; $('inspect-node').dataset.key = key;
+  $('inspect-title').textContent = nodeLabel(key);
+  $('inspect-attrs').innerHTML = Object.entries(n).filter(([k]) => !['name'].includes(k)).map(([k, v]) =>
+    `<dt>${esc(k)}</dt><dd>${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</dd>`).join('');
+  $('inspect-out').innerHTML = groups(outEdges.get(key));
+  $('inspect-in').innerHTML = groups(inEdges.get(key));
+  $('inspect-matches').innerHTML = '';
+}
+async function inspect(q) {
+  if (!(await loadGraph())) return;
+  q = q.trim(); if (!q) return;
+  if (graph.nodes[q] || outEdges.has(q) || inEdges.has(q)) { showNode(q); return; }
+  const words = q.toLowerCase().split(/\s+/);
+  const hits = [];
+  for (const [k, n] of Object.entries(graph.nodes)) {
+    const text = (k + ' ' + (n.name || '')).toLowerCase();
+    if (words.every((w) => text.includes(w))) { hits.push(k); if (hits.length >= 80) break; }
+  }
+  if (hits.length === 1) { showNode(hits[0]); return; }
+  $('inspect-matches').innerHTML = hits.length
+    ? hits.map((k) => `<div>${nodeLink(k)}</div>`).join('')
+    : '<p class="muted">no match</p>';
+}
+$('inspect-form').addEventListener('submit', (e) => { e.preventDefault(); inspect($('inspect-q').value); });
+$('inspect-back').addEventListener('click', () => { const k = inspectHistory.pop(); if (k) showNode(k, false); });
+document.addEventListener('click', (e) => {
+  const k = e.target.closest('[data-inspect]')?.dataset.inspect;
+  if (k) { e.preventDefault(); showTab('inspector'); loadGraph().then((ok) => ok && showNode(k)); }
+});
+
+/* packets */
+async function loadPackets() {
+  const { ok, body } = await api('/api/packets');
+  if (!ok) return;
+  const f = $('packet-filter').value.trim().toLowerCase();
+  const rows = (body.packets || []).slice().reverse().filter((p) => {
+    if (!f) return true;
+    const key = `${p.dir} ${p.family}/${p.sub} ${p.name || ''}`.toLowerCase();
+    return key.includes(f) || String(p.family) === f;
+  }).slice(0, 300);
+  $('packets').innerHTML = rows.map((p) =>
+    `<tr><td class="num">${new Date(p.t).toLocaleTimeString()}</td><td class="${p.dir === 'in' ? 'warn' : p.dir === 'poke' ? 'bad' : 'good'}">${esc(p.dir)}</td>` +
+    `<td class="num">${esc(p.family)}/${esc(p.sub)}</td><td>${esc(p.name || '')}</td><td class="num">${p.len}</td>` +
+    `<td class="mono">${esc(p.hex ?? '(sensitive)')}</td></tr>`).join('');
+}
+$('packet-filter').addEventListener('input', loadPackets);
+$('poke-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const { ok, body } = await api('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ hex: $('poke-hex').value }) });
+  log(ok ? `poked ${body.bytes} bytes` : 'poke failed: ' + body.error, ok ? 'good' : 'bad');
+  loadPackets();
+});
+
+/* fight */
+async function loadFight() {
+  const { ok, body } = await api('/api/fightlog');
+  if (!ok) return;
+  const events = body.events || [];
+  const sum = (k) => events.filter((e) => k.includes(e.kind)).reduce((a, e) => a + e.amount, 0);
+  $('fight-summary').textContent = `dealt ${sum(['hit', 'crit'])} · taken ${sum(['taken'])} · healed ${sum(['heal'])} · crits ${events.filter((e) => e.kind === 'crit').length}`;
+  const t0 = events.length ? events[0].time_ms : 0;
+  $('fight').innerHTML = events.slice().reverse().map((e) =>
+    `<tr><td class="num">${((e.time_ms - t0) / 1000).toFixed(1)}s</td><td class="${e.kind === 'taken' ? 'bad' : e.kind === 'heal' ? 'good' : ''}">${esc(e.kind)}</td>` +
+    `<td>${esc(e.source)}</td><td>${esc(e.target)}</td><td class="num">${e.amount}</td></tr>`).join('');
+}
+$('sim-form').addEventListener('submit', (e) => { e.preventDefault(); run('sim ' + $('sim-battle').value); });
+
+/* saves */
+async function loadSaves() {
+  const { ok, body } = await api('/api/savestates');
+  $('saves').innerHTML = ok ? (body.savestates || []).map((n) =>
+    `<tr><td>${esc(n)}</td><td><button class="ghost" data-load="${esc(n)}">load</button></td></tr>`).join('') || '<tr><td class="muted">none yet</td></tr>'
+    : `<tr><td class="muted">${esc(body.error)}</td></tr>`;
+}
+$('save-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const { ok, body } = await api('/api/savestate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ save: $('save-name').value.trim() }) });
+  log(ok ? 'saved state ' + body.saved : 'save failed: ' + body.error, ok ? 'good' : 'bad');
+  loadSaves();
+});
+$('saves').addEventListener('click', async (e) => {
+  const name = e.target.dataset.load; if (!name) return;
+  const { ok, body } = await api('/api/savestate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ load: name }) });
+  log(ok ? `loaded ${body.loaded}: ${body.note}` : 'load failed: ' + body.error, ok ? 'good' : 'bad');
+});
+
+/* report */
+let report = null;
+async function loadReport() {
+  const { ok, body } = await api('/api/report');
+  if (!ok) { $('report-meta').textContent = body.error; return; }
+  report = body;
+  $('report-meta').textContent = `generated ${body.generated} in ${body.runtime_seconds}s`;
+  const s = body.summary || {};
+  $('report-summary').innerHTML = Object.entries(s).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</dd>`).join('');
+  const ev = (body.evidence || {}).overall || {};
+  const entries = ev.entries || {};
+  const total = Object.values(entries).reduce((a, b) => a + b, 0) || 1;
+  $('evidence').innerHTML = Object.entries(entries).map(([k, v]) =>
+    `<div class="row"><span style="width:110px">${esc(k)}</span><div style="flex:1;background:var(--chip);border-radius:4px;height:12px">` +
+    `<div style="width:${(100 * v / total).toFixed(1)}%;height:12px;border-radius:4px;background:var(--accent)"></div></div>` +
+    `<span class="num" style="width:90px;text-align:right">${v}</span></div>`).join('');
+  renderFindings();
+}
+function renderFindings() {
+  if (!report) return;
+  const list = (report.checks || {})[$('finding-kind').value] || [];
+  const f = $('finding-filter').value.toLowerCase();
+  $('findings').innerHTML = list.filter((x) => !f || JSON.stringify(x).toLowerCase().includes(f)).slice(0, 400).map((x) =>
+    `<tr><td>${esc(x.file)}</td><td class="mono">${esc(x.path)}</td><td class="mono">${esc(x.value)}</td><td>${esc(x.problem)}</td></tr>`).join('');
+}
+$('finding-kind').addEventListener('change', renderFindings);
+$('finding-filter').addEventListener('input', renderFindings);
+
+/* client log */
+async function loadClientLog() {
+  const { body } = await api('/api/clientlog');
+  $('clientlog').innerHTML = (body.lines || []).map((l) =>
+    `<tr><td>${esc(l.file)}</td><td class="mono">${esc(l.line)}</td></tr>`).join('') ||
+    `<tr><td colspan="2" class="muted">${esc(body.note || 'nothing logged')}</td></tr>`;
+}
+
+/* map: terrain relief from the gateway's height grid, drawn in the browser */
+const map = { grids: {}, relief: {}, zone: null, scale: 0.25, cx: 0, cz: 0, me: null, actors: [],
+              npcs: [], battles: [], marks: [], placed: [], drag: null, centred: false };
+function parseGrid(buffer) {
+  const v = new DataView(buffer);
+  const magic = String.fromCharCode(...new Uint8Array(buffer, 0, 8));
+  if (magic !== 'OSFRHGT1') throw new Error('not a height grid');
+  const g = { minX: v.getFloat32(8, true), minZ: v.getFloat32(12, true), cell: v.getFloat32(16, true),
+              cols: v.getUint32(20, true), rows: v.getUint32(24, true) };
+  g.h = new Int16Array(buffer.slice(28));
+  return g;
+}
+function gridHeight(g, x, z) {
+  const fx = (x - g.minX) / g.cell, fz = (z - g.minZ) / g.cell;
+  const c = Math.round(fx), r = Math.round(fz);
+  if (c < 0 || r < 0 || c >= g.cols || r >= g.rows) return null;
+  const h = g.h[r * g.cols + c];
+  return h === -32768 ? null : h / 10;
+}
+// Hillshade (light from the north-west) tinted by height; empty nodes stay dark.
+function buildRelief(g) {
+  const canvas = document.createElement('canvas');
+  canvas.width = g.cols; canvas.height = g.rows;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(g.cols, g.rows);
+  let lo = Infinity, hi = -Infinity;
+  for (const h of g.h) if (h !== -32768) { lo = Math.min(lo, h); hi = Math.max(hi, h); }
+  const span = Math.max(1, hi - lo);
+  const at = (c, r) => {
+    c = Math.min(g.cols - 1, Math.max(0, c)); r = Math.min(g.rows - 1, Math.max(0, r));
+    const h = g.h[r * g.cols + c]; return h === -32768 ? null : h;
+  };
+  for (let r = 0; r < g.rows; r++) {
+    // Row 0 is the lowest z; draw north (high z) at the top.
+    const out = (g.rows - 1 - r) * g.cols;
+    for (let c = 0; c < g.cols; c++) {
+      const i = (out + c) * 4, h = at(c, r);
+      if (h === null) { img.data[i + 3] = 0; continue; }
+      const dx = ((at(c + 1, r) ?? h) - (at(c - 1, r) ?? h)) / (20 * g.cell);
+      const dz = ((at(c, r + 1) ?? h) - (at(c, r - 1) ?? h)) / (20 * g.cell);
+      const shade = Math.max(0.25, Math.min(1.25, 0.85 + (dx - dz) * 0.9));
+      const t = (h - lo) / span;
+      const base = t < 0.35 ? [70 + 120 * t, 120 + 160 * t, 60] : t < 0.7 ? [130 + 80 * (t - 0.35), 150 - 40 * (t - 0.35), 80]
+                 : [170 + 120 * (t - 0.7), 150 + 150 * (t - 0.7), 130 + 180 * (t - 0.7)];
+      img.data[i] = base[0] * shade; img.data[i + 1] = base[1] * shade; img.data[i + 2] = base[2] * shade;
+      img.data[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  return canvas;
+}
+async function loadMap() {
+  const state = await api('/api/state');
+  if (!state.ok) { $('map-status').textContent = state.body.error || 'no character'; return; }
+  const zone = state.body.character.zone_id;
+  if (map.zone !== zone) { map.zone = zone; map.centred = false; }
+  if (!map.grids[zone]) {
+    $('map-status').textContent = 'loading terrain…';
+    const response = await fetch('/api/terrain/' + zone);
+    if (!response.ok) {
+      $('map-status').textContent = `no terrain for zone ${zone}: build it with osfr-terrain and start the gateway with --terrain`;
+    } else {
+      map.grids[zone] = parseGrid(await response.arrayBuffer());
+      map.relief[zone] = buildRelief(map.grids[zone]);
+    }
+  }
+  if (map.grids[zone]) {
+    const g = map.grids[zone];
+    $('map-status').textContent = `zone ${zone} · ${(g.cols * g.cell / 1000).toFixed(1)} × ${(g.rows * g.cell / 1000).toFixed(1)} km · ${g.cell} m grid`;
+  }
+  if (!map.npcs.length) {
+    const spawns = await api('/api/content/npc_spawns_extra.json');
+    map.npcs = (spawns.body.records || []).map((r) => ({ name: r.name || r.model_file_name || 'NPC', position: r.position }));
+    const battles = await api('/api/content/field_battles.json');
+    map.battles = (battles.body.battles || []).map((b) => ({ name: b.spawner.name, position: b.spawner.position, id: b.id }));
+  }
+  await loadMarks();
+  await loadPlaced();
+  applyState(state.body);
+}
+async function loadPlaced() {
+  const { ok, body } = await api('/api/world/npc_placements.json');
+  map.placed = ok ? body.records || [] : [];
+  $('map-placed').innerHTML = map.placed.length ? '<table><tr><th>GUID</th><th>Model</th><th>Name id</th><th>Position</th><th></th></tr>' +
+    map.placed.map((r) =>
+    `<tr><td class="mono">${esc(r.guid)}</td><td class="num">${esc(r.model_id)}</td><td class="num">${esc(r.name_string_id || '')}</td>` +
+    `<td class="num">${r.position.map(fmt).join(', ')}</td>` +
+    `<td><button class="ghost" data-cmd="goto ${fmt(r.position[0])} ${fmt(r.position[1]) } ${fmt(r.position[2])}">go to</button> ` +
+    `<button class="ghost" data-cmd="unplace ${esc(r.guid)}">remove</button></td></tr>`).join('') + '</table>'
+    : 'none yet: tick "place NPCs on click", enter a model id, and click the map';
+}
+async function loadMarks() {
+  const { ok, body } = await api('/api/world/marks.json');
+  map.marks = ok ? body.marks || [] : [];
+  $('map-marks').innerHTML = map.marks.length ? '<table>' + map.marks.map((m) =>
+    `<tr><td>${esc(m.name)}</td><td class="num">zone ${m.zone}</td><td class="num">${m.position.map(fmt).join(', ')}</td>` +
+    `<td><button class="ghost" data-cmd="goto mark ${esc(m.name)}">go to</button> ` +
+    `<button class="ghost" data-cmd="unmark ${esc(m.name)}">remove</button></td></tr>`).join('') + '</table>'
+    : 'none yet: type a name and press "mark where I stand", or type realm mark &lt;name&gt; in game chat';
+}
+function applyState(body) {
+  const c = body.character;
+  map.me = { position: c.position, rotation: c.rotation, zone: c.zone_id };
+  map.actors = body.actors || [];
+  if (!map.centred) { map.cx = c.position[0]; map.cz = c.position[2]; map.centred = true; }
+  drawMap();
+}
+async function refreshMap() {
+  const { ok, body } = await api('/api/state');
+  if (!ok) return;
+  if (body.character.zone_id !== map.zone) return loadMap();
+  applyState(body);
+}
+function mapSize() {
+  const canvas = $('map-canvas'), wrap = $('map-wrap');
+  const ratio = window.devicePixelRatio || 1;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if (canvas.width !== Math.round(w * ratio) || canvas.height !== Math.round(h * ratio)) {
+    canvas.width = Math.round(w * ratio); canvas.height = Math.round(h * ratio);
+  }
+  return { canvas, ratio, w, h };
+}
+// World (x, z) <-> screen pixels (CSS units); north (+z) is up.
+const toScreen = (x, z, w, h) => [w / 2 + (x - map.cx) * map.scale, h / 2 - (z - map.cz) * map.scale];
+const toWorld = (sx, sy, w, h) => [map.cx + (sx - w / 2) / map.scale, map.cz - (sy - h / 2) / map.scale];
+function drawMap() {
+  if (tab !== 'map') return;
+  const { canvas, ratio, w, h } = mapSize();
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const g = map.grids[map.zone], relief = map.relief[map.zone];
+  if (g && relief) {
+    // Each pixel is centred on its grid node.
+    const [left, top] = toScreen(g.minX - g.cell / 2, g.minZ + (g.rows - 0.5) * g.cell, w, h);
+    ctx.imageSmoothingEnabled = map.scale < 1 / g.cell;
+    ctx.drawImage(relief, left, top, g.cols * g.cell * map.scale, g.rows * g.cell * map.scale);
+  }
+  const dot = (p, color, radius) => {
+    const [sx, sy] = toScreen(p[0], p[2], w, h);
+    if (sx < -10 || sy < -10 || sx > w + 10 || sy > h + 10) return;
+    ctx.beginPath(); ctx.arc(sx, sy, radius, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+  };
+  if ($('map-npcs').checked && map.zone === 0) for (const n of map.npcs) dot(n.position, 'rgba(127,211,255,.55)', 1.6);
+  for (const a of map.actors) dot(a.position, a.kind === 'enemy' ? '#ff5a4a' : '#7fd3ff', 3);
+  if (map.zone === 0) for (const r of map.placed) {
+    const [sx, sy] = toScreen(r.position[0], r.position[2], w, h);
+    ctx.fillStyle = '#5fe08a'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+    ctx.fillRect(sx - 4, sy - 4, 8, 8); ctx.strokeRect(sx - 4, sy - 4, 8, 8);
+  }
+  if (map.zone === 0) for (const b of map.battles) dot(b.position, '#ff5a4a', 5);
+  ctx.font = '12px system-ui, sans-serif';
+  for (const m of map.marks.filter((m) => m.zone === map.zone)) {
+    const [sx, sy] = toScreen(m.position[0], m.position[2], w, h);
+    ctx.fillStyle = '#c6a4ff';
+    ctx.beginPath(); ctx.moveTo(sx, sy - 6); ctx.lineTo(sx + 6, sy); ctx.lineTo(sx, sy + 6); ctx.lineTo(sx - 6, sy); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.fillText(m.name, sx + 9, sy + 4);
+  }
+  if (map.me && map.me.zone === map.zone) {
+    const [sx, sy] = toScreen(map.me.position[0], map.me.position[2], w, h);
+    const angle = Math.atan2(map.me.rotation[0], map.me.rotation[2]);
+    ctx.save(); ctx.translate(sx, sy); ctx.rotate(angle);
+    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(7, 7); ctx.lineTo(0, 3); ctx.lineTo(-7, 7); ctx.closePath();
+    ctx.fillStyle = '#ffd84a'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+}
+function zoomMap(factor, sx, sy) {
+  const { w, h } = mapSize();
+  const [x, z] = sx === undefined ? [map.cx, map.cz] : toWorld(sx, sy, w, h);
+  map.scale = Math.min(16, Math.max(0.03, map.scale * factor));
+  if (sx !== undefined) { // keep the point under the cursor fixed
+    map.cx = x - (sx - w / 2) / map.scale; map.cz = z + (sy - h / 2) / map.scale;
+  }
+  drawMap();
+}
+$('map-zoom-in').addEventListener('click', () => zoomMap(1.6));
+$('map-zoom-out').addEventListener('click', () => zoomMap(1 / 1.6));
+$('map-center').addEventListener('click', () => { map.centred = false; refreshMap(); });
+$('map-npcs').addEventListener('change', drawMap);
+$('map-mark').addEventListener('click', async () => {
+  const name = $('map-mark-name').value.trim();
+  if (!name) { $('map-mark-name').focus(); return; }
+  await run('mark ' + name);
+  $('map-mark-name').value = '';
+  loadMarks().then(drawMap);
+});
+$('map-marks').addEventListener('click', (e) => {
+  if (e.target.dataset.cmd) setTimeout(() => loadMarks().then(drawMap), 300);
+});
+$('map-placed').addEventListener('click', (e) => {
+  if (e.target.dataset.cmd) setTimeout(() => loadPlaced().then(drawMap), 300);
+});
+$('map-place-mode').addEventListener('change', () => {
+  $('map-wrap').style.cursor = $('map-place-mode').checked ? 'copy' : 'crosshair';
+});
+const wrapPoint = (e) => { const r = $('map-wrap').getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+$('map-wrap').addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const [sx, sy] = wrapPoint(e);
+  zoomMap(e.deltaY < 0 ? 1.25 : 0.8, sx, sy);
+}, { passive: false });
+$('map-wrap').addEventListener('pointerdown', (e) => {
+  const [sx, sy] = wrapPoint(e);
+  map.drag = { sx, sy, cx: map.cx, cz: map.cz, moved: false };
+  $('map-wrap').setPointerCapture(e.pointerId);
+});
+$('map-wrap').addEventListener('pointermove', (e) => {
+  const [sx, sy] = wrapPoint(e);
+  const { w, h } = mapSize();
+  const [x, z] = toWorld(sx, sy, w, h);
+  const g = map.grids[map.zone];
+  const ground = g ? gridHeight(g, x, z) : null;
+  $('map-cursor').textContent = `x ${x.toFixed(1)}  z ${z.toFixed(1)}` + (ground === null ? '' : `  ground ${ground.toFixed(1)}`);
+  if (!map.drag) return;
+  const dx = sx - map.drag.sx, dy = sy - map.drag.sy;
+  if (Math.abs(dx) + Math.abs(dy) > 4) map.drag.moved = true;
+  if (map.drag.moved) {
+    map.cx = map.drag.cx - dx / map.scale; map.cz = map.drag.cz + dy / map.scale;
+    drawMap();
+  }
+});
+$('map-wrap').addEventListener('pointerup', (e) => {
+  const drag = map.drag; map.drag = null;
+  if (!drag || drag.moved) return;
+  const [sx, sy] = wrapPoint(e);
+  const { w, h } = mapSize();
+  const [x, z] = toWorld(sx, sy, w, h);
+  if ($('map-place-mode').checked) {
+    const model = $('map-place-model').value.trim(), name = $('map-place-name').value.trim();
+    if (!/^\d+$/.test(model)) { log('enter a model id to place', 'bad'); $('map-place-model').focus(); return; }
+    const nameId = /^\d+$/.test(name) ? name + ' ' : '';
+    run(`place ${model} ${nameId}at ${x.toFixed(1)} ${z.toFixed(1)}`).then(() => setTimeout(() => loadPlaced().then(drawMap), 300));
+    return;
+  }
+  run(`goto ${x.toFixed(1)} ${z.toFixed(1)}`);
+});
+window.addEventListener('resize', drawMap);
+
+showTab(tab);
+refreshLive();
+setInterval(() => {
+  if (tab === 'live') refreshLive();
+  if (tab === 'packets' && $('packet-live').checked) loadPackets();
+  if (tab === 'fight') loadFight();
+  if (tab === 'map') refreshMap();
+}, 1000);
+</script>
+</body>
+</html>

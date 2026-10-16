@@ -1,0 +1,2786 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "the_snarling_hedges",
+        "name_string_id": 725470992,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for The Snarling Hedges."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key the_snarling_hedges comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > The Snarling Hedges; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "The Snarling Hedges",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 725470992,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 3,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > The Snarling Hedges difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Briarwood (Thistlerow)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 5,
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Requirements > Combat job level; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Requirements > Combat job level; cited [client] [wiki]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Requirements > Combat job level; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Requirements > Combat job level; cited [client] [wiki]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None found. Quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Briarwood (Thistlerow)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+                }
+              ]
+            },
+            "name": {
+              "value": "gate",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the gate in Thistlerow, in Briarwood. It has an Atlas icon. Client: \"The Snarling Hedges are located South, in the Hedge Maze. Don't worry about the guards out front, they'll let you in!\" (loc 4083340035). In video the entrance is a dark red-purple hedge maze with a floating \"The Snarling Hedges\" label, a crossed-swords marker and the prompt \"Press X or mouse\". | [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat Nogg the Cruel.\" (loc 4237577046) | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Goals > Main; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Goals > Main; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Defeat the 3 Hedge Knights!\" (loc 2676374441). Related client text: \"Remove the curse upon the bears and defeat the Hedge Knights!\" (loc 507763741) and \"The bears who live in this area have become cursed. Remove the curse by finding and destroying the source. Beware of the Hedge Knights, they are the keepers of the curse.\" (loc 3710027364). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"Snarling Hedges Bonus Objective\" (loc 706362671) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Nogg the Cruel"
+              ],
+              "description": {
+                "value": "Nogg the Cruel (loc 3683474294, 3786982361, game data 1879056588) | \"a dangerous gremlin\". Dev strings: \"Snarling Hedges - Nogg kick\" (loc 326525431, 876042861) and \"Snarling Hedges - Nogg buff\" (loc 205260990). Effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Mini-bosses",
+              "names": [
+                "Hedge Knight"
+              ],
+              "description": {
+                "value": "Hedge Knight (loc 1995289391, game data 1249388026) | Three of them. Related objects: \"Hedge Knight Statue\" (loc 1689380771, 4164474018) and \"Hedge Knight Chest\" (loc 3677046753, 3377428928). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not map Mini-bosses to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not source stats for Mini-bosses."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (wiki)",
+              "names": [
+                "Vine Bears",
+                "Ghost Snakes",
+                "Snake Statues",
+                "Hedge Guardians",
+                "Hedge Knights"
+              ],
+              "description": {
+                "value": "Vine Bears, Ghost Snakes, Snake Statues, Hedge Guardians, Hedge Knights | Wiki list. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not map Enemies (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not source stats for Enemies (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (client)",
+              "names": [],
+              "description": {
+                "value": "\"Hedge Guardian\" (loc 984010233, 2649902964), \"Maze Viper\" (loc 338643429, 4053007319), \"Snake Statue\" (loc 2673941928, 2306099254), \"Ghost Snake Form\" (loc 3991999950, 3968311690), \"snake_ghost ghost snake\" (loc 582630628). Quest text says \"cursed bears\" (loc 3578331403) and \"vine golem\" (loc 205112282). | The client has no \"Vine Bear\" string; \"cursed bears\" is the nearest. | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (client); cited [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not map Enemies (client) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not source stats for Enemies (client)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (client); cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Nogg the Cruel"
+              ],
+              "description": {
+                "value": "Nogg the Cruel (loc 3683474294, 3786982361, game data 1879056588) | \"a dangerous gremlin\". Dev strings: \"Snarling Hedges - Nogg kick\" (loc 326525431, 876042861) and \"Snarling Hedges - Nogg buff\" (loc 205260990). Effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Mini-bosses",
+              "names": [
+                "Hedge Knight"
+              ],
+              "description": {
+                "value": "Hedge Knight (loc 1995289391, game data 1249388026) | Three of them. Related objects: \"Hedge Knight Statue\" (loc 1689380771, 4164474018) and \"Hedge Knight Chest\" (loc 3677046753, 3377428928). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not map Mini-bosses to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Snarling Hedges.md does not source stats for Mini-bosses."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"270 Stars or less\" (wiki wording). No video. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "162 Coins slot on each job's wheel | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "203 Coins | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "One piece of clothing from a set for the player's job, random colour and body slot, for everyone in the instance | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "\"Complete the The Snarling Hedges encounter.\" (loc 525875226; the doubled \"the\" is in the client), full-group version (1222644166), \"Win Combat Encounter The Snarling Hedges\" (1880921421), \"Group: The Snarling Hedges\" (3138555069) | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Achievements; cited [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"III\", matching difficulty 3. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 162,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 203,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Composite Bow of Blizzards",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Drifting Archer Hoodie",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Anvil Hammer of Rumbling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Catchweight Brawler Jacket",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Emergency Medic Shirt",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Bonesaw of Vitals",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Scythe of 1000 Storms",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Nusumi Ninja Gi",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Combat Bonus Warrior Tunic",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Battle Hammer of Cleaving",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Scholar Wizard Medium Cloak",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Bone Wand of Glaciers",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "zone",
+            "target_name": "Briarwood (Thistlerow)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "object",
+            "target_name": "gate",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Entrance; cited [wiki] [client] [video RR1FHvCt_Ms/00018, 0mJBW1a0EIc/00374, STlzXovqRFY/00014]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Nogg the Cruel",
+            "target_id": 9500000187,
+            "reason": "Exact name matches reconstructed NPC content key in briarwood.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/briarwood.json npc_id 9500000187; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Hedge Knight",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Vine Bears",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Ghost Snakes",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Snake Statues",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Hedge Guardians",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "npc",
+            "target_name": "Hedge Knights",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Archer's Composite Bow of Blizzards",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Archer's Ring of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Drifting Archer Hoodie",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Brawler's Anvil Hammer of Rumbling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Catchweight Brawler Jacket",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Emergency Medic Shirt",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Medic's Bonesaw of Vitals",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Medic's Ring of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Ninja's Scythe of 1000 Storms",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Nusumi Ninja Gi",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Combat Bonus Warrior Tunic",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Warrior's Battle Hammer of Cleaving",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Scholar Wizard Medium Cloak",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Wizard's Bone Wand of Glaciers",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "the_snarling_hedges",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key the_snarling_hedges comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > The Snarling Hedges; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Nogg the Cruel",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Hedge Knight",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Vine Bears",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Ghost Snakes",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Snake Statues",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Hedge Guardians",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Hedge Knights",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Nogg the Cruel",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 1,
+            "name": "Hedge Knight",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Snarling Hedges.md > Enemies and boss > Mini-bosses; cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

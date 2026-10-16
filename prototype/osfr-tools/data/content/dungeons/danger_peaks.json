@@ -1,0 +1,2641 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "danger_peaks",
+        "name_string_id": 3016521866,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Danger Peaks."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key danger_peaks comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Danger Peaks; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Danger Peaks",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 3016521866,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 2,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Danger Peaks difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Wilds (Southern Wilds)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). No level-3 string exists in the client. | [wiki: Dungeons] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Danger Peaks minimum combat level; cited guide source index"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": 3,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Danger Peaks recommended level; cited guide source index"
+              }
+            ]
+          },
+          "job": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). No level-3 string exists in the client. | [wiki: Dungeons] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Requirements > Combat job level; cited [wiki: Dungeons] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Requirements > Combat job level; cited [wiki: Dungeons] [client]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None. The Ninja job quest line sends players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Wilds (Southern Wilds)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "fence",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the fence in the south west Wilds. The client calls it the \"Danger Peaks combat gate\" (loc 159704171) and places it \"near Greenwood Forest\" (loc 2109427437), in \"southern Sacred Grove\" (loc 501005009, for apprentice ninjas) and \"at the top\" of the mountain for Taka (loc 1972472335: \"Taka the Shadow hides at the top of Danger Peaks. Scale the mountain ...\"). Atlas icon exists. | [wiki] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat Taka, leader of the Shadow Talon ninja.\" (loc 2268990247; a Clan variant is loc 224291536). Short forms: \"Defeat Taka the Shadow\" (1482534595, 61086538), \"Enter Danger Peaks and defeat Taka the Shadow.\" (4226015792, 2619077384). | [client] [video 92VCAHXkLGQ/00000 to 00026 (panel text)] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Main; cited [client] [video 92VCAHXkLGQ/00000 to 00026 (panel text)] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Main; cited [client] [video 92VCAHXkLGQ/00000 to 00026 (panel text)] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Main; cited [client] [video 92VCAHXkLGQ/00000 to 00026 (panel text)] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Bonus: Release the 10 Caged Birds.\" (wiki). Client string: \"Release the 10 Caged Birds.\" (loc 2563550595); detail \"Giant birds are being held captive by the Shadow Talon Ninjas. Free the birds ...\" (loc 3589922376). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Panel shows",
+              "value": "Video shows \"Goals (1)\" with only the Taka goal, in the frames recorded from the start of the run. No bonus line or bird counter is visible in any of them. | [video 92VCAHXkLGQ/00000, 00002, 00022, 00026]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Panel shows; cited [video 92VCAHXkLGQ/00000, 00002, 00022, 00026]"
+                }
+              ]
+            },
+            {
+              "label": "Internal group",
+              "value": "\"Danger Peaks Bonus Objective\" (loc 2006345813) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Internal group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Danger Peaks\" (loc 565717217) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Goals > Win text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Taka the Shadow"
+              ],
+              "description": {
+                "value": "Taka the Shadow (loc 1835149259, 3308217852), leader of the Shadow Talon clan | Names of his abilities in the client: \"Danger Peaks - Taka Fire Slash\" (3430001312), \"Danger Peaks - ninja boss sleep bomb\" (185766942), \"ninja boss teleport back\" (2070332101), \"ninja boss teleport away\" (2648338257), \"ninja boss shadow clones\" (3048874768), \"ninja boss lightning\" (4154992280), \"danger peaks - boss primary attack\" (1454216230), \"boss extra attack\" (3995746919). Line: \"Taka begins to mutter in an unknown language.\" (2104546361). They are tagged \"Danger Peaks\" in the client, which is the only link; the effects are unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [
+                "Shadow Talon Ninja(s)",
+                "Shadow Talon Master(s)"
+              ],
+              "description": {
+                "value": "Shadow Talon Ninja(s), Shadow Talon Master(s) (loc 1197270692, 1641002485), Shadowtalon Apprentices (loc 501005009) | Video shows \"Shadow Talon Ninja\" enemy nameplates and pale blue figures. Ability names: \"Danger Peaks 46 - Master Shuriken Throw\" (1568342592), \"Master fire pillar\" (3026392904, 3404594596), \"ninja smoke bomb\" (1851121127), \"ninja melee damage absorb\" (1820570473), \"Ninja shuriken throw\" (4061723954), \"ninja melee slash\" (3995856046), \"elite ability\" (1464315520). | [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Birds",
+              "names": [
+                "Hawks / giant birds"
+              ],
+              "description": {
+                "value": "Hawks / giant birds, caged | Client names: \"tame hawk dive attack\" (loc 4133747541), \"hawk dive attack\" (4230541771), \"eagle wing flap\" (1793639197), \"tame eagle wing flap\" (942262427). The wiki lists \"Hawks\" as friendly NPCs. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not map Birds to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not source stats for Birds."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Taka the Shadow"
+              ],
+              "description": {
+                "value": "Taka the Shadow (loc 1835149259, 3308217852), leader of the Shadow Talon clan | Names of his abilities in the client: \"Danger Peaks - Taka Fire Slash\" (3430001312), \"Danger Peaks - ninja boss sleep bomb\" (185766942), \"ninja boss teleport back\" (2070332101), \"ninja boss teleport away\" (2648338257), \"ninja boss shadow clones\" (3048874768), \"ninja boss lightning\" (4154992280), \"danger peaks - boss primary attack\" (1454216230), \"boss extra attack\" (3995746919). Line: \"Taka begins to mutter in an unknown language.\" (2104546361). They are tagged \"Danger Peaks\" in the client, which is the only link; the effects are unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Danger Peaks.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"256 Stars or less\" (wiki wording) | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "70 Coins slot on every job's wheel | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "119 Coins | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Completing the bonus goal gives every player in the instance one piece of clothing from a set for their job. Colour and body slot are random. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "\"Complete the Danger Peaks encounter.\" (loc 2919593657), full-group version (670371106) | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Achievements; cited [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Ninja job reward",
+                "value": "Defeating Taka for the Ninja job quest ends with \"Taka has been flushed out of his hideout in Danger Peaks by the valiant efforts of [*player*]! As a reward, Ty has imparted the secrets of the ninja to [*player*].\" (loc 490617011). The reward text is the job unlock. | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Ninja job reward; cited [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"II\", matching difficulty 2. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 70,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 119,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Horse Bow of Blizzards",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Roving Archer Cap",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Hammer of Rumbling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Bum Rush Brawler Beanie",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Antibiotic Medic Cap",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Scalpel of Vitals",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Blade of 1000 Storms",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Sekkou Ninja Cowl",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Second Wind Warrior Helm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Axe of Cleaving",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Journeyman Wizard Cap",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Vitality II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Wand of Glaciers",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "danger_peaks",
+            "kind": "zone",
+            "target_name": "Wilds (Southern Wilds)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "object",
+            "target_name": "fence",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "npc",
+            "target_name": "Taka the Shadow",
+            "target_id": 9500000951,
+            "reason": "Exact name matches reconstructed NPC content key in wilds.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/wilds.json npc_id 9500000951; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "npc",
+            "target_name": "Shadow Talon Ninja(s)",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "npc",
+            "target_name": "Shadow Talon Master(s)",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "npc",
+            "target_name": "Hawks / giant birds",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Archer's Horse Bow of Blizzards",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Roving Archer Cap",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Brawler's Hammer of Rumbling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Bum Rush Brawler Beanie",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Antibiotic Medic Cap",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Medic's Scalpel of Vitals",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Ninja's Blade of 1000 Storms",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Sekkou Ninja Cowl",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Second Wind Warrior Helm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Warrior's Axe of Cleaving",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Journeyman Wizard Cap",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Vitality II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "danger_peaks",
+            "kind": "item",
+            "target_name": "Wizard's Wand of Glaciers",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key danger_peaks comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Danger Peaks; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Taka the Shadow",
+            "definition_id": 930047,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Taka the Shadow links to definition_id=930047; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Shadow Talon Ninja(s)",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Shadow Talon Master(s)",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Enemies; cited [video 92VCAHXkLGQ/00024, 00026] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Hawks / giant birds",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Birds; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Taka the Shadow",
+            "definition_id": 930047,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Danger Peaks.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Taka the Shadow links to definition_id=930047; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

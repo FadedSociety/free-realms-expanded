@@ -1,0 +1,25 @@
+# Artifact3 Native Interaction Approach
+
+The third original Gloam crystal is now reachable and interactable in native run 193318. Root walked the bounded direct west→northwest hillside without jumps, continued through the two close approach points, opened the normal X radial menu and clicked Interact. The crystal disappeared and native chat displayed the third-artifact goal at 1/1. Whole quest/economy and actor GUID packets remain the separate combat review.
+
+Independent packet/whole-state review now binds the visible third interaction to menu frame 7729, choice 7769 for GUID …5079, removal 7772 and objective 91001003 count/complete frames 7773–7774. [All-three checkpoint proof](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T193318Z/analysis-live/native-artifacts-all-checkpoint-proof.json), SHA256 `25b220c00ecb819fd0dd36a65411ec8d4443274bf5557e64eb12f6348959d0f5`, allows only the ordered objective counts to change; HP 895, coins 194, inventory and equipment remain unchanged. This is a bounded live-prefix checkpoint proof, not final transport acceptance.
+
+[Retained native navigation/input/pixel proof](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/artifact3-native-193318-v1/proof.json), SHA256 `96dc2e74d6f158c5ae38a95ad7894b2868218e331073a67dcedbe1eb6ba1c1e4`, binds 438 sources. Navigation logs 200854, 200907 and 200918 all ended arrived with radius 0.5 m, using A/D/W only. The retained input interval contains no Space. Actual final position `[-1844.0194,-47.837994,371.53522]` is 6.27955 m from Artifact3 and 0.08796 m from the prepared target. The frozen input slice retains one normal X press and one normal `click 640 506`. This is an ongoing-run input/navigation record, not final transport or a global hardware input recorder.
+
+![Native Artifact3 menu](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T193318Z/artifact3-close-menu_small.png)
+
+![Third crystal removed and goal complete](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261008T193318Z/artifact3-destroyed_small.png)
+
+## Exact close approach and original geometry
+
+After artifacts 1 and 2 were removed, the starting native position reported by root was `[-1843.7327,-53.522064,348.57864]`. The prepared west route was `(-1847,358) → (-1851,369) → (-1844.718,376.718)`. The first two segments are gentle, with maximum grades 0.17049 and 0.20868. The direct final hillside segment reaches grade 0.61281 and corridor normal Y 0.85129. That conservative screening failure did not prevent the actual bounded native walk; do not translate it into a claim of impassability or universal slope acceptance.
+
+The close final path is `(-1844.718,376.718) → (-1844.4,373) → (-1844.1,371.5)`. Its 5.26128 m length has maximum grade 0.20328, corridor normal Y ≥ 0.94747, no original map triangles within 4 m and no missing sampled floor. Exact target render Y is −47.924015, putting it 6.36145 m in 3D from the artifact's origin `[-1838,-46.92,370]`. Original Artifact3 triangles clipped to render floor+0.2…2.2 m stay at least 1.58310 m from this final path across both possible native-facing signs. The conservative full-render AABB gap is only 0.44738 m; an AABB is not the actual collider. Native traversal and menu now provide the observed acceptance for this particular route.
+
+The earlier northwest point was 9.50090 m from the artifact, outside the observed native default X range of 7 m even though it was inside the server's 12 m radius. The final point solves that approach distance without changing an actor or packet field. Use a 0.5 m navigation radius or observed fine walking: a default 1–1.5 m stopping radius can leave the player outside X reach. The exact ≤6.5 m margin is only 0.13855 m; verify actual position and prompt.
+
+## Prepared gentler alternative
+
+The outer route `(-1851,369) → (-1857,375) → (-1857,386) → (-1844.718,386) → (-1844.718,376.718)` avoids the steep direct slope in the conservative render screening. It is 41.04928 m, with maximum grade 0.42575, corridor normal Y ≥ 0.90372, no structural map triangles within 4 m and original artifact body-band triangle clearance ≥ 5.34777 m. This alternative was prepared but was not the route used natively.
+
+Private geometry proofs: [initial](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/artifact3-close-approach-v1.json), SHA256 `5550fb19eb9fd10ae7e717f51f6d240b3057428871df559abcc423c6dcd3a716`; [close targets](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/artifact3-close-approach-v2.json), SHA256 `b9b1540215196ef5d6794143f60d676996e66824ce2a455dc31b3ef44be6b169`; [outer slope detours](%USERPROFILE%/Documents/Projects/CartoonMMO/lab/reports/artifact3-west-slope-v3.json), SHA256 `dc89a770b23ffd73de9fa7d62fc8975408377d540c969702f9774517ed380269`. They reuse unchanged original community DME/GCNK exports and native template scale/direction. No new format parser, source, content, active save, release, input or shared decoder output was changed.

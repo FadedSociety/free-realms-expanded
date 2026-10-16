@@ -1,0 +1,2566 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "feisty_floren",
+        "name_string_id": 2647353816,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Feisty Floren."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key feisty_floren comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Feisty Floren; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Feisty Floren",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 2647353816,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 2,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Feisty Floren difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Wilds (Pixie Nursery area; wiki says south-west of Wugachug)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). No level-3 string exists in the client. | [wiki: Battles] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Feisty Floren minimum combat level; cited guide source index"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": 3,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Feisty Floren recommended level; cited guide source index"
+              }
+            ]
+          },
+          "job": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). No level-3 string exists in the client. | [wiki: Battles] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Requirements > Combat job level; cited [wiki: Battles] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Requirements > Combat job level; cited [wiki: Battles] [client]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None found | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Wilds (Pixie Nursery area; wiki says south-west of Wugachug)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "npc",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+                }
+              ]
+            },
+            "name": {
+              "value": "floren",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click a floren south-west of Wugachug. Client objective: \"Defeat Feisty Floren in the Pixie Nursery.\" (loc 3037477675). A wiki enemy page puts the battle in the Northern Wilds. A video frame shows \"Feisty Floren\" as a pink node marker 96 m away. | [wiki] [client] [video RdFC2N87-3c/00006]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat the Floren!\" (loc 945685471). Panel shows \"Goals (2)\". | [client] [video Yoxys3l0-vg/00000] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Main; cited [client] [video Yoxys3l0-vg/00000] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Main; cited [client] [video Yoxys3l0-vg/00000] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Main; cited [client] [video Yoxys3l0-vg/00000] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Bonus: Restore Nature!\" with a counter out of 10. The video reads \"Restore Natural - ?/10\" (OCR); the client string is \"Restore Nature!\" (loc 3248596102), and the group is \"Feisty Floren! Bonus\" (loc 3136540738). Not on the wiki. What counts as one point is unknown. | [client] [video Yoxys3l0-vg/00000, 00052]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Bonus; cited [client] [video Yoxys3l0-vg/00000, 00052]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Bonus; cited [client] [video Yoxys3l0-vg/00000, 00052]"
+                }
+              ]
+            },
+            {
+              "label": "Results screen",
+              "value": "\"YOU WIN!\", \"Enemies Defeated 2 = 500\" and \"Knockouts Remaining 1/3 = 0\" (client \"@1 Knockouts Remaining\", loc 2091446230) | [video Yoxys3l0-vg/00158] [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Results screen; cited [video Yoxys3l0-vg/00158] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Goals > Results screen; cited [video Yoxys3l0-vg/00158] [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Enemies",
+              "names": [
+                "Corrupted Floren"
+              ],
+              "description": {
+                "value": "Corrupted Floren (loc 1350215920, 1475346365) | Many nameplates seen in a green field; hits of 69 to 175 damage on a level 7 Warrior; some stunned. Coins drop as \"You receive 3 coins\". Counts unknown. | [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": {
+                  "damage": 175
+                },
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Node creature",
+              "names": [
+                "Feisty Floren"
+              ],
+              "description": {
+                "value": "Feisty Floren | The click target. | [client] [video RdFC2N87-3c/00006]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not map Node creature to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not source stats for Node creature."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+                }
+              ]
+            },
+            {
+              "role": "Boss",
+              "names": [],
+              "description": {
+                "value": "None named | | gap",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Boss"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Boss"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [],
+              "description": {
+                "value": "None named | | gap",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Boss"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Boss"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"119 Stars\" (wiki wording). A banner in the recording on the goal tick reads \"You receive 11 stars and 13 coins\" (not clearly the final payout). | [wiki] [video Yoxys3l0-vg/00136]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                  }
+                ]
+              },
+              {
+                "label": "Members Only Bonus",
+                "value": "\"37 Coins\". Generic client \"Bonus: 37 Coins!\" (loc 2664870581). | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel coins",
+                "value": "8 Coins slot on every wheel, as written | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel coins; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Seasonal",
+                "value": "The wiki says the Snow Days 2013 Pumpkin Prince toy was on this battle's wheel (Dec 2013). | [wiki: Pumpkin Prince]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Seasonal; cited [wiki: Pumpkin Prince]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievement",
+                "value": null,
+                "reason": "None on the wiki list; no \"Win Combat Encounter\" string | [wiki] [client]",
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Achievement; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Achievement; cited [wiki] [client]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "reported_coin_reward",
+                "conditions": {
+                  "value": "Stars",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 13,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Stars; cited [wiki] [video Yoxys3l0-vg/00136]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members Only Bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 37,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Members Only Bonus; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Prize wheel coins",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel coins; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 8,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel coins; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel coins; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Horse Bow of Explosions",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Point Blank Archer Quiver",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Brawler's Hammer of Pummeling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Peek-a-Boo Brawler Shoulderpads",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Medic's Scalpel of Alarm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Urgent Care Medic Backpack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Ninja's Blade of Shuriken Storm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Nokizaru Ninja Shoulderguard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Warrior's Axe of Earthquake",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Basic Attack Warrior Pauldrons",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Wizard's Wand of Firestorm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Bark Skin II",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Hedge Wizard Talisman",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "feisty_floren",
+            "kind": "zone",
+            "target_name": "Wilds (Pixie Nursery area; wiki says south-west of Wugachug)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "npc",
+            "target_name": "floren",
+            "target_id": null,
+            "reason": "Guide names an entrance NPC but gives no NpcSpawn.actor_id mapping.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Entrance; cited [wiki] [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "npc",
+            "target_name": "Corrupted Floren",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "npc",
+            "target_name": "Feisty Floren",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Archer's Horse Bow of Explosions",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Point Blank Archer Quiver",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Brawler's Hammer of Pummeling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Peek-a-Boo Brawler Shoulderpads",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Medic's Scalpel of Alarm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Urgent Care Medic Backpack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Ninja's Blade of Shuriken Storm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Nokizaru Ninja Shoulderguard",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Warrior's Axe of Earthquake",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Basic Attack Warrior Pauldrons",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Wizard's Wand of Firestorm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Bark Skin II",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "feisty_floren",
+            "kind": "item",
+            "target_name": "Hedge Wizard Talisman",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key feisty_floren comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Feisty Floren; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Corrupted Floren",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Enemies; cited [video Yoxys3l0-vg/00044, 00078, 00080] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Feisty Floren",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "Guide labels this as a node creature/encounter entry, not a hostile actor.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Feisty Floren.md > Enemies and boss > Node creature; cited [client] [video RdFC2N87-3c/00006]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

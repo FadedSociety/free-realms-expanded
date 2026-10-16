@@ -1,0 +1,3019 @@
+{
+  "schema_version": 1,
+  "attribution": "Free Realms Wiki, CC BY-SA; title names and acquisition notes transformed from the pinned page.",
+  "wiki_source": {
+    "title": "Titles",
+    "url": "https://freerealms.fandom.com/wiki/Titles",
+    "page_id": 16628,
+    "revision_id": 47673,
+    "revision_timestamp": "2023-07-24T02:52:24Z",
+    "sha256": "cd364c3d46fe07e03094256c663115c8066176ea08f125bc62cba484b65fcd96"
+  },
+  "client_sources": {
+    "DiplomacyTitles.txt": {
+      "sha256": "4bc7d729745c28d9f0fdc3144b29e5055b05a0e375910a0a3382d48dcfa9b49f",
+      "data_rows": 0
+    },
+    "DiplomacyRanks.txt": {
+      "sha256": "db70401609dc325472868cfb6b472fb723975c124416a6a817f8afb55384623f",
+      "data_rows": 0
+    }
+  },
+  "coverage": {
+    "wiki_titles": 36,
+    "client_title_ids_recovered": false,
+    "global_title_picker_visible": false,
+    "picker_client_condition": "Ui.IsChinaEnvironment()",
+    "definition_ids_assigned_r": 0,
+    "original_server_ids_unrecovered": true,
+    "definition_name_ids_assigned": 90,
+    "definition_description_ids_assigned": 0,
+    "legacy_title_rows": 90,
+    "wiki_titles_reconciled": 36,
+    "legacy_titles_added": 54,
+    "legacy_id_candidates_adopted": 90,
+    "legacy_id_candidates_packet_verified": 0
+  },
+  "definitions": [
+    {
+      "key": "wiki:title:01",
+      "client_id": 88,
+      "name": "Kind of a Big Deal",
+      "acquisition": null,
+      "section": "VIP",
+      "source_tag": "wiki+legacy",
+      "name_id": 10393,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:02",
+      "client_id": 87,
+      "name": "Trendsetter",
+      "acquisition": null,
+      "section": "VIP",
+      "source_tag": "wiki+legacy",
+      "name_id": 10392,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:03",
+      "client_id": 89,
+      "name": "Celebrity",
+      "acquisition": null,
+      "section": "VIP",
+      "source_tag": "wiki+legacy",
+      "name_id": 10394,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:04",
+      "client_id": 90,
+      "name": "Superstar",
+      "acquisition": null,
+      "section": "VIP",
+      "source_tag": "wiki+legacy",
+      "name_id": 10395,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:05",
+      "client_id": 1,
+      "name": "The Adventurer Enthusiast",
+      "acquisition": "For getting level 20 Adventurer",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14522,
+      "description_id": null,
+      "image_id": 1334,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1334,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:06",
+      "client_id": 2,
+      "name": "The Sniper Extraordinaire",
+      "acquisition": "For getting level 20 Archer",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14523,
+      "description_id": null,
+      "image_id": 1335,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1335,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:07",
+      "client_id": 3,
+      "name": "The Forge Master",
+      "acquisition": "For getting level 20 Blacksmith",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14524,
+      "description_id": null,
+      "image_id": 1336,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1336,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:08",
+      "client_id": 4,
+      "name": "The Big Brawler",
+      "acquisition": "For getting level 20 Brawler",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14525,
+      "description_id": null,
+      "image_id": 1337,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1337,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:09",
+      "client_id": 5,
+      "name": "The Card Strategist",
+      "acquisition": "For getting level 20 Card Duelist",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14526,
+      "description_id": null,
+      "image_id": 12612,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 12612,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:10",
+      "client_id": 6,
+      "name": "The Iron Chef",
+      "acquisition": "For getting level 20 Chef",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14527,
+      "description_id": null,
+      "image_id": 1338,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1338,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:11",
+      "client_id": 7,
+      "name": "The Master of Destruction",
+      "acquisition": "For getting level 20 Demo Derby Driver",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14528,
+      "description_id": null,
+      "image_id": 8059,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 8059,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:12",
+      "client_id": 9,
+      "name": "The Angler",
+      "acquisition": "For getting level 20 Fisherman",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14530,
+      "description_id": null,
+      "image_id": 20740,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 20740,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:13",
+      "client_id": 11,
+      "name": "The Speed Demon",
+      "acquisition": "For getting level 20 Kart Driver",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14532,
+      "description_id": null,
+      "image_id": 20725,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 20725,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:14",
+      "client_id": 12,
+      "name": "The Life Saver",
+      "acquisition": "For getting level 20 Medic",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14533,
+      "description_id": null,
+      "image_id": 1340,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1340,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:15",
+      "client_id": 13,
+      "name": "Wonder Gem",
+      "acquisition": "For getting level 20 Miner",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14534,
+      "description_id": null,
+      "image_id": 1341,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": 1341,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:16",
+      "client_id": 14,
+      "name": "Quickly Vanishes",
+      "acquisition": "For getting level 20 Ninja",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14535,
+      "description_id": null,
+      "image_id": 1342,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": 1342,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:17",
+      "client_id": 17,
+      "name": "Delivers on Time",
+      "acquisition": "For getting level 20 Postman",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14538,
+      "description_id": null,
+      "image_id": 1339,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": 1339,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:18",
+      "client_id": 19,
+      "name": "The Crowd Pleaser",
+      "acquisition": "For getting level 20 Soccer Star",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14540,
+      "description_id": null,
+      "image_id": 20743,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 20743,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:19",
+      "client_id": 20,
+      "name": "The Elite Defender",
+      "acquisition": "For getting level 20 Warrior",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14541,
+      "description_id": null,
+      "image_id": 3112,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 3112,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:20",
+      "client_id": 21,
+      "name": "Epic Enchanter",
+      "acquisition": "For getting level 20 Wizard",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 14542,
+      "description_id": null,
+      "image_id": 3012,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": 3012,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:21",
+      "client_id": 56,
+      "name": "Marksman",
+      "acquisition": "For completing the Archer Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 441542,
+      "description_id": null,
+      "image_id": 1335,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1335,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:22",
+      "client_id": 72,
+      "name": "Maestro",
+      "acquisition": "For completing the \"Feeling the Beat\" minigames",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 441258,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:23",
+      "client_id": 62,
+      "name": "Master Smith",
+      "acquisition": "For completing the Blacksmith Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117698,
+      "description_id": null,
+      "image_id": 1336,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1336,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:24",
+      "client_id": 57,
+      "name": "Street Fighter",
+      "acquisition": "For completing the Brawler Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 441550,
+      "description_id": null,
+      "image_id": 1337,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1337,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:25",
+      "client_id": 75,
+      "name": "Card Commander",
+      "acquisition": "For completing the Duelist Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 10363,
+      "description_id": null,
+      "image_id": 12612,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 12612,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:26",
+      "client_id": 76,
+      "name": "Cookie",
+      "acquisition": "For completing the Chef Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 10364,
+      "description_id": null,
+      "image_id": 1338,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1338,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:27",
+      "client_id": 65,
+      "name": "Demolisher",
+      "acquisition": "For completing the Demo Derby Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117702,
+      "description_id": null,
+      "image_id": 1337,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1337,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:28",
+      "client_id": 78,
+      "name": "Racer",
+      "acquisition": "For completing the Kart Racer Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 10366,
+      "description_id": null,
+      "image_id": 20725,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 20725,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:29",
+      "client_id": 59,
+      "name": "Flying Dragon",
+      "acquisition": "For completing the Ninja Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117710,
+      "description_id": null,
+      "image_id": 1342,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1342,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:30",
+      "client_id": 58,
+      "name": "Doctor",
+      "acquisition": "For completing the Medic Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 441577,
+      "description_id": null,
+      "image_id": 1340,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1340,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:31",
+      "client_id": 68,
+      "name": "Postmaster",
+      "acquisition": "For completing the Postman Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117713,
+      "description_id": null,
+      "image_id": 1339,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1339,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:32",
+      "client_id": 67,
+      "name": "Striker",
+      "acquisition": "For completing the Soccer Star Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117715,
+      "description_id": null,
+      "image_id": 1342,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1342,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:33",
+      "client_id": 79,
+      "name": "Desert Smith",
+      "acquisition": "For completing the Rumble Ridge Blacksmith Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 10367,
+      "description_id": null,
+      "image_id": 1336,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1336,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:34",
+      "client_id": 60,
+      "name": "Warlord",
+      "acquisition": "For completing the Warrior Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117716,
+      "description_id": null,
+      "image_id": 3112,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 3112,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:35",
+      "client_id": 61,
+      "name": "Arcane Master",
+      "acquisition": "For completing the Wizard Questline",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 117717,
+      "description_id": null,
+      "image_id": 3012,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 3012,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "wiki:title:36",
+      "client_id": 74,
+      "name": "Millionaire",
+      "acquisition": "For getting five million coins",
+      "section": "wiki-list",
+      "source_tag": "wiki+legacy",
+      "name_id": 10362,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "wiki_title_name",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "wiki",
+        "section": "wiki"
+      },
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json"
+    },
+    {
+      "key": "legacy:title:8",
+      "client_id": 8,
+      "name": "The Wonder Tinkerer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14529,
+      "description_id": null,
+      "image_id": 1336,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1336,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:10",
+      "client_id": 10,
+      "name": "Master Of Concoctions",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14531,
+      "description_id": null,
+      "image_id": 3012,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 3012,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:15",
+      "client_id": 15,
+      "name": "The Pet Whisperer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14536,
+      "description_id": null,
+      "image_id": 9158,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 9158,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:16",
+      "client_id": 16,
+      "name": "Strikes A Pose",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14537,
+      "description_id": null,
+      "image_id": 1334,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": 1334,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:18",
+      "client_id": 18,
+      "name": "Kicks It",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14539,
+      "description_id": null,
+      "image_id": 20743,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": 20743,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:22",
+      "client_id": 22,
+      "name": "\"Workaholic\"",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14543,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 2,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:23",
+      "client_id": 23,
+      "name": "Sacred Explorer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14544,
+      "description_id": null,
+      "image_id": 1334,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1334,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:24",
+      "client_id": 24,
+      "name": "The Beastmaster",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 14545,
+      "description_id": null,
+      "image_id": 9158,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 9158,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:25",
+      "client_id": 25,
+      "name": "The Knockout King",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 414924,
+      "description_id": null,
+      "image_id": 1337,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1337,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:26",
+      "client_id": 26,
+      "name": "The Knockout Queen",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 414925,
+      "description_id": null,
+      "image_id": 1337,
+      "image_set_id": null,
+      "title_type": 3,
+      "legacy_icon_id": 1337,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:27",
+      "client_id": 27,
+      "name": "Tower Defender",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 92420,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:28",
+      "client_id": 28,
+      "name": "Tactician",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431672,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:29",
+      "client_id": 29,
+      "name": "Strategist",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431690,
+      "description_id": null,
+      "image_id": 12612,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 12612,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:30",
+      "client_id": 30,
+      "name": "Captain",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431668,
+      "description_id": null,
+      "image_id": 20740,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 20740,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:31",
+      "client_id": 31,
+      "name": "Relic Hunter",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431694,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:32",
+      "client_id": 32,
+      "name": "Window Shopper",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 441497,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:33",
+      "client_id": 33,
+      "name": "Mechanic",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 401095,
+      "description_id": null,
+      "image_id": 20725,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 20725,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:34",
+      "client_id": 34,
+      "name": "Housecaller",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431676,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:35",
+      "client_id": 35,
+      "name": "Barterer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431702,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:36",
+      "client_id": 36,
+      "name": "Icebreaker",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431680,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:37",
+      "client_id": 37,
+      "name": "Groupie",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431707,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:38",
+      "client_id": 38,
+      "name": "Guildmaster",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431727,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:39",
+      "client_id": 39,
+      "name": "Stylist",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431711,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:40",
+      "client_id": 40,
+      "name": "Consumer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431731,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:41",
+      "client_id": 41,
+      "name": "Pet Whisperer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431715,
+      "description_id": null,
+      "image_id": 9158,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 9158,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:42",
+      "client_id": 42,
+      "name": "Mime",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431735,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:43",
+      "client_id": 43,
+      "name": "Collector",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431719,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:44",
+      "client_id": 44,
+      "name": "Home Improver",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431739,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:45",
+      "client_id": 45,
+      "name": "Loser",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431723,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:46",
+      "client_id": 46,
+      "name": "Cow Tipper",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 430809,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:47",
+      "client_id": 47,
+      "name": "Pwner",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431763,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:48",
+      "client_id": 48,
+      "name": "Quitter",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431743,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:49",
+      "client_id": 49,
+      "name": "Duelist",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431767,
+      "description_id": null,
+      "image_id": 12612,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 12612,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:50",
+      "client_id": 50,
+      "name": "N00b",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431747,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:51",
+      "client_id": 51,
+      "name": "Socialite",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431773,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:52",
+      "client_id": 52,
+      "name": "Team Player",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431751,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:53",
+      "client_id": 53,
+      "name": "Elite Collector",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431777,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:54",
+      "client_id": 54,
+      "name": "Master Decorator",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431755,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:55",
+      "client_id": 55,
+      "name": "Big Spender",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 431781,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:63",
+      "client_id": 63,
+      "name": "Iron Chef",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 117701,
+      "description_id": null,
+      "image_id": 1338,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1338,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:64",
+      "client_id": 64,
+      "name": "Ore Master",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 117709,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 3141,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_image_id_unresolved",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:66",
+      "client_id": 66,
+      "name": "Angler",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 117705,
+      "description_id": null,
+      "image_id": 20740,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 20740,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:69",
+      "client_id": 69,
+      "name": "Speed Demon",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 4419815,
+      "description_id": null,
+      "image_id": 20725,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 20725,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:70",
+      "client_id": 70,
+      "name": "Grand Explorer",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 117696,
+      "description_id": null,
+      "image_id": 1334,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1334,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:71",
+      "client_id": 71,
+      "name": "Free Realms Champion",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 432021,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:73",
+      "client_id": 73,
+      "name": "Homemaker",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10361,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:77",
+      "client_id": 77,
+      "name": "Flyfisher",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10365,
+      "description_id": null,
+      "image_id": 20740,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 20740,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:80",
+      "client_id": 80,
+      "name": "The Quester",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10368,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:81",
+      "client_id": 81,
+      "name": "Story Teller",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10369,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:82",
+      "client_id": 82,
+      "name": "The Friendly",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10370,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:83",
+      "client_id": 83,
+      "name": "Merchant",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10371,
+      "description_id": null,
+      "image_id": 22655,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 22655,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:84",
+      "client_id": 84,
+      "name": "Sunny Smithy",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10372,
+      "description_id": null,
+      "image_id": 1336,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1336,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:85",
+      "client_id": 85,
+      "name": "Sacred Smithy",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10359,
+      "description_id": null,
+      "image_id": 1336,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": 1336,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId",
+        "image_id": "client_Images_txt_verified",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    },
+    {
+      "key": "legacy:title:86",
+      "client_id": 86,
+      "name": "V. I. P.",
+      "acquisition": null,
+      "section": null,
+      "source_tag": "legacy",
+      "name_id": 10391,
+      "description_id": null,
+      "image_id": null,
+      "image_set_id": null,
+      "title_type": 1,
+      "legacy_icon_id": null,
+      "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
+      "source_tags": {
+        "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",
+        "title_type": "legacy_PlayerTitles_json",
+        "name": "locale_id_to_text_verified_trimmed_for_display",
+        "name_id": "legacy_NameId+locale_id_to_text_verified",
+        "legacy_icon_id": "legacy_IconId_field_absent",
+        "image_id": "legacy_icon_missing",
+        "acquisition": "unknown",
+        "section": "unknown"
+      },
+      "source": {
+        "tag": "legacy-data-row",
+        "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+        "license": "AGPL-3.0; data row only"
+      }
+    }
+  ],
+  "gaps": [
+    "No family 152 frame verifies whether the adopted Legacy title ids are original server ids; treat them as reference candidates and server use as (R).",
+    "Wiki titles have no descriptions. 52 Legacy title image ids resolve in client Images.txt; 37 rows omit IconId and one raw IconId is unresolved.",
+    "The global-client title picker remains gated by Ui.IsChinaEnvironment().",
+    "Legacy title Id values are adopted as reference candidates, not verified original server ids: no family 152/1-7 frame was found in the inspected reference captures or baseline external-input logs.",
+    "37 Legacy title rows omit IconId; Legacy IconId 3141 has no matching row in client Images.txt. Their image_id values remain null."
+  ],
+  "definition_id_assignment": {
+    "source": "FreeRealms-Legacy PlayerTitles.json",
+    "legacy_id_candidates": 90,
+    "packet_verified": 0,
+    "wiki_local_ids_remapped": 36,
+    "legacy_titles_added": 54,
+    "status": "Legacy reference candidates; family 152 values are not packet-verified; server use remains reconstructed policy (R).",
+    "previous_local_namespace": "0x42000000"
+  },
+  "locale_match_report": {
+    "source_path": "../lab/reports/locale-id-to-text.json",
+    "source_sha256": "f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844",
+    "matching": "Legacy NameId resolved by integer id; wiki rows reconciled by normalized title text.",
+    "counts": {
+      "title_name_id": {
+        "resolved": 90,
+        "unresolved": 0
+      },
+      "wiki_rows_reconciled": {
+        "resolved": 36,
+        "unresolved": 0
+      },
+      "legacy_icon_id": {
+        "client_images_resolved": 52,
+        "field_absent": 37,
+        "client_image_unresolved": 1
+      }
+    },
+    "unresolved": [
+      {
+        "field": "image_id",
+        "legacy_icon_id": 3141,
+        "status": "not_in_client_Images.txt"
+      }
+    ]
+  },
+  "image_report": {
+    "title_images_resolved": 52,
+    "title_rows_without_image": 38,
+    "reason": "Client Diplomacy tables remain headers only. W57 Legacy rows provide 53 IconIds; 52 resolve in client Images.txt, 37 rows omit IconId, and IconId 3141 is absent.",
+    "legacy_icon_id_fields_present": 53,
+    "legacy_icons_verified_against_client_images": 52,
+    "legacy_icon_ids_unresolved": [
+      3141
+    ],
+    "rows_without_legacy_icon_id": 37
+  },
+  "legacy_source": {
+    "repository": "FreeRealms-Legacy",
+    "revision": "9e082025391177d5a33ee18c714ddd06b457a695",
+    "license": "AGPL-3.0; data rows only, no source code copied",
+    "path": "lab/references/FreeRealms-Legacy/src/Resources/PlayerTitles.json",
+    "sha256": "0235992f5fb18f3e7df169bc4d5e020cc08825ab9f615d2af7b31d0a087d6e65"
+  },
+  "client_icon_source": {
+    "path": "lab/working/OSFR.Client/OSFR Client/Resources/Images/Images.txt",
+    "sha256": "0f79b8016c035b1d155d3ee71c63c61c7f3fcdb5aa29a04ac7131be3e2ef3443"
+  },
+  "locale_source": {
+    "path": "lab/reports/locale-id-to-text.json",
+    "sha256": "f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844"
+  },
+  "legacy_id_remaps": [
+    {
+      "key": "wiki:title:05",
+      "local_id": 1107296261,
+      "legacy_id_candidate": 1,
+      "name": "The Adventurer Enthusiast"
+    },
+    {
+      "key": "wiki:title:06",
+      "local_id": 1107296262,
+      "legacy_id_candidate": 2,
+      "name": "The Sniper Extraordinaire"
+    },
+    {
+      "key": "wiki:title:07",
+      "local_id": 1107296263,
+      "legacy_id_candidate": 3,
+      "name": "The Forge Master"
+    },
+    {
+      "key": "wiki:title:08",
+      "local_id": 1107296264,
+      "legacy_id_candidate": 4,
+      "name": "The Big Brawler"
+    },
+    {
+      "key": "wiki:title:09",
+      "local_id": 1107296265,
+      "legacy_id_candidate": 5,
+      "name": "The Card Strategist"
+    },
+    {
+      "key": "wiki:title:10",
+      "local_id": 1107296266,
+      "legacy_id_candidate": 6,
+      "name": "The Iron Chef"
+    },
+    {
+      "key": "wiki:title:11",
+      "local_id": 1107296267,
+      "legacy_id_candidate": 7,
+      "name": "The Master of Destruction"
+    },
+    {
+      "key": "wiki:title:12",
+      "local_id": 1107296268,
+      "legacy_id_candidate": 9,
+      "name": "The Angler"
+    },
+    {
+      "key": "wiki:title:13",
+      "local_id": 1107296269,
+      "legacy_id_candidate": 11,
+      "name": "The Speed Demon"
+    },
+    {
+      "key": "wiki:title:14",
+      "local_id": 1107296270,
+      "legacy_id_candidate": 12,
+      "name": "The Life Saver"
+    },
+    {
+      "key": "wiki:title:15",
+      "local_id": 1107296271,
+      "legacy_id_candidate": 13,
+      "name": "Wonder Gem"
+    },
+    {
+      "key": "wiki:title:16",
+      "local_id": 1107296272,
+      "legacy_id_candidate": 14,
+      "name": "Quickly Vanishes"
+    },
+    {
+      "key": "wiki:title:17",
+      "local_id": 1107296273,
+      "legacy_id_candidate": 17,
+      "name": "Delivers On Time"
+    },
+    {
+      "key": "wiki:title:18",
+      "local_id": 1107296274,
+      "legacy_id_candidate": 19,
+      "name": "The Crowd Pleaser"
+    },
+    {
+      "key": "wiki:title:19",
+      "local_id": 1107296275,
+      "legacy_id_candidate": 20,
+      "name": "The Elite Defender"
+    },
+    {
+      "key": "wiki:title:20",
+      "local_id": 1107296276,
+      "legacy_id_candidate": 21,
+      "name": "Epic Enchanter"
+    },
+    {
+      "key": "wiki:title:21",
+      "local_id": 1107296277,
+      "legacy_id_candidate": 56,
+      "name": "Marksman"
+    },
+    {
+      "key": "wiki:title:24",
+      "local_id": 1107296280,
+      "legacy_id_candidate": 57,
+      "name": "Street Fighter"
+    },
+    {
+      "key": "wiki:title:30",
+      "local_id": 1107296286,
+      "legacy_id_candidate": 58,
+      "name": "Doctor"
+    },
+    {
+      "key": "wiki:title:29",
+      "local_id": 1107296285,
+      "legacy_id_candidate": 59,
+      "name": "Flying Dragon"
+    },
+    {
+      "key": "wiki:title:34",
+      "local_id": 1107296290,
+      "legacy_id_candidate": 60,
+      "name": "Warlord"
+    },
+    {
+      "key": "wiki:title:35",
+      "local_id": 1107296291,
+      "legacy_id_candidate": 61,
+      "name": "Arcane Master"
+    },
+    {
+      "key": "wiki:title:23",
+      "local_id": 1107296279,
+      "legacy_id_candidate": 62,
+      "name": "Master Smith"
+    },
+    {
+      "key": "wiki:title:27",
+      "local_id": 1107296283,
+      "legacy_id_candidate": 65,
+      "name": "Demolisher"
+    },
+    {
+      "key": "wiki:title:32",
+      "local_id": 1107296288,
+      "legacy_id_candidate": 67,
+      "name": "Striker"
+    },
+    {
+      "key": "wiki:title:31",
+      "local_id": 1107296287,
+      "legacy_id_candidate": 68,
+      "name": "Postmaster"
+    },
+    {
+      "key": "wiki:title:22",
+      "local_id": 1107296278,
+      "legacy_id_candidate": 72,
+      "name": "Maestro"
+    },
+    {
+      "key": "wiki:title:36",
+      "local_id": 1107296292,
+      "legacy_id_candidate": 74,
+      "name": "Millionaire"
+    },
+    {
+      "key": "wiki:title:25",
+      "local_id": 1107296281,
+      "legacy_id_candidate": 75,
+      "name": "Card Commander"
+    },
+    {
+      "key": "wiki:title:26",
+      "local_id": 1107296282,
+      "legacy_id_candidate": 76,
+      "name": "Cookie"
+    },
+    {
+      "key": "wiki:title:28",
+      "local_id": 1107296284,
+      "legacy_id_candidate": 78,
+      "name": "Racer"
+    },
+    {
+      "key": "wiki:title:33",
+      "local_id": 1107296289,
+      "legacy_id_candidate": 79,
+      "name": "Desert Smith"
+    },
+    {
+      "key": "wiki:title:02",
+      "local_id": 1107296258,
+      "legacy_id_candidate": 87,
+      "name": "Trendsetter"
+    },
+    {
+      "key": "wiki:title:01",
+      "local_id": 1107296257,
+      "legacy_id_candidate": 88,
+      "name": "Kind of a Big Deal"
+    },
+    {
+      "key": "wiki:title:03",
+      "local_id": 1107296259,
+      "legacy_id_candidate": 89,
+      "name": "Celebrity"
+    },
+    {
+      "key": "wiki:title:04",
+      "local_id": 1107296260,
+      "legacy_id_candidate": 90,
+      "name": "Superstar"
+    }
+  ],
+  "w49_definition_id_assignment": {
+    "provenance": "(R)",
+    "namespace_base_hex": "0x42000000",
+    "first_assigned_id": 1107296257,
+    "last_assigned_id": 1107296292,
+    "policy": "Persist each key-to-id mapping. Allocate new rows from the next unused id in this namespace. Never renumber or reuse; retain removed ids as tombstones."
+  },
+  "w49_locale_match_report": {
+    "source_path": "../lab/reports/locale-id-to-text.json",
+    "source_sha256": "f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844",
+    "source_entries": 85932,
+    "id_field": "id",
+    "matching": "Exact text first. If absent, NFKC + casefold + punctuation-to-space + whitespace collapse. Assign only a unique candidate; ambiguous and unmatched rows stay null.",
+    "counts": {
+      "name_id": {
+        "exact_unique": 10,
+        "exact_ambiguous": 14,
+        "normalized_unique": 12
+      }
+    },
+    "unresolved": [
+      {
+        "key": "wiki:title:02",
+        "field": "name_id",
+        "text": "Trendsetter",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          10392,
+          429770
+        ]
+      },
+      {
+        "key": "wiki:title:10",
+        "field": "name_id",
+        "text": "The Iron Chef",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          14527,
+          441560,
+          441562
+        ]
+      },
+      {
+        "key": "wiki:title:21",
+        "field": "name_id",
+        "text": "Marksman",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          14600,
+          441542,
+          441544
+        ]
+      },
+      {
+        "key": "wiki:title:22",
+        "field": "name_id",
+        "text": "Maestro",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          10360,
+          388111,
+          441258
+        ]
+      },
+      {
+        "key": "wiki:title:23",
+        "field": "name_id",
+        "text": "Master Smith",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117698,
+          441546,
+          441548
+        ]
+      },
+      {
+        "key": "wiki:title:24",
+        "field": "name_id",
+        "text": "Street Fighter",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117699,
+          441550
+        ]
+      },
+      {
+        "key": "wiki:title:26",
+        "field": "name_id",
+        "text": "Cookie",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          10364,
+          42163
+        ]
+      },
+      {
+        "key": "wiki:title:27",
+        "field": "name_id",
+        "text": "Demolisher",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117702,
+          441565,
+          441567
+        ]
+      },
+      {
+        "key": "wiki:title:28",
+        "field": "name_id",
+        "text": "Racer",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          10366,
+          402913
+        ]
+      },
+      {
+        "key": "wiki:title:30",
+        "field": "name_id",
+        "text": "Doctor",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117708,
+          441577,
+          441579
+        ]
+      },
+      {
+        "key": "wiki:title:31",
+        "field": "name_id",
+        "text": "Postmaster",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117713,
+          441581,
+          441583
+        ]
+      },
+      {
+        "key": "wiki:title:32",
+        "field": "name_id",
+        "text": "Striker",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117715,
+          441585,
+          441587
+        ]
+      },
+      {
+        "key": "wiki:title:34",
+        "field": "name_id",
+        "text": "Warlord",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117716,
+          441593,
+          441595
+        ]
+      },
+      {
+        "key": "wiki:title:35",
+        "field": "name_id",
+        "text": "Arcane Master",
+        "status": "exact_ambiguous",
+        "candidate_ids": [
+          117717,
+          441597,
+          441599
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 1,
+      "game_type_id": 1,
+      "name_string_id": null,
+      "dungeon_id": "fixture-dungeon",
+      "rewards": [],
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic minigame row for loader tests" }
+      ]
+    }
+  ]
+}

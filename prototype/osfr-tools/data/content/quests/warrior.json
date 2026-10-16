@@ -1,0 +1,1190 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3150001,
+      "title_string_id": 22526,
+      "giver_npc_id": 9000000076,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W1; name 'Becoming a Warrior'; title id cell ucdt 1601137499 / ugdt 916876995"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W1; name 'Becoming a Warrior'; title id cell ucdt 1601137499 / ugdt 916876995"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3150002,
+      "title_string_id": 77223,
+      "giver_npc_id": 9000000302,
+      "prerequisite_quest_ids": [
+        3150001
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W2; name 'Warrior: Warrior Warm-up'; title id cell ucdt 1777367688 / ugdt 1775539410"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W2; name 'Warrior: Warrior Warm-up'; title id cell ucdt 1777367688 / ugdt 1775539410"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77224,
+      "intro_text_string_id": 77222,
+      "end_text_string_id": 77225
+    },
+    {
+      "id": 3150003,
+      "title_string_id": 70893,
+      "giver_npc_id": 9000000302,
+      "prerequisite_quest_ids": [
+        3150002
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W3; name \"Warrior: Warrior's Rites\"; title id cell ucdt 3860517116 / ugdt 4162035224"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W3; name \"Warrior: Warrior's Rites\"; title id cell ucdt 3860517116 / ugdt 4162035224"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 70894,
+      "intro_text_string_id": 70892
+    },
+    {
+      "id": 3150004,
+      "title_string_id": 22580,
+      "giver_npc_id": 9000000155,
+      "prerequisite_quest_ids": [
+        3150003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W4; name 'Warrior: One With Your Weapon'; title id cell ucdt 2823160192 / ugdt 1002431378"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W4; name 'Warrior: One With Your Weapon'; title id cell ucdt 2823160192 / ugdt 1002431378"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22581,
+      "intro_text_string_id": 22579
+    },
+    {
+      "id": 3150005,
+      "title_string_id": 387433,
+      "giver_npc_id": 9000000208,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W5; name 'Warrior: Achieve Level 5'; title id cell ucdt 3117570657 / ugdt 3954664518"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5 (Dewey, Morninglory, Steele), row W5; name 'Warrior: Achieve Level 5'; title id cell ucdt 3117570657 / ugdt 3954664518"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387434,
+      "intro_text_string_id": 387432,
+      "end_text_string_id": 387435
+    },
+    {
+      "id": 3150006,
+      "title_string_id": 388357,
+      "giver_npc_id": 9000000040,
+      "prerequisite_quest_ids": [
+        3150005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W6; name 'Contract: Ready Your Weapon! (wiki: with \"- Caleb Sleepyswing in Northern Wilds\")'; title id cell ucdt 4066960211 / ugdt 576240249"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W6; name 'Contract: Ready Your Weapon! (wiki: with \"- Caleb Sleepyswing in Northern Wilds\")'; title id cell ucdt 4066960211 / ugdt 576240249"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388358,
+      "intro_text_string_id": 388356,
+      "end_text_string_id": 388359
+    },
+    {
+      "id": 3150007,
+      "title_string_id": 70995,
+      "giver_npc_id": 9000000208,
+      "prerequisite_quest_ids": [
+        3150005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W7; name 'Warrior: You Deserve Better'; title id cell ucdt 740307630 / ugdt 2340002788"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W7; name 'Warrior: You Deserve Better'; title id cell ucdt 740307630 / ugdt 2340002788"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 70996,
+      "intro_text_string_id": 70994,
+      "end_text_string_id": 70997
+    },
+    {
+      "id": 3150008,
+      "title_string_id": 71036,
+      "giver_npc_id": 9000000222,
+      "prerequisite_quest_ids": [
+        3150007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W8; name 'Warrior: Distracted'; title id cell ucdt 1297406953 / ugdt 4039975473"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W8; name 'Warrior: Distracted'; title id cell ucdt 1297406953 / ugdt 4039975473"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71037,
+      "intro_text_string_id": 71035,
+      "end_text_string_id": 71038
+    },
+    {
+      "id": 3150009,
+      "title_string_id": 71233,
+      "giver_npc_id": 9000000222,
+      "prerequisite_quest_ids": [
+        3150008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W9; name 'Warrior: Too Distracted to Work'; title id cell ucdt 3059963557 / ugdt 4243358604"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 2: level 5 to 10 (Steele, Tumbolina, Roadhouse), row W9; name 'Warrior: Too Distracted to Work'; title id cell ucdt 3059963557 / ugdt 4243358604"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71234,
+      "intro_text_string_id": 71232,
+      "end_text_string_id": 71235
+    },
+    {
+      "id": 3150010,
+      "title_string_id": 387489,
+      "giver_npc_id": 9000000243,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W10; name 'Warrior: Achieve Level 10'; title id cell ucdt 2322652085 / ugdt 2233459052"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W10; name 'Warrior: Achieve Level 10'; title id cell ucdt 2322652085 / ugdt 2233459052"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387490,
+      "intro_text_string_id": 387488,
+      "end_text_string_id": 387491
+    },
+    {
+      "id": 3150011,
+      "title_string_id": 388361,
+      "giver_npc_id": 9000000267,
+      "prerequisite_quest_ids": [
+        3150010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W11; name 'Contract: Thinning Their Numbers'; title id cell ucdt 3099802893 / ugdt 3968660800"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W11; name 'Contract: Thinning Their Numbers'; title id cell ucdt 3099802893 / ugdt 3968660800"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388362,
+      "intro_text_string_id": 388360,
+      "end_text_string_id": 388363
+    },
+    {
+      "id": 3150012,
+      "title_string_id": 71265,
+      "giver_npc_id": 9000000243,
+      "prerequisite_quest_ids": [
+        3150010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W12; name 'Warrior: Knocking Some Sense In (wiki job page: \"Knocking Some Sense\")'; title id cell ucdt 2111744232 / ugdt 3588410217"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W12; name 'Warrior: Knocking Some Sense In (wiki job page: \"Knocking Some Sense\")'; title id cell ucdt 2111744232 / ugdt 3588410217"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W12; name 'Warrior: Knocking Some Sense In (wiki job page: \"Knocking Some Sense\")'; title id cell ucdt 2111744232 / ugdt 3588410217"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71266,
+      "intro_text_string_id": 71264,
+      "end_text_string_id": 71267
+    },
+    {
+      "id": 3150013,
+      "title_string_id": 72611,
+      "giver_npc_id": 9000000243,
+      "prerequisite_quest_ids": [
+        3150012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W13; name 'Warrior: Take Care of That Ankle'; title id cell ucdt 3241119781 / ugdt 3401208551"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W13; name 'Warrior: Take Care of That Ankle'; title id cell ucdt 3241119781 / ugdt 3401208551"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72612,
+      "intro_text_string_id": 72610,
+      "end_text_string_id": 72613
+    },
+    {
+      "id": 3150014,
+      "title_string_id": 77244,
+      "giver_npc_id": 9000000073,
+      "prerequisite_quest_ids": [
+        3150013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W14; name 'Warrior: General Concerns'; title id cell ucdt 316296165 / ugdt 554565237"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W14; name 'Warrior: General Concerns'; title id cell ucdt 316296165 / ugdt 554565237"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3150015,
+      "title_string_id": 45368,
+      "giver_npc_id": 9000000097,
+      "prerequisite_quest_ids": [
+        3150014
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W15; name 'Warrior: Finding Facts About Fastvi'; title id cell ucdt 1312962408 / ugdt 2509915585"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W15; name 'Warrior: Finding Facts About Fastvi'; title id cell ucdt 1312962408 / ugdt 2509915585"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W14; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 45369,
+      "intro_text_string_id": 45367
+    },
+    {
+      "id": 3150016,
+      "title_string_id": 387606,
+      "giver_npc_id": 9000000205,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W16; name 'Warrior: Achieve Level 15'; title id cell ucdt 2075595211 / ugdt 2459279560"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W16; name 'Warrior: Achieve Level 15'; title id cell ucdt 2075595211 / ugdt 2459279560"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3150017,
+      "title_string_id": 388365,
+      "giver_npc_id": 9000000267,
+      "prerequisite_quest_ids": [
+        3150016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W17; name 'Contract: What Duty Demands'; title id cell ucdt 1712059328 / ugdt 2011589509"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W17; name 'Contract: What Duty Demands'; title id cell ucdt 1712059328 / ugdt 2011589509"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388366,
+      "intro_text_string_id": 388364,
+      "end_text_string_id": 388367
+    },
+    {
+      "id": 3150018,
+      "title_string_id": 71436,
+      "giver_npc_id": 9000000205,
+      "prerequisite_quest_ids": [
+        3150016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W18; name 'Warrior: Legend of Fastvi Frostflutter'; title id cell ucdt 4160462347 / ugdt 3919133089"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W18; name 'Warrior: Legend of Fastvi Frostflutter'; title id cell ucdt 4160462347 / ugdt 3919133089"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71437,
+      "intro_text_string_id": 71435,
+      "end_text_string_id": 71438
+    },
+    {
+      "id": 3150019,
+      "title_string_id": 71480,
+      "giver_npc_id": 9000000205,
+      "prerequisite_quest_ids": [
+        3150018
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W19; name 'Warrior: Asking Old Folks'; title id cell ucdt 3534696757 / ugdt 1619360611"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W19; name 'Warrior: Asking Old Folks'; title id cell ucdt 3534696757 / ugdt 1619360611"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71481,
+      "intro_text_string_id": 71479,
+      "end_text_string_id": 71482
+    },
+    {
+      "id": 3150020,
+      "title_string_id": 71498,
+      "giver_npc_id": 9000000208,
+      "prerequisite_quest_ids": [
+        3150019
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W20; name 'Warrior: Steele is Useful'; title id cell ucdt 2853049443 / ugdt 2341920470"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W20; name 'Warrior: Steele is Useful'; title id cell ucdt 2853049443 / ugdt 2341920470"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71499,
+      "intro_text_string_id": 71497,
+      "end_text_string_id": 71500
+    },
+    {
+      "id": 3150021,
+      "title_string_id": 71504,
+      "giver_npc_id": 9000000085,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W21; name 'Warrior: Hero in the Making'; title id cell ucdt 855592684 / ugdt 3984521987"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 4: level 15 to 20 (Sir Whittington, Snowhill, Fastvi), row W21; name 'Warrior: Hero in the Making'; title id cell ucdt 855592684 / ugdt 3984521987"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3150022,
+      "title_string_id": 387597,
+      "giver_npc_id": 9000000085,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 5: level 20 (Fastvi), row W22; name 'Warrior: Achieve Level 20'; title id cell ucdt 3302139690 / ugdt 3592347326"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 5: level 20 (Fastvi), row W22; name 'Warrior: Achieve Level 20'; title id cell ucdt 3302139690 / ugdt 3592347326"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387598,
+      "intro_text_string_id": 387596,
+      "end_text_string_id": 387599
+    },
+    {
+      "id": 3150023,
+      "title_string_id": 388369,
+      "giver_npc_id": 9000000267,
+      "prerequisite_quest_ids": [
+        3150022
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 5: level 20 (Fastvi), row W23; name 'Contract: Defending Snowhill (wiki: \"Defending Snowhill from ...\", dash lost)'; title id cell ucdt 3221625004 / ugdt 790317807"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 5: level 20 (Fastvi), row W23; name 'Contract: Defending Snowhill (wiki: \"Defending Snowhill from ...\", dash lost)'; title id cell ucdt 3221625004 / ugdt 790317807"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388370,
+      "intro_text_string_id": 388368,
+      "end_text_string_id": 388371
+    },
+    {
+      "id": 3150024,
+      "title_string_id": 71516,
+      "giver_npc_id": 9000000085,
+      "prerequisite_quest_ids": [
+        3150022
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 5: level 20 (Fastvi), row W24; name 'Warrior: A Magical Boost'; title id cell ucdt 3329033861 / ugdt 1352961602"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 5: level 20 (Fastvi), row W24; name 'Warrior: A Magical Boost'; title id cell ucdt 3329033861 / ugdt 1352961602"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3150024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row W22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71517,
+      "intro_text_string_id": 71515,
+      "end_text_string_id": 71518
+    }
+  ]
+}

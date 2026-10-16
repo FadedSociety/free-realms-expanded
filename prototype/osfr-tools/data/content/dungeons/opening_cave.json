@@ -1,0 +1,1304 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "opening_cave",
+        "name_string_id": 4419563,
+        "zone_id": 411,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "411",
+            "goals": [],
+            "rewards": [
+              {
+                "coins": 50,
+                "items": [
+                  {
+                    "definition_id": 1195,
+                    "count": 1,
+                    "source": [
+                      {
+                        "kind": "reconstructed",
+                        "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                      }
+                    ]
+                  }
+                ],
+                "job_xp": {},
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              }
+            ],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Opening cave",
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 4419563,
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "difficulty": {
+          "value": null,
+          "reason": "Encounter definition has no difficulty tier.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "sg_npx_cavern_01",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "zone_id": {
+            "value": 411,
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": null,
+            "reason": "No level gate is present in the encounter content definition.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No level recommendation is present in the encounter content definition.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "job": {
+            "value": null,
+            "reason": "No job gate is present in the encounter content definition.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "Quest binding is stored in opening objectives outside this encounter config.",
+            "quest_id": {
+              "value": null,
+              "reason": "This config record has no quest ID.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "No membership gate is present in the encounter content definition.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "name": {
+              "value": "sg_npx_cavern_01",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "zone_id": {
+              "value": 411,
+              "reason": null,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "npc",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "name": {
+              "value": "Darkthorne",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "id": {
+              "value": 5715144128442986497,
+              "reason": null,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "model_id": {
+              "value": 353,
+              "reason": null,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "description": {
+            "value": "Opening objective interaction with the local guide actor; entry gate is reconstructed in opening content.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": "sg_npx_cavern_01",
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "kind": "defeat_all_configured_enemies",
+              "objective_id": 9100411,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "phases": {
+          "value": [
+            {
+              "name": "loading",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            {
+              "name": "fighting",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            {
+              "name": "won",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            {
+              "name": "lost",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "category": "EncounterEngine lifecycle states, not authored enemy waves.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "name": {
+                "value": "Gloamling",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "kind": {
+                "value": "enemy",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "definition_id": {
+                "value": 920100,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "model_id": {
+                "value": 4201,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "name_string_id": {
+                "value": 441457,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "guid": {
+                "value": 5715144128442986753,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "count": {
+                "value": 1,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "stats": {
+                "value": {
+                  "max_health": 150,
+                  "damage": 20
+                },
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "boss": {
+                "value": false,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            {
+              "name": {
+                "value": "Gloamling",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "kind": {
+                "value": "enemy",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "definition_id": {
+                "value": 920101,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "model_id": {
+                "value": 4201,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "name_string_id": {
+                "value": 441457,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "guid": {
+                "value": 5715144128442986754,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "count": {
+                "value": 1,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "stats": {
+                "value": {
+                  "max_health": 150,
+                  "damage": 20
+                },
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "boss": {
+                "value": false,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            {
+              "name": {
+                "value": "Gloamling",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "kind": {
+                "value": "enemy",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "definition_id": {
+                "value": 920102,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "model_id": {
+                "value": 4201,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "name_string_id": {
+                "value": 441457,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "guid": {
+                "value": 5715144128442986755,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "count": {
+                "value": 1,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "stats": {
+                "value": {
+                  "max_health": 150,
+                  "damage": 20
+                },
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "boss": {
+                "value": false,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            {
+              "name": {
+                "value": "Gloam Overlord",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "kind": {
+                "value": "boss",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "definition_id": {
+                "value": 920110,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "model_id": {
+                "value": 3956,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "name_string_id": {
+                "value": 5101505,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "guid": {
+                "value": 5715144128442986768,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "count": {
+                "value": 1,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "stats": {
+                "value": {
+                  "max_health": 500,
+                  "damage": 40
+                },
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "boss": {
+                "value": true,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "name": {
+                "value": "Gloam Overlord",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "kind": {
+                "value": "boss",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "definition_id": {
+                "value": 920110,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "model_id": {
+                "value": 3956,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "name_string_id": {
+                "value": 5101505,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "guid": {
+                "value": 5715144128442986768,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "count": {
+                "value": 1,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "stats": {
+                "value": {
+                  "max_health": 500,
+                  "damage": 40
+                },
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "boss": {
+                "value": true,
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "rewards": {
+          "configured_grant": {
+            "coins": 50,
+            "items": [
+              {
+                "definition_id": 1195,
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              }
+            ],
+            "job_xp": {},
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": {
+              "coins": 50,
+              "items": [
+                {
+                  "definition_id": 1195,
+                  "count": 1,
+                  "source": [
+                    {
+                      "kind": "reconstructed",
+                      "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                    }
+                  ]
+                }
+              ],
+              "job_xp": {},
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                }
+              ]
+            },
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "Exit restores saved return location after encounter close.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) src/encounter.rs::EncounterEngine::exit restores ActiveEncounter.return_location; local server behavior."
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "Destination depends on each player's saved return location.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "native_config": {
+          "encounter_id": 411,
+          "title_id": 4419563,
+          "description_id": 4419564,
+          "objective_id": 9100411,
+          "zone": {
+            "value": {
+              "zone_id": 411,
+              "name": "sg_npx_cavern_01",
+              "sky": "sky_blackspore24.xml",
+              "geometry_id": 214,
+              "position": [
+                287.0,
+                28.0,
+                286.0
+              ],
+              "rotation": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "tutorial": true
+            },
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "guide": {
+            "value": {
+              "guid": 5715144128442986497,
+              "definition_id": 0,
+              "model_id": 353,
+              "name_id": 441292,
+              "name": "Darkthorne",
+              "texture_alias": "",
+              "position": [
+                284.0,
+                28.0,
+                284.0
+              ],
+              "max_health": 1000,
+              "damage": 0,
+              "boss": false,
+              "stages": []
+            },
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "enemies": {
+            "value": [
+              {
+                "guid": 5715144128442986753,
+                "definition_id": 920100,
+                "model_id": 4201,
+                "name_id": 441457,
+                "name": "Gloamling",
+                "texture_alias": "",
+                "position": [
+                  292.0,
+                  28.0,
+                  289.0
+                ],
+                "max_health": 150,
+                "damage": 20,
+                "boss": false,
+                "stages": []
+              },
+              {
+                "guid": 5715144128442986754,
+                "definition_id": 920101,
+                "model_id": 4201,
+                "name_id": 441457,
+                "name": "Gloamling",
+                "texture_alias": "",
+                "position": [
+                  295.0,
+                  28.0,
+                  292.0
+                ],
+                "max_health": 150,
+                "damage": 20,
+                "boss": false,
+                "stages": []
+              },
+              {
+                "guid": 5715144128442986755,
+                "definition_id": 920102,
+                "model_id": 4201,
+                "name_id": 441457,
+                "name": "Gloamling",
+                "texture_alias": "",
+                "position": [
+                  298.0,
+                  28.0,
+                  295.0
+                ],
+                "max_health": 150,
+                "damage": 20,
+                "boss": false,
+                "stages": []
+              },
+              {
+                "guid": 5715144128442986768,
+                "definition_id": 920110,
+                "model_id": 3956,
+                "name_id": 5101505,
+                "name": "Gloam Overlord",
+                "texture_alias": "",
+                "position": [
+                  304.0,
+                  28.0,
+                  299.0
+                ],
+                "max_health": 500,
+                "damage": 40,
+                "boss": true,
+                "stages": []
+              }
+            ],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "reward_grant": {
+            "coins": 50,
+            "items": [
+              {
+                "definition_id": 1195,
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+                  }
+                ]
+              }
+            ],
+            "job_xp": {},
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "opening_cave",
+            "kind": "zone",
+            "target_name": "sg_npx_cavern_01",
+            "target_id": 411,
+            "reason": "Local zone ID is not joined to the public zones catalogue.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          {
+            "owner": "opening_cave",
+            "kind": "npc",
+            "target_name": "Darkthorne",
+            "target_id": 9000000067,
+            "reason": "Exact name matches reconstructed NPC content key in briarwood.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/briarwood.json npc_id 9000000067; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "opening_cave",
+            "kind": "npc",
+            "target_name": "Gloamling",
+            "target_id": null,
+            "reason": "Encounter model/definition IDs do not resolve an NpcSpawn actor ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          {
+            "owner": "opening_cave",
+            "kind": "npc",
+            "target_name": "Gloam Overlord",
+            "target_id": null,
+            "reason": "Encounter model/definition IDs do not resolve an NpcSpawn actor ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          },
+          {
+            "owner": "opening_cave",
+            "kind": "item",
+            "target_name": "item definition 1195",
+            "target_id": 1195,
+            "reason": "Configured reward ID is not present in the shared item catalogue.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Gloamling",
+            "definition_id": 920100,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Crosswalk reuses existing local EnemyDefinition gloamling."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Gloamling",
+            "definition_id": 920100,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Crosswalk reuses existing local EnemyDefinition gloamling."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Gloamling",
+            "definition_id": 920100,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Crosswalk reuses existing local EnemyDefinition gloamling."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Gloam Overlord",
+            "definition_id": 920110,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Crosswalk reuses existing local EnemyDefinition gloam_overlord."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Gloam Overlord",
+            "definition_id": 920110,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Crosswalk reuses existing local EnemyDefinition gloam_overlord."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

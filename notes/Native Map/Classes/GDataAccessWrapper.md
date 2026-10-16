@@ -1,0 +1,22 @@
+# Class: GDataAccessWrapper
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `0041493a` | `GDataAccessWrapper::GDataAccessWrapper` | 🟢 | ctor | Default constructor: writes the shared vtable PTR_FUN_0175dc60, zeroes +8 (the data-access pointer), the 16-bit +0xc (the data id) and +0x10/+0x14. |
+| `00414952` | `GDataAccessWrapper::GetOwner` | ✅ | virtual | Returns the GObject pointer stored at this+0x10. |
+| `00414956` | `GDataAccessWrapper::GetDataId` | ✅ | virtual | Writes the 16-bit GPropertyId stored at this+0xc through the caller's return buffer (return-by-value of a 16-bit id). |
+| `00414964` | `GDataAccessWrapper::GetDataAccess` | ✅ | virtual | Returns the GDataAccess pointer stored at this+8. |
+| `00414968` | `— ⚠reject` | ⚪ | ctor | Constructor taking a data-access interface: writes the shared vtable, zeroes the id at +0xc and +0x10/+0x14, then AddRefs param_2 and stores it at +8 (releasing any previous pointer). |
+| `004149a9` | `GDataAccessWrapper::GDataAccessWrapper3` | 🟢 | ctor | Constructor taking a 16-bit property id: writes the shared vtable, zeroes +8/+0x10/+0x14 and stores the id at +0xc. |
+| `004149c8` | `GDataAccessWrapper::~GDataAccessWrapper` | 🟢 | dtor | Destructor (listed as called from 46 EH unwind funclets): when this+0x14 is 1 or 2 it notifies the data-access interface at +8 through its virtual +0x5c passing a record {flags 0 or this+0x10, kind 1 or 2, payload from … |
+| `00414a48` | `GDataAccessWrapper::SetOwner` | 🟢 | virtual | Stores param_2 at +0x10 (the owner field read back by the neighbouring getter 00414952) and resets the value descriptor: +0x14 = 0, +0x18/+0x1C/+0x20 = 0, +0x24 = -1. When the 16-bit data id at +0xC was zero it invokes … |
+| `00414ad7` | `GDataAccessWrapper::SetOwnerValueKind2` | 🟢 | virtual | Stores param_2 at +0x10 (owner) and param_3 at +0x18, marks the value descriptor with kind 2 (+0x14 = 2), then performs the same id/access fixup as the kind 0 variant: invokes the held access's slot +0xC and then slot +… |
+| `00414b4f` | `GDataAccessWrapper::SetOwnerValueKind1` | 🟢 | virtual | Stores param_2 at +0x10 (owner), param_3/param_4/param_5 at +0x18/+0x1C/+0x20 and param_6 at +0x24, marks the descriptor kind 1 (+0x14 = 1), then does the same id/access fixup as the other variants: with no id set it in… |
+| `00414bcb` | `GDataAccessWrapper::LoadFromData` | 🟢 | virtual | Reads a binding out of a data node: asks param_2's vtable slot +0x64 for the node selected by param_3 and reads that node's 16-bit 'Id' attribute into the low half of param_3. When 'Id' is absent it fetches the node's '… |
+| `00414cbf` | `— ⚠reject` | ⚪ | virtual | Writes the wrapper's binding into a data node: requires the owner at +0x10, then creates or fetches the child element named 'GDataAccessWrapper' through param_2's vtable slot +0x6C. When the 16-bit id at +0xC is zero an… |
+| `00414d77` | `GDataAccessWrapper::CopyBindingFrom` | 🟢 | virtual | Copies another wrapper's binding into this one: when the source (param_3) has no 16-bit id and holds a data access at +8, resolves a value through FUN_004fdb5f(param_2, this+0x10) and applies it with own vtable slot +0x… |
+| `00414dd0` | `GDataAccessWrapper::ClearBoundValue` | 🟢 | virtual | When a data access is held at +8, builds a scoped access context through FUN_004c6dcb/FUN_004cd10a, asks the access's vtable slot 2 for the data node of that context and, when a node is returned, clears its value throug… |
+| `00414e1d` | `GDataAccessWrapper::SetDataAccess` | 🟢 | virtual | Attaches param_2 as the wrapper's data access: when a value descriptor is already recorded (+0x14 == 1 or 2) it first pushes that descriptor to the old access's vtable slot +0x5C, then invokes the NEW access param_2's s… |
+| `00414f07` | `GDataAccessWrapper::SetDataAccessIfChanged` | 🟢 | virtual | Public attach entry: returns 1 immediately when the wrapper has no owner (+0x10 == 0) or when the candidate access param_2 is already held at +8; otherwise clears the 16-bit id at +0xC and delegates to own vtable slot 0… |
+| `00414f29` | `GDataAccessWrapper::SetDataId` | 🟢 | virtual | Sets the 16-bit property id at +0xC. When the id is non-zero and the wrapper is not already consistent it builds an access object for the current owner through own vtable slot 2 and attaches it with own slot 0 (00414e1d… |
+| `0041b3b3` | `GDataAccessWrapper::ScalarDeletingDtor` | 🟢 | dtor | Calls FUN_004149C8 on this, frees this through _free when param_2 bit 0 is set, and returns this otherwise. |

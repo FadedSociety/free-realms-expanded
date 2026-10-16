@@ -1,0 +1,13 @@
+# Class: CTP::Game
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `01369c70` | `CTP::Game::DispatchTextCommand` | ✅ | virtual | Thiscall on a text command line (param_2). Returns at once when the line is null or starts with '#'. Otherwise it copies the line into a std::string, runs gate checks (00f942a0, 00f9bb50), reads arguments through 013c5e… |
+| `0136aed0` | `— ⚠reject` | ⚪ | virtual | Logs "Game::changeDuration %d, %d" with its two int arguments, then looks up key param_2 in the command map at this+0x108 (01354a00). If that node is not the header it copies the node's 8-byte element list, logs "Moving… |
+| `0136b200` | `— ⚠reject` | ⚪ | virtual | Walks the element list of the node for key param_2 in the map at this+0x108 and erases each element whose +4 is non-null and whose FUN_0142a680 result equals param_4 (erase via 01361a10). It then compacts the node's lis… |
+| `0136b7a0` | `CTP::Game::InsertKeyedRecordIfAbsent ?` | 🟡 | virtual | Finds key param_2 in the map at this+0x200 (01331340). If the key is absent and param_4 is 1, it builds a record from param_3, param_5, param_6 and a string (01332310, 013326d0, 01333810, 01334c70), inserts a node throu… |
+| `0136ba00` | `— ⚠reject` | ⚪ | virtual | Logs "Game::changeDurationFromPlayer %d, %d, %d", then walks the element list of key param_2 in the map at this+0x108. An element whose +4 is non-null is moved to key param_3 (01369290 / 01361a10) when its owner from 01… |
+| `0136ca90` | `CTP::Game::SubmitCardCommand → CTP::Game::SubmitIntroduceCardCommand` | ✅ | virtual | Asserts that param_3 (the card) is non-null (FUN_012f5a60 with Game.cpp line 0x1ce7) and that its player id via virtual slot 0x28 is non-zero (line 0x1ce8). It allocates 0x30 bytes with 00d833a6, builds the command obje… |
+| `0136cb60` | `— ⚠reject` | ⚪ | virtual | Thiscall: if the call through 01350660 on param_2 and 01344f00() gives a non-null object, it reads a vector of ints from that object through virtual slot 0x4c, and for each element increments a counter keyed by that int… |
+| `0136d1f0` | `CTP::Game::AdvanceTurn` | ✅ | virtual | Logs "inAdvanceTurn". If the setup flag byte at this+0x17c is clear it sets this+0x17d, logs "GameIsSetup = false" and returns 0. If the started flag at this+0x118 is clear it logs "GameStarted = false", sets it, logs "… |
+| `0136dbd0` | `CTP::Game::Setup ⚠downgrade` | 🟢 | virtual | Logs "gameIsSetup == true" and returns when the setup flag byte at this+0x17c is already 1. Otherwise it stores the setup time (param_2, or __time64 when zero) at this+0x180, allocates two 0x9cc-byte state objects into … |

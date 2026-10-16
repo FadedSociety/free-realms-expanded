@@ -1,0 +1,996 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "precursor_ruins",
+        "name_string_id": 1437391086,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Precursor Ruins."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key precursor_ruins comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Precursor Ruins; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Precursor Ruins",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 1437391086,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 5,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Precursor Ruins difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Sunstone Valley",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 13,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None. Quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Unknown for entry. At least one drop is members-only (see Rewards). | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Sunstone Valley",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not identify an entrance target."
+                }
+              ]
+            },
+            "name": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not identify an entrance target."
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "No entrance target ID was stated.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md has no entrance target ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "A ruin gate in Sunstone Valley with the interaction header \"Precursor Ruins\" and \"Press X or mouse\". The Sunstone Valley region panel lists \"Precursor Ruins\" with The Rumbledome, Sandscale Oasis, Red's Haven, Whirly's Scrap Camp, Rough Rider Raceway, Sunstone Valley Approach and Glimmerdeep Hydropower Dam. The Dig is northeast of the ruins (wiki), and a Gateway quest sends the player \"to the nearby Precursor Ruins\" (loc 1137255156, 696992562). | [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (probable)",
+              "value": "\"Find and defeat the queen spider deep within the Precursor Ruins.\" (loc 540067880). The only goal-style string that names this place. A shorter \"Defeat the spider queen!\" (loc 57473757, 1753746483) also exists but is not tied to this place (Arachnia's Lair also has a spider queen). | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Goals > Main (probable); cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus (unknown)",
+              "value": "No \"Precursor Ruins Bonus Objective\" string exists in the client. Tunnel-themed strings that may belong here or to the Gateway \"Tarantula Wandering Encounter\" (loc 93885984): \"Destroy All tarantula tunnels and knock out all tarantulas!\" (loc 3757841580), \"Collapse all the tarantula tunnels!\" (loc 2853979623), \"Destroy all the tarantula tunnels so the tarantulas will have a more difficult time getting in and out of the temple.\" (loc 2772490446, mentions \"the temple\"), \"Destroy tarantula tunnels to stop the tarantulas from coming!\" (loc 697129597). Not assigned. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Goals > Bonus (unknown); cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Mechanic strings",
+              "value": "\"Click on the artifact to add your power to it!\" (loc 152515907), \"Click on the large artifact to add your power to it!\" (loc 676783675), \"You must defeat nearby opponents before you can turn on the artifact.\" (loc 95077356), \"Quickly, use the artifact and takes its power! That is the only way you can defeat the spider queen!\" (loc 2771610245). The last one names the spider queen and the artifact together, so it fits this place; the others are by wording only. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Goals > Mechanic strings; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Venoxa"
+              ],
+              "description": {
+                "value": "Venoxa (loc 1551834791; game data 1308810956), the spider queen | Dev notes: \"Venoxa takes reduced damage from player attacks and abilities.\" (loc 3003020211); \"Venoxa Artifact Buff\" (loc 1868828043) and \"Venoxa Artifact Debuff\" (loc 785733795); \"Ancient Artifact Power Beam - Venoxa\" (loc 1593092145); \"Precursor Ruins - 313 - Beam effect that hits Venoxa\" (loc 949244314), \"Beam for the player\" (loc 1606950941), \"healing beam from rocklar power source\" (loc 3024238250); \"Venoxa Invisible Controler Cube\" (loc 2656446186); \"Venoxa Blurb#6\" (loc 2922512771). Speech by wording: \"You're stronger than you look, but not strong enough! Rocklar slaves - ATTACK!\" (loc 3330216712) and \"My power fades? The artifact! You will pay for this!\" (loc 699106935). The wiki lists Venoxa only on its boss list (no page). | [client] [wiki: Boss]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                }
+              ]
+            },
+            {
+              "role": "Minion",
+              "names": [
+                "Spawn of Venoxa"
+              ],
+              "description": {
+                "value": "Spawn of Venoxa (loc 3855117949; game data 3499292762) | \"Spawn of Venoxa Knockback\" (loc 2315809752); \"Spawn of Venoxa ability played on players who get too close\" (loc 3718238087). | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Minion; cited [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not map Minion to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not source stats for Minion."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Minion; cited [client]"
+                }
+              ]
+            },
+            {
+              "role": "Spiders",
+              "names": [
+                "Tarantula",
+                "Leaping Tarantula"
+              ],
+              "description": {
+                "value": "Tarantula (loc 3650906579), Leaping Tarantula (loc 2725141712) | \"Leaping Tarantula teleport\" (loc 37962547), \"leaping spider leap\" (loc 1733358504), \"Tarantula ability\" (loc 3778053066). The client also has Agitated, Skittering and Ambusher tarantulas, \"Leaping Widow\" and baby tarantulas; which are in this dungeon is not shown. Tarantula Tunnel spawner exists (loc 512923587). | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Spiders; cited [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not map Spiders to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not source stats for Spiders."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Spiders; cited [client]"
+                }
+              ]
+            },
+            {
+              "role": "Enslaved guardians",
+              "names": [
+                "Rocklar Guardian",
+                "Rocklar Shaper"
+              ],
+              "description": {
+                "value": "Rocklar Guardian (loc 281206154, 2691726200), Rocklar Shaper (loc 2775596314) | Guard speech: \"The temple must not be breached by outsiders. Rocklar.\" (loc 705456043), \"You will not lure me away from guard post! Rocklar!\" (loc 346746067), \"Intruder. Rocklar. Eliminate Intruder. Rocklar.\" (loc 733697614). Shaper dev notes: \"buff other\" (loc 3386915224), \"crow control\" (loc 213926295), \"primary attack weld attack\" (loc 3762070435). \"Spawner on death of enslaved guardians\" (loc 2374182993). The wiki says rocklar guardians often serve as monster spawners here. | [client] [wiki: Rocklar]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not map Enslaved guardians to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not source stats for Enslaved guardians."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Venoxa"
+              ],
+              "description": {
+                "value": "Venoxa (loc 1551834791; game data 1308810956), the spider queen | Dev notes: \"Venoxa takes reduced damage from player attacks and abilities.\" (loc 3003020211); \"Venoxa Artifact Buff\" (loc 1868828043) and \"Venoxa Artifact Debuff\" (loc 785733795); \"Ancient Artifact Power Beam - Venoxa\" (loc 1593092145); \"Precursor Ruins - 313 - Beam effect that hits Venoxa\" (loc 949244314), \"Beam for the player\" (loc 1606950941), \"healing beam from rocklar power source\" (loc 3024238250); \"Venoxa Invisible Controler Cube\" (loc 2656446186); \"Venoxa Blurb#6\" (loc 2922512771). Speech by wording: \"You're stronger than you look, but not strong enough! Rocklar slaves - ATTACK!\" (loc 3330216712) and \"My power fades? The artifact! You will pay for this!\" (loc 699106935). The wiki lists Venoxa only on its boss list (no page). | [client] [wiki: Boss]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Buckled Skull Jacket",
+                "value": "\"A Members only Freestyle Jobs Clothing item drop\" acquired \"through the Dungeon Precursor Ruins or through a Sunstone Valley Boss Chest\". Client name matches (loc 413478426). | [wiki] [client name]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Buckled Skull Jacket; cited [wiki] [client name]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Buckled Skull Jacket; cited [wiki] [client name]"
+                  }
+                ]
+              },
+              {
+                "label": "Boss chests",
+                "value": "Wiki: Sunstone Valley boss chests give items such as Bones Flair Shard (loc 3286740144). Whether Venoxa's chest is one is not stated. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Boss chests; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel, coins, stars, bonus clothing",
+                "value": null,
+                "reason": "Unknown. The wiki has no battle page, no video shows a results screen, and the client holds no per-dungeon figures. |",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Prize wheel, coins, stars, bonus clothing"
+                  }
+                ]
+              },
+              {
+                "label": "Quest rewards",
+                "value": "Rescue in the Ruins: the Cactoid (wiki, loc 4029078262). Other chain rewards unknown. These belong to the quests, not the dungeon. | [wiki] [client name]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Quest rewards; cited [wiki] [client name]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Quest rewards; cited [wiki] [client name]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": null,
+                "reason": "None (see Requirements). | [client: no match]",
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Rewards > Achievements; cited [client: no match]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": null,
+            "reason": "No numeric coin outcome appears in the Rewards table.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": null,
+            "reason": "No per-job prize wheel table was present.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "precursor_ruins",
+            "kind": "zone",
+            "target_name": "Sunstone Valley",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Entrance; cited [video G2tF5uF5cBE/01452, b6QfVC_2YpQ/00028] [wiki: The Dig] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "precursor_ruins",
+            "kind": "npc",
+            "target_name": "Venoxa",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+              }
+            ]
+          },
+          {
+            "owner": "precursor_ruins",
+            "kind": "npc",
+            "target_name": "Spawn of Venoxa",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Minion; cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "precursor_ruins",
+            "kind": "npc",
+            "target_name": "Tarantula",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Spiders; cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "precursor_ruins",
+            "kind": "npc",
+            "target_name": "Leaping Tarantula",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Spiders; cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "precursor_ruins",
+            "kind": "npc",
+            "target_name": "Rocklar Guardian",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              }
+            ]
+          },
+          {
+            "owner": "precursor_ruins",
+            "kind": "npc",
+            "target_name": "Rocklar Shaper",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key precursor_ruins comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Precursor Ruins; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Venoxa",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Spawn of Venoxa",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Minion; cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Tarantula",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Spiders; cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Leaping Tarantula",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Spiders; cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Rocklar Guardian",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Rocklar Shaper",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Enslaved guardians; cited [client] [wiki: Rocklar]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Venoxa",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Precursor Ruins.md > Enemies and boss > Boss; cited [client] [wiki: Boss]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

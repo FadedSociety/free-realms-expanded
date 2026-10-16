@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3,
+      "zone_id": 7,
+      "name_string_id": 3961,
+      "transform": {
+        "position": [51.391, 30.987, 363.156],
+        "position_w": null,
+        "rotation": { "kind": "heading", "value": 1.487 },
+        "scale": null
+      },
+      "icon_id": 1345,
+      "location_id": 281,
+      "notification_type": 7,
+      "sub_name_string_id": 382845,
+      "unknown_field": 651,
+      "breadcrumb_quest_id": 0,
+      "teleport_location_id": 210020,
+      "atlas_name": "sacredgrove",
+      "unknown_trailing_field": 60,
+      "source": [
+        { "kind": "client", "evidence": "lab/reports/worldcontent-20261013T203151Z/world-content.json: points_of_interest[0]; captured opcode 57 row" },
+        { "kind": "reconstructed", "evidence": "(R) zone_id is a fixture crosswalk; captured location_id 281 semantics are unresolved" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1172 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "necronomicus_unleashed",
+        "name_string_id": 2648973931,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Necronomicus Unleashed."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key necronomicus_unleashed comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Necronomicus Unleashed; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Necronomicus Unleashed",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 2648973931,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 5,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Necronomicus Unleashed difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Merry Vale",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 13,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Combat job level; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Combat job level; cited [wiki] [client]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Combat job level; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Combat job level; cited [wiki] [client]"
+              }
+            ]
+          },
+          "quest": {
+            "value": "The wiki: the battle \"can only be unlocked by getting the quest 'Necronomicus Unleashed' from the Fighter's Guild Message Board in Sanctuary\", and it follows the Southern Wilds story (Heroes Journal Merry Vale part, around Unmasking the Villain)",
+            "reason": null,
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Unknown for entry. The wiki marks the Wild weapons and the Of Light boots as Members only. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Merry Vale",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not identify an entrance target."
+                }
+              ]
+            },
+            "name": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not identify an entrance target."
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "No entrance target ID was stated.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md has no entrance target ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              }
+            ]
+          },
+          "description": {
+            "value": "\"Use the secret passage behind the mushrooms near the Den of Secrets\" (loc 2156346441). Wiki: \"within the caverns leading to the Den of Secrets, beyond a swirling portal of Gloam magic\". The Den of Secrets itself is \"the cavern north of Merry Vale\" (loc 1876015264), so the passage is in that cave system. | [client] [wiki]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat Necronomicus!\" (loc 577662353); also \"Defeat Necronomicus\" (loc 4229669973). Quest-level objectives: \"Complete Necronomicus Unleashed\" (loc 258526631) and, for the return version, \"Defeat the Awakened version of Necronomicus beneath Merry Vale in Necronomicus Unleashed!\" (loc 2004825146). | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Goals > Main; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": null,
+              "reason": "None found. There is no \"Necronomicus Bonus Objective\" string in the client. | [client: no match]",
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Goals > Bonus; cited [client: no match]"
+                }
+              ]
+            },
+            {
+              "label": "Possible sub-goal",
+              "value": "\"Destroy the Zombie Portals\" (loc 1233963050, 1793505741) with eight numbered dev strings \"Destroy Zombie Portal 1\" to \"Destroy Zombie Portal 8\" (for example loc 333870958, 3730548396, 255810573). The wiki says a zombie portal appears in this fight; the client does not say which encounter owns the numbered portals. Unassigned. | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Goals > Possible sub-goal; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Goals > Possible sub-goal; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": [
+            {
+              "label": "Phases (client)",
+              "value": "\"[dev] Necronomicus Phase 3 Basic Attack\" (loc 264350541) alongside \"Necronomicus Basic Attack\" (loc 1963478812, 2182182348), which supports at least three phases. \"Buff Package 1/2/3\" (loc 3180343573, 1721405563, 1592780761). | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (client); cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Necronomicus"
+              ],
+              "description": {
+                "value": "Necronomicus, \"Gloam Lord of Necromancy\" (loc 3006978437, 3935840341; title loc 3444961058; game data 932079975) | The wiki calls him the only Gloam Lord in the game. Dialog that matches wiki quotes: \"Back for more?\" (loc 3571622297), \"Have you met my friends?\" (loc 661282997), \"My power is eternal!\" (loc 1459764415), and (as the Mysterious Stranger) \"Do not meddle in my affairs, 'hero.' ...\" (loc 2021704970). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Phases (wiki)",
+              "names": [
+                "zombie portal",
+                "skeletal form"
+              ],
+              "description": {
+                "value": "(1) Necronomicus fights with magic. (2) When defeated \"the skeleton pieces will appear on the ground\" and a zombie portal spawns Necrowart Zombies; destroying it makes him assemble a powered skeletal form. (3) In that form he smacks the ground to shake it and harm players; defeating it ends the fight. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (wiki); cited [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not map Phases (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not source stats for Phases (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (wiki); cited [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Abilities",
+              "names": [
+                "Necrotic Gloamfire",
+                "Splash",
+                "Cave-in"
+              ],
+              "description": {
+                "value": "Necrotic Gloamfire (loc 3074822869): \"Burns an opponent with Gloamfire. Nearby opponents also catch fire. Necronomicus' signature magic blast.\" (loc 201406982), with Splash (loc 2523024004): \"Splash damage inflicted if a nearby ally is struck by Necrotic Gloamfire.\" (loc 1144200077). Cave-in (loc 1576730357): \"Necronomicus strikes the ground, raining stactites down upon the ground.\" (loc 3095627209). \"The great skeleton's chest opens and Necronomicus rains necrotic gloamfire down upon opponents in front of him.\" (loc 3772051160). \"Necronomicus removes his head, which bounces around him while biting at unlucky opponents.\" (loc 3601968300). The wiki trivia calls it the first boss whose abilities can be dodged. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not map Abilities to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not source stats for Abilities."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Adds",
+              "names": [
+                "Necrowart Zombie",
+                "Zombie Portal"
+              ],
+              "description": {
+                "value": "Necrowart Zombie (wiki appearance list; client names loc 1923750772, 4143459490, \"Ancient Necrowart Zombie\" 103459866) spawned by the Zombie Portal (loc 825559812) | The Necrowart Zombie wiki page lists this fight among its appearances. Exact add counts unknown. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not map Adds to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not source stats for Adds."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Necronomicus"
+              ],
+              "description": {
+                "value": "Necronomicus, \"Gloam Lord of Necromancy\" (loc 3006978437, 3935840341; title loc 3444961058; game data 932079975) | The wiki calls him the only Gloam Lord in the game. Dialog that matches wiki quotes: \"Back for more?\" (loc 3571622297), \"Have you met my friends?\" (loc 661282997), \"My power is eternal!\" (loc 1459764415), and (as the Mysterious Stranger) \"Do not meddle in my affairs, 'hero.' ...\" (loc 2021704970). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars, coins, bonus clothing",
+                "value": null,
+                "reason": "Unknown. No battle page, no results screen in video. |",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Stars, coins, bonus clothing"
+                  }
+                ]
+              },
+              {
+                "label": "Boots",
+                "value": "\"After returning to Sanctuary, an ancient pair of boots was awarded. They look like they are part of a larger set.\" (loc 4100297378). Wiki: one \"<Job> of Light Boots\" per job, Members only, level 2, \"acquired by defeating Necronomicus\". The client has the whole Of Light set (helmet, shoulderpads, breastplate, gauntlets, leggings, boots) for each job, but only the boots are awarded here. The queen's thanks: \"The queen has asked me to bestow these rewards upon you\" (loc 3450879884). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Boots; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Boots; cited [client] [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Awakened weapon (level 20)",
+                "value": "The wiki weapon pages: each is \"randomly acquired by completion of the quest 'Necronomicus Unleashed'\", level 20, power 5. The client slot label is \"Level 20 Awakened Weapon\" (loc 369384098). Items below. | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Awakened weapon (level 20); cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Awakened weapon (level 20); cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Wild weapon (level 2, Members only)",
+                "value": "The wiki weapon pages say \"acquired through defeating the Overworld Boss Necronomicus\" and the boss page lists them under \"Upon defeat\". Items below. | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Wild weapon (level 2, Members only); cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Wild weapon (level 2, Members only); cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Archer",
+                "value": "Archer's Wild Bow of Forbidden Magic (loc 3985640422) | Archer's Awakened Bow of Forbidden Magic (loc 3443801602) | Archer of Light Boots (loc 179207758)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Archer"
+                  }
+                ]
+              },
+              {
+                "label": "Brawler",
+                "value": "Brawler's Wild Hammer of Forbidden Magic (loc 2494776816) | Brawler's Awakened Hammer of Forbidden Magic (loc 3270322538) | Brawler of Light Boots (loc 2091427569)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Brawler"
+                  }
+                ]
+              },
+              {
+                "label": "Medic",
+                "value": "Medic's Wild Bonesaw of Forbidden Magic (loc 4209126640) | Medic's Awakened Bonesaw of Forbidden Magic (loc 2486274137) | Medic of Light Boots (loc 3035400151)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Medic"
+                  }
+                ]
+              },
+              {
+                "label": "Ninja",
+                "value": "Ninja's Wild Sword of Forbidden Magic (loc 4023287926) | Ninja's Awakened Sword of Forbidden Magic (loc 218281465) | Ninja of Light Boots (loc 1000231786)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Ninja"
+                  }
+                ]
+              },
+              {
+                "label": "Warrior",
+                "value": "Warrior's Wild Axe of Forbidden Magic (loc 1929377381) | Warrior's Awakened Axe of Forbidden Magic (loc 1154275319) | Warrior of Light Boots (loc 930409689)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Warrior"
+                  }
+                ]
+              },
+              {
+                "label": "Wizard",
+                "value": "Wizard's Wild Wand of Forbidden Magic (loc 1607964994) | Wizard's Awakened Wand of Forbidden Magic (loc 3270259384) | Wizard of Light Boots (loc 182694960, 2310270687)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Rewards > Wizard"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": null,
+            "reason": "No numeric coin outcome appears in the Rewards table.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": null,
+            "reason": "No per-job prize wheel table was present.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "quest",
+            "target_name": "The wiki: the battle \"can only be unlocked by getting the quest 'Necronomicus Unleashed' from the Fighter's Guild Message Board in Sanctuary\", and it follows the Southern Wilds story (Heroes Journal Merry Vale part, around Unmasking the Villain)",
+            "target_id": null,
+            "reason": "Guide gives a quest title but no resolved quest record ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "zone",
+            "target_name": "Merry Vale",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Entrance; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "Necronomicus",
+            "target_id": null,
+            "reason": "Exact NPC name matches multiple reconstructed regional content keys; no unique target is selected.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ambiguous exact name crosswalk to 2 regional NPC content keys; actor mapping remains unresolved."
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "zombie portal",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "skeletal form",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "Necrotic Gloamfire",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "Splash",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "Cave-in",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "Necrowart Zombie",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "necronomicus_unleashed",
+            "kind": "npc",
+            "target_name": "Zombie Portal",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key necronomicus_unleashed comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Necronomicus Unleashed; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Necronomicus",
+            "definition_id": 930014,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 440729 resolves 'Necronomicus'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930014 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "zombie portal",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "skeletal form",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Phases (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Necrotic Gloamfire",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Splash",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Cave-in",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Abilities; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Necrowart Zombie",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Zombie Portal",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Adds; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Necronomicus",
+            "definition_id": 930014,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 440729 resolves 'Necronomicus'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930014 is a W58 local projection."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

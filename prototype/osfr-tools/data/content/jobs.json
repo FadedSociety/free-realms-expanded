@@ -1,0 +1,1563 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": "adventurer",
+      "name": "Adventurer",
+      "profile_id": 1,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [],
+      "quest_ids": [
+        3000001,
+        3000002,
+        3000003,
+        3000004,
+        3000005,
+        3000006,
+        3000007,
+        3000008,
+        3000009,
+        3000010,
+        3000011,
+        3000012,
+        3000013,
+        3000014,
+        3000015,
+        3000016,
+        3000017,
+        3000018,
+        3000019,
+        3000020,
+        3000021,
+        3000022,
+        3000023,
+        3000024,
+        3000025,
+        3000026,
+        3000027,
+        3000028,
+        3000029,
+        3000030,
+        3000031,
+        3000032,
+        3000033,
+        3000034,
+        3000035,
+        3000036,
+        3000037,
+        3000038,
+        3000039,
+        3000040,
+        3000041,
+        3000042,
+        3000043,
+        3000044,
+        3000045,
+        3000046,
+        3000047,
+        3000048,
+        3000049,
+        3000050,
+        3000051,
+        3000052,
+        3000053,
+        3000054,
+        3000055,
+        3000056,
+        3000057,
+        3000058,
+        3000059,
+        3000060
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Adventurer profile 1"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "archer",
+      "name": "Archer",
+      "profile_id": 35,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000135,
+        9000000389,
+        9000000106,
+        9000000077,
+        9000000502,
+        9000000037,
+        9000000029,
+        9000000156,
+        9000000163,
+        9000000334,
+        9000000122,
+        9000000414
+      ],
+      "quest_ids": [
+        3010001,
+        3010002,
+        3010003,
+        3010004,
+        3010005,
+        3010006,
+        3010007,
+        3010008,
+        3010009,
+        3010010,
+        3010011,
+        3010012,
+        3010013,
+        3010014,
+        3010015,
+        3010016,
+        3010017,
+        3010018,
+        3010019,
+        3010020,
+        3010021,
+        3010022,
+        3010023,
+        3010024,
+        3010025,
+        3010026,
+        3010027,
+        3010028,
+        3010029,
+        3010030,
+        3010031,
+        3010032,
+        3010033,
+        3010034
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Archer profile 35"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "blacksmith",
+      "name": "Blacksmith",
+      "profile_id": 16,
+      "category": "crafting",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000207,
+        9000000160,
+        9000000206,
+        9000000220,
+        9000000033,
+        9000000069,
+        9000000479,
+        9000000405,
+        9000000025,
+        9000000203,
+        9000000006,
+        9000000179,
+        9000000193,
+        9000000114
+      ],
+      "quest_ids": [
+        3020001,
+        3020002,
+        3020003,
+        3020004,
+        3020005,
+        3020006,
+        3020007,
+        3020008,
+        3020009,
+        3020010,
+        3020011,
+        3020012,
+        3020013,
+        3020014,
+        3020015,
+        3020016,
+        3020017,
+        3020018,
+        3020019,
+        3020020,
+        3020021,
+        3020022,
+        3020023,
+        3020024,
+        3020025,
+        3020026,
+        3020027,
+        3020028,
+        3020029,
+        3020030,
+        3020031,
+        3020032,
+        3020033,
+        3020034,
+        3020035,
+        3020036,
+        3020037,
+        3020038,
+        3020039,
+        3020040,
+        3020041,
+        3020042
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Blacksmith profile 16"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "brawler",
+      "name": "Brawler",
+      "profile_id": 43,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000014,
+        9000000090,
+        9000000042,
+        9000000102,
+        9000000015,
+        9000000038,
+        9000000216,
+        9000000428,
+        9000000143,
+        9000000363,
+        9000000185,
+        9000000088,
+        9000000043,
+        9000000402
+      ],
+      "quest_ids": [
+        3030001,
+        3030002,
+        3030003,
+        3030004,
+        3030005,
+        3030006,
+        3030007,
+        3030008,
+        3030009,
+        3030010,
+        3030011,
+        3030012,
+        3030013,
+        3030014,
+        3030015,
+        3030016,
+        3030017,
+        3030018,
+        3030019,
+        3030020,
+        3030021,
+        3030022,
+        3030023,
+        3030024,
+        3030025,
+        3030026,
+        3030027,
+        3030028,
+        3030029,
+        3030030,
+        3030031,
+        3030032,
+        3030033,
+        3030034,
+        3030035,
+        3030036,
+        3030037,
+        3030038,
+        3030039,
+        3030040,
+        3030041,
+        3030042,
+        3030043
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Brawler profile 43"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "card_duelist",
+      "name": "Card Duelist",
+      "profile_id": 120,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000187,
+        9000000170,
+        9000000094,
+        9000000035,
+        9000000198,
+        9000000191,
+        9000000172,
+        9000000112,
+        9000000012,
+        9000000105,
+        9000000141,
+        9000000143,
+        9000000136,
+        9000000186
+      ],
+      "quest_ids": [
+        3040001,
+        3040002,
+        3040003,
+        3040004,
+        3040005,
+        3040006,
+        3040007,
+        3040008,
+        3040009,
+        3040010,
+        3040011,
+        3040012,
+        3040013,
+        3040014,
+        3040015,
+        3040016,
+        3040017,
+        3040018,
+        3040019,
+        3040020,
+        3040021,
+        3040022,
+        3040023,
+        3040024,
+        3040025,
+        3040026,
+        3040027,
+        3040028,
+        3040029,
+        3040030,
+        3040031,
+        3040032,
+        3040033,
+        3040034,
+        3040035,
+        3040036,
+        3040037,
+        3040038,
+        3040039,
+        3040040,
+        3040041,
+        3040042,
+        3040043,
+        3040044,
+        3040045,
+        3040046,
+        3040047,
+        3040048,
+        3040049,
+        3040050,
+        3040051,
+        3040052,
+        3040053,
+        3040054,
+        3040055,
+        3040056,
+        3040057,
+        3040058,
+        3040059,
+        3040060,
+        3040061,
+        3040062,
+        3040063
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Card Duelist profile 120"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "chef",
+      "name": "Chef",
+      "profile_id": 45,
+      "category": "crafting",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000204,
+        9000000019,
+        9000000103,
+        9000000253,
+        9000000351,
+        9000000365,
+        9000000096,
+        9000000178,
+        9000000422,
+        9000000044,
+        9000000287,
+        9000000133,
+        9000000099,
+        9000000016,
+        9000000063,
+        9000000396,
+        9000000045,
+        9000000046,
+        9000000213,
+        9000000146,
+        9000000070
+      ],
+      "quest_ids": [
+        3050001,
+        3050002,
+        3050003,
+        3050004,
+        3050005,
+        3050006,
+        3050007,
+        3050008,
+        3050009,
+        3050010,
+        3050011,
+        3050012,
+        3050013,
+        3050014,
+        3050015,
+        3050016,
+        3050017,
+        3050018,
+        3050019,
+        3050020,
+        3050021,
+        3050022,
+        3050023,
+        3050024,
+        3050025,
+        3050026,
+        3050027,
+        3050028,
+        3050029,
+        3050030,
+        3050031,
+        3050032,
+        3050033
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Chef profile 45"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "demo_derby_driver",
+      "name": "Demo Derby Driver",
+      "profile_id": 49,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000391,
+        9000000064,
+        9000000262,
+        9000000183,
+        9000000295,
+        9000000312,
+        9000000094,
+        9000000111,
+        9000000124,
+        9000000299
+      ],
+      "quest_ids": [
+        3060001,
+        3060002,
+        3060003,
+        3060004,
+        3060005,
+        3060006,
+        3060007,
+        3060008,
+        3060009,
+        3060010,
+        3060011,
+        3060012,
+        3060013,
+        3060014,
+        3060015,
+        3060016,
+        3060017,
+        3060018,
+        3060019,
+        3060020,
+        3060021,
+        3060022,
+        3060023,
+        3060024,
+        3060025,
+        3060026,
+        3060027,
+        3060028,
+        3060029,
+        3060030,
+        3060031,
+        3060032,
+        3060033,
+        3060034,
+        3060035,
+        3060036,
+        3060037,
+        3060038,
+        3060039,
+        3060040,
+        3060041,
+        3060042,
+        3060043,
+        3060044,
+        3060045,
+        3060046
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Demo Derby Driver profile 49"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "fisherman",
+      "name": "Fisherman",
+      "profile_id": 137,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000440,
+        9000000148,
+        9000000010,
+        9000000411,
+        9000000117,
+        9000000101,
+        9000000024,
+        9000000275,
+        9000000027,
+        9000000194,
+        9000000377
+      ],
+      "quest_ids": [
+        3070001,
+        3070002,
+        3070003,
+        3070004,
+        3070005,
+        3070006,
+        3070007,
+        3070008,
+        3070009,
+        3070010,
+        3070011,
+        3070012,
+        3070013,
+        3070014,
+        3070015,
+        3070016,
+        3070017,
+        3070018,
+        3070019,
+        3070020,
+        3070021,
+        3070022,
+        3070023,
+        3070024,
+        3070025,
+        3070026,
+        3070027,
+        3070028,
+        3070029,
+        3070030,
+        3070031,
+        3070032,
+        3070033,
+        3070034,
+        3070035,
+        3070036,
+        3070037,
+        3070038,
+        3070039,
+        3070040,
+        3070041,
+        3070042,
+        3070043,
+        3070044,
+        3070045,
+        3070046,
+        3070047,
+        3070048,
+        3070049,
+        3070050
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Fisherman profile 137"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "kart_driver",
+      "name": "Kart Driver",
+      "profile_id": 48,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000116,
+        9000000412,
+        9000000066,
+        9000000039,
+        9000000504,
+        9000000048,
+        9000000008
+      ],
+      "quest_ids": [
+        3080001,
+        3080002,
+        3080003,
+        3080004,
+        3080005,
+        3080006,
+        3080007,
+        3080008,
+        3080009,
+        3080010,
+        3080011,
+        3080012,
+        3080013,
+        3080014,
+        3080015,
+        3080016,
+        3080017,
+        3080018,
+        3080019,
+        3080020,
+        3080021,
+        3080022,
+        3080023,
+        3080024,
+        3080025,
+        3080026,
+        3080027,
+        3080028,
+        3080029,
+        3080030,
+        3080031,
+        3080032,
+        3080033,
+        3080034,
+        3080035,
+        3080036,
+        3080037,
+        3080038,
+        3080039,
+        3080040,
+        3080041,
+        3080042,
+        3080043,
+        3080044,
+        3080045,
+        3080046,
+        3080047,
+        3080048,
+        3080049
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Kart Driver profile 48"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "medic",
+      "name": "Medic",
+      "profile_id": 11,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000161,
+        9000000073,
+        9000000214,
+        9000000052,
+        9000000143,
+        9000000071,
+        9000000072,
+        9000000023
+      ],
+      "quest_ids": [
+        3090001,
+        3090002,
+        3090003,
+        3090004,
+        3090005,
+        3090006,
+        3090007,
+        3090008,
+        3090009,
+        3090010,
+        3090011,
+        3090012,
+        3090013,
+        3090014,
+        3090015,
+        3090016,
+        3090017,
+        3090018,
+        3090019,
+        3090020,
+        3090021,
+        3090022,
+        3090023,
+        3090024,
+        3090025,
+        3090026,
+        3090027,
+        3090028,
+        3090029,
+        3090030,
+        3090031,
+        3090032,
+        3090033
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Medic profile 11"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "miner",
+      "name": "Miner",
+      "profile_id": 14,
+      "category": "crafting",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000217,
+        9000000493,
+        9000000472,
+        9000000201,
+        9000000069,
+        9000000405,
+        9000000337,
+        9000000203,
+        9000000169,
+        9000000470,
+        9000000236,
+        9000000206,
+        9000000034,
+        9000000487,
+        9000000476
+      ],
+      "quest_ids": [
+        3100001,
+        3100002,
+        3100003,
+        3100004,
+        3100005,
+        3100006,
+        3100007,
+        3100008,
+        3100009,
+        3100010,
+        3100011,
+        3100012,
+        3100013,
+        3100014,
+        3100015,
+        3100016,
+        3100017,
+        3100018,
+        3100019,
+        3100020,
+        3100021,
+        3100022,
+        3100023,
+        3100024,
+        3100025,
+        3100026,
+        3100027,
+        3100028,
+        3100029
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Miner profile 14"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "ninja",
+      "name": "Ninja",
+      "profile_id": 2,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000223,
+        9000000335,
+        9000000047,
+        9000000093,
+        9000000447,
+        9000000151,
+        9000000180,
+        9000000390,
+        9000000129
+      ],
+      "quest_ids": [
+        3110001,
+        3110002,
+        3110003,
+        3110004,
+        3110005,
+        3110006,
+        3110007,
+        3110008,
+        3110009,
+        3110010,
+        3110011,
+        3110012,
+        3110013,
+        3110014,
+        3110015,
+        3110016,
+        3110017,
+        3110018,
+        3110019,
+        3110020,
+        3110021,
+        3110022,
+        3110023,
+        3110024,
+        3110025
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Ninja profile 2"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "pet_trainer",
+      "name": "Pet Trainer",
+      "profile_id": 121,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000235,
+        9000000139,
+        9000000145,
+        9000000184,
+        9000000231,
+        9000000228,
+        9000000153,
+        9000000130
+      ],
+      "quest_ids": [
+        3120001,
+        3120002,
+        3120003,
+        3120004,
+        3120005,
+        3120006,
+        3120007,
+        3120008,
+        3120009,
+        3120010,
+        3120011,
+        3120012,
+        3120013,
+        3120014,
+        3120015,
+        3120016,
+        3120017,
+        3120018,
+        3120019,
+        3120020,
+        3120021,
+        3120022,
+        3120023,
+        3120024,
+        3120025,
+        3120026
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Pet Trainer profile 121"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "postman",
+      "name": "Postman",
+      "profile_id": 4,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000086,
+        9000000091,
+        9000000174,
+        9000000080,
+        9000000172,
+        9000000132,
+        9000000031,
+        9000000173,
+        9000000317,
+        9000000079
+      ],
+      "quest_ids": [
+        3130001,
+        3130002,
+        3130003,
+        3130004,
+        3130005,
+        3130006,
+        3130007,
+        3130008,
+        3130009,
+        3130010,
+        3130011,
+        3130012,
+        3130013,
+        3130014,
+        3130015,
+        3130016,
+        3130017,
+        3130018,
+        3130019,
+        3130020,
+        3130021,
+        3130022,
+        3130023,
+        3130024,
+        3130025,
+        3130026,
+        3130027,
+        3130028,
+        3130029,
+        3130030,
+        3130031,
+        3130032,
+        3130033
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Postman profile 4"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "soccer_star",
+      "name": "Soccer Star",
+      "profile_id": 52,
+      "category": "freestyle",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [
+        9000000140,
+        9000000053,
+        9000000092,
+        9000000162
+      ],
+      "quest_ids": [
+        3140001,
+        3140002,
+        3140003,
+        3140004,
+        3140005,
+        3140006,
+        3140007,
+        3140008,
+        3140009,
+        3140010,
+        3140011,
+        3140012,
+        3140013,
+        3140014,
+        3140015,
+        3140016,
+        3140017,
+        3140018,
+        3140019,
+        3140020,
+        3140021,
+        3140022,
+        3140023,
+        3140024,
+        3140025,
+        3140026,
+        3140027,
+        3140028,
+        3140029,
+        3140030
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Soccer Star profile 52"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "warrior",
+      "name": "Warrior",
+      "profile_id": 32,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000311,
+        9000000155,
+        9000000208,
+        9000000222,
+        9000000030,
+        9000000243,
+        9000000073,
+        9000000097,
+        9000000205,
+        9000000085,
+        9000000040,
+        9000000214
+      ],
+      "quest_ids": [
+        3150001,
+        3150002,
+        3150003,
+        3150004,
+        3150005,
+        3150006,
+        3150007,
+        3150008,
+        3150009,
+        3150010,
+        3150011,
+        3150012,
+        3150013,
+        3150014,
+        3150015,
+        3150016,
+        3150017,
+        3150018,
+        3150019,
+        3150020,
+        3150021,
+        3150022,
+        3150023,
+        3150024
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Warrior profile 32"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "profile_id": 12,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": true,
+      "trainer_npc_ids": [
+        9000000089,
+        9000000159,
+        9000000234,
+        9000000154,
+        9000000143,
+        9000000212,
+        9000000164,
+        9000000190,
+        9000000108,
+        9000000209,
+        9000000126,
+        9000000415,
+        9000000376,
+        9000000507
+      ],
+      "quest_ids": [
+        3160001,
+        3160003,
+        3160004,
+        3160005,
+        3160006,
+        3160007,
+        3160008,
+        3160009,
+        3160010,
+        3160011,
+        3160012,
+        3160013,
+        3160014,
+        3160015,
+        3160016,
+        3160017,
+        3160018,
+        3160019,
+        3160020,
+        3160021,
+        3160022,
+        3160023,
+        3160024,
+        3160025,
+        3160026,
+        3160027,
+        3160028,
+        3160029,
+        3160030,
+        3160031,
+        3160032,
+        3160033,
+        3160034
+      ],
+      "abilities": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Overview and frontmatter; source tags wiki"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Overview and frontmatter; source tags client"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Overview and frontmatter; source tags video"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md:143; client resource ItemFilters.txt and ItemFilterOptions.txt, job option value: Wizard profile 12"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) stable lowercase slug and synthetic quest/NPC content keys are package keys, not recovered server IDs"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no job name_string_id, unlock_rules, or starting_gear fields; quest and gear detail remains in the source guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ability references are empty unless a numeric ability definition ID is known; locale string IDs are not used as ability IDs"
+        }
+      ]
+    }
+  ]
+}

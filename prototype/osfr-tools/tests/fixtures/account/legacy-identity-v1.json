@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "character": {
+    "guid": 1,
+    "first_name": "FixtureSave",
+    "last_name": "Record",
+    "model": 1,
+    "head": "head.adr",
+    "hair": "hair.adr",
+    "model_customization": "",
+    "face_paint": "none",
+    "skin_tone": "skin.adr",
+    "eye_color": 0,
+    "hair_color": 0,
+    "gender": 1,
+    "creation": {
+      "first_name": "FixtureSave",
+      "last_name": "Record",
+      "temporary_first_name": "FixtureTemp",
+      "temporary_last_name": "TempRecord",
+      "choices": [1, 1, 2, 0, 0, 1, 0, 201, 189, 199, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    },
+    "attachments": []
+  }
+}

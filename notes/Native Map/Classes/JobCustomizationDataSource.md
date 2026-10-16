@@ -1,0 +1,15 @@
+# Class: JobCustomizationDataSource
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00a84630` | `JobCustomizationDataSource::GetField` | ✅ | virtual | Lua/UI data-source field getter (vtable slot [4]): resolves the value for (row param_1, field param_2) with 00a84510, formats it through the SoeUtil IString format routine 00402fd0 into a wide string, converts it with 0… |
+| `00a84750` | `JobCustomizationDataSource::GetColumnName` | ✅ | virtual | Column-title getter (vtable slot [1]): on first use it initialises the file-scope IString at DAT_01be785c and registers its destructor with _atexit, formats "Equipment slot %d" with the column index argument through 004… |
+| `00a848d0` | `ResetJobCustomizationSlots` | 🟢 | method | Empties the equipment-slot table: allocates a small local helper object (00a035f0/00965be0/00a03690 begin-end pair), sets the value 0, and appends 18 (0x12) empty entries into the per-slot list starting at this+0x264 th… |
+| `00a849a0` | `— ⚠reject` | ⚪ | method | Loads the slot values of one job-customization row: when the row-source pointer at this+0x260 is set it walks that object's list (next link at +0x22c) param_2 times, then writes every entry of the client's job-customiza… |
+| `00a84ad0` | `— ⚠reject` | ⚪ | method | Replaces the current job-customization row: destroys the previous row object at this+0x98 (00a84840 plus FreeMemory) and nulls it, stores param_2 at [0xab] and the new row object param_3 at [0x98], zeroes the slot field… |
+| `00a84be0` | `JobCustomizationClearSlot` | 🟢 | method | Writes 0 into one equipment slot of the table (this+0x264+param_2*4) and then refreshes the table with 00a848d0. |
+| `00a84cb0` | `JobCustomizationDataSourceDtor` | ✅ | dtor | Destructor body of the job-customization data source: stores the three class vtables, destroys the row object at param_1[0x98] through 00a84840 and FreeMemory, then calls the base data-source destructor 0091bf60. |
+| `00a84d50` | `JobCustomizationDataSource::GetRowCount` | ✅ | virtual | Row-count getter (vtable slot [2]): returns 0 when the row-source object at this+0x230 is null, otherwise returns that object's field +0x14 (the row count). |
+| `00a84d70` | `JobCustomizationDataSourceCtor ⚠downgrade` | 🟢 | ctor | Constructor of the job-customization data source: registers the name through 00922890(PTR_s_BaseClient.JobCustomizationData), stores the three class vtables, saves the owner at [0x95], copies two global dwords into [0x9… |
+| `00a84e80` | `JobCustomizationDataSourceScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (vtable slot [0]) of JobCustomizationDataSource: runs the destructor body 00a84cb0 and frees the object with _free when the delete flag bit 0 is set. |
+| `00a84fe0` | `— ⚠reject` | ⚪ | method | Constructs a FinalizeJobCustomzationPacket, copies the job id from this+0x2ac and 18 equipment slot ids from this+0x264 through this+0x2a8, sends it through 00a84eb0 with flag 1 when the world connection pointer at clie… |

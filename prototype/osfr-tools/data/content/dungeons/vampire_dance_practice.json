@@ -1,0 +1,1794 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "vampire_dance_practice",
+        "name_string_id": 3768774589,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Vampire Dance Practice."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key vampire_dance_practice comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Vampire Dance Practice; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Vampire Dance Practice",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 3768774589,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 2,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Vampire Dance Practice difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Blackspore Swamp (Sinking Graveyard)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 5,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Combat job level; cited [wiki: Battles] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Combat job level; cited [wiki: Battles] [client]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": 3,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Vampire Dance Practice recommended level; cited guide source index"
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Combat job level; cited [wiki: Battles] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Combat job level; cited [wiki: Battles] [client]"
+              }
+            ]
+          },
+          "quest": {
+            "value": "The Werewolf-side quest line (see Related quests) sends the player here",
+            "reason": null,
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Unlocking quest; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Unlocking quest; cited [client] [wiki]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Not tagged on the wiki. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Blackspore Swamp (Sinking Graveyard)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "npc",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "vampire",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Started by clicking a vampire in the Sinking Graveyard, Blackspore Swamp. The \"Vampire Dance Crew\" only spawns during the Super Spooktacular (the October Halloween event). Client has spawn groups \"Vampire Dance Crew\", \"Vampire Dance Crew 2\" and \"Vampire Dance Crew 3\" (loc 411837368, 161665061, 1692806121). How many crews are up at once, and how often, is unknown. | [wiki: Vampire Dance Practice] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (only goal listed)",
+              "value": "\"Defeat the vampires!\" No bonus goal is listed on the wiki. No \"Bonus Objective\" string exists for this battle. | [client loc 3394593415] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Goals > Main (only goal listed); cited [client `loc 3394593415`] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Goals > Main (only goal listed); cited [client `loc 3394593415`] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Quest-side objective",
+              "value": "\"Sabotage the Vampires' dance practice\" (loc 687102900) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Goals > Quest-side objective; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Ed Sullenfangs"
+              ],
+              "description": {
+                "value": "Ed Sullenfangs, \"the head vampire\" (loc 169485919; game data 1778043178) | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [],
+              "description": {
+                "value": "Bats; Vampires; \"Vampire Break Dancer\" (client spelling, loc 1963231226, game data 3713066604). The wiki writes \"Vampire Break Dancers\". A \"Vampire Dancer\" also exists (loc 2999318093). Counts and waves unknown. | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Ed Sullenfangs"
+              ],
+              "description": {
+                "value": "Ed Sullenfangs, \"the head vampire\" (loc 169485919; game data 1778043178) | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"96 Stars\" | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel",
+                "value": "One wheel per job. Each has a 150 Coins slot plus 7 items, all Halloween items. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Cake",
+                "value": "The \"Werewolf Cake Slice\" is on every wheel. The client says \"Only players that participated in the Dance-off can use this cake.\" (loc 2077101154). | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Cake; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Cake; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Members bonus",
+                "value": null,
+                "reason": "None listed. | [wiki]",
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Members bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 150,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Black Cat Pail",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ghost Stand-Up",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Robgoblin Cut-Out Mask",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Skull Pail",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Spider Web Stand-Up",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Treeble Cut-Out Mask",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Ghost Pail",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Jack-O-Lantern Stand-Up",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Skeleton Paper Bag Mask",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Bat Pail",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Cat Cut-Out Mask",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ghost Stand-Up",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Jack-O-Lantern Pail",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Pumpkin Paper Bag Mask",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Spider Web Stand-Up",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Dog Cut-Out Mask",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Jack-O-Lantern Stand-Up",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Witch Pail",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "quest",
+            "target_name": "The Werewolf-side quest line (see Related quests) sends the player here",
+            "target_id": null,
+            "reason": "Guide gives a quest title but no resolved quest record ID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Unlocking quest; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Requirements > Unlocking quest; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "zone",
+            "target_name": "Blackspore Swamp (Sinking Graveyard)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "npc",
+            "target_name": "vampire",
+            "target_id": null,
+            "reason": "Guide names an entrance NPC but gives no NpcSpawn.actor_id mapping.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Entrance; cited [wiki: Vampire Dance Practice] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "npc",
+            "target_name": "Ed Sullenfangs",
+            "target_id": 9500000021,
+            "reason": "Exact name matches reconstructed NPC content key in blackspore_swamp.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/blackspore_swamp.json npc_id 9500000021; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Black Cat Pail",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Ghost Stand-Up",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Robgoblin Cut-Out Mask",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Skull Pail",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Spider Web Stand-Up",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Treeble Cut-Out Mask",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Ghost Pail",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Jack-O-Lantern Stand-Up",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Skeleton Paper Bag Mask",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Bat Pail",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Cat Cut-Out Mask",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Jack-O-Lantern Pail",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Pumpkin Paper Bag Mask",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Dog Cut-Out Mask",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "vampire_dance_practice",
+            "kind": "item",
+            "target_name": "Witch Pail",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key vampire_dance_practice comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Vampire Dance Practice; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Ed Sullenfangs",
+            "definition_id": 930031,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Ed Sullenfangs links to definition_id=930031; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Ed Sullenfangs",
+            "definition_id": 930031,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Vampire Dance Practice.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Ed Sullenfangs links to definition_id=930031; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

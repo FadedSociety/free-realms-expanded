@@ -1,0 +1,3131 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000001,
+      "title_string_id": 4419551,
+      "giver_npc_id": 9000000226,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A1; name 'Basic Combat Tutorial'; title id cell ucdt 1801816554 / ugdt 471014607"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A1; name 'Basic Combat Tutorial'; title id cell ucdt 1801816554 / ugdt 471014607"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4419552,
+      "intro_text_string_id": 4419550,
+      "end_text_string_id": 4419553
+    },
+    {
+      "id": 3000002,
+      "title_string_id": 4419555,
+      "giver_npc_id": 9000000226,
+      "prerequisite_quest_ids": [
+        3000001
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A2; name 'Advanced Combat Tutorial'; title id cell ucdt 4080949944 / ugdt 776809235"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A2; name 'Advanced Combat Tutorial'; title id cell ucdt 4080949944 / ugdt 776809235"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4419556,
+      "intro_text_string_id": 4419554,
+      "end_text_string_id": 4419557
+    },
+    {
+      "id": 3000003,
+      "title_string_id": 4419559,
+      "giver_npc_id": 9000000067,
+      "prerequisite_quest_ids": [
+        3000002
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A3; name \"Hero's Journal\"; title id cell ucdt 2376833037, 3698654819 / ugdt 2832443109"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A3; name \"Hero's Journal\"; title id cell ucdt 2376833037, 3698654819 / ugdt 2832443109"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A3; name \"Hero's Journal\"; title id cell ucdt 2376833037, 3698654819 / ugdt 2832443109"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4419560,
+      "intro_text_string_id": 4419558,
+      "end_text_string_id": 4419561
+    },
+    {
+      "id": 3000004,
+      "title_string_id": 4419563,
+      "giver_npc_id": 9000000068,
+      "prerequisite_quest_ids": [
+        3000003
+      ],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 3,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A4; reward cell '3 coins (video /00424)'"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A4; reward cell '3 coins (video /00424)'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A4; reward cell '3 coins (video /00424)'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A4; name 'The Last Best Hope'; title id cell ucdt 3594409143 / ugdt 1096552483"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A4; name 'The Last Best Hope'; title id cell ucdt 3594409143 / ugdt 1096552483"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A4; name 'The Last Best Hope'; title id cell ucdt 3594409143 / ugdt 1096552483"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4419564,
+      "intro_text_string_id": 4419562,
+      "end_text_string_id": 4419565
+    },
+    {
+      "id": 3000005,
+      "title_string_id": 4420042,
+      "giver_npc_id": 9000000165,
+      "prerequisite_quest_ids": [
+        3000004
+      ],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 4,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A5; reward cell '4 coins (video /00526)'"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A5; reward cell '4 coins (video /00526)'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A5; name \"Saving Farnum's Farm\"; title id cell ucdt 2690444444, 4104912352 / ugdt 2937971807"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A5; name \"Saving Farnum's Farm\"; title id cell ucdt 2690444444, 4104912352 / ugdt 2937971807"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420043,
+      "intro_text_string_id": 4420041,
+      "end_text_string_id": 4420044
+    },
+    {
+      "id": 3000006,
+      "title_string_id": 4420053,
+      "giver_npc_id": 9000000166,
+      "prerequisite_quest_ids": [
+        3000005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A6; name 'Farming 101'; title id cell ucdt 356185336 (title); the video's offer frame reads \"Farming 101!\""
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A6; name 'Farming 101'; title id cell ucdt 356185336 (title); the video's offer frame reads \"Farming 101!\""
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420054
+    },
+    {
+      "id": 3000007,
+      "title_string_id": 4420058,
+      "giver_npc_id": 9000000050,
+      "prerequisite_quest_ids": [
+        3000006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A7; name 'Gear Up!'; title id cell ucdt 576309282 / ugdt 3601884272"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420059,
+      "intro_text_string_id": 4420057,
+      "end_text_string_id": 4420060
+    },
+    {
+      "id": 3000008,
+      "title_string_id": 4420066,
+      "giver_npc_id": 9000000050,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 16,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A8; reward cell '16 coins and the hammer [wiki]'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A8; reward cell '16 coins and the hammer [wiki]'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A8; name 'Your First Weapon'; title id cell ucdt 3009411365, 3273543771 / ugdt 2469600820"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A8; name 'Your First Weapon'; title id cell ucdt 3009411365, 3273543771 / ugdt 2469600820"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420067,
+      "intro_text_string_id": 4420065,
+      "end_text_string_id": 4420068
+    },
+    {
+      "id": 3000009,
+      "title_string_id": 4420074,
+      "giver_npc_id": 9000000050,
+      "prerequisite_quest_ids": [
+        3000008
+      ],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 18,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A9; reward cell '18 coins [wiki]'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A9; reward cell '18 coins [wiki]'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A9; name 'Fighting the Pack'; title id cell ucdt 188245996 / ugdt 1289042976; also ucdt 46289336 \"Fighting off the Pack\""
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A9; name 'Fighting the Pack'; title id cell ucdt 188245996 / ugdt 1289042976; also ucdt 46289336 \"Fighting off the Pack\""
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420075,
+      "intro_text_string_id": 4420073,
+      "end_text_string_id": 4420076
+    },
+    {
+      "id": 3000010,
+      "title_string_id": 4420082,
+      "giver_npc_id": 9000000165,
+      "prerequisite_quest_ids": [
+        3000009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A10; name 'One More Gloam'; title id cell ucdt 1802815127 / ugdt 1622125816"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420083,
+      "intro_text_string_id": 4420081,
+      "end_text_string_id": 4420084
+    },
+    {
+      "id": 3000011,
+      "title_string_id": 4420090,
+      "giver_npc_id": 9000000167,
+      "prerequisite_quest_ids": [
+        3000010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A11; name \"Where's the Help?\"; title id cell ucdt 212609476, 2145187375 / ugdt 1005513216"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420091,
+      "intro_text_string_id": 4420089,
+      "end_text_string_id": 4420092
+    },
+    {
+      "id": 3000012,
+      "title_string_id": 4420098,
+      "giver_npc_id": 9000000021,
+      "prerequisite_quest_ids": [
+        3000011
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A12; name 'Pull the Plug'; title id cell ucdt 980834943 / ugdt 3316960852"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420099,
+      "intro_text_string_id": 4420097,
+      "end_text_string_id": 4420100
+    },
+    {
+      "id": 3000013,
+      "title_string_id": 4420106,
+      "giver_npc_id": 9000000021,
+      "prerequisite_quest_ids": [
+        3000012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A13; name 'Cobblestone Showdown'; title id cell ucdt 502193028, 1887138733, 3180346912, 3495694219 / ugdt 424904087"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A13; name 'Cobblestone Showdown'; title id cell ucdt 502193028, 1887138733, 3180346912, 3495694219 / ugdt 424904087"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420107,
+      "intro_text_string_id": 4420105,
+      "end_text_string_id": 4420108
+    },
+    {
+      "id": 3000014,
+      "title_string_id": 4420114,
+      "giver_npc_id": 9000000022,
+      "prerequisite_quest_ids": [
+        3000013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A14; name 'Off to the Queen'; title id cell ucdt 2598386294, 2758444348, 1346235735 (with \"Royal Palace\") / ugdt 3929612198"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A14; name 'Off to the Queen'; title id cell ucdt 2598386294, 2758444348, 1346235735 (with \"Royal Palace\") / ugdt 3929612198"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row A13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420115,
+      "intro_text_string_id": 4420113,
+      "end_text_string_id": 4420116
+    },
+    {
+      "id": 3000015,
+      "title_string_id": 5100479,
+      "giver_npc_id": 9000000396,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B1; name 'Second Helping of Strongarm Stew'; title id cell ucdt 1147754359, 3850568076 / ugdt 2868738865"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100480,
+      "intro_text_string_id": 5100478,
+      "end_text_string_id": 5100481
+    },
+    {
+      "id": 3000016,
+      "title_string_id": 5100483,
+      "giver_npc_id": 9000000050,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B2; name \"Cleetus' Copper Collection\"; title id cell ucdt 256052287, 1607842342 / ugdt 2308594564"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100484,
+      "intro_text_string_id": 5100482,
+      "end_text_string_id": 5100485
+    },
+    {
+      "id": 3000017,
+      "title_string_id": 5100487,
+      "giver_npc_id": 9000000050,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B3; name 'Forging for Reinforcements'; title id cell ucdt 335288606, 2040128099 / ugdt 3427502129"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100488,
+      "intro_text_string_id": 5100486,
+      "end_text_string_id": 5100489
+    },
+    {
+      "id": 3000018,
+      "title_string_id": 37702,
+      "giver_npc_id": 9000000225,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B4; name \"Peep's Missing Bowl\"; title id cell ucdt 384690558 / ugdt 3159461583"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B4; name \"Peep's Missing Bowl\"; title id cell ucdt 384690558 / ugdt 3159461583"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 37703,
+      "intro_text_string_id": 37701
+    },
+    {
+      "id": 3000019,
+      "title_string_id": 5101946,
+      "giver_npc_id": 9000000509,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B5; name 'Portal Remnants'; title id cell ucdt 1977237491 / ugdt 2696727115"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part B. Optional farm and Cobblestone-era quests, row B5; name 'Portal Remnants'; title id cell ucdt 1977237491 / ugdt 2696727115"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5101947,
+      "intro_text_string_id": 5101945
+    },
+    {
+      "id": 3000020,
+      "title_string_id": 94247,
+      "intro_text_string_id": 104097,
+      "description_string_id": 104099,
+      "giver_npc_id": 9000000002,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C1; name 'Introduce Yourself'; title id cell ucdt 4206471822 / ugdt 1457871810"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C1; name 'Introduce Yourself'; title id cell ucdt 4206471822 / ugdt 1457871810"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3000021,
+      "title_string_id": 94247,
+      "intro_text_string_id": 94246,
+      "description_string_id": 94248,
+      "giver_npc_id": 9000000189,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md: Quest index, Introduce Yourself (Cobblestone version): 'Wiki: 5 coins'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C2; name 'Introduce Yourself'; title id cell same title as C1"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C2; name 'Introduce Yourself'; title id cell same title as C1"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "(client) title string ID 4206471822 recovered from the guide title ID cell; Adventurer C2/C3 explicitly reuse C1 ID 4206471822."
+        }
+      ]
+    },
+    {
+      "id": 3000022,
+      "title_string_id": 94247,
+      "giver_npc_id": 9000000227,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C3; name 'Introduce Yourself'; title id cell same title"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C3; name 'Introduce Yourself'; title id cell same title"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "(client) title string ID 4206471822 recovered from the guide title ID cell; Adventurer C2/C3 explicitly reuse C1 ID 4206471822."
+        },
+        {
+          "kind": "client",
+          "evidence": "description 116637 'Introduce yourself to Francis Panic in Stillwater Crossing.' = guide hash 3437900159 (Adventurer C3); the shared title 94247's block belongs to the Cobblestone version, so intro/end text stay empty"
+        }
+      ],
+      "description_string_id": 116637
+    },
+    {
+      "id": 3000023,
+      "title_string_id": 45851,
+      "giver_npc_id": 9000000150,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C4; name \"Wilbur's Trouble\"; title id cell ucdt 429218679 / ugdt 984437470"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part C. Starting-town and tutorial quests, row C4; name \"Wilbur's Trouble\"; title id cell ucdt 429218679 / ugdt 984437470"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 45852,
+      "intro_text_string_id": 45850
+    },
+    {
+      "id": 3000024,
+      "title_string_id": 389187,
+      "giver_npc_id": 9000000444,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; reward cell 'Per-kill coin popups \"You receive 6 coins\" and \"3 coins\"; final popup \"You receive 11 stars and 13 coins\" (3jLPsxADZ1w/00178)'"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; reward cell 'Per-kill coin popups \"You receive 6 coins\" and \"3 coins\"; final popup \"You receive 11 stars and 13 coins\" (3jLPsxADZ1w/00178)'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; reward cell 'Per-kill coin popups \"You receive 6 coins\" and \"3 coins\"; final popup \"You receive 11 stars and 13 coins\" (3jLPsxADZ1w/00178)'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; name 'Local Hero'; title id cell ucdt 1501270270 / ugdt 2474136633"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; name 'Local Hero'; title id cell ucdt 1501270270 / ugdt 2474136633"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; name 'Local Hero'; title id cell ucdt 1501270270 / ugdt 2474136633"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 389188,
+      "intro_text_string_id": 389186,
+      "end_text_string_id": 389189
+    },
+    {
+      "id": 3000025,
+      "title_string_id": 390255,
+      "giver_npc_id": 9000000450,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D2; name \"Sal's Suggestion\"; title id cell ucdt 1580419041 / ugdt 366405720"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D2; name \"Sal's Suggestion\"; title id cell ucdt 1580419041 / ugdt 366405720"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 390256,
+      "intro_text_string_id": 390254,
+      "end_text_string_id": 390257
+    },
+    {
+      "id": 3000026,
+      "title_string_id": 391030,
+      "giver_npc_id": 9000000346,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D3; name \"Farnum's Free Advice\"; title id cell ucdt 1182347307 / ugdt 775935496"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D3; name \"Farnum's Free Advice\"; title id cell ucdt 1182347307 / ugdt 775935496"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 391031,
+      "intro_text_string_id": 391029
+    },
+    {
+      "id": 3000027,
+      "title_string_id": 391044,
+      "giver_npc_id": 9000000477,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D4; name 'Sharing Your Talents'; title id cell ucdt 2297522013 / ugdt 4267970004"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D4; name 'Sharing Your Talents'; title id cell ucdt 2297522013 / ugdt 4267970004"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 391045,
+      "intro_text_string_id": 391043
+    },
+    {
+      "id": 3000028,
+      "title_string_id": 140648,
+      "giver_npc_id": 9000000175,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D5; name 'Take a Number'; title id cell ucdt 647179845 / ugdt 1384910951"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D5; name 'Take a Number'; title id cell ucdt 647179845 / ugdt 1384910951"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D5; name 'Take a Number'; title id cell ucdt 647179845 / ugdt 1384910951"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 140649,
+      "intro_text_string_id": 140647,
+      "end_text_string_id": 140650
+    },
+    {
+      "id": 3000029,
+      "title_string_id": 90622,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E1; name 'Chapter 1: The Missing Sisters'; title id cell ucdt 3998455944 / ugdt 253509490"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E1; name 'Chapter 1: The Missing Sisters'; title id cell ucdt 3998455944 / ugdt 253509490"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E1; name 'Chapter 1: The Missing Sisters'; title id cell ucdt 3998455944 / ugdt 253509490"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90623,
+      "intro_text_string_id": 90621,
+      "end_text_string_id": 90624
+    },
+    {
+      "id": 3000030,
+      "title_string_id": 90659,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000029
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E2; name 'Chapter 1: Helping the Healers'; title id cell ucdt 3874639350 / ugdt 1693635593"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E2; name 'Chapter 1: Helping the Healers'; title id cell ucdt 3874639350 / ugdt 1693635593"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90660,
+      "intro_text_string_id": 90658,
+      "end_text_string_id": 90661
+    },
+    {
+      "id": 3000031,
+      "title_string_id": 90684,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E3; name 'Chapter 1: Good Help is Hard to Find'; title id cell ucdt 2780678958 / ugdt 2866665612"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E3; name 'Chapter 1: Good Help is Hard to Find'; title id cell ucdt 2780678958 / ugdt 2866665612"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E3; name 'Chapter 1: Good Help is Hard to Find'; title id cell ucdt 2780678958 / ugdt 2866665612"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90685,
+      "intro_text_string_id": 90683,
+      "end_text_string_id": 90686
+    },
+    {
+      "id": 3000032,
+      "title_string_id": 90703,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000031
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E4; name \"Chapter 1: Thugamug's Thievery\"; title id cell ucdt 1685133772 / ugdt 4058975351"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E4; name \"Chapter 1: Thugamug's Thievery\"; title id cell ucdt 1685133772 / ugdt 4058975351"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E4; name \"Chapter 1: Thugamug's Thievery\"; title id cell ucdt 1685133772 / ugdt 4058975351"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90704,
+      "intro_text_string_id": 90702,
+      "end_text_string_id": 90705
+    },
+    {
+      "id": 3000033,
+      "title_string_id": 90726,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000032
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E5; name 'Chapter 1: Rumors of Briarwood'; title id cell ucdt 124479101 / ugdt 3805276719"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E5; name 'Chapter 1: Rumors of Briarwood'; title id cell ucdt 124479101 / ugdt 3805276719"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90727,
+      "intro_text_string_id": 90725,
+      "end_text_string_id": 90728
+    },
+    {
+      "id": 3000034,
+      "title_string_id": 90771,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000033
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E6; name 'Chapter 1: Shrouded History'; title id cell ucdt 99291303 / ugdt 2336038161"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E6; name 'Chapter 1: Shrouded History'; title id cell ucdt 99291303 / ugdt 2336038161"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90772,
+      "intro_text_string_id": 90770,
+      "end_text_string_id": 90773
+    },
+    {
+      "id": 3000035,
+      "title_string_id": 90787,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000034
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E7; name 'Chapter 1: The Forgotten Princess'; title id cell ucdt 3454522884 / ugdt 3475170183"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E7; name 'Chapter 1: The Forgotten Princess'; title id cell ucdt 3454522884 / ugdt 3475170183"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000035 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3000036,
+      "title_string_id": 90814,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000035
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E8; name 'Chapter 1: Find The Caravan!'; title id cell ucdt 1440754687 / ugdt 3938148162"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E8; name 'Chapter 1: Find The Caravan!'; title id cell ucdt 1440754687 / ugdt 3938148162"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000036 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90815,
+      "intro_text_string_id": 90813,
+      "end_text_string_id": 90816
+    },
+    {
+      "id": 3000037,
+      "title_string_id": 90835,
+      "giver_npc_id": 9000000232,
+      "prerequisite_quest_ids": [
+        3000036
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E9; name 'Chapter 1: The Weapon Shipment'; title id cell ucdt 2603070786 / ugdt 427000496"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E9; name 'Chapter 1: The Weapon Shipment'; title id cell ucdt 2603070786 / ugdt 427000496"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000037 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90836,
+      "intro_text_string_id": 90834,
+      "end_text_string_id": 90837
+    },
+    {
+      "id": 3000038,
+      "title_string_id": 90850,
+      "giver_npc_id": 9000000232,
+      "prerequisite_quest_ids": [
+        3000037
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E10; name 'Chapter 1: The Armor Shipment'; title id cell ucdt 2920048920 / ugdt 1761493755"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E10; name 'Chapter 1: The Armor Shipment'; title id cell ucdt 2920048920 / ugdt 1761493755"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000038 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90851,
+      "intro_text_string_id": 90849,
+      "end_text_string_id": 90852
+    },
+    {
+      "id": 3000039,
+      "title_string_id": 90861,
+      "giver_npc_id": 9000000232,
+      "prerequisite_quest_ids": [
+        3000038
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E11; name 'Chapter 1: The Small Wooden Box'; title id cell ucdt 2905355420 / ugdt 4070272994"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E11; name 'Chapter 1: The Small Wooden Box'; title id cell ucdt 2905355420 / ugdt 4070272994"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000039 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90862,
+      "intro_text_string_id": 90860,
+      "end_text_string_id": 90863
+    },
+    {
+      "id": 3000040,
+      "title_string_id": 90872,
+      "giver_npc_id": 9000000510,
+      "prerequisite_quest_ids": [
+        3000039
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E12; name \"Chapter 1: There's Fungus Among Us!\"; title id cell ucdt 88863956 / ugdt 811064050"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E12; name \"Chapter 1: There's Fungus Among Us!\"; title id cell ucdt 88863956 / ugdt 811064050"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000040 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90873,
+      "intro_text_string_id": 90871,
+      "end_text_string_id": 90874
+    },
+    {
+      "id": 3000041,
+      "title_string_id": 90887,
+      "giver_npc_id": 9000000511,
+      "prerequisite_quest_ids": [
+        3000040
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E13; name \"Chapter 1: It's Business Time\"; title id cell ucdt 1908825225 / ugdt 2722726271"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E13; name \"Chapter 1: It's Business Time\"; title id cell ucdt 1908825225 / ugdt 2722726271"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000041 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90888,
+      "intro_text_string_id": 90886,
+      "end_text_string_id": 90889
+    },
+    {
+      "id": 3000042,
+      "title_string_id": 91464,
+      "giver_npc_id": 9000000512,
+      "prerequisite_quest_ids": [
+        3000041
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E14; name 'Chapter 1: Pampered Pets'; title id cell ucdt 440377 / ugdt 177047924"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E14; name 'Chapter 1: Pampered Pets'; title id cell ucdt 440377 / ugdt 177047924"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000042 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 91465,
+      "intro_text_string_id": 91463,
+      "end_text_string_id": 91466
+    },
+    {
+      "id": 3000043,
+      "title_string_id": 90904,
+      "giver_npc_id": 9000000513,
+      "prerequisite_quest_ids": [
+        3000042
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E15; name 'Chapter 1: Report to Captain Chugug'; title id cell ucdt 2159868802 / ugdt 3977301603"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E15; name 'Chapter 1: Report to Captain Chugug'; title id cell ucdt 2159868802 / ugdt 3977301603"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000043 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E14; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90905,
+      "intro_text_string_id": 90903,
+      "end_text_string_id": 90906
+    },
+    {
+      "id": 3000044,
+      "title_string_id": 93895,
+      "giver_npc_id": 9000000268,
+      "prerequisite_quest_ids": [
+        3000043
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E16; name 'Chapter 1: The Empty Box'; title id cell ucdt 657173490 / ugdt 2771051996"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E16; name 'Chapter 1: The Empty Box'; title id cell ucdt 657173490 / ugdt 2771051996"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000044 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 93896,
+      "intro_text_string_id": 93894,
+      "end_text_string_id": 93897
+    },
+    {
+      "id": 3000045,
+      "title_string_id": 90913,
+      "giver_npc_id": 9000000232,
+      "prerequisite_quest_ids": [
+        3000044
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E17; name 'Chapter 1: Bearer of Bad News'; title id cell ucdt 4289371334 / ugdt 2903462844"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E17; name 'Chapter 1: Bearer of Bad News'; title id cell ucdt 4289371334 / ugdt 2903462844"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000045 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90914,
+      "intro_text_string_id": 90912,
+      "end_text_string_id": 90915
+    },
+    {
+      "id": 3000046,
+      "title_string_id": 90922,
+      "giver_npc_id": 9000000330,
+      "prerequisite_quest_ids": [
+        3000045
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E18; name 'Chapter 1: Failure is Not an Option'; title id cell ucdt 489240878 / ugdt 605047132"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E18; name 'Chapter 1: Failure is Not an Option'; title id cell ucdt 489240878 / ugdt 605047132"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000046 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E17; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90923,
+      "intro_text_string_id": 90921,
+      "end_text_string_id": 90924
+    },
+    {
+      "id": 3000047,
+      "title_string_id": 90933,
+      "giver_npc_id": 9000000067,
+      "prerequisite_quest_ids": [
+        3000046
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E19; name 'Chapter 1: One Last Favor'; title id cell ucdt 1984766805 / ugdt 1735077479"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E19; name 'Chapter 1: One Last Favor'; title id cell ucdt 1984766805 / ugdt 1735077479"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000047 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90934,
+      "intro_text_string_id": 90932,
+      "end_text_string_id": 90935
+    },
+    {
+      "id": 3000048,
+      "title_string_id": 90944,
+      "giver_npc_id": 9000000316,
+      "prerequisite_quest_ids": [
+        3000047
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E20; name 'Chapter 1: Haunted by the Past'; title id cell ucdt 483833381 / ugdt 1432549816"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E20; name 'Chapter 1: Haunted by the Past'; title id cell ucdt 483833381 / ugdt 1432549816"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E20; name 'Chapter 1: Haunted by the Past'; title id cell ucdt 483833381 / ugdt 1432549816"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000048 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90945,
+      "intro_text_string_id": 90943,
+      "end_text_string_id": 90946
+    },
+    {
+      "id": 3000049,
+      "title_string_id": 90957,
+      "giver_npc_id": 9000000315,
+      "prerequisite_quest_ids": [
+        3000048
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E21; name 'Chapter 1: The Alchemy of Betrayal'; title id cell ucdt 105665276 / ugdt 3263095806"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E21; name 'Chapter 1: The Alchemy of Betrayal'; title id cell ucdt 105665276 / ugdt 3263095806"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E21; name 'Chapter 1: The Alchemy of Betrayal'; title id cell ucdt 105665276 / ugdt 3263095806"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000049 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E20; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90958,
+      "intro_text_string_id": 90956,
+      "end_text_string_id": 90959
+    },
+    {
+      "id": 3000050,
+      "title_string_id": 90970,
+      "giver_npc_id": 9000000067,
+      "prerequisite_quest_ids": [
+        3000049
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E22; name \"Chapter 1: The Queen's Last Hope\"; title id cell ucdt 534913627 / ugdt 2857180267"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E22; name \"Chapter 1: The Queen's Last Hope\"; title id cell ucdt 534913627 / ugdt 2857180267"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E22; name \"Chapter 1: The Queen's Last Hope\"; title id cell ucdt 534913627 / ugdt 2857180267"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000050 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E21; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90971,
+      "intro_text_string_id": 90969,
+      "end_text_string_id": 90972
+    },
+    {
+      "id": 3000051,
+      "title_string_id": 391183,
+      "giver_npc_id": 9000000445,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F1; name 'Belated Bonny'; title id cell ucdt 2376804990 / ugdt 4284003276"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F1; name 'Belated Bonny'; title id cell ucdt 2376804990 / ugdt 4284003276"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000051 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 391184,
+      "intro_text_string_id": 391182,
+      "end_text_string_id": 391185
+    },
+    {
+      "id": 3000052,
+      "title_string_id": 391247,
+      "giver_npc_id": 9000000445,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F2; name 'Lofty Letter'; title id cell ucdt 1143735946 / ugdt 786722574"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F2; name 'Lofty Letter'; title id cell ucdt 1143735946 / ugdt 786722574"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000052 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 391248,
+      "intro_text_string_id": 391246,
+      "end_text_string_id": 391249
+    },
+    {
+      "id": 3000053,
+      "title_string_id": 391255,
+      "giver_npc_id": 9000000443,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F3; name 'How to Clean'; title id cell ucdt 3363226496 / ugdt 1121688177"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F3; name 'How to Clean'; title id cell ucdt 3363226496 / ugdt 1121688177"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000053 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 391256,
+      "intro_text_string_id": 391254,
+      "end_text_string_id": 391257
+    },
+    {
+      "id": 3000054,
+      "title_string_id": 389986,
+      "giver_npc_id": 9000000474,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F4; name 'Royally Thirsty Mushrooms'; title id cell Royally Thirsty 1807782310 / 31401498; Procedures 1353711088 / 4018346881; Vitamins 3352103592 / 1104700428; Secret 3038362135 / 1285307562; Hopping 641227110 / 1363803747"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part F. Non-essential quests listed inside the Chapter 1 sequence, row F4; name 'Royally Thirsty Mushrooms'; title id cell Royally Thirsty 1807782310 / 31401498; Procedures 1353711088 / 4018346881; Vitamins 3352103592 / 1104700428; Secret 3038362135 / 1285307562; Hopping 641227110 / 1363803747"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000054 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "(client) title string ID 1807782310 recovered from the guide title ID cell."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 389987
+    },
+    {
+      "id": 3000055,
+      "title_string_id": 5100412,
+      "giver_npc_id": 9000000134,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G1; name \"Lucky's Lost Coin\"; title id cell ucdt 1535374378, 3723966605 / ugdt 4058040218"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G1; name \"Lucky's Lost Coin\"; title id cell ucdt 1535374378, 3723966605 / ugdt 4058040218"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G1; name \"Lucky's Lost Coin\"; title id cell ucdt 1535374378, 3723966605 / ugdt 4058040218"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000055 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100413,
+      "intro_text_string_id": 5100411,
+      "end_text_string_id": 5100414
+    },
+    {
+      "id": 3000056,
+      "title_string_id": 5100416,
+      "giver_npc_id": 9000000134,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G2; name 'Another Day, Another Coin'; title id cell not found"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G2; name 'Another Day, Another Coin'; title id cell not found"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000056 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) title_string_id is null because this row has no unambiguous ucdt title ID; page title is 'Another Day, Another Coin'"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100417,
+      "intro_text_string_id": 5100415,
+      "end_text_string_id": 5100418
+    },
+    {
+      "id": 3000057,
+      "title_string_id": 5100420,
+      "giver_npc_id": 9000000134,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G3; name 'To Coin a Phrase'; title id cell ucdt 1823626366, 2269301439 / ugdt 3939172636"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G3; name 'To Coin a Phrase'; title id cell ucdt 1823626366, 2269301439 / ugdt 3939172636"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000057 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100421,
+      "intro_text_string_id": 5100419,
+      "end_text_string_id": 5100422
+    },
+    {
+      "id": 3000058,
+      "title_string_id": 5100424,
+      "giver_npc_id": 9000000134,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [
+        {
+          "coins": 1,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G4; reward cell '1 coin shown when the pot is found (video myQyxfTSRpM/00012)'"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G4; reward cell '1 coin shown when the pot is found (video myQyxfTSRpM/00012)'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G4; reward cell '1 coin shown when the pot is found (video myQyxfTSRpM/00012)'"
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G4; name \"Lucky's Last Chance\"; title id cell ucdt 737985290, 3686747719 / ugdt 772215676"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G4; name \"Lucky's Last Chance\"; title id cell ucdt 737985290, 3686747719 / ugdt 772215676"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part G. Lucky's seasonal coin hunt (Merry Vale, Saint Patrick's), row G4; name \"Lucky's Last Chance\"; title id cell ucdt 737985290, 3686747719 / ugdt 772215676"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000058 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100425,
+      "intro_text_string_id": 5100423,
+      "end_text_string_id": 5100426
+    },
+    {
+      "id": 3000059,
+      "title_string_id": 94255,
+      "intro_text_string_id": 94254,
+      "description_string_id": 94256,
+      "end_text_string_id": 94257,
+      "giver_npc_id": 9500000254,
+      "prerequisite_quest_ids": [
+        3000021
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000941,
+          "dialogue_string_id": 94258,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "'Convince Shakey at the Wildwood Speedway to send the rest of Ricky's pit crew.' (1842066294); Shakey's reply locale 94258 'Tell Ricky I'll come fix his car'"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000254,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "'Let Ricky know that Shakey and his pit crew are on the way to help him out.' (1347845427, 3304545061)"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md: Quest index, Call The Crew!: giver and hand-in Ricky Danger; Shakey at Wildwood Speedway"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md: Quest index: next quest after Introduce Yourself in the Cobblestone Village Quest Series"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale block (intro, title, description, end) = 94254/94255/94256/94257, read with scripts/quest_text_backfill.py hashing"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3000059 is a stable batch key; reward unknown ('Here's something for your trouble'), left empty"
+        }
+      ]
+    },
+    {
+      "id": 3000060,
+      "title_string_id": 94263,
+      "intro_text_string_id": 94262,
+      "description_string_id": 94264,
+      "end_text_string_id": 94265,
+      "giver_npc_id": 9500000254,
+      "prerequisite_quest_ids": [
+        3000059
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000189,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 94264 'Find out what Samantha in Cobblestone Village wanted to talk to you about.'"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale block (intro, title, description, end) = 94262/94263/94264/94265, read with scripts/quest_text_backfill.py hashing"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver Ricky Danger from intro 94262 ('Samantha was looking for you'); follows Call the Crew! in locale order, skipping the unreleased 'NOT LIVE - Raceway Regulators' (94259); quest id 3000060 is a stable batch key; reward unknown"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "source": "Unmodified pinned Sanctuary BaseMiniGamePacket/PacketWriter compiled with arguments proven by original x86 constructors: RequestStartGame009be7d0-\u003E009bdc60 and SendPayload009be6b0-\u003E009b09d0 set current instance, GroupId=-1, GameId=-1. Lua00c08519 includes NUL (length\u002B1). Cooking start also equals native154503 frame4726/app2558. Synthetic payload text; no game assets.",
+  "vectors": {
+    "cooking_start": "27000581e7bd02ffffffffffffffff",
+    "cooking_ready": "27000e81e7bd02ffffffffffffffff1a00000046525365727665725f5265616479466f7247616d654461746100",
+    "smelting_start": "27000541ed9604ffffffffffffffff",
+    "smelting_ready": "27000e41ed9604ffffffffffffffff1a00000046525365727665725f5265616479466f7247616d654461746100",
+    "forging_start": "270005c1f84808ffffffffffffffff",
+    "forging_connect": "27000ec1f84808ffffffffffffffff0d0000004f6e436f6e6e6563744d736700"
+  }
+}

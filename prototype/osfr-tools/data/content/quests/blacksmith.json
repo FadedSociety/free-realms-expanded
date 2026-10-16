@@ -1,0 +1,2008 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3020001,
+      "title_string_id": 46167,
+      "giver_npc_id": 9000000207,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 1; name 'Give my Regards to Smitty'; title id cell ucdt 3644482118 / ugdt 4104631471 (bare)"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 1; name 'Give my Regards to Smitty'; title id cell ucdt 3644482118 / ugdt 4104631471 (bare)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020002,
+      "title_string_id": 78479,
+      "giver_npc_id": 9000000206,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 2; name 'Basics of Blacksmithing (wiki: \"Blacksmith: Basics of Blacksmithing\")'; title id cell ucdt 200109015 / ugdt 1434857585 (bare)"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 2; name 'Basics of Blacksmithing (wiki: \"Blacksmith: Basics of Blacksmithing\")'; title id cell ucdt 200109015 / ugdt 1434857585 (bare)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78480,
+      "intro_text_string_id": 78478,
+      "end_text_string_id": 78481
+    },
+    {
+      "id": 3020003,
+      "title_string_id": 90071,
+      "giver_npc_id": 9000000206,
+      "prerequisite_quest_ids": [
+        3020002
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 3; name 'Blacksmith: Smithy Merchandise'; title id cell ucdt 2894839040 / ugdt 469238283; bare 733403062"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 3; name 'Blacksmith: Smithy Merchandise'; title id cell ucdt 2894839040 / ugdt 469238283; bare 733403062"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 3; name 'Blacksmith: Smithy Merchandise'; title id cell ucdt 2894839040 / ugdt 469238283; bare 733403062"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90072,
+      "intro_text_string_id": 90070,
+      "end_text_string_id": 90073
+    },
+    {
+      "id": 3020004,
+      "title_string_id": 90405,
+      "giver_npc_id": 9000000206,
+      "prerequisite_quest_ids": [
+        3020003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 4; name 'Blacksmith: Hammer Training'; title id cell ucdt 3302645501 / ugdt 2049160181; bare 2766288085"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 4; name 'Blacksmith: Hammer Training'; title id cell ucdt 3302645501 / ugdt 2049160181; bare 2766288085"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90406,
+      "intro_text_string_id": 90404,
+      "end_text_string_id": 90407
+    },
+    {
+      "id": 3020005,
+      "title_string_id": 90735,
+      "giver_npc_id": 9000000206,
+      "prerequisite_quest_ids": [
+        3020004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 5; name 'Blacksmith: Curious Cancelation (wiki: \"Curious Cancellation\")'; title id cell ucdt 271643501 / ugdt 1344051312; bare 3395901477. A pre-release copy \"NOT LIVE - Curious Cancelation\" (3828575163, 387494659) is also in the client."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 5; name 'Blacksmith: Curious Cancelation (wiki: \"Curious Cancellation\")'; title id cell ucdt 271643501 / ugdt 1344051312; bare 3395901477. A pre-release copy \"NOT LIVE - Curious Cancelation\" (3828575163, 387494659) is also in the client."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90736,
+      "intro_text_string_id": 90734,
+      "end_text_string_id": 90737
+    },
+    {
+      "id": 3020006,
+      "title_string_id": 90791,
+      "giver_npc_id": 9000000220,
+      "prerequisite_quest_ids": [
+        3020005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 1: Trixi and Brody Sparfist (Singing Crystal Mines, to level 5), row 6; name 'Blacksmith: Warrior Weapon'; title id cell ucdt 1648516010 / ugdt 4292506109; bare 2109455870. A \"NOT LIVE - Warrior Weapons\" title (1358290997) also exists."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 1: Trixi and Brody Sparfist (Singing Crystal Mines, to level 5), row 6; name 'Blacksmith: Warrior Weapon'; title id cell ucdt 1648516010 / ugdt 4292506109; bare 2109455870. A \"NOT LIVE - Warrior Weapons\" title (1358290997) also exists."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90792,
+      "intro_text_string_id": 90790,
+      "end_text_string_id": 90793
+    },
+    {
+      "id": 3020007,
+      "title_string_id": 91268,
+      "giver_npc_id": 9000000033,
+      "prerequisite_quest_ids": [
+        3020006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 1: Trixi and Brody Sparfist (Singing Crystal Mines, to level 5), row 7; name 'Blacksmith: Bat Fighter'; title id cell ucdt 2302582306 / ugdt 1985062838"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 1: Trixi and Brody Sparfist (Singing Crystal Mines, to level 5), row 7; name 'Blacksmith: Bat Fighter'; title id cell ucdt 2302582306 / ugdt 1985062838"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 91269,
+      "intro_text_string_id": 91267,
+      "end_text_string_id": 91270
+    },
+    {
+      "id": 3020008,
+      "title_string_id": 387551,
+      "giver_npc_id": 9000000033,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 1: Trixi and Brody Sparfist (Singing Crystal Mines, to level 5), row 8; name 'Blacksmith: Reach Level 5'; title id cell ucdt 2462463692 / ugdt 3927833741"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387552,
+      "intro_text_string_id": 387550,
+      "end_text_string_id": 387553
+    },
+    {
+      "id": 3020009,
+      "title_string_id": 91392,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3020008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 9; name 'Blacksmith: Impressing the Axemaker'; title id cell ucdt 571327700 / ugdt 871466305; bare 2128294525"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 9; name 'Blacksmith: Impressing the Axemaker'; title id cell ucdt 571327700 / ugdt 871466305; bare 2128294525"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 91393,
+      "intro_text_string_id": 91391,
+      "end_text_string_id": 91394
+    },
+    {
+      "id": 3020010,
+      "title_string_id": 91671,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3020009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 10; name 'Blacksmith: Dull Challenge'; title id cell ucdt 138755092 / ugdt 3696408322; bare 3434009122"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 10; name 'Blacksmith: Dull Challenge'; title id cell ucdt 138755092 / ugdt 3696408322; bare 3434009122"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 91672,
+      "intro_text_string_id": 91670,
+      "end_text_string_id": 91673
+    },
+    {
+      "id": 3020011,
+      "title_string_id": 93813,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3020010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 11; name 'Blacksmith: Hammer Quality'; title id cell ucdt 16277147 / ugdt 873224911"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 11; name 'Blacksmith: Hammer Quality'; title id cell ucdt 16277147 / ugdt 873224911"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 93814,
+      "intro_text_string_id": 93812,
+      "end_text_string_id": 93815
+    },
+    {
+      "id": 3020012,
+      "title_string_id": 387555,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 12; name 'Blacksmith: Reach Level 10'; title id cell ucdt 1803823862 / ugdt 854790227"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 12; name 'Blacksmith: Reach Level 10'; title id cell ucdt 1803823862 / ugdt 854790227"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387556,
+      "intro_text_string_id": 387554,
+      "end_text_string_id": 387557
+    },
+    {
+      "id": 3020013,
+      "title_string_id": 94367,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3020012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 13; name 'Blacksmith: Supply Delivery'; title id cell ucdt 624194606 / ugdt 2644629037; bare 4227932151"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 2: Derp Axemaker (Dartmoor, level 5 to 10), row 13; name 'Blacksmith: Supply Delivery'; title id cell ucdt 624194606 / ugdt 2644629037; bare 4227932151"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94368,
+      "intro_text_string_id": 94366,
+      "end_text_string_id": 94369
+    },
+    {
+      "id": 3020014,
+      "title_string_id": 94418,
+      "giver_npc_id": 9000000479,
+      "prerequisite_quest_ids": [
+        3020013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 14; name 'Blacksmith: Do Work!'; title id cell ucdt 1060810520 / ugdt 891869357; bare 3019205149"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 14; name 'Blacksmith: Do Work!'; title id cell ucdt 1060810520 / ugdt 891869357; bare 3019205149"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94419,
+      "intro_text_string_id": 94417,
+      "end_text_string_id": 94420
+    },
+    {
+      "id": 3020015,
+      "title_string_id": 94432,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3020014
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 15; name 'Blacksmith: Bolstering the Bows'; title id cell ucdt 4261305306 / ugdt 1039964753; bare 3142017332"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 15; name 'Blacksmith: Bolstering the Bows'; title id cell ucdt 4261305306 / ugdt 1039964753; bare 3142017332"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 14; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94433,
+      "intro_text_string_id": 94431,
+      "end_text_string_id": 94434
+    },
+    {
+      "id": 3020016,
+      "title_string_id": 94461,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3020015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 16; name 'Blacksmith: Chivalrous Carlos'; title id cell ucdt 993436411 / ugdt 759701494"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 16; name 'Blacksmith: Chivalrous Carlos'; title id cell ucdt 993436411 / ugdt 759701494"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94462,
+      "intro_text_string_id": 94460,
+      "end_text_string_id": 94463
+    },
+    {
+      "id": 3020017,
+      "title_string_id": 94508,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3020016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 17; name 'Blacksmith: Local Bonesaw Shortage'; title id cell ucdt 1565790403 / ugdt 1740887809; bare 3125207690"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 17; name 'Blacksmith: Local Bonesaw Shortage'; title id cell ucdt 1565790403 / ugdt 1740887809; bare 3125207690"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94509,
+      "intro_text_string_id": 94507,
+      "end_text_string_id": 94510
+    },
+    {
+      "id": 3020018,
+      "title_string_id": 94577,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3020017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 18; name 'Blacksmith: Breaking Bank'; title id cell ucdt 3289104115 / ugdt 1009088803; bare 2686925757"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 18; name 'Blacksmith: Breaking Bank'; title id cell ucdt 3289104115 / ugdt 1009088803; bare 2686925757"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 17; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94578,
+      "intro_text_string_id": 94576,
+      "end_text_string_id": 94579
+    },
+    {
+      "id": 3020019,
+      "title_string_id": 387559,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 3: Southvale (Supply Master Leo and Mili Ironcall, level 10 to 15), row 19; name 'Blacksmith: Reach Level 15'; title id cell ucdt 45603794 / ugdt 680429219"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387560,
+      "intro_text_string_id": 387558,
+      "end_text_string_id": 387561
+    },
+    {
+      "id": 3020020,
+      "title_string_id": 95093,
+      "giver_npc_id": 9000000025,
+      "prerequisite_quest_ids": [
+        3020019
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 20; name 'Blacksmith: Silver Appearance'; title id cell ucdt 1621723703 / ugdt 1949051065; bare 4116597218"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 20; name 'Blacksmith: Silver Appearance'; title id cell ucdt 1621723703 / ugdt 1949051065; bare 4116597218"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020021,
+      "title_string_id": 95094,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3020020
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 21; name 'Blacksmith: Wand Replacement'; title id cell ucdt 2624966332 / ugdt 4136678260; bare 486970765"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 21; name 'Blacksmith: Wand Replacement'; title id cell ucdt 2624966332 / ugdt 4136678260; bare 486970765"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020022,
+      "title_string_id": null,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 22; name 'repeatable'; title id cell ucdt 60531145 / ugdt 805691106; bare 2894807983"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 22; name 'repeatable'; title id cell ucdt 60531145 / ugdt 805691106; bare 2894807983"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020023,
+      "title_string_id": 95096,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3020021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 23; name 'Blacksmith: Scythes of Stalking'; title id cell ucdt 2902175834 / ugdt 2331124210; bare 4273130331"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 23; name 'Blacksmith: Scythes of Stalking'; title id cell ucdt 2902175834 / ugdt 2331124210; bare 4273130331"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 21; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020024,
+      "title_string_id": 387563,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 24; name 'Blacksmith: Reach Level 20'; title id cell ucdt 3293230726 / ugdt 1603714490"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 24; name 'Blacksmith: Reach Level 20'; title id cell ucdt 3293230726 / ugdt 1603714490"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387564,
+      "intro_text_string_id": 387562,
+      "end_text_string_id": 387565
+    },
+    {
+      "id": 3020025,
+      "title_string_id": 95097,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3020024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 25; name 'Blacksmith: Forging Rumors'; title id cell ucdt 962163740 / ugdt 3234647877; bare 257137144"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 4: Billie JoBob and Silverray (Blackspore, level 15 to 20), row 25; name 'Blacksmith: Forging Rumors'; title id cell ucdt 962163740 / ugdt 3234647877; bare 257137144"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 24; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020026,
+      "title_string_id": 95098,
+      "giver_npc_id": 9000000006,
+      "prerequisite_quest_ids": [
+        3020025
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 26; name 'Blacksmith: Lady of the Lake'; title id cell ucdt 1145899054 / ugdt 3563231072; bare 3212344239"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 26; name 'Blacksmith: Lady of the Lake'; title id cell ucdt 1145899054 / ugdt 3563231072; bare 3212344239"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 25; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020027,
+      "title_string_id": 95099,
+      "giver_npc_id": 9000000006,
+      "prerequisite_quest_ids": [
+        3020026
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 27; name 'Blacksmith: Tools of the Trade'; title id cell ucdt 759075020 / ugdt 2663575439; bare 1023511700, 1854178384, 4011402332"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 27; name 'Blacksmith: Tools of the Trade'; title id cell ucdt 759075020 / ugdt 2663575439; bare 1023511700, 1854178384, 4011402332"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 26; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020028,
+      "title_string_id": 95100,
+      "giver_npc_id": 9000000006,
+      "prerequisite_quest_ids": [
+        3020027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 28; name 'Blacksmith: No Sticks and Plenty of Stones'; title id cell ucdt 596313141 / ugdt 4131781488"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 28; name 'Blacksmith: No Sticks and Plenty of Stones'; title id cell ucdt 596313141 / ugdt 4131781488"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 27; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020029,
+      "title_string_id": 95101,
+      "giver_npc_id": 9000000006,
+      "prerequisite_quest_ids": [
+        3020028
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 29; name 'Blacksmith: Gemstone Roundup'; title id cell ucdt 1334513737 / ugdt 816383456; bare 3932960678"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 29; name 'Blacksmith: Gemstone Roundup'; title id cell ucdt 1334513737 / ugdt 816383456; bare 3932960678"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 28; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020030,
+      "title_string_id": 95102,
+      "giver_npc_id": 9000000006,
+      "prerequisite_quest_ids": [
+        3020029
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 30; name 'Blacksmith: Legendary Summersaber'; title id cell ucdt 3545650075 / ugdt 3568033116; bare 34081128"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 30; name 'Blacksmith: Legendary Summersaber'; title id cell ucdt 3545650075 / ugdt 3568033116; bare 34081128"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 29; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020031,
+      "title_string_id": 95103,
+      "giver_npc_id": 9000000007,
+      "prerequisite_quest_ids": [
+        3020030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 31; name 'Blacksmith: The Royal Smithy'; title id cell ucdt 2298742401 / ugdt 2525715277; bare 3911620995"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 31; name 'Blacksmith: The Royal Smithy'; title id cell ucdt 2298742401 / ugdt 2525715277; bare 3911620995"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 30; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020032,
+      "title_string_id": null,
+      "giver_npc_id": 9000000207,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 6: Steelbloom (Sanctuary, repeatable), row 32; name 'repeatable'; title id cell ucdt 1024158199 / ugdt 1394054161; bare 581612357"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 6: Steelbloom (Sanctuary, repeatable), row 32; name 'repeatable'; title id cell ucdt 1024158199 / ugdt 1394054161; bare 581612357"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3020033,
+      "title_string_id": 439706,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 33; name 'Blacksmith: Grunt Work'; title id cell ucdt 80609871, 1010686749 / ugdt 2374360807"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 33; name 'Blacksmith: Grunt Work'; title id cell ucdt 80609871, 1010686749 / ugdt 2374360807"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439707,
+      "intro_text_string_id": 439705,
+      "end_text_string_id": 439708
+    },
+    {
+      "id": 3020034,
+      "title_string_id": 439710,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 34; name 'Blacksmith: Breaking a Sweat'; title id cell ucdt 105327908, 931792612 / ugdt 3846306900"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 34; name 'Blacksmith: Breaking a Sweat'; title id cell ucdt 105327908, 931792612 / ugdt 3846306900"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439711,
+      "intro_text_string_id": 439709,
+      "end_text_string_id": 439712
+    },
+    {
+      "id": 3020035,
+      "title_string_id": 439714,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 35; name \"Blacksmith: Crackin' Skullz\"; title id cell ucdt 1628642664, 2623310508 / ugdt 1936674924 (curly apostrophe in \"Crackin’\")"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 35; name \"Blacksmith: Crackin' Skullz\"; title id cell ucdt 1628642664, 2623310508 / ugdt 1936674924 (curly apostrophe in \"Crackin’\")"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020035 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439715,
+      "intro_text_string_id": 439713,
+      "end_text_string_id": 439716
+    },
+    {
+      "id": 3020036,
+      "title_string_id": 439718,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 36; name 'Blacksmith: Can We Build It?'; title id cell ucdt 1913283299, 2925884142 / ugdt 2188623300"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 36; name 'Blacksmith: Can We Build It?'; title id cell ucdt 1913283299, 2925884142 / ugdt 2188623300"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020036 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439719,
+      "intro_text_string_id": 439717,
+      "end_text_string_id": 439720
+    },
+    {
+      "id": 3020037,
+      "title_string_id": 439722,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 37; name \"Blacksmith: Scrap Surfin'\"; title id cell ucdt 519509450, 1491142307 / ugdt 3136013317"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 37; name \"Blacksmith: Scrap Surfin'\"; title id cell ucdt 519509450, 1491142307 / ugdt 3136013317"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 37; name \"Blacksmith: Scrap Surfin'\"; title id cell ucdt 519509450, 1491142307 / ugdt 3136013317"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020037 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439723,
+      "intro_text_string_id": 439721,
+      "end_text_string_id": 439724
+    },
+    {
+      "id": 3020038,
+      "title_string_id": 439726,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 38; name 'Blacksmith: From Scraps to Iron'; title id cell ucdt 1013204702, 2861514815 / ugdt 652528783"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 38; name 'Blacksmith: From Scraps to Iron'; title id cell ucdt 1013204702, 2861514815 / ugdt 652528783"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020038 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439727,
+      "intro_text_string_id": 439725,
+      "end_text_string_id": 439728
+    },
+    {
+      "id": 3020039,
+      "title_string_id": 439738,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 39; name 'Blacksmith: Hammering It Out'; title id cell ucdt 286125239, 2320659571 / ugdt 2725797889"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020039 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439739,
+      "intro_text_string_id": 439737,
+      "end_text_string_id": 439740
+    },
+    {
+      "id": 3020040,
+      "title_string_id": 439734,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 40; name 'Blacksmith: Good Ol\\' Sunstones (a \"Blacksmithing:\" form also exists)'; title id cell ucdt 3430209808 / ugdt 2292242003 (curly apostrophe); \"Blacksmithing: Good Ol' Sunstones\" ucdt 2175953281"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020040 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439735,
+      "intro_text_string_id": 439733,
+      "end_text_string_id": 439736
+    },
+    {
+      "id": 3020041,
+      "title_string_id": 439742,
+      "giver_npc_id": 9000000179,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 41; name 'Blacksmith: Clash of the Apprentice'; title id cell ucdt 1240555334, 2403200180 / ugdt 1037352987"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020041 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439743,
+      "intro_text_string_id": 439741,
+      "end_text_string_id": 439744
+    },
+    {
+      "id": 3020042,
+      "title_string_id": 439730,
+      "giver_npc_id": 9000000516,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 7: Sunstone Valley (Red Stonehammer), row 42; name 'Blacksmith: Grave Discovery (a \"Blacksmithing:\" form also exists)'; title id cell ucdt 117181578 / ugdt 1363959488; \"Blacksmithing: Grave Discovery\" ucdt 3673691668"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3020042 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439731,
+      "intro_text_string_id": 439729,
+      "end_text_string_id": 439732
+    }
+  ]
+}

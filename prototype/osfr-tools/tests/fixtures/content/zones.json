@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 7,
+      "name": "Fixture Zone",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic fixture zone for loader tests" }
+      ]
+    }
+  ]
+}

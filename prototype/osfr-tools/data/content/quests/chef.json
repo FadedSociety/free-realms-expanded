@@ -1,0 +1,1680 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3050001,
+      "title_string_id": 42125,
+      "giver_npc_id": 9000000014,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E1; name 'Chef Express (wiki: \"Tutorial: Chef Express\")'; title id cell ucdt 1099358947 / ugdt 2392701368"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E1; name 'Chef Express (wiki: \"Tutorial: Chef Express\")'; title id cell ucdt 1099358947 / ugdt 2392701368"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 42126,
+      "intro_text_string_id": 42124
+    },
+    {
+      "id": 3050002,
+      "title_string_id": 42173,
+      "giver_npc_id": 9000000062,
+      "prerequisite_quest_ids": [
+        3050001
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E2; name 'Stewing to Success (wiki: \"Tutorial: Stewing to Success\")'; title id cell ucdt 3909740580 / ugdt 3518342933"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E2; name 'Stewing to Success (wiki: \"Tutorial: Stewing to Success\")'; title id cell ucdt 3909740580 / ugdt 3518342933"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 42174,
+      "intro_text_string_id": 42172
+    },
+    {
+      "id": 3050003,
+      "title_string_id": 42120,
+      "giver_npc_id": 9000000062,
+      "prerequisite_quest_ids": [
+        3050002
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E3; name 'Party Payback (wiki: \"Tutorial: Party Payback\")'; title id cell ucdt 3840264121 / ugdt 1976978869"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E3; name 'Party Payback (wiki: \"Tutorial: Party Payback\")'; title id cell ucdt 3840264121 / ugdt 1976978869"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 42121,
+      "intro_text_string_id": 42119
+    },
+    {
+      "id": 3050004,
+      "title_string_id": 4420050,
+      "giver_npc_id": 9000000525,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E4; name 'Cooking 101'; title id cell ucdt 192446581 / ugdt 443560929"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420051,
+      "intro_text_string_id": 4420049
+    },
+    {
+      "id": 3050005,
+      "title_string_id": 4420053,
+      "giver_npc_id": 9000000396,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E5; name 'Farming 101'; title id cell client title 356185336 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Entry and tutorial quests (outside the three trainer series), row E5; name 'Farming 101'; title id cell client title 356185336 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 4420054
+    },
+    {
+      "id": 3050006,
+      "title_string_id": 94275,
+      "giver_npc_id": 9000000467,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C1; name 'Chef: Cobblestone Village Cafe (wiki: \"Crossroads Cafe\")'; title id cell ucdt 3834823863 / ugdt 2475100778"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C1; name 'Chef: Cobblestone Village Cafe (wiki: \"Crossroads Cafe\")'; title id cell ucdt 3834823863 / ugdt 2475100778"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94276,
+      "intro_text_string_id": 94274,
+      "end_text_string_id": 94277
+    },
+    {
+      "id": 3050007,
+      "title_string_id": 94291,
+      "giver_npc_id": 9000000467,
+      "prerequisite_quest_ids": [
+        3050006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C2; name 'Chef: Delivery Derailed'; title id cell ucdt 1693424941 / ugdt 2675113521"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C2; name 'Chef: Delivery Derailed'; title id cell ucdt 1693424941 / ugdt 2675113521"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94292,
+      "intro_text_string_id": 94290,
+      "end_text_string_id": 94293
+    },
+    {
+      "id": 3050008,
+      "title_string_id": 94299,
+      "giver_npc_id": 9000000120,
+      "prerequisite_quest_ids": [
+        3050007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C3; name 'Chef: Package Recovery!'; title id cell ucdt 4092713798 / ugdt 2410254548"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C3; name 'Chef: Package Recovery!'; title id cell ucdt 4092713798 / ugdt 2410254548"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94300,
+      "intro_text_string_id": 94298,
+      "end_text_string_id": 94301
+    },
+    {
+      "id": 3050009,
+      "title_string_id": 100543,
+      "giver_npc_id": 9000000120,
+      "prerequisite_quest_ids": [
+        3050008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C4; name 'Chef: Queensfields'; title id cell ucdt 29593774 / ugdt 2288579453"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C4; name 'Chef: Queensfields'; title id cell ucdt 29593774 / ugdt 2288579453"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 100544,
+      "intro_text_string_id": 100542,
+      "end_text_string_id": 100545
+    },
+    {
+      "id": 3050010,
+      "title_string_id": 71056,
+      "giver_npc_id": 9000000107,
+      "prerequisite_quest_ids": [
+        3050009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C5; name 'Chef: Crazy Craving'; title id cell ucdt 994831592 / ugdt 782690305"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 1: Cobblestone Village (Simone), row C5; name 'Chef: Crazy Craving'; title id cell ucdt 994831592 / ugdt 782690305"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71057,
+      "intro_text_string_id": 71055,
+      "end_text_string_id": 71058
+    },
+    {
+      "id": 3050011,
+      "title_string_id": 104134,
+      "giver_npc_id": 9000000019,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000178,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 104135 'Talk to Ranger Ricardo at the Ranger Station in Highroad Junction, near the road leading to Snowhill.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H2; name 'Chef: Ranger Requisition'; title id cell ucdt 3792677643 / ugdt 984140246"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H2; name 'Chef: Ranger Requisition'; title id cell ucdt 3792677643 / ugdt 984140246"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104135,
+      "intro_text_string_id": 104133,
+      "end_text_string_id": 104136
+    },
+    {
+      "id": 3050012,
+      "title_string_id": 104138,
+      "giver_npc_id": 9000000178,
+      "prerequisite_quest_ids": [
+        3050011
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H3; name 'Chef: Fireworks Frenzy!'; title id cell ucdt 1021355619 / ugdt 3440288668"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H3; name 'Chef: Fireworks Frenzy!'; title id cell ucdt 1021355619 / ugdt 3440288668"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H3; name 'Chef: Fireworks Frenzy!'; title id cell ucdt 1021355619 / ugdt 3440288668"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104139,
+      "intro_text_string_id": 104137,
+      "end_text_string_id": 104140
+    },
+    {
+      "id": 3050013,
+      "title_string_id": 104142,
+      "giver_npc_id": 9000000019,
+      "prerequisite_quest_ids": [
+        3050012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H4; name \"Chef: Perry's Pastures\"; title id cell ucdt 3343686488 / ugdt 1841482134"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H4; name \"Chef: Perry's Pastures\"; title id cell ucdt 3343686488 / ugdt 1841482134"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104143,
+      "intro_text_string_id": 104141,
+      "end_text_string_id": 104144
+    },
+    {
+      "id": 3050014,
+      "title_string_id": 139211,
+      "giver_npc_id": 9000000526,
+      "prerequisite_quest_ids": [
+        3050013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H5; name 'Chef: Snowy Treats'; title id cell ucdt 1288582300 / ugdt 468177238"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H5; name 'Chef: Snowy Treats'; title id cell ucdt 1288582300 / ugdt 468177238"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 139212,
+      "intro_text_string_id": 139210,
+      "end_text_string_id": 139213
+    },
+    {
+      "id": 3050015,
+      "title_string_id": 116477,
+      "giver_npc_id": 9000000103,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S1; name 'Chef: Stillwater Inn'; title id cell ucdt 2218586113 / ugdt 3752834667"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S1; name 'Chef: Stillwater Inn'; title id cell ucdt 2218586113 / ugdt 3752834667"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116478,
+      "intro_text_string_id": 116476
+    },
+    {
+      "id": 3050016,
+      "title_string_id": 116493,
+      "giver_npc_id": 9000000103,
+      "prerequisite_quest_ids": [
+        3050015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S2; name 'Chef: Gavin Gone Missing'; title id cell ucdt 2734608986 / ugdt 273397117"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S2; name 'Chef: Gavin Gone Missing'; title id cell ucdt 2734608986 / ugdt 273397117"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116494,
+      "intro_text_string_id": 116492,
+      "end_text_string_id": 116495
+    },
+    {
+      "id": 3050017,
+      "title_string_id": 116497,
+      "giver_npc_id": 9000000096,
+      "prerequisite_quest_ids": [
+        3050016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S3; name 'Chef: Harvest Hiccup!'; title id cell ucdt 1732292177 / ugdt 1289402740"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S3; name 'Chef: Harvest Hiccup!'; title id cell ucdt 1732292177 / ugdt 1289402740"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116498,
+      "intro_text_string_id": 116496,
+      "end_text_string_id": 116499
+    },
+    {
+      "id": 3050018,
+      "title_string_id": 100543,
+      "giver_npc_id": 9000000096,
+      "prerequisite_quest_ids": [
+        3050017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S4; name 'Chef: Queensfields'; title id cell ucdt 29593774 / ugdt 2288579453"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 3: Stillwater Crossing (Helena), row S4; name 'Chef: Queensfields'; title id cell ucdt 29593774 / ugdt 2288579453"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 100544,
+      "intro_text_string_id": 100542,
+      "end_text_string_id": 100545
+    },
+    {
+      "id": 3050019,
+      "title_string_id": 139271,
+      "giver_npc_id": 9000000107,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M1; name 'Chef: Meet the Reputable Bordon Cloo'; title id cell ucdt 123386172 / ugdt 1415008934"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M1; name 'Chef: Meet the Reputable Bordon Cloo'; title id cell ucdt 123386172 / ugdt 1415008934"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 139272,
+      "intro_text_string_id": 139270,
+      "end_text_string_id": 139273
+    },
+    {
+      "id": 3050020,
+      "title_string_id": 387247,
+      "giver_npc_id": 9000000028,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M2; name 'Chef: Reach Level 5 (wiki: \"Achieve Level 5\")'; title id cell ucdt 1299962089 / ugdt 3818721028"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M2; name 'Chef: Reach Level 5 (wiki: \"Achieve Level 5\")'; title id cell ucdt 1299962089 / ugdt 3818721028"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387248,
+      "intro_text_string_id": 387246,
+      "end_text_string_id": 387249
+    },
+    {
+      "id": 3050021,
+      "title_string_id": 24000,
+      "giver_npc_id": 9000000028,
+      "prerequisite_quest_ids": [
+        3050020
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M3; name 'Chef: Learning to Crave the Flave'; title id cell ucdt 971072598 / ugdt 2339578497"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M3; name 'Chef: Learning to Crave the Flave'; title id cell ucdt 971072598 / ugdt 2339578497"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M3; name 'Chef: Learning to Crave the Flave'; title id cell ucdt 971072598 / ugdt 2339578497"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3050022,
+      "title_string_id": 71784,
+      "giver_npc_id": 9000000044,
+      "prerequisite_quest_ids": [
+        3050021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 2: level 5 to 10 (Chef Jarvie, Merry Vale), row M4; name 'Chef: Roasted Mysteries'; title id cell ucdt 3470808793 / ugdt 3530732115"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 2: level 5 to 10 (Chef Jarvie, Merry Vale), row M4; name 'Chef: Roasted Mysteries'; title id cell ucdt 3470808793 / ugdt 3530732115"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 71785,
+      "intro_text_string_id": 71783,
+      "end_text_string_id": 71786
+    },
+    {
+      "id": 3050023,
+      "title_string_id": 387255,
+      "giver_npc_id": 9000000044,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 2: level 5 to 10 (Chef Jarvie, Merry Vale), row M5; name 'Chef: Reach Level 10 (wiki: \"Achieve Level 10\")'; title id cell ucdt 1341228228 / ugdt 1588618074"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 2: level 5 to 10 (Chef Jarvie, Merry Vale), row M5; name 'Chef: Reach Level 10 (wiki: \"Achieve Level 10\")'; title id cell ucdt 1341228228 / ugdt 1588618074"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387256,
+      "intro_text_string_id": 387254,
+      "end_text_string_id": 387257
+    },
+    {
+      "id": 3050024,
+      "title_string_id": 72106,
+      "giver_npc_id": 9000000044,
+      "prerequisite_quest_ids": [
+        3050023
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 2: level 5 to 10 (Chef Jarvie, Merry Vale), row M6; name 'Chef: Chugawhat?'; title id cell ucdt 1905081813 / ugdt 777696857"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 2: level 5 to 10 (Chef Jarvie, Merry Vale), row M6; name 'Chef: Chugawhat?'; title id cell ucdt 1905081813 / ugdt 777696857"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72107,
+      "intro_text_string_id": 72105,
+      "end_text_string_id": 72108
+    },
+    {
+      "id": 3050025,
+      "title_string_id": 72241,
+      "giver_npc_id": 9000000061,
+      "prerequisite_quest_ids": [
+        3050024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M7; name 'Chef: Surprise Me!'; title id cell ucdt 2605343129 / ugdt 3904162442"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M7; name 'Chef: Surprise Me!'; title id cell ucdt 2605343129 / ugdt 3904162442"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72242,
+      "intro_text_string_id": 72240,
+      "end_text_string_id": 72243
+    },
+    {
+      "id": 3050026,
+      "title_string_id": 72537,
+      "giver_npc_id": 9000000061,
+      "prerequisite_quest_ids": [
+        3050025
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M8; name 'Chef: The Food Reviewer'; title id cell ucdt 1221102491 / ugdt 2354587144"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M8; name 'Chef: The Food Reviewer'; title id cell ucdt 1221102491 / ugdt 2354587144"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72538,
+      "intro_text_string_id": 72536,
+      "end_text_string_id": 72539
+    },
+    {
+      "id": 3050027,
+      "title_string_id": 24313,
+      "giver_npc_id": 9000000133,
+      "prerequisite_quest_ids": [
+        3050026
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M9; name 'Chef: Double Dog Dare'; title id cell ucdt 3507941559 / ugdt 849656733"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M9; name 'Chef: Double Dog Dare'; title id cell ucdt 3507941559 / ugdt 849656733"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 24314,
+      "end_text_string_id": 24315
+    },
+    {
+      "id": 3050028,
+      "title_string_id": 387259,
+      "giver_npc_id": 9000000133,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M10; name 'Chef: Reach Level 15 (wiki: \"Achieve Level 15\")'; title id cell ucdt 3013218619 / ugdt 224265077"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 3: level 10 to 15 (Cook Yumtumlot, Lucca De'Flor), row M10; name 'Chef: Reach Level 15 (wiki: \"Achieve Level 15\")'; title id cell ucdt 3013218619 / ugdt 224265077"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387260,
+      "intro_text_string_id": 387258,
+      "end_text_string_id": 387261
+    },
+    {
+      "id": 3050029,
+      "title_string_id": 72675,
+      "giver_npc_id": 9000000385,
+      "prerequisite_quest_ids": [
+        3050028
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M11; name 'Chef: Glerga (wiki: \"Chef: Glerga\" under Lucca)'; title id cell ucdt 1155996617 / ugdt 2752685198"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M11; name 'Chef: Glerga (wiki: \"Chef: Glerga\" under Lucca)'; title id cell ucdt 1155996617 / ugdt 2752685198"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72676,
+      "end_text_string_id": 72677
+    },
+    {
+      "id": 3050030,
+      "title_string_id": 73078,
+      "giver_npc_id": 9000000332,
+      "prerequisite_quest_ids": [
+        3050029
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M12; name 'Chef: Family Style! (wiki: \"Family Style\")'; title id cell ucdt 3436730652 / ugdt 2563200224"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M12; name 'Chef: Family Style! (wiki: \"Family Style\")'; title id cell ucdt 3436730652 / ugdt 2563200224"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M12; name 'Chef: Family Style! (wiki: \"Family Style\")'; title id cell ucdt 3436730652 / ugdt 2563200224"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73079,
+      "intro_text_string_id": 73077,
+      "end_text_string_id": 73080
+    },
+    {
+      "id": 3050031,
+      "title_string_id": 387263,
+      "giver_npc_id": 9000000332,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M13; name 'Chef: Reach Level 20 (wiki: \"Achieve Level 20\")'; title id cell ucdt 3179730894 / ugdt 1856824643"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M13; name 'Chef: Reach Level 20 (wiki: \"Achieve Level 20\")'; title id cell ucdt 3179730894 / ugdt 1856824643"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M13; name 'Chef: Reach Level 20 (wiki: \"Achieve Level 20\")'; title id cell ucdt 3179730894 / ugdt 1856824643"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387264,
+      "intro_text_string_id": 387262,
+      "end_text_string_id": 387265
+    },
+    {
+      "id": 3050032,
+      "title_string_id": 73272,
+      "giver_npc_id": 9000000028,
+      "prerequisite_quest_ids": [
+        3050031
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M14; name \"Chef: Cloo's Cooking Academy\"; title id cell ucdt 4050986377 / ugdt 788125205"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M14; name \"Chef: Cloo's Cooking Academy\"; title id cell ucdt 4050986377 / ugdt 788125205"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73273,
+      "intro_text_string_id": 73271
+    },
+    {
+      "id": 3050033,
+      "title_string_id": 73251,
+      "giver_npc_id": 9000000028,
+      "prerequisite_quest_ids": [
+        3050032
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M15; name 'Chef: Cooking with Cloo'; title id cell ucdt 4125801331 / ugdt 188867641"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M15; name 'Chef: Cooking with Cloo'; title id cell ucdt 4125801331 / ugdt 188867641"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3050033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M14; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73252,
+      "intro_text_string_id": 73250
+    }
+  ]
+}

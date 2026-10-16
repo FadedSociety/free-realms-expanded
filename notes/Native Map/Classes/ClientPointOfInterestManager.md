@@ -1,0 +1,13 @@
+# Class: ClientPointOfInterestManager
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00b97ea0` | `ClientPointOfInterestManager_UnlinkRowFromBucket` | 🟢 | method | Removes a row from the manager hash table: computes the bucket from the row key at param_2+0x5c modulo 1000, walks the chain at this+0x14 (next pointer at row+0x60) and unlinks the matching row from the chain; does noth… |
+| `00b980d0` | `ClientPointOfInterestManager_Destruct` | ✅ | dtor | Destructor of the point-of-interest manager: stores ClientPointOfInterestManager::vftable, releases the data source pointer at +0x36e4 (virtual slot 0x28 with 0, FUN_0081ad80, zero) when the global DAT_01be1090 is set, … |
+| `00b98160` | `ClientPointOfInterestManager_RemoveRow` | 🟢 | method | Removes one point-of-interest row: unlinks it from its hash bucket with 00b97ea0, unlinks it from the doubly linked row list (prev at +0x54, next at +0x58, head/tail in this[2]/this[3]), decrements the row count this[4]… |
+| `00b981f0` | `ClientPointOfInterestManager_DeletingDestruct` | ✅ | dtor | Scalar deleting destructor: calls the manager destructor 00b980d0 and then _free(this) when bit 0 of param_2 is set. |
+| `00b98220` | `ClientPointOfInterestManager_RemoveAllRows` | 🟢 | method | Loops while the row list head at this+8 is non-null, removing each row through 00b98160 (its argument is read back from this+8 on every iteration); returns with the list empty. |
+| `00b98b70` | `ClientPointOfInterestManager_OnDefinitionReply` | 🟢 | handler | Receive handler for the point-of-interest definition reply: constructs a PacketPointOfInterestDefinitionReply temporary (00b97ad0), builds a reader over (buffer param_2, length param_3) whose cursor starts two bytes in,… |
+| `00b98e10` | `ClientPointOfInterestManager_Construct` | ✅ | ctor | Constructor of the point-of-interest manager: runs the PointOfInterestDefinitionManager base constructor FUN_010313c0, stores ClientPointOfInterestManager::vftable, stores param_2 at +0x36e0, zeroes +0x36e4, allocates 0… |
+| `00b99150` | `ClientPointOfInterestManager_SendDefinitionRequest` | 🟢 | method | Constructs a PacketPointOfInterestDefinitionRequest temporary with 00b97a20 and, when the session pointer at this+0x36e0 -> +0x280 is non-null, sends it through 00b98ec0 with flag 1; no other work. |
+| `00b991d0` | `ClientPointOfInterestManager_SendTeleportRequest` | ✅ | method | Validates a point-of-interest id against the local table (FUN_0102fb50) and, when the id is known, constructs the PacketZoneTeleportRequest with 00b97b80 and sends it through 00b99000 with flag 1 when the session pointe… |

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 500,
+      "name_string_id": 7000500,
+      "description_string_id": null,
+      "category_id": null,
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic test item; not a recovered game definition" }
+      ]
+    }
+  ]
+}

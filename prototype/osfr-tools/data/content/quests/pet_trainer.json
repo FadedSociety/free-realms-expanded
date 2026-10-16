@@ -1,0 +1,1276 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3120001,
+      "title_string_id": 415141,
+      "giver_npc_id": 9000000235,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Entry quests (town introductions and the job itself), row E1; name 'Become a Pet Trainer'; title id cell 3702038637 ucdt; 2841653821 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 415142
+    },
+    {
+      "id": 3120002,
+      "title_string_id": 141145,
+      "giver_npc_id": 9000000489,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Pet tutorial (three quests, same text for each trainer), row 1; name 'Pet Tutorial: Basics'; title id cell 134305614 ucdt; 2323021703 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Pet tutorial (three quests, same text for each trainer), row 1; name 'Pet Tutorial: Basics'; title id cell 134305614 ucdt; 2323021703 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141146,
+      "intro_text_string_id": 141144,
+      "end_text_string_id": 141147
+    },
+    {
+      "id": 3120003,
+      "title_string_id": 141150,
+      "giver_npc_id": 9000000452,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Pet tutorial (three quests, same text for each trainer), row 2; name 'Pet Tutorial: Happiness'; title id cell 937056452 ucdt; 723008085 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Pet tutorial (three quests, same text for each trainer), row 2; name 'Pet Tutorial: Happiness'; title id cell 937056452 ucdt; 723008085 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141151,
+      "intro_text_string_id": 141149,
+      "end_text_string_id": 141152
+    },
+    {
+      "id": 3120004,
+      "title_string_id": 141154,
+      "giver_npc_id": 9000000452,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Pet tutorial (three quests, same text for each trainer), row 3; name 'Pet Tutorial: Training'; title id cell 2048514030 ucdt; 1810570921 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Pet tutorial (three quests, same text for each trainer), row 3; name 'Pet Tutorial: Training'; title id cell 2048514030 ucdt; 1810570921 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141155,
+      "intro_text_string_id": 141153,
+      "end_text_string_id": 141156
+    },
+    {
+      "id": 3120005,
+      "title_string_id": 90019,
+      "giver_npc_id": 9000000368,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Common trainer series (same after any junior trainer), row 4; name 'Pet Trainer: Speak Up!'; title id cell 3841773075 ucdt; 1161438493 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Common trainer series (same after any junior trainer), row 4; name 'Pet Trainer: Speak Up!'; title id cell 3841773075 ucdt; 1161438493 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90020,
+      "intro_text_string_id": 90018,
+      "end_text_string_id": 90021
+    },
+    {
+      "id": 3120006,
+      "title_string_id": 90027,
+      "giver_npc_id": 9000000368,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Common trainer series (same after any junior trainer), row 5; name 'Pet Trainer: To Sanctuary!'; title id cell 320476124 ucdt; 3870170609 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Common trainer series (same after any junior trainer), row 5; name 'Pet Trainer: To Sanctuary!'; title id cell 320476124 ucdt; 3870170609 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90028,
+      "intro_text_string_id": 90026,
+      "end_text_string_id": 90029
+    },
+    {
+      "id": 3120007,
+      "title_string_id": 90031,
+      "giver_npc_id": 9000000184,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 6; name 'Pet Trainer: Sit Up and Take Notice'; title id cell 2980391045 ucdt; 799828340 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 6; name 'Pet Trainer: Sit Up and Take Notice'; title id cell 2980391045 ucdt; 799828340 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90032,
+      "intro_text_string_id": 90030,
+      "end_text_string_id": 90033
+    },
+    {
+      "id": 3120008,
+      "title_string_id": 90035,
+      "giver_npc_id": 9000000184,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 7; name 'Pet Trainer: Jump High!'; title id cell 3118522154 ucdt; 4150445352 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 7; name 'Pet Trainer: Jump High!'; title id cell 3118522154 ucdt; 4150445352 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90036,
+      "intro_text_string_id": 90034,
+      "end_text_string_id": 90037
+    },
+    {
+      "id": 3120009,
+      "title_string_id": null,
+      "giver_npc_id": 9000000184,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row G10; name '(Pet Trainer: Achieve Level 10, wiki only)'; title id cell no title in client"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row G10; name '(Pet Trainer: Achieve Level 10, wiki only)'; title id cell no title in client"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) title_string_id is null because this row has no unambiguous ucdt title ID; page title is '(Pet Trainer: Achieve Level 10, wiki only)'"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3120010,
+      "title_string_id": 90039,
+      "giver_npc_id": 9000000184,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 8; name 'Pet Trainer: Mosey On Up'; title id cell 3110761088 ucdt; 2469366365 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 1: level 1 to 10 (Roscoe, Sanctuary), row 8; name 'Pet Trainer: Mosey On Up'; title id cell 3110761088 ucdt; 2469366365 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90040,
+      "intro_text_string_id": 90038,
+      "end_text_string_id": 90041
+    },
+    {
+      "id": 3120011,
+      "title_string_id": 90043,
+      "giver_npc_id": 9000000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 9; name 'Pet Trainer: Peek-A-Who?'; title id cell 1648209957 ucdt; 2047280581 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 9; name 'Pet Trainer: Peek-A-Who?'; title id cell 1648209957 ucdt; 2047280581 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90044,
+      "intro_text_string_id": 90042,
+      "end_text_string_id": 90045
+    },
+    {
+      "id": 3120012,
+      "title_string_id": 90047,
+      "giver_npc_id": 9000000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 10; name 'Pet Trainer: A Rolling Good Time'; title id cell 3328799344 ucdt; 3286629760 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 10; name 'Pet Trainer: A Rolling Good Time'; title id cell 3328799344 ucdt; 3286629760 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90048,
+      "intro_text_string_id": 90046,
+      "end_text_string_id": 90049
+    },
+    {
+      "id": 3120013,
+      "title_string_id": 90051,
+      "giver_npc_id": 9000000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 11; name 'Pet Trainer: Go with the Punches'; title id cell 2934439161 ucdt; 1560554340 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 11; name 'Pet Trainer: Go with the Punches'; title id cell 2934439161 ucdt; 1560554340 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90052,
+      "intro_text_string_id": 90050,
+      "end_text_string_id": 90053
+    },
+    {
+      "id": 3120014,
+      "title_string_id": 90055,
+      "giver_npc_id": 9000000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 12; name 'Pet Trainer: Making a Champ'; title id cell 3070867879 ucdt; 156391474 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 12; name 'Pet Trainer: Making a Champ'; title id cell 3070867879 ucdt; 156391474 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90056,
+      "intro_text_string_id": 90054,
+      "end_text_string_id": 90057
+    },
+    {
+      "id": 3120015,
+      "title_string_id": null,
+      "giver_npc_id": 9000000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row G15; name '(Pet Trainer: Achieve Level 15, wiki only)'; title id cell no title in client"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row G15; name '(Pet Trainer: Achieve Level 15, wiki only)'; title id cell no title in client"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) title_string_id is null because this row has no unambiguous ucdt title ID; page title is '(Pet Trainer: Achieve Level 15, wiki only)'"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3120016,
+      "title_string_id": 90059,
+      "giver_npc_id": 9000000231,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000228,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 90060 'Find Verill Shiverwings in Highroad Junction.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 13; name 'Pet Trainer: All Aboard to Highroad Junction'; title id cell 3075134853 ucdt; 2354514049 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 2: level 10 to 15 (Vidor Stormshroud, Shrouded Glade), row 13; name 'Pet Trainer: All Aboard to Highroad Junction'; title id cell 3075134853 ucdt; 2354514049 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90060,
+      "intro_text_string_id": 90058,
+      "end_text_string_id": 90061
+    },
+    {
+      "id": 3120017,
+      "title_string_id": 90063,
+      "giver_npc_id": 9000000228,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 14; name 'Pet Trainer: Can You Give Me a Hand... stand?'; title id cell 2687822150 ucdt; 3531685346 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 14; name 'Pet Trainer: Can You Give Me a Hand... stand?'; title id cell 2687822150 ucdt; 3531685346 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90064,
+      "intro_text_string_id": 90062,
+      "end_text_string_id": 90065
+    },
+    {
+      "id": 3120018,
+      "title_string_id": 90067,
+      "giver_npc_id": 9000000228,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 15; name 'Pet Trainer: Spinning Tails'; title id cell 2809963530 ucdt; 4235736291 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 15; name 'Pet Trainer: Spinning Tails'; title id cell 2809963530 ucdt; 4235736291 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90068,
+      "intro_text_string_id": 90066,
+      "end_text_string_id": 90069
+    },
+    {
+      "id": 3120019,
+      "title_string_id": 90075,
+      "giver_npc_id": 9000000228,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 16; name 'Pet Trainer: Skills for Stars'; title id cell 116003824 ucdt; 4139701755 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 16; name 'Pet Trainer: Skills for Stars'; title id cell 116003824 ucdt; 4139701755 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90076,
+      "intro_text_string_id": 90074,
+      "end_text_string_id": 90077
+    },
+    {
+      "id": 3120020,
+      "title_string_id": null,
+      "giver_npc_id": 9000000228,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row G20; name '(Pet Trainer: Achieve Level 20, wiki only)'; title id cell no title in client"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row G20; name '(Pet Trainer: Achieve Level 20, wiki only)'; title id cell no title in client"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) title_string_id is null because this row has no unambiguous ucdt title ID; page title is '(Pet Trainer: Achieve Level 20, wiki only)'"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3120021,
+      "title_string_id": 90088,
+      "giver_npc_id": 9000000228,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 17; name 'Pet Trainer: Amaze Me'; title id cell 4102051740 ucdt; 1305159817 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 17; name 'Pet Trainer: Amaze Me'; title id cell 4102051740 ucdt; 1305159817 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90089,
+      "intro_text_string_id": 90087,
+      "end_text_string_id": 90090
+    },
+    {
+      "id": 3120022,
+      "title_string_id": 90092,
+      "giver_npc_id": 9000000228,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 18; name 'Pet Trainer: Down by the Bay'; title id cell 1765787762 ucdt; 2133503166 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 3: level 15 to 20 (Verill Shiverwings, Highroad Junction), row 18; name 'Pet Trainer: Down by the Bay'; title id cell 1765787762 ucdt; 2133503166 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90093,
+      "intro_text_string_id": 90091,
+      "end_text_string_id": 90094
+    },
+    {
+      "id": 3120023,
+      "title_string_id": 90098,
+      "giver_npc_id": 9000000153,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 19; name 'Pet Trainer: Shake Your Groove Thing'; title id cell 2243731891 ucdt; 2720256342 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 19; name 'Pet Trainer: Shake Your Groove Thing'; title id cell 2243731891 ucdt; 2720256342 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90099,
+      "intro_text_string_id": 90097,
+      "end_text_string_id": 90100
+    },
+    {
+      "id": 3120024,
+      "title_string_id": 90102,
+      "giver_npc_id": 9000000153,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 20; name 'Pet Trainer: Seek the Master'; title id cell 4224690749 ucdt; 1906296315 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 20; name 'Pet Trainer: Seek the Master'; title id cell 4224690749 ucdt; 1906296315 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90103,
+      "intro_text_string_id": 90101,
+      "end_text_string_id": 90104
+    },
+    {
+      "id": 3120025,
+      "title_string_id": 90106,
+      "giver_npc_id": 9000000130,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 21; name 'Pet Trainer: Nearly Departed'; title id cell 1803852182 ucdt; 4165020451 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 21; name 'Pet Trainer: Nearly Departed'; title id cell 1803852182 ucdt; 4165020451 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90107,
+      "intro_text_string_id": 90105,
+      "end_text_string_id": 90108
+    },
+    {
+      "id": 3120026,
+      "title_string_id": 90110,
+      "giver_npc_id": 9000000130,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 22; name 'Pet Trainer: Show Off!'; title id cell 3326084834 ucdt; 861147162 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Pet Trainer.md: Quest line > Main series, band 4: level 20 (Moanna, Seaside; Kirill Moonrunner, Sanctuary), row 22; name 'Pet Trainer: Show Off!'; title id cell 3326084834 ucdt; 861147162 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3120026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 90111,
+      "intro_text_string_id": 90109,
+      "end_text_string_id": 90112
+    }
+  ]
+}

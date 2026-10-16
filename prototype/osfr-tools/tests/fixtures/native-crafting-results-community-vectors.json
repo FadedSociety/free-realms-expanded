@@ -1,0 +1,21 @@
+{
+  "source": "Unmodified pinned community packet writers; native semantics and ACK constructor independently traced. ACK is not captured164218 and does not prove user Close timing.",
+  "vectors": {
+    "actual_cooking_ack": "27000783e7bd02ffffffffffffffff",
+    "actual_cooking_remove": "27001383e7bd02ffffffff2e000000",
+    "actual_cooking_scores": "27002f83e7bd02ffffffff2e000000010000000f00000073636f7265546f74616c53636f7265ffffffff04000000ffffffffffffffff4f140000",
+    "actual_cooking_won": "27001283e7bd02ffffffff2e0000000100000000290100004f140000",
+    "cooking_ack": "27000781e7bd02ffffffffffffffff",
+    "cooking_remove": "27001381e7bd02ffffffff2e000000",
+    "cooking_scores": "27002f81e7bd02ffffffff2e000000010000000f00000073636f7265546f74616c53636f7265ffffffff04000000ffffffffffffffff84030000",
+    "cooking_won": "27001281e7bd02ffffffff2e00000001000000000600000084030000",
+    "forging_ack": "270007c1f84808ffffffffffffffff",
+    "forging_remove": "270013c1f84808ffffffff8b000000",
+    "forging_scores": "27002fc1f84808ffffffff8b000000010000000f00000073636f7265546f74616c53636f7265ffffffff04000000ffffffffffffffff84030000",
+    "forging_won": "270012c1f84808ffffffff8b00000001000000000600000084030000",
+    "smelting_ack": "27000741ed9604ffffffffffffffff",
+    "smelting_remove": "27001341ed9604ffffffff4d000000",
+    "smelting_scores": "27002f41ed9604ffffffff4d000000010000000f00000073636f7265546f74616c53636f7265ffffffff04000000ffffffffffffffff84030000",
+    "smelting_won": "27001241ed9604ffffffff4d00000001000000000400000084030000"
+  }
+}

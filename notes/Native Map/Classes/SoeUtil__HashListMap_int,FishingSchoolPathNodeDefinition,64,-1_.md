@@ -1,0 +1,13 @@
+# Class: SoeUtil::HashListMap<int,FishingSchoolPathNodeDefinition,64,-1>
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00b61fe0` | `HashListMap → SoeUtil::HashListMap<int,FishingSchoolPathNodeDefinition,64,-1>::…` | ✅ | ctor | Constructs the fishing school path-node hash map: stores the class vtable, zeroes the four scalar members at +4, +8, +0xc and +0x10, memsets the 64-bucket table at +0x14 to 0 over 0x100 bytes, and returns the object. |
+| `00b63190` | `HashListMapAllocateNode` | ✅ | virtual | Vtable slot 1 of the path-node hash map: enters the container allocator (FUN_006fb9c0), asks FUN_006fb860 for the caller's free-list head and, when one exists, returns a recycled node through its vtable slot 1; otherwis… |
+| `00b631d0` | `HashListMapFreeNode` | ✅ | virtual | Vtable slot 2 of the path-node hash map: 18 bytes, bytes 8b4424046a1050e824ea89ff83c408c20400 = mov eax,[esp+4]; push 0x10; push eax; call FUN_00401c00; add esp,8; ret 4, i.e. it frees the node with the FreeMemory helpe… |
+| `00b63bf0` | `HashListMap_Remove` | 🟢 | method | Removes one node from the path-node hash map: indexes the 64 bucket chains at this+0x14 by (node+0x38 & 0x3f), unlinks the node from its bucket chain via node+0x3c, unlinks it from the insertion-order doubly linked list… |
+| `00b65540` | `— ⚠reject` | ⚪ | method | 27-byte loop: while the map head at this+8 is non-zero it calls FUN_00b63bf0 on it (unlink from the bucket chain and freelist, then free), rereading the head each iteration. |
+| `00b66420` | `HashListMap::~HashListMap` | ✅ | dtor | Non-deleting destructor: stores the map vtable and then removes every node by calling FUN_00b63bf0 on the head at param_1[2] until the map is empty; reached from three EH unwind funclets. |
+| `00b66540` | `HashListMap::~HashListMap` | ✅ | dtor | Scalar deleting destructor: stores the map vtable, removes every node through FUN_00b63bf0, then falls through to the _free call when bit 0 of the flag argument is set and returns the object pointer otherwise. |
+| `00b66770` | `HashListMap::~HashListMap → SoeUtil::HashListMap<int,FishingSchoolPathNodeDefin…` | ✅ | dtor | Destructor copy with an EH frame: stores the map vtable and then removes every node by calling FUN_00b63bf0 on the head at param_1[2] until the map is empty; of its twelve callers seven are EH unwind funclets and the re… |
+| `00b6a1f0` | `InitializeFishingPathNodeHashList → SoeUtil::HashList<FishingSchoolPathNodeDefi…` | ✅ | ctor | Installs and clears the 64-bucket hash-list map storage, switches to the HashList specialization vtable, then assigns from the supplied source map. |

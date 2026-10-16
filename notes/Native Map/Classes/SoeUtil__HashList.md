@@ -1,0 +1,20 @@
+# Class: SoeUtil::HashList
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00a82f70` | `SoeUtil::HashListCopyCtor` | ✅ | ctor | Copy constructor of SoeUtil::HashList<EncounterParticipant,5,-2>: runs the base constructor routine 00a81290, stores the HashList vtable, then copies the source container through the copy-assignment routine 00a82a40 and… |
+| `00a82fe0` | `SoeUtil::HashListScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (vtable slot [0]) of SoeUtil::HashList<EncounterParticipant,5,-2>: runs the base hash-map destructor body 00a82200 and frees the object with _free when the delete flag bit 0 is set. |
+| `00b95f70` | `HashList_InvertedList_Construct` | ✅ | ctor | Constructor body of the InvertedList hash list: runs FUN_00b94640 and then stores SoeUtil::HashList<SoeGems::TextIndex<int>::InvertedList,16384,64>::vftable at this+0; returns this. |
+| `00b964e0` | `HashList_InvertedList_DeletingDestruct` | ✅ | dtor | Scalar deleting destructor of the InvertedList hash list: calls the HashListMap text-index destructor body 00b95290 inside an SEH frame and then _free(this) when bit 0 of param_2 is set. |
+| `00be02e0` | `SoeUtil::HashList::AllocNodeRoute → SoeUtil::HashList<ActivityForProfileType,20…` | 🟢 | virtual | Calls FUN_006fb9c0, then FUN_006fb860; if that returns an object it calls the object's vtable slot +4 and returns; else if DAT_01bdf280 is set it calls that object's slot +4; else calls FUN_006fb950(0x28,4). |
+| `00be0320` | `SoeUtil::HashList::Slot2Free → SoeUtil::HashList<ActivityForProfileType,20,-1>:…` | 🟢 | virtual | Virtual with one stack argument (ret 4): pushes 4 and the pointer and calls FUN_00401c00 (free with alignment 4), then returns. |
+| `00be04d0` | `SoeUtil::HashList::AllocNodeRoute` | 🟢 | virtual | Same routing as 00be02e0 (FUN_006fb9c0, FUN_006fb860, vtable slot +4 on the returned allocator or on DAT_01bdf280), fallback FUN_006fb950(0x2c,4). |
+| `00be0510` | `SoeUtil::HashList::Slot2Free` | 🟢 | virtual | Virtual with one stack argument (ret 4): pushes 4 and the pointer and calls FUN_00401c00 (free with alignment 4), then returns. |
+| `00be0530` | `SoeUtil::HashList::AllocNodeRoute` | 🟢 | virtual | Same routing as 00be02e0 (FUN_006fb9c0, FUN_006fb860, vtable slot +4 on the returned allocator or on DAT_01bdf280), fallback FUN_006fb950(0x1c,4). |
+| `00be0570` | `SoeUtil::HashList::Slot2Free` | 🟢 | virtual | Virtual with one stack argument (ret 4): pushes 4 and the pointer and calls FUN_00401c00 (free with alignment 4), then returns. |
+| `00be3470` | `SoeUtil::HashList::Ctor20` | ✅ | ctor | Constructor body: stores the SoeUtil::HashListMap<int,ActivityForProfileType,20,-1> vtable, zeroes the words at +0x10, +8 and +0xc, zeroes 0x50 bytes at +0x14 (20 bucket pointers) with memset, zeroes +4, then stores the… |
+| `00be3f80` | `SoeUtil::HashList::Slot1PoolAlloc` | 🟢 | virtual | Virtual (slot 1 of the ClientActivityDefinition 1024,256 vtables): adds 0x1014 to this and tail-jumps to 00be3ea0 (pool allocation), so the pool sits at this+0x1014. |
+| `00be3f90` | `SoeUtil::HashList::Slot2PoolFree` | 🟢 | virtual | Virtual (slot 2 of the ClientActivityDefinition 1024,256 vtables): adds 0x1014 to this and tail-jumps to 00be3f10 (pool free). |
+| `00be4a30` | `SoeUtil::HashList::Slot1PoolAlloc_ClientScheduled` | 🟢 | virtual | Virtual (slot 1 of the ClientScheduledActivityDefinition 1024,256 vtables): adds 0x1014 to this and tail-jumps to the 0x78 pool allocation 00be4950 (same bytes as 00be3f80 apart from the callee). |
+| `00be4a40` | `SoeUtil::HashList::Slot2PoolFree_ClientScheduled` | 🟢 | virtual | Virtual (slot 2 of the ClientScheduledActivityDefinition 1024,256 vtables): adds 0x1014 to this and tail-jumps to the 0x78 pool free 00be49c0. |
+| `00be4a50` | `SoeUtil::HashList::ScalarDeletingDtor20` | ✅ | dtor | Scalar deleting destructor (ret 4) in slot 0 of the HashList<ActivityForProfileType,20,-1> vtable: stores the HashListMap<ActivityForProfileType,20,-1> vtable into *this, calls 00be2220 (pop-all-and-free), calls _free o… |

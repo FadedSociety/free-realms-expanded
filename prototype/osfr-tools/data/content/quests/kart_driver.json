@@ -1,0 +1,2166 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3080001,
+      "title_string_id": 104106,
+      "giver_npc_id": 9000000177,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Entry quests (not titled \"Kart Driver:\"), row The Burden of Fame; name 'The Burden of Fame'; title id cell 4206479156 ucdt; 2384585669 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Entry quests (not titled \"Kart Driver:\"), row The Burden of Fame; name 'The Burden of Fame'; title id cell 4206479156 ucdt; 2384585669 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104107,
+      "intro_text_string_id": 104105,
+      "end_text_string_id": 104108
+    },
+    {
+      "id": 3080002,
+      "title_string_id": 117323,
+      "giver_npc_id": 9000000412,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Entry quests (not titled \"Kart Driver:\"), row Racing Tutorial; name 'Racing Tutorial'; title id cell 3040575294 ucdt; 2386023333 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Entry quests (not titled \"Kart Driver:\"), row Racing Tutorial; name 'Racing Tutorial'; title id cell 3040575294 ucdt; 2386023333 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080003,
+      "title_string_id": 394241,
+      "giver_npc_id": 9000000538,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 1; name 'Kart Driver: Challenge Verve McNichols'; title id cell 3078946987 ucdt; 257364816 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394242
+    },
+    {
+      "id": 3080004,
+      "title_string_id": 3490,
+      "giver_npc_id": 9000000539,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 2; name 'Kart Driver: Target Acquired'; title id cell 3499492051 ucdt; 2996613623 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 2; name 'Kart Driver: Target Acquired'; title id cell 3499492051 ucdt; 2996613623 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080005,
+      "title_string_id": 394347,
+      "giver_npc_id": 9000000500,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 3; name 'Kart Driver: Even the Odds'; title id cell 1232142723 ucdt; 1342697811 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394348,
+      "intro_text_string_id": 394346,
+      "end_text_string_id": 394349
+    },
+    {
+      "id": 3080006,
+      "title_string_id": 3494,
+      "giver_npc_id": 9000000378,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 4; name 'Kart Driver: Ready to Redline'; title id cell 838462410 ucdt; 2005756081 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 3495
+    },
+    {
+      "id": 3080007,
+      "title_string_id": 394235,
+      "giver_npc_id": 9000000379,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 5; name 'Kart Driver: Challenging T.R'; title id cell 930143283 ucdt; 2370752381 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394236
+    },
+    {
+      "id": 3080008,
+      "title_string_id": 394434,
+      "giver_npc_id": 9000000540,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 6; name 'Kart Driver: You Want To Go Fast?'; title id cell 740273092 ucdt; 1281527898 ucdt, 1302444103 ugdt (spelled \"To\" in the first, \"to\" in the others)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394435,
+      "intro_text_string_id": 394433,
+      "end_text_string_id": 394436
+    },
+    {
+      "id": 3080009,
+      "title_string_id": 394484,
+      "giver_npc_id": 9000000249,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 7; name \"Kart Driver: Exploder's League Sponsorship\"; title id cell 970314492 ucdt; 2206174359 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394485,
+      "intro_text_string_id": 394483,
+      "end_text_string_id": 394486
+    },
+    {
+      "id": 3080010,
+      "title_string_id": 394496,
+      "giver_npc_id": 9000000250,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 8; name 'Kart Driver: Wildwood Sprint Challenge'; title id cell 1669408147 ucdt; 2301397015 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394497,
+      "intro_text_string_id": 394495,
+      "end_text_string_id": 394498
+    },
+    {
+      "id": 3080011,
+      "title_string_id": 394572,
+      "giver_npc_id": 9000000251,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 9; name 'Kart Driver: Wildwood Endurance Challenge'; title id cell 4045005532 ucdt; 3185435926 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394573,
+      "intro_text_string_id": 394571,
+      "end_text_string_id": 394574
+    },
+    {
+      "id": 3080012,
+      "title_string_id": 3509,
+      "giver_npc_id": 9000000252,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 10; name 'Kart Driver: Dominating at Wildwood'; title id cell 1991360986 ucdt; 542618925 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 10; name 'Kart Driver: Dominating at Wildwood'; title id cell 1991360986 ucdt; 542618925 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080013,
+      "title_string_id": 394603,
+      "giver_npc_id": 9000000026,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 11; name 'Kart Driver: Guest of Honor'; title id cell 2327413006 ucdt; 956848619 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394604,
+      "intro_text_string_id": 394602,
+      "end_text_string_id": 394605
+    },
+    {
+      "id": 3080014,
+      "title_string_id": 3512,
+      "giver_npc_id": 9000000239,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 12; name 'Kart Driver: A Treacherous Track'; title id cell 247768989 ucdt; 3867343581 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080015,
+      "title_string_id": 394647,
+      "giver_npc_id": 9000000475,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 13; name 'Kart Driver: Stopping the Sabotage'; title id cell 1065992700 ucdt; 2298886339 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394648,
+      "intro_text_string_id": 394646,
+      "end_text_string_id": 394649
+    },
+    {
+      "id": 3080016,
+      "title_string_id": 3521,
+      "giver_npc_id": 9000000541,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 14; name 'Kart Driver: Redline Returns'; title id cell 126755862 ucdt; 2553983407 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080017,
+      "title_string_id": 394655,
+      "giver_npc_id": 9000000542,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 15; name 'Kart Driver: Self Promotion'; title id cell 605457886 ucdt; 3143050549 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394656,
+      "intro_text_string_id": 394654,
+      "end_text_string_id": 394657
+    },
+    {
+      "id": 3080018,
+      "title_string_id": 3522,
+      "giver_npc_id": 9000000543,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 16; name 'Kart Driver: Icy Perfection'; title id cell 4205031367 ucdt; 1551478619 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080019,
+      "title_string_id": 394663,
+      "giver_npc_id": 9000000423,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 17; name 'Kart Driver: Seaside Board of Tourism Sponsorship'; title id cell 2204157846 ucdt; 3766626738 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394664,
+      "intro_text_string_id": 394662,
+      "end_text_string_id": 394665
+    },
+    {
+      "id": 3080020,
+      "title_string_id": 394667,
+      "giver_npc_id": 9000000426,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 18; name 'Kart Driver: Frost Ridge Sprint Challenge'; title id cell 122825727 ucdt; 4238252862 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394668,
+      "intro_text_string_id": 394666,
+      "end_text_string_id": 394669
+    },
+    {
+      "id": 3080021,
+      "title_string_id": 394671,
+      "giver_npc_id": 9000000424,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 19; name 'Kart Driver: Frost Ridge Endurance Challenge'; title id cell 1272864031 ucdt; 2713115317 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394672,
+      "intro_text_string_id": 394670,
+      "end_text_string_id": 394673
+    },
+    {
+      "id": 3080022,
+      "title_string_id": 3525,
+      "giver_npc_id": 9000000425,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 20; name 'Kart Driver: Dominating at Frost Ridge'; title id cell 1423615597 ucdt; 1437408792 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080023,
+      "title_string_id": 394679,
+      "giver_npc_id": 9000000168,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 21; name 'Kart Driver: The Price of Fame'; title id cell 3820831760 ucdt; 2023117556 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394680,
+      "intro_text_string_id": 394678,
+      "end_text_string_id": 394681
+    },
+    {
+      "id": 3080024,
+      "title_string_id": 3527,
+      "giver_npc_id": 9000000427,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 22; name 'Kart Driver: Age Before Beauty'; title id cell 4036336756 ucdt; 2103619070 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080025,
+      "title_string_id": 394692,
+      "giver_npc_id": 9000000382,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 23; name 'Kart Driver: A Helping Hand'; title id cell 1447593412 ucdt; 3202232969 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394693,
+      "intro_text_string_id": 394691,
+      "end_text_string_id": 394694
+    },
+    {
+      "id": 3080026,
+      "title_string_id": 3528,
+      "giver_npc_id": 9000000381,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 24; name 'Kart Driver: Settling the Score'; title id cell 3720689180 ucdt; 493671901 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080027,
+      "title_string_id": 394702,
+      "giver_npc_id": 9000000271,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 25; name 'Kart Driver: Making Amends'; title id cell 3539460646 ucdt; 2619443500 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 25; name 'Kart Driver: Making Amends'; title id cell 3539460646 ucdt; 2619443500 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 25; name 'Kart Driver: Making Amends'; title id cell 3539460646 ucdt; 2619443500 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394703,
+      "intro_text_string_id": 394701,
+      "end_text_string_id": 394704
+    },
+    {
+      "id": 3080028,
+      "title_string_id": 3532,
+      "giver_npc_id": 9000000271,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 26; name 'Kart Driver: High Speed Chase'; title id cell 510928773 ucdt; 2401757030 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 26; name 'Kart Driver: High Speed Chase'; title id cell 510928773 ucdt; 2401757030 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 3533,
+      "end_text_string_id": 3534
+    },
+    {
+      "id": 3080029,
+      "title_string_id": 394710,
+      "giver_npc_id": 9000000273,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 27; name 'Kart Driver: Sweetwater Sasparilla Sponsorship'; title id cell 2562047238 ucdt; 2737805468 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 27; name 'Kart Driver: Sweetwater Sasparilla Sponsorship'; title id cell 2562047238 ucdt; 2737805468 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394711,
+      "intro_text_string_id": 394709,
+      "end_text_string_id": 394712
+    },
+    {
+      "id": 3080030,
+      "title_string_id": 394740,
+      "giver_npc_id": 9000000461,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 28; name 'Kart Driver: Thunder Falls Sprint Challenge'; title id cell 711448517 ucdt; 2557422335 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 394741,
+      "intro_text_string_id": 394739,
+      "end_text_string_id": 394742
+    },
+    {
+      "id": 3080031,
+      "title_string_id": 395146,
+      "giver_npc_id": 9000000464,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 29; name 'Kart Driver: Thunder Falls Endurance Challenge'; title id cell 367062867 ucdt; 3064016631 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395147,
+      "intro_text_string_id": 395145,
+      "end_text_string_id": 395148
+    },
+    {
+      "id": 3080032,
+      "title_string_id": 3579,
+      "giver_npc_id": 9000000462,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 30; name 'Kart Driver: Dominating at Thunder Falls'; title id cell 1339119059 ucdt; 1982716411 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080033,
+      "title_string_id": 395278,
+      "giver_npc_id": 9000000544,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 31; name 'Kart Driver: Dominating and Thunder Falls'; title id cell 30216974 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080034,
+      "title_string_id": 395282,
+      "giver_npc_id": 9000000463,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 32; name 'Kart Driver: Endorsement Deal'; title id cell 4169142617 ucdt; 2418619074 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395283,
+      "intro_text_string_id": 395281,
+      "end_text_string_id": 395284
+    },
+    {
+      "id": 3080035,
+      "title_string_id": 3581,
+      "giver_npc_id": 9000000202,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 33; name 'Kart Driver: Burning Up the Track'; title id cell 1600560441 ucdt; 4050386039 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080035 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080036,
+      "title_string_id": 395293,
+      "giver_npc_id": 9000000242,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 34; name 'Kart Driver: Burnt Rubber'; title id cell 138998666 ucdt; 489488450 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080036 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395294,
+      "intro_text_string_id": 395292,
+      "end_text_string_id": 395295
+    },
+    {
+      "id": 3080037,
+      "title_string_id": 3582,
+      "giver_npc_id": 9000000380,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 35; name 'Kart Driver: The Showdown'; title id cell 144590260 ucdt; 2489125075 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080037 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080038,
+      "title_string_id": 395301,
+      "giver_npc_id": 9000000409,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 36; name 'Kart Driver: The Keys to Victory'; title id cell 1691606938 ucdt; 2033785101 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080038 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395302,
+      "intro_text_string_id": 395300,
+      "end_text_string_id": 395303
+    },
+    {
+      "id": 3080039,
+      "title_string_id": 3583,
+      "giver_npc_id": 9000000152,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 37; name 'Kart Driver: The Right Stuff'; title id cell 509182203 ucdt; 3652101059 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 37; name 'Kart Driver: The Right Stuff'; title id cell 509182203 ucdt; 3652101059 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080039 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080040,
+      "title_string_id": 395310,
+      "giver_npc_id": 9000000457,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 38; name \"Kart Driver: Miner's Guild Sponsorship\"; title id cell 472092027 ucdt; 2013492570 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 38; name \"Kart Driver: Miner's Guild Sponsorship\"; title id cell 472092027 ucdt; 2013492570 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080040 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395311,
+      "intro_text_string_id": 395309,
+      "end_text_string_id": 395312
+    },
+    {
+      "id": 3080041,
+      "title_string_id": 395316,
+      "giver_npc_id": 9000000456,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 39; name 'Kart Driver: Tangletrack Sprint Challenge'; title id cell 1025540288 ucdt; 2291785024 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 39; name 'Kart Driver: Tangletrack Sprint Challenge'; title id cell 1025540288 ucdt; 2291785024 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080041 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395317,
+      "intro_text_string_id": 395315,
+      "end_text_string_id": 395318
+    },
+    {
+      "id": 3080042,
+      "title_string_id": 395322,
+      "giver_npc_id": 9000000455,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 40; name 'Kart Driver: Tangletrack Endurance Challenge'; title id cell 3858423748 ucdt; 221410696 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 40; name 'Kart Driver: Tangletrack Endurance Challenge'; title id cell 3858423748 ucdt; 221410696 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080042 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395323,
+      "intro_text_string_id": 395321,
+      "end_text_string_id": 395324
+    },
+    {
+      "id": 3080043,
+      "title_string_id": 3598,
+      "giver_npc_id": 9000000458,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 41; name 'Kart Driver: Dominating at Tangletrack'; title id cell 3661707843 ucdt; 2517634487 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080043 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080044,
+      "title_string_id": 395332,
+      "giver_npc_id": 9000000197,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 42; name 'Kart Driver: Celebrity Giveaway'; title id cell 2968269447 ucdt; 359008695 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 42; name 'Kart Driver: Celebrity Giveaway'; title id cell 2968269447 ucdt; 359008695 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080044 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395333,
+      "intro_text_string_id": 395331,
+      "end_text_string_id": 395334
+    },
+    {
+      "id": 3080045,
+      "title_string_id": 3511,
+      "giver_npc_id": 9000000123,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 43; name 'Kart Driver: SG Tour 400: Wildwood'; title id cell 523224539 ucdt; 3816033076 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 43; name 'Kart Driver: SG Tour 400: Wildwood'; title id cell 523224539 ucdt; 3816033076 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080045 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080046,
+      "title_string_id": 395343,
+      "giver_npc_id": 9000000371,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 44; name 'Kart Driver: SG Tour 400: Frost Ridge'; title id cell 1987584609 ucdt; 3959003574 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080046 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 395344,
+      "intro_text_string_id": 395342,
+      "end_text_string_id": 395345
+    },
+    {
+      "id": 3080047,
+      "title_string_id": 3580,
+      "giver_npc_id": 9000000371,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 45; name 'Kart Driver: SG Tour 400: Thunder Falls'; title id cell 3074989322 ucdt; 2142238476 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080047 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080048,
+      "title_string_id": 3599,
+      "giver_npc_id": 9000000371,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 46; name 'Kart Driver: SG Tour 400: Tangletrack'; title id cell 3121341489 ucdt; 1143773866 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 46; name 'Kart Driver: SG Tour 400: Tangletrack'; title id cell 3121341489 ucdt; 1143773866 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 46; name 'Kart Driver: SG Tour 400: Tangletrack'; title id cell 3121341489 ucdt; 1143773866 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080048 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3080049,
+      "title_string_id": 3526,
+      "giver_npc_id": 9000000537,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 47; name 'Kart Driver: Sacred Grove Gup: Frost Ridge'; title id cell 2595156650 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3080049 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    }
+  ]
+}

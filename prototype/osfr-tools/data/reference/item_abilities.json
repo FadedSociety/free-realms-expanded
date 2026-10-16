@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "description": "Curated item -> weapon ability text links that the client has no direct data link for (weapon abilities were assigned server-side). Read by project/scripts/build_asset_graph.py.",
+  "items": [
+    {
+      "item_id": 78711,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103184,
+          "description_id": 5103185
+        },
+        {
+          "kind": "area",
+          "name_id": 5103186,
+          "description_id": 5103187
+        }
+      ]
+    },
+    {
+      "item_id": 78712,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103188,
+          "description_id": 5103189
+        },
+        {
+          "kind": "area",
+          "name_id": 5103190,
+          "description_id": 5103191
+        }
+      ]
+    },
+    {
+      "item_id": 78713,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103192,
+          "description_id": 5103193
+        },
+        {
+          "kind": "area",
+          "name_id": 5103194,
+          "description_id": 5103195
+        }
+      ]
+    },
+    {
+      "item_id": 78714,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103196,
+          "description_id": 5103197
+        },
+        {
+          "kind": "area",
+          "name_id": 5103198,
+          "description_id": 5103199
+        }
+      ]
+    },
+    {
+      "item_id": 78715,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103200,
+          "description_id": 5103201
+        },
+        {
+          "kind": "area",
+          "name_id": 5103202,
+          "description_id": 5103203
+        }
+      ]
+    },
+    {
+      "item_id": 78716,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103204,
+          "description_id": 5103205
+        },
+        {
+          "kind": "area",
+          "name_id": 5103206,
+          "description_id": 5103207
+        }
+      ]
+    },
+    {
+      "item_id": 78717,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103208,
+          "description_id": 5103209
+        },
+        {
+          "kind": "area",
+          "name_id": 5103210,
+          "description_id": 5103211
+        }
+      ]
+    },
+    {
+      "item_id": 78718,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5103212,
+          "description_id": 5103213
+        },
+        {
+          "kind": "area",
+          "name_id": 5103214,
+          "description_id": 5103215
+        }
+      ]
+    },
+    {
+      "item_id": 79020,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5102642,
+          "description_id": 5102643
+        },
+        {
+          "kind": "area",
+          "name_id": 5102644,
+          "description_id": null
+        }
+      ]
+    },
+    {
+      "item_id": 79021,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5102645,
+          "description_id": 5102646
+        },
+        {
+          "kind": "area",
+          "name_id": 5102647,
+          "description_id": 5102648
+        }
+      ]
+    },
+    {
+      "item_id": 79022,
+      "abilities": [
+        {
+          "kind": "front",
+          "name_id": 5102649,
+          "description_id": 5102650
+        },
+        {
+          "kind": "area",
+          "name_id": 5102651,
+          "description_id": 5102652
+        }
+      ]
+    }
+  ],
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "en_us_data.dat: each Player Studio weapon batch's ability name/description pairs follow the weapon names in the same order (5103184-5103215 after 5103168-5103183; 5102642-5102652 after 5102636-5102641); every pair's theme matches its weapon. Pairing is by order and theme, not a data link (R). 5102644 Power Drive has no description text."
+    }
+  ]
+}

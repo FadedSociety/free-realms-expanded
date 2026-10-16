@@ -1,0 +1,2507 @@
+{
+  "generated_utc": "2026-10-09T20:10:27Z",
+  "scope": "read-only reconciliation of all 100 delegated tasks against artifacts, registration, callsites and notes",
+  "sources": {
+    "work_items": "notes/WorkItems/*.md",
+    "work_queue": "notes/MMO Work Queue.md",
+    "registration": "prototype/osfr-tools/src/lib.rs",
+    "callsites": "prototype/osfr-tools/src/*.rs (piece modules excluded)",
+    "notes": "notes/Research/Pieces/*",
+    "lab_evidence": "lab/reports/piece-*-*"
+  },
+  "headline": {
+    "registered_piece_modules_in_lib_rs": 0,
+    "delegated_pieces": 93,
+    "delegated_with_complete_artifacts": 93,
+    "delegated_native_testable_now": 0,
+    "restoration_module_declared": false
+  },
+  "missing_work_items": [],
+  "rows": [
+    {
+      "id": "001",
+      "title": "001: Mining original board/session",
+      "kind": "pre-existing system (root-owned, not a delegated piece module)",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/mining.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 10
+        }
+      ],
+      "rust_test": null,
+      "py_script": null,
+      "py_test": null,
+      "note": "notes/Current Progress.md",
+      "lab_evidence": {},
+      "integration_status": "registered production module",
+      "native_testable_note": "native accepted on frozen builds (multiple runs); production module registered; see notes/Current Progress.md",
+      "missing_gates": "see notes/Current Progress.md (system-specific native blockers above)"
+    },
+    {
+      "id": "002",
+      "title": "002: Harvesting original game/profile",
+      "kind": "pre-existing system (root-owned, not a delegated piece module)",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/harvesting.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 12
+        }
+      ],
+      "rust_test": null,
+      "py_script": null,
+      "py_test": null,
+      "note": "notes/Current Progress.md",
+      "lab_evidence": {},
+      "integration_status": "registered production module",
+      "native_testable_note": "native harvesting blocked: selectable produce had no tile registrations; gateway guard repaired; package review pending",
+      "missing_gates": "see notes/Current Progress.md (system-specific native blockers above)"
+    },
+    {
+      "id": "003",
+      "title": "003: Fishing",
+      "kind": "pre-existing system (root-owned, not a delegated piece module)",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/fishing.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": null,
+      "py_script": null,
+      "py_test": null,
+      "note": "notes/Current Progress.md",
+      "lab_evidence": {},
+      "integration_status": "module file exists but unregistered",
+      "native_testable_note": "module unregistered; no native run found in Current Progress",
+      "missing_gates": "see notes/Current Progress.md (system-specific native blockers above)"
+    },
+    {
+      "id": "004",
+      "title": "004: Go-kart racing",
+      "kind": "pre-existing system (root-owned, not a delegated piece module)",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/kart_lobby_native.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 1
+        },
+        {
+          "path": "prototype/osfr-tools/src/kart_progress_native.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 0
+        },
+        {
+          "path": "prototype/osfr-tools/src/kart_racing.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 2
+        }
+      ],
+      "rust_test": null,
+      "py_script": null,
+      "py_test": null,
+      "note": "notes/Current Progress.md",
+      "lab_evidence": {},
+      "integration_status": "registered production module",
+      "native_testable_note": "lobby/progress codecs registered and reviewed; vehicles/race controls/finish/native return open",
+      "missing_gates": "see notes/Current Progress.md (system-specific native blockers above)"
+    },
+    {
+      "id": "005",
+      "title": "005: Soccer",
+      "kind": "pre-existing system (root-owned, not a delegated piece module)",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/soccer.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 7
+        },
+        {
+          "path": "prototype/osfr-tools/src/soccer_match.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": null,
+      "py_script": null,
+      "py_test": null,
+      "note": "notes/Current Progress.md",
+      "lab_evidence": {},
+      "integration_status": "registered production module",
+      "native_testable_note": "production wire/authority accepted in focused tests; not registered or playable native match",
+      "missing_gates": "see notes/Current Progress.md (system-specific native blockers above)"
+    },
+    {
+      "id": "006",
+      "title": "006: Housing placement",
+      "kind": "pre-existing system (root-owned, not a delegated piece module)",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/housing_native.rs",
+          "exists": true,
+          "registered_in_lib": true,
+          "callsites_outside_self": 0
+        },
+        {
+          "path": "prototype/osfr-tools/src/housing.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": null,
+      "py_script": null,
+      "py_test": null,
+      "note": "notes/Current Progress.md",
+      "lab_evidence": {},
+      "integration_status": "registered production module",
+      "native_testable_note": "housing codec/framing accepted against captured bodies; persistent placement and native building open",
+      "missing_gates": "see notes/Current Progress.md (system-specific native blockers above)"
+    },
+    {
+      "id": "007",
+      "title": "007: Demolition derby",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/derby.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/derby.rs",
+      "py_script": "scripts/pieces/piece_007.py",
+      "py_test": "tests/pieces/test_piece_007.py",
+      "note": "notes/Research/Pieces/007 Demolition derby.md",
+      "lab_evidence": {
+        "bundles": 2,
+        "latest": "piece-007-current.txt"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Native: enter a derby with the original client and verify proxied karts, hits, countdown and the result screen on the current release. - Scoring/damage numbers and the packet that fills `DerbyResults`; health, elimination threshold, pickup effects and arena geometry; the meaning of the `SetDerbyConfig` pair (240.0, 940). - Reward granting and derby/racer progression belong to queue items 016/041",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "008",
+      "title": "008: Chess",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_008.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_008.rs",
+      "py_script": "scripts/pieces/piece_008.py",
+      "py_test": "tests/pieces/test_piece_008.py",
+      "note": "notes/Research/Pieces/008 Chess.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-008-20261009T024347Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "No native client run was made by this worker, so nothing here is playable-accepted. | `prototype/osfr-tools/tests/piece_008.rs` | 14 focused tests; `#[path]`-includes the module until the lead registers it in `src/lib.rs` | - `MiniGameTypeData.txt` type 6 row: `IS_FLASH 0`, `IS_ACTIVE 1` - a native activity, not a Flash machine `014C`) is a native chess engine: its strings include \"rotated bitboar",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "009",
+      "title": "009: Checkers",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_009.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_009.rs",
+      "py_script": "scripts/pieces/piece_009.py",
+      "py_test": "tests/pieces/test_piece_009.py",
+      "note": "notes/Research/Pieces/009 Checkers.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-009-20261009T024655Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Native/integration: lobby entry, table interaction, client movie launch, real move exchange, promotion/king visuals, end-of-game result panel, quit, reconnect and restart/replay behaviour. - The binary packet carrying `OnCheckersEventMsg`/`OnMoveMsg` between the native client and the gateway is not recovered; only the movie-level text is. - `MIN_PLAYERS`/`MAX_PLAYERS` are 0 in the shipped table,",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "010",
+      "title": "010: Trading card game",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_010.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_010.rs",
+      "py_script": "scripts/pieces/piece_010.py",
+      "py_test": "tests/pieces/test_piece_010.py",
+      "note": "notes/Research/Pieces/010 Trading card game.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-010-20261009T034635Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. The module is not registered in `lib.rs` (shared file, lead-owned); the test includes it by path. The lead decides whether the gateway hosts `TcgMatch`. 2. No wire encoding is claimed. The two constructors recover sub-opcodes and field counts, not field meanings; a `TradingCardStartGamePacket` writer needs a captured or decompiled serialization before any client sees it. 3. Native acceptance is",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "011",
+      "title": "011: Pet training activities",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_011.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_011.rs",
+      "py_script": "scripts/pieces/piece_011.py",
+      "py_test": "tests/pieces/test_piece_011.py",
+      "note": "notes/Research/Pieces/011 Pet training activities.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-011-20261009T025304Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* No preserved capture contains a decodable pet-family round, so round start/stop sequencing, the 32-bit result value's meaning and the grade thresholds stay unrecovered. A fresh capture of a real trick (or the original service's serializer) is the cheapest next evidence. * Locale ids 90157 and 90161 are missing from the export; 16 of 23 gesture ids have no recorded name id. * Integration: the mod",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "012",
+      "title": "012: Cooking recipes/content",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_012.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_012.rs",
+      "py_script": "scripts/pieces/piece_012.py",
+      "py_test": "tests/pieces/test_piece_012.py",
+      "note": "notes/Research/Pieces/012 Cooking recipes/content.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-012-20261009T025212Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead integration: register the module (or adopt the constants) and decide whether the audit runs in the ordinary suite. - Native/gameplay: this piece does not start the client. The gateway-level once-only recipe settlement is already covered by the reviewed private gameplay tests; a fresh native whole-recipe run remains the item's native gate and stays with the lead. - Content: the original reci",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "013",
+      "title": "013: Smelting recipes/content",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_013.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_013.rs",
+      "py_script": "scripts/pieces/piece_013.py",
+      "py_test": "tests/pieces/test_piece_013.py",
+      "note": "notes/Research/Pieces/013 Smelting recipes/content.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-013-20261009T030014Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead integration: `piece_013.rs` is not registered in shared `lib.rs`; the lead decides whether `check_content` gates content loading. - Native acceptance: furnace entry, the four mouse stages, the normal score screen, material consumption/output and quest turn-in are untouched by this piece; see [[Original Smelting]] and [[Native Smelting Controls]]. - Missing original evidence: the 2014 server",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "014",
+      "title": "014: Forging recipes/content",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_014.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_014.rs",
+      "py_script": "scripts/pieces/piece_014.py",
+      "py_test": "tests/pieces/test_piece_014.py",
+      "note": "notes/Research/Pieces/014 Forging recipes/content.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-014-20261009T030806Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead: register `piece_014` in `lib.rs` only when a consumer exists, or use the checker as the content regression gate. Shared gateway/forging integration is lead-owned and was not modified here. - Native: actual Brawler equip of the forged hammer, Blacksmith rejection of class71 and the original anvil forge flow remain unexercised by this piece. - Original: the seven MatchThree tables, per-attem",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "015",
+      "title": "015: Minigame launch catalogue",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_015.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_015.rs",
+      "py_script": "scripts/pieces/piece_015.py",
+      "py_test": "tests/pieces/test_piece_015.py",
+      "note": "notes/Research/Pieces/015 Minigame launch catalogue.md",
+      "lab_evidence": {
+        "bundles": 2,
+        "latest": "piece-015-20261009T030000Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "pack catalogue entries, the Ghidra export, the id constants in the existing Rust modules and the native captures referenced by the receipt table. Reconstructed policy: coverage statuses, slot vocabulary, client readings, family gates and the module acceptance table. Not verified: any original engine-class binding for row 139 beyond id and name, per-row acceptance for the other 780 rows, and native",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "016",
+      "title": "016: Minigame loss and retry",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_016.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_016.rs",
+      "py_script": "scripts/pieces/piece_016.py",
+      "py_test": "tests/pieces/test_piece_016.py",
+      "note": "notes/Research/Pieces/016 Minigame loss and retry.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-016-20261009T0306Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* Lead integration: register `restoration::piece_016` in `lib.rs` and decide which engine consumes the ledger (the Type8 mining/harvesting engine already emits its own `39/17/18/19` sequence and keeps board logic private, so the wiring is an interface decision, not a copy). * Native acceptance: no client run was made by this worker. A real loss card (`TRY AGAIN!`), a real Retry that mints a new `S",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "017",
+      "title": "017: Minigame disconnect recovery",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_017.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_017.rs",
+      "py_script": "scripts/pieces/piece_017.py",
+      "py_test": "tests/pieces/test_piece_017.py",
+      "note": "notes/Research/Pieces/017 Minigame disconnect recovery.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-017-20261009T025526Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Fresh native disconnect/reconnect on the current release: launch a crafting movie, kill or disconnect the client mid-round, reconnect with the same save, confirm visible world restore, unchanged materials and a fresh attempt id. The existing native pairs prove the semantics on the captured revision only. - Mining, harvesting, fishing, kart racing, soccer and derby recovery stay with their own wo",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "018",
+      "title": "018: Minigame native test routes",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_018.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_018.rs",
+      "py_script": "scripts/pieces/piece_018.py",
+      "py_test": "tests/pieces/test_piece_018.py",
+      "note": "notes/Research/Pieces/018 Minigame native test routes.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-018-20261009T025834Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Native: a human/lead run with `--dev-tools` must show `realm game list`, `realm game cooking` reaching the Cooking Table and starting the accepted movie, and `realm game derby` refusing. This worker did not touch the client, the launcher or the release build. - Integration: register the module, convert actors to `ActorView`, and apply the returned relocation. Until then the routes are reachable ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "019",
+      "title": "019: Activity leaderboards",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_019.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_019.rs",
+      "py_script": "scripts/pieces/piece_019.py",
+      "py_test": "tests/pieces/test_piece_019.py",
+      "note": "notes/Research/Pieces/019 Activity leaderboards.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-019-20261009T025056Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- The module is not registered in shared `lib.rs`; the lead owns that change. `tests/piece_019.rs` includes it by `#[path]` so the checkout keeps building. - No gateway, save file, content package, release binary or launcher was touched. - Native acceptance was not attempted and is not claimed. The smallest future native check would be: serve the recovered row payload from a local responder bound ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "020",
+      "title": "020: Multiplayer activity grouping",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_020.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_020.rs",
+      "py_script": "scripts/pieces/piece_020.py",
+      "py_test": "tests/pieces/test_piece_020.py",
+      "note": "notes/Research/Pieces/020 Multiplayer activity grouping.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-020-20261009T0259Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "implemented and tested. The launch message *bodies* stay an explicit gap. No native or gameplay acceptance was attempted, and the module is not registered in `lib.rs`. | `prototype/osfr-tools/tests/piece_020.rs` | 12 integration tests; includes the module by `#[path]` until the lead registers it (new) | 1. Register the module (`pub mod piece_020;` under `src/restoration`) and drop the `#[path]` in",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "021",
+      "title": "021: Property acquisition",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_021.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_021.rs",
+      "py_script": "scripts/pieces/piece_021.py",
+      "py_test": "tests/pieces/test_piece_021.py",
+      "note": "notes/Research/Pieces/021 Property acquisition.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-021-20261009T025932Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead registration: `src/restoration/piece_021.rs` is not in `src/lib.rs`; the test includes it by `#[path]` and the lead drops that include when registering the module. 2. Wire gate: mapping `ClientHousingPacketRequestGrant` (23) and `HousingPacketNotifyHouseAdded` (49) needs the payload layouts; only then can a purchase answer the native client. 3. Economy gate: `StationCashDebit` must be comm",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "022",
+      "title": "022: House loading and visiting",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_022.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_022.rs",
+      "py_script": "scripts/pieces/piece_022.py",
+      "py_test": "tests/pieces/test_piece_022.py",
+      "note": "notes/Research/Pieces/022 House loading and visiting.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-022-20261009T025254Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_022;` (or move the file) and drop the `#[path]` include. 2. Wire integration: answer 127/19 with 31 BeginZoning + 127/45 zone data and route the player into the instance; reuse `encounter::zone_begin_packet`'s ordering (this module's encoder already matches it, including the extra `Unknown`/`WaitForZoneReady` bytes). 3. Property source: feed `HouseRecor",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "023",
+      "title": "023: House permissions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_023.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_023.rs",
+      "py_script": "scripts/pieces/piece_023.py",
+      "py_test": "tests/pieces/test_piece_023.py",
+      "note": "notes/Research/Pieces/023 House permissions.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-023-20261009T025927Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Levels other than 3 keep their numeric value and grant nothing. If a historical level 1 or 2 meaning exists, it is unrecovered and must not be inferred. - The world-side query (\"which houses may this player see or visit\") is not recovered; only the per-house policy is modelled. - Invite/decline state, member-only gating, upkeep, naming and furniture scoring are out of scope for this item. - No r",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "024",
+      "title": "024: Furniture catalogue",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_024.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_024.rs",
+      "py_script": "scripts/pieces/piece_024.py",
+      "py_test": "tests/pieces/test_piece_024.py",
+      "note": "notes/Research/Pieces/024 Furniture catalogue.md",
+      "lab_evidence": {
+        "bundles": 2,
+        "latest": "piece-024-20261009T030716Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: the module is a `#[path]` include; register or move it and drop the include. 2. Decide the served furniture set. The current reconstructed inventory ships 31 furniture ids out of 1,167; item 025/026 wiring and any content regeneration should use this catalogue instead of adding rows by hand. 3. Wire integration (item 025) and inventory conservation (item 026) still own placeme",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "025",
+      "title": "025: Furniture placement client wire",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_025.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_025.rs",
+      "py_script": "scripts/pieces/piece_025.py",
+      "py_test": "tests/pieces/test_piece_025.py",
+      "note": "notes/Research/Pieces/025 Furniture placement client wire.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-025-20261009T024934Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_025;` (or the agreed restoration module path) and drop the `#[path]` include from `tests/piece_025.rs`. 2. Wire the decoded opcodes 1/3/5/6 into `housing.rs` (item 006) so a placement request is answered by the reconstructed state machine; inventory proposal/commit stays with item 026. 3. Recover the server responses 28/39/40/41/53 from the client's inb",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "026",
+      "title": "026: Housing inventory transactions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_026.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_026.rs",
+      "py_script": "scripts/pieces/piece_026.py",
+      "py_test": "tests/pieces/test_piece_026.py",
+      "note": "notes/Research/Pieces/026 Housing inventory transactions.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-026-20261009T025209Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **Lead integration.** Register `pub mod housing;` and the restoration module in `src/lib.rs`, then replace the `#[path] = \"../housing.rs\"` include in `src/restoration/piece_026.rs` with `use crate::housing;`. The re-export block above it exists only so the owned test target compiles before registration. 2. **Real inventory (item 081).** The pool here counts owned furniture units. The lead's `in",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "027",
+      "title": "027: Housing fixtures and limits",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_027.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_027.rs",
+      "py_script": "scripts/pieces/piece_027.py",
+      "py_test": "tests/pieces/test_piece_027.py",
+      "note": "notes/Research/Pieces/027 Housing fixtures and limits.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-027-20261009T025107Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_027;` under `src/restoration/` and drop the `#[path]` include; keep `housing.rs` (006) as the owner of placement state. 2. Wire integration (025): send the recovered grid spacing and receive the instance maxima so a restored server and the native client agree on `Housing.gridSpacing` and `SetCounts`. 3. Native acceptance (030): place with snap on and of",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "028",
+      "title": "028: Housing save migration",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_028.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_028.rs",
+      "py_script": "scripts/pieces/piece_028.py",
+      "py_test": "tests/pieces/test_piece_028.py",
+      "note": "notes/Research/Pieces/028 Housing save migration.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-028-20261009-0345Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **No original save format.** The community server stores no housing row and the original server is not preserved, so there is nothing historically authentic to migrate *from*. The legacy version 0 here is a local reconstruction; the exact missing evidence is a real pre-existing housing save document (client-side or server-side) with a different shape than item 006's writer. 2. **Wire (item 025)",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "029",
+      "title": "029: Housing decoration discovery",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_029.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_029.rs",
+      "py_script": "scripts/pieces/piece_029.py",
+      "py_test": "tests/pieces/test_piece_029.py",
+      "note": "notes/Research/Pieces/029 Housing decoration discovery.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-029-20261009T0340Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **Lead integration.** The module is a `#[path]` include; register it in `src/lib.rs` and drop the include in `tests/piece_029.rs`. Nothing else here needs to move. 2. **The server-side fixture-definition table is unrecovered.** Which definition declares which actions, the `LuaCall` text and the `CompositeEffectId` all live on the original server. Until that data is recovered, definitions are ca",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "030",
+      "title": "030: House native acceptance",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_030.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_030.rs",
+      "py_script": "scripts/pieces/piece_030.py",
+      "py_test": "tests/pieces/test_piece_030.py",
+      "note": "notes/Research/Pieces/030 House native acceptance.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-030-20261009T032826Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead registration: `src/restoration/piece_030.rs` is not in `src/lib.rs`; the test includes it by `#[path]` and the lead drops that include on registration. 2. Wire gate (item 025): recover the server replies 2/28/40/41/51/53 so a placement answer can reach the client. 3. Native run (this item's acceptance): with the integrated server, enter the lot, place, move, pick up, have a guest enter, re",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "031",
+      "title": "031: Job catalogue",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_031.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_031.rs",
+      "py_script": "scripts/pieces/piece_031.py",
+      "py_test": "tests/pieces/test_piece_031.py",
+      "note": "notes/Research/Pieces/031 Job catalogue.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-031-20261009T035045Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- This is recovery metadata plus validation. It grants no job, defines no XP curve and claims no native activation. - Profile item classes, starter kits and default items stay with the existing production `src/profiles.rs` (`starter_items` covers six kits) and the community `Profiles.json` `ItemClasses`/`DefaultItems` fields; this catalogue does not duplicate or change them. - Independent review o",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "032",
+      "title": "032: Brawler progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_032.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_032.rs",
+      "py_script": "scripts/pieces/piece_032.py",
+      "py_test": "tests/pieces/test_piece_032.py",
+      "note": "notes/Research/Pieces/032 Brawler progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-032-20261009T032529Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **Lead integration.** Register `pub mod restoration::piece_032;` (or move the module) in `src/lib.rs` and drop the `#[path]` include from the owned test file. The module has no dependencies beyond `serde` and `std`. 2. **Wire use.** Nothing here answers a client packet. `src/profiles.rs` owns `Rank` / `RankPercent` and the 38/14 + 38/18 packets; the intended seam is that its curve stays reconst",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "033",
+      "title": "033: Warrior progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_033.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_033.rs",
+      "py_script": "scripts/pieces/piece_033.py",
+      "py_test": "tests/pieces/test_piece_033.py",
+      "note": "notes/Research/Pieces/033 Warrior progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-033-20261009T035724Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- The unlock levels are community wiki content; a server-side or client-side Warrior ability table was not recovered. The exact per-level ability list therefore stays a documented gap. - No ability ids, cooldowns, energy costs, AoE radii or damage values are recovered from original data. The community Sanctuary values were left out on purpose. - The profile packet's rank section and the equipment ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "034",
+      "title": "034: Ninja progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_034.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_034.rs",
+      "py_script": "scripts/pieces/piece_034.py",
+      "py_test": "tests/pieces/test_piece_034.py",
+      "note": "notes/Research/Pieces/034 Ninja progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-034-20261009T034148Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **Lead integration.** Register `pub mod piece_034;` under `src/restoration/` (or `lib.rs`) and replace the `#[path]` include in the owned test. The controller needs a caller: today `src/combat.rs` and `src/encounter.rs` still answer 36/10 themselves, so the validator is only exercised by its own vectors until the lead routes the request. 2. **Cooldown durations.** No original recast value is re",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "035",
+      "title": "035: Archer progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_035.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_035.rs",
+      "py_script": "scripts/pieces/piece_035.py",
+      "py_test": "tests/pieces/test_piece_035.py",
+      "note": "notes/Research/Pieces/035 Archer progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-035-20261009T033649Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "native or gameplay acceptance was attempted and the module is not registered in `lib.rs`. | `prototype/osfr-tools/tests/piece_035.rs` | 15 integration vectors; includes the module by `#[path]` until the lead registers it (new) | `admit_ranged_action` is the single entry point the lead should call: it runs the reach test first | Native acceptance | a client run of a ranged action | the lead wiring ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "036",
+      "title": "036: Wizard progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_036.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_036.rs",
+      "py_script": "scripts/pieces/piece_036.py",
+      "py_test": "tests/pieces/test_piece_036.py",
+      "note": "notes/Research/Pieces/036 Wizard progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-036-20261009T033448Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_036;` under `src/restoration/` and drop the `#[path]` include; keep `combat.rs` as the owner of the encounter and the (36/10) parse. 2. Wire integration: send the recovered 36/5 toolbar with slots 4895/4899 and the 36/13 definition packets, the 38/13 mana update, then 36/3 start casting and 32/7 attack processed for the resolved hit. Do not fabricate `A",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "037",
+      "title": "037: Medic progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_037.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_037.rs",
+      "py_script": "scripts/pieces/piece_037.py",
+      "py_test": "tests/pieces/test_piece_037.py",
+      "note": "notes/Research/Pieces/037 Medic progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-037-20261009T035019Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_037;` under `src/restoration/` and drop the `#[path]` include; keep `health`/`energy` ownership with whichever piece owns character stats. 2. Independent review of the reconstructed target matrix, especially the decision that healing never revives and that ability revives need another friendly actor. 3. Native acceptance (lead-owned): knock out in the o",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "038",
+      "title": "038: Adventurer progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_038.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_038.rs",
+      "py_script": "scripts/pieces/piece_038.py",
+      "py_test": "tests/pieces/test_piece_038.py",
+      "note": "notes/Research/Pieces/038 Adventurer progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-038-20261009T0405Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_038;` under `src/restoration/` and drop the `#[path]` include from the test. Keep item 074 as the owner of item/collectible definitions and 073 as the owner of discovery triggers. 2. Wire integration: the four recovered update packets need writers (collection id, entry id, index, name/description/icon/tint, reward bundle) before a restored server can pu",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "039",
+      "title": "039: Gathering job progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_039.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_039.rs",
+      "py_script": "scripts/pieces/piece_039.py",
+      "py_test": "tests/pieces/test_piece_039.py",
+      "note": "notes/Research/Pieces/039 Gathering job progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-039-20261009T040246Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_039;` under `src/restoration/` and drop the `#[path]` include, keeping `crate::profiles` as the single profile store. 2. Wire integration: gameplay (001/002 result handling) calls `GrantLedger::authorize` with `GrantKey::mining`/`GrantKey::harvesting` and applies the returned amount once; the farm track feeds the farm rank table from `FactoryRanks.txt` ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "040",
+      "title": "040: Crafting job progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_040.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_040.rs",
+      "py_script": "scripts/pieces/piece_040.py",
+      "py_test": "tests/pieces/test_piece_040.py",
+      "note": "notes/Research/Pieces/040 Crafting job progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-040-20261009T035326Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead integration: register `piece_040` in `lib.rs` only when a consumer exists, or use the checker as the content regression gate. Wiring the validator into the cooking/forging flow is lead-owned and was not modified here. - Native: the original client's rank gating, recipe learning and any level-up presentation for Chef/Blacksmith remain unexercised. - Original: the star curve, the `Param1` rec",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "041",
+      "title": "041: Racer and derby progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_041.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_041.rs",
+      "py_script": "scripts/pieces/piece_041.py",
+      "py_test": "tests/pieces/test_piece_041.py",
+      "note": "notes/Research/Pieces/041 Racer and derby progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-041-20261009T0402Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "table and any payout numbers stay explicit gaps. **No native or gameplay acceptance was | `prototype/osfr-tools/tests/piece_041.rs` | 11 tests; includes the module by `#[path]` until the lead registers it | * The ledger moves no coins, items or vehicle ownership. The lead's economy layer decides grants. * Native behavior for anything above: entering a race/derby, the rank-up call handler, and the",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "042",
+      "title": "042: Soccer and postman progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_042.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_042.rs",
+      "py_script": "scripts/pieces/piece_042.py",
+      "py_test": "tests/pieces/test_piece_042.py",
+      "note": "notes/Research/Pieces/042 Soccer and postman progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-042-20261009T0352Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "grants no job, item, currency or experience, and it does not claim a playable native flow. - Soccer Star: the Snowhill Soccer Field entrance icon leads to the tutorial and the job; the `prototype/osfr-tools/tests/piece_042.rs` until the lead registers the module): either job. Native acceptance stays with the lead.",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "043",
+      "title": "043: Pet trainer and card progression",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_043.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_043.rs",
+      "py_script": "scripts/pieces/piece_043.py",
+      "py_test": "tests/pieces/test_piece_043.py",
+      "note": "notes/Research/Pieces/043 Pet trainer and card progression.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-043-20261009T040732Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* XP thresholds per level, and therefore any honest level-up pacing, are unrecovered; the ledger takes a curve from the caller. This is the largest gap. * Locale ids 919922/919923 (level-up messages) are absent from the export, and the Pet Trainer job id, its own profile catalogue row and its 256px badge tier entries are unrecovered. * No capture contains a job level-up, so the server-to-client tr",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "044",
+      "title": "044: Class switching wire",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_044.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_044.rs",
+      "py_script": "scripts/pieces/piece_044.py",
+      "py_test": "tests/pieces/test_piece_044.py",
+      "note": "notes/Research/Pieces/044 Class switching wire.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-044-20261009T044119Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* The lead still has to register `pub mod piece_044;` where the restoration modules are declared; the owned test includes the file by `#[path]` until then. * Wiring the failure command into the live switch paths is a shared-file change and belongs to the lead; both the opening-world and legacy gameplay paths currently answer a bad switch with a chat message instead. * Native acceptance - actually ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "045",
+      "title": "045: Cosmetic equipment",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_045.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_045.rs",
+      "py_script": "scripts/pieces/piece_045.py",
+      "py_test": "tests/pieces/test_piece_045.py",
+      "note": "notes/Research/Pieces/045 Cosmetic equipment.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-045-20261009T041210Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* **Native equip and native restart persistence are not proved here.** No native client was driven, no UI was touched and no release was changed. The lead must equip a cosmetic through the real client, restart server and client, and confirm the item and its appearance are restored. The `rust-replay.json` samples give the exact expected `Slot/ModelName/TextureAlias/TintAlias/Tint` rows to compare a",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "046",
+      "title": "046: Consumables and buffs",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_046.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_046.rs",
+      "py_script": "scripts/pieces/piece_046.py",
+      "py_test": "tests/pieces/test_piece_046.py",
+      "note": "notes/Research/Pieces/046 Consumables and buffs.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-046-20261009T0421Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Not implemented or claimed: no item/currency/experience grant; no packet is sent; no server registration of 42/6 or 36/10; no native slot refresh; no healing amount, duration, size or stacking rule; no icon id to texture mapping; no consumable-to-effect-tag binding; no 38/25 target metadata semantics; no Stew-specific target/cooldown recovery. Integration gates for the lead: register `pub mod piec",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "047",
+      "title": "047: Gear attributes",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_047.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_047.rs",
+      "py_script": "scripts/pieces/piece_047.py",
+      "py_test": "tests/pieces/test_piece_047.py",
+      "note": "notes/Research/Pieces/047 Gear attributes.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-047-20261009T041533Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "restriction rows are recovered and tested. Combat gear stats, per-item stat types, two native stat No native acceptance was attempted and the module is not registered in `lib.rs`. | `prototype/osfr-tools/tests/piece_047.rs` | 8 integration vectors; includes the module by `#[path]` until the lead registers it (new) | | `scripts/pieces/piece_047.py` | Read-only checker over the pinned client item ta",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "048",
+      "title": "048: Ability bar",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_048.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_048.rs",
+      "py_script": "scripts/pieces/piece_048.py",
+      "py_test": "tests/pieces/test_piece_048.py",
+      "note": "notes/Research/Pieces/048 Ability bar.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-048-20261009T0442Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Status: code plus tests returned for lead review, 2026-10-09 04:42 UTC. This piece recovers the actions. It is not a playable claim: no native input was sent and the request/reply path has not been `lib.rs`, gameplay, gateway, Cargo manifest, launcher, content, state or native UI file was touched. **Assign request (42/6).** The native inventory base constructor `00a10400` writes",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "049",
+      "title": "049: Character appearance coverage",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_049.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_049.rs",
+      "py_script": "scripts/pieces/piece_049.py",
+      "py_test": "tests/pieces/test_piece_049.py",
+      "note": "notes/Research/Pieces/049 Character appearance coverage.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-049-20261009T042512Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "`prototype/osfr-tools/src/restoration/piece_049.rs` is not registered in `src/lib.rs` (lead-owned). The module is recovery metadata plus two pure lookups; the lead decides whether the creator/login path rejects skin tones 7/8 and head ids 5-8, and no native acceptance is claimed here.",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "050",
+      "title": "050: Character naming/select lifecycle",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_050.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_050.rs",
+      "py_script": "scripts/pieces/piece_050.py",
+      "py_test": "tests/pieces/test_piece_050.py",
+      "note": "notes/Research/Pieces/050 Character naming/select lifecycle.md",
+      "lab_evidence": {
+        "bundles": 3,
+        "latest": "piece-050-20261009T053017Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead registers `pub mod piece_050;` and decides whether `login.rs` should resolve the three definition fields through `NameCatalogue` instead of trusting the typed name, and whether the recovered custom-length policy replaces today's 32-character window (that changes which custom names the local realm accepts). 2. A captured native create flow is needed to decode a real 210/211 exchange \u2014 espec",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "051",
+      "title": "051: Enemy catalogue",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_051.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_051.rs",
+      "py_script": "scripts/pieces/piece_051.py",
+      "py_test": "tests/pieces/test_piece_051.py",
+      "note": "notes/Research/Pieces/051 Enemy catalogue.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-051-20261009T053532Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "No native or gameplay claim: this item binds identities and rejects fabricated ones. Not exercised: any native spawn/render of these rows, enemy combat, and the 12 divergent placements. Integration for the lead: register `pub mod piece_051;` and drop the `#[path]` include in `tests/piece_051.rs`; the catalogue rows are recovery metadata and must not be turned into granting or stat authority.",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "052",
+      "title": "052: Enemy patrol and idle",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_052.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_052.rs",
+      "py_script": "scripts/pieces/piece_052.py",
+      "py_test": "tests/pieces/test_piece_052.py",
+      "note": "notes/Research/Pieces/052 Enemy patrol and idle.md",
+      "lab_evidence": {
+        "bundles": 4,
+        "latest": "piece-052-20261009T052000Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Lead integration: register `mod piece_052;` (and the `restoration` module) in `src/lib.rs`, drop the `#[path]` include from the test, and let the encounter module construct routes from content. The module exposes the packet encoders, the recovered animation constants and `locomotion_animation_ids()` for the spawn fields; it owns no content or economy. Remaining gates: (1) lead-native idle/run acce",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "053",
+      "title": "053: Aggro and leash",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_053.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_053.rs",
+      "py_script": "scripts/pieces/piece_053.py",
+      "py_test": "tests/pieces/test_piece_053.py",
+      "note": "notes/Research/Pieces/053 Aggro and leash.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-053-20261009T051057Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "the recovered eligibility facts it consumes, and a fail-closed checker over the preserved native `lib.rs`, gameplay, gateway, Cargo manifest, launcher, content, state or native UI file was touched. Target eligibility is native and client-side, not a server table. The preserved executable's Tab-target selector `00a2ac20` (reached from the native input dispatcher `00b02880`, default action",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "054",
+      "title": "054: Melee attacks",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_054.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_054.rs",
+      "py_script": "scripts/pieces/piece_054.py",
+      "py_test": "tests/pieces/test_piece_054.py",
+      "note": "notes/Research/Pieces/054 Melee attacks.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-054-20261009T043758Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_054;` under `src/restoration/` and drop the `#[path]` include from `tests/piece_054.rs`. `encounter.rs` keeps ownership of the encounter itself. 2. Optional server adoption: replace the inline `distance(position, s.position) > range` and 600 ms checks in `encounter.rs::attack` with this gate so the reviewed rule has one owner; that is a lead-owned edit ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "055",
+      "title": "055: Ranged enemy attacks",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_055.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_055.rs",
+      "py_script": "scripts/pieces/piece_055.py",
+      "py_test": "tests/pieces/test_piece_055.py",
+      "note": "notes/Research/Pieces/055 Ranged enemy attacks.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-055-20261009T043358Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* `35/62`, `36/14`, `36/4` and `36/18` payload layouts are unrecovered; the module returns intent types and never fabricates frames. * No original cast time, projectile speed or enemy reach. The shortest closure is extracting `arrow_projectile.adr` (hash `1685399903`) with the existing pack reader and parsing it with the pinned `fr-adr-toolkit`, then reading the `ActorProjectileDefinition` fields ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "056",
+      "title": "056: Combat status effects",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_056.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_056.rs",
+      "py_script": "scripts/pieces/piece_056.py",
+      "py_test": "tests/pieces/test_piece_056.py",
+      "note": "notes/Research/Pieces/056 Combat status effects.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-056-20261009T042519Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead integration: the module is only reachable through its own test target. Registering `piece_056` under `src/restoration/`/`lib.rs` and routing encounter combat through the ledger is the lead's call; the module deliberately exposes no gameplay numbers. - Native acceptance is **not** claimed. It needs a visible buff row (icon + name + countdown) in the original client, its removal at expiry, an",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "057",
+      "title": "057: Loot and enemy rewards",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_057.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_057.rs",
+      "py_script": "scripts/pieces/piece_057.py",
+      "py_test": "tests/pieces/test_piece_057.py",
+      "note": "notes/Research/Pieces/057 Loot and enemy rewards.md",
+      "lab_evidence": {
+        "bundles": 3,
+        "latest": "piece-057-20261009T054124Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead registers `restoration::piece_057` in the shared module list and drops the `#[path]` include in the test. 2. Encounter integration is the lead's call: the natural hook is the defeat branch that already emits `35/3` removal - register the kill, then spawn the recovered prop model and apply the returned grant. No packet for that spawn is claimed by this slice. 3. Native acceptance (game-auto",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "058",
+      "title": "058: Death and revive",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_058.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_058.rs",
+      "py_script": "scripts/pieces/piece_058.py",
+      "py_test": "tests/pieces/test_piece_058.py",
+      "note": "notes/Research/Pieces/058 Death and revive.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-058-20261009T0532Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_058;` under `src/restoration/` and drop the `#[path]` include from `tests/piece_058.rs`. 2. Encounter integration: `src/encounter.rs` currently reports a knock-out with a chat line and an immediate checkpoint return. Wiring in `ReviveArbiter` + `RespawnWindow` is what turns that into the recovered 41/125 window, the 41/126 hide, the paid/free choice and",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "059",
+      "title": "059: Dungeon definitions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_059.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_059.rs",
+      "py_script": "scripts/pieces/piece_059.py",
+      "py_test": "tests/pieces/test_piece_059.py",
+      "note": "notes/Research/Pieces/059 Dungeon definitions.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-059-20261009T054317Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Coverage: 14/43 maps by confirmed zone definition; 41/43 entrance sentences; 37/43 achievement rows (every row of the contiguous block binds to exactly one dungeon); 1/43 terrain registrations. The remaining 29 maps need either a recovered `*.gzne` or an explicit lead decision to accept a stub-plus-chunks row such as Den of Secrets. - Candidate identities not counted as recovery: `sg_stillwater_",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "060",
+      "title": "060: Dungeon instance lifecycle",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_060.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_060.rs",
+      "py_script": "scripts/pieces/piece_060.py",
+      "py_test": "tests/pieces/test_piece_060.py",
+      "note": "notes/Research/Pieces/060 Dungeon instance lifecycle.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-060-20261009T041903Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Native acceptance stays with the lead: a real client run must show entry (`41/2`), zone ready (`41/107`), the state walk (`41/106` 5\u21926), spawn, settlement (`39/18` + `39/19`), exit and a reconnect. Integration for the lead is registering the module, de-duplicating the terminal encoders against `src/encounter.rs` and work item 016, and wiring capacity/grace from real evidence when it is recovered.",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "061",
+      "title": "061: Dungeon waves and gates",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_061.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_061.rs",
+      "py_script": "scripts/pieces/piece_061.py",
+      "py_test": "tests/pieces/test_piece_061.py",
+      "note": "notes/Research/Pieces/061 Dungeon waves and gates.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-061-20261009T051230Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Status: ready for review, 2026-10-09 05:12 UTC. This piece recovers the **original tutorial-cave room chain, its two static door instances, the door and rock-barrier clip families, and the interactive door verb sounds**, and adds a labelled reconstructed ordered-completion policy with tests. It is evidence plus a checker plus a small typed module; it is not a playable claim, and no wave count or t",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "062",
+      "title": "062: Boss behaviors",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_062.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_062.rs",
+      "py_script": "scripts/pieces/piece_062.py",
+      "py_test": "tests/pieces/test_piece_062.py",
+      "note": "notes/Research/Pieces/062 Boss behaviors.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-062-20261009T0533Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_062;` under `src/restoration/` and drop the `#[path]` include. This item owns no live encounter data; encounter 432 is a name, not a scheduled spawn. 2. Independent review of the ability/slot mapping and the two labelled interpretations above. 3. Native acceptance (lead-owned, shared client): enter the lair and observe, in order, the skeletal form, the ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "063",
+      "title": "063: Dungeon party rewards",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_063.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_063.rs",
+      "py_script": "scripts/pieces/piece_063.py",
+      "py_test": "tests/pieces/test_piece_063.py",
+      "note": "notes/Research/Pieces/063 Dungeon party rewards.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-063-20261009T0456Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "stay explicit gaps. No native or gameplay acceptance was attempted, and the module is not registered | `prototype/osfr-tools/tests/piece_063.rs` | 7 integration tests; includes the module by `#[path]` until the lead registers it (new) | returns the entitlement for the lead's economy layer to apply atomically. 1. Register `pub mod piece_063;` under `src/restoration` and drop the `#[path]` include f",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "064",
+      "title": "064: Dungeon collision/reachability",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_064.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_064.rs",
+      "py_script": "scripts/pieces/piece_064.py",
+      "py_test": "tests/pieces/test_piece_064.py",
+      "note": "notes/Research/Pieces/064 Dungeon collision/reachability.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-064-20261009T0438Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- **Unparsed evidence**: the CDTA payload after the prefix (91% of `room_01`) and the 5632-byte GCNK collision payloads. Until one is decoded, the walkable floor's collision source is unknown. - **Native gate**: real client traversal must be shown against decoded collision data, not only the render mesh. The checker's `--native-log` replay is the tool for that; this piece ran it on the preserved r",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "065",
+      "title": "065: Dungeon native replay",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_065.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_065.rs",
+      "py_script": "scripts/pieces/piece_065.py",
+      "py_test": "tests/pieces/test_piece_065.py",
+      "note": "notes/Research/Pieces/065 Dungeon native replay.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-065-20261009T053857Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "The transcript schema and the six rules are reconstructed; the rows they read are recovered. A gate fails on contradictory rows and reports `NotEvidenced` when the rows are absent, so a missing capture cannot pass. 1. **Fresh entry** \u2013 the run starts in the world, zones into the cave, then launch \u2192 zone ready \u2192 player enter; no player damage and no enemy movement before the first voluntary client ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "066",
+      "title": "066: Historical quest catalogue",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_066.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_066.rs",
+      "py_script": "scripts/pieces/piece_066.py",
+      "py_test": "tests/pieces/test_piece_066.py",
+      "note": "notes/Research/Pieces/066 Historical quest catalogue.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-066-20261009T043320Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: the module is not registered in `src/lib.rs`; `tests/piece_066.rs` uses a `#[path]` include until the lead registers it. 2. Catalogue repair: full wiki prerequisite titles (defect above), outside this item's paths. 3. Native: **0 original quests** have native acceptance; the 12/17 local stage figure is a 2026-10-08 snapshot. No claim of native historical fidelity. 4. Crate-wid",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "067",
+      "title": "067: Quest prerequisite engine",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_067.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_067.rs",
+      "py_script": "scripts/pieces/piece_067.py",
+      "py_test": "tests/pieces/test_piece_067.py",
+      "note": "notes/Research/Pieces/067 Quest prerequisite engine.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-067-20261009T050538Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "reconstructed policy and native acceptance. **No native run is claimed.** | `prototype/osfr-tools/tests/piece_067.rs` | 11 focused tests (owned `#[path]` include; module not yet registered) | * Original acceptance gate (native): **not exercised**. The engine is a library; wiring it into `quests.rs`/`opening.rs` is the lead's integration step, and no",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "068",
+      "title": "068: Quest event routing",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_068.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_068.rs",
+      "py_script": "scripts/pieces/piece_068.py",
+      "py_test": "tests/pieces/test_piece_068.py",
+      "note": "notes/Research/Pieces/068 Quest event routing.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-068-20261009T0521Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register the module and decide whether `gameplay.rs` replaces its hard-coded per-id checks (`recipe_id == 2001`, `resource_id == 1003`, \u2026) with `QuestEventRouter::route`. No shared file was touched here. 2. Journal wiring: emit subtype 9/10 updates keyed by `objective_key` on the existing `OpeningJournal` path; repeated or regressive credit handling stays with the engine that ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "069",
+      "title": "069: Quest turn-in transactions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_069.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_069.rs",
+      "py_script": "scripts/pieces/piece_069.py",
+      "py_test": "tests/pieces/test_piece_069.py",
+      "note": "notes/Research/Pieces/069 Quest turn-in transactions.md",
+      "lab_evidence": {
+        "bundles": 2,
+        "latest": "piece-069-20261009T052427Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- The ledger document, its schema, ordering, rejections and bounds are reconstructed. No original server transaction source was recovered. - Nothing here is wired into `gameplay.rs`; the lead owns that integration, and until it lands a crash between the quest flag change and the reward grant is still possible in the running server. - The per-quest reward numbers stay in the content owned by the ot",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "070",
+      "title": "070: Quest journal wire",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_070.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_070.rs",
+      "py_script": "scripts/pieces/piece_070.py",
+      "py_test": "tests/pieces/test_piece_070.py",
+      "note": "notes/Research/Pieces/070 Quest journal wire.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-070-20261009T051415Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* The two unnamed fields stay semantically unrecovered; only their byte positions, write-only nature and captured values are proven. * Integration seam (lead-owned): register `pub mod piece_070;`, replace `OpeningJournal::root_unknown` with `JournalRootTail::from_span` on load and `opening_campaign(...).write(...)` when rebuilding, and delete the duplicated tail walker in `opening_journal.rs`. Unt",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "071",
+      "title": "071: NPC dialogue branching",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_071.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_071.rs",
+      "py_script": "scripts/pieces/piece_071.py",
+      "py_test": "tests/pieces/test_piece_071.py",
+      "note": "notes/Research/Pieces/071 NPC dialogue branching.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-071-20261009T043725Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead-owned: register `pub mod piece_071;` (or the `restoration::piece_071` path chosen by the lead) and drop the `#[path]` include from the test. No shared file, manifest, content or save file was touched by this item. - The module never mutates quest state, grants rewards or writes packets: it returns a `DialogueReply` and the existing quest/gameplay owners apply it. - Native acceptance still r",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "072",
+      "title": "072: Starting area historical coverage",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_072.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_072.rs",
+      "py_script": "scripts/pieces/piece_072.py",
+      "py_test": "tests/pieces/test_piece_072.py",
+      "note": "notes/Research/Pieces/072 Starting area historical coverage.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-072-20261009T045430Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Integration (lead-owned): register the module in `lib.rs`, register the objective in a fresh private tutorial campaign branch, and bind the event to the reconstructed cave stage. Native acceptance is **pending** and cannot be claimed from this artefact: it needs the real client to open the original journal, show the close instruction/arrow, emit a real `45/7` only on normal Close while NPX tutoria",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "073",
+      "title": "073: Discoveries and exploration",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_073.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_073.rs",
+      "py_script": "scripts/pieces/piece_073.py",
+      "py_test": "tests/pieces/test_piece_073.py",
+      "note": "notes/Research/Pieces/073 Discoveries and exploration.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-073-20261009T0449Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Register `pub mod piece_073;` under `src/restoration/` and drop the `#[path]` include from `tests/piece_073.rs`. 2. Decide the server-side radius for a first playable slice, wire `DiscoveryTracker` into the position update path, and emit the existing collection update packets for entries whose name id resolves to the discovered POI \u2014 item 074 owns item collections and item 038 owns the collecti",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "074",
+      "title": "074: Collections and collectibles",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_074.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_074.rs",
+      "py_script": "scripts/pieces/piece_074.py",
+      "py_test": "tests/pieces/test_piece_074.py",
+      "note": "notes/Research/Pieces/074 Collections and collectibles.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-074-20261009T041951Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Lead integration: register `piece_074` in `prototype/osfr-tools/src/lib.rs` and drop the `#[path]` include from `tests/piece_074.rs`. Nothing else in the shared crate needs to change. - Interface: collection progress has no owner yet for the character save document. The ledger document is self-contained and bounded, but the lead decides where a character's bytes live. - Native: the client constr",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "075",
+      "title": "075: Postman delivery routes",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_075.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_075.rs",
+      "py_script": "scripts/pieces/piece_075.py",
+      "py_test": "tests/pieces/test_piece_075.py",
+      "note": "notes/Research/Pieces/075 Postman delivery routes.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-075-20261009T042543Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "`prototype/osfr-tools/tests/piece_075.rs` until the lead registers the module): - The helper is wired into no client or gateway path and no client run was made. Native acceptance",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "076",
+      "title": "076: Regional NPC and spawn content",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_076.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_076.rs",
+      "py_script": "scripts/pieces/piece_076.py",
+      "py_test": "tests/pieces/test_piece_076.py",
+      "note": "notes/Research/Pieces/076 Regional NPC and spawn content.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-076-20261009T043748Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Recovered original/community facts: placement rows, npc rows, area shapes, model file names, guid convention and the second-revision coverage. Community *recovered*, not first-party bytes. - Reconstructed: the region membership inference and the contradiction/finding policy. Numeric positions and identifiers are copied, never invented. - Not established: whether Sanctuary's placement recovery is",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "077",
+      "title": "077: Warpstones and travel",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_077.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_077.rs",
+      "py_script": "scripts/pieces/piece_077.py",
+      "py_test": "tests/pieces/test_piece_077.py",
+      "note": "notes/Research/Pieces/077 Warpstones and travel.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-077-20261009T051025Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* No `56`, `57`, `58` or `122` frame exists anywhere in the fourteen preserved captures (`scripts/pieces/piece_077.py` re-checks this). The destination-list layout is therefore community-reconstructed on both sides, and whether the real `57` body carries the legacy server's length prefix before the record stream is unresolved. The Rust decoder tolerates both; the encoder writes the bare framed str",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "078",
+      "title": "078: Zone transitions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_078.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_078.rs",
+      "py_script": "scripts/pieces/piece_078.py",
+      "py_test": "tests/pieces/test_piece_078.py",
+      "note": "notes/Research/Pieces/078 Zone transitions.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-078-20261009T043117Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- Independent review of the policy, its evidence and the RED/GREEN logs. - Native acceptance is a lead-owned gate: this item has no native run of its own. What would count: enter an instance and return, then confirm the client's `31`/`13`/`14`/`10` order, the bit-exact return position and that a queued prior-scene 125 does not move the saved snapshot. - Unrecovered: the exact original client behav",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "079",
+      "title": "079: World terrain readers",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_079.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_079.rs",
+      "py_script": "scripts/pieces/piece_079.py",
+      "py_test": "tests/pieces/test_piece_079.py",
+      "note": "notes/Research/Pieces/079 World terrain readers.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-079-20261009T0455Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "client, the gateway, a save or a release changed, and no gameplay or native behaviour is claimed. No native or gameplay acceptance, no collision or path-and-reachability proof, no rendering result, declared bounds, awaiting lead registration in `src/lib.rs`), its `#[path]` test",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "080",
+      "title": "080: World collision data",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_080.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_080.rs",
+      "py_script": "scripts/pieces/piece_080.py",
+      "py_test": "tests/pieces/test_piece_080.py",
+      "note": "notes/Research/Pieces/080 World collision data.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-080-20261009T044143Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Work item 080: recover the native/community collision representation and compare it against actual movement/floor samples.** Native acceptance of the down-ray hit remains open; no gameplay behaviour is `|native - render floor|` of `24.813` (the known farm plateau/cliff rows where the recorded position is native/render discrepancies already documented for the farm.",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "081",
+      "title": "081: Inventory instance lifecycle",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_081.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 1
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_081.rs",
+      "py_script": "scripts/pieces/piece_081.py",
+      "py_test": "tests/pieces/test_piece_081.py",
+      "note": "notes/Research/Pieces/081 Inventory instance lifecycle.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-081-20261009T051824Z"
+      },
+      "integration_status": "compiled into crate via inventory.rs -> mod instance_ids (#[path]); cross-module call sites: 0",
+      "native_testable_note": "compiled into the crate via inventory.rs (mod instance_ids); behaviour is unchanged until its call sites are wired, and native acceptance still needs a lead-owned client run",
+      "missing_gates": "`lib.rs`, gameplay, gateway, Cargo manifest, launcher, content, state or native UI file was touched, and no commit, release or native input was made. Hashes for every source, input and log are in the tests the lead should retire when `inventory.rs` takes its id from the counter. ## Integration contract for the lead",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "082",
+      "title": "082: Inventory search crash",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_082.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_082.rs",
+      "py_script": "scripts/pieces/piece_082.py",
+      "py_test": "tests/pieces/test_piece_082.py",
+      "note": "notes/Research/Pieces/082 Inventory search crash.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-082-20261009T052121Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Controlled native reproduction with the pinned fingerprint: start a fresh run from this exact saved state (`lab/state/rust-gameplay-character.json`), enter the world, open Stuff, search `Wheeler`, and capture the exit code plus a fault address or dump. The preflight fingerprint identifies the data state; this candidate does not change it. 2. A fault address, WER dump or debugger backtrace is th",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "083",
+      "title": "083: Shops and purchases",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_083.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_083.rs",
+      "py_script": "scripts/pieces/piece_083.py",
+      "py_test": "tests/pieces/test_piece_083.py",
+      "note": "notes/Research/Pieces/083 Shops and purchases.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-083-20261009T042532Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **Lead integration.** Register the module in `src/lib.rs` (`pub mod restoration;` plus the module) and drop nothing else. The owned test target includes the file by `#[path]` until then. 2. **Real inventory (item 081).** The ledger holds per-definition counts and tints, the same shape as `inventory::Inventory` stacks. It does not mint instance ids, so the completion packet's `ItemGuid` must com",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "084",
+      "title": "084: Selling and buyback",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_084.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_084.rs",
+      "py_script": "scripts/pieces/piece_084.py",
+      "py_test": "tests/pieces/test_piece_084.py",
+      "note": "notes/Research/Pieces/084 Selling and buyback.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-084-20261009T051314Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "currency and no experience, and it does not claim a playable native flow: the lead owns wiring real | Shipped client (native pseudocode) | `lab/decompiled/client/FreeRealms/pseudocode.c` | `f84a58674b8e7de0829d562e5f106a368f34d4750894a14b093ae745fa0befe3` | alone; the native binding accepts one or two numbers. Taken together, a request with quantity 0 never reused across a clear or a restart. Nati",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "085",
+      "title": "085: Player trading",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_085.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_085.rs",
+      "py_script": "scripts/pieces/piece_085.py",
+      "py_test": "tests/pieces/test_piece_085.py",
+      "note": "notes/Research/Pieces/085 Player trading.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-085-20261009T053901Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* **No capture/decrypt.** The pinned community repo ships raw `.pcap/.pcapng` sessions (`ofrserver/Packets/`), but SOE game frames are not decoded here; the wire rests on constructors, readers and the community enum, not on a literal captured trade. That is the largest gap. * Unrecovered field detail: the partner-name region of `TradeInvitePacket` (native offsets 0x26/0x27/0x28), the second field ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "086",
+      "title": "086: Currency and economy audit",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_086.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_086.rs",
+      "py_script": "scripts/pieces/piece_086.py",
+      "py_test": "tests/pieces/test_piece_086.py",
+      "note": "notes/Research/Pieces/086 Currency and economy audit.md",
+      "lab_evidence": {
+        "bundles": 5,
+        "latest": "piece-086-20261009T060149Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* Lead: register `src/restoration/piece_086.rs` in `src/lib.rs` and drop the `#[path]` include in `tests/piece_086.rs`. * Lead: the audit is a checker, not an economy. Spend paths (083/084/085, revive) must not be claimed until they debit coins through a checked sink. * Native gate: not attempted here. No native UI, save file or game window was touched; claiming a playable economy would require an",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "087",
+      "title": "087: Friends and presence",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_087.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_087.rs",
+      "py_script": "scripts/pieces/piece_087.py",
+      "py_test": "tests/pieces/test_piece_087.py",
+      "note": "notes/Research/Pieces/087 Friends and presence.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-087-20261009T0523Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "- `prototype/osfr-tools/src/restoration/piece_087.rs` - the module (not yet registered in `lib.rs`; the owned test includes it by `#[path]`). - `prototype/osfr-tools/tests/piece_087.rs` - 17 behaviour and wire tests. - `scripts/pieces/piece_087.py`, `tests/pieces/test_piece_087.py` - the fail-closed evidence checker and its acceptance test. Remaining integration gate (lead): register the module, r",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "088",
+      "title": "088: Chat channels",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_088.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_088.rs",
+      "py_script": "scripts/pieces/piece_088.py",
+      "py_test": "tests/pieces/test_piece_088.py",
+      "note": "notes/Research/Pieces/088 Chat channels.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-088-20261009T050912Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "playable native chat. Acceptance for the item is \"original local/party/private channel routing; **Command surface.** The `ClientChatProcessor` constructor registers fifteen names against nine `prototype/osfr-tools/tests/piece_088.rs` until the lead registers the module): The module has no crate-internal imports, so the lead's registration is adding",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "089",
+      "title": "089: Party lifecycle",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_089.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_089.rs",
+      "py_script": "scripts/pieces/piece_089.py",
+      "py_test": "tests/pieces/test_piece_089.py",
+      "note": "notes/Research/Pieces/089 Party lifecycle.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-089-20261008T1200Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "Queue item 089. Acceptance: invite/accept/leader/leave/disconnect; membership invariants and native parses headers only and writes no group payload. No native or gameplay acceptance was attempted, and the module is not registered in `lib.rs`. | `prototype/osfr-tools/tests/piece_089.rs` | 15 integration tests; includes the module by `#[path]` until the lead registers it (new) |",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "090",
+      "title": "090: Guild lifecycle",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_090.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_090.rs",
+      "py_script": "scripts/pieces/piece_090.py",
+      "py_test": "tests/pieces/test_piece_090.py",
+      "note": "notes/Research/Pieces/090 Guild lifecycle.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-090-20261009T0503Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "No guild capture exists in the preserved corpus: there is no recorded guild create, invite, promote or quit payload, no client-rendered guild window and no historical member, MOTD or role-name data. Wire vectors in the tests are synthetic reconstructions of the recovered layouts, not captures. Sub-packets 2, 11 and 26 are client-bound in the native image but have no recovered body; the parser refu",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "091",
+      "title": "091: Pets and companions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_091.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_091.rs",
+      "py_script": "scripts/pieces/piece_091.py",
+      "py_test": "tests/pieces/test_piece_091.py",
+      "note": "notes/Research/Pieces/091 Pets and companions.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-091-20261009T050738Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* **No decoded pet datagram exists.** The piece 011 wire probe scanned the preserved captures and found zero pet-family frames; this checker re-reports that finding instead of re-running Scapy. Every body above comes from the client's own writers, so the datagram-level encoding (SOE framing, field endianness on the wire) stays unverified. * 31 of the 35 subtypes still have no pinned body; three of",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "092",
+      "title": "092: Mounts and vehicles",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_092.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_092.rs",
+      "py_script": "scripts/pieces/piece_092.py",
+      "py_test": "tests/pieces/test_piece_092.py",
+      "note": "notes/Research/Pieces/092 Mounts and vehicles.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-092-20261009T0541Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Dispatch tunneled inner opcode 168 to the decoder and answer `168/2` + `168/4` from a server state machine; ownership must come from the character store, never from the request alone. 2. Add the `38/7` stat block on spawn and on dismount, and keep the actor pipeline's `35/2`/`35/3` spawn/remove packets as the visible-mount step. 3. Native acceptance: mount, dismount and re-mount in the client w",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "093",
+      "title": "093: Emotes and social actions",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_093.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_093.rs",
+      "py_script": "scripts/pieces/piece_093.py",
+      "py_test": "tests/pieces/test_piece_093.py",
+      "note": "notes/Research/Pieces/093 Emotes and social actions.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-093-20261009T053734Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead registers the module in `src/lib.rs` and drops the `#[path]` include (shared file, lead-owned). 2. Gateway wiring: broadcast a validated action row to nearby players and play animation id `N` for each; `validate_emote` is the intended entry point, not a replacement for the packet writer. 3. Native acceptance: press `/wave`, `/cheer`, `/dance` in the client and confirm the animation names a",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "094",
+      "title": "094: Reliable transport stress",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_094.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_094.rs",
+      "py_script": "scripts/pieces/piece_094.py",
+      "py_test": "tests/pieces/test_piece_094.py",
+      "note": "notes/Research/Pieces/094 Reliable transport stress.md",
+      "lab_evidence": {
+        "bundles": 4,
+        "latest": "piece-094-20261009T052118Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* Lead registration: add `pub mod piece_094;` to `src/lib.rs`. The module already uses `crate::soe`, `crate::soe_send` and `crate::session`, so no import rewrite is needed; the test target then drops its three `#[path]` crate-mirror modules and the `#[path]` include. * Native / integration gate (not claimed): there is no original-client multi-session capture. The gate that would close this item is",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "095",
+      "title": "095: Multi-character persistence",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_095.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_095.rs",
+      "py_script": "scripts/pieces/piece_095.py",
+      "py_test": "tests/pieces/test_piece_095.py",
+      "note": "notes/Research/Pieces/095 Multi-character persistence.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-095-20261009T050357Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "* Integration: the lead registers the module (`pub mod restoration;` / `piece_095`) and replaces the `#[path]` include with `use crate::character_store;`. * Login/wire: `identity.rs` and `login.rs` still load and answer a single identity; `selection_reply` still emits at most one entity, so no second character can be selected natively yet. The recovered opcode-12 `CharacterSelectInfoReply` entity ",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "096",
+      "title": "096: Typed world initialization",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_096.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_096.rs",
+      "py_script": "scripts/pieces/piece_096.py",
+      "py_test": "tests/pieces/test_piece_096.py",
+      "note": "notes/Research/Pieces/096 Typed world initialization.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-096-20261009T052309Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. **Native acceptance (lead-owned).** No client run followed these re-encodings. The unchanged vectors prove byte equality with messages the native client already accepted; they do not by themselves prove a rebuilt stream is accepted end to end. 2. **Gateway integration (lead-owned).** `src/restoration/piece_096.rs` is not registered. `Gateway::load_reference` could call `verify_captured` for the",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "097",
+      "title": "097: Asset reference validation",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_097.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_097.rs",
+      "py_script": "scripts/pieces/piece_097.py",
+      "py_test": "tests/pieces/test_piece_097.py",
+      "note": "notes/Research/Pieces/097 Asset reference validation.md",
+      "lab_evidence": {
+        "bundles": 1,
+        "latest": "piece-097-20261009T042918Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead integration: register `pub mod piece_097;` under `src/restoration/` and drop the `#[path]` include from the test. The module is not referenced by `src/lib.rs` yet. 2. No runtime consumer: nothing in the gateway enforces these findings. A follow-up could gate served inventory definitions (the reconstructed `inventory.json` ids) against this report before they are served; that is item 081/08",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "098",
+      "title": "098: Rust rendering/client feasibility",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_098.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_098.rs",
+      "py_script": "scripts/pieces/piece_098.py",
+      "py_test": "tests/pieces/test_piece_098.py",
+      "note": "notes/Research/Pieces/098 Rust rendering/client feasibility.md",
+      "lab_evidence": {
+        "bundles": 2,
+        "latest": "piece-098-20261009T051947Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Granny transform-curve evaluation (community readers exist; not implemented here), then pose sampling and skeleton binding. 2. `GCNK` collision semantics; the slice only bounds-checks the decompressed blob. 3. `GCNK` v2-v4 runtime objects (88 files are v2-v4) and height-map pixels. 4. A renderer: GPU upload, materials and a real zone view \u2014 the \"stage 6\" acceptance in [[Design/Rust Revival Road",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "099",
+      "title": "099: Multi-client integration harness",
+      "kind": "delegated piece",
+      "modules": [
+        {
+          "path": "prototype/osfr-tools/src/restoration/piece_099.rs",
+          "exists": true,
+          "registered_in_lib": false,
+          "callsites_outside_self": 0
+        }
+      ],
+      "rust_test": "prototype/osfr-tools/tests/piece_099.rs",
+      "py_script": "scripts/pieces/piece_099.py",
+      "py_test": "tests/pieces/test_piece_099.py",
+      "note": "notes/Research/Pieces/099 Multi-client integration harness.md",
+      "lab_evidence": {
+        "bundles": 2,
+        "latest": "piece-099-20261009T054208Z"
+      },
+      "integration_status": "module exists but not declared in lib.rs; zero callsites (unwired candidate)",
+      "native_testable_note": "NOT native-testable as delivered: the module is unreachable from the library/binary",
+      "missing_gates": "1. Lead registers `pub mod piece_099;` (and the candidate `piece_020`) when accepted, then the `#[path]` includes in `tests/piece_099.rs` go away. 2. Party (089), trade (085) and activity modules plug in as dispatchers; the trade case must flip from `unhandled` to a real two-sided settlement assertion. 3. Native gate: two actual clients on one desktop or a second host for party, trade and activity",
+      "artifact_completeness": "complete"
+    },
+    {
+      "id": "100",
+      "title": "100: Restoration acceptance dashboard",
+      "kind": "coordinator dispatch/status item",
+      "modules": [],
+      "note": "notes/Reviews/MMO Dispatch Status.md",
+      "integration_status": "n/a (process artifact)",
+      "native_testable_note": "n/a",
+      "missing_gates": "lead acceptance dashboard itself is the deliverable"
+    }
+  ]
+}

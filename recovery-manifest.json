@@ -1,0 +1,226 @@
+{
+  "recorded_utc": "2026-10-08T01:22:13.360961+00:00",
+  "target": "Free Realms restoration with Rust reimplementation",
+  "inputs": [
+    {
+      "archive": "OSFR.Server.zip",
+      "sha256": "cb6806c12fc26a4a5f1cb28b9b695b2de52a6d33ae35a55b46c2e6bcd3888ff5"
+    },
+    {
+      "archive": "OSFR.Client.zip",
+      "sha256": "61167cec14879ffe22669c60bc08bc49dad9dc34f075305b27b587e40956609c"
+    }
+  ],
+  "lab_path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab",
+  "managed_recovery": {
+    "assemblies": 7,
+    "csharp_files": 769,
+    "all_exit_zero": true,
+    "rebuilt": false,
+    "manifest": "../lab/manifests/server-decompilation.json"
+  },
+  "assets": {
+    "asset_entries": 108547,
+    "unique_names_case_insensitive": 108543,
+    "duplicate_name_entries": 4,
+    "raw_asset_bytes": 3020467857,
+    "crc_verified_entries": 108547
+  },
+  "rust_verification": {
+    "unit_tests_passed": 72,
+    "loopback_udp_integration_tests_passed": 1,
+    "failed": 0,
+    "release_build": "passed",
+    "original_client_connection_tested": true,
+    "command": ".\\scripts\\cargo.ps1 test --manifest-path .\\prototype\\osfr-tools\\Cargo.toml",
+    "ordinary_tests_passed": 73,
+    "transport_tests_passed": 17,
+    "opt_in_oracles_exercised": 8,
+    "note": "73 ordinary checks (including one named loopback integration) and eight private oracles exercised across milestones. Actual native reconstructed quest/reward/equipment/checkpoint loop and fresh restore verified; inventory search crashed separately.",
+    "capture_replay_report": "../lab/manifests/soe-rust-replay-20261008T0156090999173Z/summary.json",
+    "session_tests_passed": 3,
+    "gateway_tests_passed": 7,
+    "character_store_tests_passed": 7,
+    "live_session_checks_passed": 7
+  },
+  "native_analysis": {
+    "recorded_utc": "2026-10-08T01:40:59.770357+00:00",
+    "status": "export_complete_analysis_partial",
+    "analysis_timed_out": true,
+    "analysis_budget_seconds": 900,
+    "project_save_confirmed": true,
+    "export_summary": {
+      "program": "FreeRealms.exe",
+      "discovered_functions": 153968,
+      "external_functions_skipped": 0,
+      "recovered_functions": 153423,
+      "failed_functions": 0,
+      "cancelled": false,
+      "elapsed_seconds": 661
+    },
+    "saved_project_inspection": {
+      "total_functions": 153968,
+      "internal_functions": 153423,
+      "external_functions": 545
+    },
+    "index_status_counts": {
+      "recovered": 153423
+    },
+    "artifacts": [
+      {
+        "name": "pseudocode.c",
+        "bytes": 95176801,
+        "sha256": "f84a58674b8e7de0829d562e5f106a368f34d4750894a14b093ae745fa0befe3"
+      },
+      {
+        "name": "functions.tsv",
+        "bytes": 5231774,
+        "sha256": "993e041ec32aed63742bdcfac529bc7edf916fdce2f208df1071692fcf1c171c"
+      },
+      {
+        "name": "summary.json",
+        "bytes": 179,
+        "sha256": "e82faf58b6d7e5de026f4370b9e1b7ee45248557e6dc948681a8147318ef087a"
+      },
+      {
+        "name": "inspection.json",
+        "bytes": 79,
+        "sha256": "9577e419e088eca810d8d19bb5ba9dfb06132d27a4b47d3de504f95f5a620416"
+      }
+    ],
+    "limitations": [
+      "Initial analysis timed out",
+      "Pseudocode semantics not validated",
+      "Native dependencies and alternate executable not analyzed in this pass"
+    ]
+  },
+  "reference_revisions": {
+    "Open-Source-Free-Realms/Sanctuary": "4f028dcc274f628b65ef665fd59b184f5f3d3e3e",
+    "Open-Source-Free-Realms/OpenSourceFreeRealms": "ace6a82e0ab07111be0fc8e899b5a0716724e137",
+    "rehan-remade/universal-modder": "baff1e5d01f63ae7cc81a049b6f4cf60e6c91dec",
+    "edenfps/fr-adr-toolkit": "5acfdf8d6006fa6f43d1d3605f076a6be7393e72",
+    "rhettvx/forgelight-toolbox": "a8d7fae0c81ed410b43ddba279d645b74ee905a1",
+    "brhumphe/dbg-pack": "8feac971cc21449b20f1cb58d0f1ff900fd6b849",
+    "raisingkaines/FreeRealms-Legacy": "9e082025391177d5a33ee18c714ddd06b457a695"
+  },
+  "limitations": [
+    "Managed projects not rebuilt",
+    "Native pseudocode is inferred, not original source",
+    "Complete original server logic and content not established",
+    "Rust gateway uses 46 private captured initialization messages",
+    "One local GUID1/reference-zone0 supported; quests, combat, reward/inventory mutations, authentication and multiplayer unimplemented",
+    "Original native client remains in use and emits texture/image/rendering warnings"
+  ],
+  "legacy_server_runtime_check": {
+    "recorded_utc": "2026-10-08T01:23:49.585641+00:00",
+    "run_directory": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\runs\\legacy-handshake-20261007-182349",
+    "port": 54581,
+    "peer": "127.0.0.1",
+    "game_client_launched": false,
+    "server_binds": "0.0.0.0 (legacy implementation)",
+    "request_hex": "000100000002123456780000020043474150495f35323700",
+    "expected_response_hex": "000212345678705109400201000000020000000003",
+    "pid": 6184,
+    "actual_response_hex": "000212345678705109400201000000020000000003",
+    "matches_fixture": true,
+    "status": "passed",
+    "server_stopped": true
+  },
+  "continued_utc": "2026-10-08T02:35:46.832120+00:00",
+  "community_validation": {
+    "pack_report": "../lab/manifests/community-pack-check.json",
+    "pack_entries_matched": 6074,
+    "pack_asset_bytes_matched": 45765884,
+    "actor_report": "../lab/extracted/community-asset-check/report.json",
+    "static_preview": "../lab/extracted/community-asset-check/chatdy-preview.png",
+    "archive_research": "notes/Research/Universal Modder Assessment.md"
+  },
+  "original_client_baseline": {
+    "run_directory": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\runs\\client-baseline-20261008T020419Z",
+    "version": "1.910.1.530630",
+    "world_ready": true,
+    "walking_verified": true,
+    "position_updates": 12,
+    "unique_positions": 12,
+    "server": "supplied managed walking emulator",
+    "rust_game_server": false,
+    "saved_character_restoration_verified": false,
+    "processes_stopped": true,
+    "manifest": "../lab/runs/client-baseline-20261008T020419Z/manifest.json"
+  },
+  "rust_gateway_milestone": {
+    "status": "passed",
+    "recorded_utc": "2026-10-08T02:34:15.832488+00:00",
+    "client_version": "1.910.1.530630",
+    "walk_run": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\runs\\client-baseline-20261008T022638Z",
+    "restart_run": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\runs\\client-baseline-20261008T023143Z",
+    "walk_manifest_sha256": "3d62c6060b5037a2d24988c21382b4f332b91af5ab0423a86a6a256704c42ab1",
+    "restart_manifest_sha256": "f1b65d4544c635e7f36b545e0d0f7283fe73b1837bff7600a38814f733b716c9",
+    "walk_server_pid": 3688,
+    "restart_server_pid": 5656,
+    "walk_binary_sha256": "3f6bcafe362a0fd3390da293e74a0b2e3151b9d39f7a27e290ba26ba63e52180",
+    "restart_binary_sha256": "84e3937c67ffb35d765bf97c79a2a7cbaa11033a55143e6f13c4fca7cd36f6a1",
+    "actual_client_login_world_walking": true,
+    "deliberate_packet_loss_recovered": true,
+    "save_restart_restore": true,
+    "saved_character": {
+      "guid": 1,
+      "zone_id": 0,
+      "position": [
+        -1412.0295,
+        -28.21986,
+        344.7286
+      ],
+      "rotation": [
+        0.3574656,
+        0.0,
+        -0.9339263
+      ]
+    },
+    "restart_world_ready_state": {
+      "guid": 1,
+      "position": [
+        -1412.029541015625,
+        -28.219860076904297,
+        344.7286071777344
+      ],
+      "rotation": [
+        0.35746559500694275,
+        0.0,
+        -0.9339262843132019
+      ],
+      "zone_id": 0
+    },
+    "client_world_ready_position": [
+      -1412.029541,
+      -28.21986,
+      344.728607
+    ],
+    "position_and_rotation_restored_f32_exact": true,
+    "fresh_server_and_client_processes": true,
+    "all_game_test_processes_stopped": true,
+    "ordinary_tests_passed": 43,
+    "explicit_private_oracles_available": 3,
+    "original_client_capture_oracle_passed": true,
+    "live_session_checks_passed": 7,
+    "live_session_report": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\runs\\gateway-session-check-20261008T023232Z-0da6f701\\report.json",
+    "transport_report": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\runs\\client-baseline-20261008T022638Z\\analysis\\transport-report.json",
+    "private_initialization_templates": 46,
+    "scope": "one loopback character GUID1, reference zone0; original client remains native; gameplay systems unimplemented",
+    "limitations": [
+      "Initialization uses private captured emulator messages",
+      "No quest/combat/reward/account/multiplayer behavior verified",
+      "Original client still logs texture/image/rendering warnings",
+      "Short local tests do not establish long-running or multiplayer behavior"
+    ]
+  },
+  "last_updated_utc": "2026-10-08T03:49:07.263404+00:00",
+  "rust_gameplay_milestone": {
+    "status": "verified_local_reconstructed_gameplay_slice",
+    "manifest": "../lab/manifests/rust-gameplay-milestone.json",
+    "notes": "notes/Research/Gameplay Milestone.md",
+    "coverage": "notes/Research/Gameplay Coverage.md",
+    "final_binary_sha256": "949f89a53f2dc644d3b58792d6661d9c12e4ae062beb945e8c8f3c0648513b72",
+    "known_inventory_search_crash": true
+  }
+}

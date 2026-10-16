@@ -1,0 +1,17 @@
+# Class: ClientLobby
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00bb03d0` | `ClientLobby::ContainsPairKey` | 🟢 | virtual | Virtual slot [10] of ClientLobby: looks up the pair (param_2, param_3) in the 100-bucket table at this+0x1bc, bucket = (param_3 ^ param_2) % 100; walks the chain (next at node+0x14) comparing the stored hash at node+0x1… |
+| `00bb0450` | `ClientLobby::FindPairNode ?` | 🟡 | virtual | Virtual slot [17] of ClientLobby: the same xor-hash bucket walk as ClientLobby::ContainsPairKey over the table at this+0x1bc, returning the matching node pointer or 0. |
+| `00bb0780` | `ClientLobby_DtorBody` | 🟢 | dtor | Destructor body: stores the ClientLobby vtable (01824f6c) at +0, stores the LobbyMember map vtable (01824f58) at +0x1a8 and clears that map through 00bb0550, then calls 01049a20. |
+| `00bb0aa0` | `— ⚠reject` | ⚪ | ctor | Constructor: stores the ClientLobby vtable (01824f6c), constructs the LobbyMember hash-list member through 00bb07f0, calls 01049900, and zeroes the dword at this+0x350. |
+| `00bb0b10` | `ClientLobby_ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (ClientLobby vtable slot [0]): calls the destructor body 00bb0780 on ECX and calls _free when the delete flag bit 0 is set. |
+| `00bb0b30` | `ClientLobby::AddPairIfAbsent` | 🟢 | virtual | Virtual slot [8] of ClientLobby: calls virtual slot [10] (ContainsPairKey) with (param_2, param_3); when the pair is absent it inserts it through 00bb0920 and returns 1, otherwise returns 0. |
+| `00bb0c30` | `— ⚠reject` | ⚪ | virtual | Virtual slot [15] of ClientLobby: formats 'Received lobby error code: %d' and appends ' (ErrorCode = %d)' into a local string, chooses a localized message id from the code (4 gives 0xc90, 5 gives 0xc8f, 9 gives 0xc91, o… |
+| `00bb1890` | `ClientLobby::SendJoinGame` | ✅ | virtual | Virtual method at ClientLobby::vftable slot 12: constructs a JoinLobbyGamePacket in a 20-byte stack buffer (008a3da0 with the dword at this+0x1a4), fetches the client singleton (00769710) and, when the interface slot at… |
+| `00bb1920` | `ClientLobby::SendLeaveGame` | ✅ | virtual | Virtual method at ClientLobby::vftable slot 13: builds a LeaveLobbyGamePacket in a 20-byte stack buffer (008a3e60 with this+0x1a4), then, when the client singleton state at [[00769710()+4]+0x280] is non-zero, sends it t… |
+| `00bb19b0` | `ClientLobby::SendStartGame` | ✅ | virtual | Virtual method at ClientLobby::vftable slot 14: constructs a StartLobbyGamePacket in a 20-byte stack buffer (008a3f20 with this+0x1a4) and, when [[00769710()+4]+0x280] is non-zero, sends it through the tunneled sender 0… |
+| `00bb1a40` | `ClientLobby::SendLeaveLobby` | 🟢 | virtual | Virtual method at ClientLobby::vftable slot 16: constructs a LeaveLobbyPacket with id 0 (00bafe60, base opcode 101 sub-opcode 9), overwrites the packet dword at +0xc with the method argument, checks [[00769710()+4]+0x28… |
+| `00bb1ac0` | `ClientLobby::SendLeaveLobbyAndRemoveSlot44 ? ⚠downgrade` | 🟡 | virtual | Virtual method at ClientLobby::vftable slot 9: constructs a LeaveLobbyPacket (00bafe60) and sends it through 00bb1680 when [[00769710()+4]+0x280] is non-zero; then calls this->vtable slot 0x44 and, if that returns non-z… |
+| `00bb1cd0` | `ClientLobby::SendCreateGame` | 🟢 | virtual | Virtual method at ClientLobby::vftable slot 11: when the argument is non-zero it takes the client singleton (00769710), calls vtable slot 0x10 of the object reached through [[singleton+4]+0xc8]+0x54 to fill a 0xe0-byte … |

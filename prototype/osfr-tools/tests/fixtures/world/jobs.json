@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": "archer",
+      "name": "Archer",
+      "profile_id": 35,
+      "category": "combat",
+      "max_level": 20,
+      "members_only": false,
+      "trainer_npc_ids": [],
+      "quest_ids": [],
+      "abilities": [],
+      "source": [
+        { "kind": "client", "evidence": "notes/Build Guides/Content/Jobs/Archer.md: job name and client level gates" },
+        { "kind": "client", "evidence": "notes/Build Guides/Gameplay/Items and Inventory.md: ItemFilters job option, Archer profile ID 35" },
+        { "kind": "wiki", "evidence": "notes/Build Guides/Content/Jobs/Archer.md: overview, max level 20" },
+        { "kind": "reconstructed", "evidence": "(R) lower-case stable slug is a content key, not a recovered client job id" }
+      ]
+    }
+  ]
+}

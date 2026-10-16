@@ -1,0 +1,184 @@
+{
+  "schema_version": {
+    "value": 1,
+    "source": "(R) local JSON schema"
+  },
+  "abilities": [
+    {
+      "id": {
+        "value": 10001,
+        "source": "(R) local catalogue id; native ability ids arrive from server content and are not recovered"
+      },
+      "name": {
+        "value": "First Aid",
+        "source": "client locale rank text 4168670255; notes/Build Guides/Content/Jobs/Medic.md"
+      },
+      "job_profile": {
+        "value": 11,
+        "source": "client ItemFilterOptions.txt profile id, recorded in notes/Build Guides/Gameplay/Combat and Abilities.md"
+      },
+      "slot": {
+        "value": 0,
+        "source": "(R) zero-based starter toolbar placement; original Medic slot assignment is unknown"
+      },
+      "target_kind": {
+        "value": "self_or_ally",
+        "source": "wiki First Aid description: self and nearby allies; ability targeting selector is unknown"
+      },
+      "range": {
+        "value": 5.0,
+        "source": "(R) nearby-ally range is not recovered"
+      },
+      "cost": {
+        "value": 10,
+        "source": "(R) ability energy cost is not recovered"
+      },
+      "cooldown_ms": {
+        "value": 1000,
+        "source": "(R) ability cooldown is not recovered"
+      },
+      "cast_time_ms": {
+        "value": 0,
+        "source": "(R) First Aid cast time is not recovered"
+      },
+      "effects": [
+        {
+          "kind": {
+            "value": "heal",
+            "source": "(R) local effect model; client rank text does not prove server effect encoding"
+          },
+          "recipient": {
+            "value": "target",
+            "source": "wiki First Aid description: heals self or the selected nearby ally"
+          },
+          "amount": {
+            "value": 250,
+            "source": "client rank-1 text locale 4168670255; displayed healing amount, server formula remains (R)"
+          }
+        }
+      ]
+    },
+    {
+      "id": {
+        "value": 10002,
+        "source": "(R) local catalogue id; native ability ids arrive from server content and are not recovered"
+      },
+      "name": {
+        "value": "Incision",
+        "source": "client developer weapon-tier text, notes/Build Guides/Content/Jobs/Medic.md"
+      },
+      "job_profile": {
+        "value": 11,
+        "source": "client ItemFilterOptions.txt profile id, recorded in notes/Build Guides/Gameplay/Combat and Abilities.md"
+      },
+      "slot": {
+        "value": 1,
+        "source": "(R) zero-based starter toolbar placement; original Medic slot assignment is unknown"
+      },
+      "target_kind": {
+        "value": "hostile",
+        "source": "client developer weapon-tier text classifies Incision as a Medic attack"
+      },
+      "range": {
+        "value": 5.0,
+        "source": "(R) Incision range is not recovered"
+      },
+      "cost": {
+        "value": 10,
+        "source": "(R) ability energy cost is not recovered"
+      },
+      "cooldown_ms": {
+        "value": 1000,
+        "source": "(R) ability cooldown is not recovered"
+      },
+      "cast_time_ms": {
+        "value": 0,
+        "source": "(R) Incision cast time is not recovered"
+      },
+      "effects": [
+        {
+          "kind": {
+            "value": "damage",
+            "source": "(R) local effect model; client weapon data does not establish damage formula"
+          },
+          "recipient": {
+            "value": "target",
+            "source": "client developer weapon-tier text classifies Incision as an attack"
+          },
+          "amount": {
+            "value": 279,
+            "source": "(R) wiki starter Student Medic Hammer amount is used only as an initial balance hypothesis"
+          }
+        }
+      ]
+    },
+    {
+      "id": {
+        "value": 10003,
+        "source": "(R) local catalogue id; native ability ids arrive from server content and are not recovered"
+      },
+      "name": {
+        "value": "Triage",
+        "source": "client developer weapon-tier text, notes/Build Guides/Content/Jobs/Medic.md"
+      },
+      "job_profile": {
+        "value": 11,
+        "source": "client ItemFilterOptions.txt profile id, recorded in notes/Build Guides/Gameplay/Combat and Abilities.md"
+      },
+      "slot": {
+        "value": 2,
+        "source": "(R) zero-based starter toolbar placement; original Medic slot assignment is unknown"
+      },
+      "target_kind": {
+        "value": "hostile",
+        "source": "client developer weapon-tier text classifies Triage as a Medic attack"
+      },
+      "range": {
+        "value": 5.0,
+        "source": "(R) Triage range is not recovered"
+      },
+      "cost": {
+        "value": 20,
+        "source": "(R) ability energy cost is not recovered"
+      },
+      "cooldown_ms": {
+        "value": 5000,
+        "source": "(R) ability cooldown is not recovered"
+      },
+      "cast_time_ms": {
+        "value": 0,
+        "source": "(R) Triage cast time is not recovered"
+      },
+      "effects": [
+        {
+          "kind": {
+            "value": "damage",
+            "source": "(R) local effect model; client weapon data does not establish damage formula"
+          },
+          "recipient": {
+            "value": "target",
+            "source": "(R) damage is assigned to the hostile target"
+          },
+          "amount": {
+            "value": 889,
+            "source": "(R) wiki starter Student Medic Hammer amount is used only as an initial balance hypothesis"
+          }
+        },
+        {
+          "kind": {
+            "value": "heal",
+            "source": "(R) local effect model; client weapon data does not establish healing formula"
+          },
+          "recipient": {
+            "value": "caster",
+            "source": "(R) starter Triage healing is assigned to the Medic using it"
+          },
+          "amount": {
+            "value": 254,
+            "source": "(R) wiki starter Student Medic Hammer amount is used only as an initial balance hypothesis"
+          }
+        }
+      ]
+    }
+  ]
+}

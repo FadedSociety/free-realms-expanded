@@ -1,0 +1,1489 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3100001,
+      "title_string_id": 139748,
+      "giver_npc_id": 9000000001,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000217,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 139749 'Talk to Therin at Snowhill to become a miner.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0: unlock and tutorial (Snowhill, Highroad Junction), row 0a; name 'Become a Miner (optional)'; title id cell ucdt 799154819 / ugdt 3580747954"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0: unlock and tutorial (Snowhill, Highroad Junction), row 0a; name 'Become a Miner (optional)'; title id cell ucdt 799154819 / ugdt 3580747954"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 139749,
+      "end_text_string_id": 139750
+    },
+    {
+      "id": 3100002,
+      "title_string_id": 23217,
+      "giver_npc_id": 9000000217,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0: unlock and tutorial (Snowhill, Highroad Junction), row 1; name 'So, You Want To Be A Miner? (wiki: same; the client has no \"Miner:\" prefix)'; title id cell ucdt 424366129 / ugdt 3038117748"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0: unlock and tutorial (Snowhill, Highroad Junction), row 1; name 'So, You Want To Be A Miner? (wiki: same; the client has no \"Miner:\" prefix)'; title id cell ucdt 424366129 / ugdt 3038117748"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 23218,
+      "end_text_string_id": 23219
+    },
+    {
+      "id": 3100003,
+      "title_string_id": 76087,
+      "giver_npc_id": 9000000217,
+      "prerequisite_quest_ids": [
+        3100002
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000220,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 76088 'Visit Trixi in the Singing Crystal Mines and find out if she has any better mining gear for you.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0: unlock and tutorial (Snowhill, Highroad Junction), row 2; name 'Miner: All I Got'; title id cell ucdt 2960363250 / ugdt 3044663103"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0: unlock and tutorial (Snowhill, Highroad Junction), row 2; name 'Miner: All I Got'; title id cell ucdt 2960363250 / ugdt 3044663103"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76088,
+      "intro_text_string_id": 76086,
+      "end_text_string_id": 76089
+    },
+    {
+      "id": 3100004,
+      "title_string_id": 76209,
+      "giver_npc_id": 9000000220,
+      "prerequisite_quest_ids": [
+        3100003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 3; name 'Miner: Rush Order'; title id cell ucdt 1785220510 / ugdt 2809150349"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 3; name 'Miner: Rush Order'; title id cell ucdt 1785220510 / ugdt 2809150349"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 3; name 'Miner: Rush Order'; title id cell ucdt 1785220510 / ugdt 2809150349"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76210,
+      "intro_text_string_id": 76208,
+      "end_text_string_id": 76211
+    },
+    {
+      "id": 3100005,
+      "title_string_id": 76770,
+      "giver_npc_id": 9000000220,
+      "prerequisite_quest_ids": [
+        3100004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 4; name 'Miner: Gem Appraisal'; title id cell ucdt 2096904799 / ugdt 353496866"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 4; name 'Miner: Gem Appraisal'; title id cell ucdt 2096904799 / ugdt 353496866"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 4; name 'Miner: Gem Appraisal'; title id cell ucdt 2096904799 / ugdt 353496866"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76771,
+      "intro_text_string_id": 76769,
+      "end_text_string_id": 76772
+    },
+    {
+      "id": 3100006,
+      "title_string_id": 387445,
+      "giver_npc_id": 9000000472,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 5; name 'Miner: Reach Level 5'; title id cell ucdt 2349354316 / ugdt 3417374346"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 5; name 'Miner: Reach Level 5'; title id cell ucdt 2349354316 / ugdt 3417374346"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387446,
+      "intro_text_string_id": 387444,
+      "end_text_string_id": 387447
+    },
+    {
+      "id": 3100007,
+      "title_string_id": 76971,
+      "giver_npc_id": 9000000472,
+      "prerequisite_quest_ids": [
+        3100006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 6; name 'Miner: Dartmoor Mining Camp'; title id cell ucdt 1604679068 / ugdt 1681165973"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 6; name 'Miner: Dartmoor Mining Camp'; title id cell ucdt 1604679068 / ugdt 1681165973"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 6; name 'Miner: Dartmoor Mining Camp'; title id cell ucdt 1604679068 / ugdt 1681165973"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76972,
+      "intro_text_string_id": 76970,
+      "end_text_string_id": 76973
+    },
+    {
+      "id": 3100008,
+      "title_string_id": 77043,
+      "giver_npc_id": 9000000201,
+      "prerequisite_quest_ids": [
+        3100007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 7; name 'Miner: Simple Surveying'; title id cell ucdt 458305440 / ugdt 1902684592"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 7; name 'Miner: Simple Surveying'; title id cell ucdt 458305440 / ugdt 1902684592"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77044,
+      "intro_text_string_id": 77042,
+      "end_text_string_id": 77045
+    },
+    {
+      "id": 3100009,
+      "title_string_id": 77166,
+      "giver_npc_id": 9000000201,
+      "prerequisite_quest_ids": [
+        3100008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 8; name 'Miner: Suspicious Eyes'; title id cell ucdt 3899063209 / ugdt 1387023092"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 8; name 'Miner: Suspicious Eyes'; title id cell ucdt 3899063209 / ugdt 1387023092"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77167,
+      "intro_text_string_id": 77165,
+      "end_text_string_id": 77168
+    },
+    {
+      "id": 3100010,
+      "title_string_id": 77249,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3100009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 9; name 'Miner: Bigger Challenges'; title id cell ucdt 3787024052 / ugdt 634790821"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 9; name 'Miner: Bigger Challenges'; title id cell ucdt 3787024052 / ugdt 634790821"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77250,
+      "intro_text_string_id": 77248,
+      "end_text_string_id": 77251
+    },
+    {
+      "id": 3100011,
+      "title_string_id": 77321,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3100010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 10; name 'Miner: The Perfect Pour'; title id cell ucdt 2498096597 / ugdt 1147345435"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 10; name 'Miner: The Perfect Pour'; title id cell ucdt 2498096597 / ugdt 1147345435"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77322,
+      "intro_text_string_id": 77320,
+      "end_text_string_id": 77323
+    },
+    {
+      "id": 3100012,
+      "title_string_id": 387453,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 11; name 'Miner: Reach Level 10'; title id cell ucdt 3888000566 / ugdt 391333572"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 11; name 'Miner: Reach Level 10'; title id cell ucdt 3888000566 / ugdt 391333572"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387454,
+      "intro_text_string_id": 387452,
+      "end_text_string_id": 387455
+    },
+    {
+      "id": 3100013,
+      "title_string_id": 77416,
+      "giver_npc_id": 9000000069,
+      "prerequisite_quest_ids": [
+        3100012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 12; name 'Miner: Finding Southvale'; title id cell ucdt 2140669657 / ugdt 3352915159"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 2: Dartmoor Quarry (level 5 to 10), row 12; name 'Miner: Finding Southvale'; title id cell ucdt 2140669657 / ugdt 3352915159"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77417,
+      "intro_text_string_id": 77415,
+      "end_text_string_id": 77418
+    },
+    {
+      "id": 3100014,
+      "title_string_id": 77429,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3100013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 13; name 'Miner: Gems For Good Luck'; title id cell ucdt 3873213359 / ugdt 1003452021"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 13; name 'Miner: Gems For Good Luck'; title id cell ucdt 3873213359 / ugdt 1003452021"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77430,
+      "intro_text_string_id": 77428,
+      "end_text_string_id": 77431
+    },
+    {
+      "id": 3100015,
+      "title_string_id": 77481,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3100014
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 14; name 'Miner: Marriage Proposal'; title id cell ucdt 4053543483 / ugdt 3004115283"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 14; name 'Miner: Marriage Proposal'; title id cell ucdt 4053543483 / ugdt 3004115283"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77482,
+      "intro_text_string_id": 77480,
+      "end_text_string_id": 77483
+    },
+    {
+      "id": 3100016,
+      "title_string_id": 77515,
+      "giver_npc_id": 9000000405,
+      "prerequisite_quest_ids": [
+        3100015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 15; name 'Miner: Checking the Chug'; title id cell ucdt 189934649 / ugdt 853451617"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 15; name 'Miner: Checking the Chug'; title id cell ucdt 189934649 / ugdt 853451617"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 14; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77516,
+      "intro_text_string_id": 77514,
+      "end_text_string_id": 77517
+    },
+    {
+      "id": 3100017,
+      "title_string_id": 77549,
+      "giver_npc_id": 9000000337,
+      "prerequisite_quest_ids": [
+        3100016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 16; name \"Miner: Grumpore's Challenge\"; title id cell ucdt 3424826090 / ugdt 689619092"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 16; name \"Miner: Grumpore's Challenge\"; title id cell ucdt 3424826090 / ugdt 689619092"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77550,
+      "intro_text_string_id": 77548,
+      "end_text_string_id": 77551
+    },
+    {
+      "id": 3100018,
+      "title_string_id": 77600,
+      "giver_npc_id": 9000000337,
+      "prerequisite_quest_ids": [
+        3100017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 17; name 'Miner: Arrowheads for Lugabow'; title id cell ucdt 1597467405 / ugdt 1774273871"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 17; name 'Miner: Arrowheads for Lugabow'; title id cell ucdt 1597467405 / ugdt 1774273871"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77601
+    },
+    {
+      "id": 3100019,
+      "title_string_id": 387459,
+      "giver_npc_id": 9000000337,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 18; name 'Miner: Reach Level 15'; title id cell ucdt 1964707745 / ugdt 1229540640"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 18; name 'Miner: Reach Level 15'; title id cell ucdt 1964707745 / ugdt 1229540640"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387460,
+      "end_text_string_id": 387461
+    },
+    {
+      "id": 3100020,
+      "title_string_id": 77623,
+      "giver_npc_id": 9000000337,
+      "prerequisite_quest_ids": [
+        3100019
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000203,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 77624 'Visit Silverray at Quagmire Quarry in Blackspore.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 19; name 'Miner: See For Yourself'; title id cell ucdt 170920361 / ugdt 739807739"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 3: Southvale Quarry (level 10 to 15), row 19; name 'Miner: See For Yourself'; title id cell ucdt 170920361 / ugdt 739807739"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77624,
+      "intro_text_string_id": 77622,
+      "end_text_string_id": 77625
+    },
+    {
+      "id": 3100021,
+      "title_string_id": 77747,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3100020
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 4: Quagmire Quarry (level 15 to 20), row 20; name 'Miner: Minor Mix-Up'; title id cell ucdt 1793977535 / ugdt 1791657135"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 4: Quagmire Quarry (level 15 to 20), row 20; name 'Miner: Minor Mix-Up'; title id cell ucdt 1793977535 / ugdt 1791657135"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77748,
+      "intro_text_string_id": 77746,
+      "end_text_string_id": 77749
+    },
+    {
+      "id": 3100022,
+      "title_string_id": 77764,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3100021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 4: Quagmire Quarry (level 15 to 20), row 21; name 'Miner: Smelting Secrets'; title id cell ucdt 1506861154 / ugdt 1035472660"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 4: Quagmire Quarry (level 15 to 20), row 21; name 'Miner: Smelting Secrets'; title id cell ucdt 1506861154 / ugdt 1035472660"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77765,
+      "intro_text_string_id": 77763,
+      "end_text_string_id": 77766
+    },
+    {
+      "id": 3100023,
+      "title_string_id": 387467,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line table; title 'Miner: Reach Level 20'; client title locale id 1045306489"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line, level 20 band; giver and quest title 'Miner: Reach Level 20'; source precedence keeps wiki series context"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100023 is a stable batch content key; no numeric server quest id is given"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) row order preserved; quest awaits level 20 per guide, but no prior quest id is source-backed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no reward value is given in this row; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387468,
+      "end_text_string_id": 387469
+    },
+    {
+      "id": 3100024,
+      "title_string_id": 78173,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3100023
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line table; title 'Miner: Growing Up So Quickly'; client title locale id 710045233"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line, level 20 band; giver and quest title 'Miner: Growing Up So Quickly'; source precedence keeps wiki series context"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100024 is a stable batch content key; no numeric server quest id is given"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) explicit guide prerequisite After 22 mapped to batch key 3100023"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no reward value is given in this row; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78174,
+      "intro_text_string_id": 78172,
+      "end_text_string_id": 78175
+    },
+    {
+      "id": 3100025,
+      "title_string_id": 23656,
+      "giver_npc_id": 9000000169,
+      "prerequisite_quest_ids": [
+        3100024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line table; title 'Miner: Biggest is Best'; client title locale id 2476118825"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line, level 20 band; giver and quest title 'Miner: Biggest is Best'; source precedence keeps wiki series context"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100025 is a stable batch content key; no numeric server quest id is given"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) explicit guide prerequisite After 23 mapped to batch key 3100024"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no reward value is given in this row; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 23657
+    },
+    {
+      "id": 3100026,
+      "title_string_id": null,
+      "giver_npc_id": 9000000169,
+      "prerequisite_quest_ids": [
+        3100025
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: row 25 states \"Miner: Speed Smelting\" has no live client title ID"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line, level 20 band; giver and quest title 'Miner: Speed Smelting'; source precedence keeps wiki series context"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100026 is a stable batch content key; no numeric server quest id is given"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) wiki-only title has no live client title ID; explicit guide prerequisite After 24 mapped to batch key 3100025"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no reward value is given in this row; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) title_string_id is null because the guide says no live title id was found; page title is 'Miner: Speed Smelting'"
+        }
+      ]
+    },
+    {
+      "id": 3100027,
+      "title_string_id": 78196,
+      "giver_npc_id": 9000000169,
+      "prerequisite_quest_ids": [
+        3100026
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 5: Mother Lode Quarry (level 20), row 26; name 'Miner: Mother Lode Lift'; title id cell ucdt 2231955117 / ugdt 203916122"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 5: Mother Lode Quarry (level 20), row 26; name 'Miner: Mother Lode Lift'; title id cell ucdt 2231955117 / ugdt 203916122"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 25; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78197,
+      "intro_text_string_id": 78195,
+      "end_text_string_id": 78198
+    },
+    {
+      "id": 3100028,
+      "title_string_id": 78313,
+      "giver_npc_id": 9000000470,
+      "prerequisite_quest_ids": [
+        3100027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line table; title 'Miner: Rare Rock Collection'; client title locale id 3808966383"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line, level 20 band; giver and quest title 'Miner: Rare Rock Collection'; source precedence keeps wiki series context"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100028 is a stable batch content key; no numeric server quest id is given"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) explicit guide prerequisite After 26 mapped to batch key 3100027"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no reward value is given in this row; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78314,
+      "intro_text_string_id": 78312,
+      "end_text_string_id": 78315
+    },
+    {
+      "id": 3100029,
+      "title_string_id": 78337,
+      "giver_npc_id": 9000000470,
+      "prerequisite_quest_ids": [
+        3100028
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line table; title 'Miner: Part of the Guild'; client title locale id 829879740"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line, level 20 band; giver and quest title 'Miner: Part of the Guild'; source precedence keeps wiki series context"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3100029 is a stable batch content key; no numeric server quest id is given"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) explicit guide prerequisite After 27 mapped to batch key 3100028"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no reward value is given in this row; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78338,
+      "intro_text_string_id": 78336,
+      "end_text_string_id": 78339
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+# Class: CharacterCreateAccountInfoDataSource
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00c2a0d0` | `CharacterCreateAccountInfoDataSource::GetColumnName` | ✅ | virtual | Virtual column-name accessor (vtable slot [1]): a 14-entry switch returns IsMember (0), MaxCharacters (1), IsAdminAccount (2), HeadshotUrl (3), CharacterGuid (4), CharacterName (5), CharacterModelId (6), CharacterHead (… |
+| `00c2a190` | `CharacterCreateAccountInfoDataSource::Refresh` | 🟢 | virtual | Virtual override (framework vtable slot [4], default 010caf20): reads the session state field *(*(this+0x25c)+0x53d9c) into this+0x258, sets the state at this+0x254 to 0, or 2 when the field equals 1, and always finishe… |
+| `00c2a1d0` | `CharacterCreateAccountInfoDataSource::GetStatusText` | ✅ | method | Writes the current status dword (this+0x258) through the out pointer and switches on it: state 0 returns Invalid session token, state 2 returns Account has no characters, state -1 (0xffffffff) returns Unable to get acco… |
+| `00c2a260` | `CharacterCreateAccountInfoDataSource::GetRowCount` | 🟢 | virtual | Virtual method (vtable slot [2]): reads the client's account character count at *(this+0x22c)+0x22298 and walks the character array from +0x22290 (next entry at +0x62b0) counting only entries whose first name byte is no… |
+| `00c2a2c0` | `CharacterCreateAccountInfoDataSource::GetCellText` | 🟢 | virtual | Virtual method (vtable slot [4]) with signature (row, column[, out]): takes the account character count from vtable slot [2], walks the client's character list (this+0x22c -> +0x22290, next entry at +0x62b0) skipping en… |
+| `00c2a6f0` | `— ⚠reject` | ⚪ | dtor | Destructor body: resets the three vtable pointers (this+0, +0x30, +0x34) to CharacterCreateAccountInfoDataSource::vftable and calls the shared base teardown 0091bf60 with the stack cookie, then returns. |
+| `00c2a760` | `CharacterCreateAccountInfoDataSource::CharacterCreateAccountInfoDataSource` | ✅ | ctor | Constructor with two arguments: registers the data-source name 'BaseClient.AccountInfo' through 00922890, installs the three vtable pointers, zeroes +0x254 and +0x258 and stores the two arguments at +0x25c and +0x260, r… |
+| `00c2a7f0` | `CharacterCreateAccountInfoDataSource::ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (vtable slot [0]): calls the destructor body 00c2a6f0 and frees the object with _free when the low bit of the flag argument is set. |

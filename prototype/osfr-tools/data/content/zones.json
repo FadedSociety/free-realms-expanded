@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 1,
+      "name": "Blackspore Swamp",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 1 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Briarwood",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 2 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Cobblestone Village",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 3 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Durango Zoo",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 4 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Farnum Farmstead",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 5 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Greenwood Forest",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 6 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Highroad Junction",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 7 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Lakeshore",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 8 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Merry Vale",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 9 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Sanctuary",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 10 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Seaside",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 11 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Shrouded Glade",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 12 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Snowhill",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 13 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Stillwater Crossing",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 14 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Sunstone Valley",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 15 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Wilds",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 16 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Wugachug",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) zone package id 17 is assigned from the regional NPC guide title; no native numeric zone id or geometry mapping is in this batch"
+        }
+      ]
+    }
+  ]
+}

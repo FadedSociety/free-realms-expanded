@@ -1,0 +1,29 @@
+# Class: ClientGateway::BasePacket
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `0089ad90` | `ClientGateway::BasePacketDtor ⚠downgrade` | 🟢 | dtor | Trivial destructor body of ClientGateway::BasePacket: writes the class vtable pointer at +0 and returns; cited by 351 EH unwind funclets, the highest fan-in of any function in this shard. |
+| `0089ada0` | `ClientGateway::BasePacketScalarDtor` | ✅ | dtor | Scalar deleting destructor of ClientGateway::BasePacket: stores the class vtable at +0 and calls _free when bit 0 of param_2 is set. |
+| `0089ae20` | `ClientGatewayBasePacketDtor_89ae20` | ✅ | dtor | Trivial destructor body resetting the ClientGateway::BasePacket vtable at +0; cited by 226 EH unwind funclets. |
+| `0089aed0` | `ClientGatewayBasePacketDtor_89aed0` | ✅ | dtor | Trivial destructor body resetting the ClientGateway::BasePacket vtable at +0; cited by 93 EH unwind funclets. |
+| `00a98280` | `ClientGateway::BasePacket::BuildAndSend ? ⚠downgrade` | 🟡 | method | Takes a byte flag (the second argument; the first is unused). Calls 00a97250 into a 0x2048-byte stack buffer, reads two words from the object it fills (zeroing the first if its second word is zero), stores the flag byte… |
+| `00b5bc20` | `WrapPetNameRequestPayload` | 🟢 | function | Initializes a tunneled-client packet from a stack serialization buffer, copies the serialized data span into the wrapper, stores param_2 as the wrapper byte, installs the BasePacket vtable, and cleans up the temporary b… |
+| `00b5bd40` | `WrapPetUiModePayload` | 🟢 | function | Serializes the stack buffer through FUN_00b5a240, copies its pointer and length into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5be50` | `WrapPetFavoriteTrickPayload` | 🟢 | function | Serializes the supplied stack object, copies the resulting payload span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5bf60` | `WrapPetUtilityFeedPayload` | 🟢 | function | Serializes the stack payload through FUN_00b5a380, copies its data span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c070` | `WrapPetUtilityGroomPayload` | 🟢 | function | Serializes the stack payload through FUN_00b5a420, copies its data span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c180` | `WrapPetPlayWithToyPayload` | 🟢 | function | Serializes the stack payload through FUN_00b5a4c0, copies the data span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c290` | `WrapPetCanGoLocationPayload` | 🟢 | function | Serializes the payload through FUN_00b5a530, including the location block and trailing byte, copies its span into a tunneled-client packet, and installs the BasePacket vtable. |
+| `00b5c3a0` | `WrapPetPerformTrickPayload` | 🟢 | function | Serializes the payload through FUN_00b5a590, copies its data span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c4b0` | `WrapPetGestureResultPayload` | 🟢 | function | Serializes the supplied stack payload through FUN_00b5a5f0, copies its byte span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c5c0` | `WrapPetSummonRecallPayload` | 🟢 | function | Serializes a dword plus a byte from the supplied object, copies the resulting span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c6d0` | `WrapPetSummonByItemPayload` | 🟢 | function | Serializes two dwords from the supplied body, copies the resulting span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c7e0` | `WrapPetEquipPayload` | 🟢 | function | Serializes a leading byte and two dwords from the payload, copies its span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5c8f0` | `WrapPetInWaterPayload` | 🟢 | function | Serializes a single byte from the payload, copies that byte into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5ca00` | `WrapPetTargetPayload` | 🟢 | function | Serializes four dwords from the supplied target-related body, copies the data span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00b5cd50` | `WrapPetEquipByItemRecordPayload` | 🟢 | function | Serializes the supplied item-record payload through FUN_00b5b0c0, copies its span into a tunneled-client packet, stores param_2 as a byte, and installs the BasePacket vtable. |
+| `00bb8260` | `SerializeRecordAndSend ⚠downgrade` | 🟢 | function | Serializes the caller's record, writes its length-prefixed body into a tunneled client-world packet, dispatches it through 00926360, then destroys the temporary packet buffer. |
+| `00bb8380` | `SerializeListAndSend ⚠downgrade` | 🟢 | function | Serializes the caller's record and linked values into a tunneled client packet, sends through 00925640, and destroys the temporary packet buffer. |
+| `00bff5c0` | `— ⚠reject` | ⚪ | function | Builds a 0x10000000 mount-family inner packet, copies its serialized payload into a ClientGateway tunneled packet, adds param_2, and cleans both temporary writers. |
+| `00c04670` | `WrapInGamePurchasePacketForGateway` | ✅ | function | Serializes the in-game purchase packet into a temporary buffer, constructs a tunneled client world packet, adds param_2, and destroys the temporary packet writers. |
+| `00ccebc0` | `— ⚠reject` | ⚪ | function | Initializes a packet writer, serializes four tactile fields, constructs the ClientGateway base packet, copies header fields, and restores the prior exception state. |

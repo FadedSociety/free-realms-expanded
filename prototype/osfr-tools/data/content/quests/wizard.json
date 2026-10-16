@@ -1,0 +1,1672 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3160001,
+      "title_string_id": 442278,
+      "giver_npc_id": 9000000550,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Entry quests (optional, before the line), row E1; name 'Being a Better Wizard'; title id cell ucdt 3114992442 / ugdt 377656940"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Entry quests (optional, before the line), row E1; name 'Being a Better Wizard'; title id cell ucdt 3114992442 / ugdt 377656940"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3160003,
+      "title_string_id": 20859,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 1; name 'Wizard: How to be a Wizard'; title id cell ucdt 2048787144 / ugdt 1624230361"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 1; name 'Wizard: How to be a Wizard'; title id cell ucdt 2048787144 / ugdt 1624230361"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 20860
+    },
+    {
+      "id": 3160004,
+      "title_string_id": 22188,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 2; name \"Wizard: I Can't Read This!\"; title id cell ucdt 2701944597 / ugdt 1368051160"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 2; name \"Wizard: I Can't Read This!\"; title id cell ucdt 2701944597 / ugdt 1368051160"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22189,
+      "intro_text_string_id": 22187,
+      "end_text_string_id": 22190
+    },
+    {
+      "id": 3160005,
+      "title_string_id": 22193,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 3; name 'Sticky Spell Book (client has no \"Wizard:\" prefix)'; title id cell ucdt 690898156 / ugdt 266067796"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 3; name 'Sticky Spell Book (client has no \"Wizard:\" prefix)'; title id cell ucdt 690898156 / ugdt 266067796"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22194
+    },
+    {
+      "id": 3160006,
+      "title_string_id": 74827,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 4; name 'Wizard: Lightning Bolt! (wiki: \"Lightning Bolt\")'; title id cell ucdt 2346978073 / ugdt 732171236"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 4; name 'Wizard: Lightning Bolt! (wiki: \"Lightning Bolt\")'; title id cell ucdt 2346978073 / ugdt 732171236"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74828,
+      "intro_text_string_id": 74826,
+      "end_text_string_id": 74829
+    },
+    {
+      "id": 3160007,
+      "title_string_id": 74820,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 5; name 'Wizard: The First Rule of Being a Wizard'; title id cell ucdt 2712229186 / ugdt 233531357"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 5; name 'Wizard: The First Rule of Being a Wizard'; title id cell ucdt 2712229186 / ugdt 233531357"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74821,
+      "intro_text_string_id": 74819,
+      "end_text_string_id": 74822
+    },
+    {
+      "id": 3160008,
+      "title_string_id": 74839,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 6; name 'Wizard: Market Wizards'; title id cell ucdt 1297997265 / ugdt 1498950365"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 6; name 'Wizard: Market Wizards'; title id cell ucdt 1297997265 / ugdt 1498950365"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74840,
+      "intro_text_string_id": 74838,
+      "end_text_string_id": 74841
+    },
+    {
+      "id": 3160009,
+      "title_string_id": 74853,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 7; name 'Wizard: Student Profits'; title id cell ucdt 2655860047 / ugdt 499410726"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 7; name 'Wizard: Student Profits'; title id cell ucdt 2655860047 / ugdt 499410726"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74854,
+      "intro_text_string_id": 74852,
+      "end_text_string_id": 74855
+    },
+    {
+      "id": 3160010,
+      "title_string_id": 387659,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 8; name 'Wizard: Reach Level 5'; title id cell ucdt 639072755 / ugdt 990149966"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 8; name 'Wizard: Reach Level 5'; title id cell ucdt 639072755 / ugdt 990149966"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387660,
+      "intro_text_string_id": 387658,
+      "end_text_string_id": 387661
+    },
+    {
+      "id": 3160011,
+      "title_string_id": 388284,
+      "giver_npc_id": 9000000159,
+      "prerequisite_quest_ids": [
+        3160010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 9; name 'Contract: Troll Magic (repeatable)'; title id cell ucdt 1293936818 / ugdt 316942395"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 9; name 'Contract: Troll Magic (repeatable)'; title id cell ucdt 1293936818 / ugdt 316942395"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388285,
+      "intro_text_string_id": 388283,
+      "end_text_string_id": 388286
+    },
+    {
+      "id": 3160012,
+      "title_string_id": 74859,
+      "giver_npc_id": 9000000324,
+      "prerequisite_quest_ids": [
+        3160010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 10; name 'Wizard: An Icy Mistake'; title id cell ucdt 62347282 / ugdt 842351510"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 10; name 'Wizard: An Icy Mistake'; title id cell ucdt 62347282 / ugdt 842351510"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74860,
+      "intro_text_string_id": 74858,
+      "end_text_string_id": 74861
+    },
+    {
+      "id": 3160013,
+      "title_string_id": 74890,
+      "giver_npc_id": 9000000234,
+      "prerequisite_quest_ids": [
+        3160012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 11; name 'Wizard: Merry Magical Story'; title id cell ucdt 3357280436 / ugdt 3306818962"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 11; name 'Wizard: Merry Magical Story'; title id cell ucdt 3357280436 / ugdt 3306818962"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74891,
+      "intro_text_string_id": 74889,
+      "end_text_string_id": 74892
+    },
+    {
+      "id": 3160014,
+      "title_string_id": 141685,
+      "giver_npc_id": 9500000427,
+      "prerequisite_quest_ids": [
+        3160013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 12; name 'Wizard: Feeding the Storyteller'; title id cell ucdt 1585275978 / ugdt 993321699"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 12; name 'Wizard: Feeding the Storyteller'; title id cell ucdt 1585275978 / ugdt 993321699"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141686,
+      "intro_text_string_id": 141684,
+      "end_text_string_id": 141687
+    },
+    {
+      "id": 3160015,
+      "title_string_id": 74918,
+      "giver_npc_id": 9000000234,
+      "prerequisite_quest_ids": [
+        3160014
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 13; name 'Wizard: Lost Student'; title id cell ucdt 1851665471 / ugdt 1431712393"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 13; name 'Wizard: Lost Student'; title id cell ucdt 1851665471 / ugdt 1431712393"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 12; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74919,
+      "intro_text_string_id": 74917,
+      "end_text_string_id": 74920
+    },
+    {
+      "id": 3160016,
+      "title_string_id": 74938,
+      "giver_npc_id": 9000000234,
+      "prerequisite_quest_ids": [
+        3160015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 14; name 'Wizard: Osgood as it Gets (wiki: \"Osgood as it gets\")'; title id cell ucdt 1784018683 / ugdt 2885105121"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 14; name 'Wizard: Osgood as it Gets (wiki: \"Osgood as it gets\")'; title id cell ucdt 1784018683 / ugdt 2885105121"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74939,
+      "intro_text_string_id": 74937,
+      "end_text_string_id": 74940
+    },
+    {
+      "id": 3160017,
+      "title_string_id": 387663,
+      "giver_npc_id": 9000000164,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 15; name 'Wizard: Reach Level 10'; title id cell ucdt 657708926 / ugdt 2531577459"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 15; name 'Wizard: Reach Level 10'; title id cell ucdt 657708926 / ugdt 2531577459"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387664,
+      "intro_text_string_id": 387662,
+      "end_text_string_id": 387665
+    },
+    {
+      "id": 3160018,
+      "title_string_id": 388288,
+      "giver_npc_id": 9000000159,
+      "prerequisite_quest_ids": [
+        3160017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 16; name 'Contract: Robgoblin Magic (repeatable)'; title id cell ucdt 468806840 / ugdt 3964440904"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 16; name 'Contract: Robgoblin Magic (repeatable)'; title id cell ucdt 468806840 / ugdt 3964440904"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388289,
+      "intro_text_string_id": 388287,
+      "end_text_string_id": 388290
+    },
+    {
+      "id": 3160019,
+      "title_string_id": 37311,
+      "giver_npc_id": 9000000164,
+      "prerequisite_quest_ids": [
+        3160017
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000190,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 37312 'Speak with Sandbur in Sanctuary's Inner Circle.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 17; name 'Wizard: Helping a Friend'; title id cell ucdt 2203152989 / ugdt 3183744182"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 17; name 'Wizard: Helping a Friend'; title id cell ucdt 2203152989 / ugdt 3183744182"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 37312,
+      "intro_text_string_id": 37310
+    },
+    {
+      "id": 3160020,
+      "title_string_id": 22364,
+      "giver_npc_id": 9000000190,
+      "prerequisite_quest_ids": [
+        3160019
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 18; name 'Wizard: Searching for the Past (wiki: \"Searching in the Past\")'; title id cell ucdt 179010565 / ugdt 3934172150"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 18; name 'Wizard: Searching for the Past (wiki: \"Searching in the Past\")'; title id cell ucdt 179010565 / ugdt 3934172150"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 17; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22365
+    },
+    {
+      "id": 3160021,
+      "title_string_id": 74972,
+      "giver_npc_id": 9000000190,
+      "prerequisite_quest_ids": [
+        3160020
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 19; name 'Wizard: Crystal Clear Delivery'; title id cell ucdt 2300783413 / ugdt 2707260649"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 19; name 'Wizard: Crystal Clear Delivery'; title id cell ucdt 2300783413 / ugdt 2707260649"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74973,
+      "intro_text_string_id": 74971,
+      "end_text_string_id": 74974
+    },
+    {
+      "id": 3160022,
+      "title_string_id": 74984,
+      "giver_npc_id": 9000000108,
+      "prerequisite_quest_ids": [
+        3160021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 20; name 'Wizard: Things Left Unfinished'; title id cell ucdt 3650510733 / ugdt 523048267"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 20; name 'Wizard: Things Left Unfinished'; title id cell ucdt 3650510733 / ugdt 523048267"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74985,
+      "intro_text_string_id": 74983,
+      "end_text_string_id": 74986
+    },
+    {
+      "id": 3160023,
+      "title_string_id": 74996,
+      "giver_npc_id": 9000000108,
+      "prerequisite_quest_ids": [
+        3160022
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 21; name 'Wizard: Filling in the Gaps'; title id cell ucdt 3668281995 / ugdt 2620648860"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 3: level 10 to 15 (Osgood, Sandbur, Iliya, Sanctuary and Blackspore), row 21; name 'Wizard: Filling in the Gaps'; title id cell ucdt 3668281995 / ugdt 2620648860"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74997,
+      "intro_text_string_id": 74995,
+      "end_text_string_id": 74998
+    },
+    {
+      "id": 3160024,
+      "title_string_id": 387667,
+      "giver_npc_id": 9000000164,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 22; name 'Wizard: Reach Level 15'; title id cell ucdt 1993716356 / ugdt 1115360121"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 22; name 'Wizard: Reach Level 15'; title id cell ucdt 1993716356 / ugdt 1115360121"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387668,
+      "intro_text_string_id": 387666,
+      "end_text_string_id": 387669
+    },
+    {
+      "id": 3160025,
+      "title_string_id": 388292,
+      "giver_npc_id": 9000000159,
+      "prerequisite_quest_ids": [
+        3160024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 23; name 'Contract: Secret Magic (repeatable)'; title id cell ucdt 3761114130 / ugdt 885207881"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 23; name 'Contract: Secret Magic (repeatable)'; title id cell ucdt 3761114130 / ugdt 885207881"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388293,
+      "intro_text_string_id": 388291,
+      "end_text_string_id": 388294
+    },
+    {
+      "id": 3160026,
+      "title_string_id": 22309,
+      "giver_npc_id": 9000000164,
+      "prerequisite_quest_ids": [
+        3160024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 24; name 'Wizard: Missing Student Sven'; title id cell ucdt 1406086208 / ugdt 4218255642"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 24; name 'Wizard: Missing Student Sven'; title id cell ucdt 1406086208 / ugdt 4218255642"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22310
+    },
+    {
+      "id": 3160027,
+      "title_string_id": 22321,
+      "giver_npc_id": 9000000209,
+      "prerequisite_quest_ids": [
+        3160026
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 25; name \"Wizard: Sven's Job Offer\"; title id cell ucdt 4022166798 / ugdt 2409155074"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 25; name \"Wizard: Sven's Job Offer\"; title id cell ucdt 4022166798 / ugdt 2409155074"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 24; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22322
+    },
+    {
+      "id": 3160028,
+      "title_string_id": 22353,
+      "giver_npc_id": 9000000209,
+      "prerequisite_quest_ids": [
+        3160027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 26; name 'Wizard: A Twig From Treeleaf'; title id cell ucdt 361596405 / ugdt 3460213497"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 26; name 'Wizard: A Twig From Treeleaf'; title id cell ucdt 361596405 / ugdt 3460213497"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 25; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22354
+    },
+    {
+      "id": 3160029,
+      "title_string_id": 76314,
+      "giver_npc_id": 9000000209,
+      "prerequisite_quest_ids": [
+        3160028
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 27; name 'Wizard: One Thing to Bind Them'; title id cell ucdt 1467123050 / ugdt 691419732"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 27; name 'Wizard: One Thing to Bind Them'; title id cell ucdt 1467123050 / ugdt 691419732"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 26; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76315,
+      "intro_text_string_id": 76313,
+      "end_text_string_id": 76316
+    },
+    {
+      "id": 3160030,
+      "title_string_id": 387671,
+      "giver_npc_id": 9000000209,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 28; name 'Wizard: Reach Level 20'; title id cell ucdt 3185769041 / ugdt 200904680"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 28; name 'Wizard: Reach Level 20'; title id cell ucdt 3185769041 / ugdt 200904680"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387672,
+      "intro_text_string_id": 387670,
+      "end_text_string_id": 387673
+    },
+    {
+      "id": 3160031,
+      "title_string_id": 388296,
+      "giver_npc_id": 9000000159,
+      "prerequisite_quest_ids": [
+        3160030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 29; name 'Contract: Life and Death Magic (repeatable)'; title id cell ucdt 3931297330 / ugdt 855865041"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 4: level 15 to 20 (Osgood, Sven, Briarwood), row 29; name 'Contract: Life and Death Magic (repeatable)'; title id cell ucdt 3931297330 / ugdt 855865041"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 28; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388297,
+      "intro_text_string_id": 388295,
+      "end_text_string_id": 388298
+    },
+    {
+      "id": 3160032,
+      "title_string_id": 76331,
+      "giver_npc_id": 9000000209,
+      "prerequisite_quest_ids": [
+        3160030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 5: level 20 (the wand finale), row 30; name 'Wizard: Two Gems Are Better Than One'; title id cell ucdt 393214709 / ugdt 3696130347"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 5: level 20 (the wand finale), row 30; name 'Wizard: Two Gems Are Better Than One'; title id cell ucdt 393214709 / ugdt 3696130347"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 28; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76332,
+      "intro_text_string_id": 76330,
+      "end_text_string_id": 76333
+    },
+    {
+      "id": 3160033,
+      "title_string_id": 76439,
+      "giver_npc_id": 9000000126,
+      "prerequisite_quest_ids": [
+        3160032
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 5: level 20 (the wand finale), row 31; name 'Wizard: Rescue Mission'; title id cell ucdt 2193190725 / ugdt 2160185878"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 5: level 20 (the wand finale), row 31; name 'Wizard: Rescue Mission'; title id cell ucdt 2193190725 / ugdt 2160185878"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 30; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76440,
+      "intro_text_string_id": 76438,
+      "end_text_string_id": 76441
+    },
+    {
+      "id": 3160034,
+      "title_string_id": 103656,
+      "giver_npc_id": 9000000164,
+      "prerequisite_quest_ids": [
+        3160033
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 5: level 20 (the wand finale), row 32; name 'Wizard: Parts and Labor'; title id cell ucdt 2154900495 / ugdt 3795875037"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 5: level 20 (the wand finale), row 32; name 'Wizard: Parts and Labor'; title id cell ucdt 2154900495 / ugdt 3795875037"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3160034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 31; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103657,
+      "intro_text_string_id": 103655,
+      "end_text_string_id": 103658
+    }
+  ]
+}

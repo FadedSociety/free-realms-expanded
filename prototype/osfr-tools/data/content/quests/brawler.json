@@ -1,0 +1,2189 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3030001,
+      "title_string_id": 42130,
+      "giver_npc_id": 9000000014,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Entry quests (optional, outside the three starting lines), row E1; name 'Brawling 101 (wiki: \"Tutorial: Brawling 101\")'; title id cell ucdt 3192267549 / ugdt 155837148"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Entry quests (optional, outside the three starting lines), row E1; name 'Brawling 101 (wiki: \"Tutorial: Brawling 101\")'; title id cell ucdt 3192267549 / ugdt 155837148"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 42131,
+      "intro_text_string_id": 42129
+    },
+    {
+      "id": 3030002,
+      "title_string_id": 45307,
+      "giver_npc_id": 9000000090,
+      "prerequisite_quest_ids": [
+        3030001
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Entry quests (optional, outside the three starting lines), row E2; name 'The \"Hands On\" Method (wiki: \"Tutorial: The \"Hands On\" Method\")'; title id cell ucdt 1616251712 / ugdt 872075585"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Entry quests (optional, outside the three starting lines), row E2; name 'The \"Hands On\" Method (wiki: \"Tutorial: The \"Hands On\" Method\")'; title id cell ucdt 1616251712 / ugdt 872075585"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 45308,
+      "intro_text_string_id": 45306
+    },
+    {
+      "id": 3030003,
+      "title_string_id": 139686,
+      "giver_npc_id": 9000000517,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Entry quests (optional, outside the three starting lines), row E3; name 'Art of Brawling'; title id cell ucdt 1703411187 / ugdt 889379665"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Entry quests (optional, outside the three starting lines), row E3; name 'Art of Brawling'; title id cell ucdt 1703411187 / ugdt 889379665"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 139687
+    },
+    {
+      "id": 3030004,
+      "title_string_id": 140531,
+      "giver_npc_id": 9000000042,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 140532,
+      "intro_text_string_id": 140530,
+      "end_text_string_id": 140533
+    },
+    {
+      "id": 3030005,
+      "title_string_id": 94283,
+      "giver_npc_id": 9000000042,
+      "prerequisite_quest_ids": [
+        3030004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C2; name 'Brawler: Honor Lost'; title id cell ucdt 833784102 / ugdt 249251189"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C2; name 'Brawler: Honor Lost'; title id cell ucdt 833784102 / ugdt 249251189"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94284,
+      "intro_text_string_id": 94282,
+      "end_text_string_id": 94285
+    },
+    {
+      "id": 3030006,
+      "title_string_id": 94295,
+      "giver_npc_id": 9000000042,
+      "prerequisite_quest_ids": [
+        3030005
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000121,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 94296 'Find Jones at his makeshift camp, along the road leading east out of Cobblestone Village towards Blackspore.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C3; name 'Brawler: Building your Rep (wiki: \"Building Your Rep\")'; title id cell ucdt 1157026386 / ugdt 2140058686"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C3; name 'Brawler: Building your Rep (wiki: \"Building Your Rep\")'; title id cell ucdt 1157026386 / ugdt 2140058686"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94296,
+      "intro_text_string_id": 94294,
+      "end_text_string_id": 94297
+    },
+    {
+      "id": 3030007,
+      "title_string_id": 94303,
+      "giver_npc_id": 9000000121,
+      "prerequisite_quest_ids": [
+        3030006
+      ],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "model_id": 930050,
+          "count": 4,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 'Defeat the Hooligan Delinquents south of Jones to recover the artifacts' (locale 3825361510)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) count 4 and kill id 930050 (field_enemies.json definition_id); the original artifact drops are not modelled"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C4; name 'Brawler: Delinquent Dilemma'; title id cell ucdt 4051044198 / ugdt 3177811994"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C4; name 'Brawler: Delinquent Dilemma'; title id cell ucdt 4051044198 / ugdt 3177811994"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 94304,
+      "intro_text_string_id": 94302,
+      "end_text_string_id": 94305
+    },
+    {
+      "id": 3030008,
+      "title_string_id": 103354,
+      "giver_npc_id": 9000000121,
+      "prerequisite_quest_ids": [
+        3030007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C5; name 'Brawler: Bad Business'; title id cell ucdt 3547801737 / ugdt 1266448623"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C5; name 'Brawler: Bad Business'; title id cell ucdt 3547801737 / ugdt 1266448623"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103355,
+      "intro_text_string_id": 103353,
+      "end_text_string_id": 103356
+    },
+    {
+      "id": 3030009,
+      "title_string_id": 130857,
+      "giver_npc_id": 9000000446,
+      "prerequisite_quest_ids": [
+        3030008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C6; name 'Brawler: Given to Guard'; title id cell ucdt 2513078725 / ugdt 1114540062"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C6; name 'Brawler: Given to Guard'; title id cell ucdt 2513078725 / ugdt 1114540062"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130858,
+      "intro_text_string_id": 130856,
+      "end_text_string_id": 130859
+    },
+    {
+      "id": 3030010,
+      "title_string_id": 104126,
+      "giver_npc_id": 9000000051,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H1; name \"Brawler: Hewey's Escape!\"; title id cell ucdt 4204217995 / ugdt 3490633876"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H1; name \"Brawler: Hewey's Escape!\"; title id cell ucdt 4204217995 / ugdt 3490633876"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H1; name \"Brawler: Hewey's Escape!\"; title id cell ucdt 4204217995 / ugdt 3490633876"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104127,
+      "intro_text_string_id": 104125,
+      "end_text_string_id": 104128
+    },
+    {
+      "id": 3030011,
+      "title_string_id": 104146,
+      "giver_npc_id": 9000000102,
+      "prerequisite_quest_ids": [
+        3030010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H2; name 'Brawler: Restless Rumors'; title id cell ucdt 730283070 / ugdt 2872459359"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H2; name 'Brawler: Restless Rumors'; title id cell ucdt 730283070 / ugdt 2872459359"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104147,
+      "intro_text_string_id": 104145,
+      "end_text_string_id": 104148
+    },
+    {
+      "id": 3030012,
+      "title_string_id": 104150,
+      "giver_npc_id": 9000000098,
+      "prerequisite_quest_ids": [
+        3030011
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H3; name 'Brawler: Growler Encroachment'; title id cell ucdt 3978607958 / ugdt 956204014"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H3; name 'Brawler: Growler Encroachment'; title id cell ucdt 3978607958 / ugdt 956204014"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104151,
+      "intro_text_string_id": 104149,
+      "end_text_string_id": 104152
+    },
+    {
+      "id": 3030013,
+      "title_string_id": 104154,
+      "giver_npc_id": 9000000098,
+      "prerequisite_quest_ids": [
+        3030012
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H4; name 'Brawler: The Growler Report'; title id cell ucdt 1220364157 / ugdt 2443760478"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H4; name 'Brawler: The Growler Report'; title id cell ucdt 1220364157 / ugdt 2443760478"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104155,
+      "intro_text_string_id": 104153,
+      "end_text_string_id": 104156
+    },
+    {
+      "id": 3030014,
+      "title_string_id": 130791,
+      "giver_npc_id": 9000000215,
+      "prerequisite_quest_ids": [
+        3030013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H5; name 'Brawler: Way of the Brawler'; title id cell ucdt 1258558122 / ugdt 736817341"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 2: Highroad Junction (Harold / Archy), row H5; name 'Brawler: Way of the Brawler'; title id cell ucdt 1258558122 / ugdt 736817341"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row H4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130792,
+      "intro_text_string_id": 130790,
+      "end_text_string_id": 130793
+    },
+    {
+      "id": 3030015,
+      "title_string_id": 116485,
+      "giver_npc_id": 9000000038,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S1; name 'Brawler: Graveyard Grumble'; title id cell ucdt 1833939976 / ugdt 3822555601"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S1; name 'Brawler: Graveyard Grumble'; title id cell ucdt 1833939976 / ugdt 3822555601"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116486,
+      "intro_text_string_id": 116484,
+      "end_text_string_id": 116487
+    },
+    {
+      "id": 3030016,
+      "title_string_id": 116505,
+      "giver_npc_id": 9000000038,
+      "prerequisite_quest_ids": [
+        3030015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S2; name 'Brawler: Get McGrobie!'; title id cell ucdt 3469974208 / ugdt 3744151610"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S2; name 'Brawler: Get McGrobie!'; title id cell ucdt 3469974208 / ugdt 3744151610"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116506,
+      "intro_text_string_id": 116504,
+      "end_text_string_id": 116507
+    },
+    {
+      "id": 3030017,
+      "title_string_id": 116509,
+      "giver_npc_id": 9000000196,
+      "prerequisite_quest_ids": [
+        3030016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S3; name 'Brawler: Stolen Merchandise'; title id cell ucdt 1071817985 / ugdt 2590049011"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S3; name 'Brawler: Stolen Merchandise'; title id cell ucdt 1071817985 / ugdt 2590049011"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S3; name 'Brawler: Stolen Merchandise'; title id cell ucdt 1071817985 / ugdt 2590049011"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116510,
+      "intro_text_string_id": 116508,
+      "end_text_string_id": 116511
+    },
+    {
+      "id": 3030018,
+      "title_string_id": 116513,
+      "giver_npc_id": 9000000196,
+      "prerequisite_quest_ids": [
+        3030017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S4; name 'Brawler: Rightful Owner'; title id cell ucdt 4277306924 / ugdt 3481172471"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S4; name 'Brawler: Rightful Owner'; title id cell ucdt 4277306924 / ugdt 3481172471"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 116514,
+      "intro_text_string_id": 116512,
+      "end_text_string_id": 116515
+    },
+    {
+      "id": 3030019,
+      "title_string_id": 130861,
+      "giver_npc_id": 9000000505,
+      "prerequisite_quest_ids": [
+        3030018
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S5; name 'Brawler: Cemetery Security'; title id cell ucdt 3750868535 / ugdt 2768213677"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 3: Stillwater Crossing (Caitlyn Gravefog), row S5; name 'Brawler: Cemetery Security'; title id cell ucdt 3750868535 / ugdt 2768213677"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row S4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130862,
+      "intro_text_string_id": 130860,
+      "end_text_string_id": 130863
+    },
+    {
+      "id": 3030020,
+      "title_string_id": 72486,
+      "giver_npc_id": 9000000428,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M1; name 'Brawler: Prey on the Cray'; title id cell ucdt 856863320 / ugdt 1205612188"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M1; name 'Brawler: Prey on the Cray'; title id cell ucdt 856863320 / ugdt 1205612188"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72487,
+      "intro_text_string_id": 72485,
+      "end_text_string_id": 72488
+    },
+    {
+      "id": 3030021,
+      "title_string_id": 387359,
+      "giver_npc_id": 9000000428,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M2; name 'Brawler: Achieve Level 5'; title id cell ucdt 2041706193 / ugdt 3577001779"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M2; name 'Brawler: Achieve Level 5'; title id cell ucdt 2041706193 / ugdt 3577001779"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M2; name 'Brawler: Achieve Level 5'; title id cell ucdt 2041706193 / ugdt 3577001779"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387360,
+      "intro_text_string_id": 387358,
+      "end_text_string_id": 387361
+    },
+    {
+      "id": 3030022,
+      "title_string_id": 388503,
+      "giver_npc_id": 9500000785,
+      "prerequisite_quest_ids": [
+        3030021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M3; name 'Contract: Hello Fernando'; title id cell ucdt 495972426 / ugdt 2898916836"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 1: level 1 to 5 (Petra, Blackspore), row M3; name 'Contract: Hello Fernando'; title id cell ucdt 495972426 / ugdt 2898916836"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388504,
+      "intro_text_string_id": 388502,
+      "end_text_string_id": 388505
+    },
+    {
+      "id": 3030023,
+      "title_string_id": 72496,
+      "giver_npc_id": 9000000428,
+      "prerequisite_quest_ids": [
+        3030021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M4; name 'Brawler: Splendid Silver!'; title id cell ucdt 843192539 / ugdt 543033624"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M4; name 'Brawler: Splendid Silver!'; title id cell ucdt 843192539 / ugdt 543033624"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72497,
+      "intro_text_string_id": 72495,
+      "end_text_string_id": 72498
+    },
+    {
+      "id": 3030024,
+      "title_string_id": 72507,
+      "giver_npc_id": 9000000428,
+      "prerequisite_quest_ids": [
+        3030023
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M5; name 'Brawler: Finding a Buyer'; title id cell ucdt 1472669897 / ugdt 3056676963"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M5; name 'Brawler: Finding a Buyer'; title id cell ucdt 1472669897 / ugdt 3056676963"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72508,
+      "intro_text_string_id": 72506,
+      "end_text_string_id": 72509
+    },
+    {
+      "id": 3030025,
+      "title_string_id": 95079,
+      "giver_npc_id": 9000000009,
+      "prerequisite_quest_ids": [
+        3030024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M6; name 'Brawler: Missing Wallet'; title id cell ucdt 2435809608 / ugdt 1087803489"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M6; name 'Brawler: Missing Wallet'; title id cell ucdt 2435809608 / ugdt 1087803489"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 95080
+    },
+    {
+      "id": 3030026,
+      "title_string_id": 95157,
+      "giver_npc_id": 9000000009,
+      "prerequisite_quest_ids": [
+        3030025
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M7; name 'Brawler: Missing Money'; title id cell ucdt 732384495 / ugdt 465037923"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M7; name 'Brawler: Missing Money'; title id cell ucdt 732384495 / ugdt 465037923"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 95158,
+      "intro_text_string_id": 95156,
+      "end_text_string_id": 95159
+    },
+    {
+      "id": 3030027,
+      "title_string_id": 140995,
+      "giver_npc_id": 9000000009,
+      "prerequisite_quest_ids": [
+        3030026
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M8; name 'Brawler: IOU! (wiki: \"IOU\")'; title id cell ucdt 1312438298 / ugdt 620477359"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M8; name 'Brawler: IOU! (wiki: \"IOU\")'; title id cell ucdt 1312438298 / ugdt 620477359"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M7; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 140996,
+      "intro_text_string_id": 140994,
+      "end_text_string_id": 140997
+    },
+    {
+      "id": 3030028,
+      "title_string_id": 141010,
+      "giver_npc_id": 9000000415,
+      "prerequisite_quest_ids": [
+        3030027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M9; name \"Brawler: One Man's Junk\"; title id cell ucdt 2036192541 / ugdt 964430896"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M9; name \"Brawler: One Man's Junk\"; title id cell ucdt 2036192541 / ugdt 964430896"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141011,
+      "intro_text_string_id": 141009,
+      "end_text_string_id": 141012
+    },
+    {
+      "id": 3030029,
+      "title_string_id": 141065,
+      "giver_npc_id": 9000000415,
+      "prerequisite_quest_ids": [
+        3030028
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M10; name 'Brawler: Curious Key'; title id cell ucdt 747938953 / ugdt 1207251011"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M10; name 'Brawler: Curious Key'; title id cell ucdt 747938953 / ugdt 1207251011"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141066,
+      "intro_text_string_id": 141064,
+      "end_text_string_id": 141067
+    },
+    {
+      "id": 3030030,
+      "title_string_id": 387371,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M11; name 'Brawler: Achieve Level 10'; title id cell ucdt 4284196844 / ugdt 2671412968"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 2: level 5 to 10 (silver dust and the Snowhill key), row M11; name 'Brawler: Achieve Level 10'; title id cell ucdt 4284196844 / ugdt 2671412968"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387372,
+      "intro_text_string_id": 387370,
+      "end_text_string_id": 387373
+    },
+    {
+      "id": 3030031,
+      "title_string_id": 388507,
+      "giver_npc_id": 9000000323,
+      "prerequisite_quest_ids": [
+        3030030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M12; name 'Contract: Colder Weather'; title id cell ucdt 3946995887 / ugdt 3549991489"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M12; name 'Contract: Colder Weather'; title id cell ucdt 3946995887 / ugdt 3549991489"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3030032,
+      "title_string_id": 141080,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3030030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M13; name 'Brawler: An Honest Mistake'; title id cell ucdt 3585750460 / ugdt 2332315243"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M13; name 'Brawler: An Honest Mistake'; title id cell ucdt 3585750460 / ugdt 2332315243"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141081,
+      "intro_text_string_id": 141079,
+      "end_text_string_id": 141082
+    },
+    {
+      "id": 3030033,
+      "title_string_id": 72746,
+      "giver_npc_id": 9000000115,
+      "prerequisite_quest_ids": [
+        3030032
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M14; name 'Brawler: Fraudulent Brawler (wiki: \"Fradulent Buyer\")'; title id cell ucdt 4188888238 / ugdt 1406997752"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M14; name 'Brawler: Fraudulent Brawler (wiki: \"Fradulent Buyer\")'; title id cell ucdt 4188888238 / ugdt 1406997752"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72747,
+      "intro_text_string_id": 72745,
+      "end_text_string_id": 72748
+    },
+    {
+      "id": 3030034,
+      "title_string_id": 39711,
+      "giver_npc_id": 9000000453,
+      "prerequisite_quest_ids": [
+        3030033
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M15; name 'Brawler: I Want My Money! (wiki: \"I Want My Money\")'; title id cell ucdt 3807785477 / ugdt 477733253"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M15; name 'Brawler: I Want My Money! (wiki: \"I Want My Money\")'; title id cell ucdt 3807785477 / ugdt 477733253"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M14; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 39712,
+      "intro_text_string_id": 39710
+    },
+    {
+      "id": 3030035,
+      "title_string_id": 387375,
+      "giver_npc_id": 9000000363,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M16; name 'Brawler: Achieve Level 15'; title id cell ucdt 3618962003 / ugdt 2146334259"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M16; name 'Brawler: Achieve Level 15'; title id cell ucdt 3618962003 / ugdt 2146334259"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M16; name 'Brawler: Achieve Level 15'; title id cell ucdt 3618962003 / ugdt 2146334259"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030035 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387376,
+      "intro_text_string_id": 387374,
+      "end_text_string_id": 387377
+    },
+    {
+      "id": 3030036,
+      "title_string_id": 388511,
+      "giver_npc_id": 9000000323,
+      "prerequisite_quest_ids": [
+        3030035
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M17; name 'Contract: Local Bounty'; title id cell ucdt 542119772 / ugdt 2689972243"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M17; name 'Contract: Local Bounty'; title id cell ucdt 542119772 / ugdt 2689972243"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030036 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3030037,
+      "title_string_id": 72801,
+      "giver_npc_id": 9000000363,
+      "prerequisite_quest_ids": [
+        3030035
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M18; name 'Brawler: Providing Proof'; title id cell ucdt 1376350525 / ugdt 831993972"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M18; name 'Brawler: Providing Proof'; title id cell ucdt 1376350525 / ugdt 831993972"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M18; name 'Brawler: Providing Proof'; title id cell ucdt 1376350525 / ugdt 831993972"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030037 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72802,
+      "intro_text_string_id": 72800,
+      "end_text_string_id": 72803
+    },
+    {
+      "id": 3030038,
+      "title_string_id": 39827,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3030037
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M19; name 'Brawler: Confronting the Crook'; title id cell ucdt 1147393094 / ugdt 536674650"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M19; name 'Brawler: Confronting the Crook'; title id cell ucdt 1147393094 / ugdt 536674650"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M19; name 'Brawler: Confronting the Crook'; title id cell ucdt 1147393094 / ugdt 536674650"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030038 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 39828,
+      "intro_text_string_id": 39826
+    },
+    {
+      "id": 3030039,
+      "title_string_id": 72868,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3030038
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M20; name 'Brawler: Reputation Regained'; title id cell ucdt 2442530618 / ugdt 3692767672"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M20; name 'Brawler: Reputation Regained'; title id cell ucdt 2442530618 / ugdt 3692767672"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030039 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 72869,
+      "intro_text_string_id": 72867,
+      "end_text_string_id": 72870
+    },
+    {
+      "id": 3030040,
+      "title_string_id": null,
+      "giver_npc_id": 9000000185,
+      "prerequisite_quest_ids": [
+        3030039
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M21; name '(members only, wiki)'; title id cell ucdt 584305414 / ugdt 547667738"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M21; name '(members only, wiki)'; title id cell ucdt 584305414 / ugdt 547667738"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M21; name '(members only, wiki)'; title id cell ucdt 584305414 / ugdt 547667738"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030040 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M20; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3030041,
+      "title_string_id": null,
+      "giver_npc_id": 9000000185,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M22; name '(members only, wiki)'; title id cell ucdt 2768426379 / ugdt 1407922908"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M22; name '(members only, wiki)'; title id cell ucdt 2768426379 / ugdt 1407922908"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030041 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3030042,
+      "title_string_id": null,
+      "giver_npc_id": 9000000323,
+      "prerequisite_quest_ids": [
+        3030041
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M23; name '(members only, wiki)'; title id cell ucdt 2272272295 / ugdt 422963565"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M23; name '(members only, wiki)'; title id cell ucdt 2272272295 / ugdt 422963565"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030042 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3030043,
+      "title_string_id": null,
+      "giver_npc_id": 9000000185,
+      "prerequisite_quest_ids": [
+        3030041
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M24; name '(members only, wiki)'; title id cell ucdt 4000587074 / ugdt 1582345642"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M24; name '(members only, wiki)'; title id cell ucdt 4000587074 / ugdt 1582345642"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3030043 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row M22; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    }
+  ]
+}

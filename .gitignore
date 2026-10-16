@@ -1,0 +1,33 @@
+# Local editor state
+notes/.obsidian/workspace*.json
+notes/.obsidian/cache/
+notes/.trash/
+
+# Local credentials and generated output
+.env
+.env.*
+!.env.example
+*.log
+__pycache__/
+.venv/
+node_modules/
+dist/
+build/
+target/
+.DS_Store
+Thumbs.db
+
+# Analysis data belongs in the sibling lab directory
+/originals/
+/working/
+/decompiled/
+/extracted/
+/captures/
+
+# Scratch dumps and stray lab output (lab data lives in the sibling ../lab)
+/lab/
+scratch_dump.txt
+review_proposed.json.txt
+
+# Generated from the private client (quotes locale text); rebuild with scripts/content_check.py
+prototype/osfr-tools/studio/report.json

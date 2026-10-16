@@ -1,0 +1,3074 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "frostfang_caverns",
+        "name_string_id": 238419199,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Frostfang Caverns."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key frostfang_caverns comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Frostfang Caverns; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Frostfang Caverns",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 238419199,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 4,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Frostfang Caverns difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Snowhill",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 9,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Requirements > Combat job level; cited [wiki: Dungeons, Frostfang Caverns] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Requirements > Combat job level; cited [wiki: Dungeons, Frostfang Caverns] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Requirements > Combat job level; cited [wiki: Dungeons, Frostfang Caverns] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Requirements > Combat job level; cited [wiki: Dungeons, Frostfang Caverns] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None found for the dungeon itself. | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Snowhill",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "barrier",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the barrier in Snowhill. It has an Atlas icon. The client has the objective \"Find the entrance to Frostfang Caverns.\" (loc 2984405344) and puts NPCs \"outside of Frostfang Caverns\" (loc 3672144686, 2344779759, 4099574863). | [wiki] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (wiki)",
+              "value": "\"Investigate the cavern!\" (loc 1220971519). The wiki lists this as the main goal. The same text exists in the client. | [wiki] [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Main (wiki); cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Main (wiki); cited [wiki] [client]"
+                }
+              ]
+            },
+            {
+              "label": "Boss objective strings",
+              "value": "\"Defeat Chillblaine\" (loc 4293698538), \"Enter Frostfang Caverns and defeat Chillblaine.\" (loc 2425989597). The client has them as quest or objective text. Whether the in-dungeon panel shows one of them as a second step is unknown. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Boss objective strings; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Defeat the giant bat!\" (loc 3433368763). The wiki gives it as the bonus goal. The text is identical. Its detail line is probably \"There is a rumor that within the cavern is a giant bat who hordes treasure. Knock out the bat and see what kind of treasure it was guarding!\" (loc 2727509360); that text says \"the cavern\" and does not name Frostfang. | [client] [wiki] (detail link inferred)",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"Frostfang Caverns Bonus Objective\" (loc 2710069578) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Frostfang Caverns\" (loc 3125540002); \"Complete the Frostfang Caverns encounter.\" (loc 773420663) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Goals > Win text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Chillblaine"
+              ],
+              "description": {
+                "value": "Chillblaine (game data loc 959328268, UI loc 3805681920), also \"Chillblaine the Deceiver\" (game data loc 837056531, UI loc 3711380827) | A gigantic wolf (panel text). Lies and illusions; quest text says \"Not everything in Frostfang will be as it seems!\". Quest strings imply he can be hit by job abilities: \"Use Kick on Chillblaine\" (loc 1159694499), \"Use Commanding Shout on Chillblaine\" (loc 2192945840), \"Use Spinning Blade on Chillblaine\" (loc 3322368188), \"Use Quake on Chillblaine\" (loc 3452480767). Dev line \"frostfang caverns boss ability\" (loc 935329041). Ability names and effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (wiki)",
+              "names": [
+                "Wolves",
+                "Bats",
+                "Ice Crawlers",
+                "Mammoth Crawlers"
+              ],
+              "description": {
+                "value": "Wolves, Bats, Ice Crawlers, Mammoth Crawlers | Client spells the last two \"Icy Crawler\" (game data loc 924164145, UI loc 2402395289) and \"Mammoth Crawler\" (game data loc 1291206330, UI loc 2474514970). Quest text confirms wolves: \"There are wolves in there\" (loc 1404846525), \"Defeat wolves in Frostfang Caverns\" (loc 1074594800). | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not map Enemies (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not source stats for Enemies (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                }
+              ]
+            },
+            {
+              "role": "Bonus target",
+              "names": [
+                "Giant Bat"
+              ],
+              "description": {
+                "value": "Giant Bat (game data loc 1792121157, UI loc 1041065255) | Matches the bonus goal text. Starts as a hoarder of treasure per the rumor line. Health and behaviour unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not map Bonus target to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not source stats for Bonus target."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Chillblaine"
+              ],
+              "description": {
+                "value": "Chillblaine (game data loc 959328268, UI loc 3805681920), also \"Chillblaine the Deceiver\" (game data loc 837056531, UI loc 3711380827) | A gigantic wolf (panel text). Lies and illusions; quest text says \"Not everything in Frostfang will be as it seems!\". Quest strings imply he can be hit by job abilities: \"Use Kick on Chillblaine\" (loc 1159694499), \"Use Commanding Shout on Chillblaine\" (loc 2192945840), \"Use Spinning Blade on Chillblaine\" (loc 3322368188), \"Use Quake on Chillblaine\" (loc 3452480767). Dev line \"frostfang caverns boss ability\" (loc 935329041). Ability names and effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Frostfang Caverns.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"242 Stars or less\" (wiki wording). The same figure is printed on the [[Sweetwater Climb]] wiki page, so treat it with care. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "97 Coins slot on every job's wheel | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "220 Coins. No client string \"Bonus: 220 Coins!\" exists. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Completing the bonus goal gives every player in the instance one piece of clothing from a set for their current job. Colour and body slot are random. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "Bronze trophy (5 pts) \"Complete the Frostfang Caverns encounter.\" (loc 773420663); silver trophy (10 pts) \"Complete the Frostfang Caverns encounter with a full group.\" (loc 4134765256) | [client] [wiki: Achievements]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Achievements; cited [client] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Achievements; cited [client] [wiki: Achievements]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"IV\", matching difficulty 4. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "label": "Video",
+                "value": null,
+                "reason": "None. No result screen from this dungeon was found. | [video] none",
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Video; cited [video]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 97,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 220,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Recurve Bow of Explosions",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Energy IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Bodkin Archer Quiver",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Drill Hammer of Pummeling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Energy IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Stick and Move Brawler Shoulderpads",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Megasaw of Alarm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Energy IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Pressure Wave Medic Backpack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Jagged Scythe of Shuriken Storm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Energy IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Sensei Ninja Shoulderguard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Threat Range Warrior Pauldrons",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Double Axe of Earthquake",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Energy IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Disciple Wizard Talisman",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Jewel Wand of Firestorm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Energy IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "frostfang_caverns",
+            "kind": "zone",
+            "target_name": "Snowhill",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "object",
+            "target_name": "barrier",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "npc",
+            "target_name": "Chillblaine",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "npc",
+            "target_name": "Wolves",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "npc",
+            "target_name": "Bats",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "npc",
+            "target_name": "Ice Crawlers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "npc",
+            "target_name": "Mammoth Crawlers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "npc",
+            "target_name": "Giant Bat",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Archer's Recurve Bow of Explosions",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Archer's Ring of Energy IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Bodkin Archer Quiver",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Brawler's Drill Hammer of Pummeling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Energy IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Stick and Move Brawler Shoulderpads",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Medic's Megasaw of Alarm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Medic's Ring of Energy IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Pressure Wave Medic Backpack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Ninja's Jagged Scythe of Shuriken Storm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Energy IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Sensei Ninja Shoulderguard",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Threat Range Warrior Pauldrons",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Warrior's Double Axe of Earthquake",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Energy IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Disciple Wizard Talisman",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Wizard's Jewel Wand of Firestorm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "frostfang_caverns",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Energy IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key frostfang_caverns comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Frostfang Caverns; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Chillblaine",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Wolves",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Bats",
+            "definition_id": 930027,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Bats links to definition_id=930027; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Ice Crawlers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Mammoth Crawlers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Giant Bat",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Chillblaine",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

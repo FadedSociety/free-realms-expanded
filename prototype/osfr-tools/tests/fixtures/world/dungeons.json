@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": "fixture-dungeon",
+      "name_string_id": null,
+      "zone_id": 7,
+      "entry_requirements": [
+        {
+          "kind": "player_level",
+          "level": 1,
+          "source": [
+            { "kind": "reconstructed", "evidence": "(R) synthetic entry requirement for loader tests" }
+          ]
+        }
+      ],
+      "encounters": [
+        {
+          "id": "first-encounter",
+          "goals": [
+            {
+              "kind": "defeat",
+              "id": 1,
+              "model_id": 9001,
+              "count": 1,
+              "source": [
+                { "kind": "reconstructed", "evidence": "(R) synthetic encounter goal for loader tests" }
+              ]
+            }
+          ],
+          "rewards": [],
+          "source": [
+            { "kind": "reconstructed", "evidence": "(R) synthetic encounter for loader tests" }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 3,
+          "items": [],
+          "job_xp": { "35": 4 },
+          "source": [
+            { "kind": "reconstructed", "evidence": "(R) synthetic dungeon reward bundle for loader tests" }
+          ]
+        }
+      ],
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic dungeon for loader tests" }
+      ]
+    }
+  ]
+}

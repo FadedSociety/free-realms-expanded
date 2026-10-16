@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 0,
+      "name": "Synthetic Opening Zone",
+      "geometry_id": 0,
+      "zone_type": 2,
+      "tutorial": false,
+      "sky": "",
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic zone-0 serializer parity fixture; not retail zone data" }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Fixture Zone",
+      "geometry_id": null,
+      "zone_type": null,
+      "tutorial": null,
+      "sky": null,
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic fixture zone for loader tests" }
+      ]
+    }
+  ]
+}

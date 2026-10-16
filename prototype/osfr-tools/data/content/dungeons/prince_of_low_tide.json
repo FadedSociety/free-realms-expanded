@@ -1,0 +1,2237 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "prince_of_low_tide",
+        "name_string_id": 3994251663,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Prince of Low Tide."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key prince_of_low_tide comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Prince of Low Tide; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Prince of Low Tide",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 3994251663,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 4,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Prince of Low Tide difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Seaside (north end, near the Tide Pools; roams the main beach, cove beach and oceanfront homes)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 9,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": "Cook-off Catastrophe",
+            "reason": null,
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Unlocking quest; cited [client] [video] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Unlocking quest; cited [client] [video] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Unlocking quest; cited [client] [video] [wiki]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Not tagged on the wiki. The wiki names a members coin bonus with the figure blank. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Seaside (north end, near the Tide Pools; roams the main beach, cove beach and oceanfront homes)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "npc",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+                }
+              ]
+            },
+            "name": {
+              "value": "Prince",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the Prince, a roaming boss, in Seaside. The wiki puts him in the north end near the Tide Pools and anywhere on the main beach, cove beach or around the oceanfront homes. The recordings show him as a pink or red marker 20 to 127 m away. | [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Knock out the Prince of Low Tide!\" (loc 4040346419). The panel in the quest run shows \"Goals (1)\". | [client] [video 506rO_mhaSs/00006, 00046] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Main; cited [client] [video 506rO_mhaSs/00006, 00046] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Main; cited [client] [video 506rO_mhaSs/00006, 00046] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Main; cited [client] [video 506rO_mhaSs/00006, 00046] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": null,
+              "reason": "None listed. No \"Bonus Objective\" string was found. | [wiki] [client]",
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Bonus; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Bonus; cited [wiki] [client]"
+                }
+              ]
+            },
+            {
+              "label": "Quest-side objectives",
+              "value": "\"Knock out some Cray Royal Servants!\" (loc 612593269), with a counter \"1/8\" up to \"8/8\" in the Cook-off Catastrophe run (video), and \"Defeat the Prince of Low Tide\" (loc 1041601812). | [client] [video 506rO_mhaSs/00044 to 00200]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Quest-side objectives; cited [client] [video 506rO_mhaSs/00044 to 00200]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Goals > Quest-side objectives; cited [client] [video 506rO_mhaSs/00044 to 00200]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": [
+            {
+              "label": "Water attack",
+              "value": "A system message during the fight: \"The water around the prince no longer looks safe! Look out!\" (loc 1539908958). Dev strings: \"prince of low tide - tidal wave event\" (loc 3040962455), \"root self for tide attack\" (loc 1621069580), \"special heal\" (loc 170415069). Damage and timing unknown. | [client] [video 506rO_mhaSs/00190]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Water attack; cited [client] [video 506rO_mhaSs/00190]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Water attack; cited [client] [video 506rO_mhaSs/00190]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Prince of Low Tide"
+              ],
+              "description": {
+                "value": "Prince of Low Tide, a male cray with black eyes. Speech seen in video (enemy lines, tagged by speaker): \"They found us!\" (loc 1918750979), \"Which of you was followed! Idiots!\", \"Get them!\", \"I am the prince! I said get them!\", \"Get them, or I'll make chowder out of you!\" (loc 435650605), \"I need smarter servants. I'll get you myself!\" (loc 2456368720), \"The water will get you!\" (loc 1168485945), \"I command the tide! Wash away my foe!\" (loc 4028516881), \"Water will wash you away!\". | [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                }
+              ]
+            },
+            {
+              "role": "Minions",
+              "names": [
+                "Cray Royal Servant"
+              ],
+              "description": {
+                "value": "Cray Royal Servant (loc 1932264035, game data 4022178782), seen in the quest run, 8 to knock out for the quest objective. Whether the plain Atlas battle has them is not proven. | [client] [video 506rO_mhaSs/00044, 00146]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not map Minions to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not source stats for Minions."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Prince of Low Tide"
+              ],
+              "description": {
+                "value": "Prince of Low Tide, a male cray with black eyes. Speech seen in video (enemy lines, tagged by speaker): \"They found us!\" (loc 1918750979), \"Which of you was followed! Idiots!\", \"Get them!\", \"I am the prince! I said get them!\", \"Get them, or I'll make chowder out of you!\" (loc 435650605), \"I need smarter servants. I'll get you myself!\" (loc 2456368720), \"The water will get you!\" (loc 1168485945), \"I command the tide! Wash away my foe!\" (loc 4028516881), \"Water will wash you away!\". | [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Prince of Low Tide.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"59 Stars\" | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel",
+                "value": "One wheel per job: 5 items plus a coin slot. The wiki body prints the coin figure blank (\" Coins\"); its infobox template carries the numbers 70 then 68 six times. Reading: 68 is each wheel's coin slot, 70 the members bonus. This is an inference from template order. | [wiki] (inferred)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members bonus",
+                "value": "\"Members Only Bonus: Coins\" with the figure blank in the page body (70 by the template reading above) | [wiki] (inferred)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Members bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Quest-run rewards (video)",
+                "value": "\"You receive 5 coins\", \"You receive 3 Unmoving Orbs\" at the quest's New Goal \"Return to Teaspoon Tarisa\", and a separate \"You receive 1 Hardwood Celestial Necklace\" during the fight (source of the necklace unknown). | [video 506rO_mhaSs/00152, 00102]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Quest-run rewards (video); cited [video 506rO_mhaSs/00152, 00102]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "reported_coin_reward",
+                "conditions": {
+                  "value": "Quest-run rewards (video)",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Quest-run rewards (video); cited [video 506rO_mhaSs/00152, 00102]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 5,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Quest-run rewards (video); cited [video 506rO_mhaSs/00152, 00102]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Quest-run rewards (video); cited [video 506rO_mhaSs/00152, 00102]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Recurve Bow of Explosions",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Bobtailed Archer Gloves",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Barnburner Brawler Gloves",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Drill Hammer of Pummeling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Hydrostatic Medic Gloves",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Megasaw of Alarm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Kanja Ninja Wristguards",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Jagged Scythe of Shuriken Storm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "High Initiative Warrior Gauntlets",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Double Axe of Earthquake",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Adherent Wizard Gloves",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Jewel Wand of Firestorm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Vitality IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration IV",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "quest",
+            "target_name": "Cook-off Catastrophe",
+            "target_id": null,
+            "reason": "Guide gives a quest title but no resolved quest record ID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Unlocking quest; cited [client] [video] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Unlocking quest; cited [client] [video] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Requirements > Unlocking quest; cited [client] [video] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "zone",
+            "target_name": "Seaside (north end, near the Tide Pools; roams the main beach, cove beach and oceanfront homes)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "npc",
+            "target_name": "Prince",
+            "target_id": null,
+            "reason": "Guide names an entrance NPC but gives no NpcSpawn.actor_id mapping.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Entrance; cited [wiki: Prince of Low Tide!, Prince of Low Tide] [video GCXrT74iaOU/00000, 4Y2sOrvk1Lo/00000, GILOdk6L_G4/00288]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "npc",
+            "target_name": "Prince of Low Tide",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "npc",
+            "target_name": "Cray Royal Servant",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Archer's Recurve Bow of Explosions",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Bobtailed Archer Gloves",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Archer; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Barnburner Brawler Gloves",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Brawler's Drill Hammer of Pummeling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Hydrostatic Medic Gloves",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Medic's Megasaw of Alarm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Kanja Ninja Wristguards",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Ninja's Jagged Scythe of Shuriken Storm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "High Initiative Warrior Gauntlets",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Warrior's Double Axe of Earthquake",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Adherent Wizard Gloves",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Wizard's Jewel Wand of Firestorm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Vitality IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "prince_of_low_tide",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration IV",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key prince_of_low_tide comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Prince of Low Tide; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Prince of Low Tide",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Cray Royal Servant",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Minions; cited [client] [video 506rO_mhaSs/00044, 00146]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Prince of Low Tide",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Prince of Low Tide.md > Enemies and boss > Boss; cited [client] [video 506rO_mhaSs/00044 to 00214] [wiki: Prince of Low Tide]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

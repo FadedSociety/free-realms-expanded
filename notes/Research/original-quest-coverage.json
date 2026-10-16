@@ -1,0 +1,2939 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-09T02:25:31.419156Z",
+  "scope": "Selected supplied 2014 opening arc: Briarwood Caverns -> Farnum Farmstead -> Cobblestone Village -> Royal Palace.",
+  "sources": [
+    {
+      "label": "content/quest-inventory.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\opening-anvil-placement-v1\\content\\quest-inventory.json",
+      "kind": "supplied-journal",
+      "note": "25 record span, 7970 bytes",
+      "exists": true,
+      "sha256": "17a94fe8ebbe49a1fa0d08fceacdb6cdcb547e126a1636b80d3f4f4166c7fc54"
+    },
+    {
+      "label": "content/quests.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\opening-anvil-placement-v1\\content\\quests.json",
+      "kind": "engine-definitions",
+      "note": "bounded local quest definitions",
+      "exists": true,
+      "sha256": "587995ad0a85e275de8944e60858e8ebdbe9508a0e38a2bd4bd0f46ef1f866f0"
+    },
+    {
+      "label": "content/opening.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\opening-anvil-placement-v1\\content\\opening.json",
+      "kind": "local-opening",
+      "note": "17 reconstructed opening stages",
+      "exists": true,
+      "sha256": "4e6ac15cd19b5785a04ac7eb944bf0235f4a0592f4c42df755f89c47896b0ad1"
+    },
+    {
+      "label": "content/profiles.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\opening-anvil-placement-v1\\content\\profiles.json",
+      "kind": "local-profiles",
+      "note": "profile ids for unlock resolution",
+      "exists": true,
+      "sha256": "d963fe7dff169912560d6e744ccac1e0161e7168245ef951f5aa2f4320cc3436"
+    },
+    {
+      "label": "StartingZone.cs",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\FreeRealms-Legacy\\src\\Sanctuary.Game\\Zones\\StartingZone.cs",
+      "kind": "community-journal",
+      "note": "AGPL-3.0 pinned community reconstruction",
+      "exists": true,
+      "sha256": "0e26fd20ad103e6d78461e150dbbcc7e80c175b1061cab7ee3785c14053cae37"
+    },
+    {
+      "label": "quest-pages.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\freerealms-wiki\\quest-pages.json",
+      "kind": "wiki",
+      "note": "52 quest pages with revision pins",
+      "exists": true,
+      "sha256": "db4266bed954da6aab394cb514de2c54da1181966cd393fc122cdaae90c66c05"
+    },
+    {
+      "label": "wiki.sqlite",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\references\\freerealms-wiki\\wiki.sqlite",
+      "kind": "wiki",
+      "note": "read-only cross-check corpus",
+      "exists": true,
+      "sha256": "b9d7b9f1adabb42db54c3253bf43fddc249d6d70e3f2075b134a9441e2fcd911"
+    },
+    {
+      "label": "locale-id-to-text.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\reports\\locale-id-to-text.json",
+      "kind": "locale",
+      "note": "locale export via pinned community reader",
+      "exists": true,
+      "sha256": "f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844"
+    },
+    {
+      "label": "starting-area-audit.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\reports\\starting-area-audit.json",
+      "kind": "prior-audit",
+      "note": "prior opening hub extraction for cross-check",
+      "exists": true,
+      "sha256": "bba21d030e75d6a4c8a9f1c571e2eb31e04cf8c10fdef47eec53d8ec08f73166"
+    },
+    {
+      "label": "starting-dungeon-audit.json",
+      "path": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\reports\\starting-dungeon-audit.json",
+      "kind": "prior-audit",
+      "note": "cave/dungeon boundary evidence",
+      "exists": true,
+      "sha256": "cbbd20cf70117c6e20505c17300b7d7cd742cc8f4426a958da4091978367e7b6"
+    }
+  ],
+  "corpus_totals": {
+    "supplied-journal": 25,
+    "supplied-journal-objectives": 42,
+    "community-journal-hubs": 10,
+    "community-journal-hub-quests": 58,
+    "community-journal-opening-hub-quests": 13,
+    "community-journal-stickers": 16,
+    "wiki-quest-pages": 52,
+    "wiki-opening-quest-pages": 2,
+    "local-opening-stages": 17,
+    "local-opening-objectives": 51,
+    "locale-entries": 85932,
+    "engine-definitions": 2
+  },
+  "quests": [
+    {
+      "source": "supplied-journal",
+      "id": 6,
+      "title_locale_id": 4563,
+      "title_locale": "Stolen Turnips",
+      "title": "Stolen Turnips",
+      "description_locale_id": 4564,
+      "description_locale": "Retrieve Farmer Cinn's turnips from Snowy Canyon.",
+      "objectives": [
+        {
+          "id": 345,
+          "name_locale_id": 6721,
+          "name_locale": "Find the turnips",
+          "text": "Find the turnips",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 3021,
+          "quantity": 5
+        }
+      ],
+      "record_offset": 4,
+      "record_length": 262,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 92,
+      "title_locale_id": 15297,
+      "title_locale": "History Comes Alive!",
+      "title": "History Comes Alive!",
+      "description_locale_id": 15136,
+      "description_locale": "Play the role of the commander in the Tower Defense game that is next to Sir Whittington.",
+      "objectives": [
+        {
+          "id": 663,
+          "name_locale_id": 15938,
+          "name_locale": "Beat 10 stages of a Briarwood Defense game",
+          "text": "Beat 10 stages of a Briarwood Defense game",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 17666,
+          "name_locale_id": 428850,
+          "name_locale": "Click on the Briarwood Defense table",
+          "text": "Click on the Briarwood Defense table",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 266,
+      "record_length": 327,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 218,
+      "title_locale_id": 21055,
+      "title_locale": "Flag Dancin'",
+      "title": "Flag Dancin'",
+      "description_locale_id": 21056,
+      "description_locale": "Follow Nog's orders and touch the colored flags in the correct order!",
+      "objectives": [],
+      "reward_refs": [],
+      "record_offset": 593,
+      "record_length": 113,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 435,
+      "title_locale_id": 36830,
+      "title_locale": "Noise Permit",
+      "title": "Noise Permit",
+      "description_locale_id": 36831,
+      "description_locale": "Flynn swears he has permission to put on a concert in Snowhill. He hasn't received the permit in the mail yet however. Search around Snowhill for the permit. Perhaps one of the penguin mailmen delivered it to the wrong address or dropped it while making their rounds.",
+      "objectives": [
+        {
+          "id": 3364,
+          "name_locale_id": 36834,
+          "name_locale": "Find the permit",
+          "text": "Find the permit",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 706,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 439,
+      "title_locale_id": 36927,
+      "title_locale": "Snowhill Secret Society",
+      "title": "Snowhill Secret Society",
+      "description_locale_id": 36928,
+      "description_locale": "Snowhill has a secret society made up of prominent people from the community. Together, they help plan fun events for the town. You can ask some of the members how you can join, but you'll have to find out who they are first.",
+      "objectives": [
+        {
+          "id": 3373,
+          "name_locale_id": 36929,
+          "name_locale": "Find member #1 ",
+          "text": "Find member #1 ",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 926,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 462,
+      "title_locale_id": 37602,
+      "title_locale": "Grubby Hands",
+      "title": "Grubby Hands",
+      "description_locale_id": 37603,
+      "description_locale": "Dooba can't catch fish without grubs and he can't leave his sasparilla unattended either.  Collect the grubs he needs from under nearby mossy stones.",
+      "objectives": [
+        {
+          "id": 3534,
+          "name_locale_id": 37604,
+          "name_locale": "Collect fishing grubs.",
+          "text": "Collect fishing grubs.",
+          "required": 6,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 3614,
+          "quantity": 1
+        }
+      ],
+      "record_offset": 1146,
+      "record_length": 262,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 624,
+      "title_locale_id": 47534,
+      "title_locale": "One Man's Trash",
+      "title": "One Man's Trash",
+      "description_locale_id": 47535,
+      "description_locale": "Ratsplat has asked you to sift around in the rubbish piles around Merry Vale for anything that seems salvageable.",
+      "objectives": [
+        {
+          "id": 4140,
+          "name_locale_id": 47543,
+          "name_locale": "Search near the human and pixie camp",
+          "text": "Search near the human and pixie camp",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 4141,
+          "name_locale_id": 47545,
+          "name_locale": "Search near the chugawug camp",
+          "text": "Search near the chugawug camp",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 4142,
+          "name_locale_id": 47547,
+          "name_locale": "Search near the vendor booths",
+          "text": "Search near the vendor booths",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 4143,
+          "name_locale_id": 47549,
+          "name_locale": "Search near the stage spectators",
+          "text": "Search near the stage spectators",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 3850,
+          "quantity": 1
+        },
+        {
+          "kind": "item",
+          "item_definition": 3023,
+          "quantity": 5
+        }
+      ],
+      "record_offset": 1408,
+      "record_length": 625,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1019,
+      "title_locale_id": 90071,
+      "title_locale": "Blacksmith: Smithy Merchandise",
+      "title": "Blacksmith: Smithy Merchandise",
+      "description_locale_id": 90072,
+      "description_locale": "Purchase some Thorny Fasteners and Wooden Planks from Bruno Battlerock.",
+      "objectives": [
+        {
+          "id": 11498,
+          "name_locale_id": 90125,
+          "name_locale": "Obtain Thorny Fasteners",
+          "text": "Obtain Thorny Fasteners",
+          "required": 4,
+          "progress": 0
+        },
+        {
+          "id": 11500,
+          "name_locale_id": 90132,
+          "name_locale": "Obtain Wooden Planks",
+          "text": "Obtain Wooden Planks",
+          "required": 2,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 75799,
+          "quantity": 1
+        }
+      ],
+      "record_offset": 2033,
+      "record_length": 369,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1029,
+      "title_locale_id": 90150,
+      "title_locale": "Smoothie Operator",
+      "title": "Smoothie Operator",
+      "description_locale_id": 90151,
+      "description_locale": "Help Murphy and Carrie make a Snowberry Blizzard Blast. You can find all the ingredients just south of Snowhill, near Perry's farm.",
+      "objectives": [
+        {
+          "id": 15576,
+          "name_locale_id": 407053,
+          "name_locale": "Play and beat 'Esther's Challenge Deck'",
+          "text": "Play and beat 'Esther's Challenge Deck'",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 2402,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1077,
+      "title_locale_id": 91211,
+      "title_locale": "No More Norv?",
+      "title": "No More Norv?",
+      "description_locale_id": 91212,
+      "description_locale": "What happened to Marco's partner?",
+      "objectives": [
+        {
+          "id": 17711,
+          "name_locale_id": 429320,
+          "name_locale": "Click the Tower Defense table in Chatty's camp",
+          "text": "Click the Tower Defense table in Chatty's camp",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 17712,
+          "name_locale_id": 429322,
+          "name_locale": "Beat 25 straight levels of the Gardening 101 tower defense game",
+          "text": "Beat 25 straight levels of the Gardening 101 tower defense game",
+          "required": 25,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 2622,
+      "record_length": 327,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1304,
+      "title_locale_id": 103744,
+      "title_locale": "Card Duelist: Poe's Best Deck",
+      "title": "Card Duelist: Poe's Best Deck",
+      "description_locale_id": 103745,
+      "description_locale": "Play and Beat Poe's Tournament Deck to win one of his cards!",
+      "objectives": [
+        {
+          "id": 12597,
+          "name_locale_id": 103739,
+          "name_locale": "As a Card Duelist; Beat Poe's Tournament Deck",
+          "text": "As a Card Duelist; Beat Poe's Tournament Deck",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 51187,
+          "quantity": 1
+        }
+      ],
+      "record_offset": 2949,
+      "record_length": 262,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1346,
+      "title_locale_id": 115533,
+      "title_locale": "Free the Balloons?!",
+      "title": "Free the Balloons?!",
+      "description_locale_id": 115534,
+      "description_locale": "Aida's sister keeps letting her balloons go. Collect the escaped balloons from around Merry Vale and bring them back to Aida.",
+      "objectives": [
+        {
+          "id": 13354,
+          "name_locale_id": 141709,
+          "name_locale": "Beat the Free the Balloons minigame",
+          "text": "Beat the Free the Balloons minigame",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 3211,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1593,
+      "title_locale_id": 388503,
+      "title_locale": "Contract: Hello Fernando",
+      "title": "Contract: Hello Fernando",
+      "description_locale_id": 388504,
+      "description_locale": "Fernando Flexsteel is a busy bounty hunter and is always looking for skilled brawlers to assist him with claiming his bounties.",
+      "objectives": [
+        {
+          "id": 13914,
+          "name_locale_id": 388520,
+          "name_locale": "Defeat some Robgoblin Pondblasters",
+          "text": "Defeat some Robgoblin Pondblasters",
+          "required": 20,
+          "progress": 0
+        },
+        {
+          "id": 13915,
+          "name_locale_id": 388522,
+          "name_locale": "Defeat some Amazing Asps",
+          "text": "Defeat some Amazing Asps",
+          "required": 10,
+          "progress": 0
+        },
+        {
+          "id": 13916,
+          "name_locale_id": 388524,
+          "name_locale": "Defeat some Killer Cobras",
+          "text": "Defeat some Killer Cobras",
+          "required": 4,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 3431,
+      "record_length": 434,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1617,
+      "title_locale_id": 389427,
+      "title_locale": "Harassing the Harassers",
+      "title": "Harassing the Harassers",
+      "description_locale_id": 389428,
+      "description_locale": "Protect Snowhill from the wandering yetis that have been harassing travelers. Jonathon Forkpath has promised you another medal for this.",
+      "objectives": [
+        {
+          "id": 14096,
+          "name_locale_id": 389456,
+          "name_locale": "Defeat Petty Yetis",
+          "text": "Defeat Petty Yetis",
+          "required": 20,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 1843,
+          "quantity": 1
+        }
+      ],
+      "record_offset": 3865,
+      "record_length": 262,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1625,
+      "title_locale_id": 389648,
+      "title_locale": "Something to Snack On",
+      "title": "Something to Snack On",
+      "description_locale_id": 389649,
+      "description_locale": "Cella would like you to make some Gummyfruit Gumbo and feed it to the little penguin in Shrouded Glade.",
+      "objectives": [
+        {
+          "id": 14138,
+          "name_locale_id": 389657,
+          "name_locale": "Cook up some Gummyfruit Gumbo",
+          "text": "Cook up some Gummyfruit Gumbo",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 31256,
+          "quantity": 5
+        }
+      ],
+      "record_offset": 4127,
+      "record_length": 262,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1648,
+      "title_locale_id": 390570,
+      "title_locale": "Burial Service",
+      "title": "Burial Service",
+      "description_locale_id": 390571,
+      "description_locale": "Vasher wants someone to recover the bones of fallen explorers in Cracked Claw Caverns.",
+      "objectives": [
+        {
+          "id": 14264,
+          "name_locale_id": 390239,
+          "name_locale": "Collect lost explorer bones",
+          "text": "Collect lost explorer bones",
+          "required": 6,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 11011,
+          "quantity": 5
+        }
+      ],
+      "record_offset": 4389,
+      "record_length": 262,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1673,
+      "title_locale_id": 391210,
+      "title_locale": "Smelly Stockpile",
+      "title": "Smelly Stockpile",
+      "description_locale_id": 391211,
+      "description_locale": "Arci Joan is well known for her tower building. She loves the Mail Penguin Towers and uses them to her advantage. She finds you worthy enough to learn her fish defense trick. Now, she wants you to use the trick to defend the smelly stockpile!",
+      "objectives": [
+        {
+          "id": 14439,
+          "name_locale_id": 391218,
+          "name_locale": "Click on the Medium Penguin Defense table",
+          "text": "Click on the Medium Penguin Defense table",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 14440,
+          "name_locale_id": 391198,
+          "name_locale": "Complete 'Penguin Produce'",
+          "text": "Complete 'Penguin Produce'",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 14443,
+          "name_locale_id": 391200,
+          "name_locale": "Complete 'A Fishy Situation'",
+          "text": "Complete 'A Fishy Situation'",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 14444,
+          "name_locale_id": 391202,
+          "name_locale": "Complete 'My Fish, MINE!'",
+          "text": "Complete 'My Fish, MINE!'",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 56735,
+          "quantity": 1
+        },
+        {
+          "kind": "item",
+          "item_definition": 56733,
+          "quantity": 1
+        },
+        {
+          "kind": "item",
+          "item_definition": 56763,
+          "quantity": 1
+        }
+      ],
+      "record_offset": 4651,
+      "record_length": 667,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1680,
+      "title_locale_id": 391345,
+      "title_locale": "Mushroom Guard",
+      "title": "Mushroom Guard",
+      "description_locale_id": 391346,
+      "description_locale": "General Spattonug has told you the second step in his powerful tower defense strategy - upgrade Vine Towers! He'll tell you his final strategy once you've completed this task.",
+      "objectives": [
+        {
+          "id": 14465,
+          "name_locale_id": 391351,
+          "name_locale": "Click on the Medium Briarwood Defense table",
+          "text": "Click on the Medium Briarwood Defense table",
+          "required": 1,
+          "progress": 0
+        },
+        {
+          "id": 14466,
+          "name_locale_id": 391353,
+          "name_locale": "Complete 'Weed killing!'",
+          "text": "Complete 'Weed killing!'",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 14467,
+          "name_locale_id": 391336,
+          "name_locale": "Complete 'Plants Alive!'",
+          "text": "Complete 'Plants Alive!'",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 14468,
+          "name_locale_id": 391338,
+          "name_locale": "Complete 'Weeding the Weeds!'",
+          "text": "Complete 'Weeding the Weeds!'",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [
+        {
+          "kind": "item",
+          "item_definition": 56741,
+          "quantity": 1
+        },
+        {
+          "kind": "item",
+          "item_definition": 56739,
+          "quantity": 1
+        },
+        {
+          "kind": "item",
+          "item_definition": 56762,
+          "quantity": 1
+        }
+      ],
+      "record_offset": 5318,
+      "record_length": 667,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 1875,
+      "title_locale_id": 407019,
+      "title_locale": "Card Duelist: Esther, the Brains",
+      "title": "Card Duelist: Esther, the Brains",
+      "description_locale_id": 407020,
+      "description_locale": "Dominic of Briarwood wants you to meet Esther who is near the dig site he's been patrolling. Go play a game of cards with her so she's distracted and won't come yelling at him for taking a break from his job.",
+      "objectives": [
+        {
+          "id": 15573,
+          "name_locale_id": 407045,
+          "name_locale": "Meet Esther",
+          "text": "Meet Esther",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 15574,
+          "name_locale_id": 407047,
+          "name_locale": "Play and beat 'Esther's Friendly Deck'",
+          "text": "Play and beat 'Esther's Friendly Deck'",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 5985,
+      "record_length": 327,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 2061,
+      "title_locale_id": 415050,
+      "title_locale": "Trick-or-Treat",
+      "title": "Trick-or-Treat",
+      "description_locale_id": 415051,
+      "description_locale": "Look for people with the Halloween icon to trick with a good &quot;/scare&quot; for your treat!",
+      "objectives": [
+        {
+          "id": 16787,
+          "name_locale_id": 415821,
+          "name_locale": "Trick-or-Treat around Sanctuary",
+          "text": "Trick-or-Treat around Sanctuary",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 6312,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 2248,
+      "title_locale_id": 428089,
+      "title_locale": "Feeding the Crowd",
+      "title": "Feeding the Crowd",
+      "description_locale_id": 428090,
+      "description_locale": "Helga Humbleloaf is overwhelmed by all the people helping prepare for the big birthday party. If the numbers keep going up, she won't have enough food for everyone. She's asked you to help her prepare for the crowd by harvesting some honeytwig and bumbleberry.",
+      "objectives": [
+        {
+          "id": 17635,
+          "name_locale_id": 419414,
+          "name_locale": "Gather honeytwig",
+          "text": "Gather honeytwig",
+          "required": 5,
+          "progress": 0
+        },
+        {
+          "id": 17636,
+          "name_locale_id": 419416,
+          "name_locale": "Gather bumbleberry",
+          "text": "Gather bumbleberry",
+          "required": 5,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 6532,
+      "record_length": 327,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 2270,
+      "title_locale_id": 429315,
+      "title_locale": "Defensive Strategy",
+      "title": "Defensive Strategy",
+      "description_locale_id": 429316,
+      "description_locale": "Counselor Tyra has developed a plan to help campers prepare for an attack by forest creatures. Beat her tower defense game.",
+      "objectives": [
+        {
+          "id": 12879,
+          "name_locale_id": 116536,
+          "name_locale": "Find the truant students",
+          "text": "Find the truant students",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 6859,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 2287,
+      "title_locale_id": 416778,
+      "title_locale": "The Great Scare",
+      "title": "The Great Scare",
+      "description_locale_id": 432127,
+      "description_locale": "The Pumpkin Prince is devastating the lands of Sacred Grove! Help send him back to where ever he came from.",
+      "objectives": [
+        {
+          "id": 17882,
+          "name_locale_id": 416121,
+          "name_locale": "Defeat the Pumpkin Prince",
+          "text": "Defeat the Pumpkin Prince",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 7079,
+      "record_length": 220,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 2347,
+      "title_locale_id": 436701,
+      "title_locale": "Welcome Home",
+      "title": "Welcome Home",
+      "description_locale_id": 436702,
+      "description_locale": "Your new neighbor, Melanie Lane, brought you a Chicken. Show your appreciation by placing it somewhere in your Wilds Condo.",
+      "objectives": [
+        {
+          "id": 18072,
+          "name_locale_id": 436724,
+          "name_locale": "Enter Decorate Mode",
+          "text": "Enter Decorate Mode",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 18073,
+          "name_locale_id": 436726,
+          "name_locale": "Place a Chicken",
+          "text": "Place a Chicken",
+          "required": 1,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 7299,
+      "record_length": 327,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "supplied-journal",
+      "id": 2513,
+      "title_locale_id": 4419559,
+      "title_locale": "Hero's Journal",
+      "title": "Hero's Journal",
+      "description_locale_id": 4419560,
+      "description_locale": "This is the Hero’s Journal, a gift from the Heartseed to aid you with defeating the Gloam. It will record your deeds and provide hints as what you can do next in your adventures.",
+      "objectives": [
+        {
+          "id": 18930,
+          "name_locale_id": 5100520,
+          "name_locale": "Enter Briarwood Caverns",
+          "text": "Enter Briarwood Caverns",
+          "required": 0,
+          "progress": 0
+        },
+        {
+          "id": 19189,
+          "name_locale_id": 4419598,
+          "name_locale": "Find the Hero's Journal",
+          "text": "Find the Hero's Journal",
+          "required": 0,
+          "progress": 0
+        }
+      ],
+      "reward_refs": [],
+      "record_offset": 7626,
+      "record_length": 327,
+      "evidence_class": "supplied-emulator-canned-record",
+      "implementation_state": "not-implemented",
+      "notes": "Original numeric ids in canned emulator character data; the content is mixed-era, not a faithful quest database."
+    },
+    {
+      "source": "community-journal",
+      "id": 2514,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 1,
+      "region_id": 1,
+      "display_order": 2,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2513,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 1,
+      "region_id": 1,
+      "display_order": 1,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2521,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 2,
+      "region_id": 1,
+      "display_order": 2,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2526,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 2,
+      "region_id": 1,
+      "display_order": 7,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2522,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 2,
+      "region_id": 1,
+      "display_order": 3,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2523,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 2,
+      "region_id": 1,
+      "display_order": 4,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2524,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 2,
+      "region_id": 1,
+      "display_order": 5,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2525,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 2,
+      "region_id": 1,
+      "display_order": 6,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2529,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 3,
+      "region_id": 1,
+      "display_order": 3,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2528,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 3,
+      "region_id": 1,
+      "display_order": 2,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2527,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 3,
+      "region_id": 1,
+      "display_order": 1,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2566,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 3,
+      "region_id": 1,
+      "display_order": 5,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2530,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "hub_id": 3,
+      "region_id": 1,
+      "display_order": 4,
+      "evidence_class": "community-journal-registration",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Journal hub registration only; no title/objective/reward recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2563,
+      "title_locale_id": 5100479,
+      "title_locale": "Second Helping of Strongarm Stew",
+      "title": "Second Helping of Strongarm Stew",
+      "description_locale_id": 5100480,
+      "description_locale": "Cook a 2nd helping of Strongarm Stew for Mae Farnum",
+      "region_id": 1,
+      "sticker_id": 1,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2564,
+      "title_locale_id": 5100483,
+      "title_locale": "Cleetus' Copper Collection",
+      "title": "Cleetus' Copper Collection",
+      "description_locale_id": 5100484,
+      "description_locale": "Mine a large batch of Copper Ore for Cleetus Farnum",
+      "region_id": 1,
+      "sticker_id": 2,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2565,
+      "title_locale_id": 5100487,
+      "title_locale": "Forging for Reinforcements",
+      "title": "Forging for Reinforcements",
+      "description_locale_id": 5100488,
+      "description_locale": "Forge another Spunky Scrapper Hammer for Cleetus Farnum.",
+      "region_id": 1,
+      "sticker_id": 3,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2572,
+      "title_locale_id": 5100772,
+      "title_locale": "Fighting for Funds",
+      "title": "Fighting for Funds",
+      "description_locale_id": 5100773,
+      "description_locale": "First get your Derby License. Then help Mad Jack win money for the Farnum's Farmstead Fire Relief Fund at the Wildwood Speedway.",
+      "region_id": 1,
+      "sticker_id": 4,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2573,
+      "title_locale_id": 5100776,
+      "title_locale": "Margin of Victory",
+      "title": "Margin of Victory",
+      "description_locale_id": 5100777,
+      "description_locale": "First get your Driver's License. Then help Johnny Thunder pull off an upset against the Gloam Racers at Wildwood Speedway.",
+      "region_id": 1,
+      "sticker_id": 5,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2587,
+      "title_locale_id": 5101187,
+      "title_locale": "Spreading the Cheer",
+      "title": "Spreading the Cheer",
+      "description_locale_id": 5101188,
+      "description_locale": "As a Postman help Jonelle deliver care packages to the people of Cobblestone Village.",
+      "region_id": 1,
+      "sticker_id": 6,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2568,
+      "title_locale_id": 5100756,
+      "title_locale": "In Memoriam",
+      "title": "In Memoriam",
+      "description_locale_id": 5100757,
+      "description_locale": "Diana Jones of Merry Vale has lost an Adventurer's Coin in the depths of the Memorial Caverns. Find it and return to Diana.",
+      "region_id": 2,
+      "sticker_id": 16,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2569,
+      "title_locale_id": 5100760,
+      "title_locale": "Mine Your Own Business",
+      "title": "Mine Your Own Business",
+      "description_locale_id": 5100761,
+      "description_locale": "Gerald Gemcutter in Southvale Quarry needs help finding Turquoise. Mine some from Copper Veins and return to Gerald.",
+      "region_id": 2,
+      "sticker_id": 17,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2570,
+      "title_locale_id": 5100764,
+      "title_locale": "The Slice Is Right",
+      "title": "The Slice Is Right",
+      "description_locale_id": 5100765,
+      "description_locale": "Help Mili Ironcall outside of Southvale Quarry craft a Medic's Forged Scalpel of Vitals.",
+      "region_id": 2,
+      "sticker_id": 18,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2571,
+      "title_locale_id": 5100768,
+      "title_locale": "Stop, Jacque, and Roll",
+      "title": "Stop, Jacque, and Roll",
+      "description_locale_id": 5100769,
+      "description_locale": "Help put the finishing touches on Jacque's Secret Recipe.",
+      "region_id": 2,
+      "sticker_id": 19,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2574,
+      "title_locale_id": 5100780,
+      "title_locale": "Mentor's Mulligan",
+      "title": "Mentor's Mulligan",
+      "description_locale_id": 5100781,
+      "description_locale": "Defeat Sam's Tournament Deck again.",
+      "region_id": 2,
+      "sticker_id": 20,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2575,
+      "title_locale_id": 5100784,
+      "title_locale": "Sort of Urgent",
+      "title": "Sort of Urgent",
+      "description_locale_id": 5100785,
+      "description_locale": "Help Flitter of Sanctuary sort through a giant pile of mail to make sure Sergeant Larkspur gets all of his fan mail.",
+      "region_id": 2,
+      "sticker_id": 21,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2602,
+      "title_locale_id": 442851,
+      "title_locale": "Truth, Ore, Dare",
+      "title": "Truth, Ore, Dare",
+      "description_locale_id": 442857,
+      "description_locale": "Find the &quot;Rare Metal Vein&quot; in Seaside, mine it, and return the ore from it to Duane near the Seaside Post Office.",
+      "region_id": 3,
+      "sticker_id": 32,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2605,
+      "title_locale_id": 442854,
+      "title_locale": "Quality Ingredients",
+      "title": "Quality Ingredients",
+      "description_locale_id": 442860,
+      "description_locale": "Help Diggy restock his diner by harvesting Rainleaf, Gummyfruit, and Spiralmint from Queensfields and Farnum's Farm.",
+      "region_id": 3,
+      "sticker_id": 35,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2606,
+      "title_locale_id": 442855,
+      "title_locale": "A Hop, Skip, and a Bounce",
+      "title": "A Hop, Skip, and a Bounce",
+      "description_locale_id": 442861,
+      "description_locale": "Help Diana Jones find the Legendary Seaside Coin somewhere in Seaside.",
+      "region_id": 3,
+      "sticker_id": 36,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "community-journal",
+      "id": 2592,
+      "title_locale_id": 0,
+      "title_locale": null,
+      "title": null,
+      "description_locale_id": 0,
+      "description_locale": null,
+      "region_id": 4,
+      "sticker_id": 37,
+      "evidence_class": "community-journal-sticker",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Opening sticker record; objectives/rewards not recovered."
+    },
+    {
+      "source": "wiki",
+      "id": "Quest:Fighting off the Pack",
+      "title": "Quest:Fighting off the Pack",
+      "revision_id": 28955,
+      "revision_timestamp": "2013-07-21T15:08:55Z",
+      "prerequisites": [
+        "Quest:Your"
+      ],
+      "previous": "Quest:Your First Weapon",
+      "next": "Quest:Eviction Notice",
+      "npc": "Cleetus Farnum that can be found on Farnum's Farm located in Southern Wilds.",
+      "goals": [
+        "Learn how to use your weapon by fighting Hooligan Wolves.",
+        "Switch to the Brawler job",
+        "Knock out Hooligan Wolves - /5",
+        "Return to Cleetus Farnum"
+      ],
+      "coin_reward": 18,
+      "quest_series": "Farnum's Farm",
+      "opening_arc": true,
+      "evidence_class": "wiki-only-community-page",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Community wiki text; revision pinned per page."
+    },
+    {
+      "source": "wiki",
+      "id": "Quest:Your First Weapon",
+      "title": "Quest:Your First Weapon",
+      "revision_id": 27815,
+      "revision_timestamp": "2013-07-12T21:59:06Z",
+      "prerequisites": [
+        "Quest:Learn"
+      ],
+      "previous": "Quest:Learn to Mine & Smelt Ore",
+      "next": "Quest:Fighting off the Pack",
+      "npc": "Cleetus Farnum that can be found on Farnum's Farm located in Southern Wilds.",
+      "goals": [
+        "Learn how to forge weapons with Cleetus Farnum's help.",
+        "Forge a Funky Scrapper Hammer",
+        "Return to Cleetus Farnum"
+      ],
+      "coin_reward": 16,
+      "quest_series": "Farnum's Farm",
+      "opening_arc": true,
+      "evidence_class": "wiki-only-community-page",
+      "implementation_state": "not-implemented",
+      "objectives": [],
+      "notes": "Community wiki text; revision pinned per page."
+    },
+    {
+      "source": "local-opening",
+      "id": 910001,
+      "original_quest_id": null,
+      "title_locale_id": 4419559,
+      "title_locale": "Hero's Journal",
+      "title": "Hero's Journal",
+      "description_locale_id": 4419560,
+      "description_locale": "This is the Hero’s Journal, a gift from the Heartseed to aid you with defeating the Gloam. It will record your deeds and provide hints as what you can do next in your adventures.",
+      "objectives": [
+        {
+          "id": 91000101,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Brawler using the native Jobs menu.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 43
+          }
+        },
+        {
+          "id": 91000102,
+          "name_locale_id": 4419602,
+          "name_locale": "Interact with the Hero's Journal",
+          "text": "Interact with the Hero's Journal",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925058
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925057,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925057,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000102].actor_guid",
+          "guid": 5715144128442925058,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910002,
+      "original_quest_id": null,
+      "title_locale_id": 4419563,
+      "title_locale": "The Last Best Hope",
+      "title": "The Last Best Hope",
+      "description_locale_id": 4419564,
+      "description_locale": "The Gloam have found Darkthorne and have trapped her in the Heartseed Chamber. Defend Darkthorne until she can find a way out.",
+      "objectives": [
+        {
+          "id": 91000201,
+          "name_locale_id": 4419610,
+          "name_locale": "Defend Darkthorne from the Gloam",
+          "text": "Defend Darkthorne from the Gloam",
+          "required": 1,
+          "trigger": {
+            "kind": "dungeon_completed",
+            "encounter_id": 411
+          }
+        },
+        {
+          "id": 91000202,
+          "name_locale_id": 4419612,
+          "name_locale": "Talk to Pappy Farnum",
+          "text": "Talk to Pappy Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925059
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925057,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000202].actor_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 25
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910003,
+      "original_quest_id": null,
+      "title_locale_id": 4420042,
+      "title_locale": "Saving Farnum's Farm",
+      "title": "Saving Farnum's Farm",
+      "description_locale_id": 4420043,
+      "description_locale": "Darkthorne teleported you to Farnum's Farmstead, but Gloamlings have set it ablaze. Help the Farnums by putting out some of the fires.",
+      "objectives": [
+        {
+          "id": 91000301,
+          "name_locale_id": 4420047,
+          "name_locale": "Fill the water bucket",
+          "text": "Fill the water bucket",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925064
+          }
+        },
+        {
+          "id": 91000302,
+          "name_locale_id": 5100043,
+          "name_locale": "Put out the fires",
+          "text": "Extinguish farm fire1.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925065
+          }
+        },
+        {
+          "id": 91000303,
+          "name_locale_id": 5100043,
+          "name_locale": "Put out the fires",
+          "text": "Extinguish farm fire2.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925066
+          }
+        },
+        {
+          "id": 91000304,
+          "name_locale_id": 5100043,
+          "name_locale": "Put out the fires",
+          "text": "Extinguish farm fire3.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925067
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000301].actor_guid",
+          "guid": 5715144128442925064,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000302].actor_guid",
+          "guid": 5715144128442925065,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000303].actor_guid",
+          "guid": 5715144128442925066,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000304].actor_guid",
+          "guid": 5715144128442925067,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910004,
+      "original_quest_id": null,
+      "title_locale_id": 4420050,
+      "title_locale": "Cooking 101",
+      "title": "Cooking 101",
+      "description_locale_id": 4420051,
+      "description_locale": "Learn how to cook some supplies for your journey.",
+      "objectives": [
+        {
+          "id": 91000401,
+          "name_locale_id": 4420055,
+          "name_locale": "Talk to Mae Farnum",
+          "text": "Talk to Mae Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925060
+          }
+        },
+        {
+          "id": 91000402,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Chef.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          }
+        },
+        {
+          "id": 91000403,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Equip the Student Chef Shirt in the Chef equipment screen.",
+          "required": 1,
+          "trigger": {
+            "kind": "cosmetic_equipped",
+            "definition_id": 13597
+          }
+        },
+        {
+          "id": 91000404,
+          "name_locale_id": 5100033,
+          "name_locale": "Collect Bundles of Rainleaf and Gummy Fruit",
+          "text": "Harvest 4 Rainleaf bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1001
+          }
+        },
+        {
+          "id": 91000405,
+          "name_locale_id": 5100033,
+          "name_locale": "Collect Bundles of Rainleaf and Gummy Fruit",
+          "text": "Harvest 4 Gummyfruit bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1002
+          }
+        },
+        {
+          "id": 91000406,
+          "name_locale_id": 5100039,
+          "name_locale": "Make Strong Arm Stew",
+          "text": "Complete the original cooking game to make StrongArm Stew.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2001
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925060,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925060,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000401].actor_guid",
+          "guid": 5715144128442925060,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [
+        45
+      ],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        },
+        {
+          "kind": "item",
+          "item_definition": 14794,
+          "quantity": 1
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910005,
+      "original_quest_id": null,
+      "title_locale_id": 4420058,
+      "title_locale": "Gear Up!",
+      "title": "Gear Up!",
+      "description_locale_id": 4420059,
+      "description_locale": "It's time to start gearing up for your journey to the Queen. Mine ore and smelt it so it can be useful in creating some equipment.",
+      "objectives": [
+        {
+          "id": 91000501,
+          "name_locale_id": 4420063,
+          "name_locale": "Talk to Cleetus Farnum",
+          "text": "Talk to Cleetus Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925061
+          }
+        },
+        {
+          "id": 91000502,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Miner.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          }
+        },
+        {
+          "id": 91000503,
+          "name_locale_id": 5100117,
+          "name_locale": "Mine Copper Ore",
+          "text": "Mine Copper Ore",
+          "required": 5,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1003
+          }
+        },
+        {
+          "id": 91000504,
+          "name_locale_id": 5100121,
+          "name_locale": "Smelt 5 Copper Bars",
+          "text": "Smelt 5 Copper Bars",
+          "required": 5,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2002
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000501].actor_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [
+        14
+      ],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910006,
+      "original_quest_id": null,
+      "title_locale_id": 4420066,
+      "title_locale": "Your First Weapon",
+      "title": "Your First Weapon",
+      "description_locale_id": 4420067,
+      "description_locale": "You're ready to begin forging your first weapon. This should be useful in defending yourself as you journey to the Queen.",
+      "objectives": [
+        {
+          "id": 91000601,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Blacksmith.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 16
+          }
+        },
+        {
+          "id": 91000602,
+          "name_locale_id": 4420071,
+          "name_locale": "Forge a Spunky Scrapper Hammer",
+          "text": "Win the original forging game to make a Spunky Scrapper Hammer. Board tuning, consumption and tint selection are local reconstructions.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2003
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [
+        16
+      ],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 16
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910007,
+      "original_quest_id": null,
+      "title_locale_id": 4420074,
+      "title_locale": "Fighting the Pack",
+      "title": "Fighting off the Pack",
+      "description_locale_id": 4420075,
+      "description_locale": "With a new weapon in hand, it is time to learn how to use it to become a hero and protector of the Realms.",
+      "objectives": [
+        {
+          "id": 91000701,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Brawler.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 43
+          }
+        },
+        {
+          "id": 91000702,
+          "name_locale_id": 4420079,
+          "name_locale": "Equip the Spunky Scrapper Hammer",
+          "text": "Equip the forged Spunky Scrapper Hammer as Brawler.",
+          "required": 1,
+          "trigger": {
+            "kind": "cosmetic_equipped",
+            "definition_id": 30280
+          }
+        },
+        {
+          "id": 91000703,
+          "name_locale_id": 5100203,
+          "name_locale": "Defeat Hooligan Wolves",
+          "text": "Defeat Hooligan Wolves",
+          "required": 5,
+          "trigger": {
+            "kind": "defeat",
+            "definition_id": 3156
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 18
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910008,
+      "original_quest_id": null,
+      "title_locale_id": 4420082,
+      "title_locale": "One More Gloam",
+      "title": "One More Gloam",
+      "description_locale_id": 4420083,
+      "description_locale": "Before you leave to find the Queen, Pappy Farnum asked for your help defeating one last Gloam Creature roaming nearby.",
+      "objectives": [
+        {
+          "id": 91000801,
+          "name_locale_id": 4420087,
+          "name_locale": "Talk to Pappy Farnum",
+          "text": "Talk to Pappy Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925059
+          }
+        },
+        {
+          "id": 91000802,
+          "name_locale_id": 5100268,
+          "name_locale": "Defeat the Gloam Creature",
+          "text": "Defeat the Gloam Creature",
+          "required": 1,
+          "trigger": {
+            "kind": "defeat",
+            "definition_id": 920001
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000801].actor_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 20
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910009,
+      "original_quest_id": null,
+      "title_locale_id": 4420090,
+      "title_locale": "Where's the Help?",
+      "title": "Where's the Help?",
+      "description_locale_id": 4420091,
+      "description_locale": "Expected help from nearby Cobblestone Village never arrived at Farnum Farmstead. Talk to Bartle and try to learn why.",
+      "objectives": [
+        {
+          "id": 91000901,
+          "name_locale_id": 4420095,
+          "name_locale": "Talk to Bartle",
+          "text": "Talk to Bartle",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925062
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925059,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        },
+        {
+          "field": "objective[91000901].actor_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910010,
+      "original_quest_id": null,
+      "title_locale_id": 4420098,
+      "title_locale": "Pull the Plug",
+      "title": "Pull the Plug",
+      "description_locale_id": 4420099,
+      "description_locale": "A gang of Hooligans led by Mac has blockaded Cobblestone Village. Destroy the Gloam Artifacts they're using to shield their camp.",
+      "objectives": [
+        {
+          "id": 91001001,
+          "name_locale_id": 5100332,
+          "name_locale": "Destroy Gloam Artifacts",
+          "text": "Destroy Gloam Artifact1.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925077
+          }
+        },
+        {
+          "id": 91001002,
+          "name_locale_id": 5100332,
+          "name_locale": "Destroy Gloam Artifacts",
+          "text": "Destroy Gloam Artifact2.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925078
+          }
+        },
+        {
+          "id": 91001003,
+          "name_locale_id": 5100332,
+          "name_locale": "Destroy Gloam Artifacts",
+          "text": "Destroy Gloam Artifact3.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925079
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001001].actor_guid",
+          "guid": 5715144128442925077,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001002].actor_guid",
+          "guid": 5715144128442925078,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001003].actor_guid",
+          "guid": 5715144128442925079,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910011,
+      "original_quest_id": null,
+      "title_locale_id": 4420106,
+      "title_locale": "Cobblestone Showdown",
+      "title": "Cobblestone Showdown",
+      "description_locale_id": 4420107,
+      "description_locale": "With their Artifacts destroyed, Mac and his gang are vulnerable to attack. Show them who's boss and free Cobblestone Village.",
+      "objectives": [
+        {
+          "id": 91001101,
+          "name_locale_id": 4420111,
+          "name_locale": "Defeat Mac",
+          "text": "Defeat Mac",
+          "required": 1,
+          "trigger": {
+            "kind": "defeat",
+            "definition_id": 920002
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 25
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910012,
+      "original_quest_id": null,
+      "title_locale_id": 4420114,
+      "title_locale": "Off to the Queen",
+      "title": "Off to the Queen",
+      "description_locale_id": 4420115,
+      "description_locale": "With Mac defeated and the Gloam Barrier dissipating you are free to head to Sanctuary and tell Queen Valerian about what happened to Briarheart and Darkthorne.",
+      "objectives": [
+        {
+          "id": 91001201,
+          "name_locale_id": 4420119,
+          "name_locale": "Enter the Royal Palace",
+          "text": "Enter the Royal Palace",
+          "required": 1,
+          "trigger": {
+            "kind": "visit",
+            "zone_id": 0,
+            "position": [
+              -1054.135,
+              4.629629,
+              305.7209
+            ],
+            "radius": 25.0
+          }
+        },
+        {
+          "id": 91001202,
+          "name_locale_id": 5100330,
+          "name_locale": "Talk to Queen Valerian",
+          "text": "Talk to Queen Valerian",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925063
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925062,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925063,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001202].actor_guid",
+          "guid": 5715144128442925063,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 25
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "native-accepted",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910013,
+      "original_quest_id": null,
+      "title_locale_id": 5100479,
+      "title_locale": "Second Helping of Strongarm Stew",
+      "title": "Second Helping of Strongarm Stew",
+      "description_locale_id": 5100480,
+      "description_locale": "Cook a 2nd helping of Strongarm Stew for Mae Farnum",
+      "objectives": [
+        {
+          "id": 91001301,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Chef.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          }
+        },
+        {
+          "id": 91001302,
+          "name_locale_id": 5100033,
+          "name_locale": "Collect Bundles of Rainleaf and Gummy Fruit",
+          "text": "Harvest 4 Rainleaf bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1001
+          }
+        },
+        {
+          "id": 91001303,
+          "name_locale_id": 5100033,
+          "name_locale": "Collect Bundles of Rainleaf and Gummy Fruit",
+          "text": "Harvest 4 Gummyfruit bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1002
+          }
+        },
+        {
+          "id": 91001304,
+          "name_locale_id": 5100039,
+          "name_locale": "Make Strong Arm Stew",
+          "text": "Complete the original cooking game to make StrongArm Stew.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2001
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925060,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925060,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "code-only",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910014,
+      "original_quest_id": null,
+      "title_locale_id": 5100483,
+      "title_locale": "Cleetus' Copper Collection",
+      "title": "Cleetus' Copper Collection",
+      "description_locale_id": 5100484,
+      "description_locale": "Mine a large batch of Copper Ore for Cleetus Farnum",
+      "objectives": [
+        {
+          "id": 91001401,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Miner.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          }
+        },
+        {
+          "id": 91001402,
+          "name_locale_id": 5100117,
+          "name_locale": "Mine Copper Ore",
+          "text": "Mine10 more Copper Ore for the local bonus contract.",
+          "required": 10,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1003
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "code-only",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910015,
+      "original_quest_id": null,
+      "title_locale_id": 5100487,
+      "title_locale": "Forging for Reinforcements",
+      "title": "Forging for Reinforcements",
+      "description_locale_id": 5100488,
+      "description_locale": "Forge another Spunky Scrapper Hammer for Cleetus Farnum.",
+      "objectives": [
+        {
+          "id": 91001501,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Miner.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          }
+        },
+        {
+          "id": 91001502,
+          "name_locale_id": 5100121,
+          "name_locale": "Smelt 5 Copper Bars",
+          "text": "Smelt 5 Copper Bars",
+          "required": 5,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2002
+          }
+        },
+        {
+          "id": 91001503,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Blacksmith.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 16
+          }
+        },
+        {
+          "id": 91001504,
+          "name_locale_id": 5100503,
+          "name_locale": "Forge another Spunky Scrapper Hammer for Cleetus Farnum.",
+          "text": "Win the original forging game to make another Spunky Scrapper Hammer.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2003
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925061,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "code-only",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910016,
+      "original_quest_id": null,
+      "title_locale_id": 5100581,
+      "title_locale": "Visiting the Job Center",
+      "title": "Visiting the Job Center",
+      "description_locale_id": 5100582,
+      "description_locale": "Queen Valerian has suggested that you meet the different Job Trainers in the Job Center here in Sanctuary.",
+      "objectives": [
+        {
+          "id": 91001601,
+          "name_locale_id": 5100586,
+          "name_locale": "Talk to Ellandra Shieldbreaker",
+          "text": "Talk to Ellandra Shieldbreaker",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925080
+          }
+        },
+        {
+          "id": 91001602,
+          "name_locale_id": 5100588,
+          "name_locale": "Talk to Maximus Axegrinder",
+          "text": "Talk to Maximus Axegrinder",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925081
+          }
+        },
+        {
+          "id": 91001603,
+          "name_locale_id": 5100590,
+          "name_locale": "Talk to Scotty Trackrunner",
+          "text": "Talk to Scotty Trackrunner",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925082
+          }
+        },
+        {
+          "id": 91001604,
+          "name_locale_id": 5100592,
+          "name_locale": "Talk to Captain Sunspark",
+          "text": "Talk to Captain Sunspark",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925083
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925063,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925083,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001601].actor_guid",
+          "guid": 5715144128442925080,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001602].actor_guid",
+          "guid": 5715144128442925081,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001603].actor_guid",
+          "guid": 5715144128442925082,
+          "resolved": true
+        },
+        {
+          "field": "objective[91001604].actor_guid",
+          "guid": 5715144128442925083,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [
+        11,
+        35
+      ],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "code-only",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    },
+    {
+      "source": "local-opening",
+      "id": 910017,
+      "original_quest_id": null,
+      "title_locale_id": 5100609,
+      "title_locale": "Talk to Captain Sunspark",
+      "title": "Talk to Captain Sunspark",
+      "description_locale_id": 5100617,
+      "description_locale": "Being an adventurer is dangerous work. Let me show you a trick that could help if you are attacked when you are not in a combat job like Brawler or Medic.",
+      "objectives": [
+        {
+          "id": 91001701,
+          "name_locale_id": 5100611,
+          "name_locale": "Switch to the Adventurer job",
+          "text": "Switch to the Adventurer job",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 1
+          }
+        },
+        {
+          "id": 91001702,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Try the Medic job in the native Jobs menu.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 11
+          }
+        },
+        {
+          "id": 91001703,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Try the Archer job in the native Jobs menu.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 35
+          }
+        },
+        {
+          "id": 91001704,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Switch to Chef and show your earned hat.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          }
+        },
+        {
+          "id": 91001705,
+          "name_locale_id": 0,
+          "name_locale": null,
+          "text": "Equip the Student Chef Hat earned earlier.",
+          "required": 1,
+          "trigger": {
+            "kind": "cosmetic_equipped",
+            "definition_id": 14794
+          }
+        }
+      ],
+      "actor_refs": [
+        {
+          "field": "giver_guid",
+          "guid": 5715144128442925083,
+          "resolved": true
+        },
+        {
+          "field": "turnin_guid",
+          "guid": 5715144128442925083,
+          "resolved": true
+        }
+      ],
+      "unlock_profiles": [],
+      "unlocks_resolved": true,
+      "reward_refs": [
+        {
+          "kind": "coins",
+          "amount": 10
+        }
+      ],
+      "evidence_class": "local-reconstruction",
+      "implementation_state": "code-only",
+      "status_source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open",
+      "notes": "Reserved 910xxx stage id; original_quest_id stays null because no original numeric binding is proven."
+    }
+  ],
+  "engine_definitions": [
+    {
+      "id": 1617,
+      "title": "Harassing the Harassers",
+      "original": true,
+      "enemy_definitions": [
+        0
+      ],
+      "goal_texts": [
+        "Defeat Petty Yetis"
+      ],
+      "coins": 0,
+      "items": [
+        [
+          1843,
+          1
+        ]
+      ]
+    },
+    {
+      "id": 900001,
+      "title": "Local restoration: Robgoblin patrol",
+      "original": false,
+      "enemy_definitions": [
+        1294
+      ],
+      "goal_texts": [
+        "Defeat three training Robgoblins"
+      ],
+      "coins": 25,
+      "items": [
+        [
+          1195,
+          1
+        ]
+      ]
+    }
+  ],
+  "coverage": {
+    "local_binding": {
+      "bound": 0,
+      "total": 17,
+      "note": "Local stages use reserved 910xxx ids and keep original_quest_id null; title similarity is not a binding."
+    },
+    "original_starting_zone": {
+      "opening_hub_main_quests": 13,
+      "opening_stickers": 6,
+      "titles_recovered": 6
+    },
+    "original_starting_dungeon": {
+      "encounter_id": 411,
+      "map": "sg_npx_cavern_01",
+      "status": "implementation ready for native validation; no original complete dungeon acceptance",
+      "missing_original_rules": 6
+    },
+    "original_tutorial": {
+      "status": "partially recovered from supplied locale only",
+      "local_stage1_scope": "class selection plus journal interaction"
+    },
+    "native_acceptance": {
+      "local_stages_native_accepted": 12,
+      "local_stages_code_only": 5,
+      "original_quests_native_accepted": 0,
+      "source": "notes/Current Progress.md (2026-10-08, 6:14 p.m. Pacific): twelve of the 17 local opening stages are rewarded; stages 13-17 remain open"
+    }
+  },
+  "blocked_claims": [
+    {
+      "quest_id": 1617,
+      "claim": "quest 1617 (Harassing the Harassers) advanced by unrelated kills",
+      "status": "disabled",
+      "objective": "Defeat Petty Yetis",
+      "required": 20,
+      "reason": "Production content leaves the engine enemy_definition at 0; generic Robgoblins/wolves do not advance the quest and no verified Petty Yeti enemy definition exists in the pinned resources."
+    }
+  ],
+  "missing_originals": [
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2514,
+      "hub_id": 1,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2513,
+      "hub_id": 1,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2521,
+      "hub_id": 2,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2526,
+      "hub_id": 2,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2522,
+      "hub_id": 2,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2523,
+      "hub_id": 2,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2524,
+      "hub_id": 2,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2525,
+      "hub_id": 2,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2529,
+      "hub_id": 3,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2528,
+      "hub_id": 3,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2527,
+      "hub_id": 3,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2566,
+      "hub_id": 3,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "opening-hub-main-quest",
+      "quest_id": 2530,
+      "hub_id": 3,
+      "reason": "no recovered title, objective, prerequisite or reward record"
+    },
+    {
+      "kind": "wiki-chain-link",
+      "quest_title": "Quest:Eviction Notice",
+      "referenced_by": "Quest:Fighting off the Pack",
+      "reason": "wiki prerequisite/continuation page absent from the corpus"
+    },
+    {
+      "kind": "wiki-chain-link",
+      "quest_title": "Quest:Learn to Mine & Smelt Ore",
+      "referenced_by": "Quest:Your First Weapon",
+      "reason": "wiki prerequisite/continuation page absent from the corpus"
+    },
+    {
+      "kind": "opening-optional-sticker",
+      "quest_id": 2572,
+      "title": "Fighting for Funds",
+      "reason": "same-region sticker absent from the 17-stage local chain"
+    },
+    {
+      "kind": "opening-optional-sticker",
+      "quest_id": 2573,
+      "title": "Margin of Victory",
+      "reason": "same-region sticker absent from the 17-stage local chain"
+    },
+    {
+      "kind": "opening-optional-sticker",
+      "quest_id": 2587,
+      "title": "Spreading the Cheer",
+      "reason": "same-region sticker absent from the 17-stage local chain"
+    }
+  ],
+  "cross_checks": [
+    {
+      "check": "community-journal-vs-prior-audit",
+      "status": "match",
+      "prior_ids": [
+        2513,
+        2514,
+        2521,
+        2522,
+        2523,
+        2524,
+        2525,
+        2526,
+        2527,
+        2528,
+        2529,
+        2530,
+        2566
+      ],
+      "parsed_ids": [
+        2513,
+        2514,
+        2521,
+        2522,
+        2523,
+        2524,
+        2525,
+        2526,
+        2527,
+        2528,
+        2529,
+        2530,
+        2566
+      ]
+    },
+    {
+      "check": "wiki-pages-json-vs-sqlite",
+      "status": "match",
+      "sqlite_count": 52,
+      "json_count": 52
+    }
+  ],
+  "limitations": [
+    "Supplied journal records are canned emulator data; ids are original but the set is not a complete database.",
+    "Community hub registrations carry no title/objective/reward fields; those originals remain missing.",
+    "Wiki text spans 2013-2026 revisions; presence is community evidence, not exact 2014 server behavior.",
+    "Reward item definition ids are recorded as references only; no complete item corpus exists in this audit.",
+    "Native acceptance states are a 2026-10-08 snapshot, not historical fidelity."
+  ]
+}

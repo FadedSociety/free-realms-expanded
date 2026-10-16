@@ -1,0 +1,15 @@
+# Class: MatchmakingRequestsDataSource
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00a7f430` | `MatchmakingRequestsDataSource::GetColumnName` | ✅ | virtual | Column-name table of the matchmaking request list: RequestId, QueueId, RequestingPlayerGuid, IsGroupRequest and CreationTime for indices 0..4, <error> otherwise; it never touches this. |
+| `00a7fe30` | `MatchmakingRequestsDataSource::GetRowCount` | 🟢 | virtual | Byte-identical sibling of 00a7fe00: when the byte at this+0x228 is clear it calls virtual slot 3 on the sink at this+4, sets that byte to 1, and returns the count at this+0x238. |
+| `00a82420` | `MatchmakingRequestsDataSource::GetField` | ✅ | virtual | Lua/UI data-source field getter (vtable slot [4]): lazily loads rows (one call through this+4 slot 3, then flag this+0x228 = 1), walks the request list from this+0x230 (stride 0xf0, count at this+0x238) to row param_2 a… |
+| `00a83490` | `OnPlayerMatchmakingRemoved` | ✅ | handler | Walks the request list at param_1[0x98] (next link at +0xf0) and for every request whose field +0x14 equals param_2 removes it with 00a832c0 and fires the UI event "PlayerMatchmakingRemoved" through the client event sys… |
+| `00a835a0` | `RemoveMatchmakingRequestByIds` | 🟢 | method | Walks the request list at param_1[0x98] and removes every node whose fields +8 and +0xc equal the two id arguments param_2/param_3 using 00a832c0, then notifies the data source through its vtable slot [4]. |
+| `00a839d0` | `MatchmakingRequestsDataSourceClearRequests` | 🟢 | method | Empties the request list at param_1[0x98] by repeatedly destroying the head node with 00a832c0 until it is null, then notifies the data source through its vtable slot [4]. |
+| `00a83d70` | `MatchmakingRequestsDataSourceCtor` | ✅ | ctor | Constructor of the Matchmaking.Requests data source: registers the name through 00922890(PTR_s_BaseClient.Matchmaking.Requests), stores the three class vtables, saves the owner pointer at [0x95], clears the loaded flag … |
+| `00a83e30` | `MatchmakingRequestsDataSourceDtor` | ✅ | dtor | Destructor body of the Matchmaking.Requests data source: stores the three class vtables, stores the SoeUtil::List<EncounterMatchmaking::MatchmakingRequest,-1> vtable and drains that request list at param_1[0x98] through… |
+| `00a83ed0` | `OnPlayerQueuedGroup` | ✅ | handler | Handles one queued-group notification: first drops the player's previous requests (00a83490), then appends the new request (00a83a80); if the request's handle pair (+0x18/+0x1c) differs from the client's own connection … |
+| `00a84150` | `CancelMatchRequestsForPlayer` | ✅ | handler | Walks the request list at param_1[0x98] and for every request whose field +0x14 equals param_2 builds a CancelMatchRequestPacket in a 24-byte stack object - vtable EncounterMatchmaking::CancelMatchRequestPacket, class i… |
+| `00a84260` | `MatchmakingRequestsDataSourceScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (vtable slot [0]) of MatchmakingRequestsDataSource: runs the destructor body 00a83e30 and frees the object with _free when the delete flag bit 0 is set. |

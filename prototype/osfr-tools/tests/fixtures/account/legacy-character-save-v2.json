@@ -1,0 +1,9 @@
+{
+  "schema_version": 2,
+  "character": {
+    "guid": 900000001,
+    "zone_id": 7,
+    "position": [1.0, 2.0, 3.0],
+    "rotation": [0.0, 0.0, 1.0]
+  }
+}

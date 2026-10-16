@@ -1,0 +1,1413 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "the_rumbledome",
+        "name_string_id": 439732449,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for The Rumbledome."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key the_rumbledome comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > The Rumbledome; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "The Rumbledome",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 439732449,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 1,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > The Rumbledome difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Sunstone Valley",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": null,
+            "reason": "None by the wiki (difficulty 1, \"Varied\"). The level line of the entry window was not read, so no client confirmation. | [wiki] [video MGbXhwbWFV4/00004]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > The Rumbledome minimum combat level; cited guide source index"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": null,
+            "reason": "None by the wiki (difficulty 1, \"Varied\"). The level line of the entry window was not read, so no client confirmation. | [wiki] [video MGbXhwbWFV4/00004]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Requirements > Combat job level; cited [wiki] [video MGbXhwbWFV4/00004]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Requirements > Combat job level; cited [wiki] [video MGbXhwbWFV4/00004]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None. Quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Unknown. The wiki page lists no members-only bonus. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Sunstone Valley",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not identify an entrance target."
+                }
+              ]
+            },
+            "name": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not identify an entrance target."
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "No entrance target ID was stated.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md has no entrance target ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              }
+            ]
+          },
+          "description": {
+            "value": "The entrance in Rumble Ridge, \"just down the way from Wheelie Pete's\" (wiki). Standing at it shows the prompt \"Join The Rumbledome?\" / \"Press X\". A distance label \"The Rumbledome 105m\" is seen in the world. The Sunstone Valley region panel lists \"The Rumbledome\" with Rough Rider Raceway, Sunstone Valley Approach, Precursor Ruins, Red's Haven, Sandscale Oasis, Whirly's Scrap Camp and Glimmerdeep Hydropower Dam. | [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (and only)",
+              "value": "\"Defeat the Champion of the Rumbledome!\" (loc 768596353; also 3859088650 with lower-case \"champion\"). The panel reads \"Goals (1)\" and the tick shows when Goldcrusher falls. | [client] [video MGbXhwbWFV4/00114, 00196, PQwyCEP7uWM/00072] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Main (and only); cited [client] [video MGbXhwbWFV4/00114, 00196, PQwyCEP7uWM/00072] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Main (and only); cited [client] [video MGbXhwbWFV4/00114, 00196, PQwyCEP7uWM/00072] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Main (and only); cited [client] [video MGbXhwbWFV4/00114, 00196, PQwyCEP7uWM/00072] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": null,
+              "reason": "None found. The panel shows one goal, and no \"Rumbledome Bonus Objective\" string exists in the client. | [video] [client: no match]",
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Bonus; cited [video] [client: no match]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Bonus; cited [video] [client: no match]"
+                }
+              ]
+            },
+            {
+              "label": "Sub-goals (quest-side strings)",
+              "value": "\"Defeat Bronzeknuckles!\" (loc 832031262), \"Defeat Silverfist!\" (loc 1100863650), \"Defeat Goldcrusher, champion of Rumbledome!\" (loc 789709007), \"Defeat the Rumbledome Gladiators!\" (loc 974189640), \"Defeat the second wave of Rumbledome Gladiators!\" (loc 2407226726), \"Defeat the second batch of the formidable Rumbledome Gladiators\" (loc 1167100850). These come from the Dorn story quest, not necessarily from the lobby battle. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Sub-goals (quest-side strings); cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Quest-only objective",
+              "value": "\"Knock out Bronzeknuckles inside the Rumbledome!\" (loc 3645922706), \"Knock out Silverfist in a Rumbledome Rumble!\" (loc 3625057184) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Quest-only objective; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": [
+            {
+              "label": "Sub-goals (quest-side strings)",
+              "value": "\"Defeat Bronzeknuckles!\" (loc 832031262), \"Defeat Silverfist!\" (loc 1100863650), \"Defeat Goldcrusher, champion of Rumbledome!\" (loc 789709007), \"Defeat the Rumbledome Gladiators!\" (loc 974189640), \"Defeat the second wave of Rumbledome Gladiators!\" (loc 2407226726), \"Defeat the second batch of the formidable Rumbledome Gladiators\" (loc 1167100850). These come from the Dorn story quest, not necessarily from the lobby battle. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Goals > Sub-goals (quest-side strings); cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Wave enemy",
+              "value": "Rumbledome Gladiator (loc 177678104; game data 54945777) | Announcer: \"Defeat the latest contenders for the Rumbledome - the Rumbledome Gladiators!\" (loc 2938966400). Two waves are named in client strings; the video shows Gladiators both before and after Silverfist. | [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "First contender",
+              "names": [
+                "Bronzeknuckles"
+              ],
+              "description": {
+                "value": "Bronzeknuckles (loc 1057195974) | Announcer: \"Our first contender: Stumbling all the way down the road from Wheelie Pete's - BRONZEKNUCKLES!\" (loc 4050294793); \"Bronzeknuckles has been defeated!\" (loc 2056278185). Dev note: \"bronzeknuckles extra ability\" (loc 954553970). Boss bar and red nameplate seen. | [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map First contender to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for First contender."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Second champion",
+              "names": [
+                "Silverfist"
+              ],
+              "description": {
+                "value": "Silverfist (loc 3851449769) | Announcer: \"Our next challenger spent years sparring with the manguana hunters in the Sandscale Oasis. He is - SILVERFIST!\" (loc 2009416936); \"Silverfist has been defeated!\" (loc 3003104383). | [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map Second champion to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for Second champion."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Final boss",
+              "names": [
+                "Goldcrusher"
+              ],
+              "description": {
+                "value": "Goldcrusher (loc 1793168724), \"Geothem Goldcrusher\" in the announcer text (loc 3188028688) | \"Entering the dome is the one, the only... Goldcrusher!\" (loc 944519991), \"The champion of the Rumbledome - GOLDCRUSHER!\" (loc 1779708057), \"The Goldcrusher is looking winded! Could this be the fight that actually dethrones him!?\" (loc 2792227363), \"I can't beleive it! The goldcrusher has been knocked out!\" (loc 715031091). Dev notes: \"final boss ground pound\" (loc 787395162), \"fire trap hit by goldcrusher resulting explosion\" (loc 115552812), \"shock pad smashed by boss\" (loc 848389967). | [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map Final boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for Final boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Wave enemy",
+              "names": [
+                "Rumbledome Gladiator"
+              ],
+              "description": {
+                "value": "Rumbledome Gladiator (loc 177678104; game data 54945777) | Announcer: \"Defeat the latest contenders for the Rumbledome - the Rumbledome Gladiators!\" (loc 2938966400). Two waves are named in client strings; the video shows Gladiators both before and after Silverfist. | [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map Wave enemy to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for Wave enemy."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Brother-sister pair",
+              "names": [
+                "Kraig",
+                "Krissy"
+              ],
+              "description": {
+                "value": "Kraig (loc 1164542993) and Krissy (loc 3189591423, 3375517174) | Client-only. \"The brother and sister duo, Kraig and Krissy, are now entering the dome!\" (loc 2033347648), \"Ouch! And down goes Kraig!\" (loc 597531043), \"Smashing! Krissy has been knocked out!\" (loc 2915918276), \"Oh my! Both Kraig and Krissy have been defeated!\" (loc 1401680871). Dev notes under the encounter tag: \"Kraig goes berserker if Krissy is defeated first\" (loc 2386841307), \"Stun component for Kraig's Charge\" (loc 1929470463), \"Krissy's Heal (self only)\" (loc 2295712429), \"Krissy's big heal\" (loc 2643287830), \"Krissy's Shield (self only)\" (loc 3478355960). They are not in the wiki list and were not seen in the one full video run, so where they fit (an extra stage, a variant, or a cut fight) is unknown. | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Brother-sister pair; cited [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map Brother-sister pair to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for Brother-sister pair."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Brother-sister pair; cited [client]"
+                }
+              ]
+            },
+            {
+              "role": "Hazards",
+              "names": [
+                "Fire Trap",
+                "Spike Trap",
+                "Shock Trap",
+                "Gloam Fire Trap"
+              ],
+              "description": {
+                "value": "Fire Trap (loc 1688760482), Spike Trap (loc 820210589), Shock Trap (loc 2308528600), Gloam Fire Trap (loc 2374180958) | Flame-trap smoke over a floor grate and purple trap effects at the arena edge were seen. Spectators: \"crowd throws vegetable\" (dev, loc 1227071045) and a thrown bottle (loc 435223939, shared with the Finnerty bottle quest). | [client] [video MGbXhwbWFV4/00072, 00168]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map Hazards to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for Hazards."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Final boss",
+              "names": [
+                "Goldcrusher"
+              ],
+              "description": {
+                "value": "Goldcrusher (loc 1793168724), \"Geothem Goldcrusher\" in the announcer text (loc 3188028688) | \"Entering the dome is the one, the only... Goldcrusher!\" (loc 944519991), \"The champion of the Rumbledome - GOLDCRUSHER!\" (loc 1779708057), \"The Goldcrusher is looking winded! Could this be the fight that actually dethrones him!?\" (loc 2792227363), \"I can't beleive it! The goldcrusher has been knocked out!\" (loc 715031091). Dev notes: \"final boss ground pound\" (loc 787395162), \"fire trap hit by goldcrusher resulting explosion\" (loc 115552812), \"shock pad smashed by boss\" (loc 848389967). | [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not map Final boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md does not source stats for Final boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Coins",
+                "value": "\"You receive 22 coins\" appears at the end of a Medic 20 run. A Warrior 20 run shows \"You receive ? coins\" after Bronzeknuckles (amount unreadable). Whether 22 is a flat fee, a share or a scaled value is unknown. | [video PQwyCEP7uWM/00072, 00074, MGbXhwbWFV4/00062]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Coins; cited [video PQwyCEP7uWM/00072, 00074, MGbXhwbWFV4/00062]"
+                  }
+                ]
+              },
+              {
+                "label": "Wiki reward list",
+                "value": "Coins; Backward Baseball Cap; Stitched Wristbands; Strapped Skull Shirt; Tattered Short Sleeve Shirt; Stitched Pants; Knee High Combat Boots; \"Level 1 Combat Gear for Archer, Brawler, Medic, Ninja, Warrior & Wizard\". No prize wheel table, no members bonus and no star figure on the page. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Wiki reward list; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Client names for those items",
+                "value": "Backward Baseball Cap (loc 612314083), Stitched Wristbands (794123706), Strapped Skull Shirt (1140981251), Stitched Pants (2479454943) match the wiki. Tattered Short-sleeve Shirt (loc 3427185857) and Knee-high Combat Boots (loc 2716866594) are the client spellings. | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Client names for those items; cited [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Level 1 combat gear",
+                "value": "The client has no \"Level 1 Combat Gear\" string. Which exact pieces the gear is, and whether they come from a prize wheel, is unknown. | [client: no match]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Level 1 combat gear; cited [client: no match]"
+                  }
+                ]
+              },
+              {
+                "label": "Results screen",
+                "value": "Not captured. The Warrior run fades out on the goal tick and the Medic run goes to a blurred transition, so no \"YOU WIN!\" screen, score table or wheel was seen. | [video MGbXhwbWFV4/00196, PQwyCEP7uWM/00074]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Results screen; cited [video MGbXhwbWFV4/00196, PQwyCEP7uWM/00074]"
+                  }
+                ]
+              },
+              {
+                "label": "Trophies",
+                "value": null,
+                "reason": "None for this fight (see Requirements). Separate \"Bronze / Silver / Gold / Epic Rumbledome Trophy\" items exist (loc 3023334233, 1294785100, 2514704957, 1752705635); their source is unknown, and the Card Duelist trophy \"rumble-Rumble-RUMBLEDOME!\" is awarded for \"Complete the Rumbledome TCG Questline.\" | [client] [video 2nq801iM8kU/00202]",
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Trophies; cited [client] [video 2nq801iM8kU/00202]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Trophies; cited [client] [video 2nq801iM8kU/00202]"
+                  }
+                ]
+              },
+              {
+                "label": "Related drops",
+                "value": "Finnerty's quest wants the \"rare, valuable bottles that the spectators throw into the Rumbledome arena\" (loc 101685310, 1766084512). | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Related drops; cited [client]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "reported_coin_reward",
+                "conditions": {
+                  "value": "Coins",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Coins; cited [video PQwyCEP7uWM/00072, 00074, MGbXhwbWFV4/00062]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 22,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Coins; cited [video PQwyCEP7uWM/00072, 00074, MGbXhwbWFV4/00062]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Rewards > Coins; cited [video PQwyCEP7uWM/00072, 00074, MGbXhwbWFV4/00062]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": null,
+            "reason": "No per-job prize wheel table was present.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "the_rumbledome",
+            "kind": "zone",
+            "target_name": "Sunstone Valley",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Entrance; cited [wiki] [video olPW8aULhW0/00008, MGbXhwbWFV4/00002, fMOGHMuA2Hc/00122, b6QfVC_2YpQ/00028]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Bronzeknuckles",
+            "target_id": 9500000807,
+            "reason": "Exact name matches reconstructed NPC content key in sunstone_valley.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/sunstone_valley.json npc_id 9500000807; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Silverfist",
+            "target_id": 9500000855,
+            "reason": "Exact name matches reconstructed NPC content key in sunstone_valley.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/sunstone_valley.json npc_id 9500000855; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Goldcrusher",
+            "target_id": 9500000820,
+            "reason": "Exact name matches reconstructed NPC content key in sunstone_valley.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/sunstone_valley.json npc_id 9500000820; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Rumbledome Gladiator",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Kraig",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Brother-sister pair; cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Krissy",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Brother-sister pair; cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Fire Trap",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Spike Trap",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Shock Trap",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "owner": "the_rumbledome",
+            "kind": "npc",
+            "target_name": "Gloam Fire Trap",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key the_rumbledome comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > The Rumbledome; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Bronzeknuckles",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > First contender; cited [client] [video MGbXhwbWFV4/00038 to 00066] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Silverfist",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Second champion; cited [client] [video MGbXhwbWFV4/00082, 00094, 00106] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Goldcrusher",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Rumbledome Gladiator",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Wave enemy; cited [client] [video MGbXhwbWFV4/00082, 00118, 00130] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 4,
+            "name": "Kraig",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Brother-sister pair; cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 4,
+            "name": "Krissy",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Brother-sister pair; cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 5,
+            "name": "Fire Trap",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 5,
+            "name": "Spike Trap",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 5,
+            "name": "Shock Trap",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 5,
+            "name": "Gloam Fire Trap",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Hazards; cited [client] [video MGbXhwbWFV4/00072, 00168]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Goldcrusher",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/The Rumbledome.md > Enemies and boss > Final boss; cited [client] [video MGbXhwbWFV4/00154 to 00172] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

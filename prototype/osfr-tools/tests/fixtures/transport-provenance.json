@@ -1,0 +1,12 @@
+{
+  "source": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\lab\\working\\OSFR.Server\\OSFR Server\\LibSOE.dll",
+  "source_sha256": "bf51ad9073f4c2e235106b445ef3b250e304a55e94b6f981d6f9e4154e6c2845",
+  "methods": [
+    "SOEWriter.GetFinalSOEPacket",
+    "SOEProtocol.GetCRC32Checksum"
+  ],
+  "vector_count": 105,
+  "constructor_execution": false,
+  "network_execution": false,
+  "note": "Synthetic payloads and seeds. Objects allocated without constructors; only serializer, compression and checksum methods execute."
+}

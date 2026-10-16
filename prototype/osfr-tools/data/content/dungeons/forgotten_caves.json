@@ -1,0 +1,3066 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "forgotten_caves",
+        "name_string_id": 669488071,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Forgotten Caves."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key forgotten_caves comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Forgotten Caves; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Forgotten Caves",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 669488071,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 3,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Forgotten Caves difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Sanctuary (Memorial Caverns)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 5,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Requirements > Combat job level; cited [wiki: Forgotten Caves, Dungeons] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Requirements > Combat job level; cited [wiki: Forgotten Caves, Dungeons] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Requirements > Combat job level; cited [wiki: Forgotten Caves, Dungeons] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Requirements > Combat job level; cited [wiki: Forgotten Caves, Dungeons] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None. Many quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Sanctuary (Memorial Caverns)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "barrier",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the barrier in the Memorial Caverns, in Sanctuary. It has an Atlas icon. The Memorial Caverns are \"behind the Great Tree\" (loc 2067151334). Client directions: enter the Memorial Caverns north of General Glowlight, take the east tunnel all the way down to the lowest level, go west out of the main chamber and over a bridge, which leads straight to the entrance (loc 2616040833, 1426700937). | [wiki: Forgotten Caves] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "Wiki panel text \"Defeat Amoranth!\". The client strings are \"Defeat Amoranth\" (loc 1061410967) and \"Defeat Amoranth.\" (loc 430977270); neither has the exclamation mark. Quest-style text: \"Enter the Forgotten Caves and defeat Amoranth.\" (loc 54773739). Goal detail: \"Amoranth protects the magic fires. Defeating him is the only way to assist Petulia with her task.\" (loc 3348622690; the link to the goal is inferred). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Main; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Main; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "Wiki \"Bonus: Escort Archmage Petulia.\". Client goal text \"Escort Archmage Petulia.\" (loc 2262630666) and a separate \"Bonus: \" prefix string (loc 897202295). The combined line was not seen in client or video. | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Escort rules",
+              "value": "\"There are six magical braziers that Archmage Petulia desires a sample from. Escort her safely to each brazier so she may collect the samples. She must get all 6 to consider her research successful.\" (loc 2359831338). \"Do not allow Petulia to be knocked out.\" (loc 493114276). \"If petulia is knocked out, she will be unable to finish her quest.\" (loc 1943007875). \"Archmage Petulia requires assistance; protect her so she can do her duties by keeping the changelings at bay!\" (loc 1139645311). Between braziers: \"All done! On to the next brazier.\" (loc 3186237327). | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Escort rules; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Petulia's lines",
+              "value": "\"You're here to help, yes? I need samples from the magical braziers in these caverns.\" (loc 4101597732). \"They have special braziers set up in various parts of these caverns and I need to look at each one...\" (loc 3331608486). Quest text \"Speak with Archmage Petulia!\" (loc 2647021995). | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Petulia's lines; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"Forgotten Caves Bonus Objective\" (loc 2063871438) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Forgotten Caves\" (loc 2112925184); \"Complete the Forgotten Caves encounter.\" (loc 1809064605) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Goals > Win text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Amoranth"
+              ],
+              "description": {
+                "value": "Amoranth (loc 2953797610, game data 1986048496) | Client quest text calls him \"the leader of the changlings there\" (loc 3779875552), \"that brute\" (loc 445084524) and the master of a clan of changeling ninjas (loc 3995631769, 201585678). Client ability names: \"Amoranth AoE Swing Attack\" (loc 88246099), \"Amoranth Lightning Blast\" (loc 1144909026), \"Amoranth AoE Sleep\" (loc 1600679677), \"Amoranth Multithrust Jab\" (loc 3755657415), \"Amoranth Absorb Brazier Power\" (loc 3098266156). A line reads \"Wait until I absorb power from the Brazier! You won't be able to stop me!\" (loc 2644469637) next to a \"Power of the Brazier\" name (loc 2643683899, 2718734560). The wiki Boss page ranks him a difficulty 3 boss. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (wiki)",
+              "names": [
+                "Changelings",
+                "Changeling Berserkers",
+                "Bats",
+                "Changeling Arcanus (written \"Arcarus\")"
+              ],
+              "description": {
+                "value": "Changelings, Changeling Berserkers, Bats, Changeling Arcanus (written \"Arcarus\") | Wiki list. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not map Enemies (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not source stats for Enemies (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (client names)",
+              "names": [
+                "Changeling Berserker",
+                "Changeling Arcanus"
+              ],
+              "description": {
+                "value": "Changeling Berserker (loc 2446541356, 1156739968), Changeling Arcanus (loc 1435902026, 1818611931), Changeling Marauder (loc 1673105357, 3406294104), Changeling Ninja (loc 1830675970, 1250680925), Bat (loc 1677961011) and Cave Bat (loc 1623002612) | Quest text ties Marauders, Arcanus and ninjas to the caves: \"Defeat Changeling Marauders inside of Sanctuary's Forgotten Caves.\" (loc 2762900694); \"The Changeling Arcanus carry the transfiguring crystals - you'll need to defeat them to obtain the crystals.\" (loc 2782989475); changeling ninjas serve Amoranth (loc 3995631769). \"Changeling Berserkers are among the strongest of their clans. If anyone has the murals, it would be them.\" (loc 1229831662). The bat names are generic and not tied to this dungeon by text. | [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (client names); cited [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not map Enemies (client names) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not source stats for Enemies (client names)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (client names); cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Amoranth"
+              ],
+              "description": {
+                "value": "Amoranth (loc 2953797610, game data 1986048496) | Client quest text calls him \"the leader of the changlings there\" (loc 3779875552), \"that brute\" (loc 445084524) and the master of a clan of changeling ninjas (loc 3995631769, 201585678). Client ability names: \"Amoranth AoE Swing Attack\" (loc 88246099), \"Amoranth Lightning Blast\" (loc 1144909026), \"Amoranth AoE Sleep\" (loc 1600679677), \"Amoranth Multithrust Jab\" (loc 3755657415), \"Amoranth Absorb Brazier Power\" (loc 3098266156). A line reads \"Wait until I absorb power from the Brazier! You won't be able to stop me!\" (loc 2644469637) next to a \"Power of the Brazier\" name (loc 2643683899, 2718734560). The wiki Boss page ranks him a difficulty 3 boss. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Forgotten Caves.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"210 Stars or less\" (wiki wording) | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "80 Coins slot on every job's wheel. The client has a generic string \"Bonus: 80 Coins!\" (loc 2568992024), not tied to a dungeon. | [wiki] [client, generic]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "151 Coins. No client \"Bonus: 151 Coins!\" string exists. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Completing the bonus goal gives every player in the instance one piece of clothing from a set for their job. Colour and body slot are random. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "Bronze trophy (5 pts) \"Complete the Forgotten Caves encounter.\"; silver trophy (10 pts) \"Complete the Forgotten Caves encounter with a full group.\" | [client loc 1809064605, 2401550378] [wiki: Achievements]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Achievements; cited [client `loc 1809064605`, `2401550378`] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Achievements; cited [client `loc 1809064605`, `2401550378`] [wiki: Achievements]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"III\", matching difficulty 3. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 80,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 151,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Composite Bow of Volleys",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Energy III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Cross Wind Archer Hoodie",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Anvil Hammer of Sweeps",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Energy III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Rubber Match Brawler Jacket",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Bonesaw of Triage",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Energy III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Trauma Care Medic Shirt",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Energy III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Scythe of Dragonstrike",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Shinobi Ninja Gi",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Charge Attack Warrior Tunic",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Battle Hammer of Spinning",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Energy III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Practitioner Wizard Medium Cloak",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Bone Wand of Shock",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Energy III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "forgotten_caves",
+            "kind": "zone",
+            "target_name": "Sanctuary (Memorial Caverns)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "object",
+            "target_name": "barrier",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Entrance; cited [wiki: Forgotten Caves] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Amoranth",
+            "target_id": 9500000437,
+            "reason": "Exact name matches reconstructed NPC content key in sanctuary.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/sanctuary.json npc_id 9500000437; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Changelings",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Changeling Berserkers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Bats",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Changeling Arcanus (written \"Arcarus\")",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Changeling Berserker",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (client names); cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "npc",
+            "target_name": "Changeling Arcanus",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (client names); cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Archer's Composite Bow of Volleys",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Archer's Ring of Energy III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Cross Wind Archer Hoodie",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Brawler's Anvil Hammer of Sweeps",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Energy III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Rubber Match Brawler Jacket",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Medic's Bonesaw of Triage",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Medic's Ring of Energy III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Trauma Care Medic Shirt",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Energy III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Ninja's Scythe of Dragonstrike",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Shinobi Ninja Gi",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Charge Attack Warrior Tunic",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Warrior's Battle Hammer of Spinning",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Energy III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Practitioner Wizard Medium Cloak",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Wizard's Bone Wand of Shock",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "forgotten_caves",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Energy III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key forgotten_caves comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Forgotten Caves; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Amoranth",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Changelings",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Changeling Berserkers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Bats",
+            "definition_id": 930027,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Bats links to definition_id=930027; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Changeling Arcanus (written \"Arcarus\")",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Changeling Berserker",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (client names); cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Changeling Arcanus",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Enemies (client names); cited [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Amoranth",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Forgotten Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

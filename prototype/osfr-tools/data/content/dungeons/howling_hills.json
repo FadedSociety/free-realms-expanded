@@ -1,0 +1,2966 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "howling_hills",
+        "name_string_id": 2369298095,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Howling Hills."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key howling_hills comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Howling Hills; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Howling Hills",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 2369298095,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 3,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Howling Hills difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Snowhill",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 5,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Requirements > Combat job level; cited [wiki: Dungeons, Howling Hills] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Requirements > Combat job level; cited [wiki: Dungeons, Howling Hills] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Requirements > Combat job level; cited [wiki: Dungeons, Howling Hills] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Requirements > Combat job level; cited [wiki: Dungeons, Howling Hills] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None found for the dungeon itself. | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Snowhill",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "barrier",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the barrier in Snowhill. It has an Atlas icon. The client calls it \"the Howling Hills, north of Snowhill\" (loc 3394134736), \"the pass through Howling Hills\" (loc 797046977) and says an NPC stands \"near the entrance to Howling Hills, not far from here\" (loc 3882321755). | [wiki] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Find and defeat Snognosh!\" (loc 3825908130). Related client objective strings: \"Defeat Snognosh\" (loc 1940525597), \"Enter Howling Hills and defeat Snognosh.\" (loc 3289387601), \"Defeat Snognosh, the Ice Troll King!\" (loc 3694925383). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Main; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Main; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Return all three Lost Ice Bear Cubs to their mother!\" (loc 4049526188). The wiki gives it as \"Bonus: Return all three Lost Ice Bear Cubs to their mother!\". The \"Bonus: \" prefix was not found in the client text for this string. | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus detail",
+              "value": "\"A few ice bear cubs have gotten separated from their mother! Find them and return them to their worried mother!\" (loc 1448652886). A cub NPC says \"The lost bear cub seems nervous, but begins to follow you.\" (loc 3000050148). On delivery: \"The bear cub seems happy to be with its mother once again.\" (loc 1226425784). | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Bonus detail; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"Howling Hills Bonus Objective\" (loc 1396700682) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Howling Hills\" (loc 93383990); \"Complete the Howling Hills encounter.\" (loc 773375349) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Goals > Win text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Snognosh"
+              ],
+              "description": {
+                "value": "Snognosh (game data loc 1860779061, UI loc 1531420550, 3243532495) | Titled \"the Ice Troll King\" in quest text (loc 3694925383). Client ability strings (names only): \"Snognosh Chilling Breath\" (loc 1471056918, 4092135597), \"Snognosh Brain Freeze\" (loc 2756599452, 3529926034), \"Snognosh Frost Rain\" (loc 4018652854, 4141448947). The dev line \"howling hills - boss attack\" (loc 4191662328) also exists. Effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [
+                "Ice Trolls",
+                "Wolves",
+                "Big Mean Ice Trolls"
+              ],
+              "description": {
+                "value": "Ice Trolls, Wolves, Big Mean Ice Trolls (wiki list) | Client confirms \"Big Mean Ice Troll\" (game data loc 3048214012, UI loc 3483836035). Client quest text names \"Ice Wolf Trainers\" in Howling Hills (loc 2289362402), plus the enemy strings \"Ice Wolf Trainer\" (loc 3750191317) and \"Trained Ice Wolf\" (loc 2520071568, 3401191480). The panel text calls the wolves \"trained snow wolves\". Quest text also sends players to \"defeat Ice Trolls in the Howling Hills\" (loc 3864767315). | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Snognosh"
+              ],
+              "description": {
+                "value": "Snognosh (game data loc 1860779061, UI loc 1531420550, 3243532495) | Titled \"the Ice Troll King\" in quest text (loc 3694925383). Client ability strings (names only): \"Snognosh Chilling Breath\" (loc 1471056918, 4092135597), \"Snognosh Brain Freeze\" (loc 2756599452, 3529926034), \"Snognosh Frost Rain\" (loc 4018652854, 4141448947). The dev line \"howling hills - boss attack\" (loc 4191662328) also exists. Effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Howling Hills.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"178 Stars or less\" (wiki wording) | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "343 Coins slot on every job's wheel. This is far above the other difficulty-3 entries ([[Bone Bog Cemetery]] 112). It may be a wiki error. See Conflicts. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "98 Coins. The client holds a generic string \"Bonus: 98 Coins!\" (loc 4007016911) that is not tied to any dungeon. | [wiki] [client, generic]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Completing the bonus goal gives every player in the instance one piece of clothing from a set for their current job. Colour and body slot are random. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "Bronze trophy (5 pts) \"Complete the Howling Hills encounter.\" (loc 773375349); silver trophy (10 pts) \"Complete the Howling Hills encounter with a full group.\" (loc 3116031680) | [client] [wiki: Achievements]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Achievements; cited [client] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Achievements; cited [client] [wiki: Achievements]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"III\", matching difficulty 3. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "label": "Video",
+                "value": null,
+                "reason": "None. No result screen from this dungeon was found. | [video] none",
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Video; cited [video]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 343,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 98,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Members-only bonus; cited [wiki] [client, generic]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Composite Bow of Blizzards",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Bark Skin III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Cross Wind Archer Cap",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Anvil Hammer of Rumbling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Bark Skin III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Rubber Match Brawler Helmet",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Bonesaw of Vitals",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Bark Skin III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Trauma Care Medic Cap",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Bark Skin III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Scythe of 1000 Storms",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Shinobi Ninja Cowl",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Charge Attack Warrior Helm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Battle Hammer of Cleaving",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Bark Skin III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Practitioner Wizard Fez",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Bone Wand of Glaciers",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Bark Skin III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "howling_hills",
+            "kind": "zone",
+            "target_name": "Snowhill",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "object",
+            "target_name": "barrier",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Entrance; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "npc",
+            "target_name": "Snognosh",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "npc",
+            "target_name": "Ice Trolls",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "npc",
+            "target_name": "Wolves",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "npc",
+            "target_name": "Big Mean Ice Trolls",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Archer's Composite Bow of Blizzards",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Bark Skin III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Cross Wind Archer Cap",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Brawler's Anvil Hammer of Rumbling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Bark Skin III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Rubber Match Brawler Helmet",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Medic's Bonesaw of Vitals",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Bark Skin III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Trauma Care Medic Cap",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Bark Skin III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Ninja's Scythe of 1000 Storms",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Shinobi Ninja Cowl",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Charge Attack Warrior Helm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Warrior's Battle Hammer of Cleaving",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Bark Skin III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Practitioner Wizard Fez",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Wizard's Bone Wand of Glaciers",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Bark Skin III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "howling_hills",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key howling_hills comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Howling Hills; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Snognosh",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Ice Trolls",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Wolves",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Big Mean Ice Trolls",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Snognosh",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+# System: engine.screenshot
+
+94 mapped functions. Grouped by confidence; server behaviour below is inference from client code only.
+
+## ✅ confirmed (32)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `008a80d0` | `BaseClient::StartImageCapture` | BaseClient | Starts a screenshot/image capture on the BaseClient: sets up full-size and thumbnail encoders plus their buffers, sets the started/enabled flags, and logs every failure path to FreeRealms.log through FUN_006faad0. Only … | [[Native Map/Shards/S0220 008a3ce0-008a8500|S0220]] |
+| `008a8750` | `EnsureRootStore` |  | Creates the client's uploader handle (the object built by FUN_0108c8a0 stores YouTube::YouTubeUploaderImpl_SingleUse::vftable) configured with the SSL RootStore file; the RootStore string is the domain anchor in this fu… | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `00b4b520` | `ScreenshotManager::SetupCapture` | ScreenshotManager | Shared gate and render-state setup for the TCG, portrait and headshot capture entry points (00b4e9f0, 00b4eba0, 00b4ed20). | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4bb50` | `ScreenshotManager::StoreHeadShotBufferToFile` | ScreenshotManager | Saves a cached HEADSHOT image for a character guid to a file path. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4bd40` | `ScreenshotManager::StorePortraitBufferToFile` | ScreenshotManager | Saves a cached PORTRAIT image for a character guid to a file path. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4c350` | `ScreenshotManager::GetPortraitBuffer` | ScreenshotManager | Gets the stored PORTRAIT buffer pointer and size for a character guid without creating an entry. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4c440` | `ScreenshotManager::InitPortraitScene` | ScreenshotManager | Creates the portrait render scene (sky_portrait.xml) and the camera and render state used by the portrait and headshot captures. Its ready flag gates 00b4f870 and 00b50190. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4cf00` | `ScreenshotManager::OnPostResult` | ScreenshotManager | HTTP completion callback for the manager's uploads: logs the request id, HTTP result, URL and the response body. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4d210` | `FormatHeadShotPathAndCall` |  | Builds the per-guid headshot PNG path (Resources\images\heads\<guid>.png). | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4d2e0` | `ScreenshotManager::StorePhotoToFile` | ScreenshotManager | Saves the cached PHOTO capture for the global guid pair to a file path. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e220` | `ScreenshotManager::LoadDefaultHeadShots` | ScreenshotManager | Loads the default empty-portrait image (icon_UI_empty_portrait_64.png) as the fallback headshot buffer at this+0x248. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e810` | `ScreenshotManager::ScreenshotManager` | ScreenshotManager | Creates the ScreenshotManager with its storage map, default headshot buffer, portrait scene and pending-job lists. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e970` | `ScreenshotManager::CreatePhoto` | ScreenshotManager | Public photo-capture entry: ensures the PHOTO store entry for the global guid pair and forwards the render request. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e9f0` | `ScreenshotManager::CaptureTCGPortraitToBuffer` | ScreenshotManager | Requests a TCG card portrait render for one character guid into the manager's buffer store. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4eba0` | `ScreenshotManager::CapturePortraitToBuffer` | ScreenshotManager | Captures the 330x180 PORTRAIT image for one character guid. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4ed20` | `ScreenshotManager::CaptureHeadShotToBuffer` | ScreenshotManager | Renders the 70x70 headshot for a character object and hands it to that character's completion callback. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4faa0` | `ScreenshotManager::GetHeadShotBuffer` | ScreenshotManager | Gives callers the headshot buffer for a guid: stored node first, then the PNG file, then the default headshot. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4fd60` | `ScreenshotManager::PostPortraitToHttp` | ScreenshotManager | Uploads a character's stored PORTRAIT image to the portrait web service as multipart form data. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00bd43f0` | `FotomatPortraitDataManager::GetHeadshotBuffer` | FotomatPortraitDataManager | Supplies the headshot image buffer and size of a character id to its users, requesting it when it is not loaded and falling back to a manager-level default buffer. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4e20` | `HashListMap8_ScalarDeletingDtor` | SoeUtil::HashListMap<int,FotomatPortrai… | Virtual slot [0] of the FotomatPortraitData map vtable, the heap-delete entry for the map. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4f90` | `FotomatPortraitDataManager::AdjustorThunk_ScalarDtor` | FotomatPortraitDataManager | Entry point for deleting the manager through its secondary base vtable: the thunk translates this to the primary subobject and jumps to the manager deleting destructor. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd50f0` | `HashListMap8_Ctor` | SoeUtil::HashListMap<int,FotomatPortrai… | Constructs the eight-bucket FotomatPortraitData map that FotomatPortraitDataManager owns (constructed by 00bd5190). | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd5170` | `HashList8_ScalarDeletingDtor` | SoeUtil::HashList<FotomatPortraitData,8… | Heap-delete entry for the base HashList view of the FotomatPortraitData map. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd5190` | `FotomatPortraitDataManager::FotomatPortraitDataManager` | FotomatPortraitDataManager | Constructs the portrait cache manager (the Fotomat portrait table with its FotomatPortraitData map and pending table). Called by PlayClient::Initialize (0092b170). | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00d0b3a0` | `ImageCaptureJobQueueCallbackHandler_Ctor` | CaptureCommon::JobQueueCallbackHandlerT… | Constructs callback handler for ImageCapture job records. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0b410` | `JobQueueCallbackHandler_DtorBody` | CaptureCommon::JobQueueCallbackHandlerT… | Destroys ImageCapture job callback handler. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0b470` | `AdjustorThunk_00fc4db0` | CaptureCommon::JobQueueCallbackHandlerT… | Adjustor thunk for callback-handler virtual method. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0b490` | `JobQueueCallbackHandler_ScalarDeletingDtor` | CaptureCommon::JobQueueCallbackHandlerT… | Virtual scalar-deleting destructor for ImageCapture callback handler. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0be00` | `JobQueueCallbackHandler_OnJob` | CaptureCommon::JobQueueCallbackHandlerT… | Handles a queued ImageCapture job callback. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0be50` | `ImageCaptureJob_Construct` | CaptureCommon::JobT<ImageCapture::JobRe… | Constructs an ImageCapture job carrying a JobRec reference. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0bee0` | `ImageCaptureJob_DtorBody` | CaptureCommon::JobT<ImageCapture::JobRe… | Destroys a JobT carrying an ImageCapture JobRec. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d0bf50` | `ImageCaptureJob_ScalarDeletingDtor` | CaptureCommon::JobT<ImageCapture::JobRe… | Virtual scalar-deleting destructor for ImageCapture JobT. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+
+## 🟢 likely (33)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `008a8500` | `BufferEncoderStep` |  | Likely second half of the image-capture path started by 008a80d0: checks or refreshes dimensions, wraps a buffer and passes it to an encoder helper. The only listed caller is 008bafa0. | [[Native Map/Shards/S0220 008a3ce0-008a8500|S0220]] |
+| `008a86b0` | `GuardedWrapper_010003e0` |  | Small guarded hook on the object that owns the +0x8e8 state field used by the image-capture cluster (008a80d0/008a8500); the guard is provable, the target's role is not. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a86c0` | `GuardedWrapper_010003f0` |  | Second guarded hook on the same +0x8e8 state field as 008a86b0; a sibling cleanup/notify pair whose targets are not yet identified. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a86d0` | `Wrapper_010f4f20` |  | Value provider that hands the option system a fresh temp video-file path in the Videos folder; role inferred from the callee's Win32 calls (video capture output naming). | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a86f0` | `Wrapper_010f5350` |  | Produces the timestamped name/value that the caller (00c05a00, an option value provider) stores; the date pattern is exactly the filename-style stamp used for capture output. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8990` | `GuardedWrapper_0108c680` |  | Cleanup/notify call on the same store object as 008a8840, gated on the +0x904 field; FUN_0108c680 is unmapped. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8de0` | `SetStoredVectorFromLookup` |  | Records a 3D point (with a constant fourth component) into the capture-state sub-object at this+0x1ec; the source point comes from the FUN_0102fb50 lookup on this+0x158. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8e50` | `RestoreStoredVector` |  | Companion of 008a8de0 that pushes the previously stored point back into the capture-state sub-object at this+0x1ec. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `00b4afa0` | `ScreenshotManager::SetupCapture ⚠downgrade` | ScreenshotManager | Render-target setup for a portrait/headshot capture: it snapshots the current device state so the capture can be restored afterwards and refuses to run while the frame buffers are busy. | [[Native Map/Shards/S0344 00b44fa0-00b4b360|S0344]] |
+| `00b4b240` | `ScreenshotManager::GetDefaultHeadShot` | ScreenshotManager | Returns the cached default headshot buffer and length when present, or logs that the buffer is empty. Whether callers use this because a server portrait failed is not established. | [[Native Map/Shards/S0344 00b44fa0-00b4b360|S0344]] |
+| `00b4b840` | `ScreenshotManager::FindStorageNode` | ScreenshotManager | Looks up the capture-store entry for a guid pair and a kind name (PORTRAIT, HEADSHOT, PHOTO) without creating one. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e950` | `ScreenshotManager::ScalarDeletingDestructor ⚠downgrade` | ScreenshotManager | Deleting destructor of the ScreenshotManager, used at shutdown. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4f190` | `ScreenshotManager::CaptureHeadShotToBuffer ⚠downgrade` | ScreenshotManager | Renders the local player's 70x70 headshot and passes it to the manager's completion callback. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4f870` | `ScreenshotManager::LoadHeadShot` | ScreenshotManager | Ensures a headshot PNG exists for a guid: renders and saves one when the character is present, otherwise loads the file. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b50190` | `ScreenshotManager::ProcessPortraitRequest` | ScreenshotManager | Processes one queued portrait job: a server Fotomat portrait request or a local TCG capture. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b50330` | `ScreenshotManager::Update` | ScreenshotManager | Update pump of the screenshot/portrait manager: drains the pending headshot and portrait job queues each frame. The class role is carried by the labelled callees 00b4f870 ScreenshotManager::LoadHeadShot, 00b4faa0 Screen… | [[Native Map/Shards/S0346 00b50330-00b55fc0|S0346]] |
+| `00bd3dc0` | `FotomatPortraitData::ReleaseImageArrays` | FotomatPortraitData | Destructor body for the three image arrays of a FotomatPortraitData record: +0x20e0 is Portrait (lookup 00bd4350), +0x20f0 is TcgPortrait (00bd4300), +0x2100 is Headshot (00bd43a0). Used by the node removal 00bd46f0 and… | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd3f10` | `FotomatPortraitData::FotomatPortraitData` | FotomatPortraitData | Initializes one per-id portrait record that the manager keeps in its eight-bucket map. The three arrays are the Portrait, TcgPortrait and Headshot images. The binding to FotomatPortraitData rests on the caller 00bd4100 … | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd3ff0` | `FotomatPortraitDataManager::RequestPortrait` | FotomatPortraitDataManager | Requests a portrait image of one kind (TcgPortrait, Portrait or Headshot) for a character id from the server, once per id while it is pending. Called by the lookup helpers 00bd4300, 00bd4350, 00bd43a0 and the virtual 00… | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4250` | `FotomatPortraitData::ScalarDeletingDtor` | FotomatPortraitData | Heap-delete entry for the FotomatPortraitData record, matching the deleting-destructor shape. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd43a0` | `HeadshotLookupOrRequest` |  | Returns the Headshot image array of a character id when it is loaded, otherwise queues a request through 00bd3ff0. Called by 00bd4490 and 00bd4810. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4490` | `PortraitKindWriteToPath` |  | Writes the Portrait or Headshot image buffer of one id to a path when the open helper accepts it. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd46f0` | `HashListMap8_RemoveNode` | SoeUtil::HashListMap<int,FotomatPortrai… | Removes one FotomatPortraitData node from the eight-bucket map and destroys it. Callers are the head-drain 00bd4d10 and the dtor bodies 00bd4df0, 00bd4e20 and 00bd4e60. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd47c0` | `FotomatPortraitDataManager::InsertEntry` | FotomatPortraitDataManager | Creates the FotomatPortraitData entry for an id that is not yet loaded (the caller does the lookup first) and stamps it with the cached clock time. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4810` | `HeadshotUpdateNotify` |  | Headshot-change notice for one character id: refreshes the cached entry of the sub-object's own id through 00b4b820, or pushes an existing headshot to 00bd2870. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd48a0` | `PortraitRequestTcgOrPortrait` |  | Dispatches a portrait lookup-or-request for one id by kind: TCG portrait when the flag is set, Portrait otherwise. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4930` | `FotomatPortraitDataManager::StoreHeadshotBytes` | FotomatPortraitDataManager | Stores a headshot image received for a character id into its entry and notifies the headshot consumers. Called by ScreenshotManager::Update (00b50330, labelled in the vault). | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4d10` | `HashListMap8_ClearHead` | SoeUtil::HashListMap<int,FotomatPortrai… | Empties the FotomatPortraitData map by removing the head node until the head pointer is null. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4df0` | `HashListMap8_DtorBody` | SoeUtil::HashListMap<int,FotomatPortrai… | Destructor body of the eight-bucket FotomatPortraitData map: it drains all nodes. Two EH unwind funclets call it, which marks it as cleanup. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4e60` | `HashListMap8_DtorBodyEH` | SoeUtil::HashListMap<int,FotomatPortrai… | Cleanup copy of the FotomatPortraitData map destructor body: used by the manager dtor 00bd4ed0, the HashList scalar deleting dtor 00bd5170 and two unwind funclets. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd5260` | `FotomatPortraitDataManager::ScalarDeletingDtor` | FotomatPortraitDataManager | Heap-delete entry of the portrait manager, reached through the adjustor thunk 00bd4f90. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00d2e930` | `CopyParamsQualityTo10000` |  | Copies the screenshot-start parameter block for BaseClient::StartImageCapture (caller 008a80d0, labelled; neighbour support only), converting quality percent to basis points. | [[Native Map/Shards/S0437 00d297c0-00d2f870|S0437]] |
+| `00d2ed20` | `BuildTimestampedJpgName` |  | Builds a timestamped .jpg file name for a captured screenshot. | [[Native Map/Shards/S0437 00d297c0-00d2f870|S0437]] |
+
+## 🟡 speculative (3)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `00b4b820` | `Wrapper_00b4b820 ?` |  | Thiscall-style forwarder: adds 0x234 to ECX, pushes the address of its own first stack argument (the two stack dwords form an 8-byte value), calls 00a888c0 with that receiver and argument, and returns with ret 8. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00bd3ec0` | `Wrapper_00bd3dc0 ?` |  | SEH-framed wrapper: saves ECX (this) to the frame and calls 00bd3dc0 on the same this with no stack argument (the cookie value in the decompile is not an argument), then restores the handler chain and returns. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00d2e9e0` | `PredicateParams1to3Even ?` |  | Returns AL=1 when word 0 is 1, 2 or 3; word 1 and word 2 are even and at least 2; words 12 and 13 are even, at least 2, and no larger than words 1 and 2; word 14 is in 0..100; and word 6 is above 4. Otherwise AL=0. | [[Native Map/Shards/S0437 00d297c0-00d2f870|S0437]] |
+
+## ⚪ unknown (26)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `008a86e0` | `— ⚠reject` |  | Re-targets a call onto the sub-object stored at this+0x900, replacing a string and clearing the pending list there; the sub-object is part of the same client capture/option family. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8700` | `— ⚠reject` |  | String-to-enum conversion helper used by the VideoCapture Lua binding at 00c05510 (which pushes the returned int as the Lua result); the binding family and the string argument are provable, the value domain is not. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8730` | `— ⚠reject` |  | Third adapter of the this+0x900 sub-object, sibling of 008a86e0/008a86f0; the callee's role is unmapped so the name stays mechanical. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8740` | `— ⚠reject` |  | List-draining adapter on the this+0x900 sub-object, sibling of 008a86e0; used to clear the sub-object's pending list. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8840` | `— ⚠reject` |  | Periodic poll that advances or tears down the upload session stored at +0x908 (status 4/5 is a terminal state), called from 0090c970. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a88e0` | `— ⚠reject` |  | Gated invocation of the uploader's media-metadata/upload step (FUN_0108cc70 builds the 'Free Realms(TM) video capture' YouTube metadata) only while the send gate and the payload checks pass. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008a8ec0` | `— ⚠reject` |  | Destroys the capture sub-object and its buffer inside the large client allocation at this+0x20 (the same allocation whose +0x66f20 sub-object 008a8be0 returns); caller 00960520 is the owning teardown. | [[Native Map/Shards/S0221 008a86b0-008b1d80|S0221]] |
+| `008bacc0` | `— ⚠reject` |  | Starts an asynchronous client image capture. | [[Native Map/Shards/S0223 008b7790-008bcf40|S0223]] |
+| `008baf70` | `— ⚠reject` |  | Advances an active image capture or starts one when idle. | [[Native Map/Shards/S0223 008b7790-008bcf40|S0223]] |
+| `008bafa0` | `— ⚠reject` |  | Polls asynchronous image capture and signals completion. | [[Native Map/Shards/S0223 008b7790-008bcf40|S0223]] |
+| `008c66d0` | `— ⚠reject` |  | Per-frame update of a screenshot or image capture object; the capture-size check labelled CaptureSizeMatchesRenderer (008a84a0, accepted) and the BaseClient::StartImageCapture messages in the strings elsewhere support t… | [[Native Map/Shards/S0225 008c52a0-008ca980|S0225]] |
+| `00903320` | `— ⚠reject` | BaseClient | Drives the screenshot and thumbnail capture for the client: the in-memory capture notifies Lua ScreenCapHandler:OnScreenshotTaken, the file path writes the screenshot and a _thumb.png thumbnail and shows the UI again. C… | [[Native Map/Shards/S0237 008ff3d0-00904e70|S0237]] |
+| `00b4b1a0` | `— ⚠reject` |  | Colour quantisation step used by the screenshot capture path (its only caller 00b4d540 is ScreenshotManager::DoCapture), which is where the packed pixel written into the captured image comes from. | [[Native Map/Shards/S0344 00b44fa0-00b4b360|S0344]] |
+| `00b4c850` | `— ⚠reject` | ScreenshotManager | Common render-to-array request for capture kinds (called by CreatePhoto 00b4e970 for PHOTO); the caller receives no usable success flag. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4d540` | `— → ScreenshotManager::DoCapture ⚠reject` | ScreenshotManager | Core capture routine for the TCG, portrait and headshot paths: renders the scene in tiles and PNG-compresses it for one guid. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e4f0` | `— ⚠reject` | ScreenshotManager | Destroys the manager's capture store and frees its default headshot buffer. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4e650` | `— ⚠reject` | ScreenshotManager | Returns the capture-store node for a guid pair and kind, creating one when it is missing. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00b4f5a0` | `— ⚠reject` | ScreenshotManager | Reads a headshot PNG from disk into memory for the manager's headshot cache. | [[Native Map/Shards/S0345 00b4b3e0-00b50190|S0345]] |
+| `00bd4100` | `— ⚠reject` | FotomatPortraitData | Creates the node that 00bd4620 links into the FotomatPortraitData map; the key at +0x2118 is the xor of the id halves that 00bd47c0 passes by pointer. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4300` | `— ⚠reject` |  | Returns the TCG card portrait image array of a character id when it is loaded, otherwise queues a request for it through 00bd3ff0. Called by 00bd48a0 when the flag is nonzero. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4350` | `— ⚠reject` |  | Returns the Portrait image array of a character id when it is loaded, otherwise queues a request through 00bd3ff0. Called by 00bd4490 and 00bd48a0. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4620` | `— ⚠reject` | SoeUtil::HashListMap<int,FotomatPortrai… | Inserts a freshly created FotomatPortraitData node into the eight-bucket map. Bucket index (key & 7) matches the lookup 00bd2730 at manager+0x1d0. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4ed0` | `— ⚠reject` | FotomatPortraitDataManager | Destructor body of the portrait manager, called by its scalar deleting destructor 00bd5260. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00bd4fa0` | `— ⚠reject` | FotomatPortraitDataManager | Periodic (60 second) generate-portrait request from the manager, sent only while the owner's gateway flag is set. The stamp is refreshed only when a request fires. | [[Native Map/Shards/S0372 00bd37e0-00bd5d40|S0372]] |
+| `00d0bec0` | `— ⚠reject` | CaptureCommon::JobT<ImageCapture::JobRe… | Executes ImageCapture job record through its referenced object interface. | [[Native Map/Shards/S0428 00d07500-00d0bf70|S0428]] |
+| `00d2ec40` | `— ⚠reject` |  | Prepares the ImageCaptureOutput folder used for screenshot output. | [[Native Map/Shards/S0437 00d297c0-00d2f870|S0437]] |
+
+## Wire contract (client side) and server hypotheses
+
+| addr | name | dir | packet | opcode | server hypothesis |
+|---|---|---|---|---|---|
+| `00bd3ff0` | `FotomatPortraitDataManager::RequestPortrait` | send | PacketPortraitDataRequest |  | Hypothesis: the server answered a PacketPortraitDataRequest (156/2) with the PacketPlayerImageData body (156/3) that 00bd4d30, 00bd4a50 and 00bd4180 parse; the pending table suppresses repeat requests until the reply arrives. Depends on 00bd4a50 for the reply handling. |

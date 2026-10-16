@@ -1,0 +1,4055 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "key": "chef.baconfish_bits",
+      "job": "chef",
+      "name": "Baconfish Bits",
+      "candidate_recipe_id": 77,
+      "candidate_recipe_item_definition_id": 68806,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 77 from pattern item 68806; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 68806; Comment='Baconfish Bits Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.butter_flyfish_flambe",
+      "job": "chef",
+      "name": "Butter Flyfish Flambe",
+      "candidate_recipe_id": 75,
+      "candidate_recipe_item_definition_id": 68804,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 75 from pattern item 68804; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 68804; Comment='Butter Flyfish Flambe Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.feral_catfish_oil",
+      "job": "chef",
+      "name": "Feral Catfish Oil",
+      "candidate_recipe_id": 78,
+      "candidate_recipe_item_definition_id": 68807,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 78 from pattern item 68807; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 68807; Comment='Feral Catfish Oil Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.flutterfish_medley",
+      "job": "chef",
+      "name": "Flutterfish Medley",
+      "candidate_recipe_id": 74,
+      "candidate_recipe_item_definition_id": 68803,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 74 from pattern item 68803; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 68803; Comment='Flutterfish Medley Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.fried_flutterfish_sticks",
+      "job": "chef",
+      "name": "Fried Flutterfish Sticks",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        }
+      }
+    },
+    {
+      "key": "chef.honey_milk_sundae",
+      "job": "chef",
+      "name": "Honey Milk Sundae",
+      "candidate_recipe_id": 71,
+      "candidate_recipe_item_definition_id": 65832,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 71 from pattern item 65832; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 65832; Comment='Honey Milk Sundae Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.jacque_s_dinner_rolls",
+      "job": "chef",
+      "name": "Jacque's Dinner Rolls",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        }
+      }
+    },
+    {
+      "key": "chef.merri_s_marinated_morpgill",
+      "job": "chef",
+      "name": "Merri's Marinated Morpgill",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        }
+      }
+    },
+    {
+      "key": "chef.pepper_punkin",
+      "job": "chef",
+      "name": "Pepper Punkin",
+      "candidate_recipe_id": 46,
+      "candidate_recipe_item_definition_id": 856,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 46 from pattern item 856; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 856; Comment='Pepper Punkin Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.punkin_pot_roast",
+      "job": "chef",
+      "name": "Punkin Pot Roast",
+      "candidate_recipe_id": 40,
+      "candidate_recipe_item_definition_id": 850,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 40 from pattern item 850; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 850; Comment='Punkin Pot Roast Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.purple_nosed_sharkfin_soup",
+      "job": "chef",
+      "name": "Purple-Nosed Sharkfin Soup",
+      "candidate_recipe_id": 73,
+      "candidate_recipe_item_definition_id": 68802,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 73 from pattern item 68802; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 68802; Comment='Purple-Nosed Sharkfin Soup Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.seared_blind_swurglefish",
+      "job": "chef",
+      "name": "Seared Blind Swurglefish",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        }
+      }
+    },
+    {
+      "key": "chef.seared_stainberry",
+      "job": "chef",
+      "name": "Seared Stainberry",
+      "candidate_recipe_id": 51,
+      "candidate_recipe_item_definition_id": 861,
+      "candidate_output_definition_id": 21825,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_recipe_list); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md:206-238; wiki ingredients are not promoted here unless independently tied to client definition ids"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 51 from pattern item 861; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 861; Comment='Seared Stainberry Recipe'."
+        },
+        "candidate_output_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate output item definition 21825; Comment='Seared Stainberry'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "chef.spaghetti_with_meatballs",
+      "job": "chef",
+      "name": "Spaghetti with Meatballs",
+      "candidate_recipe_id": 72,
+      "candidate_recipe_item_definition_id": 65830,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 72 from pattern item 65830; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 65830; Comment='Spaghetti with Meatballs Recipe'."
+        }
+      }
+    },
+    {
+      "key": "chef.stainberry_mint_sorbet",
+      "job": "chef",
+      "name": "Stainberry Mint Sorbet",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        }
+      }
+    },
+    {
+      "key": "chef.tangy_tumtumnip_mishmash",
+      "job": "chef",
+      "name": "Tangy Tumtumnip Mishmash",
+      "candidate_recipe_id": 37,
+      "candidate_recipe_item_definition_id": 847,
+      "candidate_output_definition_id": 21811,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 37 from pattern item 847; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 847; Comment='Tangy Tumtumnip Mishmash Recipe'."
+        },
+        "candidate_output_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate output item definition 21811; Comment='Tangy Tumtumnip Mishmash'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "chef.three_cheese_frostgill_smelt",
+      "job": "chef",
+      "name": "Three Cheese Frostgill Smelt",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_text_only); MiniGameData TYPE 9"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        }
+      }
+    },
+    {
+      "key": "chef.three_leaf_omelette",
+      "job": "chef",
+      "name": "Three Leaf Omelette",
+      "candidate_recipe_id": 36,
+      "candidate_recipe_item_definition_id": 846,
+      "candidate_output_definition_id": 21810,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 36 from pattern item 846; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 846; Comment='Three Leaf Omelette Recipe'."
+        },
+        "candidate_output_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate output item definition 21810; Comment='Three Leaf Omelette'."
+        }
+      }
+    },
+    {
+      "key": "chef.toothy_tetra_vitamins",
+      "job": "chef",
+      "name": "Toothy Tetra Vitamins",
+      "candidate_recipe_id": 76,
+      "candidate_recipe_item_definition_id": 68805,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_client_minigame); MiniGameData TYPE 9"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 9."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 76 from pattern item 68805; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 68805; Comment='Toothy Tetra Vitamins Recipe'."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.alley_fighter_hammer",
+      "job": "blacksmith",
+      "name": "Alley Fighter Hammer",
+      "candidate_recipe_id": 20,
+      "candidate_recipe_item_definition_id": 2515,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 20 from pattern item 2515; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2515; Comment='Alley Fighter Hammer Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.anguish_aid_bonesaw",
+      "job": "blacksmith",
+      "name": "Anguish Aid Bonesaw",
+      "candidate_recipe_id": 21,
+      "candidate_recipe_item_definition_id": 2516,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 21 from pattern item 2516; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2516; Comment='Anguish Aid Bonesaw Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.archer_s_forged_bow_of_advantage",
+      "job": "blacksmith",
+      "name": "Archer's Forged Bow of Advantage",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.biting_mongoose_blade",
+      "job": "blacksmith",
+      "name": "Biting Mongoose Blade",
+      "candidate_recipe_id": 18,
+      "candidate_recipe_item_definition_id": 2513,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 18 from pattern item 2513; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2513; Comment='Biting Mongoose Blade Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.blacksmith_head",
+      "job": "blacksmith",
+      "name": "Blacksmith Head",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.blacksmith_misc",
+      "job": "blacksmith",
+      "name": "Blacksmith Misc.",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.brawler_s_forged_hammer_of_challenge",
+      "job": "blacksmith",
+      "name": "Brawler's Forged Hammer of Challenge",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.brutal_blast_bow",
+      "job": "blacksmith",
+      "name": "Brutal Blast Bow",
+      "candidate_recipe_id": 67,
+      "candidate_recipe_item_definition_id": 49383,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 20,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 67 from pattern item 49383; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 49383; Comment='Brutal Blast Bow Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 20."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.chivalrous_guardian_hammer",
+      "job": "blacksmith",
+      "name": "Chivalrous Guardian Hammer",
+      "candidate_recipe_id": 23,
+      "candidate_recipe_item_definition_id": 2518,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 23 from pattern item 2518; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2518; Comment='Chivalrous Guardian Hammer Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.chrome_drakeling",
+      "job": "blacksmith",
+      "name": "Chrome Drakeling",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.chrome_mini_rocklar",
+      "job": "blacksmith",
+      "name": "Chrome Mini-Rocklar",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.consumable_5",
+      "job": "blacksmith",
+      "name": "Consumable 5",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.dancing_monkey_bokken",
+      "job": "blacksmith",
+      "name": "Dancing Monkey Bokken",
+      "candidate_recipe_id": 13,
+      "candidate_recipe_item_definition_id": 2508,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 13 from pattern item 2508; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2508; Comment='Dancing Monkey Bokken Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.diving_hawk_scythe",
+      "job": "blacksmith",
+      "name": "Diving Hawk Scythe",
+      "candidate_recipe_id": 22,
+      "candidate_recipe_item_definition_id": 2517,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 22 from pattern item 2517; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2517; Comment='Diving Hawk Scythe Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.drake_statue",
+      "job": "blacksmith",
+      "name": "Drake Statue",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.dust_storm_flair_shard",
+      "job": "blacksmith",
+      "name": "Dust Storm Flair Shard",
+      "candidate_recipe_id": 155,
+      "candidate_recipe_item_definition_id": 23872,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 155 from pattern item 23872; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 23872; Comment='Dust Storm Flair Shard Recipe'."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.dwarf_biker_firework",
+      "job": "blacksmith",
+      "name": "Dwarf Biker Firework",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.eclipse_infused_wand",
+      "job": "blacksmith",
+      "name": "Eclipse Infused Wand",
+      "candidate_recipe_id": 64,
+      "candidate_recipe_item_definition_id": 49385,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 10,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 64 from pattern item 49385; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 49385; Comment='Eclipse Infused Wand Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 10."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.fast_blast_bow",
+      "job": "blacksmith",
+      "name": "Fast Blast Bow",
+      "candidate_recipe_id": 15,
+      "candidate_recipe_item_definition_id": 2510,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 15 from pattern item 2510; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2510; Comment='Fast Blast Bow Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.field_support_scalpel",
+      "job": "blacksmith",
+      "name": "Field Support Scalpel",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.first_aid_hammer",
+      "job": "blacksmith",
+      "name": "First Aid Hammer",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.focus_fire_bow",
+      "job": "blacksmith",
+      "name": "Focus Fire Bow",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.frenzy_fighter_hammer",
+      "job": "blacksmith",
+      "name": "Frenzy Fighter Hammer",
+      "candidate_recipe_id": 28,
+      "candidate_recipe_item_definition_id": 2523,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 20,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 28 from pattern item 2523; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2523; Comment='Frenzy Fighter Hammer Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 20."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.hammer_fist",
+      "job": "blacksmith",
+      "name": "Hammer Fist",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.intrepid_protector_axe",
+      "job": "blacksmith",
+      "name": "Intrepid Protector Axe",
+      "candidate_recipe_id": 31,
+      "candidate_recipe_item_definition_id": 2526,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 31 from pattern item 2526; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2526; Comment='Intrepid Protector Axe Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.lunar_enchanted_wand",
+      "job": "blacksmith",
+      "name": "Lunar Enchanted Wand",
+      "candidate_recipe_id": 19,
+      "candidate_recipe_item_definition_id": 2514,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 5,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 19 from pattern item 2514; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2514; Comment='Lunar Enchanted Wand Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 5."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.manguana_statue",
+      "job": "blacksmith",
+      "name": "Manguana Statue",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.medic_s_forged_saw_of_promise",
+      "job": "blacksmith",
+      "name": "Medic's Forged Saw of Promise",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.medic_s_forged_scalpel_of_vitals",
+      "job": "blacksmith",
+      "name": "Medic's Forged Scalpel of Vitals",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.metal_cactoid_illusion",
+      "job": "blacksmith",
+      "name": "Metal Cactoid Illusion",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.metal_drakeling_illusion",
+      "job": "blacksmith",
+      "name": "Metal Drakeling Illusion",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.metal_rocklar",
+      "job": "blacksmith",
+      "name": "Metal Rocklar",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.metal_rocklar_illusion",
+      "job": "blacksmith",
+      "name": "Metal Rocklar Illusion",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.mini_mech",
+      "job": "blacksmith",
+      "name": "Mini-Mech",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.motorsmith_boots",
+      "job": "blacksmith",
+      "name": "Motorsmith Boots",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.motorsmith_gloves",
+      "job": "blacksmith",
+      "name": "Motorsmith Gloves",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.motorsmith_pants",
+      "job": "blacksmith",
+      "name": "Motorsmith Pants",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.motorsmith_tank_top",
+      "job": "blacksmith",
+      "name": "Motorsmith Tank Top",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.motorsmith_tool_belt",
+      "job": "blacksmith",
+      "name": "Motorsmith Tool Belt",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.motorsmith_welding_mask",
+      "job": "blacksmith",
+      "name": "Motorsmith Welding Mask",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.ninja_s_forged_sword_of_purge",
+      "job": "blacksmith",
+      "name": "Ninja's Forged Sword of Purge",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.pain_relief_bonesaw",
+      "job": "blacksmith",
+      "name": "Pain Relief Bonesaw",
+      "candidate_recipe_id": 25,
+      "candidate_recipe_item_definition_id": 2520,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 25 from pattern item 2520; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2520; Comment='Pain Relief Bonesaw Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.power_charmed_wand",
+      "job": "blacksmith",
+      "name": "Power Charmed Wand",
+      "candidate_recipe_id": 14,
+      "candidate_recipe_item_definition_id": 2509,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 14 from pattern item 2509; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2509; Comment='Power Charmed Wand Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.power_crystal_flair_shard",
+      "job": "blacksmith",
+      "name": "Power Crystal Flair Shard",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.quick_shot_bow",
+      "job": "blacksmith",
+      "name": "Quick Shot Bow",
+      "candidate_recipe_id": 10,
+      "candidate_recipe_item_definition_id": 2505,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 10 from pattern item 2505; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2505; Comment='Quick Shot Bow Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.robgoblin_archway",
+      "job": "blacksmith",
+      "name": "Robgoblin Archway",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.rowdy_rumbler_hammer",
+      "job": "blacksmith",
+      "name": "Rowdy Rumbler Hammer",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.savage_sting_bow",
+      "job": "blacksmith",
+      "name": "Savage Sting Bow",
+      "candidate_recipe_id": 65,
+      "candidate_recipe_item_definition_id": 49382,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 15,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 65 from pattern item 49382; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 49382; Comment='Savage Sting Bow Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 15."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.skullz_housing_item",
+      "job": "blacksmith",
+      "name": "Skullz Housing Item",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.skullz_wall_hanging",
+      "job": "blacksmith",
+      "name": "Skullz Wall Hanging",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.spirited_protector_axe",
+      "job": "blacksmith",
+      "name": "Spirited Protector Axe",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.stalking_panther_scythe",
+      "job": "blacksmith",
+      "name": "Stalking Panther Scythe",
+      "candidate_recipe_id": 26,
+      "candidate_recipe_item_definition_id": 2521,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 26 from pattern item 2521; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2521; Comment='Stalking Panther Scythe Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.stalwart_protector_hammer",
+      "job": "blacksmith",
+      "name": "Stalwart Protector Hammer",
+      "candidate_recipe_id": 27,
+      "candidate_recipe_item_definition_id": 2522,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 27 from pattern item 2522; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2522; Comment='Stalwart Protector Hammer Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.striking_serpent_sword",
+      "job": "blacksmith",
+      "name": "Striking Serpent Sword",
+      "candidate_recipe_id": 30,
+      "candidate_recipe_item_definition_id": 2525,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 20,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 30 from pattern item 2525; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2525; Comment='Striking Serpent Sword Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 20."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.striped_mini_mech",
+      "job": "blacksmith",
+      "name": "Striped Mini-Mech",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.strong_scrapper_hammer",
+      "job": "blacksmith",
+      "name": "Strong Scrapper Hammer",
+      "candidate_recipe_id": 24,
+      "candidate_recipe_item_definition_id": 2519,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 15,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 24 from pattern item 2519; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2519; Comment='Strong Scrapper Hammer Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 15."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.sturdy_summersaber",
+      "job": "blacksmith",
+      "name": "Sturdy Summersaber",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.sunny_potion",
+      "job": "blacksmith",
+      "name": "Sunny Potion",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.tempest_woven_wand",
+      "job": "blacksmith",
+      "name": "Tempest Woven Wand",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.trauma_support_shockrod",
+      "job": "blacksmith",
+      "name": "Trauma Support Shockrod",
+      "candidate_recipe_id": 29,
+      "candidate_recipe_item_definition_id": 2524,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 1,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 29 from pattern item 2524; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 2524; Comment='Trauma Support Shockrod Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.valiant_guardian_cudgel",
+      "job": "blacksmith",
+      "name": "Valiant Guardian Cudgel",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.void_woven_wand",
+      "job": "blacksmith",
+      "name": "Void Woven Wand",
+      "candidate_recipe_id": 68,
+      "candidate_recipe_item_definition_id": 49384,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": 20,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 68 from pattern item 49384; association still candidate."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 49384; Comment='Void Woven Wand Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 20."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.warrior_s_forged_axe_of_boon",
+      "job": "blacksmith",
+      "name": "Warrior's Forged Axe of Boon",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    },
+    {
+      "key": "blacksmith.wizard_s_forged_wand_of_cunning",
+      "job": "blacksmith",
+      "name": "Wizard's Forged Wand of Cunning",
+      "candidate_recipe_id": null,
+      "candidate_recipe_item_definition_id": null,
+      "candidate_output_definition_id": null,
+      "candidate_required_job_rank": null,
+      "minigame_type_id": 8,
+      "minigame_id": null,
+      "missing_fields": [
+        "native recipe row payload/components unavailable",
+        "ingredient definitions and counts",
+        "recipe-to-minigame binding",
+        "required job rank",
+        "recipe item definition link",
+        "output item definition selection"
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+        }
+      ],
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "MiniGameData/job guide: crafting type 8."
+        }
+      }
+    }
+  ]
+}

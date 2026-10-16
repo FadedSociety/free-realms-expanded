@@ -1,0 +1,3687 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "haunted_mines",
+        "name_string_id": 961605015,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Haunted Mines."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key haunted_mines comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Haunted Mines; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Haunted Mines",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 961605015,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 5,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Haunted Mines difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Blackspore Swamp",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 13,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Requirements > Combat job level; cited [wiki: Haunted Mines, Dungeons, Necrowart Zombie] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Requirements > Combat job level; cited [wiki: Haunted Mines, Dungeons, Necrowart Zombie] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Requirements > Combat job level; cited [wiki: Haunted Mines, Dungeons, Necrowart Zombie] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Requirements > Combat job level; cited [wiki: Haunted Mines, Dungeons, Necrowart Zombie] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None for the dungeon. Many quests send players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Blackspore Swamp",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "barrier",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the barrier in Blackspore Swamp. It has an Atlas icon. Client text: \"Travel southeast from Sanctuary\" (loc 2937594607). The wiki puts the Quagmire Quarry in the southern part of Blackspore \"around the Haunted Mines\" and the Blackspore Crafting Station (Hess, Boddington) near it. | [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat Foreman Ironfist.\" (loc 33019493; a variant without the full stop is loc 2769648454) | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Goals > Main; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Goals > Main; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Bonus: Defeat the Spider Queen, Necrosis!\" in the wiki. Client goal text \"Defeat the Spider Queen, Necrosis!\" (loc 186544471) and a separate \"Bonus: \" prefix string (loc 897202295). Detail: \"The brood of Necrosis has infested all of the Haunted Mines! Defeat her to put an end to the infestation!\" (loc 4246613399). The bonus has no counter in the wiki (single target). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"Haunted Mines Bonus Objective\" (loc 2645914890) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Haunted Mines\" (loc 3150218305); \"Complete the Haunted Mines encounter.\" (loc 3590656006) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Goals > Win text; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss (main)",
+              "names": [
+                "Foreman Ironfist"
+              ],
+              "description": {
+                "value": "Foreman Ironfist (loc 300046663, game data 976802498) | Quest text calls him a ghost: \"the ghost of Foreman Ironfist in the Haunted Mines\" (loc 777324205) and says he holds a powerful gem or crystal (loc 3671817311, 322386096). Client ability names: \"haunted mines - boss reactive\" (loc 1312237980), \"haunted mines - boss reactive PROC\" (loc 532744530), \"Haunted Mines: Foreman Buff\" (loc 2380079232). The wiki lists him on its Boss and Dwarves pages. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not map Boss (main) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not source stats for Boss (main)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Boss (bonus)",
+              "names": [
+                "Necrosis"
+              ],
+              "description": {
+                "value": "Necrosis, the Spider Queen (loc 3201834934, game data 45497422) | \"Necrosis senses your presence.\" (loc 3166412652). Client ability and object names: \"Haunted Mines: Necrotic Poison\" (loc 746169301), \"Haunted Mines: Cocoon\" (loc 2354946292), \"Haunted Mines: Lifetap \" (loc 2389521499), \"Lay Necrosis Egg\" (loc 40737477), \"Exploding Necrosis Egg\" (loc 3426613017), \"Necrosis Spawn Egg\" (loc 3905596087), \"haunted mines 91: causes other nearby eggs to start hatching\" (loc 2706796419). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not map Boss (bonus) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not source stats for Boss (bonus)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (wiki)",
+              "names": [
+                "Black Widows",
+                "Ghost Dwarves",
+                "Necrowart Zombies",
+                "Hulking Shamblers"
+              ],
+              "description": {
+                "value": "Black Widows, Ghost Dwarves, Necrowart Zombies, Hulking Shamblers | Wiki list. The wiki says Necrowart Zombies in this dungeon \"are referred to as Shamblers and do not have a mushroom growing out of their back\", and that baby black widows hatch from eggs here. | [wiki: Haunted Mines, Necrowart Zombie, Black Widow]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not map Enemies (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not source stats for Enemies (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (client names)",
+              "names": [
+                "Ghost Dwarf",
+                "Hulking Shambler",
+                "Shambler Miner",
+                "Ghost Miner"
+              ],
+              "description": {
+                "value": "Ghost Dwarf (loc 3650825494, 2141373830), Hulking Shambler (loc 488574013, 1132169474), Shambler Miner (loc 195511850), Ghost Miner (loc 4191638653, 3762634640), cave stalker (loc 543639443, 1894120385), Baby Black Widow (loc 1263261189) | Developer strings tie these to the mine: \"haunted mines - shambler miner 25% / 50% / 75% decay\" (loc 4167415461, 4191874192, 3606684149), \"Shambler explosion for Haunted Mines.\" (loc 79722954), \"Haunted Mines - Ghost Miner power drain aura\" (loc 789132441), \" Haunted Mines - Ghost frost melee slow AE\" (loc 40193656). Quest text: \"The cave stalkers within the Haunted Mines ...\" (loc 2212970530) and \"The spiders lay their eggs inside the Haunted Mines\" (loc 121188347). The client string \"Black Widows\" (loc 870861543) is a soccer team, so the wiki's \"Black Widows\" maps to Baby Black Widow and the cave stalker spiders at best. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not map Enemies (client names) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not source stats for Enemies (client names)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss (main)",
+              "names": [
+                "Foreman Ironfist"
+              ],
+              "description": {
+                "value": "Foreman Ironfist (loc 300046663, game data 976802498) | Quest text calls him a ghost: \"the ghost of Foreman Ironfist in the Haunted Mines\" (loc 777324205) and says he holds a powerful gem or crystal (loc 3671817311, 322386096). Client ability names: \"haunted mines - boss reactive\" (loc 1312237980), \"haunted mines - boss reactive PROC\" (loc 532744530), \"Haunted Mines: Foreman Buff\" (loc 2380079232). The wiki lists him on its Boss and Dwarves pages. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not map Boss (main) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not source stats for Boss (main)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Boss (bonus)",
+              "names": [
+                "Necrosis"
+              ],
+              "description": {
+                "value": "Necrosis, the Spider Queen (loc 3201834934, game data 45497422) | \"Necrosis senses your presence.\" (loc 3166412652). Client ability and object names: \"Haunted Mines: Necrotic Poison\" (loc 746169301), \"Haunted Mines: Cocoon\" (loc 2354946292), \"Haunted Mines: Lifetap \" (loc 2389521499), \"Lay Necrosis Egg\" (loc 40737477), \"Exploding Necrosis Egg\" (loc 3426613017), \"Necrosis Spawn Egg\" (loc 3905596087), \"haunted mines 91: causes other nearby eggs to start hatching\" (loc 2706796419). | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not map Boss (bonus) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md does not source stats for Boss (bonus)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"478 Stars or less\" (wiki wording) | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "77 Coins slot on every job's wheel. The client holds a generic \"Bonus: 77 Coins!\" string (loc 2278433839), not tied to a dungeon. | [wiki] [client, generic]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "270 Coins. No client \"Bonus: 270 Coins!\" string exists. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Completing the bonus goal gives every player in the instance one piece of clothing from a set for their job. Colour and body slot are random. These are the same sets as [[Briarheart Caverns]] (the other difficulty 5 dungeon). | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "Bronze trophy (5 pts) \"Complete the Haunted Mines encounter.\"; silver trophy (10 pts) \"Complete the Haunted Mines encounter with a full group.\" | [client loc 3590656006, 3083350911] [wiki: Achievements]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Achievements; cited [client `loc 3590656006`, `3083350911`] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Achievements; cited [client `loc 3590656006`, `3083350911`] [wiki: Achievements]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"V\", matching difficulty 5. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 77,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Coins on the prize wheel; cited [wiki] [client, generic]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 270,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Raptor Bow of Explosions",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Energy V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Bull's-Eye Archer Tunic",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Pin Hole Archer Quiver",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Atlas Hammer of Pummeling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Energy V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Knockdown Brawler Jersey",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Power Punch Brawler Shoulderpads",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Energy V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Shockrod of Alarm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Stopping Power Medic Jacket",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wound Ballistic Medic Backpack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Jonin Ninja Gi",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Energy V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Shadow Blade of Shuriken Storm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Soke Ninja Shoulderguard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Called Shot Warrior Pauldrons",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Critical Hit Warrior Breastplate",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Energy V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Warlord Axe of Earthquake",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Arcane Master Wizard Robe",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archmagus Wizard Talisman",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ornate Wand of Firestorm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Energy V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "haunted_mines",
+            "kind": "zone",
+            "target_name": "Blackspore Swamp",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "object",
+            "target_name": "barrier",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Entrance; cited [wiki: Haunted Mines, Quagmire Quarry, Hess, Boddington] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Foreman Ironfist",
+            "target_id": 9500000027,
+            "reason": "Exact name matches reconstructed NPC content key in blackspore_swamp.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/blackspore_swamp.json npc_id 9500000027; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Necrosis",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Black Widows",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Ghost Dwarves",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Necrowart Zombies",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Hulking Shamblers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Ghost Dwarf",
+            "target_id": 9500000028,
+            "reason": "Exact name matches reconstructed NPC content key in blackspore_swamp.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/blackspore_swamp.json npc_id 9500000028; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Hulking Shambler",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Shambler Miner",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "npc",
+            "target_name": "Ghost Miner",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Archer's Raptor Bow of Explosions",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Archer's Ring of Energy V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Bull's-Eye Archer Tunic",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Pin Hole Archer Quiver",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Brawler's Atlas Hammer of Pummeling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Energy V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Knockdown Brawler Jersey",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Power Punch Brawler Shoulderpads",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Medic's Ring of Energy V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Medic's Shockrod of Alarm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Stopping Power Medic Jacket",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Wound Ballistic Medic Backpack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Jonin Ninja Gi",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Energy V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Ninja's Shadow Blade of Shuriken Storm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Soke Ninja Shoulderguard",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Called Shot Warrior Pauldrons",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Critical Hit Warrior Breastplate",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Energy V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Warrior's Warlord Axe of Earthquake",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Arcane Master Wizard Robe",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Archmagus Wizard Talisman",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Wizard's Ornate Wand of Firestorm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "haunted_mines",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Energy V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key haunted_mines comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Haunted Mines; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Foreman Ironfist",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Necrosis",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Black Widows",
+            "definition_id": 930028,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Black Widows links to definition_id=930028; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Ghost Dwarves",
+            "definition_id": 930032,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ghost Dwarves links to definition_id=930032; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Necrowart Zombies",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Hulking Shamblers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (wiki); cited [wiki: Haunted Mines, Necrowart Zombie, Black Widow]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Ghost Dwarf",
+            "definition_id": 930032,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ghost Dwarf links to definition_id=930032; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Hulking Shambler",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Shambler Miner",
+            "definition_id": 930034,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Shambler Miner links to definition_id=930034; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 3,
+            "name": "Ghost Miner",
+            "definition_id": 930033,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Enemies (client names); cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ghost Miner links to definition_id=930033; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Foreman Ironfist",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (main); cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 1,
+            "name": "Necrosis",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Haunted Mines.md > Enemies and boss > Boss (bonus); cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

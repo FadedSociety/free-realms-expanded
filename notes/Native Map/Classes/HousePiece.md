@@ -1,0 +1,16 @@
+# Class: HousePiece
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00cb90a0` | `HousePiece::SetByte25One ?` | 🟡 | virtual | Virtual slot 2 of HousePiece (thiscall, one ignored stack argument, ret 4): stores 1 in the byte at receiver+0x25. Bytes c6 41 25 01 c2 04 00. |
+| `00cb90b0` | `HousePiece::SetChildByte100IfPresent ?` | 🟡 | virtual | Virtual slot 7 of HousePiece (thiscall, one ignored stack argument, ret 4): when the pointer at receiver+0x1c is nonnull, stores 1 in the byte at that pointer plus 0x100. Bytes 8b 41 1c 85 c0 74 07 c6 80 00 01 00 00 c2 … |
+| `00cb91d0` | `HousePiece::Slot9ForwardKey70 ?` | 🟡 | virtual | Virtual slot 9 of HousePiece and Fixture (shared implementation; thiscall with no stack argument of its own): bytes 8b 51 70 51 8b c4 89 10 8b 49 68 8b 01 8b 50 10 ff d2 c3 push the dword at receiver+0x70 as one stack a… |
+| `00cb98f0` | `— ⚠reject` | ⚪ | dtor | Fastcall on receiver p: stores HousePiece::vftable at p+0 and at p+0x50; frees the buffer at p+0x6c when set (_free thunk after 0072d130); when byte p+0x76 is set and p+0x70 is nonzero calls slot 2 of the object at p+0x… |
+| `00cb9a40` | `HousePiece::TailCallSlot9 ?` | 🟡 | virtual | Virtual slot 0 of HousePiece and slot 0 of Fixture (shared implementation): bytes 8b 01 8b 50 24 ff e2 load the vtable, load slot 9 (+0x24) and tail-jump to it with ECX = receiver and the caller's stack unchanged. Not a… |
+| `00cb9a50` | `HousePiece::AdjustorThunk50 ?` | 🟡 | virtual | Adjustor thunk at slot 0 of the secondary HousePiece vftable (018372cc): bytes 83 e9 50 e9 48 03 00 00 subtract 0x50 from ECX and jump to 00cb9da0 (rel32). It forwards to 00cb9da0 with the adjusted receiver. |
+| `00cb9a60` | `HousePiece::ClearDword20 ?` | 🟡 | virtual | Virtual slot 13 of HousePiece and Fixture (shared implementation): bytes c7 41 20 00 00 00 00 c2 04 00 store zero in the dword at receiver+0x20 and return, popping 4. |
+| `00cb9aa0` | `— ⚠reject` | ⚪ | virtual | Virtual slot 8 of HousePiece and Fixture (shared implementation; thiscall, one stack argument, ret 4): calls slot 9 of the receiver with one stack argument; when the result is nonnull calls 00777610 on that result with … |
+| `00cb9da0` | `HousePiece::DeletingDtor` | ✅ | dtor | Thiscall with one stack argument (a byte flag): calls the HousePiece dtor body 00cb98f0 on the receiver, then when flag bit 0 is set calls _free (thunk 00d82463) on it; returns the receiver and pops 4. Bytes decode as c… |
+| `00cb9dc0` | `HousePiece::Ctor` | ✅ | ctor | Thiscall with two stack arguments and receiver p: calls 00bf00e0 on the receiver, stores ActorHandler::vftable at p+0x50 and then HousePiece::vftable at p+0 and p+0x50, stores the IString<char> vftable at p+0x54 with th… |
+| `00cb9e80` | `HousePiece::SetFlag25ThenLazyCreate ?` | 🟡 | virtual | Virtual slot 1 of the secondary HousePiece vftable (018372cc), thiscall with one stack argument: stores 1 at receiver+0x25; when byte +0x24 is nonzero and bit 1 of the byte at the argument+0x10 is clear, calls 00705200,… |
+| `00cb9f80` | `HousePiece::CtorWithStrings` | ✅ | ctor | Thiscall with six stack arguments (C strings and dwords, plus an object pointer at the seventh): calls 00bf00e0 on the receiver, stores ActorHandler::vftable at p+0x50 then HousePiece::vftable at p+0 and p+0x50, stores … |

@@ -1,0 +1,3606 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "snowy_canyon",
+        "name_string_id": 1429180355,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Snowy Canyon."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key snowy_canyon comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Snowy Canyon; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Snowy Canyon",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 1429180355,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 5,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Snowy Canyon difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Snowhill",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 13,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Requirements > Combat job level; cited [wiki: Dungeons, Snowy Canyon] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Requirements > Combat job level; cited [wiki: Dungeons, Snowy Canyon] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Requirements > Combat job level; cited [wiki: Dungeons, Snowy Canyon] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Requirements > Combat job level; cited [wiki: Dungeons, Snowy Canyon] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None found for the dungeon itself. | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Snowhill",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+                }
+              ]
+            },
+            "name": {
+              "value": "barrier",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the barrier in Snowhill. It has an Atlas icon. The client says \"the gate to the Snowy Canyon\" (loc 1578499778), \"Snowy Canyon, north of Snowhill\" (loc 1644634710, 1019302529) and \"The yetis up the path\" (loc 2755895875). Video shows a \"Snowy Canyon\" signpost with a red X on a rope bridge over an icy gorge. | [wiki] [client] [video Dsk5NVq5YMU/00420]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat the yeti's leader!\" (loc 2397646746). Related client objectives: \"Defeat Unga Frostclaw\" (loc 350689074), \"Enter Snowy Canyon and defeat Unga Frostclaw.\" (loc 3794133524), \"Defeat the yeti boss in Snowy Canyon, north of Snowhill.\" (loc 1644634710). | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Main; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Main; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Find the Elusive Tranquil Sasquatch!\" (loc 1067763583). The wiki gives it as \"Bonus: Find the Elusive Tranquil Sasquatch!\". The \"Bonus: \" prefix was not found in the client text. | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Bonus; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Bonus; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus detail",
+              "value": "\"There is a rumor that a tranquil sasquatch lives in this canyon but nobody can ever take a picture of it! If you happen to see him, chase him until you find his home!\" (loc 2485363970) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Bonus detail; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"Snowy Canyon Bonus Objective\" (loc 1435702301) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Win text",
+              "value": "\"Win Combat Encounter Snowy Canyon\" (loc 3596935201); \"Complete the Snowy Canyon encounter.\" (loc 522775849) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Win text; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Goal count",
+              "value": "The results screen shows \"Goals 1/1\" and \"Bonus Goals 1/1\" for a completed run, so one main goal and one bonus goal. | [video fMSzCfrLzc8/00062]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Goals > Goal count; cited [video fMSzCfrLzc8/00062]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Unga Frostclaw"
+              ],
+              "description": {
+                "value": "Unga Frostclaw (game data loc 1755324008, UI loc 1289647903) | Yeti war leader. He also appears as the last fight in [[Hot Springs Haven]]: \"He must have been visiting the haven from his home in Snowy Canyon\" (loc 3292573459). Dev lines \"snowy canyon - elite ability\" (loc 3877761380) and \"snowy canyon - yeti basepop extra attack\" (loc 2570447616) exist. The first may be the boss or elites. Effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies (wiki)",
+              "names": [
+                "Ice Crawlers",
+                "Ice Trolls",
+                "Icetroll Champion",
+                "Yetis",
+                "Yeti Pounders"
+              ],
+              "description": {
+                "value": "Ice Crawlers, Ice Trolls, Icetroll Champion, Yetis, Yeti Pounders | Client names: \"Icy Crawler\" (game data loc 924164145), \"Ice Troll\" (game data loc 1440855783), \"Icetroll Champion\" (game data loc 2806251612, UI loc 4281410542), \"Yeti Pounder\" (game data loc 1318614414, UI loc 251233426). Many other yeti names exist (\"Frosty Yeti\", \"Icy Yeti\", \"Cave Yeti\", \"Yeti Mystic\", \"Yeti Frostlord\"). Which ones spawn in the canyon is not shown. Quest text confirms both sides: \"Defeat some of the yeti within Snowy Canyon!\" (loc 1091593956) and \"Find and knock out Ice Trolls at Snowy Canyon.\" (loc 557938627). | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not map Enemies (wiki) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not source stats for Enemies (wiki)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+                }
+              ]
+            },
+            {
+              "role": "Bonus target",
+              "names": [
+                "Elusive Tranquil Sasquatch"
+              ],
+              "description": {
+                "value": "Elusive Tranquil Sasquatch (game data loc 720135146, UI loc 3842035294) | See Goals. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not map Bonus target to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not source stats for Bonus target."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Unga Frostclaw"
+              ],
+              "description": {
+                "value": "Unga Frostclaw (game data loc 1755324008, UI loc 1289647903) | Yeti war leader. He also appears as the last fight in [[Hot Springs Haven]]: \"He must have been visiting the haven from his home in Snowy Canyon\" (loc 3292573459). Dev lines \"snowy canyon - elite ability\" (loc 3877761380) and \"snowy canyon - yeti basepop extra attack\" (loc 2570447616) exist. The first may be the boss or elites. Effects unknown. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"186 Stars or less\" (wiki wording). The results frame has a \"Rewards\" panel, but the star and coin values are not recorded. | [wiki] [video fMSzCfrLzc8/00062]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Stars; cited [wiki] [video fMSzCfrLzc8/00062]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Stars; cited [wiki] [video fMSzCfrLzc8/00062]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "117 Coins slot on every job's wheel. This equals the [[Briarheart Caverns]] figure. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "304 Coins. No client string \"Bonus: 304 Coins!\" exists. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Completing the bonus goal gives every player in the instance one piece of clothing from a set for their current job. Colour and body slot are random. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": "Bronze trophy (5 pts) \"Complete the Snowy Canyon encounter.\" (loc 522775849); silver trophy (10 pts) \"Complete the Snowy Canyon encounter with a full group.\" (loc 428128665) | [client] [wiki: Achievements]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Achievements; cited [client] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Achievements; cited [client] [wiki: Achievements]"
+                  }
+                ]
+              },
+              {
+                "label": "Gear tier",
+                "value": "Wheel gear carries \"V\", matching difficulty 5. | [wiki] [client names]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Gear tier; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "label": "Line",
+                "value": "Value",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Line"
+                  }
+                ]
+              },
+              {
+                "label": "Enemies Defeated",
+                "value": "47, worth 141,000 points (3,000 each)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Enemies Defeated"
+                  }
+                ]
+              },
+              {
+                "label": "Time Bonus",
+                "value": "18:13, worth 181,000 points",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Time Bonus"
+                  }
+                ]
+              },
+              {
+                "label": "Knock outs Remaining",
+                "value": "5/5, worth 250,000 points (50,000 each)",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Knock outs Remaining"
+                  }
+                ]
+              },
+              {
+                "label": "Goals",
+                "value": "1/1, worth 120,000",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Goals"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus Goals",
+                "value": "1/1, worth 75,000",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Bonus Goals"
+                  }
+                ]
+              },
+              {
+                "label": "Total score",
+                "value": "767,000",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Total score"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 117,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 304,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Raptor Bow of Blizzards",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Ring of Precision",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Pin Hole Archer Shades",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Atlas Hammer of Rumbling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Ring of Precision",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Power Punch Brawler Helmet",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Ring of Precision",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Shockrod of Vitals",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wound Ballistic Medic Helmet",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Ring of Precision",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Shadow Blade of 1000 Storms",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Soke Ninja Cowl",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Called Shot Warrior Helm",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Ring of Precision",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Warlord Axe of Cleaving",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    },
+                    {
+                      "kind": "client",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archmagus Wizard Hat",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Vitality V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ornate Wand of Glaciers",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Regeneration V",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Ring of Precision",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        },
+                        {
+                          "kind": "client",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      },
+                      {
+                        "kind": "client",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "snowy_canyon",
+            "kind": "zone",
+            "target_name": "Snowhill",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "object",
+            "target_name": "barrier",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Entrance; cited [wiki] [client] [video Dsk5NVq5YMU/00420]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Unga Frostclaw",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Ice Crawlers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Ice Trolls",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Icetroll Champion",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Yetis",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Yeti Pounders",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "npc",
+            "target_name": "Elusive Tranquil Sasquatch",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Archer's Raptor Bow of Blizzards",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Archer's Ring of Precision",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Pin Hole Archer Shades",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Archer; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Brawler's Atlas Hammer of Rumbling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Brawler's Ring of Precision",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Power Punch Brawler Helmet",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Brawler; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Medic's Ring of Precision",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Medic's Shockrod of Vitals",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Wound Ballistic Medic Helmet",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Medic; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Ninja's Ring of Precision",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Ninja's Shadow Blade of 1000 Storms",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Soke Ninja Cowl",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Ninja; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Called Shot Warrior Helm",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Warrior's Ring of Precision",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Warrior's Warlord Axe of Cleaving",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Warrior; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Archmagus Wizard Hat",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Vitality V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Wizard's Ornate Wand of Glaciers",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Regeneration V",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          },
+          {
+            "owner": "snowy_canyon",
+            "kind": "item",
+            "target_name": "Wizard's Ring of Precision",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Rewards > Prize wheel by job > Wizard; cited [wiki] [client names]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key snowy_canyon comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Snowy Canyon; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Unga Frostclaw",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Ice Crawlers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Ice Trolls",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Icetroll Champion",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Yetis",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Yeti Pounders",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Elusive Tranquil Sasquatch",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Bonus target; cited [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Unga Frostclaw",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Boss; cited [client] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

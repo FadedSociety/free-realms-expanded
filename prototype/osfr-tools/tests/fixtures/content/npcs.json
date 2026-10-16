@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "actor_id": 2732686529148769137,
+      "zone_id": 7,
+      "model_id": 3311,
+      "name_string_id": 432135,
+      "transform": {
+        "position": [-2136.071, -32.9525, 1038.784],
+        "position_w": 1.0,
+        "rotation": { "kind": "quaternion", "value": [-0.02317995, 0.0, 0.9997313, 0.0] },
+        "scale": 1.0
+      },
+      "role": ["ambient", "quest_giver"],
+      "quest_ids": [101],
+      "source": [
+        { "kind": "client", "evidence": "lab/reports/worldcontent-20261013T203151Z/world-content.json: npc_spawns[0]; captured 35/2 AddNpc row" },
+        { "kind": "reconstructed", "evidence": "(R) fixture zone, roles, and quest link are synthetic; the captured float4 position's fourth component is retained without assigning meaning" }
+      ]
+    }
+  ]
+}

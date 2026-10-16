@@ -1,0 +1,14 @@
+# Class: MiniGameBossDataSource
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00c48040` | `MiniGameBossDataSource_GetColumnName` | ✅ | virtual | Column-name getter of the boss table: index 0 returns Name, index 1 returns Health, anything else '<error>'. |
+| `00c48700` | `MiniGameBossDataSource_RemoveAllEntries` | 🟢 | method | When the boss-entry array embedded at this+0x258 is non-empty (count at this+0x260 > 0) it destroys all of its elements by passing that count to the array tail-destroy helper 00c48470 and then calls the data source's vi… |
+| `00c488d0` | `MiniGameBossDataSource_GetValue` | ✅ | virtual | Data-source value accessor (vtable slot 4). Column 0 fetches the row's name string through 00836c70; column 1 converts the 32-bit value at row*0x20 + *(this+0x22c) + 0x18 to a double and writes it into the caller's vari… |
+| `00c48930` | `MiniGameBossDataSource_AgeEntries` | 🟢 | method | Walks the entry buffer at this+0x25c (count at this+0x260) and for every entry whose float at +0x18 equals the sentinel DAT_01762a30 adds param_2 to the counter at +0x1c; when that counter reaches the threshold DAT_01be… |
+| `00c489b0` | `MiniGameBossDataSource_RemoveEntry` | 🟢 | method | Linear-searches the entry buffer at this+0x25c (count at this+0x260, stride 0x20 bytes) for the entry whose first dword equals param_2 and, when found, erases it by index with 00c48760 and calls the data source's virtua… |
+| `00c48bd0` | `MiniGameBossDataSource_AddOrUpdateEntry` | 🟢 | method | Adds or updates an entry keyed by param_2. It searches with 00c481f0. On a hit it updates the id at +4 and refreshes the name through the lookup service when that id changes; it writes param_4 to the float at +0x18 when… |
+| `00c48e00` | `MiniGameBossDataSource::MiniGameBossDataSource` | ✅ | ctor | Constructor: registers the data source name 'MiniGame.Bosses' through 00922890, installs the three MiniGameBossDataSource base-subobject vtables at +0, +0x30 and +0x34, stores its argument as the lookup-service pointer … |
+| `00c48ea0` | `MiniGameBossDataSource_RowCount` | 🟢 | virtual | Seven-byte getter (bytes 8b 81 30 02 00 00 c3 = mov eax,[ecx+0x230]; ret) that returns the row count field at this+0x230: the element count of the row array exposed to the data-source interface. |
+| `00c48eb0` | `MiniGameBossDataSource::~MiniGameBossDataSource` | 🟢 | dtor | Destructor body: destroys the embedded Entry array (installs its vtable at +0x258, destroys the +0x260 element count through 00c48470, releases the +0x25c buffer with FreeMemory and clears it) and then runs the base-cla… |
+| `00c48f40` | `— ⚠reject` | ⚪ | dtor | Scalar deleting destructor (vtable slot 0 of the tertiary base subobject at +0x34): runs the data source destructor 00c48eb0 and frees the object with CRT _free when bit 0 of the flag argument is set. |

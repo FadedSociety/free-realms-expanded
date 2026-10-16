@@ -1,0 +1,3080 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3040001,
+      "title_string_id": 383065,
+      "giver_npc_id": 9000000198,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Entry quest (wiki; bare client title), row E1; name 'Pick a Card, any Card'; title id cell 2526693993 uc, 1173696077 ug; also \"Pick a Card\" 4067382889 uc, 792935299 ug (no \"Card Duelist:\" prefix in the client)"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Entry quest (wiki; bare client title), row E1; name 'Pick a Card, any Card'; title id cell 2526693993 uc, 1173696077 ug; also \"Pick a Card\" 4067382889 uc, 792935299 ug (no \"Card Duelist:\" prefix in the client)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "(client) title string ID 2526693993 recovered from the guide title ID cell."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 383066,
+      "intro_text_string_id": 383064,
+      "end_text_string_id": 383067
+    },
+    {
+      "id": 3040002,
+      "title_string_id": 103263,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 1; name 'Card Duelist: Enter the Champion'; title id cell 3701715584 ucdt; 4266284614 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 1; name 'Card Duelist: Enter the Champion'; title id cell 3701715584 ucdt; 4266284614 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103264,
+      "intro_text_string_id": 103262,
+      "end_text_string_id": 103265
+    },
+    {
+      "id": 3040003,
+      "title_string_id": 103500,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 2; name 'Card Duelist: Sam I Am'; title id cell 1250961330 ucdt; 3791740111 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 2; name 'Card Duelist: Sam I Am'; title id cell 1250961330 ucdt; 3791740111 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103501,
+      "intro_text_string_id": 103499,
+      "end_text_string_id": 103502
+    },
+    {
+      "id": 3040004,
+      "title_string_id": 103240,
+      "giver_npc_id": 9000000187,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 3; name 'Practice Makes Perfect'; title id cell 1645470343 uc, 3418579226 ug (bare title; no \"Card Duelist:\" prefix in the client)"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 3; name 'Practice Makes Perfect'; title id cell 1645470343 uc, 3418579226 ug (bare title; no \"Card Duelist:\" prefix in the client)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "(client) title string ID 1645470343 recovered from the guide title ID cell."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103241
+    },
+    {
+      "id": 3040005,
+      "title_string_id": 103208,
+      "giver_npc_id": 9000000187,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 4; name 'Card Duelist: 52 Card Pick-Up'; title id cell 2553502263 ucdt; 2638565380 ugdt; bare title 2959831566 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 4; name 'Card Duelist: 52 Card Pick-Up'; title id cell 2553502263 ucdt; 2638565380 ugdt; bare title 2959831566 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103209,
+      "intro_text_string_id": 103207,
+      "end_text_string_id": 103210
+    },
+    {
+      "id": 3040006,
+      "title_string_id": 103535,
+      "giver_npc_id": 9000000187,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 5; name 'Card Duelist: So Over Archery'; title id cell 4174021167 ucdt; 3792898090 ugdt; bare title 2691516548 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 5; name 'Card Duelist: So Over Archery'; title id cell 4174021167 ucdt; 3792898090 ugdt; bare title 2691516548 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103536,
+      "intro_text_string_id": 103534,
+      "end_text_string_id": 103537
+    },
+    {
+      "id": 3040007,
+      "title_string_id": 103556,
+      "giver_npc_id": 9000000187,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 6; name 'Card Duelist: Cardie 4 Life'; title id cell 1444771264 ucdt; 994626474 ugdt; bare title 3776140200 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 6; name 'Card Duelist: Cardie 4 Life'; title id cell 1444771264 ucdt; 994626474 ugdt; bare title 3776140200 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103557,
+      "intro_text_string_id": 103555,
+      "end_text_string_id": 103558
+    },
+    {
+      "id": 3040008,
+      "title_string_id": 103580,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 7; name 'Card Duelist: History of the Crew'; title id cell 624601231 ucdt; 753541036 ugdt; bare title 3141936050 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 7; name 'Card Duelist: History of the Crew'; title id cell 624601231 ucdt; 753541036 ugdt; bare title 3141936050 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103581,
+      "intro_text_string_id": 103579,
+      "end_text_string_id": 103582
+    },
+    {
+      "id": 3040009,
+      "title_string_id": 103649,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 8; name 'Card Duelist: Half a Deck'; title id cell 2873814427 ucdt; 1710904700 ugdt; bare title 175273734 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 8; name 'Card Duelist: Half a Deck'; title id cell 2873814427 ucdt; 1710904700 ugdt; bare title 175273734 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103650,
+      "intro_text_string_id": 103648,
+      "end_text_string_id": 103651
+    },
+    {
+      "id": 3040010,
+      "title_string_id": 103705,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 9; name \"Card Duelist: Poe's Planted Cards\"; title id cell 2640936960 ucdt; 3960015772 ugdt; bare title 851234434 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 9; name \"Card Duelist: Poe's Planted Cards\"; title id cell 2640936960 ucdt; 3960015772 ugdt; bare title 851234434 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103706,
+      "intro_text_string_id": 103704,
+      "end_text_string_id": 103707
+    },
+    {
+      "id": 3040011,
+      "title_string_id": 103744,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 10; name \"Card Duelist: Poe's Best Deck\"; title id cell 3137990006 ucdt; 3915047429 ugdt; bare title 680459578 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 10; name \"Card Duelist: Poe's Best Deck\"; title id cell 3137990006 ucdt; 3915047429 ugdt; bare title 680459578 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103745,
+      "intro_text_string_id": 103743,
+      "end_text_string_id": 103746
+    },
+    {
+      "id": 3040012,
+      "title_string_id": 103802,
+      "giver_npc_id": 9000000170,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 11; name 'Card Duelist: An Old Friend'; title id cell 76470738 ucdt; 4103171487 ugdt; bare title 257814628 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1a - Sanctuary (Poe Tatters and Sam Potts), row 11; name 'Card Duelist: An Old Friend'; title id cell 76470738 ucdt; 4103171487 ugdt; bare title 257814628 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103803,
+      "intro_text_string_id": 103801,
+      "end_text_string_id": 103804
+    },
+    {
+      "id": 3040013,
+      "title_string_id": 103833,
+      "giver_npc_id": 9000000035,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 12; name 'Card Duelist: Battle Bry'; title id cell 3034941134 ucdt; 1363208635 ugdt; bare title 2036805740 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 12; name 'Card Duelist: Battle Bry'; title id cell 3034941134 ucdt; 1363208635 ugdt; bare title 2036805740 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103834,
+      "intro_text_string_id": 103832,
+      "end_text_string_id": 103835
+    },
+    {
+      "id": 3040014,
+      "title_string_id": 103883,
+      "giver_npc_id": 9000000035,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 13; name 'Card Duelist: Cardie Party'; title id cell 199050889 ucdt; 2664980937 ugdt; bare title 2496759884 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 13; name 'Card Duelist: Cardie Party'; title id cell 199050889 ucdt; 2664980937 ugdt; bare title 2496759884 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 13; name 'Card Duelist: Cardie Party'; title id cell 199050889 ucdt; 2664980937 ugdt; bare title 2496759884 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103884,
+      "intro_text_string_id": 103882,
+      "end_text_string_id": 103885
+    },
+    {
+      "id": 3040015,
+      "title_string_id": 103934,
+      "giver_npc_id": 9000000035,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 14; name 'Card Duelist: Garrisoning Garrison'; title id cell 167446337 ucdt; 1989559421 ugdt; bare title 1657018109 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1b - Lakeshore (Bry), row 14; name 'Card Duelist: Garrisoning Garrison'; title id cell 167446337 ucdt; 1989559421 ugdt; bare title 1657018109 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103935,
+      "intro_text_string_id": 103933,
+      "end_text_string_id": 103936
+    },
+    {
+      "id": 3040016,
+      "title_string_id": 103955,
+      "giver_npc_id": 9000000094,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1c - Snowhill (Garrison Gold), row 15; name 'Card Duelist: Serious Business'; title id cell 482050070 ucdt; 1645702318 ugdt; bare title 3479886075 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1c - Snowhill (Garrison Gold), row 15; name 'Card Duelist: Serious Business'; title id cell 482050070 ucdt; 1645702318 ugdt; bare title 3479886075 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103956,
+      "intro_text_string_id": 103954,
+      "end_text_string_id": 103957
+    },
+    {
+      "id": 3040017,
+      "title_string_id": 104173,
+      "giver_npc_id": 9000000094,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1c - Snowhill (Garrison Gold), row 16; name 'Card Duelist: Snowhill Showdown'; title id cell 1991719174 ucdt; 970066335 ugdt; bare title 258741514 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1c - Snowhill (Garrison Gold), row 16; name 'Card Duelist: Snowhill Showdown'; title id cell 1991719174 ucdt; 970066335 ugdt; bare title 258741514 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104174,
+      "intro_text_string_id": 104172,
+      "end_text_string_id": 104175
+    },
+    {
+      "id": 3040018,
+      "title_string_id": 104191,
+      "giver_npc_id": 9000000094,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1c - Snowhill (Garrison Gold), row 17; name 'Card Duelist: Shifty Dealings'; title id cell 2092953308 ucdt; 3538212945 ugdt; bare title 2644824598 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1c - Snowhill (Garrison Gold), row 17; name 'Card Duelist: Shifty Dealings'; title id cell 2092953308 ucdt; 3538212945 ugdt; bare title 2644824598 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104192,
+      "intro_text_string_id": 104190,
+      "end_text_string_id": 104193
+    },
+    {
+      "id": 3040019,
+      "title_string_id": 104209,
+      "giver_npc_id": 9000000198,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 18; name 'Card Duelist: Misplaced Deck'; title id cell 514649205 ucdt; 2494309058 ugdt; bare title 2415666179 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 18; name 'Card Duelist: Misplaced Deck'; title id cell 514649205 ucdt; 2494309058 ugdt; bare title 2415666179 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104210,
+      "intro_text_string_id": 104208,
+      "end_text_string_id": 104211
+    },
+    {
+      "id": 3040020,
+      "title_string_id": 104230,
+      "giver_npc_id": 9000000191,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 19; name 'Card Duelist: Squash the Shuffler'; title id cell 723945475 ucdt; 1099631456 ugdt; bare title 2835059730 ucdt; bare 2835059730 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 19; name 'Card Duelist: Squash the Shuffler'; title id cell 723945475 ucdt; 1099631456 ugdt; bare title 2835059730 ucdt; bare 2835059730 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 19; name 'Card Duelist: Squash the Shuffler'; title id cell 723945475 ucdt; 1099631456 ugdt; bare title 2835059730 ucdt; bare 2835059730 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104231,
+      "intro_text_string_id": 104229,
+      "end_text_string_id": 104232
+    },
+    {
+      "id": 3040021,
+      "title_string_id": 104253,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1d - Wugachug, row 20; name 'Card Duelist: Parcel Recovery'; title id cell 2178142502 ucdt; 939009919 ugdt; bare title 3327370383 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104254,
+      "intro_text_string_id": 104252,
+      "end_text_string_id": 104255
+    },
+    {
+      "id": 3040022,
+      "title_string_id": 104271,
+      "giver_npc_id": 9000000112,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1e - Seaside (Jammie Swiftsong), row 21; name \"Card Duelist: Monty Has 'Em All\"; title id cell 2060345580 ucdt; 2701633920 ugdt; bare title 945381605 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1e - Seaside (Jammie Swiftsong), row 21; name \"Card Duelist: Monty Has 'Em All\"; title id cell 2060345580 ucdt; 2701633920 ugdt; bare title 945381605 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104272,
+      "intro_text_string_id": 104270,
+      "end_text_string_id": 104273
+    },
+    {
+      "id": 3040023,
+      "title_string_id": 115417,
+      "giver_npc_id": 9000000112,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1e - Seaside (Jammie Swiftsong), row 22; name 'Card Duelist: Just One More!'; title id cell 2174672120 ucdt; 2496227703 ugdt; bare title 4136790752 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1e - Seaside (Jammie Swiftsong), row 22; name 'Card Duelist: Just One More!'; title id cell 2174672120 ucdt; 2496227703 ugdt; bare title 4136790752 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 115418,
+      "intro_text_string_id": 115416,
+      "end_text_string_id": 115419
+    },
+    {
+      "id": 3040024,
+      "title_string_id": 104284,
+      "giver_npc_id": 9000000112,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1e - Seaside (Jammie Swiftsong), row 23; name 'Card Duelist: Finding the Fish'; title id cell 1304870559 ucdt; 4152320779 ugdt; bare title 1508418236 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1e - Seaside (Jammie Swiftsong), row 23; name 'Card Duelist: Finding the Fish'; title id cell 1304870559 ucdt; 4152320779 ugdt; bare title 1508418236 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104285,
+      "intro_text_string_id": 104283,
+      "end_text_string_id": 104286
+    },
+    {
+      "id": 3040025,
+      "title_string_id": 115444,
+      "giver_npc_id": 9500000869,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 24; name 'Card Duelist: Proof is in the Cards'; title id cell 2225969390 ucdt; 1217932548 ugdt; bare title 1385546851 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 24; name 'Card Duelist: Proof is in the Cards'; title id cell 2225969390 ucdt; 1217932548 ugdt; bare title 1385546851 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 115445,
+      "intro_text_string_id": 115443,
+      "end_text_string_id": 115446
+    },
+    {
+      "id": 3040026,
+      "title_string_id": 104314,
+      "giver_npc_id": 9500000869,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 25; name 'Card Duelist: Herme the Hermit'; title id cell 2909471104 ucdt; 4209279958 ugdt; bare title 2133908854 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 25; name 'Card Duelist: Herme the Hermit'; title id cell 2909471104 ucdt; 4209279958 ugdt; bare title 2133908854 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104315,
+      "intro_text_string_id": 104313,
+      "end_text_string_id": 104316
+    },
+    {
+      "id": 3040027,
+      "title_string_id": 104328,
+      "giver_npc_id": 9000000347,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 26; name 'Card Duelist: Playing a Prodigy'; title id cell 4275342924 ucdt; 776342810 ugdt; bare title 1979046908 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 26; name 'Card Duelist: Playing a Prodigy'; title id cell 4275342924 ucdt; 776342810 ugdt; bare title 1979046908 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 26; name 'Card Duelist: Playing a Prodigy'; title id cell 4275342924 ucdt; 776342810 ugdt; bare title 1979046908 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104329,
+      "intro_text_string_id": 104327,
+      "end_text_string_id": 104330
+    },
+    {
+      "id": 3040028,
+      "title_string_id": 104345,
+      "giver_npc_id": 9000000141,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 27; name 'Card Duelist: Best of the Best!'; title id cell 3381357059 ucdt; 1392031368 ugdt; bare title 2795856548 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 27; name 'Card Duelist: Best of the Best!'; title id cell 3381357059 ucdt; 1392031368 ugdt; bare title 2795856548 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 1f - Merry Vale and Farnum Farmstead (Ari, Herme, Maple), row 27; name 'Card Duelist: Best of the Best!'; title id cell 3381357059 ucdt; 1392031368 ugdt; bare title 2795856548 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104346,
+      "intro_text_string_id": 104344,
+      "end_text_string_id": 104347
+    },
+    {
+      "id": 3040029,
+      "title_string_id": 407008,
+      "giver_npc_id": 9000000518,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 28; name 'Card Duelist: A Card Dueling Rumor'; title id cell 802906481 ucdt; 3532295604 ugdt; bare title 110127651 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 407009,
+      "intro_text_string_id": 407007,
+      "end_text_string_id": 407010
+    },
+    {
+      "id": 3040030,
+      "title_string_id": 407029,
+      "giver_npc_id": 9000000074,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 29; name \"Card Duelist: Dominic's New Card\"; title id cell 2336257939 ucdt; 824616479 ugdt; bare title 2932515784 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 29; name \"Card Duelist: Dominic's New Card\"; title id cell 2336257939 ucdt; 824616479 ugdt; bare title 2932515784 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 407030,
+      "intro_text_string_id": 407028,
+      "end_text_string_id": 407031
+    },
+    {
+      "id": 3040031,
+      "title_string_id": 413775,
+      "giver_npc_id": 9000000074,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 30; name 'Card Duelist: Break Time'; title id cell 727420106 ucdt; 1537956290 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413776,
+      "intro_text_string_id": 413774,
+      "end_text_string_id": 413777
+    },
+    {
+      "id": 3040032,
+      "title_string_id": 407012,
+      "giver_npc_id": 9000000082,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 31; name 'Card Duelist: Quick Game of Cards'; title id cell 1411608127 ucdt; 596530846 ugdt; bare title 3585980374 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3040033,
+      "title_string_id": 407024,
+      "giver_npc_id": 9000000082,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 32; name \"Card Duelist: Esther's Special Card\"; title id cell 810004621 ucdt; 1837824449 ugdt; bare title 1596122055 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 32; name \"Card Duelist: Esther's Special Card\"; title id cell 810004621 ucdt; 1837824449 ugdt; bare title 1596122055 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 407025,
+      "intro_text_string_id": 407023,
+      "end_text_string_id": 407026
+    },
+    {
+      "id": 3040034,
+      "title_string_id": 407019,
+      "giver_npc_id": 9000000082,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 33; name 'Card Duelist: Esther, the Brains'; title id cell 2401845827 ucdt; 1795503479 ugdt; bare title 1071125660 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 33; name 'Card Duelist: Esther, the Brains'; title id cell 2401845827 ucdt; 1795503479 ugdt; bare title 1071125660 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040034 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 407020,
+      "intro_text_string_id": 407018,
+      "end_text_string_id": 407021
+    },
+    {
+      "id": 3040035,
+      "title_string_id": 413787,
+      "giver_npc_id": 9000000082,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 34; name 'Card Duelist: Confronting Ambrose'; title id cell 3019848983 ucdt; 833041671 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040035 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413788,
+      "intro_text_string_id": 413786,
+      "end_text_string_id": 413789
+    },
+    {
+      "id": 3040036,
+      "title_string_id": 413771,
+      "giver_npc_id": 9000000084,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 35; name 'Card Duelist: Alleged Thievery'; title id cell 1245727084 ucdt; 2678188332 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040036 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413772,
+      "intro_text_string_id": 413770,
+      "end_text_string_id": 413773
+    },
+    {
+      "id": 3040037,
+      "title_string_id": 413791,
+      "giver_npc_id": 9000000005,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 36; name 'Card Duelist: Something Precious'; title id cell 2215047685 ucdt; 2137481815 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040037 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413792,
+      "intro_text_string_id": 413790,
+      "end_text_string_id": 413793
+    },
+    {
+      "id": 3040038,
+      "title_string_id": 413795,
+      "giver_npc_id": 9000000005,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 37; name 'Card Duelist: Scattered Artifacts'; title id cell 3197400606 ucdt; 506654877 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040038 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413796,
+      "intro_text_string_id": 413794,
+      "end_text_string_id": 413797
+    },
+    {
+      "id": 3040039,
+      "title_string_id": 413767,
+      "giver_npc_id": 9000000238,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 38; name \"Card Duelist: Wellington's Game Face\"; title id cell 1734096828 ucdt; 3183870611 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 38; name \"Card Duelist: Wellington's Game Face\"; title id cell 1734096828 ucdt; 3183870611 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 38; name \"Card Duelist: Wellington's Game Face\"; title id cell 1734096828 ucdt; 3183870611 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040039 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413768,
+      "intro_text_string_id": 413766,
+      "end_text_string_id": 413769
+    },
+    {
+      "id": 3040040,
+      "title_string_id": 413811,
+      "giver_npc_id": 9000000519,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 39; name 'Card Duelist: Cardie Partay'; title id cell 3538702431 ucdt; 322170228 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040040 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413812,
+      "intro_text_string_id": 413810,
+      "end_text_string_id": 413813
+    },
+    {
+      "id": 3040041,
+      "title_string_id": 413807,
+      "giver_npc_id": 9000000224,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 40; name 'Card Duelist: Final Dig'; title id cell 691480628 ucdt; 3532800124 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 40; name 'Card Duelist: Final Dig'; title id cell 691480628 ucdt; 3532800124 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040041 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 413808,
+      "intro_text_string_id": 413806,
+      "end_text_string_id": 413809
+    },
+    {
+      "id": 3040042,
+      "title_string_id": 436538,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 41; name 'Card Duelist: Snowhill is Melting'; title id cell 2336551740 ucdt; 780251172 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040042 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 436539,
+      "intro_text_string_id": 436537,
+      "end_text_string_id": 436540
+    },
+    {
+      "id": 3040043,
+      "title_string_id": 2570,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 42; name 'Card Duelist: Defenders Duty'; title id cell 1242863763 ucdt; 233885967 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040043 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3040044,
+      "title_string_id": 436478,
+      "giver_npc_id": 9000000520,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 43; name 'Card Duelist: Dark Deal'; title id cell 3555356684 ucdt; 2821186970 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 43; name 'Card Duelist: Dark Deal'; title id cell 3555356684 ucdt; 2821186970 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040044 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 436479,
+      "intro_text_string_id": 436477,
+      "end_text_string_id": 436480
+    },
+    {
+      "id": 3040045,
+      "title_string_id": 2569,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 44; name 'Card Duelist: In Search of The Baron'; title id cell 3066807454 ucdt; 457577169 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 44; name 'Card Duelist: In Search of The Baron'; title id cell 3066807454 ucdt; 457577169 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040045 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3040046,
+      "title_string_id": 436542,
+      "giver_npc_id": 9000000521,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 45; name 'Card Duelist: Suspicious Sneak'; title id cell 1687158850 ucdt; 1315765836 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040046 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 436543,
+      "intro_text_string_id": 436541,
+      "end_text_string_id": 436544
+    },
+    {
+      "id": 3040047,
+      "title_string_id": 2571,
+      "giver_npc_id": 9000000522,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 46; name 'Card Duelist: To Catch a Sneak'; title id cell 1857224941 ucdt; 171585002 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040047 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3040048,
+      "title_string_id": 436546,
+      "giver_npc_id": 9000000523,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 47; name 'Card Duelist: Finder of Secrets'; title id cell 3461045341 ucdt; 1211139414 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040048 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 436547,
+      "intro_text_string_id": 436545,
+      "end_text_string_id": 436548
+    },
+    {
+      "id": 3040049,
+      "title_string_id": 2572,
+      "giver_npc_id": 9000000195,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 48; name 'Card Duelist: A Guide to The Baron'; title id cell 2991450430 ucdt; 3944985595 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 48; name 'Card Duelist: A Guide to The Baron'; title id cell 2991450430 ucdt; 3944985595 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040049 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3040050,
+      "title_string_id": 436550,
+      "giver_npc_id": 9000000195,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 49; name 'Card Duelist: Master Explorer'; title id cell 3799595359 ucdt; 2000424797 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 49; name 'Card Duelist: Master Explorer'; title id cell 3799595359 ucdt; 2000424797 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040050 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 436551,
+      "intro_text_string_id": 436549,
+      "end_text_string_id": 436552
+    },
+    {
+      "id": 3040051,
+      "title_string_id": 2573,
+      "giver_npc_id": 9000000524,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 50; name 'Card Duelist: Confronting The Baron'; title id cell 2491569756 ucdt; 3058350398 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 50; name 'Card Duelist: Confronting The Baron'; title id cell 2491569756 ucdt; 3058350398 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040051 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3040052,
+      "title_string_id": 436554,
+      "giver_npc_id": 9000000020,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 51; name 'Card Duelist: Baron von Darkcheat'; title id cell 2220173659 ucdt; 1389473288 ugdt; bare title 2087525998 ucdt, 2547770658 ugdt, 3091282303 ucdt, 3114971974 ucdt, 3958155406 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 51; name 'Card Duelist: Baron von Darkcheat'; title id cell 2220173659 ucdt; 1389473288 ugdt; bare title 2087525998 ucdt, 2547770658 ugdt, 3091282303 ucdt, 3114971974 ucdt, 3958155406 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040052 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 436555,
+      "intro_text_string_id": 436553,
+      "end_text_string_id": 436556
+    },
+    {
+      "id": 3040053,
+      "title_string_id": 439671,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 52; name \"Card Duelist: Zelda's Warning\"; title id cell 4166094737 ucdt; 363394714 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 52; name \"Card Duelist: Zelda's Warning\"; title id cell 4166094737 ucdt; 363394714 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040053 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 439672,
+      "intro_text_string_id": 439670,
+      "end_text_string_id": 439673
+    },
+    {
+      "id": 3040054,
+      "title_string_id": 7947,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 53; name 'Card Duelist: Heart of Darkness'; title id cell 3518840584 ucdt; 908958430 ugdt; bare title 860515487 ucdt, 1344239073 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 53; name 'Card Duelist: Heart of Darkness'; title id cell 3518840584 ucdt; 908958430 ugdt; bare title 860515487 ucdt, 1344239073 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040054 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 7948,
+      "intro_text_string_id": 7946,
+      "end_text_string_id": 7949
+    },
+    {
+      "id": 3040055,
+      "title_string_id": 7951,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 54; name 'Card Duelist: Slow and Steady'; title id cell 935260923 ucdt; 4122502151 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 54; name 'Card Duelist: Slow and Steady'; title id cell 935260923 ucdt; 4122502151 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040055 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 7952,
+      "intro_text_string_id": 7950,
+      "end_text_string_id": 7953
+    },
+    {
+      "id": 3040056,
+      "title_string_id": 7955,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 55; name 'Card Duelist: Stinky Feet'; title id cell 427514654 ucdt; 3893191882 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 55; name 'Card Duelist: Stinky Feet'; title id cell 427514654 ucdt; 3893191882 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 55; name 'Card Duelist: Stinky Feet'; title id cell 427514654 ucdt; 3893191882 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040056 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 7956,
+      "intro_text_string_id": 7954,
+      "end_text_string_id": 7957
+    },
+    {
+      "id": 3040057,
+      "title_string_id": 7959,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 56; name 'Card Duelist: Meet the Boss'; title id cell 675532428 ucdt; 3055274765 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 4 - Realmkeepers and Madam Zelda (TCG Series 4), row 56; name 'Card Duelist: Meet the Boss'; title id cell 675532428 ucdt; 3055274765 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040057 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 7960,
+      "intro_text_string_id": 7958,
+      "end_text_string_id": 7961
+    },
+    {
+      "id": 3040058,
+      "title_string_id": 5100175,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 57; name 'Card Duelist: The Realmkeepers Are Missing!'; title id cell 2521340804 ucdt; 3335686259 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 57; name 'Card Duelist: The Realmkeepers Are Missing!'; title id cell 2521340804 ucdt; 3335686259 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040058 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100176,
+      "intro_text_string_id": 5100174,
+      "end_text_string_id": 5100177
+    },
+    {
+      "id": 3040059,
+      "title_string_id": 5100183,
+      "giver_npc_id": 9000000370,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 58; name 'Card Duelist: Junkmaker Jort'; title id cell 254923939 ucdt; 3199356987 ugdt; bare title 190998004 ugdt, 3994814258 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 58; name 'Card Duelist: Junkmaker Jort'; title id cell 254923939 ucdt; 3199356987 ugdt; bare title 190998004 ugdt, 3994814258 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 58; name 'Card Duelist: Junkmaker Jort'; title id cell 254923939 ucdt; 3199356987 ugdt; bare title 190998004 ugdt, 3994814258 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040059 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100184,
+      "intro_text_string_id": 5100182,
+      "end_text_string_id": 5100185
+    },
+    {
+      "id": 3040060,
+      "title_string_id": 5100179,
+      "giver_npc_id": 9000000408,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 59; name 'Card Duelist: Milo E. Lizardo'; title id cell 730877819 ucdt; 946898069 ugdt; bare title 3196257721 ucdt, 3569967384 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 59; name 'Card Duelist: Milo E. Lizardo'; title id cell 730877819 ucdt; 946898069 ugdt; bare title 3196257721 ucdt, 3569967384 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 59; name 'Card Duelist: Milo E. Lizardo'; title id cell 730877819 ucdt; 946898069 ugdt; bare title 3196257721 ucdt, 3569967384 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040060 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100180,
+      "intro_text_string_id": 5100178,
+      "end_text_string_id": 5100181
+    },
+    {
+      "id": 3040061,
+      "title_string_id": 5100187,
+      "giver_npc_id": 9000000176,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 60; name 'Card Duelist: Quizzical Yucca'; title id cell 2792642590 ucdt; 3908793532 ugdt; bare title 1292836560 ugdt, 2191399872 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 60; name 'Card Duelist: Quizzical Yucca'; title id cell 2792642590 ucdt; 3908793532 ugdt; bare title 1292836560 ugdt, 2191399872 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 60; name 'Card Duelist: Quizzical Yucca'; title id cell 2792642590 ucdt; 3908793532 ugdt; bare title 1292836560 ugdt, 2191399872 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040061 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100188,
+      "intro_text_string_id": 5100186,
+      "end_text_string_id": 5100189
+    },
+    {
+      "id": 3040062,
+      "title_string_id": 5100191,
+      "giver_npc_id": 9000000109,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 61; name 'Card Duelist: Ironteeth'; title id cell 3114855867 ucdt; 3832205503 ugdt; bare title 486169237 ugdt, 4008122318 ucdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 61; name 'Card Duelist: Ironteeth'; title id cell 3114855867 ucdt; 3832205503 ugdt; bare title 486169237 ugdt, 4008122318 ucdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 61; name 'Card Duelist: Ironteeth'; title id cell 3114855867 ucdt; 3832205503 ugdt; bare title 486169237 ugdt, 4008122318 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040062 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100192,
+      "intro_text_string_id": 5100190,
+      "end_text_string_id": 5100193
+    },
+    {
+      "id": 3040063,
+      "title_string_id": 5100630,
+      "giver_npc_id": 9000000136,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 62; name 'Card Duelist: Return from the Rumbledome'; title id cell 3334173901 ucdt; 2945412816 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 62; name 'Card Duelist: Return from the Rumbledome'; title id cell 3334173901 ucdt; 2945412816 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 5 - The Rumbledome (TCG Series 5, Sunstone Valley), row 62; name 'Card Duelist: Return from the Rumbledome'; title id cell 3334173901 ucdt; 2945412816 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040063 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 5100631,
+      "intro_text_string_id": 5100629,
+      "end_text_string_id": 5100632
+    }
+  ]
+}

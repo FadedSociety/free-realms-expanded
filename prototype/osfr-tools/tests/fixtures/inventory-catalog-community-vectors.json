@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "producer": "Unchanged Sanctuary PlayerUpdatePacketItemDefinitions and PacketWriter",
+  "vectors": [
+    {
+      "count": 0,
+      "hex": "230025000400000000000000",
+      "sha256": "028f62a46e93668727bf6d204e84250a173871f0b828e3c366b0f2344b355b06"
+    },
+    {
+      "count": 1,
+      "hex": "230025000c000000010000006400000008000000",
+      "sha256": "02bf1dde131604dd64de0768c3eb1f53a14998d505080321e14018863e2834f0"
+    },
+    {
+      "count": 3,
+      "hex": "230025001c00000003000000640000000800000065000000080000006600000008000000",
+      "sha256": "723baa6d1776bc43c47da816933fba908bda0e477be3a9a83d20abc20eb8ccd1"
+    }
+  ]
+}

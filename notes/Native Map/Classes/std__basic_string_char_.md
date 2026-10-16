@@ -1,0 +1,15 @@
+# Class: std::basic_string<char>
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `0041f1d7` | `_Tidy` | 🟢 | function | Thiscall wrapper passes its receiver in ECX and calls FUN_0041ba81 with flag 1 and new length 0, then returns without a value. The helper tidies the string buffer and sets the string length to zero. |
+| `0041f653` | `_Grow` | ✅ | function | MSVC 2005 std::basic_string<char>::_Grow: rejects a requested size of 0xffffffff, allocates through FUN_0041c08c when the requested size exceeds the current capacity field (+0x18), shrinks with FUN_0041ba81(1,min(reques… |
+| `00420ff1` | `std::basic_string::assign_substr` | ✅ | function | MSVC 2005 std::basic_string<char>::assign(const basic_string&, size_type, size_type): validates the start index against the source length (+0x14), clamps the count, and when source and destination are the same object er… |
+| `0042131b` | `std::basic_string::assign ⚠downgrade` | 🟢 | function | MSVC 2005 std::basic_string<char>::assign(const char*, size_type): when the source lies inside the string it re-assigns from the computed offset, otherwise it grows with _Grow(this,param_2,false), copies param_2 bytes i… |
+| `00422034` | `std::basic_string::basic_string` | ✅ | ctor | MSVC 2005 std::basic_string<char> copy constructor: sets the capacity field at +0x18 to 0xf (the inline-buffer state), terminates the empty buffer with _Eos(this,0) and then copies the source string through assign(this,… |
+| `004224b1` | `std::basic_string::assign_cstr` | ✅ | function | MSVC std::basic_string<char>::assign(const char*): computes the length with an inline scan loop and forwards to the pointer+length assign 0042131b. |
+| `0174f2c0` | `std::basic_string::_TidyStatic_01bb84c8` | 🟢 | method | Tidy of the file-scope std::basic_string at 01bb84c8 (buffer +4, size +0x14, capacity +0x18): if capacity is above 15 it frees the heap buffer, then sets capacity 0xf, size 0 and the first buffer byte to 0 (inline empty… |
+| `0174f2f0` | `std::basic_string::_TidyStatic_01bb94a0` | 🟢 | method | Tidy of the file-scope std::basic_string at 01bb94a0 (buffer +4, size +0x14, capacity +0x18): if capacity is above 15 it frees the heap buffer, then sets capacity 0xf, size 0 and the first buffer byte to 0 (inline empty… |
+| `0174f320` | `std::basic_string::_TidyStatic_01bb94bc` | 🟢 | method | Tidy of the file-scope std::basic_string at 01bb94bc (buffer +4, size +0x14, capacity +0x18): if capacity is above 15 it frees the heap buffer, then sets capacity 0xf, size 0 and the first buffer byte to 0 (inline empty… |
+| `0174f350` | `std::basic_string::_TidyStatic_01bb953c` | 🟢 | method | Tidy of the file-scope std::basic_string at 01bb953c (buffer +4, size +0x14, capacity +0x18): if capacity is above 15 it frees the heap buffer, then sets capacity 0xf, size 0 and the first buffer byte to 0 (inline empty… |
+| `0174f480` | `std::basic_string::_TidyStatic_01bc0540` | 🟢 | method | Tidy of the file-scope std::basic_string at 01bc0540 (buffer +4, size +0x14, capacity +0x18): if capacity is above 15 it frees the heap buffer, then sets capacity 0xf, size 0 and the first buffer byte to 0 (inline empty… |

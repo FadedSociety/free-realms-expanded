@@ -1,0 +1,186 @@
+# System: net.ingamepurchase
+
+102 mapped functions. Grouped by confidence; server behaviour below is inference from client code only.
+
+## ✅ confirmed (79)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `00b1fec0` | `InGamePurchaseMerchantListPacketCleanup` | InGamePurchaseMerchantListPacket | Exception-unwind cleanup for the merchant-list packet object. | [[Native Map/Shards/S0337 00b1b5a0-00b21f20|S0337]] |
+| `00b22e10` | `PacketBaseInGamePurchase::PacketBaseInGamePurchase` | PacketBaseInGamePurchase | Shared family-envelope constructor for family-66 packets. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b22e80` | `PacketBaseInGamePurchase::ScalarDeletingDestructor` | PacketBaseInGamePurchase | Standard MSVC delete path for the InGamePurchase base packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b22f00` | `PacketInGamePurchaseStoreBundleBase::PacketInGamePurchaseStoreBundleBase` | PacketInGamePurchaseStoreBundleBase | Builds the envelope of the store-bundle base packet (catalogue base 66 sub 5) used by bundle list/update payloads. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b22f70` | `PacketInGamePurchaseStoreBundleBase::ScalarDeletingDestructor` | PacketInGamePurchaseStoreBundleBase | Standard MSVC delete path for PacketInGamePurchaseStoreBundleBase. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b22fd0` | `PacketInGamePurchaseStoreBundleCategories::PacketInGamePurchaseStoreBundleCateg…` | PacketInGamePurchaseStoreBundleCategori… | Envelope builder for the store categories list packet (catalogue base 66 sub 7). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23040` | `PacketInGamePurchaseStoreBundleCategories::ScalarDeletingDestructor` | PacketInGamePurchaseStoreBundleCategori… | Standard MSVC delete path for PacketInGamePurchaseStoreBundleCategories. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23100` | `PacketInGamePurchaseWalletInfoRequest::ScalarDeletingDestructor` | PacketInGamePurchaseWalletInfoRequest | Standard MSVC delete path for the wallet-info request packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b231c0` | `PacketInGamePurchaseServerStatusRequest::ScalarDeletingDestructor` | PacketInGamePurchaseServerStatusRequest | Standard MSVC delete path for the server status request packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23290` | `PacketInGamePurchaseServerStatusResponse::ScalarDeletingDestructor` | PacketInGamePurchaseServerStatusResponse | Standard MSVC delete path for the server status response packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23360` | `PacketInGamePurchaseStationCashProductsResponse::ScalarDeletingDestructor` | PacketInGamePurchaseStationCashProducts… | Standard MSVC delete path for the Station Cash products response. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b233c0` | `PacketInGamePurchaseStateCodesRequest::PacketInGamePurchaseStateCodesRequest` | PacketInGamePurchaseStateCodesRequest | Envelope builder for the billing state-codes lookup request (catalogue base 66 sub 18). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23420` | `PacketInGamePurchaseStateCodesRequest::ScalarDeletingDestructor` | PacketInGamePurchaseStateCodesRequest | Standard MSVC delete path for the state-codes request. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b234f0` | `PacketInGamePurchaseStateCodesResponse::ScalarDeletingDestructor` | PacketInGamePurchaseStateCodesResponse | Standard MSVC delete path for the state-codes response. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23550` | `PacketInGamePurchaseEnableMarketplace::PacketInGamePurchaseEnableMarketplace` | PacketInGamePurchaseEnableMarketplace | Envelope builder for the server instruction that enables/disable the marketplace UI (catalogue base 66 sub 24). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b235c0` | `PacketInGamePurchaseEnableMarketplace::ScalarDeletingDestructor` | PacketInGamePurchaseEnableMarketplace | Standard MSVC delete path for the EnableMarketplace packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23640` | `PacketInGamePurchaseStoreBundleGroups::PacketInGamePurchaseStoreBundleGroups` | PacketInGamePurchaseStoreBundleGroups | Envelope builder for the store bundle groups list (catalogue base 66 sub 9). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b236b0` | `PacketInGamePurchaseStoreBundleGroups::ScalarDeletingDestructor` | PacketInGamePurchaseStoreBundleGroups | Standard MSVC delete path for the store bundle groups packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23780` | `PacketInGamePurchaseDisplayMannequinStoreBundles::ScalarDeletingDestructor` | PacketInGamePurchaseDisplayMannequinSto… | Standard MSVC delete path for the mannequin display packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b237e0` | `PacketInGamePurchaseStoreBundleCategoryGroups::PacketInGamePurchaseStoreBundleC…` | PacketInGamePurchaseStoreBundleCategory… | Envelope builder for the category-group list of the store (catalogue base 66 sub 6). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23850` | `PacketInGamePurchaseStoreBundleCategoryGroups::ScalarDeletingDestructor` | PacketInGamePurchaseStoreBundleCategory… | Standard MSVC delete path for the store category groups packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b238b0` | `PacketInGamePurchaseStoreEnablePaymentSources::PacketInGamePurchaseStoreEnableP…` | PacketInGamePurchaseStoreEnablePaymentS… | Envelope builder for the payment-source enable list of the store (catalogue base 66 sub 33). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23920` | `PacketInGamePurchaseStoreEnablePaymentSources::ScalarDeletingDestructor` | PacketInGamePurchaseStoreEnablePaymentS… | Standard MSVC delete path for the payment-sources packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b239e0` | `PacketInGamePurchaseGiftNotification::ScalarDeletingDestructor` | PacketInGamePurchaseGiftNotification | Standard MSVC delete path for the gift notification packet, running its real destructor first. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23a70` | `InGamePurchaseUpdateMerchantSellBundleQuantityAvailableForPurchase::ScalarDelet…` | InGamePurchaseUpdateMerchantSellBundleQ… | Standard MSVC delete path for the merchant stock update packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23b40` | `InGamePurchaseMerchantListPacket::ScalarDeletingDestructor` | InGamePurchaseMerchantListPacket | Standard MSVC delete path for the merchant list packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24030` | `PacketInGamePurchaseStoreClientStatistics::ScalarDeletingDestructor` | PacketInGamePurchaseStoreClientStatisti… | Standard MSVC delete path for the store client statistics packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24100` | `PacketInGamePurchaseStoreBundleUpdate::ScalarDeletingDestructor` | PacketInGamePurchaseStoreBundleUpdate<A… | Standard MSVC delete path for the store bundle update packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b241d0` | `PacketInGamePurchaseIOTD::ScalarDeletingDestructor` | PacketInGamePurchaseIOTD<AppStoreBundle… | Standard MSVC delete path for the IOTD packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b242a0` | `PacketInGamePurchaseBOTD::ScalarDeletingDestructor` | PacketInGamePurchaseBOTD<AppStoreBundle… | Standard MSVC delete path for the BOTD packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24370` | `PacketInGamePurchaseExclusivePartnerStoreBundles::ScalarDeletingDestructor` | PacketInGamePurchaseExclusivePartnerSto… | Standard MSVC delete path for the exclusive partner store bundles packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24440` | `PacketInGamePurchasePlaceOrderPacket::ScalarDeletingDestructor` | PacketInGamePurchasePlaceOrderPacket<Ga… | Standard MSVC delete path for the place-order packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b27ea0` | `PacketInGamePurchasePreviewOrderResponse::ScalarDeletingDestructor` | PacketInGamePurchasePreviewOrderResponse | Standard MSVC delete path for the preview-order response. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b28450` | `PacketInGamePurchaseStoreBundles::ScalarDeletingDtor → PacketInGamePurchaseStor…` | PacketInGamePurchaseStoreBundles<AppSto… | Standard MSVC delete path for the store bundles packet. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b2f8d0` | `PacketInGamePurchasePlaceOrderResponse::Ctor` | PacketInGamePurchasePlaceOrderResponse | Initializes the place-order response packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2f960` | `PacketInGamePurchasePlaceOrderResponse::ScalarDeletingDtor` | PacketInGamePurchasePlaceOrderResponse | Implements scalar deleting destruction for the packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2f980` | `PacketInGamePurchaseWalletInfoResponse::Ctor` | PacketInGamePurchaseWalletInfoResponse | Initializes the wallet-info response packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2f9f0` | `PacketInGamePurchaseWalletInfoResponse::ScalarDeletingDtor` | PacketInGamePurchaseWalletInfoResponse | Implements scalar deleting destruction for the wallet-info response packet. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fa10` | `PacketInGamePurchaseStationCashProductsRequest::Ctor` | PacketInGamePurchaseStationCashProducts… | Initializes a station-cash products request packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fa80` | `PacketInGamePurchaseStationCashProductsRequest::ScalarDeletingDtor` | PacketInGamePurchaseStationCashProducts… | Implements scalar deleting destruction for the station-cash products request packet. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2faa0` | `PacketInGamePurchaseSubscriptionProductsRequest::Ctor` | PacketInGamePurchaseSubscriptionProduct… | Initializes a subscription-products request packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fb20` | `PacketInGamePurchaseSubscriptionProductsRequest::ScalarDeletingDtor` | PacketInGamePurchaseSubscriptionProduct… | Implements scalar deleting destruction for the subscription-products request. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fb40` | `PacketInGamePurchaseSubscriptionProductsResponse::Ctor` | PacketInGamePurchaseSubscriptionProduct… | Initializes the subscription-products response packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fbc0` | `PacketInGamePurchaseSubscriptionProductsResponse::ScalarDeletingDtor` | PacketInGamePurchaseSubscriptionProduct… | Implements scalar deleting destruction for the subscription-products response. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fbe0` | `PacketInGamePurchaseCurrencyCodesRequest::Ctor` | PacketInGamePurchaseCurrencyCodesRequest | Initializes the currency-codes request packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fc50` | `PacketInGamePurchaseCurrencyCodesRequest::ScalarDeletingDtor` | PacketInGamePurchaseCurrencyCodesRequest | Implements scalar deleting destruction for the currency-codes request. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fc70` | `PacketInGamePurchaseCurrencyCodesResponse::Ctor` | PacketInGamePurchaseCurrencyCodesRespon… | Initializes the currency-codes response packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fcf0` | `PacketInGamePurchaseCurrencyCodesResponse::ScalarDeletingDtor` | PacketInGamePurchaseCurrencyCodesRespon… | Implements scalar deleting destruction for the currency-codes response. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fd10` | `PacketInGamePurchaseCountryCodesRequest::Ctor` | PacketInGamePurchaseCountryCodesRequest | Initializes the country-codes request packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fd80` | `PacketInGamePurchaseCountryCodesRequest::ScalarDeletingDtor` | PacketInGamePurchaseCountryCodesRequest | Implements scalar deleting destruction for the country-codes request. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fda0` | `PacketInGamePurchaseCountryCodesResponse::Ctor` | PacketInGamePurchaseCountryCodesResponse | Initializes the country-codes response packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fe20` | `PacketInGamePurchaseCountryCodesResponse::ScalarDeletingDtor` | PacketInGamePurchaseCountryCodesResponse | Implements scalar deleting destruction for the country-codes response. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fe40` | `PacketInGamePurchaseAccountInfoRequest::Ctor` | PacketInGamePurchaseAccountInfoRequest | Initializes the account-info request packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2feb0` | `PacketInGamePurchaseAccountInfoRequest::ScalarDeletingDtor` | PacketInGamePurchaseAccountInfoRequest | Implements scalar deleting destruction for the account-info request. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fed0` | `PacketInGamePurchaseAccountInfoResponse::Ctor` | PacketInGamePurchaseAccountInfoResponse | Initializes the account-info response packet object. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2ff60` | `PacketInGamePurchaseAccountInfoResponse::ScalarDeletingDtor` | PacketInGamePurchaseAccountInfoResponse | Implements scalar deleting destruction for the account-info response. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2ff80` | `InGamePurchaseUpdateItemRequirementsReply::Ctor` | InGamePurchaseUpdateItemRequirementsRep… | Initializes the item-requirements reply packet object and its owned list. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b2fff0` | `InGamePurchaseUpdateItemRequirementsReply::Dtor` | InGamePurchaseUpdateItemRequirementsRep… | Cleans the reply packet and its update-data list. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b335d0` | `InGamePurchaseUpdateItemRequirementsReply::ScalarDeletingDtor` | InGamePurchaseUpdateItemRequirementsRep… | Implements scalar deleting destruction for the item-requirements reply packet. | [[Native Map/Shards/S0340 00b2ec20-00b33a50|S0340]] |
+| `00b3ad20` | `ReadStoreBundleCategoryGroups` |  | Reads the category-group portion of the in-game-purchase store response. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3b450` | `HandlePreviewOrderResponse` |  | Delivers the in-game-purchase order preview result to the client UI. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3bde0` | `HandleServerStatusResponse` |  | Passes the in-game-purchase server-status result to the client UI. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3bf30` | `HandleMarketplaceEnabledResponse` |  | Updates the client-side marketplace-enabled flag and callback from the in-game-purchase response. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3c000` | `HandleStorePaymentSourcesResponse` |  | Updates the manager's local payment-source flags from the in-game-purchase response. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3c0d0` | `HandleMerchantSellBundleQuantityUpdate` |  | Handles the merchant sell-bundle quantity update within the in-game-purchase packet family. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3d770` | `ReadStoreBundleGroups` |  | Reads grouped store-bundle data from the in-game-purchase response. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3d930` | `ReadCounted128ByteRecords` |  | Reads country-code response entries through the nested country-code payload parser. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3d9c0` | `ReadCounted72ByteRecords` |  | Reads state-code response entries through the nested state-code payload parser. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3e120` | `HandleWalletInfoResponse` |  | Updates and reports the account wallet state from the in-game-purchase response; the currency audit identifies this as the Station Cash wallet path. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3e340` | `HandleDisplayMannequinStoreBundles` |  | Displays the mannequin store-bundle preview from an in-game-purchase response. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b3e490` | `HandleItemRequirementsReply` |  | Applies item-requirement results returned by the in-game-purchase service to client item data. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b43230` | `PacketInGamePurchaseStoreBundleContentRequest::PacketInGamePurchaseStoreBundleC…` | PacketInGamePurchaseStoreBundleContentR… | Builds the client request for store bundle content. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00b43b20` | `PacketInGamePurchaseStoreBundleContentRequest::ScalarDeletingDtor` | PacketInGamePurchaseStoreBundleContentR… | Slot-0 scalar deleting destructor for the store-bundle content request packet. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00b43c40` | `RequestStationCashSkuPrices` |  | Requests station-cash SKU price data after account information is available. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00b43d10` | `RequestSubscriptionSkuPrices` |  | Requests subscription SKU price data after account information is available. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00c022a0` | `InGamePurchaseUpdateItemRequirementsRequest::DtorBody` | InGamePurchaseUpdateItemRequirementsReq… | Runs derived and base packet cleanup during request destruction. | [[Native Map/Shards/S0382 00bfcfe0-00c056a0|S0382]] |
+| `00c03920` | `InGamePurchaseUpdateItemRequirementsRequest::Ctor` | InGamePurchaseUpdateItemRequirementsReq… | Initializes the update-item-requirements request packet. | [[Native Map/Shards/S0382 00bfcfe0-00c056a0|S0382]] |
+| `00c03980` | `InGamePurchaseUpdateItemRequirementsRequest::ScalarDeletingDtor` | InGamePurchaseUpdateItemRequirementsReq… | Implements scalar deleting destruction for the request packet. | [[Native Map/Shards/S0382 00bfcfe0-00c056a0|S0382]] |
+| `00c047a0` | `SendInGamePurchaseUpdateItemRequirementsRequest` | InGamePurchaseUpdateItemRequirementsReq… | Sends the client request for updated purchase item requirements. | [[Native Map/Shards/S0382 00bfcfe0-00c056a0|S0382]] |
+
+## 🟢 likely (14)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `00b230a0` | `PacketInGamePurchaseWalletInfoRequest::PacketInGamePurchaseWalletInfoRequest` | PacketInGamePurchaseWalletInfoRequest | Constructs the family-66/sub-opcode-10 wallet-info request; caller 00b43bc0 submits it through the client tunnel. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23160` | `PacketInGamePurchaseServerStatusRequest::PacketInGamePurchaseServerStatusRequest` | PacketInGamePurchaseServerStatusRequest | Envelope builder for the marketplace server status request; the class exists only in the client RTTI (not in the community catalogue). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23220` | `PacketInGamePurchaseServerStatusResponse::PacketInGamePurchaseServerStatusRespo…` | PacketInGamePurchaseServerStatusResponse | Envelope builder for the marketplace server status reply carrying one byte (usually the enabled/status flag); only present in client RTTI. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23710` | `PacketInGamePurchaseDisplayMannequinStoreBundles::Construct` | PacketInGamePurchaseDisplayMannequinSto… | Envelope builder for the server push that makes store bundles appear on mannequins in the world (client-only RTTI, sub-opcode 31). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23a10` | `InGamePurchaseUpdateMerchantSellBundleQuantityAvailableForPurchase::Ctor` | InGamePurchaseUpdateMerchantSellBundleQ… | Envelope builder for the merchant stock update that tells the client how many units of a bundle remain purchasable (client-only RTTI, sub-opcode 45). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23fc0` | `PacketInGamePurchaseStoreClientStatistics::Ctor` | PacketInGamePurchaseStoreClientStatisti… | Constructs a family-66 envelope with sub-opcode 0x1d and stores one 4-byte value at +0x18; serialization and direction are not established here. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24160` | `PacketInGamePurchaseIOTD::Ctor` | PacketInGamePurchaseIOTD<AppStoreBundle… | Envelope builder for the item-of-the-day store push carrying an AppStoreBundleDefinition (client-only RTTI, sub-opcode 32). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24230` | `PacketInGamePurchaseBOTD::Ctor` | PacketInGamePurchaseBOTD<AppStoreBundle… | Envelope builder for the bundle-of-the-day push (client-only RTTI, sub-opcode 41). | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24300` | `PacketInGamePurchaseExclusivePartnerStoreBundles::Ctor` | PacketInGamePurchaseExclusivePartnerSto… | Envelope builder for the exclusive partner store bundle list (client-only RTTI, sub-opcode 8); the payload type is a SoeUtil::HashList of AppStoreBundleDefinition. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b243d0` | `PacketInGamePurchasePlaceOrderPacket::Ctor ⚠downgrade` | PacketInGamePurchasePlaceOrderPacket<Ga… | Constructs a family-66 envelope with sub-opcode 3 and stores an order pointer at +0x18; this constructor does not establish serialization or direction. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b27e20` | `PacketInGamePurchasePreviewOrderResponse::PacketInGamePurchasePreviewOrderRespo…` | PacketInGamePurchasePreviewOrderResponse | Constructs the family-66/sub-opcode-2 response payload from four 32-bit caller values; their individual meanings are unknown. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b43bc0` | `BuildWalletInfoRequest ⚠downgrade` |  | Sends the account Station Cash wallet-info request. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00b44e60` | `BuildCurrencyCodesRequest` |  | Builds the payload that the startup caller 00b46b90 uses for the currency-code list request; payload field semantics remain opaque. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00b44f00` | `BuildCountryCodesRequest` |  | Builds the payload that startup caller 00b46b90 uses for the country-code list request; payload field semantics remain opaque. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+
+## 🟡 speculative (3)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `00b232f0` | `PacketInGamePurchaseStationCashProductsResponse::Ctor ?` | PacketInGamePurchaseStationCashProducts… | Constructs the subtype handled by 00b45660; the meaning of the value 2 and the field at +0x1c is unknown. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23ae0` | `InGamePurchaseMerchantListPacket::InGamePurchaseMerchantListPacket ? ⚠rename` | InGamePurchaseMerchantListPacket | Envelope builder for the merchant list of the marketplace (client-only RTTI, sub-opcode 42); the +0x18 field is probably a count or list head initialised to zero. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b24090` | `PacketInGamePurchaseStoreBundleUpdate::Ctor ?` | PacketInGamePurchaseStoreBundleUpdate<A… | Constructs the subtype selected by inner tag 2 in the family-66/sub-opcode-5 parser at 00b48700. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+
+## ⚪ unknown (6)
+
+| addr | name | class | purpose / does | shard |
+|---|---|---|---|---|
+| `00b23480` | `— ⚠reject` | PacketInGamePurchaseStateCodesResponse | Envelope builder for the state-codes response (catalogue base 66 sub 19); constant 2 is the fixed result/type marker for this reply. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b23980` | `— ⚠reject` | PacketInGamePurchaseGiftNotification | Envelope builder for the incoming gift notification, whose payload holds a gift record with an IString field and an array of gift item entries. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b283e0` | `— ⚠reject` | PacketInGamePurchaseStoreBundles<AppSto… | Constructs the store-bundle list subtype selected by the family-66/sub-opcode-5 parser at 00b48700. | [[Native Map/Shards/S0338 00b21fb0-00b29620|S0338]] |
+| `00b3b6d0` | `— ⚠reject` |  | Routes the in-game-purchase order result to the store UI and its transaction callbacks; client callbacks do not establish server fulfillment rules. | [[Native Map/Shards/S0342 00b39c10-00b3f310|S0342]] |
+| `00b40050` | `— ⚠reject` |  | Applies an InGamePurchase store-bundles family packet onto the client's cached bundle table keyed by bundle id; called from 00b48a10, the InGamePurchase packet dispatch. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+| `00b44d70` | `— ⚠reject` |  | Parses the category-group payload; successful cache mutation is delegated to 00b3ad20, while this body clears the cached nodes only on parse failure. | [[Native Map/Shards/S0343 00b3f370-00b44f00|S0343]] |
+
+## Wire contract (client side) and server hypotheses
+
+| addr | name | dir | packet | opcode | server hypothesis |
+|---|---|---|---|---|---|
+| `00b22f00` | `PacketInGamePurchaseStoreBundleBase::PacketInGamePurchaseStoreBundleBase` | recv | PacketInGamePurchaseStoreBundleBase | 5 |  |
+| `00b22fd0` | `PacketInGamePurchaseStoreBundleCategories::PacketInGamePurchaseStoreBundleCateg…` | recv | PacketInGamePurchaseStoreBundleCategories | 7 |  |
+| `00b233c0` | `PacketInGamePurchaseStateCodesRequest::PacketInGamePurchaseStateCodesRequest` | send | PacketInGamePurchaseStateCodesRequest | 0x12 | Hypothesis: the original service returned state-code data on sub-opcode 19, matching the client parser at 00b46a50. The request/response path does not establish a locale or billing-table server rule. |
+| `00b23550` | `PacketInGamePurchaseEnableMarketplace::PacketInGamePurchaseEnableMarketplace` | recv | PacketInGamePurchaseEnableMarketplace | 0x18 | Hypothesis: the original service sent this marketplace-enable state, which the client handles at 00b3bf30. The conditions for enabling it and any per-character or regional policy are unknown. |
+| `00b23640` | `PacketInGamePurchaseStoreBundleGroups::PacketInGamePurchaseStoreBundleGroups` | recv | PacketInGamePurchaseStoreBundleGroups | 9 |  |
+| `00b237e0` | `PacketInGamePurchaseStoreBundleCategoryGroups::PacketInGamePurchaseStoreBundleC…` | recv | PacketInGamePurchaseStoreBundleCategoryGroups | 6 |  |
+| `00b238b0` | `PacketInGamePurchaseStoreEnablePaymentSources::PacketInGamePurchaseStoreEnableP…` | recv | PacketInGamePurchaseStoreEnablePaymentSources | 0x21 | Hypothesis: the original service supplied payment-source enablement data parsed by 00b3c000. The source-specific rules and backend behavior are unknown. |
+| `00b2f8d0` | `PacketInGamePurchasePlaceOrderResponse::Ctor` | recv | PacketInGamePurchasePlaceOrderResponse | 4 |  |
+| `00b2f980` | `PacketInGamePurchaseWalletInfoResponse::Ctor` | recv | PacketInGamePurchaseWalletInfoResponse | 11 |  |
+| `00b2fa10` | `PacketInGamePurchaseStationCashProductsRequest::Ctor` | send |  | 0xe |  |
+| `00b2faa0` | `PacketInGamePurchaseSubscriptionProductsRequest::Ctor` | send | PacketInGamePurchaseSubscriptionProductsRequest | 0x16 |  |
+| `00b2fb40` | `PacketInGamePurchaseSubscriptionProductsResponse::Ctor` | recv | PacketInGamePurchaseSubscriptionProductsResponse | 0x17 |  |
+| `00b2fbe0` | `PacketInGamePurchaseCurrencyCodesRequest::Ctor` | send | PacketInGamePurchaseCurrencyCodesRequest | 0x10 |  |
+| `00b2fc70` | `PacketInGamePurchaseCurrencyCodesResponse::Ctor` | recv | PacketInGamePurchaseCurrencyCodesResponse | 0x11 |  |
+| `00b2fd10` | `PacketInGamePurchaseCountryCodesRequest::Ctor` | send | PacketInGamePurchaseCountryCodesRequest | 0x14 |  |
+| `00b2fda0` | `PacketInGamePurchaseCountryCodesResponse::Ctor` | recv | PacketInGamePurchaseCountryCodesResponse | 0x15 |  |
+| `00b2fe40` | `PacketInGamePurchaseAccountInfoRequest::Ctor` | send | PacketInGamePurchaseAccountInfoRequest | 0x19 |  |
+| `00b2fed0` | `PacketInGamePurchaseAccountInfoResponse::Ctor` | recv | PacketInGamePurchaseAccountInfoResponse | 0x1a |  |
+| `00b2ff80` | `InGamePurchaseUpdateItemRequirementsReply::Ctor` | recv | InGamePurchaseUpdateItemRequirementsReply | 0x27 |  |
+| `00b3ad20` | `ReadStoreBundleCategoryGroups` | recv | PacketInGamePurchaseStoreBundleCategoryGroups |  |  |
+| `00b3b450` | `HandlePreviewOrderResponse` | recv | PacketInGamePurchasePreviewOrderResponse |  |  |
+| `00b3bde0` | `HandleServerStatusResponse` | recv | PacketBaseInGamePurchase |  |  |
+| `00b3bf30` | `HandleMarketplaceEnabledResponse` | recv | PacketInGamePurchaseEnableMarketplace |  |  |
+| `00b3c000` | `HandleStorePaymentSourcesResponse` | recv | PacketInGamePurchaseStoreEnablePaymentSources |  |  |
+| `00b3c0d0` | `HandleMerchantSellBundleQuantityUpdate` | recv | PacketBaseInGamePurchase |  |  |
+| `00b3d770` | `ReadStoreBundleGroups` | recv | PacketInGamePurchaseStoreBundleGroups |  |  |
+| `00b3d930` | `ReadCounted128ByteRecords` | recv | PacketInGamePurchaseCountryCodesResponse |  |  |
+| `00b3d9c0` | `ReadCounted72ByteRecords` | recv | PacketInGamePurchaseStateCodesResponse |  |  |
+| `00b3e120` | `HandleWalletInfoResponse` | recv | PacketInGamePurchaseWalletInfoResponse |  |  |
+| `00b3e340` | `HandleDisplayMannequinStoreBundles` | recv | PacketBaseInGamePurchase |  |  |
+| `00b3e490` | `HandleItemRequirementsReply` | recv | InGamePurchaseUpdateItemRequirementsReply |  |  |
+| `00b43230` | `PacketInGamePurchaseStoreBundleContentRequest::PacketInGamePurchaseStoreBundleC…` | send | PacketInGamePurchaseStoreBundleContentRequest |  | Hypothesis: the server responds with bundle-content records keyed by the request data; depends on this request class and the catalogue's matching response class, not original server code. |
+| `00b43d10` | `RequestSubscriptionSkuPrices` | send | PacketInGamePurchaseSubscriptionProductsRequest |  | Hypothesis: the purchase service returns the subscription product/price list in the matching response; this depends on the catalogue request/response pair, not original server code. |
+| `00c03920` | `InGamePurchaseUpdateItemRequirementsRequest::Ctor` | send | InGamePurchaseUpdateItemRequirementsRequest |  | Hypothesis: this request uses in-game purchase sub-opcode 0x26; server handling and resulting requirements are outside this client function. |
+| `00c047a0` | `SendInGamePurchaseUpdateItemRequirementsRequest` | send | InGamePurchaseUpdateItemRequirementsRequest |  | Hypothesis: this sends opcode family 66 sub-opcode 38 request; the server reply contract is not inferred from this send wrapper alone. |
+| `00b230a0` | `PacketInGamePurchaseWalletInfoRequest::PacketInGamePurchaseWalletInfoRequest` | send | PacketInGamePurchaseWalletInfoRequest | 10 | Hypothesis: the original marketplace service returned wallet data after this request. This depends on a corresponding response path, whose field layout and server behavior are not established by this constructor. |
+| `00b23160` | `PacketInGamePurchaseServerStatusRequest::PacketInGamePurchaseServerStatusRequest` | send |  | 0xc | Hypothesis: the original service answered family 66/sub-opcode 12 with a status response, consistent with the client receive handler at 00b3bde0 and the client send path at 00b43b40. The response fields and server-side status rule are not established here. |
+| `00b23220` | `PacketInGamePurchaseServerStatusResponse::PacketInGamePurchaseServerStatusRespo…` | recv |  | 0xd | Hypothesis: this is a client-parsed status response paired with the 66/12 request. The client receive handler is 00b3bde0; the meaning of its payload and whether it duplicates or complements sub-opcode 24 remain open. |
+| `00b23710` | `PacketInGamePurchaseDisplayMannequinStoreBundles::Construct` | recv |  | 0x1f | Hypothesis: the original service supplied the payload consumed by receive handler 00b3e340 on sub-opcode 31. The payload fields and any mannequin/display behavior are not established here. |
+| `00b23a10` | `InGamePurchaseUpdateMerchantSellBundleQuantityAvailableForPurchase::Ctor` | recv |  | 0x2d | Hypothesis: the original service sent this sub-opcode-45 update, which the client parses at 00b3c0d0. The constructor stores two words, but their individual meanings are not established here. |
+| `00b24160` | `PacketInGamePurchaseIOTD::Ctor` | recv |  | 0x20 | Hypothesis: the original service supplied the item-of-the-day payload consumed by 00b47690. The two stored words and any rotation policy are not identified here. |
+| `00b24230` | `PacketInGamePurchaseBOTD::Ctor` | recv |  | 0x29 | Hypothesis: the original service supplied the bundle-of-the-day payload consumed by 00b477e0. The fields and any selection or rotation policy remain unknown. |
+| `00b24300` | `PacketInGamePurchaseExclusivePartnerStoreBundles::Ctor` | recv |  | 8 | Hypothesis: the original service supplied the exclusive-partner bundle payload consumed by 00b47f20. The source of partner configuration and server selection rules are not shown. |
+| `00b27e20` | `PacketInGamePurchasePreviewOrderResponse::PacketInGamePurchasePreviewOrderRespo…` | recv | PacketInGamePurchasePreviewOrderResponse | 2 | Hypothesis: this is the client-side object for a response to a preview-order request. This depends on parser 00b3b450 and the community packet catalogue; the four fields? meanings and original server calculation are unknown. |
+| `00b43bc0` | `BuildWalletInfoRequest ⚠downgrade` | send | PacketInGamePurchaseWalletInfoRequest |  | Hypothesis: the service returns wallet balance fields in a matching response; the claim depends on the request/response catalogue pair and the response handler 00b43de0, not original server code. |
+| `00b44e60` | `BuildCurrencyCodesRequest` | send | PacketInGamePurchaseCurrencyCodesRequest |  | Hypothesis: service returns the currency-code table; this depends on the named request/response catalogue entries and startup path, not original server logic. |
+| `00b44f00` | `BuildCountryCodesRequest` | send | PacketInGamePurchaseCountryCodesRequest |  | Hypothesis: service returns a country-code list; this depends on the named request/response catalogue pair and startup path, not original server logic. |
+| `00b232f0` | `PacketInGamePurchaseStationCashProductsResponse::Ctor ?` | recv |  | 0xf | Hypothesis: the original service supplied the payload consumed by handler 00b45660 on family 66/sub-opcode 0xf. This depends on the native dispatcher and handler; this constructor does not establish the payload semantics or original server implementation. |
+| `00b23ae0` | `InGamePurchaseMerchantListPacket::InGamePurchaseMerchantListPacket ? ⚠rename` | recv |  | 0x2a | Hypothesis: the original service supplied a merchant-list payload handled by the family-66 dispatcher at 00b48a10. This does not establish how the server selected or authorized merchants. |
+| `00b24090` | `PacketInGamePurchaseStoreBundleUpdate::Ctor ?` | recv | PacketInGamePurchaseStoreBundleBase |  | Hypothesis: the original service sent a family-66/sub-opcode-5 payload with inner tag 2 for this update subtype. This depends on dispatcher 00b48a10 and parser 00b48700; field semantics and original server behavior remain unknown. |
+| `00b23480` | `— ⚠reject` | recv | PacketInGamePurchaseStateCodesResponse | 0x13 |  |
+| `00b23980` | `— ⚠reject` | recv |  | 0 | Hypothesis: the original service sent a gift-notification payload parsed by 00b41fb0. The client code does not establish when the server sends it or what purchase event triggers it. |
+| `00b283e0` | `— ⚠reject` | recv | PacketInGamePurchaseStoreBundles |  | Hypothesis: the original service sent this list subtype inside family 66/sub-opcode 5 with inner tag 1. This depends on dispatcher 00b48a10 and parser 00b48700; the server implementation is unavailable and payload semantics are only partly reconstructed. |
+| `00b3b6d0` | `— ⚠reject` | recv | PacketInGamePurchasePlaceOrderResponse |  |  |
+| `00b40050` | `— ⚠reject` | recv | PacketInGamePurchaseStoreBundleBase |  | Hypothesis: the server pushed the store bundle table (per-bundle ids and their content entries) to populate or replace the client's cached bundle entries keyed by id; depends on the dispatch entry 00b48a10 and the sibling bundle packets (groups/categories/category groups), none of which are resolved here. |
+| `00b44d70` | `— ⚠reject` | recv | PacketInGamePurchaseStoreBundleCategoryGroups |  | Hypothesis: the service supplies category-group data for the store cache; this depends on this client parser and the catalogue class name, not original server logic. |

@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "enemies": [
+    {
+      "guid": 100000004154,
+      "definition_id": 930050,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1971.408,
+        -34.51335,
+        539.8358
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 30,
+      "aggro_range": 10.0,
+      "quest_ids": [
+        3030007
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Resources/Npcs.json 4154/4155: 'Hooligan', NameId 5100401, models 203 (human_m_hooligan_brawler_01) and 489 (human_m_hooligan_brawler_02)"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 3825361510 'Defeat the Hooligan Delinquents south of Jones to ...'; 3357157076/4203836905: they patrol the area south of the camp"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2820 spawn 4154"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000004155,
+      "definition_id": 930050,
+      "model_id": 489,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1966.171,
+        -35.09792,
+        544.2426
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 30,
+      "aggro_range": 10.0,
+      "quest_ids": [
+        3030007
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Resources/Npcs.json 4154/4155: 'Hooligan', NameId 5100401, models 203 (human_m_hooligan_brawler_01) and 489 (human_m_hooligan_brawler_02)"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 3825361510 'Defeat the Hooligan Delinquents south of Jones to ...'; 3357157076/4203836905: they patrol the area south of the camp"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2821 spawn 4155"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 5064655448674664449,
+      "definition_id": 930050,
+      "model_id": 489,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1975.2,
+        -34.3,
+        548.0
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 30,
+      "aggro_range": 10.0,
+      "quest_ids": [
+        3030007
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Resources/Npcs.json 4154/4155: 'Hooligan', NameId 5100401, models 203 (human_m_hooligan_brawler_01) and 489 (human_m_hooligan_brawler_02)"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 3825361510 'Defeat the Hooligan Delinquents south of Jones to ...'; 3357157076/4203836905: they patrol the area south of the camp"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) extra patrol spot ~9 m from Legacy spawn 4154"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 5064655448674664450,
+      "definition_id": 930050,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1962.0,
+        -35.5,
+        535.0
+      ],
+      "max_health": 220,
+      "damage": 8,
+      "boss": false,
+      "respawn_seconds": 30,
+      "aggro_range": 10.0,
+      "quest_ids": [
+        3030007
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Resources/Npcs.json 4154/4155: 'Hooligan', NameId 5100401, models 203 (human_m_hooligan_brawler_01) and 489 (human_m_hooligan_brawler_02)"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 3825361510 'Defeat the Hooligan Delinquents south of Jones to ...'; 3357157076/4203836905: they patrol the area south of the camp"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) extra patrol spot ~10 m from Legacy spawn 4155"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    }
+  ]
+}

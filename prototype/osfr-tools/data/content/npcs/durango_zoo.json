@@ -1,0 +1,3881 @@
+{
+  "schema_version": 1,
+  "region_page": "Durango Zoo",
+  "region_zone_id": 4,
+  "records": [
+    {
+      "npc_id": 9500000257,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Glenn",
+      "name_reason": null,
+      "name_string_id": null,
+      "name_string_ids": [
+        {
+          "table": "ucdt",
+          "id": 726266677
+        },
+        {
+          "table": "ugdt",
+          "id": 2065140458
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": null,
+      "zone_id": null,
+      "zone_reason": "Page marks this as quest-text-only, weakly placed, or quest-only; no regional spawn is asserted.",
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "mentioned_only",
+      "title_or_role": [
+        "The missing kid. A search target, not a giver."
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "\"Somewhere around the zoo\" (3069490493); \"I hope he didn't wander in to one of the pens...\" (1407110953)."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "None. Objective \"Search for Glenn\" (2401882626)."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -1.65908,
+        0.0,
+        1.519853
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) No regional POI, zone spawn, or area center is available in supplied content/startup data; offset from world-origin default [0, 0, 0] only to keep this NPC placeable. Placement is explicitly unanchored.",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 47; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "../lab/content/startup-snapshot/startup.json has no Durango Zoo POI or matching regional AddNpc identity; zones.json has no zone geometry/spawn, and the reviewed FabledRealmsAreas.xml has no Durango/Zoo area."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reconstructed_unanchored_default records placement method and provenance, not a recovered NPC transform."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9500000258,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Gram Tracker",
+      "name_reason": null,
+      "name_string_id": null,
+      "name_string_ids": [
+        {
+          "table": "ucdt",
+          "id": 2120733092
+        },
+        {
+          "table": "ugdt",
+          "id": 2227378357
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": null,
+      "zone_id": null,
+      "zone_reason": "The guide explicitly leaves the standing place unproven or gives no place.",
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Animal-tour host: \"Gram Tracker wants you to visit various animals within the zoo!\" (530806500)."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "The zoo, by the quest text. No place sentence of his own."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "An animal-visit tour: \"Visit a turtle, a firefly, a bear, an owl, a snake, a spider, a toad, and a bat.\" (357396851, by wording); hand-in \"Return to Gram Tracker.\" (1247308365); a collector's boast \"I pride myself on having quite the collection of exotic animals. Sure, our pack of bears are great, but there's so much more to see.\" (360196999, speaker not named, by wording). Title not found."
+      ],
+      "quests_accepted": [
+        {
+          "quest_id": null,
+          "title": null,
+          "evidence_text": "Return to Gram Tracker.",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        0.232921,
+        0.0,
+        -2.654012
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) No regional POI, zone spawn, or area center is available in supplied content/startup data; offset from world-origin default [0, 0, 0] only to keep this NPC placeable. Placement is explicitly unanchored.",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 32; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "../lab/content/startup-snapshot/startup.json has no Durango Zoo POI or matching regional AddNpc identity; zones.json has no zone geometry/spawn, and the reviewed FabledRealmsAreas.xml has no Durango/Zoo area."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reconstructed_unanchored_default records placement method and provenance, not a recovered NPC transform."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9500000259,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Monno Monogram",
+      "name_reason": null,
+      "name_string_id": null,
+      "name_string_ids": [
+        {
+          "table": "ucdt",
+          "id": 1200518110
+        },
+        {
+          "table": "ugdt",
+          "id": 1727043505
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": null,
+      "zone_id": null,
+      "zone_reason": "The guide explicitly leaves the standing place unproven or gives no place.",
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Bear keeper for \"Gram Grounds\", a park name that may be the zoo (see Conflicts). The two texts that name him spell it \"Mono\"."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Not stated."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "The night-bear hand-in: \"Report to Mono Monogram\" (1332293645); \"Return to Mono Monogram and let him know that all bears have been return to the park\" (584591800). See the night-bears row in the quest table."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        1.814396,
+        0.0,
+        2.366558
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) No regional POI, zone spawn, or area center is available in supplied content/startup data; offset from world-origin default [0, 0, 0] only to keep this NPC placeable. Placement is explicitly unanchored.",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 33; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "../lab/content/startup-snapshot/startup.json has no Durango Zoo POI or matching regional AddNpc identity; zones.json has no zone geometry/spawn, and the reviewed FabledRealmsAreas.xml has no Durango/Zoo area."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reconstructed_unanchored_default records placement method and provenance, not a recovered NPC transform."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9000000156,
+      "id_kind": "reconstructed_from_job_reference",
+      "reference_ids": [
+        9000000156
+      ],
+      "name": "Mr. Miles",
+      "name_reason": null,
+      "name_string_id": 100788,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 100788
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": "Durango Zoo",
+      "zone_id": 4,
+      "zone_reason": null,
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Zoo employee who keeps the dangerous animals from the guests (wiki). Bear wrangler in the client. Also the Archer line's contact: the smuggler investigation sends the player to him."
+      ],
+      "roles": [
+        "quest_giver",
+        "trainer"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "\"Mr. Miles at the Durango Zoo\" (479926652, 709749362, 2193223637, 3175323418); \"Maybe someone at the Durango Zoo to the north knows\" (4190297834)."
+      ],
+      "quests_given": [
+        {
+          "quest_id": 3010023,
+          "title": "Archer: Prevention First (wiki: \"from Mr. Miles\")",
+          "title_string_id": 78404,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3010023 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "title_string_id corrected from raw locale hash 1188062760 to Global.Text id 78404 (content_check text_raw_hash, 2026-10-15)"
+            }
+          ]
+        },
+        {
+          "quest_id": null,
+          "title": "Bears on the Loose!",
+          "title_string_id": null,
+          "relation": "page_lists",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3010023
+      ],
+      "quests_given_text": [
+        "Archer: Animal Investigation (the player goes to him; \"Speak with Mr. Miles at the Durango Zoo\", 479926652); Archer: Prevention First (he asks for food bundles, \"Mr. Miles wants you to gather some food for the animals to eat. Once you turn in the bundles to Mr. Miles, return to Bowman Bilter.\", 572827109); Bears on the Loose! (client title 4241189458; \"Assist Mr. Miles in wrangling up the loose bears.\", 1808830298; thanks \"Thanks a bunch! I'm glad those bears didn't get into any trouble!\", 3394952785, 4223572578). See #Town and area quests."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -517.9431,
+        -0.4583573,
+        610.2614
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.9797778119083265,
+        0.0,
+        0.20008857861490276
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788). NameId resolves in client locale table to 'Mr. Miles'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788). NameId resolves in client locale table to 'Mr. Miles'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) trainer classification follows the unchanged jobs.json trainer_npc_ids reference; the page may not give a trainer title"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) quest id 3010023 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 3: level 10 to 15 (Eddie, Bullseye, Bowman Bilter, Mr. Miles), row 21; name 'Archer: Prevention First (wiki: \"from Mr. Miles\")'; title id cell ucdt 1188062760 / ugdt 2084685443"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) quest id 3010023 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) source explicitly says after row 20; mapped that page label to the preceding batch content key"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 29; source cell: [client][video (chat line)][wiki]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788). Legacy spawn has XYZ only."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788). No competing regional row or spawn candidate."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:64; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1274 (ModelId=784, ModelFileName=human_m_farmhand_02.agr, NameId=100788)."
+          }
+        ]
+      },
+      "heading": -2.738696,
+      "model_id": 784,
+      "model_file_name": "human_m_farmhand_02.agr"
+    },
+    {
+      "npc_id": 9500000260,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Nugglewug",
+      "name_reason": null,
+      "name_string_id": 101638,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 101638
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": null,
+      "zone_id": null,
+      "zone_reason": "Page marks this as quest-text-only, weakly placed, or quest-only; no regional spawn is asserted.",
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "mentioned_only",
+      "title_or_role": [
+        "Field-trip helper who takes the headcount: \"Nugglewug has just done a headcount of the field trip and the group of kids is short by one!\" (1831307263). The speaker says \"I haven't told the teacher yet\" (2061710255), so the teacher is a separate, unnamed person."
+      ],
+      "roles": [
+        "quest_giver",
+        "trainer"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "The zoo, by the quest text (\"Glenn should be somewhere around the zoo.\", 3069490493). Nugglewug has no place sentence."
+      ],
+      "quests_given": [
+        {
+          "quest_id": null,
+          "title": "Glenn's Gone!",
+          "title_string_id": null,
+          "relation": "page_lists",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "Glenn's Gone! (client title 3368872053; ugdt 936988039): \"Help Nugglewug find Glenn!\" (2390453620); \"What am I gonna do!? I just did a count of the kids on the field trip and we're missing one kid, Glenn!\" (2061710255); hand-in \"Return to Nugglewug\" (2126868352)."
+      ],
+      "quests_accepted": [
+        {
+          "quest_id": null,
+          "title": null,
+          "evidence_text": "Return to Nugglewug",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -579.3323,
+        -0.6200509,
+        559.2054
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.9919682525841562,
+        0.0,
+        0.1264870976231788
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638). NameId resolves in client locale table to 'Nugglewug'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638). NameId resolves in client locale table to 'Nugglewug'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 46; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638). Legacy spawn has XYZ only."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638). No competing regional row or spawn candidate."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:68; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1278 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=101638)."
+          }
+        ]
+      },
+      "heading": -2.887939,
+      "model_id": 14,
+      "model_file_name": "chugawug_m_01.adr"
+    },
+    {
+      "npc_id": 9500000261,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Old Gregory",
+      "name_reason": null,
+      "name_string_id": 70768,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 70768
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": "Durango Zoo",
+      "zone_id": 4,
+      "zone_reason": null,
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Old hermit with a camp and a \"magical, talking well\". \"I'm an impatient old man.\""
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "\"His camp just north of Durango Zoo\" (973743465); \"the well just north of Durango Zoo\" (628942850)."
+      ],
+      "quests_given": [
+        {
+          "quest_id": null,
+          "title": "Scoring a Chess Table",
+          "title_string_id": null,
+          "relation": "page_lists",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+            }
+          ]
+        },
+        {
+          "quest_id": null,
+          "title": "Robgoblin Adept Trouble!",
+          "title_string_id": null,
+          "relation": "page_lists",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "The well chain: \"Could you check out that well for me?\" (1530040842); \"Check out the well for Old Gregory. He might not be just hearing things...\" (1077296856). The voice is Lorna, a chess player in the Memorial Caverns, who wants quiet: \"Break the news to Old Gregory that his magical, talking well is nothing more than an angry lady in the Memorial Caverns, and ask him to keep it down.\" (1841258661); his reply \"You mean to tell me my well is alive and well? She plays chess too, you say? Maybe if I had a table in my camp she'd be willing to visit...\" (160616205). Next link: Scoring a Chess Table (client title 1086900492; fetch a table from Fedrick in Shrouded Glade; \"Did you get that chess table from Shrouded Glade yet? I'm an impatient old man.\", 2557626828) and \"Go fetch Lorna\" (3333957292). Separate job: Robgoblin Adept Trouble! (client title 1655477556; \"Robgoblin Adepts have been running around Old Gregory's campsite, waving their fiery wands all over the place...\", 2582277123). Hand-ins \"Return to Old Gregory\" (2880660657, 973743465). Chain titles other than the two named are not found."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [
+        "A chess table, once the player has fetched one (\"Old Gregory's Game Table\", 1181689285, by wording)."
+      ],
+      "services_reason": null,
+      "position": [
+        -398.1445,
+        12.3364,
+        578.3692
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.00905387630035877,
+        0.0,
+        0.9999590128219945
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768). NameId resolves in client locale table to 'Old Gregory'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768). NameId resolves in client locale table to 'Old Gregory'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part B. The camp just north of the zoo, row 40; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768). Legacy spawn has XYZ only."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768). No competing regional row or spawn candidate."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4177 (ModelId=25, ModelFileName=humanelder_m_peacoat.adr, NameId=70768)."
+          }
+        ]
+      },
+      "heading": -0.018108,
+      "model_id": 25,
+      "model_file_name": "humanelder_m_peacoat.adr"
+    },
+    {
+      "npc_id": 9500000262,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Shana Hailglow",
+      "name_reason": null,
+      "name_string_id": 101636,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 101636
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": "Durango Zoo",
+      "zone_id": 4,
+      "zone_reason": null,
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Zoo-side giver of the robgoblin boomer job."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "\"Return to Shana Hailglow at the Durango Zoo\" (3708786085)."
+      ],
+      "quests_given": [
+        {
+          "quest_id": null,
+          "title": "Run off the Robgoblins",
+          "title_string_id": null,
+          "relation": "page_lists",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "Run off the Robgoblins (client title 2406439360; \"Shana wants you to teach the Robgoblin Boomers near the Durango Zoo a lesson!\", 725556903; offer text 1699017891: Boomers \"keep blowing stuff up and scaring the animals\"). Video quest panel: 25 boomers in one recording, 10 in another (see Conflicts)."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -551.7469,
+        2.013304,
+        541.3114
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.829426915702646,
+        0.0,
+        0.5586152446075883
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636). NameId resolves in client locale table to 'Shana Hailglow'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636). NameId resolves in client locale table to 'Shana Hailglow'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636). Legacy spawn has XYZ only."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636). No competing regional row or spawn candidate."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
+          }
+        ]
+      },
+      "heading": -1.956162,
+      "model_id": 548,
+      "model_file_name": "human_f_freestyle_06.agr"
+    },
+    {
+      "npc_id": 9500000263,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Tom Shalsey",
+      "name_reason": null,
+      "name_string_id": 101631,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 101631
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": null,
+      "zone_id": null,
+      "zone_reason": "Page marks this as quest-text-only, weakly placed, or quest-only; no regional spawn is asserted.",
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "mentioned_only",
+      "title_or_role": [
+        "A riddle-giver of the same style as Eppy Eppigram's. Not Tom Hammer of Sunstone Valley."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Not stated. His animals are \"in Durango Zoo\"."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "An animal-guessing errand: \"Figure out what Tom is talking about!\" (1173225179); \"Find the animal that Tom is talking about in Durango Zoo.\" (1929227366); two animals: \"Find the dark feathered animal somewhere in Durango Zoo\" (1374780710; the same errand \"Find the dark feathered animal Tom Shalsey spoke of.\", 2602304895) and \"Find the small fluffy animal with a bushy tail in Durango Zoo\" (2685534297; \"Find the fluffy-tailed animal Tom Shalsey talked about.\", 3055939093); hand-in \"Return to Tom Shalsey\" (2727584095). Title not found."
+      ],
+      "quests_accepted": [
+        {
+          "quest_id": null,
+          "title": null,
+          "evidence_text": "Return to Tom Shalsey",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": null,
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -560.0451,
+        -1.810404,
+        644.9109
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.9518308198692926,
+        0.0,
+        0.306623695018748
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631). NameId resolves in client locale table to 'Tom Shalsey'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631). NameId resolves in client locale table to 'Tom Shalsey'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part C. Quest-only characters, row 48; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631). Legacy spawn has XYZ only."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631). No competing regional row or spawn candidate."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2747; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4081 (ModelId=502, ModelFileName=human_m_freestyle_10.agr, NameId=101631)."
+          }
+        ]
+      },
+      "heading": -2.518305,
+      "model_id": 502,
+      "model_file_name": "human_m_freestyle_10.agr"
+    },
+    {
+      "npc_id": 9500000264,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Zanna Sugarzing",
+      "name_reason": null,
+      "name_string_id": 101639,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 101639
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": "Durango Zoo",
+      "zone_id": 4,
+      "zone_reason": null,
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "\"Runs the candy cart in Durango Zoo\" (2808924263)."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "The zoo, by her candy cart. [video: nameplate on 7 frames of one recording, with the client names Tania Timberclaw and Pipagug, but no zone label, banner or prompt, so this does not place her: piWfe7lXZ9I/00000, /00003, /00009, /00015, /00018, /00024, /00033]"
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "The wrapper clean-up quest: \"Help Zanna Sugarzing clean up the candy wrappers around Durango Zoo!\" (2376338173); \"Help Zanna collect all the litter that's been dropped around the Zoo.\" (3509372953); objectives \"Speak to Zanna Sugarzing\" (1396257395), \"Bring the trash you've collected back to Zanna.\" (1138310231), \"Return to Zanna\" (3829174861). Quest title not matched (see quest table). Her reward line, by wording only: \"I'm going to give you one of my most special treats, just make sure you don't leave it lying around the zoo!\" (1761703098)."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [
+        "Candy. The \"Wrapper Round-Up\" minigame starts at a bucket (3915331686)."
+      ],
+      "services_reason": null,
+      "position": [
+        -582.3358,
+        0.4625247,
+        513.2714
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.981929592025582,
+        0.0,
+        0.18924660183071704
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639).",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639). NameId resolves in client locale table to 'Zanna Sugarzing'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639). NameId resolves in client locale table to 'Zanna Sugarzing'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          },
+          {
+            "kind": "video",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 30; source cell: [client][video (name only)]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639). Legacy spawn has XYZ only."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639). No competing regional row or spawn candidate."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:81; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1295 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=101639)."
+          }
+        ]
+      },
+      "heading": 2.760803,
+      "model_id": 573,
+      "model_file_name": "fairy_f_freestyle_11.agr"
+    },
+    {
+      "npc_id": 9500000265,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Zoo Keeper",
+      "name_reason": null,
+      "name_string_id": null,
+      "name_string_ids": [
+        {
+          "table": "ucdt",
+          "id": 1361116812
+        },
+        {
+          "table": "ucdt",
+          "id": 1569939060
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": "Durango Zoo",
+      "zone_id": 4,
+      "zone_reason": null,
+      "region_pages": [
+        "Durango Zoo"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Generic ambient name, one of several such entries (compare \"Tourist\"). Not an individual."
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        -3.928469,
+        0.0,
+        1.621615
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) No regional POI, zone spawn, or area center is available in supplied content/startup data; offset from world-origin default [0, 0, 0] only to keep this NPC placeable. Placement is explicitly unanchored.",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 34; source cell: [client name]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "client",
+            "evidence": "../lab/content/startup-snapshot/startup.json has no Durango Zoo POI or matching regional AddNpc identity; zones.json has no zone geometry/spawn, and the reviewed FabledRealmsAreas.xml has no Durango/Zoo area."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reconstructed_unanchored_default records placement method and provenance, not a recovered NPC transform."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ]
+      }
+    }
+  ]
+}

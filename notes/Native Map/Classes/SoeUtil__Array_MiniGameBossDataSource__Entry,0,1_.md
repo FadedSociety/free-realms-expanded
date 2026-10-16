@@ -1,0 +1,13 @@
+# Class: SoeUtil::Array<MiniGameBossDataSource::Entry,0,1>
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00c48240` | `— ⚠reject` | ⚪ | virtual | Array resize/grow policy for the boss entry array: for a requested count it either keeps the current capacity (when growth is not needed or the force flag matches), grows by 1.25x, shrinks by 1.2x or, when the request i… |
+| `00c482e0` | `Array_BossEntry_Free` | 🟢 | virtual | Virtual slot 2 of the boss entry array: frees the storage pointer through FreeMemory FUN_00401c00 with 4-byte alignment (18-byte body: mov/push/push/call/add esp/ret 8). |
+| `00c48300` | `SoeUtilArrayEntry_Swap ⚠downgrade` | 🟢 | virtual | Virtual slot 3 of the Entry array. With a zero third argument it swaps the three dwords at this+4/+8/+0xc (element buffer, element count, capacity) with the same fields of the second array and returns with ret 8; when t… |
+| `00c48470` | `SoeUtilArrayEntry_DestroyTail` | 🟢 | method | Destroys the last param_2 elements of the array: computes the new count as *(this+8) - param_2, calls the Entry destructor 00c48370 for each element from the new count up to the old count-1, then stores the new count at… |
+| `00c48550` | `— ⚠reject` | ⚪ | method | Grows the array's element buffer: calls the container's virtual allocator (slot 1) with the requested element count to obtain a buffer, and when the returned pointer differs from the current buffer at +4 it relocates ev… |
+| `00c48730` | `SoeUtilArrayEntry_Destruct` | ✅ | dtor | Array destructor body: installs the array vtable, destroys all elements (element count from +8 passed to 00c48470) and releases the element buffer at +4 with the aligned FreeMemory helper 00401c00 before clearing the po… |
+| `00c48760` | `SoeUtilArrayEntry_EraseRange` | 🟢 | method | Erases param_3 elements starting at index param_2 from the 0x20-byte-element array: for each surviving element it destroys the slot at param_2+i with 00c48370 and copy-constructs (00c484c0) the element at param_2+param_… |
+| `00c48810` | `SoeUtilArrayEntry_ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (vtable slot 0) of the Entry array: installs the array vtable, destroys all elements through 00c48470 using the count at +8, releases the element buffer with FreeMemory 00401c00, clears the bu… |
+| `00c48a00` | `SoeUtilArrayEntry_PushBackDefault` | 🟢 | method | Appends one default-constructed element: when count (+8) plus one exceeds capacity (+0xc) it grows the buffer through 00c48550, increments the stored count, and constructs the new element in place with the Entry constru… |

@@ -1,0 +1,13 @@
+# Class: PlayerSpawnProjectileEvent
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00b84910` | `PlayerSpawnProjectileEvent::Ctor` | ✅ | ctor | Thiscall constructor taking param_2 and two further stack arguments. Calls FUN_008b8160, stores ActorHandler::vftable at +0x50, then PlayerSpawnProjectileEvent::vftable at +0x00 and at +0x50. Stores param_2 at +0x54 and… |
+| `00b84a20` | `PlayerSpawnProjectileEvent::ReleaseOwnerIfCheckZero ?` | 🟡 | virtual | Virtual slot [1] of the secondary PlayerSpawnProjectileEvent vtable (01823a54). Adjusts this by -0x50 into ESI, calls FUN_00ae2470 with ECX = that object, and when the result is 0 and the adjusted pointer is non-null ca… |
+| `00b84a50` | `PlayerSpawnProjectileEvent::ScalarDeleteThunkAdj50 ?` | 🟡 | virtual | Virtual slot [2] of the secondary PlayerSpawnProjectileEvent vtable (01823a54). Adjusts this by -0x50, and when the adjusted pointer is non-null tail-jumps through its vtable slot +0x0c with argument 1 (ret 4). |
+| `00b84a70` | `PlayerSpawnProjectileEvent::DeleteSelfViaSlot3 ?` | 🟡 | virtual | Virtual slot [10] of the primary PlayerSpawnProjectileEvent vtable (01823a90). When this is non-null it tail-jumps through its own vtable slot +0x0c with argument 1, which is the scalar deleting destructor 00b84cc0. Oth… |
+| `00b84a90` | `PlayerSpawnProjectileEvent::ScalarDeletingDtorThunk ?` | 🟡 | dtor | Thunk, 8 bytes. SUB ECX, 0x50 then JMP 00b84cc0. It adjusts this from the secondary subobject to the primary and passes the scalar deleting argument through unchanged. |
+| `00b84aa0` | `PlayerSpawnProjectileEvent::ResolveAndReleaseHandle ?` | 🟡 | virtual | Virtual slot [1] of the primary PlayerSpawnProjectileEvent vtable (01823a90). Calls FUN_00ae2470 and, when it returns non-zero and flag bit 0 of the argument is set, resolves the handle at +0x130 through the owner's (+0… |
+| `00b84bf0` | `— ⚠reject` | ⚪ | dtor | Non-deleting destructor body. Stores PlayerSpawnProjectileEvent::vftable in the primary and secondary vtable slots. When the handle at +0x130 is non-zero it calls the owner's (+0x54) vtable +0x10 and then vtable +0x08 o… |
+| `00b84cc0` | `PlayerSpawnProjectileEvent::ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor. Calls the dtor body 00b84bf0 on ECX (this), then calls _free on this when bit 0 of the flag argument is set, and returns this. |
+| `00b84ce0` | `PlayerSpawnProjectileEvent::BuildRequestAndDispatch ?` | 🟡 | virtual | Virtual slot [3] of the secondary PlayerSpawnProjectileEvent vtable (01823a54). Calls FUN_00ae2470 and, when it returns non-zero, calls its vtable +0x24. It then copies a 16-dword template from DAT_01bc2660 into a local… |

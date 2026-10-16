@@ -1,0 +1,11 @@
+# Class: GameCommerce::StoreBundleGroupDefinition
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00b25c80` | `StoreBundleGroupDefinition::ScalarDeletingDtor` | 🟢 | dtor | Scalar deleting destructor: calls FUN_00d58cf0 with this in ECX (that body writes GameCommerce::StoreBundleGroupDefinition::vftable and tears down its HashListMap member), then frees this via _free when the flags low bi… |
+| `00d58770` | `GameCommerce::StoreBundleGroupDefinition::FormatGroupRecord` | ✅ | virtual | Builds a comma-separated list of entry texts through the entry list at this+0x44 (each via vtable slot 1 of the entry, formatted with '(%s), ' and trimmed of its final separator), then formats the group's ids at +4, +8,… |
+| `00d58af0` | `GameCommerce::StoreBundleGroupDefinition::Ctor ⚠downgrade` | 🟢 | ctor | Installs the StoreBundleGroupDefinition vtable, stores the argument at +4, clears the dwords at +8, +0xc and +0x10, runs the base initialiser FUN_00d672e0, clears the byte at +0x38, installs the HashListMap vtable at +0… |
+| `00d58be0` | `GameCommerce::StoreBundleGroupDefinition::CtorSentinel` | ✅ | ctor | Installs the StoreBundleGroupDefinition vtable, stores the global sentinel DAT_01bf2ccc at +4, clears the dwords at +8, +0xc and +0x10, runs FUN_00d672e0, clears the byte at +0x38, installs the HashListMap vtable at +0x… |
+| `00d58cf0` | `GameCommerce::StoreBundleGroupDefinition::Dtor` | ✅ | dtor | Sets the StoreBundleGroupDefinition vtable, installs the HashListMap vtable at +0x3c, removes every list node at +0x44 with FUN_00b290e0 until empty, runs the base teardown FUN_00d67250, and finally sets the BaseDefinit… |
+| `00d58d70` | `GameCommerce::StoreBundleGroupDefinition::ScalarDeletingDtorAlign0` | ✅ | dtor | Bytes 56 8b f1 e8 78 ff ff ff f6 44 24 08 01 74 0b 6a 00 56 e8 79 8e 6a ff 83 c4 08 8b c6 5e c2 04 00: calls the group body destructor 00d58cf0 on this, then calls FreeMemory(this, 0) when bit 0 of the flags argument is… |
+| `00d58d90` | `GameCommerce::StoreBundleGroupDefinition::CopyCtor` | ✅ | ctor | Installs the StoreBundleGroupDefinition vtable, clears +4, runs the base initialiser FUN_00d672e0, installs the HashListMap vtable at +0x3c, clears the list fields, then copies the source object (param_2) into this thro… |

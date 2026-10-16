@@ -1,0 +1,15 @@
+# Native Farm travel and Pappy turn-in
+
+Independent offline audit of ended run `client-baseline-20261008T090058Z`. The native client successfully travels from Darkthorne to Farnum Farmstead, turns in The Last Best Hope to Pappy, reaches Brawler level2 and accepts Saving Farnum's Farm. **The new Farm objectives remain incomplete.**
+
+All3,195 captured datagrams match their saved SHA256/lengths. The established decoder verifies3,174 gateway CRCs using negotiated length3 and fully reassembles all reliable messages. All153,719 bytes of the initial self payload match the supplied compiled `Gateway.dll` serializer, including the active quest, objective counters and preserved10/30 journal limits. The next quest's full49/3 record also independently matches the original compiled writer.
+
+Darkthorne's actual radial Interact/selection1 produces one normal opcode31 transition to zone0/FabledRealms. Destination `[-2181.512939,-31.537279,328.111206]` equals the pinned community Pappy spawn plus3X; the native log confirms World Ready there. This is a reconstructed nearby arrival point. Original locale4420033/4420043/5100071 proves the story's Magic Door/teleport destination, not the exact original coordinate. See [[Research/Original Cave Exit to Farnum]].
+
+The first reward after loading is discovery2: coins70→75 and Brawler XP50→75. Pappy's first actual Interact completes and turns in quest910002; coins75→100, XP75→100, native38/18 announces level2,49/4 removes910002 and49/12 sets completed count2. The second Pappy Interact emits49/3 for910003 with all four objectives at0. These wire replies agree with the final saved state. Items, equipment, encounter state/reward flag411, identity and every other opening stage remain unchanged. No second cave reward was granted.
+
+The independent screenshot review confirms Pappy rendered, the native Interact menu, Quest Complete and Brawler Level Up2. The named Farm-arrival screenshot itself shows the original News overlay; it does not establish unobstructed terrain. The later Pappy views and World Ready log establish the accepted arrival. Reserved local quest IDs,5/25 coin grants and the100-XP rank curve remain reconstruction; original localized story text is recovered.
+
+The attempted next Farm walk encountered obstacles. Housing-well and seasonal-fire models failed dependencies (`hsg_well_01` mesh/textures and `evnt_world_party_luau_campfire_01.dma`); Gloam-obelisk assets also failed. Well/fire visuals and those objectives are explicitly **not accepted**. The snapshot ends with910003 accepted and `[0,0,0,0]`; the whole opening playthrough is still pending.
+
+Private reproducible helper: `lab/reports/verify-native-farm-travel.py`. Evidence: `lab/runs/client-baseline-20261008T090058Z/analysis/native-farm-travel-proof.json`, whole-self compiled oracle and hashed screenshots. Ending campaign SHA256 `9ebc09e654ba8591bc1c02b456e4255e8b1cd73416079348cf9929b73d2ccea3`. This audit changed no game/save/identity and sent no native input.

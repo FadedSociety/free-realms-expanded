@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Local enemy behaviour: the melee values are this build's original constants; the skittish cycle is the owner's 2026-10-15 design for the Troll Summoner (Research/Owner Field Notes); no original server AI parameters are recovered."
+    }
+  ],
+  "presets": {
+    "melee": {
+      "mode": "melee",
+      "move_speed": 3.0,
+      "reach": 2.5,
+      "attack_ms": 1000,
+      "chase_limit": 40.0,
+      "note": "(R) Chase and swing; the build's original enemy constants. The default for enemies without a behaviour."
+    },
+    "skittish": {
+      "mode": "skittish",
+      "move_speed": 3.0,
+      "reach": 2.5,
+      "attack_ms": 1000,
+      "chase_limit": 40.0,
+      "run_ms": 4000,
+      "rest_ms": 3000,
+      "run_speed": 3.5,
+      "leash": 12.0,
+      "run_from": 10.0,
+      "rest_animation": 1401,
+      "note": "(R) Troll Summoner, the owner's design 2026-10-15: fights beside its summoned minions; alone it runs 4 s (slower than a running player), rests 3 s playing com_stunned (the window to hit it), then runs again, within 12 m of its spawn."
+    },
+    "stationary": {
+      "mode": "stationary",
+      "reach": 2.5,
+      "attack_ms": 1000,
+      "note": "(R) Never moves; swings at players within reach. For turrets, totems and guards that hold a doorway."
+    }
+  }
+}

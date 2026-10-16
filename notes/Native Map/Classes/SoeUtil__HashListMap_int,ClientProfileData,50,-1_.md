@@ -1,0 +1,17 @@
+# Class: SoeUtil::HashListMap<int,ClientProfileData,50,-1>
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00a39c70` | `HashListMap_ClientProfileData50_Construct` | ✅ | ctor | Constructs the 50-bucket HashListMap: stores its vtable at +0, zeros bookkeeping fields +4 through +0x10, clears 200 bytes of bucket heads beginning at +0x14, and returns this. |
+| `00a39d10` | `HashListMap_ClientProfileData50_UnlinkBucket` | 🟢 | method | Unlinks a hash node from its bucket chain: computes the bucket index node->key field (+0x50) modulo 50, takes the bucket head at map+0x14+index*4, walks the chain through the +0x54 links and splices the node out by rewr… |
+| `00a39e10` | `HashListMap_ClientProfileData50_AllocNode` | 🟢 | virtual | Vtable slot-1 node allocator: calls FUN_006fb9c0 then FUN_006fb860, and when a memory manager is returned calls its virtual slot 1 (allocation) with the node size 0x58 and alignment 4 taken from the stack pushes; falls … |
+| `00a39e50` | `HashListMap_ClientProfileData50_FreeNode` | 🟢 | virtual | One-argument deallocator: calls FUN_00401c00(ptr,4) (the memory-manager free route) and returns; no other field is touched. |
+| `00a3a070` | `HashListMap_ClientProfileData50_NodeConstruct` | 🟢 | ctor | Node constructor: zeroes eleven dword fields at +0x00..+0x2c and the two flag bytes at +0x24/+0x25, then selects this+0x30 in ECX and calls FUN_008f15b0, the constructor-side helper of the container embedded at +0x30; r… |
+| `00a3a140` | `— ⚠reject` | ⚪ | ctor | Builds a new map node in ECX (calls 00a3a070 to construct it) and then copies the key: it loads the dword pointed to by the second argument and stores it into the node field +0x50; returns ECX. |
+| `00a3a200` | `— ⚠reject` | ⚪ | method | Insert: allocates a node through the map vtable slot +4 (the 0x58-byte allocator), builds the keyed node with 00a3a140 (key copied to +0x50), links the node into the ordered list (prev=+0x4c, next=+0x48, head at +8, tai… |
+| `00a3a4b0` | `HashListMap_ClientProfileData50_Erase` | 🟢 | method | Erase node (this=map, arg=node): unlinks the node from its bucket chain through 00a39d10, splices it out of the ordered list using the +0x4c predecessor and +0x48 successor (fixing head +8 / tail +0xc), decrements the c… |
+| `00a3a560` | `HashListMap_ClientProfileData50_RemoveAll` | 🟢 | method | Loops on the head pointer at map+8 and calls the erase routine 00a3a4b0 for every node until the head is null, i.e. removes all entries of the ClientProfileData map. |
+| `00a3a580` | `HashListMap_ClientProfileData50_LoadFromReader` | 🟢 | method | Drains the map from head +8, reads a 32-bit row count, then for each row checks the reader error flag, reads a key, inserts a node through 00a3a200, and parses its record through 00a3a2b0. If a key or record read sets t… |
+| `00a3a620` | `HashListMap_ClientProfileData50_Destruct` | ✅ | dtor | Destructor body: installs SoeUtil::HashListMap<int,ClientProfileData,50,-1>::vftable at +0 and then loops erasing every node reachable from the head at +8 through 00a3a4b0 until the head is null. |
+| `00a3a650` | `HashListMap_ClientProfileData50_ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor: installs the map vtable, drains all nodes through 00a3a4b0, and calls _free(this) when bit 0 of the flag argument is set; returns this otherwise. |
+| `00a3a6a0` | `HashListMap_ClientProfileData50_Destruct_B` | ✅ | dtor | Standalone destructor body with an SEH frame: installs the map vtable and drains the node list at +8 through 00a3a4b0, without freeing the object. |

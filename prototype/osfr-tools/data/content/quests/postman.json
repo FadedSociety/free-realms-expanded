@@ -1,0 +1,1669 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3130001,
+      "title_string_id": 412445,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E1; name 'Become a Postman'; title id cell 2603863993 ucdt; 1520984500 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E1; name 'Become a Postman'; title id cell 2603863993 ucdt; 1520984500 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 412446
+    },
+    {
+      "id": 3130002,
+      "title_string_id": null,
+      "giver_npc_id": 9000000546,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E2; name \"It's all in the Training\"; title id cell 582052115 ucdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E2; name \"It's all in the Training\"; title id cell 582052115 ucdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3130003,
+      "title_string_id": 93381,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [
+        3130001
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E3; name 'Can You Deliver?'; title id cell 1000315976 ugdt only"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E3; name 'Can You Deliver?'; title id cell 1000315976 ugdt only"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "(client) title string ID 1000315976 is explicitly marked ugdt only in the guide; stored as the available title string ID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 93382
+    },
+    {
+      "id": 3130004,
+      "title_string_id": 103917,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 1; name 'Postman: Mail Marksman'; title id cell 1746345795 ucdt; 2928782471 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 1; name 'Postman: Mail Marksman'; title id cell 1746345795 ucdt; 2928782471 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 1; name 'Postman: Mail Marksman'; title id cell 1746345795 ucdt; 2928782471 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 103918,
+      "intro_text_string_id": 103916,
+      "end_text_string_id": 103919
+    },
+    {
+      "id": 3130005,
+      "title_string_id": 104217,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 2; name 'Postman: Beware of Ankle Biters'; title id cell 2487815912 ucdt; 2676885009 ugdt; 2484916384 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 2; name 'Postman: Beware of Ankle Biters'; title id cell 2487815912 ucdt; 2676885009 ugdt; 2484916384 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104218,
+      "intro_text_string_id": 104216,
+      "end_text_string_id": 104219
+    },
+    {
+      "id": 3130006,
+      "title_string_id": 104359,
+      "giver_npc_id": 9000000091,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 3; name \"Postman: It's a Postal Disaster!\"; title id cell 3566157155 ucdt; 2938736136 ugdt; 2945409385 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 3; name \"Postman: It's a Postal Disaster!\"; title id cell 3566157155 ucdt; 2938736136 ugdt; 2945409385 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 104360,
+      "intro_text_string_id": 104358,
+      "end_text_string_id": 104361
+    },
+    {
+      "id": 3130007,
+      "title_string_id": 141809,
+      "giver_npc_id": 9000000091,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 4; name 'Postman: Sort of a Mess'; title id cell 3397871796 ucdt; 67506840 ugdt; 23357702 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 4; name 'Postman: Sort of a Mess'; title id cell 3397871796 ucdt; 67506840 ugdt; 23357702 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141810,
+      "intro_text_string_id": 141808,
+      "end_text_string_id": 141811
+    },
+    {
+      "id": 3130008,
+      "title_string_id": 115007,
+      "giver_npc_id": 9000000091,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 5; name 'Postman: Running the Route'; title id cell 707853610 ucdt; 1116946935 ugdt; 1413511730 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 5; name 'Postman: Running the Route'; title id cell 707853610 ucdt; 1116946935 ugdt; 1413511730 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 115008,
+      "intro_text_string_id": 115006,
+      "end_text_string_id": 115009
+    },
+    {
+      "id": 3130009,
+      "title_string_id": 115047,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 6; name 'Postman: Special Delivery'; title id cell 1620057561 ucdt; 3636619373 ugdt; 4181280013 and 3792119847 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 6; name 'Postman: Special Delivery'; title id cell 1620057561 ucdt; 3636619373 ugdt; 4181280013 and 3792119847 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 115048,
+      "intro_text_string_id": 115046,
+      "end_text_string_id": 115049
+    },
+    {
+      "id": 3130010,
+      "title_string_id": 387931,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 7; name 'Postman: Achieve Level 5'; title id cell 2527511555 ucdt; 3451504990 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 7; name 'Postman: Achieve Level 5'; title id cell 2527511555 ucdt; 3451504990 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387932,
+      "intro_text_string_id": 387930,
+      "end_text_string_id": 387933
+    },
+    {
+      "id": 3130011,
+      "title_string_id": 115427,
+      "giver_npc_id": 9000000086,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000107,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 115428 'Meet up with Honey in the Queensfield south of Sanctuary.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 8; name 'Postman: Bixie Buds'; title id cell 4007062377 ucdt; 3195767047 ugdt; 2925384772 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 8; name 'Postman: Bixie Buds'; title id cell 4007062377 ucdt; 3195767047 ugdt; 2925384772 unprefixed"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 1 - Sanctuary (Felipe and Flitter), levels 1 to 5, row 8; name 'Postman: Bixie Buds'; title id cell 4007062377 ucdt; 3195767047 ugdt; 2925384772 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 115428,
+      "intro_text_string_id": 115426,
+      "end_text_string_id": 115429
+    },
+    {
+      "id": 3130012,
+      "title_string_id": 117036,
+      "giver_npc_id": 9000000174,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 9; name 'Postman: Missing Mail'; title id cell 3517459343 ucdt; 1000738624 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 9; name 'Postman: Missing Mail'; title id cell 3517459343 ucdt; 1000738624 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 9; name 'Postman: Missing Mail'; title id cell 3517459343 ucdt; 1000738624 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 117037,
+      "intro_text_string_id": 117035,
+      "end_text_string_id": 117038
+    },
+    {
+      "id": 3130013,
+      "title_string_id": 117075,
+      "giver_npc_id": 9000000174,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 10; name 'Postman: Mail Mix-Up'; title id cell 2377222129 ucdt; 2732229000 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 10; name 'Postman: Mail Mix-Up'; title id cell 2377222129 ucdt; 2732229000 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 117076,
+      "intro_text_string_id": 117074,
+      "end_text_string_id": 117077
+    },
+    {
+      "id": 3130014,
+      "title_string_id": 117169,
+      "giver_npc_id": 9000000174,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 11; name 'Postman: And the Winner Is'; title id cell 3244167433 ucdt; 895239276 ugdt; 1850510957 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 11; name 'Postman: And the Winner Is'; title id cell 3244167433 ucdt; 895239276 ugdt; 1850510957 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 117170,
+      "intro_text_string_id": 117168,
+      "end_text_string_id": 117171
+    },
+    {
+      "id": 3130015,
+      "title_string_id": 117017,
+      "giver_npc_id": 9000000545,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 2 - Merry Vale (Postmaster Vixie), levels 5 to 10, row 12; name 'Postman: Beautiful Bouquet'; title id cell 2090136608 ucdt; 3755395032 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 117018,
+      "intro_text_string_id": 117016,
+      "end_text_string_id": 117019
+    },
+    {
+      "id": 3130016,
+      "title_string_id": 117306,
+      "giver_npc_id": 9000000079,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 13; name \"Postman: It's a Breeze!\"; title id cell 1993371873 ucdt; 778171888 ugdt; 4148515973 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 13; name \"Postman: It's a Breeze!\"; title id cell 1993371873 ucdt; 778171888 ugdt; 4148515973 unprefixed"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 13; name \"Postman: It's a Breeze!\"; title id cell 1993371873 ucdt; 778171888 ugdt; 4148515973 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 117307,
+      "intro_text_string_id": 117305,
+      "end_text_string_id": 117308
+    },
+    {
+      "id": 3130017,
+      "title_string_id": 387935,
+      "giver_npc_id": 9000000080,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 14; name 'Postman: Achieve Level 10'; title id cell 3313962189 ucdt; 1574385046 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 14; name 'Postman: Achieve Level 10'; title id cell 3313962189 ucdt; 1574385046 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 14; name 'Postman: Achieve Level 10'; title id cell 3313962189 ucdt; 1574385046 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387936,
+      "intro_text_string_id": 387934,
+      "end_text_string_id": 387937
+    },
+    {
+      "id": 3130018,
+      "title_string_id": 130182,
+      "giver_npc_id": 9000000079,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 15; name 'Postman: Invitation Only'; title id cell 2484879015 ucdt; 3429675711 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130183,
+      "intro_text_string_id": 130181,
+      "end_text_string_id": 130184
+    },
+    {
+      "id": 3130019,
+      "title_string_id": 130193,
+      "giver_npc_id": 9000000079,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), levels 10 to 15, row 16; name \"Postman: Where's the Sasparilla?\"; title id cell 1960073937 ucdt; 2073355985 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130194,
+      "intro_text_string_id": 130192,
+      "end_text_string_id": 130195
+    },
+    {
+      "id": 3130020,
+      "title_string_id": 130203,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 17; name 'Postman: Jug Clean Up'; title id cell 1530013060 ucdt; 2730130471 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 17; name 'Postman: Jug Clean Up'; title id cell 1530013060 ucdt; 2730130471 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130204,
+      "intro_text_string_id": 130202,
+      "end_text_string_id": 130205
+    },
+    {
+      "id": 3130021,
+      "title_string_id": 130220,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 18; name 'Postman: Sorting It Out'; title id cell 3333907631 ucdt; 3775941237 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 18; name 'Postman: Sorting It Out'; title id cell 3333907631 ucdt; 3775941237 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130221,
+      "intro_text_string_id": 130219,
+      "end_text_string_id": 130222
+    },
+    {
+      "id": 3130022,
+      "title_string_id": 387939,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 19; name 'Postman: Achieve Level 15'; title id cell 1764302563 ucdt; 1196702632 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 19; name 'Postman: Achieve Level 15'; title id cell 1764302563 ucdt; 1196702632 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387940,
+      "intro_text_string_id": 387938,
+      "end_text_string_id": 387941
+    },
+    {
+      "id": 3130023,
+      "title_string_id": 130232,
+      "giver_npc_id": 9000000172,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 20; name 'Postman: Fair Warning'; title id cell 1217191977 ucdt; 2070383436 ugdt"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 4 - Wugachug (Postchug Runalug), levels 15 to 20 start, row 20; name 'Postman: Fair Warning'; title id cell 1217191977 ucdt; 2070383436 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130233,
+      "intro_text_string_id": 130231,
+      "end_text_string_id": 130234
+    },
+    {
+      "id": 3130024,
+      "title_string_id": 130264,
+      "giver_npc_id": 9000000132,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 21; name 'Postman: What a Mess!'; title id cell 3478129041 ucdt; 2704648522 ugdt; 932067148 ugdt unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 21; name 'Postman: What a Mess!'; title id cell 3478129041 ucdt; 2704648522 ugdt; 932067148 ugdt unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130265,
+      "intro_text_string_id": 130263,
+      "end_text_string_id": 130266
+    },
+    {
+      "id": 3130025,
+      "title_string_id": 130282,
+      "giver_npc_id": 9000000132,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 22; name 'Postman: A Plea for Help'; title id cell 2116872441 ucdt; 3946184372 ugdt; 1869981972 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 22; name 'Postman: A Plea for Help'; title id cell 2116872441 ucdt; 3946184372 ugdt; 1869981972 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130283,
+      "intro_text_string_id": 130281,
+      "end_text_string_id": 130284
+    },
+    {
+      "id": 3130026,
+      "title_string_id": 130295,
+      "giver_npc_id": 9000000132,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 23; name 'Postman: Biting Back'; title id cell 863377687 ucdt; 963033735 ugdt; 1236923372 ugdt \"Biting Back\"; 1170074676 ugdt \"NOT LIVE - Biting Back\""
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 23; name 'Postman: Biting Back'; title id cell 863377687 ucdt; 963033735 ugdt; 1236923372 ugdt \"Biting Back\"; 1170074676 ugdt \"NOT LIVE - Biting Back\""
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130296,
+      "intro_text_string_id": 130294,
+      "end_text_string_id": 130297
+    },
+    {
+      "id": 3130027,
+      "title_string_id": 130305,
+      "giver_npc_id": 9000000132,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 24; name 'Postman: Summit in Shrouded Glade'; title id cell 223924213 ucdt; 1696141100 ugdt; 2245452192 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 5 - Snowhill (Loryn), row 24; name 'Postman: Summit in Shrouded Glade'; title id cell 223924213 ucdt; 1696141100 ugdt; 2245452192 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130306,
+      "intro_text_string_id": 130304,
+      "end_text_string_id": 130307
+    },
+    {
+      "id": 3130028,
+      "title_string_id": 130314,
+      "giver_npc_id": 9000000031,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 25; name 'Postman: Beware of Dogs'; title id cell 1877263579 ucdt; 3009477729 ugdt; 1361925829 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 25; name 'Postman: Beware of Dogs'; title id cell 1877263579 ucdt; 3009477729 ugdt; 1361925829 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130315,
+      "intro_text_string_id": 130313,
+      "end_text_string_id": 130316
+    },
+    {
+      "id": 3130029,
+      "title_string_id": 130370,
+      "giver_npc_id": 9000000031,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 26; name 'Postman: Mile High Mail'; title id cell 40723138 ucdt; 3454218622 ugdt; 1607254360 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 26; name 'Postman: Mile High Mail'; title id cell 40723138 ucdt; 3454218622 ugdt; 1607254360 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130371,
+      "intro_text_string_id": 130369,
+      "end_text_string_id": 130372
+    },
+    {
+      "id": 3130030,
+      "title_string_id": 130397,
+      "giver_npc_id": 9000000031,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 27; name 'Postman: Always On Time'; title id cell 904347409 ucdt; 388147795 ugdt; 1304286103 and 2555968749 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 27; name 'Postman: Always On Time'; title id cell 904347409 ucdt; 388147795 ugdt; 1304286103 and 2555968749 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130398,
+      "intro_text_string_id": 130396,
+      "end_text_string_id": 130399
+    },
+    {
+      "id": 3130031,
+      "title_string_id": 387943,
+      "giver_npc_id": 9000000031,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 28; name 'Postman: Achieve Level 20'; title id cell 3120807656 ucdt; 1389112411 ugdt"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387944,
+      "intro_text_string_id": 387942,
+      "end_text_string_id": 387945
+    },
+    {
+      "id": 3130032,
+      "title_string_id": 141829,
+      "giver_npc_id": 9000000173,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000172,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 141830 'Speak to Postchug Runalug about the recent attack on Wugachug.'; target resolved by scripts/quest_talk_objectives.py"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 29; name 'Postman: Trail of Mail'; title id cell 2665259734 ucdt; 3728598852 ugdt; 231598685 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 29; name 'Postman: Trail of Mail'; title id cell 2665259734 ucdt; 3728598852 ugdt; 231598685 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 141830,
+      "intro_text_string_id": 141828,
+      "end_text_string_id": 141831
+    },
+    {
+      "id": 3130033,
+      "title_string_id": 130252,
+      "giver_npc_id": 9000000317,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 30; name 'Postman: Outpost Ordeal'; title id cell 2064072475 ucdt; 2469827298 ugdt; 3139498656 unprefixed"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 6 - Shrouded Glade and the PCA Camp (Brin Galeglow, Postmaster Lane, Emahl), row 30; name 'Postman: Outpost Ordeal'; title id cell 2064072475 ucdt; 2469827298 ugdt; 3139498656 unprefixed"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3130033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 130253,
+      "intro_text_string_id": 130251,
+      "end_text_string_id": 130254
+    }
+  ]
+}

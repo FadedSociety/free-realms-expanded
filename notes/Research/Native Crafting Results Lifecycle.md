@@ -1,0 +1,25 @@
+# Native crafting results lifecycle
+
+Native164218 completed all six original Cooking phases with score5199 and accepted elapsed297 seconds. Exactly four each of Bat Meat, Gummyfruit, Rainleaf and Spice were consumed, and original food definition35 quantity1 was granted once. The quest reached[1,1,1,4,4,1], awaiting Mae turn-in. The last Stir round remained visible because the service sent OnGameWonMsg and39/18 but no score rows or39/19. This is a presentation defect after a valid reward, not a failed recipe.
+
+## Original evidence
+
+Original AS2 `GameClient.OnGameWonMsg` calls `EndOfGame`, which only sets mStarted=false and emits FRServer_GameOver. It does not open the native results screen. Native39/18 records Won plus stars, elapsed seconds and total score at state offsets99,0x70,0x74,0x78. Native39/19 invokes009bf190→009b7170→MinigameEndHandler:setMiniGameEndData. Original Lua explicitly selects ScoreScreen type9 for Cooking, and9 is in its valid reward/score page list. Forging and Smelting use the same native result interface.
+
+ScoreScreen parses39/47 into ScoreData. Type4's Score Points is the total used by both the Lua title and original ScoreTotal row. Without any score/stat/reward page, original Flash initializeState automatically calls close. A single genuine scoreTotalScore row therefore supplies the necessary page without inventing other scoring. Original CodeStringMappings resolves that key to117296. The existing three reward bundles are empty; they must not advertise invented coins, stars or wheel prizes. Food35 is a genuine inventory grant, but a native reward-page entry/update requires its own proven metadata/packet path.
+
+## Close distinction and final policy
+
+Native39/19 automatically emits39/7 through009bdc60; this acknowledgement is not player Close. A preliminary conditional proposal to release server terminal state on ACK was withdrawn once the actual native Close notification was recovered. No39/7 was captured in finalized164218, including its stale old-instance cleanup, so its fixture comes from the original constructor and unchanged community writer rather than that capture.
+
+Original ScoreScreen Close sends Lua Hide→ExitScreen→Ui.LeaveMiniGameOrEncounter. Native00c172c0→008d2730→009bd240 sends encounter41/109 only when state+0x61 is true. Ordinary JoinGame9bfdb0 passes0 into PlayerStartMiniGame9beb70, which stores that flag. Regardless of that encounter branch, native Close ends through009b2f300→008a2eb0 and dedicated writer0090ac70: CommandPacketClosedMinigameEndScreen26/42 is exactly four bytes **1a002a00**. Constructor parameter0 is not serialized. Existing crafting gameplay handlers already require that exact length. Ui.QuitMiniGame instead has a separately proven39/6 path; adding and accepting ordinary pre-win Quit remains a next cancellation task.
+
+## Narrow repair and verification
+
+Cooking and Smelting now send callback→39/18→39/47→39/19 on terminal win/loss. Forging preserves its original delayed FRServer_GameOver callback before sending the same native terminal sequence. GameOver uses0 awarded stars and actual elapsed/score; the score page uses the actual bounded Cooking/Smelting report or authoritative Forging score. A private service-local results_presented flag suppresses duplicate presentation/removal and is not serialized. Terminal Won/Lost and all economy remain until actual26/42 or the existing explicit close/cancel route;39/7 is a no-op. Close clears active crafting without sending a second39/19. Smelting terminal ScoreSet replay cannot change the presented score.
+
+Thirty ordinary crafting tests pass, plus three original-content checks, all private recipe/gameplay checks with their intended versioned fixtures, and mapped17-stage/restart integration. Tests cover exact compiled community packet bytes, nonempty actual total, ordered presentation, duplicate callback/win/loss, terminal ACK retention, malformed ACK/Close length, actual four-byte gameplay Close with no redundant Remove, persistent completed/item counts, and atomic bundle/remote/profile/pending recipe gates. Older fire-only integration uses its three-actor cef512 variant; the current Cooking variant has six hidden completion actors and is separately covered.
+
+Proofs: `../lab/reports/native-crafting-results-lifecycle-proof.json` SHA256`967e974b36806434f9eeaa629ac93bd2360e4502ee91e4f7ea95d36a91ca6012`; exact original Close proof `native-crafting-close-proof.json` SHA256`2f91cb89894117be3a405159c40e9c14c48849c845464294ba1bce28f4b49f2b`;16 compiled unchanged community vectors SHA256`eb9fb61d9c3284b47d3c8584dd633a10121508d75c56f7d48d5c96eb79bf6153`. Reproducers and originals remain private in the lab. No release build, save/content/movie mutation or native input was performed by this repair agent.
+
+Next native gate: NEW branch from the immutable pregame checkpoint, six original rounds→visible total score page held open→actual player Close26/42→Mae turn-in→restart. Preserve the existing won snapshot separately; do not merge or regrant its reward. Native acceptance of the new finish sequence remains pending.

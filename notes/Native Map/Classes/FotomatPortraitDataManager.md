@@ -1,0 +1,14 @@
+# Class: FotomatPortraitDataManager
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00bd3ff0` | `FotomatPortraitDataManager::RequestPortrait` | 🟢 | method | Thiscall (ECX = manager) with id halves (arg1, arg2) and a kind string (arg3): does nothing when the id equals the sentinel pair DAT_01beaa20/DAT_01beaa24. Otherwise it checks the 100-bucket pending table at this+0x2c (… |
+| `00bd43f0` | `FotomatPortraitDataManager::GetHeadshotBuffer` | ✅ | virtual | Virtual slot [0] of FotomatPortraitDataManager::vftable (thiscall, two id dwords and two out-pointers, ret 0x10): looks up the id through 00bd2730; when there is no entry it calls 00bd3ff0 with Headshot. When the entry'… |
+| `00bd47c0` | `FotomatPortraitDataManager::InsertEntry` | 🟢 | method | Thiscall (ECX = manager) with two dword args (id halves), ret 8: key = arg1 xor arg2 in a local; inserts a node through 00bd4620 into the map at this+0x1bc using &key and &arg1; passes the address of arg1 to 00702670 (f… |
+| `00bd4930` | `FotomatPortraitDataManager::StoreHeadshotBytes` | 🟢 | method | Thiscall (ECX = manager), four stack args (id lo, id hi, data pointer, size), ret 0x10: when size > 0, finds the entry through 00bd2730 or inserts one through 00bd47c0; sets the size field at entry+0x2108 to size, calli… |
+| `00bd4a50` | `— ⚠reject` | ⚪ | handler | Thiscall (ECX = manager) with two stack args (reader start, length): constructs a local PacketPlayerImageData (00bd3b40) and parses the body with 00bd4180 from the given range; when the reader raised no error and consum… |
+| `00bd4ed0` | `— ⚠reject` | ⚪ | dtor | Thiscall (ECX = manager): stores the manager vftable at +0 and +4, runs member teardown through 00bd28c0, 00bd2dc0, the map body 00bd4e60 and 00bd2980 with a per-member EH state, stores the second vftable (HashListMap<i… |
+| `00bd4f90` | `FotomatPortraitDataManager::AdjustorThunk_ScalarDtor` | ✅ | virtual | Adjustor thunk (8 bytes: sub ecx,4 then a jump) at slot [0] of the secondary FotomatPortraitDataManager vtable 01826874: it moves this back by 4 bytes and jumps to 00bd5260, the manager scalar deleting destructor. |
+| `00bd4fa0` | `— ⚠reject` | ⚪ | method | Thiscall (ECX = manager): reads the cached clock (00702670) and compares its low dword with the stamp at this+0x10; when more than 60 (0x3c) seconds have passed it builds an object with 00ad3190 (PacketGeneratePortraitR… |
+| `00bd5190` | `FotomatPortraitDataManager::FotomatPortraitDataManager` | ✅ | ctor | Thiscall ctor (ECX = manager, one stack arg = owner): installs CharacterImageProvider and AssetDeliveryHandlerInterface vftables, copies the dword at singleton+0x18 (from 00769710) to +8, installs the FotomatPortraitDat… |
+| `00bd5260` | `FotomatPortraitDataManager::ScalarDeletingDtor` | 🟢 | dtor | Thiscall scalar deleting destructor of the manager: calls the dtor body 00bd4ed0 on this, then calls _free(this) (thunk 00d82463) when bit 0 of the flag byte is set; returns this. |

@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "battles": [
+    {
+      "id": 96,
+      "title_id": 42056,
+      "description_id": 42059,
+      "objective_id": 42071,
+      "difficulty": 1,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100000096000,
+        "definition_id": 930096,
+        "model_id": 168,
+        "name_id": 15623,
+        "name": "Troll Summoner",
+        "texture_alias": "",
+        "position": [
+          -440.0,
+          0.8,
+          1290.0
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100000096001,
+          "definition_id": 930096,
+          "model_id": 168,
+          "name_id": 15623,
+          "name": "Troll Summoner",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 900,
+          "damage": 4,
+          "boss": true,
+          "skittish": true
+        },
+        {
+          "guid": 100000096002,
+          "definition_id": 930097,
+          "model_id": 182,
+          "name_id": 42038,
+          "name": "Troll Scoutling",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false,
+          "summon_below_percent": 75,
+          "scale": 0.65
+        },
+        {
+          "guid": 100000096003,
+          "definition_id": 930097,
+          "model_id": 182,
+          "name_id": 42038,
+          "name": "Troll Scoutling",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false,
+          "summon_below_percent": 75,
+          "scale": 0.65
+        },
+        {
+          "guid": 100000096004,
+          "definition_id": 930097,
+          "model_id": 182,
+          "name_id": 42038,
+          "name": "Troll Scoutling",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false,
+          "summon_below_percent": 50,
+          "scale": 0.65
+        },
+        {
+          "guid": 100000096005,
+          "definition_id": 930097,
+          "model_id": 166,
+          "name_id": 42040,
+          "name": "Troll Rageling",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false,
+          "summon_below_percent": 50,
+          "scale": 0.65
+        },
+        {
+          "guid": 100000096006,
+          "definition_id": 930097,
+          "model_id": 166,
+          "name_id": 42040,
+          "name": "Troll Rageling",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false,
+          "summon_below_percent": 25,
+          "scale": 0.65
+        },
+        {
+          "guid": 100000096007,
+          "definition_id": 930097,
+          "model_id": 166,
+          "name_id": 42040,
+          "name": "Troll Rageling",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false,
+          "summon_below_percent": 25,
+          "scale": 0.65
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "locale: 'Encounter 96' comments; title 42056 'Troll Summoner Madness!', description 42059, goal 42071 'Defeat the troll summoner!' (42081 '...to complete the encounter'), summoner ranged attack 42077, Shaman Ground Pound 42075, 'Troll Bow Shot' 42078 for the Troll Novice Archer 42039; start-screen picture Images.txt 4543 icon_ui_combatstart_panelgraphic_trollsummonermadness.dds (sent as MiniGameInfo.IconId)"
+        },
+        {
+          "kind": "client",
+          "evidence": "models: troll_shaman = 168 (summoner; 'Shaman's Ground Pound'), troll_scout = 182 (Troll Scoutling 42038), troll_peasant_01 = 166 (Troll Rageling 42040) (Legacy Resources/Models.txt); arena sg_random_encounter_clearing (client .gzne; Areas.xml area 'Bed' centred (136,0,165) r100 with CombatMusic); sky sky_wilds24.xml (ObjectTerrainData 'Wilds')"
+        },
+        {
+          "kind": "video",
+          "evidence": "Owner Field Notes 2026-10-15: Ninja: Stolen Away's goal 'Defeat the troll summoner', fought as the instance 'Troll Summoner Madness!'"
+        },
+        {
+          "kind": "video",
+          "evidence": "Owner Field Notes 2026-10-15 'Battle flow, corrected': the overworld marker is the walking Troll Summoner with the crossed-swords icon; Go teleports to a closed-off arena; the summoner runs away and turns around, and after being hit for a while swirls its arms and summons 2-3 small trolls in a puff of smoke, repeating until beaten"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) overworld position on the trail south of the Forest Troll Fort; arena zone id 9600, spawn points and minion models (Scoutling/Rageling as the 'small trolls'); summon thresholds 75/50/25% with 2 minions each at scale 0.65, the gang-up/run/rest summoner cycle (the owner, 2026-10-15), health, damage, kill ids 930096/930097 and the 25-coin reward are local balance; overhead icon 11970 (encounter_start_hard_free_64) chosen over 1345 without live evidence"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) prize list: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354, Small Health Potion 11002 (ids, names and icons from the client item catalogue). Modelled on the wiki's per-job dungeon 'Medic Prize Wheel' (Robgoblin Treasure Trove: Battle Item Mystery Pack, Medic's Power Shard of Vitality II, ...); the original Troll Summoner Madness prizes and their job-specific wheels are unknown; one is awarded at random per win"
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": 4543,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
+    }
+  ]
+}

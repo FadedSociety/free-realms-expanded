@@ -1,0 +1,1601 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "legacy_repository_revision": "9e082025391177d5a33ee18c714ddd06b457a695",
+    "legacy_license": "AGPL-3.0; data rows only, no source code copied",
+    "node_tables": "lab/references/FreeRealms-Legacy/src/Resources/CollectionNodeTypes.json and CollectionNodePools.json",
+    "spawn_tables": "lab/references/FreeRealms-Legacy/src/Resources/CollectionNodeSpawns/1/*.json",
+    "client_models": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt; all 2 ModelId values verified",
+    "client_items": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; all 8 distinct loot ItemDefinitionId values verified",
+    "spawns_and_pool_rules": "Legacy reference data; no client/native packet or runtime verification",
+    "legacy_table_sha256": "CollectionNodeTypes.json=0a58e58696414ff5649567d4bc1121b0825dc5bbb5cee648b5c84089469e3dee; CollectionNodePools.json=4162ed2330967ffeacca1ec6d1e41ca26b4105564d8f32e3460c7b34db4351f8; briarwood-mushrooms-rare.json=8f0c7123eab19adea7608522b7eb74b20e221fd40dc14c44f5baefae7607c7f0; briarwood-mushrooms.json=66795417e698aad350af206a5a07f42d29530f7672f7d468d10e55bc86deafef",
+    "client_models_sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+    "client_item_definitions_sha256": "40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025"
+  },
+  "node_types": [
+    {
+      "key": "mushrooms",
+      "name": "Mushrooms",
+      "model_id": 249,
+      "scale": 1.0,
+      "composite_effect_id": 5742,
+      "interact_range": 12,
+      "cursor_id": 18,
+      "placement_y_offset": -0.05,
+      "drop_table": [
+        {
+          "item_definition_id": 11082,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11083,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11084,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11086,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11087,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11088,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        }
+      ],
+      "source_tag": "legacy_reference_type_data",
+      "source_tags": {
+        "model_id": "legacy+client_Models_txt_verified",
+        "name": "legacy_type_table",
+        "scale": "legacy_reference_policy_R",
+        "composite_effect_id": "legacy_reference_unverified_client_effect",
+        "interact_range": "legacy_reference_policy_R",
+        "cursor_id": "legacy_reference_unverified_client_cursor",
+        "placement_y_offset": "legacy_reference_policy_R"
+      }
+    },
+    {
+      "key": "rare-mushrooms",
+      "name": "Rare Mushrooms",
+      "model_id": 674,
+      "scale": 1.0,
+      "composite_effect_id": 5740,
+      "interact_range": 12,
+      "cursor_id": 18,
+      "placement_y_offset": -0.05,
+      "drop_table": [
+        {
+          "item_definition_id": 11081,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11085,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "legacy_reference_policy_R"
+          }
+        }
+      ],
+      "source_tag": "legacy_reference_type_data",
+      "source_tags": {
+        "model_id": "legacy+client_Models_txt_verified",
+        "name": "legacy_type_table",
+        "scale": "legacy_reference_policy_R",
+        "composite_effect_id": "legacy_reference_unverified_client_effect",
+        "interact_range": "legacy_reference_policy_R",
+        "cursor_id": "legacy_reference_unverified_client_cursor",
+        "placement_y_offset": "legacy_reference_policy_R"
+      }
+    }
+  ],
+  "pools": [
+    {
+      "key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "node_type": "mushrooms",
+      "max_active_nodes": 12,
+      "respawn_seconds": 60,
+      "source_tag": "legacy_reference_pool_data_R",
+      "source_tags": {
+        "zone_definition_id": "legacy_pool_table",
+        "node_type": "legacy_pool_table",
+        "max_active_nodes": "legacy_reference_policy_R",
+        "respawn_seconds": "legacy_reference_policy_R"
+      }
+    },
+    {
+      "key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "node_type": "rare-mushrooms",
+      "max_active_nodes": 2,
+      "respawn_seconds": 300,
+      "source_tag": "legacy_reference_pool_data_R",
+      "source_tags": {
+        "zone_definition_id": "legacy_pool_table",
+        "node_type": "legacy_pool_table",
+        "max_active_nodes": "legacy_reference_policy_R",
+        "respawn_seconds": "legacy_reference_policy_R"
+      }
+    }
+  ],
+  "spawns": [
+    {
+      "id": 1,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -803.49036,
+        -50.01,
+        1718.534
+      ],
+      "heading": 1.3969846,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 2,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -777.5667,
+        -50.01,
+        1732.152
+      ],
+      "heading": 1.9003488,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 3,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -771.9481,
+        -50.01,
+        1759.2593
+      ],
+      "heading": -0.20764561,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 4,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -745.1193,
+        -50.01,
+        1749.243
+      ],
+      "heading": -1.277564,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 5,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -691.169,
+        -50.01,
+        1788.7634
+      ],
+      "heading": -2.5878139,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 6,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -742.1772,
+        -50.009968,
+        1822.9713
+      ],
+      "heading": -0.6479319,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 7,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -874.4694,
+        -49.8508,
+        1699.0721
+      ],
+      "heading": 0.1630986,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 8,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -870.82263,
+        -50.01,
+        1746.2748
+      ],
+      "heading": -1.7938848,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 9,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -885.5964,
+        -50.009995,
+        1787.501
+      ],
+      "heading": 0.6147363,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 10,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -900.13684,
+        -50.01,
+        1866.7305
+      ],
+      "heading": -1.4087245,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 11,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -861.20026,
+        -50.01,
+        1840.9888
+      ],
+      "heading": 2.4495385,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 12,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -851.2451,
+        -50.010002,
+        1889.454
+      ],
+      "heading": 1.2004899,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 13,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -634.61035,
+        -48.422714,
+        1795.4663
+      ],
+      "heading": 2.247903,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 14,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -710.75903,
+        -49.96198,
+        1834.3875
+      ],
+      "heading": -1.0517426,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 17,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -694.16046,
+        -50.01,
+        1687.7819
+      ],
+      "heading": 2.1102843,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 18,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -737.7079,
+        -50.010067,
+        1664.1189
+      ],
+      "heading": 0.62728953,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 19,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -820.82135,
+        -50.008923,
+        1683.7112
+      ],
+      "heading": 2.135825,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 20,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -633.81506,
+        -68.270584,
+        1865.6357
+      ],
+      "heading": -0.37828174,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 21,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -683.2057,
+        -63.321262,
+        1897.0142
+      ],
+      "heading": -0.7824209,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 22,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -605.5209,
+        -69.418175,
+        1953.3473
+      ],
+      "heading": 0.5377409,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 23,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -792.25665,
+        -50.01,
+        1760.9254
+      ],
+      "heading": 0.0985059,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 24,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -707.0895,
+        -50.01,
+        1778.8201
+      ],
+      "heading": 2.2405055,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 25,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -568.0275,
+        -64.49648,
+        1917.343
+      ],
+      "heading": 0.13079979,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 26,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -591.3292,
+        -70.27984,
+        1985.4259
+      ],
+      "heading": -0.48694044,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 27,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -647.45776,
+        -68.85806,
+        2004.0754
+      ],
+      "heading": -2.2309275,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 28,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -506.81717,
+        -64.13412,
+        1904.7926
+      ],
+      "heading": 1.8666081,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 29,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -402.14172,
+        -67.150116,
+        1883.4929
+      ],
+      "heading": -0.4119073,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 30,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -328.79944,
+        -67.25351,
+        1924.1362
+      ],
+      "heading": -0.16708885,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 31,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -330.10132,
+        -58.31651,
+        2022.7954
+      ],
+      "heading": 2.566614,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 32,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -389.08704,
+        -56.52382,
+        1995.9691
+      ],
+      "heading": -2.4227517,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 33,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -479.98526,
+        -67.32392,
+        1972.0228
+      ],
+      "heading": -2.232457,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 34,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -525.9714,
+        -69.19547,
+        2255.0442
+      ],
+      "heading": 0.42731214,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 35,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -548.6164,
+        -67.35766,
+        2279.7188
+      ],
+      "heading": 0.6146312,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 36,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -632.8548,
+        -65.09812,
+        2330.8767
+      ],
+      "heading": -1.6296002,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 37,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -682.0958,
+        -65.1131,
+        2343.3176
+      ],
+      "heading": -1.2635078,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 38,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -714.92676,
+        -65.91882,
+        2287.7495
+      ],
+      "heading": -2.8364804,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 39,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -802.3364,
+        -62.33505,
+        2263.524
+      ],
+      "heading": 2.8834631,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 40,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -739.1476,
+        -67.1372,
+        2191.0913
+      ],
+      "heading": 1.7332697,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 41,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -748.30817,
+        -68.88648,
+        2152.1672
+      ],
+      "heading": 2.7011878,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 42,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -703.1558,
+        -43.550823,
+        2097.3254
+      ],
+      "heading": 1.0312008,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 43,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -648.3753,
+        -46.407696,
+        2098.3667
+      ],
+      "heading": 2.6019995,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 44,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -436.62305,
+        -57.587856,
+        2077.9
+      ],
+      "heading": 1.4587224,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 45,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -465.4537,
+        -52.09379,
+        2038.1394
+      ],
+      "heading": -2.5061805,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 46,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -415.8508,
+        -54.3267,
+        2012.7069
+      ],
+      "heading": 1.4330372,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 47,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -430.6802,
+        -52.251366,
+        2141.75
+      ],
+      "heading": 0.49767965,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 48,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -461.86642,
+        -70.75791,
+        2200.0042
+      ],
+      "heading": 0.21403292,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 49,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -518.60614,
+        -69.17378,
+        2120.5327
+      ],
+      "heading": 3.1191359,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 50,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -522.22504,
+        -69.738914,
+        2061.766
+      ],
+      "heading": 1.5663147,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 51,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -580.2633,
+        -68.493324,
+        2144.2332
+      ],
+      "heading": -1.4587042,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 52,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -623.37665,
+        -67.62083,
+        2167.187
+      ],
+      "heading": -2.8794231,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 53,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -480.00656,
+        -86.02494,
+        2368.6853
+      ],
+      "heading": 0.5805629,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 54,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -309.77576,
+        -87.409195,
+        2381.4607
+      ],
+      "heading": -1.1186222,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 55,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -238.04156,
+        -87.98718,
+        2390.8877
+      ],
+      "heading": -0.5576502,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 56,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -122.267235,
+        -64.331276,
+        2188.415
+      ],
+      "heading": 1.6134723,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 57,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -100.95085,
+        -55.816563,
+        2248.7014
+      ],
+      "heading": -0.06412733,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 58,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -339.51035,
+        -80.31579,
+        2309.9722
+      ],
+      "heading": -1.4516871,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 59,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -561.9884,
+        -81.130516,
+        2408.5576
+      ],
+      "heading": 2.896125,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 60,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -573.84796,
+        -59.91512,
+        2464.9766
+      ],
+      "heading": -2.3863616,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 61,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -535.21027,
+        -57.03634,
+        2539.072
+      ],
+      "heading": -2.91449,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 62,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -425.50714,
+        -75.67235,
+        2502.2708
+      ],
+      "heading": 2.4123127,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 63,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -387.5754,
+        -88.301994,
+        2403.8025
+      ],
+      "heading": -1.4520632,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 64,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -345.85052,
+        -86.52874,
+        2355.4653
+      ],
+      "heading": -1.1766242,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 65,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -341.65167,
+        -89.86473,
+        2231.979
+      ],
+      "heading": -0.64272326,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 66,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -631.0856,
+        -62.595737,
+        2440.0237
+      ],
+      "heading": -0.19398248,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 67,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -803.2385,
+        -50.01226,
+        1672.3546
+      ],
+      "heading": -0.9076394,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 68,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -540.30286,
+        -68.46892,
+        1983.3242
+      ],
+      "heading": -0.2174618,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 69,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -544.2744,
+        -65.32526,
+        1849.7983
+      ],
+      "heading": 1.7433255,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 70,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -899.4192,
+        -50.008297,
+        1929.6582
+      ],
+      "heading": 0.52385485,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 71,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -752.1683,
+        -50.298775,
+        1642.752
+      ],
+      "heading": 2.1564155,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 72,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -770.9457,
+        -65.60923,
+        2442.2864
+      ],
+      "heading": -0.5129169,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 73,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -87.60222,
+        -31.911438,
+        2275.838
+      ],
+      "heading": -0.50418246,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 74,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -273.33215,
+        -98.80864,
+        2548.5076
+      ],
+      "heading": 2.0222392,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 75,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -675.4563,
+        -60.241264,
+        2450.3093
+      ],
+      "heading": 2.7146401,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 76,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -235.26727,
+        -66.90222,
+        2109.241
+      ],
+      "heading": -2.5212421,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 77,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -811.9612,
+        -63.83907,
+        2206.1758
+      ],
+      "heading": 2.45503,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    },
+    {
+      "id": 78,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -756.3964,
+        -68.267296,
+        2383.2256
+      ],
+      "heading": -2.7948217,
+      "source_tag": "legacy_reference_spawn_not_native_capture",
+      "source_tags": {
+        "id": "legacy_spawn_Id",
+        "pool_key": "legacy_filename_to_pool_key",
+        "zone_definition_id": "legacy_CollectionNodePools_ZoneDefinitionId",
+        "position": "legacy_spawn_Position",
+        "heading": "legacy_spawn_Heading"
+      }
+    }
+  ]
+}

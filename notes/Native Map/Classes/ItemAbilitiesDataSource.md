@@ -1,0 +1,12 @@
+# Class: ItemAbilitiesDataSource
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00a7e410` | `ItemAbilitiesDataSource::GetColumnName` | ✅ | virtual | Column-name table of the item abilities list: returns Ability ID, Ability Icon, Ability Name, Ability Description and Ability Effect Count for indices 0..4 and the literal <error> otherwise; it never touches this. |
+| `00a7e600` | `ItemAbilitiesDataSource::GetRowCount` | 🟢 | virtual | Resolves the client singleton with FUN_00769710, then looks the item definition up by the id at this+0x240 in the item table at (*(singleton+4))+0x20c (bucket array at +100, index id & 0x3ff, chain through +0xb0 keyed a… |
+| `00a7e660` | `ItemAbilitiesDataSource::RefreshAfterAbilityDefinitionsCached` | 🟢 | virtual | Looks up the item definition for this+0x1c in the item table and gets the player's ability-modifier object. If either is absent it returns. It walks the definition list at +0xc4 and calls 00a34d10 for each entry, return… |
+| `00a7ea90` | `ItemAbilitiesDataSource::GetColumnValue` | ✅ | virtual | Row-value getter of the abilities list (vtable slot 4). Resolves the item definition by the id at this+0x240 in the item table (bucket id & 0x3ff, chain +0xb0 keyed at +0xb4), copies the definition's ability list at +0x… |
+| `00a7ede0` | `ItemAbilitiesDataSource::~ItemAbilitiesDataSource` | ✅ | dtor | Destructor body: rewrites the four ItemAbilitiesDataSource vtable pointers (+0, +0x30, +0x34 and +0x254) and then runs FUN_00835610 (observer base) and FUN_0091bf60 (shared base destructor). |
+| `00a7ee70` | `ItemAbilitiesDataSource::DeletingDtorThunk254` | ✅ | virtual | Adjustor thunk in slot 1 of the +0x254 vtable group: the raw bytes are 81 e9 54 02 00 00 (sub ecx,0x254) and e9 a5 00 00 00 (jmp 00a7ef20), so it re-bases the subobject pointer onto the primary object and jumps to the s… |
+| `00a7ee80` | `ItemAbilitiesDataSource::ItemAbilitiesDataSource` | ✅ | ctor | Constructor: registers BaseClient.ItemAbilities through FUN_00922890, runs the base construction FUN_0081b470, installs the four class vtables (+0, +0x30, +0x34, +0x254) and registers the second name BaseClient.Abilitie… |
+| `00a7ef20` | `ItemAbilitiesDataSource::ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor: calls the destructor body 00a7ede0 and frees the object with _free when bit 0 of param_2 is set, returning the object pointer. |

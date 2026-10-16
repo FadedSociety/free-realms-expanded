@@ -1,0 +1,1628 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3090001,
+      "title_string_id": 23048,
+      "giver_npc_id": 9000000161,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 1; name 'So You Want to be a Medic? (wiki: \"Medic: So You Want to be a Medic?\")'; title id cell ucdt 2991926009 / ugdt 4080575481"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 1; name 'So You Want to be a Medic? (wiki: \"Medic: So You Want to be a Medic?\")'; title id cell ucdt 2991926009 / ugdt 4080575481"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 23049
+    },
+    {
+      "id": 3090002,
+      "title_string_id": 10164,
+      "giver_npc_id": 9000000161,
+      "prerequisite_quest_ids": [
+        3090001
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 2; name 'Medic: Operation: Revival'; title id cell ucdt 511442475 / ugdt 3987711664"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 2; name 'Medic: Operation: Revival'; title id cell ucdt 511442475 / ugdt 3987711664"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090003,
+      "title_string_id": 22989,
+      "giver_npc_id": 9000000419,
+      "prerequisite_quest_ids": [
+        3090002
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 22990
+    },
+    {
+      "id": 3090004,
+      "title_string_id": 77437,
+      "giver_npc_id": 9000000073,
+      "prerequisite_quest_ids": [
+        3090003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 4; name 'Medic: Palatable Pills'; title id cell ucdt 3179409013 / ugdt 2243629226"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 4; name 'Medic: Palatable Pills'; title id cell ucdt 3179409013 / ugdt 2243629226"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 77438,
+      "intro_text_string_id": 77436,
+      "end_text_string_id": 77439
+    },
+    {
+      "id": 3090005,
+      "title_string_id": 23019,
+      "giver_npc_id": 9000000073,
+      "prerequisite_quest_ids": [
+        3090004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 5; name 'Medic: Take Your Vitamins'; title id cell ucdt 2261927574 / ugdt 503105687"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 5; name 'Medic: Take Your Vitamins'; title id cell ucdt 2261927574 / ugdt 503105687"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 23020
+    },
+    {
+      "id": 3090006,
+      "title_string_id": 387463,
+      "giver_npc_id": 9000000073,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 6; name 'Medic: Achieve Level 5'; title id cell ucdt 1924758543 / ugdt 1750174744"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 6; name 'Medic: Achieve Level 5'; title id cell ucdt 1924758543 / ugdt 1750174744"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 6; name 'Medic: Achieve Level 5'; title id cell ucdt 1924758543 / ugdt 1750174744"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387464,
+      "intro_text_string_id": 387462,
+      "end_text_string_id": 387465
+    },
+    {
+      "id": 3090007,
+      "title_string_id": null,
+      "giver_npc_id": 9000000023,
+      "prerequisite_quest_ids": [
+        3090006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 7; name '(repeatable)'; title id cell ucdt 2736856905 / ugdt 2817117748"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 7; name '(repeatable)'; title id cell ucdt 2736856905 / ugdt 2817117748"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090008,
+      "title_string_id": 76748,
+      "giver_npc_id": 9000000073,
+      "prerequisite_quest_ids": [
+        3090006
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 8; name 'Medic: Surgical Precision'; title id cell ucdt 2010603607 / ugdt 2270036209"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 8; name 'Medic: Surgical Precision'; title id cell ucdt 2010603607 / ugdt 2270036209"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76749,
+      "intro_text_string_id": 76747,
+      "end_text_string_id": 76750
+    },
+    {
+      "id": 3090009,
+      "title_string_id": 73361,
+      "giver_npc_id": 9000000161,
+      "prerequisite_quest_ids": [
+        3090008
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 9; name 'Medic: Supply Recovery'; title id cell ucdt 3057036280 / ugdt 1665779904"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 9; name 'Medic: Supply Recovery'; title id cell ucdt 3057036280 / ugdt 1665779904"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 8; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73362,
+      "intro_text_string_id": 73360,
+      "end_text_string_id": 73363
+    },
+    {
+      "id": 3090010,
+      "title_string_id": 73493,
+      "giver_npc_id": 9000000488,
+      "prerequisite_quest_ids": [
+        3090009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 10; name 'Medic: Medic on a Mission'; title id cell ucdt 623216863 / ugdt 2466271411"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 10; name 'Medic: Medic on a Mission'; title id cell ucdt 623216863 / ugdt 2466271411"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 10; name 'Medic: Medic on a Mission'; title id cell ucdt 623216863 / ugdt 2466271411"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 9; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73494,
+      "intro_text_string_id": 73492,
+      "end_text_string_id": 73495
+    },
+    {
+      "id": 3090011,
+      "title_string_id": 73752,
+      "giver_npc_id": 9000000161,
+      "prerequisite_quest_ids": [
+        3090010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 11; name 'Medic: Tummies in Turmoil'; title id cell ucdt 1050035324 / ugdt 3591343218"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 11; name 'Medic: Tummies in Turmoil'; title id cell ucdt 1050035324 / ugdt 3591343218"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 10; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73753,
+      "intro_text_string_id": 73751,
+      "end_text_string_id": 73754
+    },
+    {
+      "id": 3090012,
+      "title_string_id": 73783,
+      "giver_npc_id": 9000000052,
+      "prerequisite_quest_ids": [
+        3090011
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 12; name \"Medic: Clover's Crisis\"; title id cell ucdt 2312387900 / ugdt 1422887507"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 12; name \"Medic: Clover's Crisis\"; title id cell ucdt 2312387900 / ugdt 1422887507"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 12; name \"Medic: Clover's Crisis\"; title id cell ucdt 2312387900 / ugdt 1422887507"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 11; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73784,
+      "intro_text_string_id": 73782,
+      "end_text_string_id": 73785
+    },
+    {
+      "id": 3090013,
+      "title_string_id": 387532,
+      "giver_npc_id": 9000000052,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 13; name 'Medic: Achieve Level 10'; title id cell ucdt 58421768 / ugdt 1605313536"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 13; name 'Medic: Achieve Level 10'; title id cell ucdt 58421768 / ugdt 1605313536"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090014,
+      "title_string_id": null,
+      "giver_npc_id": 9000000023,
+      "prerequisite_quest_ids": [
+        3090013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 14; name '(repeatable)'; title id cell ucdt 1012951327 / ugdt 2102450664"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 14; name '(repeatable)'; title id cell ucdt 1012951327 / ugdt 2102450664"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090015,
+      "title_string_id": null,
+      "giver_npc_id": 9000000052,
+      "prerequisite_quest_ids": [
+        3090013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 15; name 'Medic: A Strong Supplement'; title id cell none found"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) title_string_id is null because this row has no unambiguous ucdt title ID; page title is 'Medic: A Strong Supplement'"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 13; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090016,
+      "title_string_id": 73828,
+      "giver_npc_id": 9000000073,
+      "prerequisite_quest_ids": [
+        3090015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 16; name 'Medic: Flu Season'; title id cell ucdt 3063039943 / ugdt 3459783688"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 16; name 'Medic: Flu Season'; title id cell ucdt 3063039943 / ugdt 3459783688"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 15; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 73829,
+      "intro_text_string_id": 73827,
+      "end_text_string_id": 73830
+    },
+    {
+      "id": 3090017,
+      "title_string_id": 74026,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3090016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 17; name 'Medic: A Blustery Blunder'; title id cell ucdt 2220865843 / ugdt 4169948548"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 17; name 'Medic: A Blustery Blunder'; title id cell ucdt 2220865843 / ugdt 4169948548"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 16; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74027,
+      "intro_text_string_id": 74025,
+      "end_text_string_id": 74028
+    },
+    {
+      "id": 3090018,
+      "title_string_id": 74064,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3090017
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 18; name 'Medic: Into the Bristlewood'; title id cell ucdt 1745067116 / ugdt 216367228"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 18; name 'Medic: Into the Bristlewood'; title id cell ucdt 1745067116 / ugdt 216367228"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 17; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74065,
+      "intro_text_string_id": 74063,
+      "end_text_string_id": 74066
+    },
+    {
+      "id": 3090019,
+      "title_string_id": 74073,
+      "giver_npc_id": 9000000071,
+      "prerequisite_quest_ids": [
+        3090018
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 19; name 'Medic: Virtuous Venom'; title id cell ucdt 2542964654 / ugdt 287453314"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 19; name 'Medic: Virtuous Venom'; title id cell ucdt 2542964654 / ugdt 287453314"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 18; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74074,
+      "intro_text_string_id": 74072,
+      "end_text_string_id": 74075
+    },
+    {
+      "id": 3090020,
+      "title_string_id": 74713,
+      "giver_npc_id": 9000000071,
+      "prerequisite_quest_ids": [
+        3090019
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 20; name 'Medic: Dewpetal Tea'; title id cell ucdt 3568377214 / ugdt 2837653171"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 20; name 'Medic: Dewpetal Tea'; title id cell ucdt 3568377214 / ugdt 2837653171"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 19; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74714,
+      "intro_text_string_id": 74712,
+      "end_text_string_id": 74715
+    },
+    {
+      "id": 3090021,
+      "title_string_id": 387567,
+      "giver_npc_id": 9000000071,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 21; name 'Medic: Achieve Level 15'; title id cell ucdt 2409273051 / ugdt 261868907"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 21; name 'Medic: Achieve Level 15'; title id cell ucdt 2409273051 / ugdt 261868907"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387568,
+      "intro_text_string_id": 387566,
+      "end_text_string_id": 387569
+    },
+    {
+      "id": 3090022,
+      "title_string_id": null,
+      "giver_npc_id": 9000000023,
+      "prerequisite_quest_ids": [
+        3090021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 22; name '(repeatable)'; title id cell ucdt 521658371 / ugdt 1966315189"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 3: level 10 to 15 (Snowhill and Briarwood), row 22; name '(repeatable)'; title id cell ucdt 521658371 / ugdt 1966315189"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 21; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090023,
+      "title_string_id": 93132,
+      "giver_npc_id": 9000000071,
+      "prerequisite_quest_ids": [
+        3090021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 23; name 'Medic: Shock Paddles and You'; title id cell ucdt 4196272573 / ugdt 2278005321"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 23; name 'Medic: Shock Paddles and You'; title id cell ucdt 4196272573 / ugdt 2278005321"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 21; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 93133,
+      "intro_text_string_id": 93131,
+      "end_text_string_id": 93134
+    },
+    {
+      "id": 3090024,
+      "title_string_id": 74725,
+      "giver_npc_id": 9000000071,
+      "prerequisite_quest_ids": [
+        3090023
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 24; name 'Medic: The Missing Patrol'; title id cell ucdt 1975071322 / ugdt 3651554390"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 24; name 'Medic: The Missing Patrol'; title id cell ucdt 1975071322 / ugdt 3651554390"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 23; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74726,
+      "intro_text_string_id": 74724,
+      "end_text_string_id": 74727
+    },
+    {
+      "id": 3090025,
+      "title_string_id": 74768,
+      "giver_npc_id": 9000000052,
+      "prerequisite_quest_ids": [
+        3090024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 25; name 'Medic: Shocking Developments'; title id cell ucdt 321435442 / ugdt 3538708750"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 25; name 'Medic: Shocking Developments'; title id cell ucdt 321435442 / ugdt 3538708750"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 24; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74769,
+      "intro_text_string_id": 74767,
+      "end_text_string_id": 74770
+    },
+    {
+      "id": 3090026,
+      "title_string_id": 74783,
+      "giver_npc_id": 9000000280,
+      "prerequisite_quest_ids": [
+        3090025
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 26; name 'Medic: Omitted Admission'; title id cell ucdt 735775189 / ugdt 446557402"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 26; name 'Medic: Omitted Admission'; title id cell ucdt 735775189 / ugdt 446557402"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090026 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 25; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74784,
+      "intro_text_string_id": 74782,
+      "end_text_string_id": 74785
+    },
+    {
+      "id": 3090027,
+      "title_string_id": 387577,
+      "giver_npc_id": 9000000072,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 27; name 'Medic: Achieve Level 20'; title id cell ucdt 3147198230 / ugdt 2707426051"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 27; name 'Medic: Achieve Level 20'; title id cell ucdt 3147198230 / ugdt 2707426051"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090027 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387578,
+      "intro_text_string_id": 387576,
+      "end_text_string_id": 387579
+    },
+    {
+      "id": 3090028,
+      "title_string_id": null,
+      "giver_npc_id": 9000000023,
+      "prerequisite_quest_ids": [
+        3090027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 28; name '(repeatable)'; title id cell ucdt 1150051292 / ugdt 426017225"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 28; name '(repeatable)'; title id cell ucdt 1150051292 / ugdt 426017225"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090028 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 27; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3090029,
+      "title_string_id": 74799,
+      "giver_npc_id": 9000000072,
+      "prerequisite_quest_ids": [
+        3090027
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 29; name 'Medic: No Pain, No Gain'; title id cell ucdt 2944630431 / ugdt 714486671"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 29; name 'Medic: No Pain, No Gain'; title id cell ucdt 2944630431 / ugdt 714486671"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090029 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 27; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74800,
+      "intro_text_string_id": 74798,
+      "end_text_string_id": 74801
+    },
+    {
+      "id": 3090030,
+      "title_string_id": 74835,
+      "giver_npc_id": 9000000072,
+      "prerequisite_quest_ids": [
+        3090029
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 30; name 'Medic: Risky Research'; title id cell ucdt 2419123168 / ugdt 3415179108"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 30; name 'Medic: Risky Research'; title id cell ucdt 2419123168 / ugdt 3415179108"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090030 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 29; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 74836,
+      "intro_text_string_id": 74834,
+      "end_text_string_id": 74837
+    },
+    {
+      "id": 3090031,
+      "title_string_id": 76047,
+      "giver_npc_id": 9000000072,
+      "prerequisite_quest_ids": [
+        3090030
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 31; name 'Medic: A Frosty Remedy'; title id cell ucdt 2242323082 / ugdt 48998947"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 31; name 'Medic: A Frosty Remedy'; title id cell ucdt 2242323082 / ugdt 48998947"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090031 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 30; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76048,
+      "intro_text_string_id": 76046,
+      "end_text_string_id": 76049
+    },
+    {
+      "id": 3090032,
+      "title_string_id": 76151,
+      "giver_npc_id": 9000000072,
+      "prerequisite_quest_ids": [
+        3090031
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 32; name 'Medic: Just What the Doctor Ordered'; title id cell ucdt 176076292 / ugdt 338872762"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 32; name 'Medic: Just What the Doctor Ordered'; title id cell ucdt 176076292 / ugdt 338872762"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090032 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 31; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 76152,
+      "intro_text_string_id": 76150,
+      "end_text_string_id": 76153
+    },
+    {
+      "id": 3090033,
+      "title_string_id": 72972,
+      "giver_npc_id": 9000000072,
+      "prerequisite_quest_ids": [
+        3090032
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 33; name 'Medic: Paying Your Student Debts'; title id cell ucdt 2045019797 / ugdt 184746992"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 5: Seaside School of Combat Medicine (after level 20), row 33; name 'Medic: Paying Your Student Debts'; title id cell ucdt 2045019797 / ugdt 184746992"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3090033 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row 32; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1481 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "sandscale_oasis",
+        "name_string_id": 3894478291,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Sandscale Oasis."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key sandscale_oasis comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Sandscale Oasis; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Sandscale Oasis",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 3894478291,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 2,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Sandscale Oasis difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Sunstone Valley",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). No level-3 string exists in the client. | [wiki: Dungeons] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Sandscale Oasis minimum combat level; cited guide source index"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": 3,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Sandscale Oasis recommended level; cited guide source index"
+              }
+            ]
+          },
+          "job": {
+            "value": null,
+            "reason": "None (difficulty 2: \"recommended levels 3 and higher, but can be entered by anyone\"). No level-3 string exists in the client. | [wiki: Dungeons] [client]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Requirements > Combat job level; cited [wiki: Dungeons] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Requirements > Combat job level; cited [wiki: Dungeons] [client]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None. A dwarf quest chain in Sunstone Valley sends players in (see Related quests). | [client]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Requirements > Unlocking quest; cited [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Unknown. The wiki page lists no members-only bonus. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Sunstone Valley",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+                }
+              ]
+            },
+            "name": {
+              "value": "gate",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the gate in Sunstone Valley. In the world, the Sandscale Oasis shows as a red map marker (15 m, 107 m, 131 m, 133 m in different frames). The Sunstone Valley region panel lists \"Sandscale Oasis\" with Rough Rider Raceway, Sunstone Valley Approach, The Rumbledome, Precursor Ruins, Red's Haven, Whirly's Scrap Camp and Glimmerdeep Hydropower Dam. The client sends players \"to the summit of Sandscale Oasis\" (loc 115298841, 1245206620) and says \"Go to Sandscale Oasis\" (loc 4093910411). Atlas icon exists. A loading card reads \"Sandscale Oasis\". | [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main",
+              "value": "\"Defeat Cactus Jake\" (video panel). Client strings: \"Defeat Cactus Jake\" (loc 1685846669), \"Defeat Cactus Jake in Sandscale Oasis\" (loc 1148594892), \"Defeat Cactus Jake in Sandscale Oasis to stop him from corrupting the Manguana's water sources.\" (loc 2557615874). One frame misreads \"Cactus John\". | [video rWTxDOHv-eY/00028, 00052, 00054, 00180] [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Main; cited [video rWTxDOHv-eY/00028, 00052, 00054, 00180] [client] [wiki]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Main; cited [video rWTxDOHv-eY/00028, 00052, 00054, 00180] [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Main; cited [video rWTxDOHv-eY/00028, 00052, 00054, 00180] [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Bonus: Defeat Cactus Bandits\" with a counter, 0/10 to 4/10 (best reading, the counter line is small). Client strings: \"Defeat Cactus Bandits\" (loc 493068252), \"Defeat Cactus Jake's gang of Cactus Bandits.\" (loc 1511162222). The wiki gives no number. | [video rWTxDOHv-eY/00028, 00066, 00180] [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Bonus; cited [video rWTxDOHv-eY/00028, 00066, 00180] [client] [wiki]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Bonus; cited [video rWTxDOHv-eY/00028, 00066, 00180] [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Bonus; cited [video rWTxDOHv-eY/00028, 00066, 00180] [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Panel shows",
+              "value": "\"Goals (2)\" | [video rWTxDOHv-eY/00028, 00054, 00180]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Panel shows; cited [video rWTxDOHv-eY/00028, 00054, 00180]"
+                }
+              ]
+            },
+            {
+              "label": "Internal groups",
+              "value": "The client has no \"Sandscale Oasis Bonus Objective\" string, although the bonus goal exists in video. | [client: no match] [video]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Internal groups; cited [client: no match] [video]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Internal groups; cited [client: no match] [video]"
+                }
+              ]
+            },
+            {
+              "label": "Side objective",
+              "value": "\"Defeat Sandscale Scavengers\" (loc 1281695675) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Goals > Side objective; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": [
+            {
+              "label": "Boss",
+              "value": "Cactus Jake (loc 2403828476, 2077323117) | A cactus outlaw. Client ability and effect names: \"Cactus Jake sprouts deadly thorns!\" (loc 1608763585), \"Cactus Jake's thorns fall away!\" (loc 1488429174, 317194102), \"Cactus Jake's Thorn Shield\" (3457176930, 2273591387), \"Cactus Jake's Thorns\" (2303542908, 4002575602), \"Cactus Jake's Needles\" (3062326029, 3451656431), \"Cactus Jake's Brambles\" (3913689833, 1392025339), \"Cactus Jake's Stomp\" (2145665438, 3917584500), \"Roots Cactus Jake in place and plays thorns PFX\" (2272845946). Dev strings: \"sandscale oasis 317 - boss aoe / boss ranged attack / boss summons adds / cactus boss thorn reactive / cactus burst for boss fight / damage shield for jumping cactus / Exploding Cactus / summon tornado\". The pattern reads as a thorn shield phase that falls away, plus adds and area attacks. Inferred from names only. | [client] [video rWTxDOHv-eY/00052] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Cactus Jake"
+              ],
+              "description": {
+                "value": "Cactus Jake (loc 2403828476, 2077323117) | A cactus outlaw. Client ability and effect names: \"Cactus Jake sprouts deadly thorns!\" (loc 1608763585), \"Cactus Jake's thorns fall away!\" (loc 1488429174, 317194102), \"Cactus Jake's Thorn Shield\" (3457176930, 2273591387), \"Cactus Jake's Thorns\" (2303542908, 4002575602), \"Cactus Jake's Needles\" (3062326029, 3451656431), \"Cactus Jake's Brambles\" (3913689833, 1392025339), \"Cactus Jake's Stomp\" (2145665438, 3917584500), \"Roots Cactus Jake in place and plays thorns PFX\" (2272845946). Dev strings: \"sandscale oasis 317 - boss aoe / boss ranged attack / boss summons adds / cactus boss thorn reactive / cactus burst for boss fight / damage shield for jumping cactus / Exploding Cactus / summon tornado\". The pattern reads as a thorn shield phase that falls away, plus adds and area attacks. Inferred from names only. | [client] [video rWTxDOHv-eY/00052] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [
+                "Sandscale Scavengers",
+                "Sandscale Water-seekers",
+                "Sandscale Hunters",
+                "Cactus Bandits"
+              ],
+              "description": {
+                "value": "Sandscale Scavengers (loc 1643211702, 2232129772, 2200018944), Sandscale Water-seekers (2907746623, 2515546817, 664495943), Sandscale Hunters (2267553830, 2352169326, 1060872684), Cactus Bandits (561775667, 776063698), Thirst-crazed Sandscale (1037410753, 1817086945) | Video confirms the \"Sandscale Scavenger\" nameplate. Water-seeker shamans heal and revive: \"Manguana Shaman (Sandscale Water-seeker) Heal Spell / Revive Spell / Nuke\" (836321619, 278630241, 3096175869). Other client Sandscale names not in the wiki list: Sandscale Magus (131335440), Sandscale Warlord (1645053745), Sandscale Gatherer (587057599), Sandscale Spectator. | [video] [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Cactus Jake"
+              ],
+              "description": {
+                "value": "Cactus Jake (loc 2403828476, 2077323117) | A cactus outlaw. Client ability and effect names: \"Cactus Jake sprouts deadly thorns!\" (loc 1608763585), \"Cactus Jake's thorns fall away!\" (loc 1488429174, 317194102), \"Cactus Jake's Thorn Shield\" (3457176930, 2273591387), \"Cactus Jake's Thorns\" (2303542908, 4002575602), \"Cactus Jake's Needles\" (3062326029, 3451656431), \"Cactus Jake's Brambles\" (3913689833, 1392025339), \"Cactus Jake's Stomp\" (2145665438, 3917584500), \"Roots Cactus Jake in place and plays thorns PFX\" (2272845946). Dev strings: \"sandscale oasis 317 - boss aoe / boss ranged attack / boss summons adds / cactus boss thorn reactive / cactus burst for boss fight / damage shield for jumping cactus / Exploding Cactus / summon tornado\". The pattern reads as a thorn shield phase that falls away, plus adds and area attacks. Inferred from names only. | [client] [video rWTxDOHv-eY/00052] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Sandscale Oasis.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"210 Stars\" (wiki, stub page) | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins",
+                "value": "\"35 Coins\" (wiki, stub page). It is not stated whether this is the wheel Coins slot or a flat award, and no other difficulty 2 dungeon has a figure this shape. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Coins; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "Not listed | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "Not listed. By the pattern of the other difficulty 2 dungeons it probably exists, but nothing here shows it. | [wiki: none]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Bonus-goal clothing; cited [wiki: none]"
+                  }
+                ]
+              },
+              {
+                "label": "In-run drops",
+                "value": "Coyote Juice Bottle (see above) | [video rWTxDOHv-eY/00054]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > In-run drops; cited [video rWTxDOHv-eY/00054]"
+                  }
+                ]
+              },
+              {
+                "label": "Achievements",
+                "value": null,
+                "reason": "None in the client | [client: no match]",
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Achievements; cited [client: no match]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Coins; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 35,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Coins; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Coins; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "unknown",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "unknown",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "unknown",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "unknown",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "unknown",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "unknown",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "sandscale_oasis",
+            "kind": "zone",
+            "target_name": "Sunstone Valley",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "object",
+            "target_name": "gate",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Entrance; cited [wiki] [client] [video ns0rlvCjXtU/00302, fMOGHMuA2Hc/00012, 00064, 00090, b6QfVC_2YpQ/00028, rWTxDOHv-eY/00214]"
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "npc",
+            "target_name": "Cactus Jake",
+            "target_id": 9500000808,
+            "reason": "Exact name matches reconstructed NPC content key in sunstone_valley.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/sunstone_valley.json npc_id 9500000808; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "npc",
+            "target_name": "Sandscale Scavengers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "npc",
+            "target_name": "Sandscale Water-seekers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "npc",
+            "target_name": "Sandscale Hunters",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "npc",
+            "target_name": "Cactus Bandits",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "sandscale_oasis",
+            "kind": "item",
+            "target_name": "unknown",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key sandscale_oasis comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Sandscale Oasis; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Cactus Jake",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Sandscale Scavengers",
+            "definition_id": 930018,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 403236 resolves 'Sandscale Scavenger'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930018 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Sandscale Water-seekers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Sandscale Hunters",
+            "definition_id": 930017,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 5102869 resolves 'Sandscale Hunter'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930017 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Cactus Bandits",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Cactus Jake",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Class: EncounterMatchmaking::BaseMatchmakingPacket
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00a7f0d0` | `EncounterMatchmaking::BaseMatchmakingPacket::BaseMatchmakingPacket` | ✅ | ctor | Common constructor for the matchmaking packet family: stores BasePacket::vftable at +0, writes 0x8d (141) at +4, replaces the vtable with BaseMatchmakingPacket::vftable, and stores caller-supplied sub-opcode at +8. Its … |
+| `00a7f140` | `EncounterMatchmaking::BaseMatchmakingPacket::~BaseMatchmakingPacket` | 🟢 | dtor | Destructor body for a matchmaking packet object: rewrites the object's vtable pointer to EncounterMatchmaking::BaseMatchmakingPacket::vftable and then to BasePacket::vftable (the inlined base-destructor step). It is cal… |
+| `00a7f190` | `EncounterMatchmaking::BaseMatchmakingPacket::ScalarDeletingDtor` | ✅ | dtor | Scalar deleting destructor (slot 0 of the packet vtable): rewrites the vtable pointer to BaseMatchmakingPacket::vftable, then to BasePacket::vftable, and frees the object with _free when bit 0 of param_2 is set. |
+| `00a862f0` | `EncounterMatchmakingBaseMatchmakingPacketDtorBody ⚠downgrade` | 🟢 | dtor | Destructor body of EncounterMatchmaking::BaseMatchmakingPacket: stores its own vtable and then the BasePacket vtable and returns; reached from an MSVC unwind funclet. |
+| `00a98fa0` | `EncounterMatchmaking::BaseMatchmakingPacket::BaseMatchmakingPacket` | ✅ | ctor | Stores BasePacket::vftable, writes the family byte 0x8d at +4, stores EncounterMatchmaking::BaseMatchmakingPacket::vftable and zeroes the word at +8. |
+| `00a9dfb0` | `EncounterMatchmaking::BaseMatchmakingPacket::~BaseMatchmakingPacket` | ✅ | dtor | Destructor body of the matchmaking packet base: restores the SoeUtil::List vtable at +0x28 and calls the list destructor FUN_007798c0, restores the list vtable at +0x18 and calls FUN_007798c0 again, then rewrites the ob… |
+| `00c087f0` | `EncounterMatchmaking::BaseMatchmakingPacket::Dtor` | ✅ | dtor | Base-class destructor body: destroys the embedded member via FUN_00a82b30, then rewrites the vtable to EncounterMatchmaking::BaseMatchmakingPacket::vftable and BasePacket::vftable; called from the AddMatchRequestPacket … |

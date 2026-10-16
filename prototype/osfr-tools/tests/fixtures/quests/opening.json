@@ -1,0 +1,2469 @@
+{
+  "schema_version": 1,
+  "scope": "Local 17-stage opening quest parity fixture",
+  "reconstruction_notice": "(R) Local quest bindings and reward values; not a retail quest catalogue.",
+  "initial_profiles": [
+    1,
+    43
+  ],
+  "actors": [
+    {
+      "guid": 5715144128442925057,
+      "definition_id": 6445,
+      "name_id": 441292,
+      "name": "Darkthorne",
+      "model_id": 353,
+      "model_file_name": "fairy_darkthorne_f.adr",
+      "zone_id": 0,
+      "position": [
+        -1897.0,
+        -39.7,
+        412.6
+      ],
+      "heading": 2.995849,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925058,
+      "definition_id": 920010,
+      "name_id": 4419617,
+      "name": "Hero's Journal",
+      "model_id": 797,
+      "model_file_name": "sg_book_01.adr",
+      "zone_id": 0,
+      "position": [
+        -1901.0,
+        -39.7,
+        418.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925058
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925059,
+      "definition_id": 3211,
+      "name_id": 19091,
+      "name": "Pappy Farnum",
+      "model_id": 430,
+      "model_file_name": "human_m_pappy_farnum.agr",
+      "zone_id": 0,
+      "position": [
+        -2184.513,
+        -31.53728,
+        328.1112
+      ],
+      "heading": -0.618079,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925060,
+      "definition_id": 2538,
+      "name_id": 46913,
+      "name": "Mae Farnum",
+      "model_id": 782,
+      "model_file_name": "human_f_mae_farnum.agr",
+      "zone_id": 0,
+      "position": [
+        -2112.839,
+        -56.52175,
+        208.5168
+      ],
+      "heading": 2.328618,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925061,
+      "definition_id": 3232,
+      "name_id": 5101863,
+      "name": "Cleetus Farnum",
+      "model_id": 438,
+      "model_file_name": "human_m_andrew.agr",
+      "zone_id": 0,
+      "position": [
+        -2078.389,
+        -55.64841,
+        200.7649
+      ],
+      "heading": 2.076398,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925062,
+      "definition_id": 2087,
+      "name_id": 20942,
+      "name": "Bartle",
+      "model_id": 221,
+      "model_file_name": "chugawug_m_02.adr",
+      "zone_id": 0,
+      "position": [
+        -1860.185,
+        -51.30442,
+        341.1369
+      ],
+      "heading": -0.109688,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925063,
+      "definition_id": 31331,
+      "name_id": 130547,
+      "name": "Queen Valerian",
+      "model_id": 400,
+      "model_file_name": "fairy_queenvalerian.adr",
+      "zone_id": 0,
+      "position": [
+        -1054.135,
+        4.629629,
+        305.7209
+      ],
+      "heading": -1.496669,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925064,
+      "definition_id": 6433,
+      "name_id": 5100023,
+      "name": "Water Well",
+      "model_id": 3519,
+      "model_file_name": "farming_well_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2113.0,
+        -56.5,
+        222.0
+      ],
+      "heading": 0.269979,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925064
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925065,
+      "definition_id": 2489,
+      "name_id": 5100342,
+      "name": "Fire",
+      "model_id": 204,
+      "model_file_name": "bw_campfire_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2123.0,
+        -56.5,
+        215.0
+      ],
+      "heading": -0.135653,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925065
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925066,
+      "definition_id": 2489,
+      "name_id": 5100342,
+      "name": "Fire",
+      "model_id": 204,
+      "model_file_name": "bw_campfire_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2133.0,
+        -56.5,
+        226.0
+      ],
+      "heading": -0.135653,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925066
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925067,
+      "definition_id": 2489,
+      "name_id": 5100342,
+      "name": "Fire",
+      "model_id": 204,
+      "model_file_name": "bw_campfire_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2124.0,
+        -55.65,
+        237.0
+      ],
+      "heading": -0.135653,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925067
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925068,
+      "definition_id": 2540,
+      "name_id": 5100033,
+      "name": "Collect Bundles of Rainleaf and Gummy Fruit",
+      "model_id": 3653,
+      "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2122.528,
+        -56.22014,
+        206.9492
+      ],
+      "heading": -2.036677,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "gather",
+        "resource_id": 1001
+      },
+      "required_profile": 45,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925069,
+      "definition_id": 2546,
+      "name_id": 5100033,
+      "name": "Collect Bundles of Rainleaf and Gummy Fruit",
+      "model_id": 3633,
+      "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2116.325,
+        -56.67786,
+        199.2877
+      ],
+      "heading": 0.130585,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "gather",
+        "resource_id": 1002
+      },
+      "required_profile": 45,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925070,
+      "definition_id": 2537,
+      "name_id": 2061,
+      "name": "Cooking Table",
+      "model_id": 419,
+      "model_file_name": "sg_cooking_table_nodes_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2109.244,
+        -56.61908,
+        210.265
+      ],
+      "heading": -0.761661,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "craft",
+        "recipe_id": 2001
+      },
+      "required_profile": 45,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925071,
+      "definition_id": 920011,
+      "name_id": 21917,
+      "name": "Copper Ore",
+      "model_id": 607,
+      "model_file_name": "sg_mining_node_ore_naturaldirt_copper_01.agr",
+      "zone_id": 0,
+      "position": [
+        -2072.0,
+        -55.6,
+        207.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "gather",
+        "resource_id": 1003
+      },
+      "required_profile": 14,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925072,
+      "definition_id": 920012,
+      "name_id": 5100121,
+      "name": "Smelt 5 Copper Bars",
+      "model_id": 484,
+      "model_file_name": "sh_forge_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2076.0,
+        -55.6,
+        190.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "craft",
+        "recipe_id": 2002
+      },
+      "required_profile": 14,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925073,
+      "definition_id": 3600,
+      "name_id": 36164,
+      "name": "Anvil",
+      "model_id": 273,
+      "model_file_name": "sg_anvil_stump_01.adr",
+      "zone_id": 0,
+      "position": [
+        -2088.0,
+        -54.79,
+        200.0
+      ],
+      "heading": -1.007059,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "craft",
+        "recipe_id": 2003
+      },
+      "required_profile": 16,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925074,
+      "definition_id": 3156,
+      "name_id": 5100200,
+      "name": "Hooligan Wolf",
+      "model_id": 3284,
+      "model_file_name": "wolf_generic.adr",
+      "zone_id": 0,
+      "position": [
+        -2100.965,
+        -45.98195,
+        456.7631
+      ],
+      "heading": 0.208813,
+      "interaction_radius": 12.0,
+      "kind": "enemy",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925075,
+      "definition_id": 920001,
+      "name_id": 5101961,
+      "name": "Gloam Creature",
+      "model_id": 3933,
+      "model_file_name": "gloam_m_construct.adr",
+      "zone_id": 0,
+      "position": [
+        -2173.0,
+        -31.5,
+        348.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "enemy",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925076,
+      "definition_id": 920002,
+      "name_id": 5100344,
+      "name": "Mac",
+      "model_id": 3897,
+      "model_file_name": "human_m_hooligan_boss_02.agr",
+      "zone_id": 0,
+      "position": [
+        -1828.0,
+        -51.3,
+        365.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "enemy",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925077,
+      "definition_id": 920041,
+      "name_id": 5100327,
+      "name": "Gloam Artifact",
+      "model_id": 3934,
+      "model_file_name": "gl_gloam_obelisk_large_01.adr",
+      "zone_id": 0,
+      "position": [
+        -1858.0,
+        -51.17,
+        355.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925077
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925078,
+      "definition_id": 920042,
+      "name_id": 5100327,
+      "name": "Gloam Artifact",
+      "model_id": 3934,
+      "model_file_name": "gl_gloam_obelisk_large_01.adr",
+      "zone_id": 0,
+      "position": [
+        -1844.0,
+        -54.47,
+        343.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925078
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925079,
+      "definition_id": 920043,
+      "name_id": 5100327,
+      "name": "Gloam Artifact",
+      "model_id": 3934,
+      "model_file_name": "gl_gloam_obelisk_large_01.adr",
+      "zone_id": 0,
+      "position": [
+        -1838.0,
+        -46.92,
+        370.0
+      ],
+      "heading": 0.0,
+      "interaction_radius": 12.0,
+      "kind": "resource",
+      "action": {
+        "kind": "interact",
+        "actor_guid": 5715144128442925079
+      },
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925080,
+      "definition_id": 2385,
+      "name_id": 442310,
+      "name": "Ellandra Shieldbreaker",
+      "model_id": 4213,
+      "model_file_name": "human_f_guildmaster_fighter.agr",
+      "zone_id": 0,
+      "position": [
+        -1179.094,
+        5.245171,
+        226.7734
+      ],
+      "heading": 1.491786,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925081,
+      "definition_id": 2338,
+      "name_id": 442311,
+      "name": "Maximus Axegrinder",
+      "model_id": 574,
+      "model_file_name": "fairy_m_blacksmith_01.agr",
+      "zone_id": 0,
+      "position": [
+        -1179.59,
+        5.572295,
+        363.1204
+      ],
+      "heading": 1.680711,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925082,
+      "definition_id": 2351,
+      "name_id": 442312,
+      "name": "Scotty Trackrunner",
+      "model_id": 1457,
+      "model_file_name": "human_m_manager_landon.agr",
+      "zone_id": 0,
+      "position": [
+        -1080.5,
+        5.272346,
+        414.9592
+      ],
+      "heading": -2.491853,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    },
+    {
+      "guid": 5715144128442925083,
+      "definition_id": 2378,
+      "name_id": 437145,
+      "name": "Captain Sunspark",
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "zone_id": 0,
+      "position": [
+        -1164.294,
+        5.642769,
+        227.7217
+      ],
+      "heading": -0.842952,
+      "interaction_radius": 12.0,
+      "kind": "guide",
+      "action": null,
+      "required_profile": null,
+      "provenance": "(R) Local opening actor binding used for parity."
+    }
+  ],
+  "discoveries": [],
+  "stages": [
+    {
+      "id": 910001,
+      "original_quest_id": null,
+      "title_id": 4419559,
+      "description_id": 4419560,
+      "title": "Hero's Journal",
+      "description": "This is the Hero’s Journal, a gift from the Heartseed to aid you with defeating the Gloam. It will record your deeds and provide hints as what you can do next in your adventures.",
+      "giver_guid": 5715144128442925057,
+      "turnin_guid": 5715144128442925057,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000101,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Brawler using the native Jobs menu.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 43
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000102,
+          "name_id": 4419602,
+          "description_id": 4419602,
+          "description": "Interact with the Hero's Journal",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925058
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910001,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910002,
+      "original_quest_id": null,
+      "title_id": 4419563,
+      "description_id": 4419564,
+      "title": "The Last Best Hope",
+      "description": "The Gloam have found Darkthorne and have trapped her in the Heartseed Chamber. Defend Darkthorne until she can find a way out.",
+      "giver_guid": 5715144128442925057,
+      "turnin_guid": 5715144128442925059,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000201,
+          "name_id": 4419610,
+          "description_id": 4419610,
+          "description": "Defend Darkthorne from the Gloam",
+          "required": 1,
+          "trigger": {
+            "kind": "dungeon_completed",
+            "encounter_id": 411
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000202,
+          "name_id": 4419612,
+          "description_id": 4419612,
+          "description": "Talk to Pappy Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925059
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910002,
+        "coins": 25,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910003,
+      "original_quest_id": null,
+      "title_id": 4420042,
+      "description_id": 4420043,
+      "title": "Saving Farnum's Farm",
+      "description": "Darkthorne teleported you to Farnum's Farmstead, but Gloamlings have set it ablaze. Help the Farnums by putting out some of the fires.",
+      "giver_guid": 5715144128442925059,
+      "turnin_guid": 5715144128442925059,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000301,
+          "name_id": 4420047,
+          "description_id": 4420047,
+          "description": "Fill the water bucket",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925064
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000302,
+          "name_id": 5100043,
+          "description_id": 5100043,
+          "description": "Extinguish farm fire1.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925065
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000303,
+          "name_id": 5100043,
+          "description_id": 5100043,
+          "description": "Extinguish farm fire2.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925066
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000304,
+          "name_id": 5100043,
+          "description_id": 5100043,
+          "description": "Extinguish farm fire3.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925067
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910003,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910004,
+      "original_quest_id": null,
+      "title_id": 4420050,
+      "description_id": 4420051,
+      "title": "Cooking 101",
+      "description": "Learn how to cook some supplies for your journey.",
+      "giver_guid": 5715144128442925060,
+      "turnin_guid": 5715144128442925060,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000401,
+          "name_id": 4420055,
+          "description_id": 4420055,
+          "description": "Talk to Mae Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925060
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000402,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Chef.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000403,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Equip the Student Chef Shirt in the Chef equipment screen.",
+          "required": 1,
+          "trigger": {
+            "kind": "cosmetic_equipped",
+            "definition_id": 13597
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000404,
+          "name_id": 5100033,
+          "description_id": 5100033,
+          "description": "Harvest 4 Rainleaf bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1001
+          },
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored."
+        },
+        {
+          "id": 91000405,
+          "name_id": 5100033,
+          "description_id": 5100033,
+          "description": "Harvest 4 Gummyfruit bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1002
+          },
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored."
+        },
+        {
+          "id": 91000406,
+          "name_id": 5100039,
+          "description_id": 5100039,
+          "description": "Complete the original cooking game to make StrongArm Stew.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2001
+          },
+          "recovery": "Original game_cooking.gfx controls and protocol. Game46 binding, six-phase sequence/numeric tuning and one-food output are reconstructed; recipe materials four each2862/2875/2884/2900 are wiki-backed."
+        }
+      ],
+      "reward": {
+        "stage_id": 910004,
+        "coins": 10,
+        "items": [
+          [
+            14794,
+            1
+          ]
+        ]
+      },
+      "unlock_profiles": [
+        45
+      ],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910005,
+      "original_quest_id": null,
+      "title_id": 4420058,
+      "description_id": 4420059,
+      "title": "Gear Up!",
+      "description": "It's time to start gearing up for your journey to the Queen. Mine ore and smelt it so it can be useful in creating some equipment.",
+      "giver_guid": 5715144128442925061,
+      "turnin_guid": 5715144128442925061,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000501,
+          "name_id": 4420063,
+          "description_id": 4420063,
+          "description": "Talk to Cleetus Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925061
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000502,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Miner.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000503,
+          "name_id": 5100117,
+          "description_id": 5100117,
+          "description": "Mine Copper Ore",
+          "required": 5,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1003
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000504,
+          "name_id": 5100121,
+          "description_id": 5100121,
+          "description": "Smelt 5 Copper Bars",
+          "required": 5,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2002
+          },
+          "recovery": "Original Smelting77 movie/four stages; reconstructed numeric phase tuning and fixed recipe. Native completion consumes5 Copper Ore/3 Singing Coal and grants10 Copper Bars atomically."
+        }
+      ],
+      "reward": {
+        "stage_id": 910005,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [
+        14
+      ],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910006,
+      "original_quest_id": null,
+      "title_id": 4420066,
+      "description_id": 4420067,
+      "title": "Your First Weapon",
+      "description": "You're ready to begin forging your first weapon. This should be useful in defending yourself as you journey to the Queen.",
+      "giver_guid": 5715144128442925061,
+      "turnin_guid": 5715144128442925061,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000601,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Blacksmith.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 16
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000602,
+          "name_id": 4420071,
+          "description_id": 4420071,
+          "description": "Win the original forging game to make a Spunky Scrapper Hammer. Board tuning, consumption and tint selection are local reconstructions.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2003
+          },
+          "recovery": "Original Forging139 movie/protocol; quota5/180seconds/board tuning and consumption are reconstructed. Wiki revision27815 proves the acceptance grant, not a per-attempt recipe."
+        }
+      ],
+      "reward": {
+        "stage_id": 910006,
+        "coins": 16,
+        "items": []
+      },
+      "unlock_profiles": [
+        16
+      ],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910007,
+      "original_quest_id": null,
+      "title_id": 4420074,
+      "description_id": 4420075,
+      "title": "Fighting off the Pack",
+      "description": "With a new weapon in hand, it is time to learn how to use it to become a hero and protector of the Realms.",
+      "giver_guid": 5715144128442925061,
+      "turnin_guid": 5715144128442925061,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000701,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Brawler.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 43
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000702,
+          "name_id": 4420079,
+          "description_id": 4420079,
+          "description": "Equip the forged Spunky Scrapper Hammer as Brawler.",
+          "required": 1,
+          "trigger": {
+            "kind": "cosmetic_equipped",
+            "definition_id": 30280
+          },
+          "recovery": "Genuine Legacy definition30280/name102173/class71/slot7; selected tint is a local choice."
+        },
+        {
+          "id": 91000703,
+          "name_id": 5100203,
+          "description_id": 5100203,
+          "description": "Defeat Hooligan Wolves",
+          "required": 5,
+          "trigger": {
+            "kind": "defeat",
+            "definition_id": 3156
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910007,
+        "coins": 18,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910008,
+      "original_quest_id": null,
+      "title_id": 4420082,
+      "description_id": 4420083,
+      "title": "One More Gloam",
+      "description": "Before you leave to find the Queen, Pappy Farnum asked for your help defeating one last Gloam Creature roaming nearby.",
+      "giver_guid": 5715144128442925059,
+      "turnin_guid": 5715144128442925059,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000801,
+          "name_id": 4420087,
+          "description_id": 4420087,
+          "description": "Talk to Pappy Farnum",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925059
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91000802,
+          "name_id": 5100268,
+          "description_id": 5100268,
+          "description": "Defeat the Gloam Creature",
+          "required": 1,
+          "trigger": {
+            "kind": "defeat",
+            "definition_id": 920001
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910008,
+        "coins": 20,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910009,
+      "original_quest_id": null,
+      "title_id": 4420090,
+      "description_id": 4420091,
+      "title": "Where's the Help?",
+      "description": "Expected help from nearby Cobblestone Village never arrived at Farnum Farmstead. Talk to Bartle and try to learn why.",
+      "giver_guid": 5715144128442925059,
+      "turnin_guid": 5715144128442925062,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91000901,
+          "name_id": 4420095,
+          "description_id": 4420095,
+          "description": "Talk to Bartle",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925062
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910009,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910010,
+      "original_quest_id": null,
+      "title_id": 4420098,
+      "description_id": 4420099,
+      "title": "Pull the Plug",
+      "description": "A gang of Hooligans led by Mac has blockaded Cobblestone Village. Destroy the Gloam Artifacts they're using to shield their camp.",
+      "giver_guid": 5715144128442925062,
+      "turnin_guid": 5715144128442925062,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001001,
+          "name_id": 5100332,
+          "description_id": 5100332,
+          "description": "Destroy Gloam Artifact1.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925077
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001002,
+          "name_id": 5100332,
+          "description_id": 5100332,
+          "description": "Destroy Gloam Artifact2.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925078
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001003,
+          "name_id": 5100332,
+          "description_id": 5100332,
+          "description": "Destroy Gloam Artifact3.",
+          "required": 1,
+          "trigger": {
+            "kind": "interact",
+            "actor_guid": 5715144128442925079
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910010,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910011,
+      "original_quest_id": null,
+      "title_id": 4420106,
+      "description_id": 4420107,
+      "title": "Cobblestone Showdown",
+      "description": "With their Artifacts destroyed, Mac and his gang are vulnerable to attack. Show them who's boss and free Cobblestone Village.",
+      "giver_guid": 5715144128442925062,
+      "turnin_guid": 5715144128442925062,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001101,
+          "name_id": 4420111,
+          "description_id": 4420111,
+          "description": "Defeat Mac",
+          "required": 1,
+          "trigger": {
+            "kind": "defeat",
+            "definition_id": 920002
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910011,
+        "coins": 25,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910012,
+      "original_quest_id": null,
+      "title_id": 4420114,
+      "description_id": 4420115,
+      "title": "Off to the Queen",
+      "description": "With Mac defeated and the Gloam Barrier dissipating you are free to head to Sanctuary and tell Queen Valerian about what happened to Briarheart and Darkthorne.",
+      "giver_guid": 5715144128442925062,
+      "turnin_guid": 5715144128442925063,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001201,
+          "name_id": 4420119,
+          "description_id": 4420119,
+          "description": "Enter the Royal Palace",
+          "required": 1,
+          "trigger": {
+            "kind": "visit",
+            "zone_id": 0,
+            "position": [
+              -1054.135,
+              4.629629,
+              305.7209
+            ],
+            "radius": 25.0
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001202,
+          "name_id": 5100330,
+          "description_id": 5100330,
+          "description": "Talk to Queen Valerian",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925063
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910012,
+        "coins": 25,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910013,
+      "original_quest_id": null,
+      "title_id": 5100479,
+      "description_id": 5100480,
+      "title": "Second Helping of Strongarm Stew",
+      "description": "Cook a 2nd helping of Strongarm Stew for Mae Farnum",
+      "giver_guid": 5715144128442925060,
+      "turnin_guid": 5715144128442925060,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001301,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Chef.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001302,
+          "name_id": 5100033,
+          "description_id": 5100033,
+          "description": "Harvest 4 Rainleaf bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1001
+          },
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored."
+        },
+        {
+          "id": 91001303,
+          "name_id": 5100033,
+          "description_id": 5100033,
+          "description": "Harvest 4 Gummyfruit bundles.",
+          "required": 4,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1002
+          },
+          "recovery": "Local four-count gathering objective, matching community StrongArm Stew recipe inputs. Each valid newly counted Chef interaction grants one material; original gathering minigame/drop table remains unrestored."
+        },
+        {
+          "id": 91001304,
+          "name_id": 5100039,
+          "description_id": 5100039,
+          "description": "Complete the original cooking game to make StrongArm Stew.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2001
+          },
+          "recovery": "Original game_cooking.gfx controls and protocol. Game46 binding, six-phase sequence/numeric tuning and one-food output are reconstructed; recipe materials four each2862/2875/2884/2900 are wiki-backed."
+        }
+      ],
+      "reward": {
+        "stage_id": 910013,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910014,
+      "original_quest_id": null,
+      "title_id": 5100483,
+      "description_id": 5100484,
+      "title": "Cleetus' Copper Collection",
+      "description": "Mine a large batch of Copper Ore for Cleetus Farnum",
+      "giver_guid": 5715144128442925061,
+      "turnin_guid": 5715144128442925061,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001401,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Miner.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001402,
+          "name_id": 5100117,
+          "description_id": 5100117,
+          "description": "Mine10 more Copper Ore for the local bonus contract.",
+          "required": 10,
+          "trigger": {
+            "kind": "gather",
+            "resource_id": 1003
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910014,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910015,
+      "original_quest_id": null,
+      "title_id": 5100487,
+      "description_id": 5100488,
+      "title": "Forging for Reinforcements",
+      "description": "Forge another Spunky Scrapper Hammer for Cleetus Farnum.",
+      "giver_guid": 5715144128442925061,
+      "turnin_guid": 5715144128442925061,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001501,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Miner.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 14
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001502,
+          "name_id": 5100121,
+          "description_id": 5100121,
+          "description": "Smelt 5 Copper Bars",
+          "required": 5,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2002
+          },
+          "recovery": "Original Smelting77 movie/four stages; reconstructed numeric phase tuning and fixed recipe. Native completion consumes5 Copper Ore/3 Singing Coal and grants10 Copper Bars atomically."
+        },
+        {
+          "id": 91001503,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Blacksmith.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 16
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001504,
+          "name_id": 5100503,
+          "description_id": 5100503,
+          "description": "Win the original forging game to make another Spunky Scrapper Hammer.",
+          "required": 1,
+          "trigger": {
+            "kind": "craft",
+            "recipe_id": 2003
+          },
+          "recovery": "Original Forging139 movie/protocol; quota5/180seconds/board tuning and consumption are reconstructed. Wiki revision27815 proves the acceptance grant, not a per-attempt recipe."
+        }
+      ],
+      "reward": {
+        "stage_id": 910015,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910016,
+      "original_quest_id": null,
+      "title_id": 5100581,
+      "description_id": 5100582,
+      "title": "Visiting the Job Center",
+      "description": "Queen Valerian has suggested that you meet the different Job Trainers in the Job Center here in Sanctuary.",
+      "giver_guid": 5715144128442925063,
+      "turnin_guid": 5715144128442925083,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001601,
+          "name_id": 5100586,
+          "description_id": 5100586,
+          "description": "Talk to Ellandra Shieldbreaker",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925080
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001602,
+          "name_id": 5100588,
+          "description_id": 5100588,
+          "description": "Talk to Maximus Axegrinder",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925081
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001603,
+          "name_id": 5100590,
+          "description_id": 5100590,
+          "description": "Talk to Scotty Trackrunner",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925082
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001604,
+          "name_id": 5100592,
+          "description_id": 5100592,
+          "description": "Talk to Captain Sunspark",
+          "required": 1,
+          "trigger": {
+            "kind": "talk",
+            "actor_guid": 5715144128442925083
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910016,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [
+        11,
+        35
+      ],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    },
+    {
+      "id": 910017,
+      "original_quest_id": null,
+      "title_id": 5100609,
+      "description_id": 5100617,
+      "title": "Talk to Captain Sunspark",
+      "description": "Being an adventurer is dangerous work. Let me show you a trick that could help if you are attacked when you are not in a combat job like Brawler or Medic.",
+      "giver_guid": 5715144128442925083,
+      "turnin_guid": 5715144128442925083,
+      "ordered": true,
+      "objectives": [
+        {
+          "id": 91001701,
+          "name_id": 5100611,
+          "description_id": 5100611,
+          "description": "Switch to the Adventurer job",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 1
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001702,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Try the Medic job in the native Jobs menu.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 11
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001703,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Try the Archer job in the native Jobs menu.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 35
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001704,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Switch to Chef and show your earned hat.",
+          "required": 1,
+          "trigger": {
+            "kind": "class_selected",
+            "profile_id": 45
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        },
+        {
+          "id": 91001705,
+          "name_id": 0,
+          "description_id": 0,
+          "description": "Equip the Student Chef Hat earned earlier.",
+          "required": 1,
+          "trigger": {
+            "kind": "cosmetic_equipped",
+            "definition_id": 14794
+          },
+          "recovery": "Original action text where locale_id is nonzero; local ordered binding/count unless explicitly five copper bars. Craft/gather interactions substitute for unimplemented original minigames."
+        }
+      ],
+      "reward": {
+        "stage_id": 910017,
+        "coins": 10,
+        "items": []
+      },
+      "unlock_profiles": [],
+      "provenance": "(R) Local opening quest definition; not recovered retail quest data."
+    }
+  ],
+  "provenance": {
+    "source": [
+      {
+        "kind": "reconstructed",
+        "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+      }
+    ],
+    "actors": [
+      {
+        "actor_id": 5715144128442925057,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925058,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925059,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925060,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925061,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925062,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925063,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925064,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925065,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925066,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925067,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925068,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925069,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925070,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925071,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925072,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925073,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925074,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925075,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925076,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925077,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925078,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925079,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925080,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925081,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925082,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      },
+      {
+        "actor_id": 5715144128442925083,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ]
+      }
+    ],
+    "quests": [
+      {
+        "quest_id": 910001,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000101,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000102,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910002,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000201,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000202,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910003,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000301,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000302,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000303,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000304,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910004,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000401,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000402,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000403,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000404,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000405,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000406,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910005,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000501,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000502,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000503,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000504,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910006,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000601,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000602,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910007,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000701,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000702,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000703,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910008,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000801,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91000802,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910009,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91000901,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910010,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001001,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001002,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001003,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910011,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001101,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910012,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001201,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001202,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910013,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001301,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001302,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001303,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001304,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910014,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001401,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001402,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910015,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001501,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001502,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001503,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001504,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910016,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001601,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001602,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001603,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001604,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "quest_id": 910017,
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+          }
+        ],
+        "objectives": [
+          {
+            "objective_id": 91001701,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001702,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001703,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001704,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          },
+          {
+            "objective_id": 91001705,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Local opening quest binding; native acceptance is recorded separately in project research."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

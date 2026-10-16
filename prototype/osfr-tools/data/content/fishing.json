@@ -1,0 +1,1494 @@
+{
+  "schema_version": 1,
+  "minigame_type_id": 21,
+  "source_tags": {
+    "minigame_type_id": "client MiniGameTypeData.txt; native fishing is non-Flash TYPE 21"
+  },
+  "timing": {
+    "bite_delay_ms": 1500,
+    "nibble_ms": 900,
+    "reel_window_ms": 7000,
+    "catch_chance": 1.0,
+    "line_snap_chance": 0.0,
+    "source": "R: no original fishing timing or outcome probabilities are sent by the client."
+  },
+  "registration": {
+    "player_words": [
+      3.0,
+      2.0,
+      35.0,
+      1.0,
+      15.0,
+      3.0,
+      0.0,
+      100.0,
+      1.0,
+      12.0,
+      0.65,
+      0.0,
+      1.0,
+      30.0,
+      12.0,
+      5.0
+    ],
+    "underwater_sky": "",
+    "zone_words": [
+      1.0,
+      0.0,
+      8.0,
+      1.0,
+      0.0
+    ],
+    "integer_values": [],
+    "source": "R: values project into recovered sub-3 fields; originals are unavailable."
+  },
+  "sizes": [
+    {
+      "grade": 1,
+      "name": "Small",
+      "source": "client result reader 00b66be0 and catch card 00cd0150"
+    },
+    {
+      "grade": 2,
+      "name": "Medium",
+      "source": "client result reader 00b66be0 and catch card 00cd0150"
+    },
+    {
+      "grade": 3,
+      "name": "Large",
+      "source": "client result reader 00b66be0 and catch card 00cd0150"
+    },
+    {
+      "grade": 4,
+      "name": "Extra Large",
+      "source": "client result reader 00b66be0 and catch card 00cd0150"
+    }
+  ],
+  "areas": [
+    {
+      "key": "sacred_grove_shallows",
+      "name": "Sacred Grove Shallows",
+      "fish": [
+        "flutterfish",
+        "slugmud_skipper",
+        "butter_flyfish",
+        "tickled_trout",
+        "tangletooth_shark",
+        "feral_catfish",
+        "cheery_salmon",
+        "chipsen_fish",
+        "baconfish"
+      ],
+      "schools": [
+        [
+          5.0,
+          0.0,
+          5.0
+        ],
+        [
+          15.0,
+          0.0,
+          -5.0
+        ]
+      ],
+      "source": "area and roster: client locale; levels: wiki; school layout: R"
+    },
+    {
+      "key": "bramblebacks_bayou",
+      "name": "Brambleback's Bayou",
+      "fish": [
+        "creeping_cod",
+        "bitter_betta",
+        "golden_scaled_nettler",
+        "globfish",
+        "blind_swurglefish",
+        "fanged_grouper",
+        "changed_salmon",
+        "briar_nibbler"
+      ],
+      "schools": [
+        [
+          6.0,
+          0.0,
+          4.0
+        ],
+        [
+          14.0,
+          0.0,
+          -6.0
+        ]
+      ],
+      "source": "area and roster: client locale; levels: wiki except marked R; school layout: R"
+    },
+    {
+      "key": "darklit_lagoon",
+      "name": "Darklit Lagoon",
+      "fish": [
+        "creeping_cod",
+        "ink_cod",
+        "purplenosed_shark",
+        "old_sole",
+        "thorny_trout",
+        "golden_scaled_nettler",
+        "roach_loach"
+      ],
+      "schools": [
+        [
+          4.0,
+          0.0,
+          7.0
+        ],
+        [
+          16.0,
+          0.0,
+          -4.0
+        ]
+      ],
+      "source": "area and roster: client locale; levels: wiki; school layout: R"
+    },
+    {
+      "key": "rainbow_lake",
+      "name": "Rainbow Lake",
+      "fish": [
+        "flutterfish",
+        "finless_fish",
+        "tickled_trout",
+        "tangletooth_shark",
+        "peachy_perch",
+        "calico_catfish",
+        "lady_tetra",
+        "toothy_tetra"
+      ],
+      "schools": [
+        [
+          5.0,
+          0.0,
+          6.0
+        ],
+        [
+          15.0,
+          0.0,
+          -5.0
+        ]
+      ],
+      "source": "area and roster: client locale; levels: wiki; school layout: R"
+    },
+    {
+      "key": "wintery_basin",
+      "name": "Wintery Basin",
+      "fish": [
+        "winter_piranha",
+        "frostgill_smelt",
+        "coach_loach",
+        "frozen_char",
+        "ferocious_fangler",
+        "blubracuda",
+        "spineless_stickleback"
+      ],
+      "schools": [
+        [
+          6.0,
+          0.0,
+          5.0
+        ],
+        [
+          14.0,
+          0.0,
+          -5.0
+        ]
+      ],
+      "source": "area and roster: client locale; levels: wiki; school layout: R"
+    },
+    {
+      "key": "frostbitten_banks",
+      "name": "Frostbitten Banks",
+      "fish": [
+        "winter_piranha",
+        "chilly_grouper",
+        "blue_thornfin",
+        "ferocious_fangler",
+        "frostgill_smelt",
+        "spineless_stickleback",
+        "talking_bass",
+        "pacu_pacu",
+        "goofy_grouper",
+        "plattypus"
+      ],
+      "schools": [
+        [
+          5.0,
+          0.0,
+          5.0
+        ],
+        [
+          15.0,
+          0.0,
+          -5.0
+        ]
+      ],
+      "source": "area and roster: client locale; levels: wiki; school layout: R"
+    }
+  ],
+  "species": [
+    {
+      "key": "flutterfish",
+      "name": "Flutterfish",
+      "name_id": 3684473514,
+      "type_id": 1001,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.2,
+        2.5
+      ],
+      "size_weights": [
+        55,
+        30,
+        12,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "slugmud_skipper",
+      "name": "Slugmud Skipper",
+      "name_id": 1323940429,
+      "type_id": 1002,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.1,
+        1.8
+      ],
+      "size_weights": [
+        60,
+        27,
+        11,
+        2
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "butter_flyfish",
+      "name": "Butter Flyfish",
+      "name_id": 4078677637,
+      "type_id": 1003,
+      "minimum_level": 5,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 85,
+      "weight_kg": [
+        0.4,
+        3.5
+      ],
+      "size_weights": [
+        45,
+        32,
+        18,
+        5
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "tickled_trout",
+      "name": "Tickled Trout",
+      "name_id": 201959869,
+      "type_id": 1004,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.3,
+        3.0
+      ],
+      "size_weights": [
+        50,
+        32,
+        15,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "tangletooth_shark",
+      "name": "Tangletooth Shark",
+      "name_id": 2297626118,
+      "type_id": 1005,
+      "minimum_level": 20,
+      "rarity": 5,
+      "difficulty": 5,
+      "selection_weight": 12,
+      "weight_kg": [
+        4.0,
+        24.0
+      ],
+      "size_weights": [
+        15,
+        25,
+        35,
+        25
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "feral_catfish",
+      "name": "Feral Catfish",
+      "name_id": 4139537974,
+      "type_id": 1006,
+      "minimum_level": 17,
+      "rarity": 4,
+      "difficulty": 4,
+      "selection_weight": 22,
+      "weight_kg": [
+        2.0,
+        21.0
+      ],
+      "size_weights": [
+        20,
+        28,
+        32,
+        20
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "cheery_salmon",
+      "name": "Cheery Salmon",
+      "name_id": 3740293957,
+      "type_id": 1007,
+      "minimum_level": 10,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 40,
+      "weight_kg": [
+        1.0,
+        12.0
+      ],
+      "size_weights": [
+        25,
+        35,
+        28,
+        12
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "chipsen_fish",
+      "name": "Chipsen Fish",
+      "name_id": 1764105760,
+      "type_id": 1008,
+      "minimum_level": 14,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 30,
+      "weight_kg": [
+        0.8,
+        10.0
+      ],
+      "size_weights": [
+        28,
+        34,
+        27,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "baconfish",
+      "name": "Baconfish",
+      "name_id": 97750453,
+      "type_id": 1009,
+      "minimum_level": 20,
+      "rarity": 5,
+      "difficulty": 4,
+      "selection_weight": 12,
+      "weight_kg": [
+        3.0,
+        19.0
+      ],
+      "size_weights": [
+        18,
+        27,
+        33,
+        22
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "creeping_cod",
+      "name": "Creeping Cod",
+      "name_id": 3825681255,
+      "type_id": 1010,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.2,
+        3.0
+      ],
+      "size_weights": [
+        55,
+        30,
+        12,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "bitter_betta",
+      "name": "Bitter Betta",
+      "name_id": 2581337494,
+      "type_id": 1011,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.1,
+        2.0
+      ],
+      "size_weights": [
+        60,
+        27,
+        11,
+        2
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki first occurrence; duplicate level-20 entry is unresolved",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "golden_scaled_nettler",
+      "name": "Golden Scaled Nettler",
+      "name_id": 1843206912,
+      "type_id": 1012,
+      "minimum_level": 1,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 70,
+      "weight_kg": [
+        0.5,
+        5.0
+      ],
+      "size_weights": [
+        42,
+        33,
+        19,
+        6
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level_rarity_difficulty_selection_weight_weight_size_weights": "R; wiki level absent",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "globfish",
+      "name": "Globfish",
+      "name_id": 3446142081,
+      "type_id": 1013,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.2,
+        2.8
+      ],
+      "size_weights": [
+        56,
+        29,
+        12,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "blind_swurglefish",
+      "name": "Blind Swurglefish",
+      "name_id": 1712345757,
+      "type_id": 1014,
+      "minimum_level": 5,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 75,
+      "weight_kg": [
+        0.5,
+        5.0
+      ],
+      "size_weights": [
+        40,
+        34,
+        20,
+        6
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "fanged_grouper",
+      "name": "Fanged Grouper",
+      "name_id": 1213211111,
+      "type_id": 1015,
+      "minimum_level": 14,
+      "rarity": 4,
+      "difficulty": 4,
+      "selection_weight": 28,
+      "weight_kg": [
+        2.0,
+        17.0
+      ],
+      "size_weights": [
+        22,
+        28,
+        32,
+        18
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "changed_salmon",
+      "name": "Changed Salmon",
+      "name_id": 3593608617,
+      "type_id": 1016,
+      "minimum_level": 10,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 45,
+      "weight_kg": [
+        1.0,
+        13.0
+      ],
+      "size_weights": [
+        26,
+        34,
+        28,
+        12
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "briar_nibbler",
+      "name": "Briar Nibbler",
+      "name_id": 2964441616,
+      "type_id": 1017,
+      "minimum_level": 17,
+      "rarity": 4,
+      "difficulty": 4,
+      "selection_weight": 24,
+      "weight_kg": [
+        1.5,
+        16.0
+      ],
+      "size_weights": [
+        23,
+        29,
+        31,
+        17
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "ink_cod",
+      "name": "Ink Cod",
+      "name_id": 1396025175,
+      "type_id": 1018,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.2,
+        3.0
+      ],
+      "size_weights": [
+        54,
+        30,
+        13,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "purplenosed_shark",
+      "name": "Purplenosed Shark",
+      "name_id": 1740067327,
+      "type_id": 1019,
+      "minimum_level": 14,
+      "rarity": 4,
+      "difficulty": 4,
+      "selection_weight": 28,
+      "weight_kg": [
+        2.0,
+        18.0
+      ],
+      "size_weights": [
+        20,
+        28,
+        33,
+        19
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "old_sole",
+      "name": "Old Sole",
+      "name_id": 1398907761,
+      "type_id": 1020,
+      "minimum_level": 10,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 42,
+      "weight_kg": [
+        0.8,
+        11.0
+      ],
+      "size_weights": [
+        25,
+        35,
+        28,
+        12
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "thorny_trout",
+      "name": "Thorny Trout",
+      "name_id": 1571765311,
+      "type_id": 1021,
+      "minimum_level": 5,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 70,
+      "weight_kg": [
+        0.4,
+        4.5
+      ],
+      "size_weights": [
+        42,
+        34,
+        19,
+        5
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "roach_loach",
+      "name": "Roach Loach",
+      "name_id": 1471786984,
+      "type_id": 1022,
+      "minimum_level": 17,
+      "rarity": 4,
+      "difficulty": 3,
+      "selection_weight": 25,
+      "weight_kg": [
+        1.0,
+        12.0
+      ],
+      "size_weights": [
+        22,
+        32,
+        30,
+        16
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "finless_fish",
+      "name": "Finless Fish",
+      "name_id": 1775121672,
+      "type_id": 1023,
+      "minimum_level": 14,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 32,
+      "weight_kg": [
+        0.7,
+        9.0
+      ],
+      "size_weights": [
+        28,
+        35,
+        26,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "peachy_perch",
+      "name": "Peachy Perch",
+      "name_id": 382076945,
+      "type_id": 1024,
+      "minimum_level": 10,
+      "rarity": 3,
+      "difficulty": 2,
+      "selection_weight": 45,
+      "weight_kg": [
+        0.5,
+        8.0
+      ],
+      "size_weights": [
+        30,
+        34,
+        25,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "calico_catfish",
+      "name": "Calico Catfish",
+      "name_id": 3019459429,
+      "type_id": 1025,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 95,
+      "weight_kg": [
+        0.3,
+        4.0
+      ],
+      "size_weights": [
+        50,
+        32,
+        15,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "lady_tetra",
+      "name": "Lady Tetra",
+      "name_id": 3183599288,
+      "type_id": 1026,
+      "minimum_level": 17,
+      "rarity": 4,
+      "difficulty": 3,
+      "selection_weight": 24,
+      "weight_kg": [
+        0.8,
+        11.0
+      ],
+      "size_weights": [
+        22,
+        31,
+        31,
+        16
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "toothy_tetra",
+      "name": "Toothy Tetra",
+      "name_id": 3105715660,
+      "type_id": 1027,
+      "minimum_level": 5,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 70,
+      "weight_kg": [
+        0.4,
+        5.0
+      ],
+      "size_weights": [
+        42,
+        34,
+        19,
+        5
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "winter_piranha",
+      "name": "Winter Piranha",
+      "name_id": 520427170,
+      "type_id": 1028,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 100,
+      "weight_kg": [
+        0.2,
+        3.0
+      ],
+      "size_weights": [
+        52,
+        31,
+        14,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat (client lure text spells Pirahna)",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "frostgill_smelt",
+      "name": "Frostgill Smelt",
+      "name_id": 1298061048,
+      "type_id": 1029,
+      "minimum_level": 5,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 72,
+      "weight_kg": [
+        0.4,
+        4.0
+      ],
+      "size_weights": [
+        43,
+        34,
+        18,
+        5
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "coach_loach",
+      "name": "Coach Loach",
+      "name_id": 596154789,
+      "type_id": 1030,
+      "minimum_level": 17,
+      "rarity": 4,
+      "difficulty": 4,
+      "selection_weight": 25,
+      "weight_kg": [
+        1.0,
+        13.0
+      ],
+      "size_weights": [
+        20,
+        31,
+        32,
+        17
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "frozen_char",
+      "name": "Frozen Char",
+      "name_id": 604305585,
+      "type_id": 1031,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 95,
+      "weight_kg": [
+        0.3,
+        4.0
+      ],
+      "size_weights": [
+        50,
+        32,
+        15,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "ferocious_fangler",
+      "name": "Ferocious Fangler",
+      "name_id": 2666854879,
+      "type_id": 1032,
+      "minimum_level": 20,
+      "rarity": 5,
+      "difficulty": 5,
+      "selection_weight": 12,
+      "weight_kg": [
+        3.0,
+        22.0
+      ],
+      "size_weights": [
+        15,
+        25,
+        35,
+        25
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "blubracuda",
+      "name": "Blubracuda",
+      "name_id": 293056293,
+      "type_id": 1033,
+      "minimum_level": 14,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 32,
+      "weight_kg": [
+        1.0,
+        12.0
+      ],
+      "size_weights": [
+        27,
+        34,
+        28,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat (spelling confirmed against client)",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "spineless_stickleback",
+      "name": "Spineless Stickleback",
+      "name_id": 3504078607,
+      "type_id": 1034,
+      "minimum_level": 10,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 44,
+      "weight_kg": [
+        0.7,
+        9.0
+      ],
+      "size_weights": [
+        27,
+        35,
+        27,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "chilly_grouper",
+      "name": "Chilly Grouper",
+      "name_id": 2457750639,
+      "type_id": 1035,
+      "minimum_level": 1,
+      "rarity": 1,
+      "difficulty": 1,
+      "selection_weight": 92,
+      "weight_kg": [
+        0.4,
+        5.0
+      ],
+      "size_weights": [
+        49,
+        32,
+        16,
+        3
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "blue_thornfin",
+      "name": "Blue Thornfin",
+      "name_id": 2669055528,
+      "type_id": 1036,
+      "minimum_level": 10,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 42,
+      "weight_kg": [
+        0.8,
+        10.0
+      ],
+      "size_weights": [
+        27,
+        34,
+        28,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "talking_bass",
+      "name": "Talking Bass",
+      "name_id": 1925930408,
+      "type_id": 1037,
+      "minimum_level": 17,
+      "rarity": 4,
+      "difficulty": 4,
+      "selection_weight": 24,
+      "weight_kg": [
+        1.5,
+        15.0
+      ],
+      "size_weights": [
+        20,
+        30,
+        32,
+        18
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "pacu_pacu",
+      "name": "Pacu Pacu",
+      "name_id": 3217487345,
+      "type_id": 1038,
+      "minimum_level": 5,
+      "rarity": 2,
+      "difficulty": 2,
+      "selection_weight": 72,
+      "weight_kg": [
+        0.4,
+        5.0
+      ],
+      "size_weights": [
+        42,
+        34,
+        19,
+        5
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "goofy_grouper",
+      "name": "Goofy Grouper",
+      "name_id": 4219774350,
+      "type_id": 1039,
+      "minimum_level": 14,
+      "rarity": 3,
+      "difficulty": 3,
+      "selection_weight": 34,
+      "weight_kg": [
+        0.8,
+        10.0
+      ],
+      "size_weights": [
+        27,
+        35,
+        27,
+        11
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    },
+    {
+      "key": "plattypus",
+      "name": "Plattypus",
+      "name_id": 3336696870,
+      "type_id": 1040,
+      "minimum_level": 20,
+      "rarity": 5,
+      "difficulty": 4,
+      "selection_weight": 12,
+      "weight_kg": [
+        2.0,
+        18.0
+      ],
+      "size_weights": [
+        16,
+        25,
+        34,
+        25
+      ],
+      "source_tags": {
+        "name_id": "client locale en_us_data.dat",
+        "area": "client Fish Finder table",
+        "minimum_level": "wiki",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
+        "icon_id": "R: unresolved client icon mapping; placeholder zero",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
+      }
+    }
+  ],
+  "lures": [
+    {
+      "key": "16oz_steak",
+      "name": "16oz Steak - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "talking_bass",
+        "cheery_salmon",
+        "bitter_betta"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "flyfisher_3000",
+      "name": "Flyfisher 3000 - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "plattypus",
+        "lady_tetra",
+        "roach_loach"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "french_fry",
+      "name": "French Fry - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "spineless_stickleback",
+        "calico_catfish",
+        "purplenosed_shark"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "frostflies",
+      "name": "Frostflies - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "goofy_grouper",
+        "finless_fish",
+        "fanged_grouper"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "mega_slider",
+      "name": "Mega Slider - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "blue_thornfin",
+        "chipsen_fish",
+        "thorny_trout"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "nightcrawlers",
+      "name": "Nightcrawlers - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "pacu_pacu",
+        "peachy_perch",
+        "globfish"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "perch_pinpointer",
+      "name": "Perch Pinpointer - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "chilly_grouper",
+        "butter_flyfish",
+        "briar_nibbler"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "shiny_crankbait",
+      "name": "Shiny Crankbait - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "frostgill_smelt",
+        "flutterfish",
+        "ink_cod"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "skipper_seeker",
+      "name": "Skipper Seeker - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "winter_piranha",
+        "toothy_tetra",
+        "blind_swurglefish"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "sleek_clicker",
+      "name": "Sleek Clicker - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "coach_loach",
+        "feral_catfish",
+        "creeping_cod"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "thorn_jig",
+      "name": "Thorn Jig - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "frozen_char",
+        "slugmud_skipper",
+        "old_sole"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "tiny_rib",
+      "name": "Tiny Rib - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "blubracuda",
+        "baconfish",
+        "changed_salmon"
+      ],
+      "source": "10%: client lure text; name-to-group pairing: wiki"
+    },
+    {
+      "key": "treasure_magnet",
+      "name": "Treasure Magnet",
+      "bonus_percent": 10,
+      "fish": [],
+      "source": "10%: client lure text; treasure effect mechanics R"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# Class: BaseFactoryPacket
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `009d9070` | `BaseFactoryPacket::BaseFactoryPacket` | ✅ | ctor | Default constructor: installs BasePacket::vftable, writes the base packet id 0xbc (188) at +4 and zero at +8, then installs BaseFactoryPacket::vftable. |
+| `009d90d0` | `BaseFactoryPacket::Init` | ✅ | method | Constructor variant taking a sub-opcode: installs BasePacket::vftable, writes the base packet id 0xbc (188) at +4, installs BaseFactoryPacket::vftable, stores the argument at +8 (the family sub-opcode). |
+| `009d9140` | `BaseFactoryPacket::~BaseFactoryPacket` | ✅ | dtor | Destructor body with no member work: rewrites the object vtable to BaseFactoryPacket::vftable and then to BasePacket::vftable. Reached only from compiler-generated EH unwind funclets (58 of them), i.e. it is the base de… |
+| `009d9190` | `BaseFactoryPacket::ScalarDeletingDtor` | 🟢 | dtor | Scalar deleting destructor: resets the vtables to BaseFactoryPacket::vftable then BasePacket::vftable and calls _free(param_1) when (param_2 and 1) is set, returning param_1. Slot 0 of BaseFactoryPacket::vftable (dword … |
+| `009d9420` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (one of several identical copies): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable. Only reached from EH unwind funclets and from the packet creator/destroyer helpers … |
+| `009d94e0` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |
+| `009d9530` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |
+| `009d95e0` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |
+| `009d9690` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |
+| `009d9740` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |
+| `009d9850` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |
+| `009d99c0` | `BaseFactoryPacket::~BaseFactoryPacket` | 🟢 | dtor | Trivial destructor body (identical copy of the base destructor): rewrites the vtables to BaseFactoryPacket::vftable then BasePacket::vftable; its only caller is an EH unwind funclet. |

@@ -1,0 +1,907 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "stone_heart_s_hideaway",
+        "name_string_id": 567675672,
+        "zone_id": null,
+        "entry_requirements": [
+          {
+            "kind": "members_only",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          }
+        ],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Stone Heart's Hideaway."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key stone_heart_s_hideaway comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Stone Heart's Hideaway; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Stone Heart's Hideaway",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 567675672,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 5,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Stone Heart's Hideaway difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Merry Vale",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 13,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Combat job level; cited [wiki] [client, generic]"
+              }
+            ]
+          },
+          "quest": {
+            "value": "Softening the Stone",
+            "reason": null,
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": true,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Merry Vale",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not identify an entrance target."
+                }
+              ]
+            },
+            "name": {
+              "value": null,
+              "reason": "No clicked NPC/object is identified.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not identify an entrance target."
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "No entrance target ID was stated.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md has no entrance target ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "\"Enter Stone Heart's hideaway on the western side of Merry Vale.\" (loc 3155888320). The NPC-side wording calls it a \"hideout\" (loc 1251788045, 2061189905). Exact door or object is unknown. | [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (probable)",
+              "value": "\"Defeat Stone Heart\" (loc 813734101). The wiki and panel text agree the aim is to defeat him in combat. | [client] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Goals > Main (probable); cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Goals > Main (probable); cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Minion goal (probable)",
+              "value": "\"Defeat the minions of Stone Heart!\" (loc 756429409). Could be a sub-goal or a second panel line. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Goals > Minion goal (probable); cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Quest-side objective",
+              "value": "\"Collect flowers that only grow in Stone Heart's Hideaway!\" (loc 1447454725). Cudip's daily quest: \"Help Cudip with his top secret solution by collecting flowers from within Stone Heart's Hideaway!\" (loc 2940859742), \"needs some rare flowers from within Stone Heart's Hideaway\" (loc 3517600679, 3640360417), \"You need to enter Stone Heart's Hideaway!\" (loc 975160938). The flowers are in the instance; whether they are the bonus goal is unknown. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Goals > Quest-side objective; cited [client]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": null,
+              "reason": "Unknown. There is no \"Stone Heart's Hideaway Bonus Objective\" string. | [client: no match]",
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Goals > Bonus; cited [client: no match]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Stone Heart"
+              ],
+              "description": {
+                "value": "Stone Heart (loc 419255199; game data 945500272) | Abilities (names only): Stone Heart's Stone Slam (loc 2810703753), Stone Heart's Stonefist (loc 1289244022), Stone Heart's Stone Skin (loc 2008038419), and the combat flags \"Stone Heart *OnSpawn*\" (loc 1066560064), \"*OnHit*\" (loc 1732182403), \"*Invuln*\" (loc 219715362). Effects are not described. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Minions",
+              "names": [
+                "Changeling Heartbreaker"
+              ],
+              "description": {
+                "value": "Changeling Heartbreaker (loc 3770695936), \"Stone Heart's Minion\" (loc 2454048414), \"Heart Breaker\" (loc 2517159261) | \"Heartbreaker Self Destruct\" (loc 2090488185), \"Heart Breaker Chain\" (loc 3934613293). The wiki: \"The Heart Breakers and Changelings attempt to attack you in the battle.\" | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not map Minions to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not source stats for Minions."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Stone Heart"
+              ],
+              "description": {
+                "value": "Stone Heart (loc 419255199; game data 945500272) | Abilities (names only): Stone Heart's Stone Slam (loc 2810703753), Stone Heart's Stonefist (loc 1289244022), Stone Heart's Stone Skin (loc 2008038419), and the combat flags \"Stone Heart *OnSpawn*\" (loc 1066560064), \"*OnHit*\" (loc 1732182403), \"*Invuln*\" (loc 219715362). Effects are not described. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Prize wheel",
+                "value": "Wiki: the battle \"rewards house, clothing, and fluff items, as well as a unique level 16 weapon for each job\", and the weapon pages say \"acquired from the prize wheel on the Stone Heart's Hideway encounter\". The house, clothing and fluff items are not named. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins, stars, results",
+                "value": null,
+                "reason": "Unknown. No results screen or wiki figure. |",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Coins, stars, results"
+                  }
+                ]
+              },
+              {
+                "label": "Treasure",
+                "value": "The client has \"Stone Heart's Treasure\" (loc 1980584385) and \"Stone Heart's Roses\" (loc 3597859952). The wiki says the open-world Stone Heart drops a treasure chest of festival items; whether the Hideaway has one is not stated. | [client] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Treasure; cited [client] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Treasure; cited [client] [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Cudip's daily quest",
+                "value": "Rewards unknown. |",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Cudip's daily quest"
+                  }
+                ]
+              },
+              {
+                "label": "Archer",
+                "value": "Beloved Bow (loc 1953617640) | Shot to the Heart, 2372 | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Archer; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Archer; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Brawler",
+                "value": "Match-Maker Mallet (loc 1337906201) | Tough Love, 2372 | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Brawler; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Brawler; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Medic",
+                "value": "Sweetheart Saw (loc 2059619056) | Heart Attack, 2372 | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Medic; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Medic; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Ninja",
+                "value": "Everloving Edge (loc 2793144955) | Secret Admirer, 2609 | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Ninja; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Ninja; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Warrior",
+                "value": "Heartthrob Hammer (loc 2225765394) | Love Struck, 2372 | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Warrior; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Warrior; cited [wiki] [client]"
+                  }
+                ]
+              },
+              {
+                "label": "Wizard",
+                "value": "Wooing Wand (loc 547626363) | Charm, 2372 | [wiki] [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Wizard; cited [wiki] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Rewards > Wizard; cited [wiki] [client]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": null,
+            "reason": "No numeric coin outcome appears in the Rewards table.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": null,
+            "reason": "No per-job prize wheel table was present.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "stone_heart_s_hideaway",
+            "kind": "quest",
+            "target_name": "Softening the Stone",
+            "target_id": null,
+            "reason": "Guide gives a quest title but no resolved quest record ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Requirements > Unlocking quest; cited [wiki] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "stone_heart_s_hideaway",
+            "kind": "zone",
+            "target_name": "Merry Vale",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Entrance; cited [client]"
+              }
+            ]
+          },
+          {
+            "owner": "stone_heart_s_hideaway",
+            "kind": "npc",
+            "target_name": "Stone Heart",
+            "target_id": 9500000426,
+            "reason": "Exact name matches reconstructed NPC content key in merry_vale.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/merry_vale.json npc_id 9500000426; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "stone_heart_s_hideaway",
+            "kind": "npc",
+            "target_name": "Changeling Heartbreaker",
+            "target_id": 9500000374,
+            "reason": "Exact name matches reconstructed NPC content key in merry_vale.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/merry_vale.json npc_id 9500000374; not an original NPC actor ID."
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key stone_heart_s_hideaway comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Overview > Client name; cited [client] [wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Stone Heart's Hideaway; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Stone Heart",
+            "definition_id": 930022,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 427068 resolves 'Stone Heart'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930022 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Changeling Heartbreaker",
+            "definition_id": 930002,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Minions; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 427522 resolves 'Changeling Heartbreaker'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930002 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Stone Heart",
+            "definition_id": 930022,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 427068 resolves 'Stone Heart'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930022 is a W58 local projection."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

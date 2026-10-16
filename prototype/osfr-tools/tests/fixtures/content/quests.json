@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 101,
+      "title_string_id": null,
+      "giver_npc_id": 2732686529148769137,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "item_id": 500,
+          "quantity": 1,
+          "source": [
+            { "kind": "reconstructed", "evidence": "(R) synthetic objective for loader tests" }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 500,
+              "count": 1,
+              "source": [
+                { "kind": "reconstructed", "evidence": "(R) synthetic item grant for loader tests" }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            { "kind": "reconstructed", "evidence": "(R) synthetic reward bundle for loader tests" }
+          ]
+        }
+      ],
+      "source": [
+        { "kind": "reconstructed", "evidence": "(R) synthetic quest and giver link for loader tests" }
+      ]
+    }
+  ]
+}

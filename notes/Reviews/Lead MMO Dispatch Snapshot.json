@@ -1,0 +1,540 @@
+{
+  "checked_utc": "2026-10-09T17:37:22.902978+00:00",
+  "direct_review_workers": [
+    "mining_review",
+    "harvesting_review",
+    "fishing_review",
+    "kart_review",
+    "soccer_review",
+    "housing_review"
+  ],
+  "coordinator": "/root/mmo_dispatch",
+  "direct_spawned": [
+    {
+      "piece": "028",
+      "task_name": "/root/piece_028",
+      "result": "accepted"
+    },
+    {
+      "piece": "029",
+      "task_name": "/root/piece_029",
+      "result": "accepted"
+    },
+    {
+      "piece": "030",
+      "task_name": "/root/piece_030",
+      "result": "accepted"
+    },
+    {
+      "piece": "031",
+      "task_name": "/root/piece_031",
+      "result": "accepted"
+    },
+    {
+      "piece": "032",
+      "task_name": "/root/piece_032",
+      "result": "accepted"
+    },
+    {
+      "piece": "033",
+      "task_name": "/root/piece_033",
+      "result": "accepted"
+    },
+    {
+      "piece": "034",
+      "task_name": "/root/piece_034",
+      "result": "accepted"
+    },
+    {
+      "piece": "035",
+      "task_name": "/root/piece_035",
+      "result": "accepted"
+    },
+    {
+      "piece": "036",
+      "task_name": "/root/piece_036",
+      "result": "accepted"
+    },
+    {
+      "piece": "037",
+      "task_name": "/root/piece_037",
+      "result": "accepted"
+    },
+    {
+      "piece": "038",
+      "task_name": "/root/piece_038",
+      "result": "accepted"
+    },
+    {
+      "piece": "039",
+      "task_name": "/root/piece_039",
+      "result": "accepted"
+    },
+    {
+      "piece": "040",
+      "task_name": "/root/piece_040",
+      "result": "accepted"
+    },
+    {
+      "piece": "041",
+      "task_name": "/root/piece_041",
+      "result": "accepted"
+    },
+    {
+      "piece": "042",
+      "task_name": "/root/piece_042",
+      "result": "accepted"
+    },
+    {
+      "piece": "043",
+      "task_name": "/root/piece_043",
+      "result": "accepted"
+    },
+    {
+      "piece": "044",
+      "task_name": "/root/piece_044",
+      "result": "accepted"
+    },
+    {
+      "piece": "045",
+      "task_name": "/root/piece_045",
+      "result": "accepted"
+    },
+    {
+      "piece": "046",
+      "task_name": "/root/piece_046",
+      "result": "accepted"
+    },
+    {
+      "piece": "047",
+      "task_name": "/root/piece_047",
+      "result": "accepted"
+    },
+    {
+      "piece": "048",
+      "task_name": "/root/piece_048",
+      "result": "accepted"
+    }
+  ],
+  "coordinator_prior_spawns": "007-027,21 accepted in MMO Dispatch Ledger.json",
+  "total_workers_dispatched_at_snapshot": 100,
+  "remaining_dispatch": [],
+  "all_roles": "crack_builder / DeepSeek V4.1 Flash / max / forknone",
+  "root_supervision": "final children interrupted; premature finals resumed with concrete artifact milestones",
+  "coordinator_verified_ids": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99
+  ],
+  "concurrent_running_count": "not inferred from dispatch",
+  "coordinator_ownership": "007-027 and 049-099",
+  "root_ownership": "001-006 and 028-048",
+  "interpretation": "100 accepted assignments including coordinator100; earlier children finished before later dispatch. Completion, independent review, integration and native acceptance remain separate.",
+  "reported_initial_work_returned": 100,
+  "completion_interpretation": "100 initial assignments returned artifacts.17/17 LOCAL opening stages and whole reconstructed cave/replay/5000score accepted. Current Mining151307 has actualorecredit but no win; Harvest v2 code/content reviewed, nativewhole pending. Historical starting-area and broaderMMO coverage remains incomplete.",
+  "native_opening_rewarded": 17,
+  "native_opening_total_local": 17,
+  "full_rust_suite": {
+    "passed": 1438,
+    "failed": 0,
+    "ignored": 57,
+    "ignored_private": 57,
+    "log": "../lab/reports/type8-parity-lead-gate-20261009T134122Z/full-suite.log",
+    "revision": "mining6c59/guard996d/inventorydccb/Harvest2727;releaseef85"
+  },
+  "native_opening_verified_run": "client-baseline-20261009T103605Z",
+  "native_opening_restart_run": "client-baseline-20261009T111125Z",
+  "cave_replay_lead_native": {
+    "run": "client-baseline-20261009T114509Z",
+    "release_sha256": "4d7226e066d9262a211dd9ebb58f8f0d4310dab2da826bce0e8898ca31b902bc",
+    "instances": {
+      "2": "loss3kills",
+      "3": "win4kills660playerhp",
+      "4": "freshfullhealthordinaryguideexit"
+    },
+    "coins": 309,
+    "economy_profiles_opening_unchanged": true,
+    "datagrams": 5025,
+    "gateway_crc_verified": 5005,
+    "complete_reassembly": true,
+    "independent_review": {
+      "status": "passed",
+      "note": "Reviews/Native Cave Replay 114509.md"
+    },
+    "score_display_issue": "114509 goal5000,total0 retained historically; repaired native121834 goal5000,total5000 independently reviewed"
+  },
+  "latest_lead_gate": {
+    "status": "qualified_partial",
+    "passed": 1407,
+    "failed_observed": 0,
+    "ignored_in_executed_targets": 56,
+    "unexecuted_targets": [
+      "piece_059",
+      "piece_072",
+      "piece_074",
+      "piece_081",
+      "piece_099"
+    ],
+    "blocker": "Windows Application Control4551; security settings unchanged",
+    "private_explicit_passed": 4,
+    "log": "../lab/reports/mining-move-lead-gate-20261009T150000Z/receipt.json",
+    "revision": "mining da3b5b56 / harvesting a977c466 / gameplay d65f89a8",
+    "release_sha256": "cb0feab5c15338fa0104c7a75d20e07ada6ecc61610b561f1af41142d6d8f601",
+    "full_suite_pass": false
+  },
+  "native_mining_score_121834": {
+    "review": "Reviews/Native Mining Score 121834.md",
+    "review_sha256": "cf30f9e36933bfa81642f8d65adce4a4ece8cf1c2c514a954d715141983247a4",
+    "datagrams": 7440,
+    "gateway_crcs": 7413,
+    "complete_reassembly": true,
+    "cave_total_score": 5000,
+    "mining_chains": 1,
+    "mining_score": 400,
+    "mining_whole_win": false,
+    "mining_visual_bugs": [
+      "regular/ore sprite index sends category instead of per-kind index"
+    ],
+    "economy_unchanged": true,
+    "iron_label_followup": "Original601/602 map to Iron by quality; duplicate text is correct, see Research/Native Mining Tile Rendering.md"
+  },
+  "native_mining_125556": {
+    "run": "client-baseline-20261009T125556Z",
+    "gateway_frames": 13834,
+    "login_frames": 23,
+    "gateway_crc_verified": 13832,
+    "complete_reassembly": true,
+    "sprite_rendering": "five regular colours and distinct Iron qualities native visible",
+    "chains": 6,
+    "score": 3000,
+    "collected": [
+      0,
+      0
+    ],
+    "all_idle": true,
+    "legal_moves": 0,
+    "whole_win": false,
+    "blocker": "ore does not drop/collect and dead board does not reshuffle",
+    "ordinary_quit_world": true,
+    "world_shot_after_record_stop": true,
+    "active_cleared": true,
+    "completed": 0,
+    "economy_opening_unchanged": true,
+    "review_status": "accepted as failure evidence; wholewinfalse",
+    "review": "Reviews/Native Mining 125556.md",
+    "services_closed": true,
+    "review_sha256": "a078d1933f19bc7a05f43bc09c4aeb5dc2ce88a33c1f90ea2932d898a963935d"
+  },
+  "harvesting_gateway_candidate": {
+    "registered_source": true,
+    "release_built": false,
+    "native_tested": false,
+    "source_gameplay_sha256": "996d33865966fcf8b7d0cc5f0e761f2afdeff9230cb64758e0f303a3ac21d8fa",
+    "focused_lead_passed": 69,
+    "focused_targets": 7,
+    "log": "../lab/reports/harvesting-lead-gate-20261009T132558Z/receipt.json",
+    "independent_gateway_review": "pending",
+    "native_package": "catalogue/transactions independent passed; nativeblockedmissingselectabletilemappings",
+    "job": 45,
+    "game": 111,
+    "reward_guard": "independent review accepted"
+  },
+  "mining_parity_repairs": {
+    "source_sha256": "6c59ae0ce97a998c062e5cc25658c0c4c8accd150e8db0ac7550c756c1ed38ed",
+    "dead_board_tests": 3,
+    "shape_pool_tests": 4,
+    "independent_review": "accepted; Reviews/Mining Drop and Reshuffle Parity Review.md",
+    "native_acceptance": "active run134930",
+    "quota_seed_rewards_unchanged": true
+  },
+  "continuation_checkpoint": {
+    "time_utc": "2026-10-09T16:18:59.455993+00:00",
+    "ui": "awaiting user control clarification; no input after observed resize/extra chain",
+    "workers": "Mining powerup shuffle/RNG corrections; Soccer native wire repair; root registered codec and lobby responder gate pending",
+    "next_native": "After root gates and control clarification: normal clear of Lost instance, Mining whole round and Harvest111 calibration/fullround"
+  },
+  "latest_native_mining": {
+    "run": "client-baseline-20261009T151307Z",
+    "status": "finalized_Lost_launcher_bound",
+    "documented_driver_chains": 84,
+    "observed_chains": 85,
+    "unattributed_extra_chain": 1,
+    "score": 54200,
+    "collected": [
+      2,
+      0
+    ],
+    "reshuffles": 5,
+    "completed": 0,
+    "whole_win": false,
+    "snapshot": "../lab/runs/client-baseline-20261009T151307Z/character-after.json",
+    "qualification": "84 guarded driver chains, one extra unattributed; prior snapshotfilename said84 but actual85. UIcontrolreply pending; no new UI test.",
+    "phase": "Lost",
+    "wall_ms": 1800000,
+    "snapshot_sha256": "7a0fc38a28fcc94b191fcc1a0163cb77a9e801b8cbb34b9ce8cb013ff384a2da",
+    "gateway_datagrams": 22043,
+    "login_datagrams": 51,
+    "crc3": 22041,
+    "complete_reassembly": true,
+    "normal_quit_or_close_accepted": false,
+    "world_return_accepted": false,
+    "review": "accepted as failed-run evidence; notes/Reviews/Mining Native 151307 Final Review.md",
+    "review_sha256": "5dd1c12bc129ff6c30a8c0899b0e37b4e42d3eb72d371d2221facafb73f7c133",
+    "local_opening_rewarded_preserved": 17
+  },
+  "latest_harvesting_candidate": {
+    "content": "../lab/references/opening-harvesting-native-20261009T142624Z/content",
+    "content_sha256": "c08f264e898a5e8703690c8c02ee4cfce277e271efbf4170674c0e3b8ab4d30f",
+    "runtime_and_border_review": "notes/Reviews/Harvesting Runtime and Border Review.md",
+    "native_whole_round": false,
+    "measured_layout": null
+  },
+  "prior_lead_gates": [
+    {
+      "passed": 1438,
+      "failed": 0,
+      "ignored": 57,
+      "ignored_private": 57,
+      "log": "../lab/reports/type8-parity-lead-gate-20261009T134122Z/full-suite.log",
+      "revision": "mining6c59/guard996d/inventorydccb/Harvest2727;releaseef85",
+      "command_exit_code": 0,
+      "private_explicit_passed": 3,
+      "release_sha256": "ef85c0d9d05475f7d8c2bb5b3d9f960eeaf6b911a16ee7731b4a0720652ac32b"
+    }
+  ],
+  "latest_completed_builder_gate": {
+    "passed": 1468,
+    "failed": 0,
+    "ignored": 59,
+    "result_groups": 155,
+    "full_suite_pass": true,
+    "previously_blocked_targets_executed": [
+      "piece_059",
+      "piece_072",
+      "piece_074",
+      "piece_081",
+      "piece_099"
+    ],
+    "security_changed": false,
+    "log": "../lab/reports/kart-lobby-native-codec-20261009T1602Z/full-suite-attempt.log",
+    "log_sha256": "296499ef5e57a9f77b21c3b8d204cf755bbcd6ca97da04e678898048c5746b82",
+    "qualification": "Builder log independently parsed and focused checks reproduced. Predates root codec module registration and current Mining clickable implementation; next root gate pending."
+  },
+  "kart_native_codec": {
+    "independent_review": "notes/Reviews/Kart Native Lobby Codec Review.md",
+    "independent_probes": 32,
+    "private_roundtrip": true,
+    "root_module_registered": true,
+    "root_registration_gate_passed": true,
+    "native_lobby_accepted": false,
+    "native_world_names_recovered": [
+      "sg_kt_track",
+      "sg_dm_arena",
+      "sg_soccer"
+    ],
+    "root_progress_module_registered": true,
+    "root_zone_module_registered": true,
+    "root_lobby_responder_implemented": true,
+    "root_lobby_private_tests_passed": 3,
+    "root_lobby_independent_review": "notes/Reviews/Kart Progress and Gateway Catalogue Review.md"
+  },
+  "soccer_native_adapter_review": {
+    "review": "notes/Reviews/Soccer Native Adapter Readiness Review.md",
+    "candidate_only": true,
+    "native_playable": false,
+    "findings": [
+      "sub14 state byte misread as i32",
+      "sub16 controls bits misread as float",
+      "sub13 outbound impulse and native authority adapter missing",
+      "no native production route"
+    ],
+    "repair_owner": "/root/mining_review",
+    "status": "registered wire codec and synthetic tests accepted; private2917 corpus exact; native direction/route pending",
+    "independent_review": "notes/Reviews/Soccer Native Wire Repair Review.md",
+    "independent_probes": 14,
+    "captured_state_roundtrips": 250,
+    "captured_controls_roundtrips": 1216,
+    "root_module_registered": true,
+    "captured_all_opcode76_roundtrips": 2917
+  },
+  "mining_clickables": {
+    "values": [
+      950,
+      951,
+      952,
+      953
+    ],
+    "status": "shuffle independently accepted and1530gate/release frozen; newshort-idleACKbug underrepair",
+    "review": "notes/Reviews/Mining Clickable Powerups Review.md",
+    "default_parity_independent": true,
+    "native_clickables_accepted": false,
+    "remaining_findings": [
+      "OnIdleMsg wrongly inherits chainminimum3; one/two pair native ACK rejected"
+    ],
+    "timed_900_902": "authoring refused; deferred",
+    "source_sha256": "4abe6b07f8edf52798ce810cde752a58fb959c30fcb639675371a041e463eb46",
+    "tests_sha256": "507945e9d42d2568572c70bfa3f1c93b2c12ab825c7a56524502fce18359f40a",
+    "runtime_probe_passed": 3,
+    "runtime_probe_report": "../lab/reports/mining-clickable-repair-verify-20261009T171910Z/"
+  },
+  "updated_utc": "2026-10-09T18:08:24.689609+00:00",
+  "latest_root_combined_gate": {
+    "ordinary_passed": 1536,
+    "failed": 0,
+    "ignored": 66,
+    "result_groups": 162,
+    "private_passed": 12,
+    "source_unchanged": true,
+    "path": "..\\lab\\reports\\lead-idle-gate-20261009T174628Z\\receipt.json",
+    "receipt_sha256": "ff262eb9db1bab0d20cde4cd5dcb318002d9c11d60be9eac539fb0bbfb87c791",
+    "mining_source": "3cc6652b0da68542748c0af28fa9ef60abf5c6554e4b0f4dce5e4d3ced76ddfc",
+    "housing_source": "9091118fbe055764a460aa98bf3c34419de610cdce3d7a7ce236ef25a96b3e51",
+    "release_sha256": "21233dc79cc031d301e726c81d8330310f1078209c51a5a7bed89c9a824c9edf",
+    "native_tested": false,
+    "deployed": false,
+    "qualification": "Short idle independently accepted18checks; corrected comment only after review. Fresh source/log hash verification passes; native acceptance remains open."
+  },
+  "housing_tail": {
+    "independent_review": "notes/Reviews/Housing Fixture Tail Compatibility Review.md",
+    "captured_full_replies_exact": 9,
+    "native_accepted": false,
+    "production_registered": true,
+    "candidate": "accepted production codec and explicit family framing",
+    "codec_review": "notes/Reviews/Housing Native Placement Codec Review.md",
+    "registered_private_capture_count": 44
+  },
+  "current_followups": {},
+  "prior_root_combined_gates": [
+    {
+      "ordinary_passed": 1514,
+      "failed": 0,
+      "ignored": 65,
+      "private_passed": 11,
+      "source_unchanged": true,
+      "path": "../lab/reports/lead-minigame-gate-20261009T165651Z/receipt.json",
+      "mining_source": "038a135d64fe0c3be6a8e57eabbe002e7f8b651566b0ca260098175abf16959e",
+      "qualification": "Historical frozen038 gate. Repaired4abe now independently accepted, but new root gate/release not yet executed."
+    },
+    {
+      "ordinary_passed": 1530,
+      "failed": 0,
+      "ignored": 66,
+      "private_passed": 12,
+      "source_unchanged": true,
+      "path": "../lab/reports/lead-minigame-gate-20261009T173220Z/receipt.json",
+      "mining_source": "4abe6b07f8edf52798ce810cde752a58fb959c30fcb639675371a041e463eb46",
+      "housing_source": "9091118fbe055764a460aa98bf3c34419de610cdce3d7a7ce236ef25a96b3e51",
+      "release_sha256": "59032cfa5bd959fa45272c940a8d7bc8911018cd63845525f31ae07b360cbdef",
+      "qualification": "Frozen4abe/9091 tree passed. New short-idle ACK protocol bug discovered afterward; hold release until narrow repair/review/new gate. Native not tested.",
+      "historical_log_qualification": "Original receipt/release/frozen590 intact; ordinary log and source pin files overwritten by failed CR rerun. See historical-log-overwrite-disclosure.json. Fresh174628 supersedes."
+    }
+  ],
+  "soccer_private_state_adapter": {
+    "candidate_sha256": "11d291c2284922e3cde7549632a969b85261a2c12a7ba59464178281c2de5dd7",
+    "builder_tests_passed": 14,
+    "independent_lead_tests_passed": 13,
+    "review": "notes/Reviews/Soccer State Input Adapter Review.md",
+    "production_registered": false,
+    "native_tested": false,
+    "red_qualification": "Earlier12-test API-removalE0432 after implementation is missingAPI evidence only."
+  },
+  "mining_starting_round_private": {
+    "selected_spec_sha256": "24568d64f7d32dcd7e9b025c963e85333bc0895ab4cc0207844d0549626358f8",
+    "collectable_percent": 40,
+    "quotas": [
+      6,
+      6
+    ],
+    "actions": 85,
+    "model_seconds": 340,
+    "model_seconds_per_action": 4,
+    "independent_replay": {
+      "checks_passed": 17,
+      "checks_failed": 0,
+      "path": "..\\lab\\reports\\mining-starting-round-independent-20261009T1806Z\\independent-run.json",
+      "preclose_collected": [
+        6,
+        6
+      ],
+      "reshuffles": 9,
+      "score": 59200,
+      "remaining_ms": 546000,
+      "wall_ms": 340000,
+      "normal_close": true,
+      "completed_count": 1
+    },
+    "package": "../lab/references/opening-mining-starter-20261009T180011Z",
+    "native_tested": false,
+    "deployed": false,
+    "reconstructed": true
+  }
+}

@@ -1,0 +1,1308 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3110001,
+      "title_string_id": 20960,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000335,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "Owner Field Notes 2026-10-15: helper 'Ask around Forest Troll Village for information' (locale 93206); the quest is handed in to Grosh"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E1; name 'Ninja: The Ninja Path'; title id cell ucdt 3503585681 / ugdt 1320256515"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E1; name 'Ninja: The Ninja Path'; title id cell ucdt 3503585681 / ugdt 1320256515"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110001 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "video",
+          "evidence": "Owner Field Notes 2026-10-15: Ty's offer text = locale 24829; Grosh's turn-in line = locale 9731 ('You look for kidnap pixies?...')"
+        }
+      ],
+      "description_string_id": 20961,
+      "intro_text_string_id": 24829,
+      "end_text_string_id": 9731
+    },
+    {
+      "id": 3110002,
+      "title_string_id": 78925,
+      "giver_npc_id": 9000000335,
+      "prerequisite_quest_ids": [
+        3110001
+      ],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "model_id": 930096,
+          "count": 1,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "Owner Field Notes 2026-10-15: goal 'Defeat the troll summoner', fought as the battle 'Troll Summoner Madness!' (locale 42056; journal goal 115023)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) kill id 930096 = Troll Summoner in data/content/field_battles.json battle 96; handed in to the giver Grosh"
+            }
+          ]
+        }
+      ],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E2; name 'Ninja: Stolen Away'; title id cell ucdt 538405209 / ugdt 1512150309"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E2; name 'Ninja: Stolen Away'; title id cell ucdt 538405209 / ugdt 1512150309"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110002 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78926,
+      "intro_text_string_id": 78924
+    },
+    {
+      "id": 3110003,
+      "title_string_id": 78845,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [
+        3110002
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E3; name 'Ninja: Super Star'; title id cell ucdt 372338818 / ugdt 785271926"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E3; name 'Ninja: Super Star'; title id cell ucdt 372338818 / ugdt 785271926"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110003 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78846,
+      "intro_text_string_id": 78844,
+      "end_text_string_id": 78847
+    },
+    {
+      "id": 3110004,
+      "title_string_id": 78849,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [
+        3110003
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E4; name 'Ninja: Silence is Golden... and Deadly'; title id cell ucdt 3233537318 / ugdt 1328641529"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E4; name 'Ninja: Silence is Golden... and Deadly'; title id cell ucdt 3233537318 / ugdt 1328641529"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110004 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78850,
+      "intro_text_string_id": 78848,
+      "end_text_string_id": 78851
+    },
+    {
+      "id": 3110005,
+      "title_string_id": 78853,
+      "giver_npc_id": 9000000047,
+      "prerequisite_quest_ids": [
+        3110004
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C1; name 'Ninja: Strike from the Shadows'; title id cell ucdt 2580872460 / ugdt 1535781811"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C1; name 'Ninja: Strike from the Shadows'; title id cell ucdt 2580872460 / ugdt 1535781811"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C1; name 'Ninja: Strike from the Shadows'; title id cell ucdt 2580872460 / ugdt 1535781811"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110005 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row E4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78854,
+      "intro_text_string_id": 78852,
+      "end_text_string_id": 78855
+    },
+    {
+      "id": 3110006,
+      "title_string_id": 78857,
+      "giver_npc_id": 9000000047,
+      "prerequisite_quest_ids": [
+        3110005
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C2; name 'Ninja: Handle with Care'; title id cell ucdt 2510956907 / ugdt 1913015057"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C2; name 'Ninja: Handle with Care'; title id cell ucdt 2510956907 / ugdt 1913015057"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C2; name 'Ninja: Handle with Care'; title id cell ucdt 2510956907 / ugdt 1913015057"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110006 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C1; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78858,
+      "intro_text_string_id": 78856,
+      "end_text_string_id": 78859
+    },
+    {
+      "id": 3110007,
+      "title_string_id": 387201,
+      "giver_npc_id": 9000000047,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C3; name 'Ninja: Achieve Level 5'; title id cell ucdt 917745838 / ugdt 4072681270"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 1: level 1 to 5 (Chloe, Blackspore), row C3; name 'Ninja: Achieve Level 5'; title id cell ucdt 917745838 / ugdt 4072681270"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110007 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387202,
+      "intro_text_string_id": 387200,
+      "end_text_string_id": 387203
+    },
+    {
+      "id": 3110008,
+      "title_string_id": 388400,
+      "giver_npc_id": 9000000180,
+      "prerequisite_quest_ids": [
+        3110007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B1; name 'Contract: Trouble in Snowhill'; title id cell ucdt 172639783 / ugdt 3102829172"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B1; name 'Contract: Trouble in Snowhill'; title id cell ucdt 172639783 / ugdt 3102829172"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110008 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388401,
+      "intro_text_string_id": 388399,
+      "end_text_string_id": 388402
+    },
+    {
+      "id": 3110009,
+      "title_string_id": 78861,
+      "giver_npc_id": 9000000047,
+      "prerequisite_quest_ids": [
+        3110007
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B2; name 'Ninja: Nothing to Sneeze At'; title id cell ucdt 2206319953 / ugdt 3729978092"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B2; name 'Ninja: Nothing to Sneeze At'; title id cell ucdt 2206319953 / ugdt 3729978092"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110009 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row C3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78862,
+      "intro_text_string_id": 78860,
+      "end_text_string_id": 78863
+    },
+    {
+      "id": 3110010,
+      "title_string_id": 78865,
+      "giver_npc_id": 9000000047,
+      "prerequisite_quest_ids": [
+        3110009
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B3; name \"Ninja: That's the Spirit\"; title id cell ucdt 2002704819 / ugdt 343530960"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B3; name \"Ninja: That's the Spirit\"; title id cell ucdt 2002704819 / ugdt 343530960"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B3; name \"Ninja: That's the Spirit\"; title id cell ucdt 2002704819 / ugdt 343530960"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110010 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row B2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78866,
+      "intro_text_string_id": 78864,
+      "end_text_string_id": 78867
+    },
+    {
+      "id": 3110011,
+      "title_string_id": 78869,
+      "giver_npc_id": 9000000506,
+      "prerequisite_quest_ids": [
+        3110010
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B4; name 'Ninja: Troubled Waters'; title id cell ucdt 406708629 / ugdt 2105105533"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B4; name 'Ninja: Troubled Waters'; title id cell ucdt 406708629 / ugdt 2105105533"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110011 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row B3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78870,
+      "intro_text_string_id": 78868,
+      "end_text_string_id": 78871
+    },
+    {
+      "id": 3110012,
+      "title_string_id": 78873,
+      "giver_npc_id": 9000000093,
+      "prerequisite_quest_ids": [
+        3110011
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B5; name 'Ninja: Return to the Mentor'; title id cell ucdt 769699029 / ugdt 2876463241"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B5; name 'Ninja: Return to the Mentor'; title id cell ucdt 769699029 / ugdt 2876463241"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110012 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row B4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78874,
+      "intro_text_string_id": 78872,
+      "end_text_string_id": 78875
+    },
+    {
+      "id": 3110013,
+      "title_string_id": 387205,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B6; name 'Ninja: Achieve Level 10'; title id cell ucdt 3176185440 / ugdt 2986367494"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 2: level 5 to 10 (Chloe, then Snowhill), row B6; name 'Ninja: Achieve Level 10'; title id cell ucdt 3176185440 / ugdt 2986367494"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110013 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387206,
+      "end_text_string_id": 387207
+    },
+    {
+      "id": 3110014,
+      "title_string_id": 388404,
+      "giver_npc_id": 9000000439,
+      "prerequisite_quest_ids": [
+        3110013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D1; name 'Contract: Sharp Claws and Sharper Swords'; title id cell ucdt 1061584715 / ugdt 1720151834"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D1; name 'Contract: Sharp Claws and Sharper Swords'; title id cell ucdt 1061584715 / ugdt 1720151834"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110014 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row B6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388405,
+      "intro_text_string_id": 388403,
+      "end_text_string_id": 388406
+    },
+    {
+      "id": 3110015,
+      "title_string_id": 78877,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [
+        3110013
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D2; name 'Ninja: Shadows in the Snow'; title id cell ucdt 761694132 / ugdt 2076911050"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D2; name 'Ninja: Shadows in the Snow'; title id cell ucdt 761694132 / ugdt 2076911050"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110015 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row B6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78878,
+      "intro_text_string_id": 78876,
+      "end_text_string_id": 78879
+    },
+    {
+      "id": 3110016,
+      "title_string_id": 78881,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [
+        3110015
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D3; name 'Ninja: Burst of Speed'; title id cell ucdt 2948206532 / ugdt 417259078"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D3; name 'Ninja: Burst of Speed'; title id cell ucdt 2948206532 / ugdt 417259078"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110016 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row D2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78882,
+      "intro_text_string_id": 78880,
+      "end_text_string_id": 78883
+    },
+    {
+      "id": 3110017,
+      "title_string_id": 78889,
+      "giver_npc_id": 9000000447,
+      "prerequisite_quest_ids": [
+        3110016
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D4; name 'Ninja: Idol Conversation'; title id cell ucdt 899397350 / ugdt 2790688077"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D4; name 'Ninja: Idol Conversation'; title id cell ucdt 899397350 / ugdt 2790688077"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110017 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row D3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78890,
+      "intro_text_string_id": 78888,
+      "end_text_string_id": 78891
+    },
+    {
+      "id": 3110018,
+      "title_string_id": 387209,
+      "giver_npc_id": 9000000447,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D5; name 'Ninja: Achieve Level 15'; title id cell ucdt 2531704661 / ugdt 3883711650"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 3: level 10 to 15 (Ty, then Sakka), row D5; name 'Ninja: Achieve Level 15'; title id cell ucdt 2531704661 / ugdt 3883711650"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110018 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387210,
+      "end_text_string_id": 387211
+    },
+    {
+      "id": 3110019,
+      "title_string_id": 388408,
+      "giver_npc_id": 9000000439,
+      "prerequisite_quest_ids": [
+        3110018
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F1; name 'Contract: Fending off the Floren'; title id cell ucdt 3152737592 / ugdt 119447850"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F1; name 'Contract: Fending off the Floren'; title id cell ucdt 3152737592 / ugdt 119447850"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110019 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row D5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388409,
+      "intro_text_string_id": 388407,
+      "end_text_string_id": 388410
+    },
+    {
+      "id": 3110020,
+      "title_string_id": 78928,
+      "giver_npc_id": 9000000447,
+      "prerequisite_quest_ids": [
+        3110018
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F2; name 'Ninja: Missive for Michi'; title id cell ucdt 2084212531 / ugdt 316576290"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F2; name 'Ninja: Missive for Michi'; title id cell ucdt 2084212531 / ugdt 316576290"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110020 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row D5; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        }
+      ]
+    },
+    {
+      "id": 3110021,
+      "title_string_id": 78893,
+      "giver_npc_id": 9000000151,
+      "prerequisite_quest_ids": [
+        3110020
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F3; name 'Ninja: Real Ultimate Power'; title id cell ucdt 1533787975 / ugdt 3953733804"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F3; name 'Ninja: Real Ultimate Power'; title id cell ucdt 1533787975 / ugdt 3953733804"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110021 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row F2; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78894,
+      "intro_text_string_id": 78892,
+      "end_text_string_id": 78895
+    },
+    {
+      "id": 3110022,
+      "title_string_id": 78901,
+      "giver_npc_id": 9000000151,
+      "prerequisite_quest_ids": [
+        3110021
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F4; name 'Ninja: The Masterless Ninja'; title id cell ucdt 552016076 / ugdt 3597214767"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F4; name 'Ninja: The Masterless Ninja'; title id cell ucdt 552016076 / ugdt 3597214767"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F4; name 'Ninja: The Masterless Ninja'; title id cell ucdt 552016076 / ugdt 3597214767"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110022 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row F3; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78902,
+      "intro_text_string_id": 78900,
+      "end_text_string_id": 78903
+    },
+    {
+      "id": 3110023,
+      "title_string_id": 78905,
+      "giver_npc_id": 9000000151,
+      "prerequisite_quest_ids": [
+        3110022
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F5; name 'Ninja: Ice Troll Rampage'; title id cell ucdt 763835843 / ugdt 1848117192"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F5; name 'Ninja: Ice Troll Rampage'; title id cell ucdt 763835843 / ugdt 1848117192"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110023 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row F4; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 78906,
+      "intro_text_string_id": 78904,
+      "end_text_string_id": 78907
+    },
+    {
+      "id": 3110024,
+      "title_string_id": 387213,
+      "giver_npc_id": 9000000151,
+      "prerequisite_quest_ids": [],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F6; name 'Ninja: Achieve Level 20'; title id cell ucdt 3332103999 / ugdt 1504264774"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Band 4: level 15 to 20 (Sakka, then Michi), row F6; name 'Ninja: Achieve Level 20'; title id cell ucdt 3332103999 / ugdt 1504264774"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110024 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 387214,
+      "end_text_string_id": 387215
+    },
+    {
+      "id": 3110025,
+      "title_string_id": 388412,
+      "giver_npc_id": 9000000439,
+      "prerequisite_quest_ids": [
+        3110024
+      ],
+      "objectives": [],
+      "rewards": [],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Level 20 and later, row G1; name 'Contract: Spirits and Spider Trainers'; title id cell ucdt 3240081657 / ugdt 63652993"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Level 20 and later, row G1; name 'Contract: Spirits and Spider Trainers'; title id cell ucdt 3240081657 / ugdt 63652993"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3110025 is a stable batch key; the guide does not provide a numeric server quest id"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) source explicitly says after row F6; mapped that page label to the preceding batch content key"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        }
+      ],
+      "description_string_id": 388413,
+      "intro_text_string_id": 388411,
+      "end_text_string_id": 388414
+    }
+  ]
+}

@@ -1,0 +1,2317 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "bigfoot_s_lair",
+        "name_string_id": 591464176,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Bigfoot's Lair."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key bigfoot_s_lair comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Bigfoot's Lair; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Bigfoot's Lair",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 591464176,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 3,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Bigfoot's Lair difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Wilds (Greenwood Forest, southwest, near Camp Chatty)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 5,
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Combat job level; cited [client `loc 2145075890`, `3173661191`, `66524078`] [video s4q4D_xmPoU/00002, L27vxozHOls/00004] [wiki: \"Levels 5 and higher\", difficulty 3]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Combat job level; cited [client `loc 2145075890`, `3173661191`, `66524078`] [video s4q4D_xmPoU/00002, L27vxozHOls/00004] [wiki: \"Levels 5 and higher\", difficulty 3]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Combat job level; cited [client `loc 2145075890`, `3173661191`, `66524078`] [video s4q4D_xmPoU/00002, L27vxozHOls/00004] [wiki: \"Levels 5 and higher\", difficulty 3]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Combat job level; cited [client `loc 2145075890`, `3173661191`, `66524078`] [video s4q4D_xmPoU/00002, L27vxozHOls/00004] [wiki: \"Levels 5 and higher\", difficulty 3]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Combat job level; cited [client `loc 2145075890`, `3173661191`, `66524078`] [video s4q4D_xmPoU/00002, L27vxozHOls/00004] [wiki: \"Levels 5 and higher\", difficulty 3]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Combat job level; cited [client `loc 2145075890`, `3173661191`, `66524078`] [video s4q4D_xmPoU/00002, L27vxozHOls/00004] [wiki: \"Levels 5 and higher\", difficulty 3]"
+              }
+            ]
+          },
+          "quest": {
+            "value": "Putting Your Foot Down",
+            "reason": null,
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Unlocking quest; cited [wiki] [video s4q4D_xmPoU/00000]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Unlocking quest; cited [wiki] [video s4q4D_xmPoU/00000]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": null,
+            "reason": "Not stated on the wiki page (the wiki tags other battles \"Members Only\", this one is not tagged). Unconfirmed. | [wiki]",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Wilds (Greenwood Forest, southwest, near Camp Chatty)",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "npc",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+                }
+              ]
+            },
+            "name": {
+              "value": "Bigfoot",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Started by clicking Bigfoot in the southwest Wilds, near Camp Chatty. Bigfoot only appears while you hold the right quest. No Atlas icon is mentioned. | [wiki]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (only goal)",
+              "value": "\"Defeat Bigfoot!\" The goals panel shows \"Goals (1)\". There is no bonus goal. | [client loc 1087603867] [video s4q4D_xmPoU/00024, L27vxozHOls/00230] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Goals > Main (only goal); cited [client `loc 1087603867`] [video s4q4D_xmPoU/00024, L27vxozHOls/00230] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Goals > Main (only goal); cited [client `loc 1087603867`] [video s4q4D_xmPoU/00024, L27vxozHOls/00230] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Goals > Main (only goal); cited [client `loc 1087603867`] [video s4q4D_xmPoU/00024, L27vxozHOls/00230] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Also in client",
+              "value": "\"Defeat \"Bigfoot\"\" (loc 3165914726) and \"Don't let Bigfoot get knocked out\" (loc 817448663). The second belongs to the sister battle [[Bigfoot Defender]], not this one. | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Goals > Also in client; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Bigfoot",
+                "Robbie"
+              ],
+              "description": {
+                "value": "Bigfoot (boss name bar \"Bigfoot\"), actually Robbie in costume | Speech bubbles in the fight: \"RAAAAWR! ...and stuff...\", \"GRRR! ...um, and RAWR!\", \"BLERG!\". The player is shown \"You can't use abilities when you are stunned!\" during the fight. | [video s4q4D_xmPoU/00114 to 00158] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [
+                "Bears"
+              ],
+              "description": {
+                "value": "Bears (brown bear-like creatures in a meadow) | Only bears are named on the wiki. | [wiki] [video L27vxozHOls/00092]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss",
+              "names": [
+                "Bigfoot",
+                "Robbie"
+              ],
+              "description": {
+                "value": "Bigfoot (boss name bar \"Bigfoot\"), actually Robbie in costume | Speech bubbles in the fight: \"RAAAAWR! ...and stuff...\", \"GRRR! ...um, and RAWR!\", \"BLERG!\". The player is shown \"You can't use abilities when you are stunned!\" during the fight. | [video s4q4D_xmPoU/00114 to 00158] [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not map Boss to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md does not source stats for Boss."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"102 Stars or less\" (as written on the wiki, meaning unclear). No stars figure was read in video. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel",
+                "value": "One wheel per combat job. Each wheel has a 990 Coins slot. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Quest reward (Confronting Bigfoot)",
+                "value": "\"You receive 1 Camp Chatty Hat\" on \"Quest Completed! Confronting Bigfoot\" | [video L27vxozHOls/00326] [client item loc 3789252990]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Quest reward (Confronting Bigfoot); cited [video L27vxozHOls/00326] [client item `loc 3789252990`]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Quest reward (Confronting Bigfoot); cited [video L27vxozHOls/00326] [client item `loc 3789252990`]"
+                  }
+                ]
+              },
+              {
+                "label": "Members bonus",
+                "value": "Not listed for this battle. | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Members bonus; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 990,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                    },
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Camp Chatty Banner",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        },
+                        {
+                          "kind": "video",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      },
+                      {
+                        "kind": "video",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Chatty Tent",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        },
+                        {
+                          "kind": "video",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      },
+                      {
+                        "kind": "video",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Robbie Flair Shard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        },
+                        {
+                          "kind": "video",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      },
+                      {
+                        "kind": "video",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Chugawug Totem",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        },
+                        {
+                          "kind": "video",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      },
+                      {
+                        "kind": "video",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Mushroom Spitfire",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        },
+                        {
+                          "kind": "video",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      },
+                      {
+                        "kind": "video",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Tasty Marshmallow",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        },
+                        {
+                          "kind": "video",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      },
+                      {
+                        "kind": "video",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Camp Robbie Banner",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Robbie Flair Shard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Robbie Tent",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Caterpillar Spitfire",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Treeble Treat",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Troll Totem",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Camp Chatty Tent",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Robbie Flair Shard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Owl Totem",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Camp Chatty Flair Shard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Robbie Tent",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Chatty Totem",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Camp Chatty Flair Shard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Chatty Tent",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Robbie Totem",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Camp Chatty Banner",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Chatty Flair Shard",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Camp Robbie Tent",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Man-Eating Plant Totem",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Nutty Spitfire",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Tasty Marshmallow",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": [
+              {
+                "text": "On completion a \"Goal Complete\" banner shows and an Exit marker appears (17 to 19 m away in the recordings). [video s4q4D_xmPoU/00194, 00198]",
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > exit evidence; cited [video s4q4D_xmPoU/00194, 00198]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit wording follows explicit page evidence."
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "quest",
+            "target_name": "Putting Your Foot Down",
+            "target_id": null,
+            "reason": "Guide gives a quest title but no resolved quest record ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Unlocking quest; cited [wiki] [video s4q4D_xmPoU/00000]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Requirements > Unlocking quest; cited [wiki] [video s4q4D_xmPoU/00000]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "zone",
+            "target_name": "Wilds (Greenwood Forest, southwest, near Camp Chatty)",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Entrance; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "npc",
+            "target_name": "Bigfoot",
+            "target_id": 9500000287,
+            "reason": "Exact name matches reconstructed NPC content key in greenwood_forest.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/greenwood_forest.json npc_id 9500000287; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "npc",
+            "target_name": "Robbie",
+            "target_id": 9500000318,
+            "reason": "Exact name matches reconstructed NPC content key in greenwood_forest.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/greenwood_forest.json npc_id 9500000318; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "npc",
+            "target_name": "Bears",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Camp Chatty Banner",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Camp Chatty Tent",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Camp Robbie Flair Shard",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Chugawug Totem",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Mushroom Spitfire",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Archer; cited [wiki] [video L27vxozHOls/00004]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Tasty Marshmallow",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Camp Robbie Banner",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Camp Robbie Tent",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Caterpillar Spitfire",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Treeble Treat",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Troll Totem",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Brawler; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Owl Totem",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Medic; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Camp Chatty Flair Shard",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Chatty Totem",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Ninja; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Robbie Totem",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Warrior; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Man-Eating Plant Totem",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          },
+          {
+            "owner": "bigfoot_s_lair",
+            "kind": "item",
+            "target_name": "Nutty Spitfire",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Rewards > Prize wheel by job > Wizard; cited [wiki]"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key bigfoot_s_lair comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Battles (category Battle: nodes, special spawns and quest battles) > Bigfoot's Lair; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Bigfoot",
+            "definition_id": 930000,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 428930 resolves 'Bigfoot'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930000 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Robbie",
+            "definition_id": 930000,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 428930 resolves 'Bigfoot'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930000 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "Bears",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Bigfoot",
+            "definition_id": 930000,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 428930 resolves 'Bigfoot'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930000 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Robbie",
+            "definition_id": 930000,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Boss; cited [video s4q4D_xmPoU/00114 to 00158] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 428930 resolves 'Bigfoot'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930000 is a W58 local projection."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

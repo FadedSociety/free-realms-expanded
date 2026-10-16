@@ -1,0 +1,16 @@
+# Class: Window
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00c289e0` | `Window::SetProperty` | 🟢 | method | Lua method body: requires exactly 3 arguments, guards argument 1 with 00c28980, reads both string arguments (00e39c30 at indices 2 and 3) and, after resolving the property name with 00820460, calls the property interfac… |
+| `00c28a50` | `— ⚠reject` | ⚪ | method | Lua method body: guards argument 1 with 00c28980 and, when exactly 3 arguments are present, reads the two integers at stack indices -1 and -2 through 00e3a7b0 and calls the UI command helper 004072e2(first,second,0,0,6)… |
+| `00c28bd0` | `— ⚠reject` | ⚪ | method | Lua method body: guards argument 1 with 00c28980 and, when exactly 3 arguments are present, reads the two integers at stack indices -1 and -2, calls the UI command helper 004072e2(0,0,second,first,5), then writes the sc… |
+| `00c28c90` | `Window::PostFocus` | 🟢 | method | Lua method body: requires exactly 1 argument, guards it with 00c28980, zeroes a 7-dword structure plus word (seeded from DAT_01bc3b40) and passes it to the window's virtual method at vtable offset 0x110; when the return… |
+| `00c28d50` | `Window::SetCaption` | 🟢 | method | Lua method body: requires exactly 2 arguments, guards argument 1 with 00c28980, reads the string at index 2 with 00e39c30 and, when non-empty, calls the property interface at control+0x1a0 virtual slot 0x14 with the fix… |
+| `00c28e60` | `RegisterWindowModule` | ✅ | init | Lua module initialiser: calls the register helper 00e39e40(L,'Window',table@0x0182f580) whose entries include GetPosition->00c29050, SetPosition->00c28a50, GetSize->00c290f0, SetSizeScaled->00c28bd0, Find->00c28f40, Clo… |
+| `00c29000` | `Window::IsVisible` | 🟢 | method | Lua method body: guards argument 1 with 00c28980 and, when the guard returns a window, pushes a Lua boolean through 00e3ac00 with the value ((window flags at +0x60) & 1) == 0 - i.e. true when bit 0 is clear - and return… |
+| `00c29050` | `Window::GetPosition` | 🟢 | method | Lua method body: guards argument 1 with 00c28980, then pushes the 32-bit fields at control+0x68 and control+0x6c as Lua numbers through 00e3aa30 and returns 2 Lua results; returns 0 when the guard fails. |
+| `00c290f0` | `Window::GetSize` | 🟢 | method | Lua method body: guards argument 1 with 00c28980, then pushes the 32-bit fields at window+0x70 and window+0x74 as Lua numbers through 00e3aa30 and returns 2 Lua results; returns 0 when the guard fails. |
+| `00c29130` | `Window::SetFocus` | 🟢 | method | Lua method body: when exactly 1 argument is present it guards it with 00c28980, otherwise it resolves the global scene by name through 00c1a4d0('GameScene'); if the resulting object is non-null it calls the UI focus hel… |
+| `00c29280` | `Window::ShowModal` | 🟢 | method | Lua method body: guards argument 1 with 00c28980, then on the window calls the property interface at +0x1a0 virtual slot 0x14 with property 0xc and the default value at 0x0176cfcc; calls the UI helper 00406607(0); sets … |
+| `00c29380` | `Window::GetProperty` | 🟢 | method | Lua method body: requires exactly 2 arguments, guards argument 1 with 00c28980, resolves the property name (00e39c30 + 00820460) and, when the id is not negative, builds a SoeUtil::IString<unsigned_short> temporary (vft… |

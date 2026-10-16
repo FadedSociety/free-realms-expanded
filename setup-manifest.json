@@ -1,0 +1,267 @@
+{
+  "setup_date": "2026-10-08",
+  "timezone": "America/Los_Angeles",
+  "skill_packs": [
+    {
+      "repository": "https://github.com/dietrichgebert/ponytail",
+      "revision": "552acd5efd0aeae2583a12efe39373d2f076f25e",
+      "skills": [
+        {
+          "name": "ponytail-audit",
+          "source_path": "skills/ponytail-audit/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ponytail-audit\\SKILL.md",
+          "sha256": "38c209f3b56c8c8291bd00cf91da1ee9048ddafb1b5e7f838c1e1b81822e4023",
+          "files": 1
+        },
+        {
+          "name": "ponytail-debt",
+          "source_path": "skills/ponytail-debt/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ponytail-debt\\SKILL.md",
+          "sha256": "d3611761039bdb2955e31856834feeec6ed5483a3fc64576e9a166f949a131d1",
+          "files": 1
+        },
+        {
+          "name": "ponytail-gain",
+          "source_path": "skills/ponytail-gain/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ponytail-gain\\SKILL.md",
+          "sha256": "b85750bbceb37095c7bc59e77a05ffd428ac92f0e570e99bc789e295d8734640",
+          "files": 1
+        },
+        {
+          "name": "ponytail-help",
+          "source_path": "skills/ponytail-help/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ponytail-help\\SKILL.md",
+          "sha256": "dd07abd59ef4acdfc308c193e22b8c526fd99dc1c9a48d710f5ecd5c58b8580c",
+          "files": 1
+        },
+        {
+          "name": "ponytail-review",
+          "source_path": "skills/ponytail-review/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ponytail-review\\SKILL.md",
+          "sha256": "4b29656469baa5df3513a1557197ec8053162c6a54c166c871c57061e37a8ebb",
+          "files": 1
+        },
+        {
+          "name": "ponytail",
+          "source_path": "skills/ponytail/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ponytail\\SKILL.md",
+          "sha256": "1316a2f3f95741d2300b116fe0c2d81ce4a9568656ed0a62643f54aaf09957f2",
+          "files": 1
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/ayghri/i-have-adhd",
+      "revision": "723af7d9afaf43eb871dbcce6129e2bf80de90d5",
+      "skills": [
+        {
+          "name": "i-have-adhd",
+          "source_path": "skills/i-have-adhd/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\i-have-adhd\\SKILL.md",
+          "sha256": "88955c019bbb1419ff4b49dbb1f80a867467de6233d7865af2e06a7d7b76c7d3",
+          "files": 3
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/juliusbrussee/caveman",
+      "revision": "99aafe151a1be72be783e662858e8a0955add59f",
+      "skills": [
+        {
+          "name": "cavecrew",
+          "source_path": "skills/cavecrew/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\cavecrew\\SKILL.md",
+          "sha256": "d8a21355e717761746cd34e8355787c9745a72ce007a150f9d92334e5a2335e4",
+          "files": 2
+        },
+        {
+          "name": "caveman-commit",
+          "source_path": "skills/caveman-commit/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-commit\\SKILL.md",
+          "sha256": "c788a282fc75b981b421dfdad5d84ea7f83f946c126daa39cfc7d3f97845e193",
+          "files": 2
+        },
+        {
+          "name": "caveman-compress",
+          "source_path": "skills/caveman-compress/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-compress\\SKILL.md",
+          "sha256": "377b0b8682d9db1a832c20ee6732ed0f19f55e4f7048955296128244c869c916",
+          "files": 10
+        },
+        {
+          "name": "caveman-discover",
+          "source_path": "skills/caveman-discover/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-discover\\SKILL.md",
+          "sha256": "0483d17fce14ca5bbfcf1e085c180412dc20a672f5e8e4171fd0bbbb6f42b81a",
+          "files": 1
+        },
+        {
+          "name": "caveman-evidence-review",
+          "source_path": "skills/caveman-evidence-review/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-evidence-review\\SKILL.md",
+          "sha256": "05bd896c76a41918fe7b87113dabe852117727a579a7e445891aa41391ed57c2",
+          "files": 1
+        },
+        {
+          "name": "caveman-explore",
+          "source_path": "skills/caveman-explore/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-explore\\SKILL.md",
+          "sha256": "908f504ce45f5f8517ac7b64dc89fef57c4519d26f92b0b1843febf4b6fe2ac8",
+          "files": 3
+        },
+        {
+          "name": "caveman-help",
+          "source_path": "skills/caveman-help/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-help\\SKILL.md",
+          "sha256": "150dc9b454d6e897bc22f6744b90dfa02f4fe680ded69b0d880556c49a91a18e",
+          "files": 2
+        },
+        {
+          "name": "caveman-learn",
+          "source_path": "skills/caveman-learn/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-learn\\SKILL.md",
+          "sha256": "466ce607aebff17df2fb0d4ec5fba9b0ab61b1f6a0fd7ae03f4f5ea4aa5627b9",
+          "files": 6
+        },
+        {
+          "name": "caveman-manage",
+          "source_path": "skills/caveman-manage/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-manage\\SKILL.md",
+          "sha256": "3404a3c8651d63b6a7c02ccda17fcb4fca2489e931bb814580979a9ff548a48e",
+          "files": 1
+        },
+        {
+          "name": "caveman-optimize",
+          "source_path": "skills/caveman-optimize/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-optimize\\SKILL.md",
+          "sha256": "93f391beb93198b5bf9c0c21bc8b7b194e57cb7855fbf05384a4a5d6dd8c06cb",
+          "files": 1
+        },
+        {
+          "name": "caveman-review",
+          "source_path": "skills/caveman-review/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-review\\SKILL.md",
+          "sha256": "599330563f19b5c59c3efddffcd7e8d9098b74c29817ab422ccd3253b103fcb8",
+          "files": 2
+        },
+        {
+          "name": "caveman-setup",
+          "source_path": "skills/caveman-setup/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-setup\\SKILL.md",
+          "sha256": "42c8b8eeba19c6d4ffd3c421be60a7e8b5c0e5108fd4496f0be3c7ced90bfd5f",
+          "files": 1
+        },
+        {
+          "name": "caveman-stats",
+          "source_path": "skills/caveman-stats/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman-stats\\SKILL.md",
+          "sha256": "4632f1611a56483df7851a0dabcc1e0c1952393cd8f5d08ddeda17f81a4e1e50",
+          "files": 2
+        },
+        {
+          "name": "caveman",
+          "source_path": "skills/caveman/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\caveman\\SKILL.md",
+          "sha256": "34255a0215a7701eb83d508d03bc9560dc7bffbeb95a145ad2921ad2598a03bf",
+          "files": 2
+        },
+        {
+          "name": "investigate-first",
+          "source_path": "skills/investigate-first/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\investigate-first\\SKILL.md",
+          "sha256": "7cc19dd2fc457eb20d65c44dee4d1b72dcdfcd1617182f5bff666700f2a055d8",
+          "files": 2
+        },
+        {
+          "name": "lean-build",
+          "source_path": "skills/lean-build/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\lean-build\\SKILL.md",
+          "sha256": "4d498073c6312858b220e9a04b7456c2485c734edb077f6bb17d88a7ed96ad7a",
+          "files": 2
+        },
+        {
+          "name": "megacave",
+          "source_path": "skills/megacave/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\megacave\\SKILL.md",
+          "sha256": "f25399c535a2f8f906e06cd0c5c52146b0e747abbf80e111c96f93adade04a69",
+          "files": 2
+        },
+        {
+          "name": "migration",
+          "source_path": "skills/migration/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\migration\\SKILL.md",
+          "sha256": "fe7cf96a58b0521130fbb886dab2a326869d6ed0001e0306fd244014ba7a9662",
+          "files": 2
+        },
+        {
+          "name": "safe-refactor",
+          "source_path": "skills/safe-refactor/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\safe-refactor\\SKILL.md",
+          "sha256": "cd52867aba26aafb53379d43068cef9b2feca3a3fff850f877a99f710ccd02c0",
+          "files": 2
+        },
+        {
+          "name": "surgical-patch",
+          "source_path": "skills/surgical-patch/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\surgical-patch\\SKILL.md",
+          "sha256": "81ea9f7b51409970099e04b98875dd65806cd35472f9a774b847030328187387",
+          "files": 2
+        },
+        {
+          "name": "ultracave",
+          "source_path": "skills/ultracave/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\ultracave\\SKILL.md",
+          "sha256": "8afefa7ae95bfb7fd080dac0ce95b09063cbe37ea9d78ef48662b2ec96884c6c",
+          "files": 2
+        },
+        {
+          "name": "verify-and-stop",
+          "source_path": "skills/verify-and-stop/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\verify-and-stop\\SKILL.md",
+          "sha256": "3d5599f49771b864eba94f27f456fda295c48c1a37fa6ba2f65fdcb13cc32acb",
+          "files": 2
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/zhaoxuya520/reverse-skill",
+      "revision": "cab634bd855fc287f6e420c1f36fd1a6b9245960",
+      "skills": [
+        {
+          "name": "reverse-skill-router",
+          "source_path": "plugins/reverse-skill/skills/reverse-skill-router/SKILL.md",
+          "installed_path": "%USERPROFILE%\\.codex\\skills\\reverse-skill-router\\SKILL.md",
+          "sha256": "9991b8b028b30362f49f90f28093a14a24fc0091993bd49bcea7693fe4f6a435",
+          "files": 1
+        }
+      ]
+    }
+  ],
+  "reverse_skill_support": "%USERPROFILE%\\.codex\\tools\\reverse-skill",
+  "applications": [
+    {
+      "name": "Obsidian",
+      "version": "1.14.4",
+      "package": "Obsidian.Obsidian"
+    },
+    {
+      "name": "RTK",
+      "version": "0.50.0",
+      "package": "rtk-ai.rtk",
+      "source_ref": "v0.50.0",
+      "codex_hook_registered": true,
+      "telemetry_enabled": false
+    }
+  ],
+  "workspace": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO",
+  "vault": "%USERPROFILE%\\Documents\\Projects\\CartoonMMO\\project\\notes",
+  "analysis_status": "awaiting-user-files",
+  "validation": {
+    "note_links_checked": true,
+    "hook_active_in_current_codex_session": "not-verified-restart-required",
+    "obsidian_home_loaded": true,
+    "skills_checked": 30,
+    "rtk_hook_rewrite_checked": true,
+    "rtk_direct_command_checked": true
+  }
+}

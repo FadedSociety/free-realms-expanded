@@ -1,0 +1,14 @@
+# Class: GDisplayD3D9Impl
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `0046cac7` | `— ⚠reject` | ⚪ | method | Checks the display object's 'ready' flag at +0x79 and, when unset, asks the D3D interface at +0x10 for its state (vtable slot 0xc) and compares the code against the constants -0x7789f797 / -0x7789f798 (D3DERR_DEVICELOST… |
+| `0046cb80` | `— ⚠reject` | ⚪ | method | Applies a new backbuffer size (param_3 x param_4): returns immediately with *param_2 = 0x10 when the display flag at +0x49 is clear, stores the new size and, when the windowed-mode flag 0x4000 is not set, rewrites both … |
+| `0046cd73` | `— ⚠reject` | ⚪ | method | Reports display readiness into the object at param_1 and, when param_2 is non-zero, into human-readable text: returns 1 and reports 'Display not ready - Video mode not set' when the +0x49 flag is clear or the mode point… |
+| `0046ce78` | `— ⚠reject` | ⚪ | method | Walks the registered-interface table from FUN_0045c980/FUN_0045c993 and, when an entry's first pointer equals param_2, erases that entry (FUN_00464882 over the tree at +0xa0/+0xa4), copies its key with FUN_004679f4/FUN_… |
+| `0046cef2` | `GDisplayD3D9Impl::~GDisplayD3D9Impl` | ✅ | dtor | Destructor body: restores the object's two vtable pointers to PTR_FUN_01765040 / PTR_LAB_0176503c, releases the object at +0x24 through its vtable slot 8, frees the module handle at +0x20 with FreeLibrary, runs the D3D … |
+| `0046cf8c` | `GDisplayD3D9Impl::BlitImage` | 🟢 | method | Blits a source image (param_2) into the display's client area: reads the image's +0x94/+0x90 fields, returns 0 when the display or image is missing, and when the image is not clipped against the object's own +0x6c..+0x7… |
+| `0046d05e` | `GDisplayD3D9Impl::PresentTrackedRect` | 🟢 | method | Flushes the object's tracked rect: returns 0 with no display, otherwise copies the tracked rect at +0x6c into a local region with FUN_004c9ed9 and blits it with FUN_0046c889, passing either a scratch region or null when… |
+| `0046d0c1` | `GDisplayD3D9Impl::PresentRect` | 🟢 | method | Flushes the rect passed in param_2: returns 0 with no display, converts it with FUN_004c9ed9, optionally clips it against the display's client rect (FUN_004ca149 when param_3 is set) and the tracked bounds (FUN_004f75b5… |
+| `0046d9ed` | `GDisplayD3D9Impl::DtorThunk` | 🟢 | dtor | Deleting-destructor variant: runs the GDisplayD3D9Impl destructor body FUN_0046cef2 and, when the low bit of param_2 is set, frees the object through thunk_FUN_004c6a61. |
+| `00476d95` | `GDisplayD3D9ImplFactory` | 🟢 | function | Factory selector for the 0x34-byte GDisplayD3D9Impl family: mode 0 constructs in place through FUN_00476b89, mode 1 copy-constructs through FUN_00474792, modes 2/3 allocate 0x34 bytes before the corresponding constructo… |

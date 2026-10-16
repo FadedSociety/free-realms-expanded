@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "jobs": [
+    {
+      "profile_id": 11,
+      "slots": [
+        {
+          "slot": 1,
+          "definition_id": 4899,
+          "name_id": 442456,
+          "icon_id": 22590,
+          "damage_multiplier": 3.2,
+          "heal": 254,
+          "energy_cost": 100,
+          "cooldown_ms": 1000,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "name 442456 'Triage'; icon Images.txt 22590 (icon_abil_medic_triage, image set 4795)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Student Medic Hammer: Incision 279, Triage heals 254 and deals 889 (Medic job page); Triage is the tier-1 Medic ultra ability"
+            },
+            {
+              "kind": "reference",
+              "evidence": "definition 4899 and 100 energy from the community emulator's combat job data (reference only)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) damage = basic attack x 3.2 (the wiki's 889/279 ratio on our reconstructed scale); 1 s cooldown; single target in melee reach (the reference's radius-10 area is not implemented)"
+            }
+          ],
+          "min_level": 1
+        },
+        {
+          "slot": 2,
+          "definition_id": 4901,
+          "name_id": 3784,
+          "description_id": 3813,
+          "icon_id": 260,
+          "heal": 250,
+          "cooldown_ms": 15000,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "name 3784 'First Aid', rank 1 text 3813 (heals 250; guide hash 4168670255); icon Images.txt 260 (image set 887)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "First Aid, level 1 Medic ability: heals yourself and any ally near you for 250"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) definition id 4901 is local; 15 s cooldown and no energy cost; allies are not healed yet (no multiplayer)"
+            }
+          ],
+          "min_level": 1
+        }
+      ]
+    }
+  ]
+}

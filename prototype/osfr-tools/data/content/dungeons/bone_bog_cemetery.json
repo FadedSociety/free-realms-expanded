@@ -1,0 +1,3096 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "record": {
+        "id": "bone_bog_cemetery",
+        "name_string_id": 51703131,
+        "zone_id": null,
+        "entry_requirements": [],
+        "encounters": [
+          {
+            "id": "main",
+            "goals": [],
+            "rewards": [],
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Bone Bog Cemetery."
+              }
+            ]
+          }
+        ],
+        "rewards": [],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key bone_bog_cemetery comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Bone Bog Cemetery; cited guide source index"
+          }
+        ]
+      },
+      "dungeon_data": {
+        "display_name": {
+          "value": "Bone Bog Cemetery",
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "name_string_id": {
+          "value": 51703131,
+          "reason": null,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Client name; cited [client]"
+            }
+          ]
+        },
+        "difficulty": {
+          "value": 3,
+          "reason": null,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Bone Bog Cemetery difficulty; cited guide source index"
+            }
+          ]
+        },
+        "zone": {
+          "name": {
+            "value": "Blackspore Swamp",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              }
+            ]
+          },
+          "zone_id": {
+            "value": null,
+            "reason": "Guide names a region/subregion but gives no ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Zone label is not a numeric zone mapping."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+            }
+          ]
+        },
+        "entry_requirements": {
+          "minimum_combat_job_level": {
+            "value": 5,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Combat job level (normal); cited [wiki: Dungeons, Bone Bog Cemetery] [client, generic] [video TjpDl22Lwpk/00042]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Combat job level (normal); cited [wiki: Dungeons, Bone Bog Cemetery] [client, generic] [video TjpDl22Lwpk/00042]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Combat job level (normal); cited [wiki: Dungeons, Bone Bog Cemetery] [client, generic] [video TjpDl22Lwpk/00042]"
+              }
+            ]
+          },
+          "recommended_player_level": {
+            "value": null,
+            "reason": "No separate recommended player level is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md has no separate recommended-level claim."
+              }
+            ]
+          },
+          "job": {
+            "value": "combat job",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Combat job level (normal); cited [wiki: Dungeons, Bone Bog Cemetery] [client, generic] [video TjpDl22Lwpk/00042]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Combat job level (normal); cited [wiki: Dungeons, Bone Bog Cemetery] [client, generic] [video TjpDl22Lwpk/00042]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Combat job level (normal); cited [wiki: Dungeons, Bone Bog Cemetery] [client, generic] [video TjpDl22Lwpk/00042]"
+              }
+            ]
+          },
+          "quest": {
+            "value": null,
+            "reason": "None for the normal version. The event version is entered through the Lucinda quest \"The Pumpkin Prince\" (see Related quests). | [wiki: Super Spooktacular]",
+            "quest_id": {
+              "value": null,
+              "reason": "Guide title/locale IDs are not resolved quest record IDs.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Quest title has no stable content quest key."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Unlocking quest; cited [wiki: Super Spooktacular]"
+              }
+            ]
+          },
+          "members_only": {
+            "value": false,
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Requirements > Members only; cited [wiki]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Guide requirements are source claims, not recovered server authorization rules."
+            }
+          ]
+        },
+        "entrance": {
+          "zone": {
+            "value": "Blackspore Swamp",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              }
+            ]
+          },
+          "initiator": {
+            "kind": {
+              "value": "object",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+                }
+              ]
+            },
+            "name": {
+              "value": "gate",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+                }
+              ]
+            },
+            "id": {
+              "value": null,
+              "reason": "Guide does not map this NPC/object to a numeric content key.",
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Entrance target name has no resolved content ID."
+                }
+              ]
+            },
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              }
+            ]
+          },
+          "description": {
+            "value": "Click the gate in Blackspore Swamp. Atlas icon exists. Recordings show a stone / bone-shaped gate with a \"Bone Bog Cemetery\" landmark marker. Client text: \"Speak to Lucinda just outside of Bone Bog Cemetery.\" (loc 3325099950). | [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+            }
+          ]
+        },
+        "instance_scene_name": {
+          "value": null,
+          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md has no exact instance scene-name field."
+            }
+          ]
+        },
+        "goals": {
+          "value": [
+            {
+              "label": "Main (normal)",
+              "value": "\"Defeat the cemetery banshee!\" (loc 407646356). | [client] [video TjpDl22Lwpk/00152, 00326, 00344] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Main (normal); cited [client] [video TjpDl22Lwpk/00152, 00326, 00344] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Main (normal); cited [client] [video TjpDl22Lwpk/00152, 00326, 00344] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Main (normal); cited [client] [video TjpDl22Lwpk/00152, 00326, 00344] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Main (event)",
+              "value": "\"Defeat the Pumpkin Prince\" (loc 202086571). The first-goal line was unreadable in the early frames. The chat log later shows \"The Pumpkin Prince Goal Complete: Defeat the Pumpkin Prince\" followed by \"New Goal: Speak to Lucinda\". | [video 0LoQe5VZ0PY/00098, 00102] [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Main (event); cited [video 0LoQe5VZ0PY/00098, 00102] [client]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Main (event); cited [video 0LoQe5VZ0PY/00098, 00102] [client]"
+                }
+              ]
+            },
+            {
+              "label": "Bonus",
+              "value": "\"Bonus: Find and defeat the 3 Bone Bog Skeletons!\" with a counter 0/3 to 3/3. Client string loc 3694930972. | [client] [video TjpDl22Lwpk/00152 to 00344, 0LoQe5VZ0PY/00000] [wiki]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Bonus; cited [client] [video TjpDl22Lwpk/00152 to 00344, 0LoQe5VZ0PY/00000] [wiki]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Bonus; cited [client] [video TjpDl22Lwpk/00152 to 00344, 0LoQe5VZ0PY/00000] [wiki]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Bonus; cited [client] [video TjpDl22Lwpk/00152 to 00344, 0LoQe5VZ0PY/00000] [wiki]"
+                }
+              ]
+            },
+            {
+              "label": "Panel shows",
+              "value": "\"Goals (2)\" | [video 0LoQe5VZ0PY/00000]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Panel shows; cited [video 0LoQe5VZ0PY/00000]"
+                }
+              ]
+            },
+            {
+              "label": "Internal bonus group",
+              "value": "\"bone bog cemetery - bonus objective\" (loc 2504452980) | [client]",
+              "reason": null,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Goals > Internal bonus group; cited [client]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Goal wording is preserved without inventing model or objective IDs."
+            }
+          ]
+        },
+        "phases": {
+          "value": null,
+          "reason": "No sourced phase/wave sequence was stated.",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not define phase/wave ordering or triggers."
+            }
+          ]
+        },
+        "enemies": {
+          "value": [
+            {
+              "role": "Boss (normal)",
+              "names": [
+                "Banshee"
+              ],
+              "description": {
+                "value": "Banshee (boss bar \"Banshee\") | Client names: \"Banshee Boss\" (loc 1702385876, 1783634524, 1843208900, 3889942244), \"Howling Banshee\" (loc 1778728347), \"Screeching Banshee\" (loc 1548156321), abilities \"Banshee Scream\", \"Banshee Bolt\", \"Banshee Form\". Dev strings: \"bone bog cemetery 339 - scream attack\", \"Banshe Scream\", \"mini boss nuke\", \"mini boss reclaim\". The wiki says five wraiths spawn with her. | [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not map Boss (normal) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not source stats for Boss (normal)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                }
+              ]
+            },
+            {
+              "role": "Boss (event)",
+              "names": [
+                "The Pumpkin Prince"
+              ],
+              "description": {
+                "value": "The Pumpkin Prince (UI loc 3506549451, game data 3549407549) | Dev strings: \"event boss ability\", \"event boss pumpking CC\", \"halloween adds heal\". Defeating him lets the minions be attacked: \"His friends can now be attacked! Send them back to the ghost world!\" | [video 0LoQe5VZ0PY/00048 to 00098] [client loc 3910443369, 4193966717, 3284379933]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not map Boss (event) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not source stats for Boss (event)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                }
+              ]
+            },
+            {
+              "role": "Enemies",
+              "names": [
+                "Wraiths",
+                "Bone Bog Skeletons",
+                "Ravens",
+                "Ghost Dwarves",
+                "Grave Elementals",
+                "Necromancers",
+                "Bats"
+              ],
+              "description": {
+                "value": "Wraiths, Bone Bog Skeletons, Ravens, Ghost Dwarves, Grave Elementals, Necromancers, Bats | Video confirms Grave Elemental (red nameplate; \"You receive 25 coins\" from one). Event adds \"Pumpkin Prince Ghost\". Client names: \"Ghost Dwarf\", \"Necromancer\", \"Cemetery Bat\", \"Wraith\", \"Grave Elemental\" and variants. Dev strings: \"wraith root\", \"grave elemental bonus attack\", \"grave elemental buff cast by necromancer\". | [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client loc 3650825494, 553797784, 912760119, 2307843224, 319395169, 3625642073]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+                  },
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not map Enemies to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not source stats for Enemies."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+                },
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Enemy names and roles follow source rows; model IDs remain unresolved."
+            }
+          ]
+        },
+        "bosses": {
+          "value": [
+            {
+              "role": "Boss (normal)",
+              "names": [
+                "Banshee"
+              ],
+              "description": {
+                "value": "Banshee (boss bar \"Banshee\") | Client names: \"Banshee Boss\" (loc 1702385876, 1783634524, 1843208900, 3889942244), \"Howling Banshee\" (loc 1778728347), \"Screeching Banshee\" (loc 1548156321), abilities \"Banshee Scream\", \"Banshee Bolt\", \"Banshee Form\". Dev strings: \"bone bog cemetery 339 - scream attack\", \"Banshe Scream\", \"mini boss nuke\", \"mini boss reclaim\". The wiki says five wraiths spawn with her. | [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not map Boss (normal) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not source stats for Boss (normal)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                },
+                {
+                  "kind": "wiki",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+                }
+              ]
+            },
+            {
+              "role": "Boss (event)",
+              "names": [
+                "The Pumpkin Prince"
+              ],
+              "description": {
+                "value": "The Pumpkin Prince (UI loc 3506549451, game data 3549407549) | Dev strings: \"event boss ability\", \"event boss pumpking CC\", \"halloween adds heal\". Defeating him lets the minions be attacked: \"His friends can now be attacked! Send them back to the ghost world!\" | [video 0LoQe5VZ0PY/00048 to 00098] [client loc 3910443369, 4193966717, 3284379933]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                  }
+                ]
+              },
+              "model_id": {
+                "value": null,
+                "reason": "Guide row has no client model-ID mapping.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not map Boss (event) to a model ID."
+                  }
+                ]
+              },
+              "stats": {
+                "value": null,
+                "reason": "No numeric HP/damage value is stated in this row.",
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md does not source stats for Boss (event)."
+                  }
+                ]
+              },
+              "source": [
+                {
+                  "kind": "video",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                },
+                {
+                  "kind": "client",
+                  "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+                }
+              ]
+            }
+          ],
+          "reason": null,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Boss classification follows page row labels; no unnamed boss is inferred."
+            }
+          ]
+        },
+        "rewards": {
+          "reported_facts": {
+            "value": [
+              {
+                "label": "Stars",
+                "value": "\"306 Stars or less\" (wiki wording) | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Stars; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coins on the prize wheel",
+                "value": "112 Coins slot on every wheel | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Members-only bonus",
+                "value": "180 Coins | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Coin drops",
+                "value": "\"You receive 25 coins\" (Grave Elemental) and \"You receive 15 coins\" | [video 0LoQe5VZ0PY/00014, TjpDl22Lwpk/00152]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coin drops; cited [video 0LoQe5VZ0PY/00014, TjpDl22Lwpk/00152]"
+                  }
+                ]
+              },
+              {
+                "label": "Prize wheel in video",
+                "value": "\"YOU WIN!\" wheel with \"Archer's Composite Bow of Flame\" in the centre slot, then the revealed prize \"Cross Wind Archer Boots\" | [video TjpDl22Lwpk/00352, 00360]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel in video; cited [video TjpDl22Lwpk/00352, 00360]"
+                  }
+                ]
+              },
+              {
+                "label": "Bonus-goal clothing",
+                "value": "One piece of the job's set, random slot and colour, for everyone in the instance | [wiki]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Bonus-goal clothing; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "label": "Trophy",
+                "value": "Pop-up \"You've Earned a Trophy!\" with \"Complete the Bone Bog Cemetery encounter.\" (trophy 5 in the recording). The wiki: bronze 5 pts; silver 10 pts with a full group (loc 2741097049). Also loc 3565367626. | [video TjpDl22Lwpk/00378, 00386] [client] [wiki: Achievements]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Trophy; cited [video TjpDl22Lwpk/00378, 00386] [client] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Trophy; cited [video TjpDl22Lwpk/00378, 00386] [client] [wiki: Achievements]"
+                  },
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Trophy; cited [video TjpDl22Lwpk/00378, 00386] [client] [wiki: Achievements]"
+                  }
+                ]
+              },
+              {
+                "label": "Event treasure",
+                "value": "\"Pumpkin Prince's Treasure\" chest (loc 2369094282) gave \"Gothic Rag Doll Face Paint Card\" and \"18 Ectoplasmic Goo\" in the open-world fight. It is not confirmed that the cemetery fight drops this chest. | [video nmT76ti9kyo/00264] (open world) [client]",
+                "reason": null,
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Event treasure; cited [video nmT76ti9kyo/00264] [client]"
+                  },
+                  {
+                    "kind": "client",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Event treasure; cited [video nmT76ti9kyo/00264] [client]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Reward rows are claims, not necessarily deterministic payouts."
+              }
+            ]
+          },
+          "coin_grants": {
+            "value": [
+              {
+                "kind": "prize_wheel_slot",
+                "conditions": {
+                  "value": "Coins on the prize wheel",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 112,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coins on the prize wheel; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "members_only_bonus",
+                "conditions": {
+                  "value": "Members-only bonus",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 180,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Members-only bonus; cited [wiki]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Members-only bonus; cited [wiki]"
+                  }
+                ]
+              },
+              {
+                "kind": "reported_coin_reward",
+                "conditions": {
+                  "value": "Coin drops",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coin drops; cited [video 0LoQe5VZ0PY/00014, TjpDl22Lwpk/00152]"
+                    }
+                  ]
+                },
+                "grant": {
+                  "coins": 25,
+                  "items": [],
+                  "job_xp": {},
+                  "source": [
+                    {
+                      "kind": "video",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coin drops; cited [video 0LoQe5VZ0PY/00014, TjpDl22Lwpk/00152]"
+                    }
+                  ]
+                },
+                "source": [
+                  {
+                    "kind": "video",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Coin drops; cited [video 0LoQe5VZ0PY/00014, TjpDl22Lwpk/00152]"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No numeric coin RewardGrant could be created."
+              }
+            ]
+          },
+          "prize_wheels": {
+            "value": [
+              {
+                "job": {
+                  "value": "Archer",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Archer's Composite Bow of Flame",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Necklace of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Archer's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Cross Wind Archer Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Brawler",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Anvil Hammer of Dirt Kick",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Necklace of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Brawler's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Rubber Match Brawler Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Medic",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Bonesaw of Shock",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Necklace of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Medic's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Trauma Care Medic Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Ninja",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Necklace of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Ninja's Scythe of Solar Flare",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Shinobi Ninja Tabi Boots",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Warrior",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Charge Attack Warrior Hightops",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Battle Hammer of Hurling",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Necklace of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Warrior's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+                  }
+                ]
+              },
+              {
+                "job": {
+                  "value": "Wizard",
+                  "reason": null,
+                  "source": [
+                    {
+                      "kind": "wiki",
+                      "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                    }
+                  ]
+                },
+                "items": [
+                  {
+                    "name": {
+                      "value": "Battle Item Mystery Pack",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Bone Wand of Lightning",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Necklace of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Wizard's Power Shard of Vitality III",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  },
+                  {
+                    "name": {
+                      "value": "Practitioner Wizard Shoes",
+                      "reason": null,
+                      "source": [
+                        {
+                          "kind": "wiki",
+                          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                        }
+                      ]
+                    },
+                    "definition_id": {
+                      "value": null,
+                      "reason": "Guide gives a display name, not an item definition ID.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize item has no item-definition ID crosswalk."
+                        }
+                      ]
+                    },
+                    "count": {
+                      "value": null,
+                      "reason": "Guide does not state a numeric grant count for this wheel entry.",
+                      "source": [
+                        {
+                          "kind": "reconstructed",
+                          "evidence": "(R) Prize-wheel item count is not a RewardGrant count."
+                        }
+                      ]
+                    },
+                    "source": [
+                      {
+                        "kind": "wiki",
+                        "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                      }
+                    ]
+                  }
+                ],
+                "source": [
+                  {
+                    "kind": "wiki",
+                    "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+                  }
+                ]
+              }
+            ],
+            "reason": null,
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No per-job wheel rows were provided."
+              }
+            ]
+          },
+          "deterministic_grant": {
+            "value": null,
+            "reason": "Conditional wheel/member outcomes or missing item IDs prevent a complete fixed grant.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) ContentDb RewardGrant has no chance/slot condition; conditional outcomes are not guaranteed dungeon rewards."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Reward claims do not establish historical server payout policy."
+            }
+          ]
+        },
+        "exits": {
+          "behavior": {
+            "value": "An exit marker appears after the main goal.",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Shared rules > Goals panel; cited [video 5_U-uAzDuR4/00002, 9gfkEIFMV4s/00022, s4q4D_xmPoU/00194]"
+              }
+            ]
+          },
+          "destination_zone_id": {
+            "value": null,
+            "reason": "No destination zone ID is stated.",
+            "source": [
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exit destination is not mapped to a content zone."
+              }
+            ]
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No exit destination is inferred."
+            }
+          ]
+        },
+        "references": [
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "zone",
+            "target_name": "Blackspore Swamp",
+            "target_id": null,
+            "reason": "Build guide gives a zone label but no numeric ContentDb zone ID.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "object",
+            "target_name": "gate",
+            "target_id": null,
+            "reason": "Guide names an entrance object but gives no object content key.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Entrance; cited [wiki] [video APmoVBnJt98/00000, TjpDl22Lwpk/00040] [client]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Banshee",
+            "target_id": 9500000000,
+            "reason": "Exact name matches reconstructed NPC content key in blackspore_swamp.json; this key is not a client actor GUID.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Exact name crosswalk to data/content/npcs/blackspore_swamp.json npc_id 9500000000; not an original NPC actor ID."
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "The Pumpkin Prince",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Wraiths",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Bone Bog Skeletons",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Ravens",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Ghost Dwarves",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Grave Elementals",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Necromancers",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "npc",
+            "target_name": "Bats",
+            "target_id": null,
+            "reason": "Guide names an enemy/NPC but does not map it to NpcSpawn.actor_id.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Archer's Composite Bow of Flame",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Archer's Necklace of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Archer's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Battle Item Mystery Pack",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Cross Wind Archer Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Archer; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Brawler's Anvil Hammer of Dirt Kick",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Brawler's Necklace of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Brawler's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Rubber Match Brawler Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Brawler; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Medic's Bonesaw of Shock",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Medic's Necklace of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Medic's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Trauma Care Medic Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Medic; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Ninja's Necklace of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Ninja's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Ninja's Scythe of Solar Flare",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Shinobi Ninja Tabi Boots",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Ninja; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Charge Attack Warrior Hightops",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Warrior's Battle Hammer of Hurling",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Warrior's Necklace of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Warrior's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Warrior; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Wizard's Bone Wand of Lightning",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Wizard's Necklace of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Wizard's Power Shard of Vitality III",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          },
+          {
+            "owner": "bone_bog_cemetery",
+            "kind": "item",
+            "target_name": "Practitioner Wizard Shoes",
+            "target_id": null,
+            "reason": "Prize wheel item is named but no item definition ID is supplied.",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Rewards > Prize wheel by job > Wizard; cited guide source index"
+              }
+            ]
+          }
+        ],
+        "source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Stable content key bone_bog_cemetery comes from the guide filename, not a recovered client dungeon ID."
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Overview > Client name; cited [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Dungeons/Dungeons.md > Dungeons (Atlas entries, category Dungeon) > Bone Bog Cemetery; cited guide source index"
+          }
+        ],
+        "enemy_refs": [
+          {
+            "source_field": "enemies",
+            "row_index": 0,
+            "name": "Banshee",
+            "definition_id": 930026,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Banshee links to definition_id=930026; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 1,
+            "name": "The Pumpkin Prince",
+            "definition_id": 930024,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 414863 resolves 'The Pumpkin Prince'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930024 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Wraiths",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Bone Bog Skeletons",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Ravens",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Ghost Dwarves",
+            "definition_id": 930032,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ghost Dwarves links to definition_id=930032; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Grave Elementals",
+            "definition_id": 930011,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 115851 resolves 'Grave Elemental'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930011 is a W58 local projection."
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Necromancers",
+            "definition_id": null,
+            "status": "unresolved",
+            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              }
+            ]
+          },
+          {
+            "source_field": "enemies",
+            "row_index": 2,
+            "name": "Bats",
+            "definition_id": 930027,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Bats links to definition_id=930027; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 0,
+            "name": "Banshee",
+            "definition_id": 930026,
+            "status": "resolved",
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "wiki",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (normal); cited [video TjpDl22Lwpk/00326, 00328, 00344] [client] [wiki: Banshee]"
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Banshee links to definition_id=930026; model and name provenance is in enemies_unresolved.json."
+              }
+            ]
+          },
+          {
+            "source_field": "bosses",
+            "row_index": 1,
+            "name": "The Pumpkin Prince",
+            "definition_id": 930024,
+            "status": "resolved",
+            "reason": null,
+            "source": [
+              {
+                "kind": "video",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Boss (event); cited [video 0LoQe5VZ0PY/00048 to 00098] [client `loc 3910443369`, `4193966717`, `3284379933`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "Locale id 414863 resolves 'The Pumpkin Prince'."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) definition_id 930024 is a W58 local projection."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

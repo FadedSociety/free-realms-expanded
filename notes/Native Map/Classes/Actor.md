@@ -1,0 +1,15 @@
+# Class: Actor
+
+| addr | name | conf | kind | does |
+|---|---|---|---|---|
+| `00787e70` | `Actor::TimedNodeSweep ?` | 🟡 | method | Returns unless byte this+0x240 is set. Reads the 64-bit ms tick (007027f0) and compares it with the stored tick at +0x768/+0x76c. When more than 60000 ms have passed, walks the node list at +0x3dc: a node qualifies when… |
+| `00788080` | `Actor::~Actor` | ✅ | dtor | Actor destructor body: stores Actor::vftable at +0 and at +0x1c0, releases owned members (reference-counted pointers with LOCK decrement, string buffers, list members drained by loops), calls 00788010 for two HashListMa… |
+| `00788990` | `Actor::AdjustorDeletingDtor` | ✅ | virtual | Thunk: sub ecx,0x1c0 (81 e9 c0 01 00 00) then jmp 0078b2c0 (e9 25 29 00 00). It is slot [0] of the secondary Actor vftable at +0x1c0 and adjusts this back to the primary subobject before the scalar deleting destructor. |
+| `00788a30` | `Actor::CopyMatrix16AndNotify ?` | 🟡 | virtual | Same body as 007889a0: copies 16 dwords from the argument into this+0x160, calls the vtable slot +0x18 of the object at this+0xc with the argument when non-null, and calls 007351c0 when this+4 is non-null. Virtual slot … |
+| `00788a70` | `Actor::QueryKeyedFloat ?` | 🟡 | virtual | Returns 0 unless the second stack argument equals -0x4ebba5b5. Then writes one float to the out pointer (first stack argument): DAT_0175b420 minus max(this+0x258, this+0x260) when byte this+0x226 is set, otherwise DAT_0… |
+| `00789010` | `Actor::PlayAnimRecord` | ✅ | method | Returns early unless this+0x2c0 is zero, this+0x374 is nonzero and byte +0x228 is zero. Resolves the animation slot and transition rule (0076ff00, 00769710, 007a8d70, 0076d040, 007a46c0, 00787490) and logs through 00402… |
+| `0078aa90` | `Actor::Actor` | ✅ | ctor | Constructor body: writes AssetRequester::vftable and then Actor::vftable at +0x1c0, Actor::vftable at +0, stores the owner argument at +0x1c4, initialises flags and fields, calls 0078a800 twice for HashList members, con… |
+| `0078b2c0` | `Actor::DeletingDtor` | ✅ | dtor | Scalar deleting destructor (Actor::vftable slot [0]): calls 00788080(this) (the destructor body), then _free(this) when bit 0 of the flag argument is set; returns this with ret 4. |
+| `0078b2e0` | `Actor::PlayAnimRecordAndChildren` | 🟢 | method | Calls 00789010(record, 0). When the result is positive it stores it at this+0x37c and the record id at +0x380, then for each child in the +0x608 list whose +0x2b0 object has byte +0x139 set, copies the 12-dword record a… |
+| `0078b520` | `Actor::LookupAndPlayRecord` | 🟢 | method | Calls 007742d0(arg1). If the result is non-null and its +0x10 value is not -1, builds a 0x30-byte record (key from +0x10, byte flag from arg2, two fields -1, the rest zero) and calls 0078b2e0(record) with this as receiv… |
+| `0078b5f0` | `Actor::Update` | ✅ | virtual | Per-frame update with a float delta argument. Calls the hook at +0x368 (vtable +0x30) and returns when that returns 0. Advances the +0x798 accumulator, eases the values at +0x210, +0x24c/+0x248, +0x600 and +0x260 toward… |
