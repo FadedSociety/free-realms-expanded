@@ -113,6 +113,9 @@ fn distance(a: [f32; 3], b: [f32; 3]) -> f32 {
         .sum::<f32>()
         .sqrt()
 }
+fn horizontal_distance(a: [f32; 3], b: [f32; 3]) -> f32 {
+    (a[0] - b[0]).hypot(a[2] - b[2])
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -180,6 +183,8 @@ struct Actor {
     position: [f32; 3],
     max_health: u32,
     damage: u32,
+    #[serde(default = "one")]
+    level: u32,
     boss: bool,
     #[serde(default)]
     stages: Vec<u32>,
@@ -408,6 +413,16 @@ struct FieldActor {
     respawn_seconds: u32,
     /// The enemy chases a player within this range and otherwise walks home.
     aggro_range: f32,
+    #[serde(default)]
+    level_band: Option<[u32; 2]>,
+    #[serde(default)]
+    spawn_area: Option<SpawnArea>,
+    #[serde(default)]
+    leash_radius: Option<f32>,
+    #[serde(default)]
+    region: Option<String>,
+    #[serde(default)]
+    zone_id: u32,
     /// The enemy exists only while one of these quests is active (the owner's
     /// field notes: overworld enemies belong to active quests, like the
     /// opening's stage-gated wolves). Empty means always present.
@@ -416,6 +431,21 @@ struct FieldActor {
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+struct SpawnArea {
+    id: String,
+    centre: [f32; 3],
+    radius: f32,
+    count: u32,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum FieldMotion {
+    Idle,
+    Chasing,
+    Returning,
 }
 
 #[derive(Deserialize)]
@@ -434,6 +464,30 @@ struct FieldEnemy {
     present: bool,
     state: EnemyState,
     respawn_at: Option<u64>,
+    leash_radius: Option<f32>,
+    roam_radius: f32,
+    motion: FieldMotion,
+    roam_goal: Option<[f32; 3]>,
+    pause_until: u64,
+    seed: u64,
+}
+
+impl FieldEnemy {
+    fn reset_motion(&mut self) {
+        self.motion = FieldMotion::Idle;
+        self.roam_goal = None;
+        self.pause_until = 0;
+        self.seed = self.actor.guid;
+    }
+
+    /// (R) Per-actor deterministic random stream, same LCG as combat crits.
+    fn random(&mut self) -> f32 {
+        self.seed = self
+            .seed
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1_442_695_040_888_963_407);
+        (self.seed >> 40) as f32 / 16_777_216.0
+    }
 }
 
 /// Overworld battle started from a spawner (red crossed swords): clicking it
@@ -671,6 +725,18 @@ impl Ground {
     fn snapped(&self, mut p: [f32; 3]) -> [f32; 3] {
         self.snap(&mut p);
         p
+    }
+    /// Field motion must not cross missing terrain or snap over a ledge (R).
+    /// Without a terrain grid, retain the authored/interpolated height.
+    fn field_position(&self, mut p: [f32; 3]) -> Option<[f32; 3]> {
+        if let Some((terrain, zone)) = &self.0 {
+            let height = terrain.height_at(*zone, p[0], p[2])?;
+            if (height - p[1]).abs() > MAX_SNAP {
+                return None;
+            }
+            p[1] = height;
+        }
+        Some(p)
     }
 }
 
@@ -910,6 +976,15 @@ impl EncounterEngine {
         self.behaviour_of.get(&guid)
     }
 
+    /// Authored field level, for client presentation by the owning gameplay
+    /// route once its wire carrier is verified. Never infer it from HP.
+    pub fn field_level(&self, guid: u64) -> Option<u32> {
+        self.field
+            .iter()
+            .find(|f| f.present && f.actor.guid == guid)
+            .map(|f| f.actor.level)
+    }
+
     /// Load the overworld enemies (`field_enemies.json`). Their GUIDs must not
     /// collide with opening or dungeon actors.
     pub fn load_field_enemies(&mut self, path: &Path) -> io::Result<()> {
@@ -935,24 +1010,66 @@ impl EncounterEngine {
             }))
             .collect();
         let mut field = Vec::with_capacity(content.enemies.len());
-        for f in content.enemies {
+        let mut areas = BTreeSet::new();
+        for mut f in content.enemies {
             validate_actor(&f.actor)?;
+            let behaviour =
+                resolve_behaviour(&f.actor, &self.behaviour_presets).map_err(|e| invalid(&e))?;
+            let leash = f.leash_radius.unwrap_or(behaviour.leash);
             if !f.actor.stages.is_empty()
                 || f.actor.boss
                 || !(1..=3600).contains(&f.respawn_seconds)
                 || !(f.aggro_range > 0.0 && f.aggro_range <= 40.0)
+                || !(1..=20).contains(&f.actor.level)
+                || f.level_band.is_some_and(|[lo, hi]| {
+                    lo == 0 || lo > f.actor.level || hi < f.actor.level || hi > 20
+                })
+                || f.zone_id != self.content.world.zone_id
+                || !leash.is_finite()
+                || leash <= 0.0
+                || leash > 1000.0
+                || f.region
+                    .as_ref()
+                    .is_some_and(|s| s.len() > 120 || s.chars().any(char::is_control))
             {
                 return Err(invalid("invalid field enemy"));
+            }
+            if let Some(area) = &f.spawn_area {
+                if area.id.is_empty()
+                    || area.id.len() > 120
+                    || area.id.chars().any(char::is_control)
+                    || !areas.insert(area.id.clone())
+                    || area.count != 1
+                    || !valid_position(area.centre)
+                    || area.centre != f.actor.position
+                    || !area.radius.is_finite()
+                    || area.radius < 0.0
+                    || area.radius > leash
+                {
+                    return Err(invalid("invalid field spawn area"));
+                }
             }
             if !guids.insert(f.actor.guid) {
                 return Err(invalid("duplicate field enemy GUID"));
             }
+            // (R) Authored stats are level-one baselines. Reuse final-era HP
+            // curve and weapon tiers, rather than inventing per-kind curves.
+            let health_scale = level_health(f.actor.level) as f32 / PLAYER_MAX as f32;
+            f.actor.max_health = (f.actor.max_health as f32 * health_scale).round() as u32;
+            f.actor.damage = (f.actor.damage as f32 * 1.75_f32.powi(weapon_tier(f.actor.level) - 1))
+                .round() as u32;
             field.push(FieldEnemy {
                 state: enemy_state(&f.actor),
                 respawn_ms: u64::from(f.respawn_seconds) * 1000,
                 aggro_range: f.aggro_range,
                 present: f.quest_ids.is_empty(),
                 quest_ids: f.quest_ids,
+                leash_radius: f.leash_radius,
+                roam_radius: f.spawn_area.map_or(0.0, |a| a.radius),
+                motion: FieldMotion::Idle,
+                roam_goal: None,
+                pause_until: 0,
+                seed: f.actor.guid,
                 actor: f.actor,
                 respawn_at: None,
             });
@@ -969,7 +1086,7 @@ impl EncounterEngine {
             .map(|f| crate::dev_teleport::Target {
                 guid: f.actor.guid,
                 name: f.actor.name.clone(),
-                zone_id: 0,
+                zone_id: self.content.world.zone_id,
                 position: f.state.position,
                 kind: "enemy".into(),
             })
@@ -1641,13 +1758,20 @@ impl EncounterEngine {
             if f.present && f.state.health > 0 {
                 packets.push(remove(f.actor.guid));
             }
-            self.moving.remove(&f.actor.guid);
-            self.enemy_attacks.remove(&f.actor.guid);
         }
         if let Err(error) = self.load_field_enemies(path) {
             self.field = previous;
             self.rebuild_behaviours()?;
             return Err(error);
+        }
+        for f in &previous {
+            self.moving.remove(&f.actor.guid);
+            self.enemy_attacks.remove(&f.actor.guid);
+            self.skill_dots
+                .retain(|(target, _), _| *target != f.actor.guid);
+            self.skill_stuns.remove(&f.actor.guid);
+            self.skill_buffs
+                .retain(|(target, _), _| *target != f.actor.guid);
         }
         packets.extend(self.field_initialization());
         Ok(packets)
@@ -1782,6 +1906,8 @@ impl EncounterEngine {
             if present {
                 f.state = enemy_state(&f.actor);
                 f.respawn_at = None;
+                f.reset_motion();
+                self.enemy_attacks.remove(&f.actor.guid);
                 shown.push(i);
             } else {
                 if f.state.health > 0 {
@@ -2345,6 +2471,15 @@ impl EncounterEngine {
         if self.state.player_health == 0 {
             return Ok(EncounterOutcome::default());
         }
+        // (R) Evading field actors cannot be damaged or re-aggroed by attacks
+        // (including an old DoT); return-home healing must finish first.
+        if self
+            .field
+            .iter()
+            .any(|f| f.actor.guid == guid && f.motion == FieldMotion::Returning)
+        {
+            return Ok(EncounterOutcome::default());
+        }
         let Some((a, s)) = self.enemy(guid) else {
             return Ok(EncounterOutcome::default());
         };
@@ -2400,6 +2535,7 @@ impl EncounterEngine {
         };
         if let Some(i) = field_index {
             self.field[i].state.health = hp;
+            self.field[i].motion = FieldMotion::Chasing;
         } else {
             let states = if let Some(active) = &mut self.state.active {
                 &mut active.enemies
@@ -2871,9 +3007,8 @@ impl EncounterEngine {
         }
     }
 
-    /// Overworld enemies: respawn when due, chase a player inside their aggro
-    /// range, strike within reach, otherwise walk home. Combat rules follow
-    /// whether any of them is engaged.
+    /// (R) Field actors roam, chase within a home leash, then evade home and
+    /// heal. Returning actors ignore aggro until they arrive.
     fn tick_field(
         &mut self,
         position: [f32; 3],
@@ -2895,63 +3030,131 @@ impl EncounterEngine {
                 if f.respawn_at.is_some_and(|at| now_ms >= at) {
                     f.respawn_at = None;
                     f.state = enemy_state(&f.actor);
+                    f.reset_motion();
                     respawned.push(i);
                 }
                 continue;
             }
             let b = self.behaviour_of.get(&guid).cloned().unwrap_or_default();
+            let home = ground.snapped(f.actor.position);
+            let leash = f.leash_radius.unwrap_or(b.leash);
+            let delta = distance(position, f.state.position);
+            // (R) A 4 m hysteresis margin avoids target flicker at aggro range.
+            if now_ms < self.field_grace_until
+                || horizontal_distance(f.state.position, home) > leash
+                || (f.motion == FieldMotion::Chasing && delta > f.aggro_range + 4.0)
+            {
+                f.motion = FieldMotion::Returning;
+                f.roam_goal = None;
+            }
+            if f.motion == FieldMotion::Idle && delta <= f.aggro_range {
+                f.motion = FieldMotion::Chasing;
+                f.roam_goal = None;
+            }
             if self
                 .skill_stuns
                 .get(&guid)
                 .is_some_and(|until| now_ms < *until)
+                && f.motion != FieldMotion::Returning
             {
-                engaged = true;
+                engaged |= f.motion == FieldMotion::Chasing;
                 continue;
             }
-            let delta = distance(position, f.state.position);
-            if delta > f.aggro_range || now_ms < self.field_grace_until {
-                let home = ground.snapped(f.actor.position);
-                let back = distance(f.state.position, home);
-                if back > 0.5 && b.mode != Mode::Stationary {
-                    let heading = [
-                        (home[0] - f.state.position[0]) / back,
-                        0.0,
-                        (home[2] - f.state.position[2]) / back,
-                    ];
-                    let step = (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(back);
-                    for (coord, to) in f.state.position.iter_mut().zip(home) {
-                        *coord += (to - *coord) / back * step;
-                    }
-                    ground.snap(&mut f.state.position);
-                    out.replies.push(movement(guid, f.state.position, heading));
-                    if self.moving.insert(guid) {
-                        out.replies.push(animation(guid, 3, true));
-                    }
-                    out.changed = true;
-                } else if self.moving.remove(&guid) {
-                    out.replies.push(animation(guid, 1, true));
+            if f.motion == FieldMotion::Idle
+                && f.roam_goal.is_none()
+                && now_ms >= f.pause_until
+                && f.roam_radius > 0.0
+                && b.mode != Mode::Stationary
+            {
+                // (R) Uniform disc samples, stable per GUID; no band/level roll.
+                let angle = f.random() * std::f32::consts::TAU;
+                let radius = f.random().sqrt() * f.roam_radius.min(leash);
+                f.roam_goal = ground.field_position([
+                    home[0] + radius * angle.cos(),
+                    home[1],
+                    home[2] + radius * angle.sin(),
+                ]);
+                if f.roam_goal.is_none() {
+                    f.pause_until = now_ms.saturating_add(3000);
                 }
+            }
+            let goal = match f.motion {
+                FieldMotion::Returning => Some(home),
+                FieldMotion::Chasing if delta > b.reach => Some(position),
+                FieldMotion::Idle if now_ms >= f.pause_until => f.roam_goal,
+                _ => None,
+            };
+            if let Some(goal) = goal {
+                let left = distance(f.state.position, goal);
+                let speed = if f.motion == FieldMotion::Returning {
+                    b.run_speed
+                } else {
+                    b.move_speed
+                };
+                let stop = if f.motion == FieldMotion::Chasing {
+                    (b.reach - 0.1).max(0.0)
+                } else {
+                    0.0
+                };
+                let step = (speed * elapsed.min(250) as f32 / 1000.0).min((left - stop).max(0.0));
+                if left > 0.001 && step > 0.0 && b.mode != Mode::Stationary {
+                    let heading = [
+                        (goal[0] - f.state.position[0]) / left,
+                        0.0,
+                        (goal[2] - f.state.position[2]) / left,
+                    ];
+                    let mut next = f.state.position;
+                    for (coord, to) in next.iter_mut().zip(goal) {
+                        *coord += (to - *coord) / left * step;
+                    }
+                    // Check BEFORE moving. Never take even one step outside home leash.
+                    if f.motion == FieldMotion::Chasing && horizontal_distance(next, home) > leash {
+                        f.motion = FieldMotion::Returning;
+                        f.roam_goal = None;
+                    } else if let Some(next) = ground.field_position(next) {
+                        f.state.position = next;
+                        out.replies.push(movement(guid, next, heading));
+                        if self.moving.insert(guid) {
+                            out.replies.push(animation(guid, 3, true));
+                        }
+                        out.changed = true;
+                    } else {
+                        f.roam_goal = None;
+                        f.pause_until = now_ms.saturating_add(3000);
+                        if f.motion == FieldMotion::Chasing {
+                            f.motion = FieldMotion::Returning;
+                        }
+                        if self.moving.remove(&guid) {
+                            out.replies.push(animation(guid, 1, true));
+                        }
+                    }
+                }
+                if f.motion != FieldMotion::Chasing && distance(f.state.position, goal) <= 0.001 {
+                    if self.moving.remove(&guid) {
+                        out.replies.push(animation(guid, 1, true));
+                    }
+                    if f.motion == FieldMotion::Returning {
+                        if f.state.health != f.actor.max_health {
+                            f.state.health = f.actor.max_health;
+                            out.replies
+                                .push(enemy_hp(guid, f.state.health, f.actor.max_health));
+                            out.changed = true;
+                        }
+                        self.enemy_attacks.remove(&guid);
+                        self.skill_dots.retain(|(target, _), _| *target != guid);
+                        self.skill_stuns.remove(&guid);
+                        self.skill_buffs.retain(|(target, _), _| *target != guid);
+                        f.motion = FieldMotion::Idle;
+                    }
+                    f.roam_goal = None;
+                    f.pause_until = now_ms.saturating_add(1500 + (f.random() * 1500.0) as u64);
+                    continue;
+                }
+            }
+            if f.motion != FieldMotion::Chasing {
                 continue;
             }
             engaged = true;
-            if delta > b.reach && b.mode != Mode::Stationary {
-                let heading = [
-                    (position[0] - f.state.position[0]) / delta,
-                    0.0,
-                    (position[2] - f.state.position[2]) / delta,
-                ];
-                let step =
-                    (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
-                for (coord, to) in f.state.position.iter_mut().zip(position) {
-                    *coord += (to - *coord) / delta * step;
-                }
-                ground.snap(&mut f.state.position);
-                out.replies.push(movement(guid, f.state.position, heading));
-                if self.moving.insert(guid) {
-                    out.replies.push(animation(guid, 3, true));
-                }
-                out.changed = true;
-            }
             if distance(position, f.state.position) <= b.reach {
                 if self.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
