@@ -606,6 +606,21 @@ class Checker:
         enabled = quest.get("enabled", True)
         if not isinstance(enabled, bool):
             error("enabled", enabled, "quest enabled must be boolean")
+        # W114 requirement fields: optional, independent, never inferred.
+        if not hasattr(self, "job_profiles"):
+            try:
+                jobs = json.loads((CONTENT / "jobs.json").read_text(encoding="utf-8"))
+                self.job_profiles = {r.get("profile_id") for r in jobs.get("records", [])
+                                     if type(r.get("profile_id")) is int and r["profile_id"] > 0}
+            except (OSError, ValueError):
+                self.job_profiles = set()
+        level = quest.get("min_level")
+        if level is not None and not (type(level) is int and 1 <= level <= 20):
+            error("min_level", level, "quest min_level must be an integer from 1 to 20")
+        job = quest.get("job")
+        if job is not None and not (type(job) is int and 0 < job <= 0x7fffffff
+                                    and job in self.job_profiles):
+            error("job", job, "quest job must be a positive profile_id from jobs.json")
         goals = quest.get("objectives")
         if not isinstance(goals, list) or len(goals) > 64:
             error("objectives", goals, "quest objectives must be a list of at most 64")
