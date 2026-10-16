@@ -2,11 +2,14 @@
 //!
 //! The 35/1 AddPc dispatch and field sequence use native client bytes plus a
 //! pinned peer-schema crosswalk. The 35/3 remove and standalone 125 movement
-//! layouts follow mapped client readers. Interest limits and minimal AddPc
-//! appearance values are reconstructed policy (R).
+//! layouts follow mapped client readers. Interest limits and fallback AddPc
+//! presentation values are reconstructed policy (R).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
+
+const MAX_ADD_PC_MESSAGE_BYTES: usize = 64 * 1024; // (R) local snapshot/output bound.
+const ADD_PC_FIXED_INNER_BYTES: usize = 195;
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct SessionId(pub u64);
@@ -15,6 +18,59 @@ pub struct SessionId(pub u64);
 pub struct ZoneInstance {
     pub zone_id: u32,
     pub instance_id: u64,
+}
+
+/// Public AddPc presentation built from authenticated character and account
+/// state. `attachments_wire` is the existing inventory helper's count plus
+/// encoded attachment rows; the registry validates it before storing it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PlayerPresentation {
+    /// (R) Binds this snapshot to the authenticated character at registry join.
+    pub character_guid: u64,
+    pub name_ids: [i32; 3],
+    pub first_name: String,
+    pub last_name: String,
+    pub model: i32,
+    pub head: String,
+    pub hair: String,
+    pub hair_color: i32,
+    pub eye_color: i32,
+    pub skin_tone: String,
+    pub face_paint: String,
+    pub model_customization: String,
+    pub max_movement_speed: f32,
+    pub underage: bool,
+    pub member: bool,
+    pub referee: bool,
+    pub active_profile: i32,
+    pub attachments_wire: Vec<u8>,
+    pub wield_type: i32,
+}
+
+impl Default for PlayerPresentation {
+    fn default() -> Self {
+        Self {
+            character_guid: 0,
+            name_ids: [0; 3], // (R) literal-name mode until identity metadata is supplied.
+            first_name: String::new(),
+            last_name: String::new(),
+            model: 0, // (R) compatibility value when no presentation was supplied.
+            head: String::new(),
+            hair: String::new(),
+            hair_color: 0, // (R) compatibility value when no presentation was supplied.
+            eye_color: 0,  // (R) compatibility value when no presentation was supplied.
+            skin_tone: String::new(),
+            face_paint: String::new(),
+            model_customization: String::new(),
+            max_movement_speed: 10.0, // (R) matches the gateway's reconstructed base speed.
+            underage: false,          // (R) display default only.
+            member: false,            // (R) display default only.
+            referee: false,           // (R) display default; never grants a server role.
+            active_profile: 0, // (R) compatibility profile until gateway supplies the active one.
+            attachments_wire: vec![0; 4], // (R) no active-profile attachments.
+            wield_type: 0,     // (R) no equipped-weapon value supplied.
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -45,6 +101,9 @@ pub struct PlayerSession {
     pub zone: ZoneInstance,
     pub position: [f32; 3],
     pub heading: f32,
+    pub presentation: PlayerPresentation,
+    pub movement_state: u8,
+    pub movement_unknown: u8,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -65,6 +124,7 @@ pub struct OutboundMessage {
 pub enum RegistryError {
     InvalidPolicy,
     InvalidPose,
+    InvalidPresentation,
     InvalidGuid,
     SessionAlreadyActive,
     GuidAlreadyBound,
@@ -76,6 +136,7 @@ impl fmt::Display for RegistryError {
         match self {
             Self::InvalidPolicy => f.write_str("invalid player interest policy"),
             Self::InvalidPose => f.write_str("player pose contains a non-finite value"),
+            Self::InvalidPresentation => f.write_str("invalid player presentation snapshot"),
             Self::InvalidGuid => f.write_str("account and character GUIDs must be nonzero"),
             Self::SessionAlreadyActive => f.write_str("session is already active"),
             Self::GuidAlreadyBound => f.write_str("GUID is already bound to another session"),
@@ -116,8 +177,35 @@ impl PlayerRegistry {
         position: [f32; 3],
         heading: f32,
     ) -> Result<Vec<OutboundMessage>, RegistryError> {
+        let mut presentation = PlayerPresentation::default();
+        presentation.character_guid = character_guid;
+        self.join_with_presentation(
+            session_id,
+            account_guid,
+            character_guid,
+            zone,
+            position,
+            heading,
+            presentation,
+        )
+    }
+
+    /// Join with the authenticated snapshot used to build the subject's 35/1
+    /// AddPc. The legacy `join` wrapper remains for callers awaiting gateway
+    /// wiring and supplies only the explicit reconstructed fallback (R).
+    pub fn join_with_presentation(
+        &mut self,
+        session_id: SessionId,
+        account_guid: u64,
+        character_guid: u64,
+        zone: ZoneInstance,
+        position: [f32; 3],
+        heading: f32,
+        presentation: PlayerPresentation,
+    ) -> Result<Vec<OutboundMessage>, RegistryError> {
         validate_identity(account_guid, character_guid)?;
         validate_pose(position, heading)?;
+        presentation.validate(character_guid)?;
         if self.sessions.contains_key(&session_id) {
             return Err(RegistryError::SessionAlreadyActive);
         }
@@ -142,6 +230,9 @@ impl PlayerRegistry {
                 zone,
                 position,
                 heading,
+                presentation,
+                movement_state: 0,   // (R) no accepted movement report yet.
+                movement_unknown: 0, // (R) no accepted movement report yet.
             },
         );
         self.guid_owners.insert(account_guid, session_id);
@@ -167,8 +258,8 @@ impl PlayerRegistry {
         self.diff_messages(&before_sessions, &before_views, &after_views, None)
     }
 
-    /// Change pose and/or zone. Interest radius and visible-count rules are
-    /// reconstructed policy (R); zone equality includes the instance id.
+    /// Change pose and/or zone while preserving accepted relay bytes. Interest
+    /// radius and visible-count rules are reconstructed policy (R).
     pub fn update_pose(
         &mut self,
         session_id: SessionId,
@@ -176,11 +267,35 @@ impl PlayerRegistry {
         position: [f32; 3],
         heading: f32,
     ) -> Result<Vec<OutboundMessage>, RegistryError> {
+        let (state, unknown) = self
+            .sessions
+            .get(&session_id)
+            .map(|player| (player.movement_state, player.movement_unknown))
+            .unwrap_or((0, 0));
+        self.update_pose_with_state(session_id, zone, position, heading, state, unknown)
+    }
+
+    /// Store bytes accepted for this session after GUID and pose validation.
+    /// They are opaque protocol state; every u8 value is preserved as-is (R).
+    pub fn update_pose_with_state(
+        &mut self,
+        session_id: SessionId,
+        zone: ZoneInstance,
+        position: [f32; 3],
+        heading: f32,
+        state: u8,
+        unknown: u8,
+    ) -> Result<Vec<OutboundMessage>, RegistryError> {
         validate_pose(position, heading)?;
         let Some(current) = self.sessions.get(&session_id) else {
             return Err(RegistryError::UnknownSession);
         };
-        if current.zone == zone && current.position == position && current.heading == heading {
+        if current.zone == zone
+            && current.position == position
+            && current.heading == heading
+            && current.movement_state == state
+            && current.movement_unknown == unknown
+        {
             return Ok(Vec::new());
         }
 
@@ -190,6 +305,8 @@ impl PlayerRegistry {
         changed.zone = zone;
         changed.position = position;
         changed.heading = heading;
+        changed.movement_state = state;
+        changed.movement_unknown = unknown;
         let after_views = self.visible_sets();
         Ok(self.diff_messages(
             &before_sessions,
@@ -237,7 +354,7 @@ impl PlayerRegistry {
         before_sessions: &BTreeMap<SessionId, PlayerSession>,
         before_views: &BTreeMap<SessionId, BTreeSet<SessionId>>,
         after_views: &BTreeMap<SessionId, BTreeSet<SessionId>>,
-        moved_session: Option<SessionId>,
+        updated_session: Option<SessionId>,
     ) -> Vec<OutboundMessage> {
         let mut messages = Vec::new();
         for (viewer, current_view) in after_views {
@@ -260,9 +377,9 @@ impl PlayerRegistry {
                     });
                 }
             }
-            if let Some(moved) = moved_session {
-                if current_view.contains(&moved) && old_view.contains(&moved) {
-                    if let Some(player) = self.sessions.get(&moved) {
+            if let Some(updated) = updated_session {
+                if current_view.contains(&updated) && old_view.contains(&updated) {
+                    if let Some(player) = self.sessions.get(&updated) {
                         messages.push(OutboundMessage {
                             recipient: *viewer,
                             kind: MessageKind::Position,
@@ -291,6 +408,92 @@ fn validate_pose(position: [f32; 3], heading: f32) -> Result<(), RegistryError> 
     Ok(())
 }
 
+impl PlayerPresentation {
+    fn validate(&self, character_guid: u64) -> Result<(), RegistryError> {
+        if self.character_guid != character_guid
+            || !self.max_movement_speed.is_finite()
+            || self.max_movement_speed < 0.0
+        {
+            return Err(RegistryError::InvalidPresentation);
+        }
+
+        let mut message_bytes = ADD_PC_FIXED_INNER_BYTES + 7;
+        for value in [
+            &self.first_name,
+            &self.last_name,
+            &self.head,
+            &self.hair,
+            &self.skin_tone,
+            &self.face_paint,
+            &self.model_customization,
+        ] {
+            i32::try_from(value.len()).map_err(|_| RegistryError::InvalidPresentation)?;
+            message_bytes = message_bytes
+                .checked_add(value.len())
+                .ok_or(RegistryError::InvalidPresentation)?;
+        }
+
+        let attachment_rows_bytes = validate_attachment_wire(&self.attachments_wire)?;
+        message_bytes = message_bytes
+            .checked_add(attachment_rows_bytes)
+            .ok_or(RegistryError::InvalidPresentation)?;
+        if message_bytes > MAX_ADD_PC_MESSAGE_BYTES {
+            return Err(RegistryError::InvalidPresentation);
+        }
+        Ok(())
+    }
+}
+
+fn validate_attachment_wire(bytes: &[u8]) -> Result<usize, RegistryError> {
+    if bytes.len() > MAX_ADD_PC_MESSAGE_BYTES {
+        return Err(RegistryError::InvalidPresentation);
+    }
+    let mut offset = 0;
+    let count = usize::try_from(read_attachment_i32(bytes, &mut offset)?)
+        .map_err(|_| RegistryError::InvalidPresentation)?;
+    let available_rows = bytes.len().saturating_sub(4) / 24;
+    if count > available_rows {
+        return Err(RegistryError::InvalidPresentation);
+    }
+
+    for _ in 0..count {
+        for _ in 0..3 {
+            let length = usize::try_from(read_attachment_i32(bytes, &mut offset)?)
+                .map_err(|_| RegistryError::InvalidPresentation)?;
+            let start = offset;
+            let end = offset
+                .checked_add(length)
+                .filter(|end| *end <= bytes.len())
+                .ok_or(RegistryError::InvalidPresentation)?;
+            std::str::from_utf8(&bytes[start..end])
+                .map_err(|_| RegistryError::InvalidPresentation)?;
+            offset = end;
+        }
+        offset = offset
+            .checked_add(12)
+            .filter(|end| *end <= bytes.len())
+            .ok_or(RegistryError::InvalidPresentation)?;
+    }
+    if offset != bytes.len() {
+        return Err(RegistryError::InvalidPresentation);
+    }
+    Ok(bytes.len() - 4)
+}
+
+fn read_attachment_i32(bytes: &[u8], offset: &mut usize) -> Result<i32, RegistryError> {
+    let end = offset
+        .checked_add(4)
+        .filter(|end| *end <= bytes.len())
+        .ok_or(RegistryError::InvalidPresentation)?;
+    let value = i32::from_le_bytes(
+        bytes[*offset..end]
+            .try_into()
+            .map_err(|_| RegistryError::InvalidPresentation)?,
+    );
+    *offset = end;
+    Ok(value)
+}
+
 fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {
     let dx = f64::from(left[0]) - f64::from(right[0]);
     let dy = f64::from(left[1]) - f64::from(right[1]);
@@ -304,14 +507,13 @@ fn build_add_pc(player: &PlayerSession) -> Vec<u8> {
     put_u16(&mut inner, 1);
     put_u64(&mut inner, player.character_guid);
 
-    // (R) Presentation, membership, guild, title and mount data are not in the
-    // registry inputs. Emit empty/zero defaults until account data is wired in.
-    for _ in 0..3 {
-        put_i32(&mut inner, 0);
+    let presentation = &player.presentation;
+    for value in presentation.name_ids {
+        put_i32(&mut inner, value);
     }
-    put_string(&mut inner, "");
-    put_string(&mut inner, "");
-    put_i32(&mut inner, 0); // model
+    put_string(&mut inner, &presentation.first_name);
+    put_string(&mut inner, &presentation.last_name);
+    put_i32(&mut inner, presentation.model);
     for _ in 0..3 {
         put_i32(&mut inner, 0); // chat bubble fields
     }
@@ -323,38 +525,40 @@ fn build_add_pc(player: &PlayerSession) -> Vec<u8> {
     ] {
         put_f32(&mut inner, value);
     }
-    // (R) AddPc carries a quaternion. The recovered movement packet carries a
-    // horizontal direction vector; this yaw quaternion is the spawn crosswalk.
-    let half_heading = player.heading * 0.5;
-    for value in [0.0, half_heading.sin(), 0.0, half_heading.cos()] {
+    // Native 0092ff2c-0092ff44 derives yaw as atan2(X, Z); heading is radians (R).
+    for value in [player.heading.sin(), 0.0, player.heading.cos(), 0.0] {
         put_f32(&mut inner, value);
     }
-    put_i32(&mut inner, 0); // attachment count
-    put_string(&mut inner, ""); // head
-    put_string(&mut inner, ""); // hair
-    for _ in 0..3 {
-        put_i32(&mut inner, 0); // hair color, eye color, unknown field
-    }
-    for _ in 0..3 {
-        put_string(&mut inner, ""); // skin tone, face paint, customization
-    }
-    put_f32(&mut inner, 0.0); // (R) movement speed; profile data not yet supplied
-    inner.extend_from_slice(&[0, 0, 0]); // (R) underage, member, referee
-    put_i32(&mut inner, 0); // temporary appearance
-    put_i32(&mut inner, 0); // guild count
-    put_i32(&mut inner, 0); // active profile
+    inner.extend_from_slice(&presentation.attachments_wire);
+    put_string(&mut inner, &presentation.head);
+    put_string(&mut inner, &presentation.hair);
+    put_i32(&mut inner, presentation.hair_color);
+    put_i32(&mut inner, presentation.eye_color);
+    put_i32(&mut inner, 0); // (R) Unknown3 has no authoritative source.
+    put_string(&mut inner, &presentation.skin_tone);
+    put_string(&mut inner, &presentation.face_paint);
+    put_string(&mut inner, &presentation.model_customization);
+    put_f32(&mut inner, presentation.max_movement_speed);
+    inner.extend_from_slice(&[
+        u8::from(presentation.underage),
+        u8::from(presentation.member),
+        u8::from(presentation.referee),
+    ]);
+    put_i32(&mut inner, 0); // (R) no temporary model override.
+    put_i32(&mut inner, 0); // (R) guild runtime is not routed.
+    put_i32(&mut inner, presentation.active_profile);
     for _ in 0..4 {
-        put_i32(&mut inner, 0); // title fields
+        put_i32(&mut inner, 0); // (R) title fields are not routed.
     }
-    put_i32(&mut inner, 0); // effect-tag count
-    put_u64(&mut inner, 0); // mount GUID
-    put_i32(&mut inner, 0); // mount seat
-    put_i32(&mut inner, 0); // mount queue position
-    put_f32(&mut inner, 0.0); // name vertical offset
-    put_i32(&mut inner, 0); // wield type
-    put_f32(&mut inner, 0.0); // VIP rank
+    put_i32(&mut inner, 0); // (R) no public persistent-effect snapshot.
+    put_u64(&mut inner, 0); // (R) mounts are not routed.
+    put_i32(&mut inner, -1); // (R) unmounted seat sentinel.
+    put_i32(&mut inner, -1); // (R) unmounted queue sentinel.
+    put_f32(&mut inner, 0.0); // (R) no mount/nameplate lift.
+    put_i32(&mut inner, presentation.wield_type);
+    put_f32(&mut inner, 0.0); // (R) no VIP progression source.
     for _ in 0..3 {
-        put_i32(&mut inner, 0); // VIP icon, VIP title, unknown field
+        put_i32(&mut inner, 0); // (R) VIP icon/title and Unknown17.
     }
     tunnel(&inner)
 }
@@ -370,7 +574,7 @@ fn build_position_update(player: &PlayerSession) -> Vec<u8> {
     for value in [player.heading.sin(), 0.0, player.heading.cos()] {
         put_f32(&mut inner, value);
     }
-    inner.extend_from_slice(&[0, 0]); // (R) state and unknown bytes
+    inner.extend_from_slice(&[player.movement_state, player.movement_unknown]);
     tunnel(&inner)
 }
 
