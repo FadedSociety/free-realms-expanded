@@ -11,16 +11,22 @@ backdrop. Four orange vines grow from the banner wordmark on launch. Art sources
 hashes and slice boxes are listed in `assets/ui/README.md`; review captures and
 the readability audit are in `lab/reports/rust-launcher-w98/`.
 
-Login uses the local compatibility stub when a realm has no profile ID; that
-path accepts literal loopback endpoints only. Choose a saved profile beside
-PLAY to use the selected realm's trusted key-pair profile. The launcher loads
-the profile from the current user's `APPDATA` and runs `auth::login` before the
-existing launch handoff. The profile's broker endpoint and server identity are
-trusted local settings; the UI never learns a pin from the network. Login
-errors appear in the status plank. Profiles are selected per realm for the
-current launcher session.
+To join a friend's realm, open **Settings → Join a realm** and enter the game
+address, the 64-digit server identity supplied by the host, and your account
+handle. Check the short fingerprint against the host, then choose **Create my
+key**. The launcher stores the private key and trusted profile in your Windows
+user profile, adds the realm to the list, and shows the public key. Copy that
+public key and send it to the host for enrollment. It is safe to share; never
+send a private key. Return to **Realms** and choose the saved account beside
+PLAY.
 
-Create a key and print its public half with the launcher executable:
+The trusted server identity comes from the host, never from a network response.
+Login uses the local secure tunnel at `127.0.0.1:20043`; the host must enroll the
+public key for the supplied account handle. A refused login explains that the
+host may still need to add the key. The broker intentionally returns one
+generic refusal for unknown, disabled, wrong-key and locked accounts.
+
+The launcher keeps the command-line key tools for operator setup and recovery:
 
 ```powershell
 & $exe --new-key my-realm
@@ -29,10 +35,8 @@ Create a key and print its public half with the launcher executable:
 
 `--new-key` writes an owner-only key under the current user's
 `APPDATA\FreeRealmsExpanded\profiles\<id>` directory and prints only the
-public key. Enroll that public key with the trusted local broker, provision the
-matching pinned profile through `auth::save_profile`, then select the profile
-for that realm. A profile ID alone does not create a profile or enroll a key.
-Key commands run before UI startup and return their output directly.
+public key. `--print-public-key` exports the public half for an existing local
+profile. These commands run before UI startup and return their output directly.
 The controller option controls this launcher window. It does not inject game
 input or start the existing in-game Python bridge. Settings are session-only.
 
@@ -195,3 +199,9 @@ worker/PLAY route are separately tested. Full output, canary, threat model,
 security self-review and before/final captures are in
 `lab/reports/rust-launcher-w121/README.md`. Native game launch, public HTTPS host,
 fresh-PC acceptance and normal-token stored-profile tests remain lead gates.
+
+W131 adds the key-pair setup flow to Settings. `--test-join-flow --screenshot
+<unused.png>` captures a synthetic example at any supported `--window-size`; it
+does not create a key, save a profile, or contact a server. The default window
+is 940 x 790 logical points. At 150% display scale, use `--window-size 853x533`
+for a 1280 x 800 physical capture.

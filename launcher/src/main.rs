@@ -22,8 +22,10 @@ use std::{
         atomic::{AtomicBool, Ordering},
         mpsc,
     },
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
+
+const AUTH_BROKER_ENDPOINT: &str = "127.0.0.1:20043";
 
 fn load_banner(ctx: &egui::Context) -> Result<egui::TextureHandle, String> {
     // (R) Fit bundled art to the current limit, including before the first frame.
@@ -57,11 +59,17 @@ fn save_capture(path: &Path, screenshot: &egui::ColorImage) -> Result<(), image:
     )
 }
 
-struct Server {
-    name: String,
-    address: String,
-    profile_id: String,
-    patch: PatchSource,
+pub(crate) struct Server {
+    pub(crate) name: String,
+    pub(crate) address: String,
+    pub(crate) profile_id: String,
+    pub(crate) patch: PatchSource,
+}
+
+pub(crate) struct JoinedRealm {
+    pub(crate) profile: auth::Profile,
+    pub(crate) address: String,
+    pub(crate) public_key: String,
 }
 
 type PatchSelection = (String, usize, PatchSource);
@@ -92,6 +100,111 @@ fn saved_profiles() -> Vec<(String, String)> {
     profiles
 }
 
+pub(crate) fn parse_server_identity(input: &str) -> Option<[u8; 32]> {
+    fn nibble(byte: u8) -> Option<u8> {
+        match byte {
+            b'0'..=b'9' => Some(byte - b'0'),
+            b'a'..=b'f' => Some(byte - b'a' + 10),
+            b'A'..=b'F' => Some(byte - b'A' + 10),
+            _ => None,
+        }
+    }
+
+    let hex = input.trim().as_bytes();
+    if hex.len() != 64 {
+        return None;
+    }
+    let mut identity = [0; 32];
+    for (byte, pair) in identity.iter_mut().zip(hex.chunks_exact(2)) {
+        *byte = (nibble(pair[0])? << 4) | nibble(pair[1])?;
+    }
+    Some(identity)
+}
+
+pub(crate) fn short_fingerprint(identity: &[u8; 32]) -> String {
+    identity[..8]
+        .chunks_exact(2)
+        .map(|pair| format!("{:02X}{:02X}", pair[0], pair[1]))
+        .collect::<Vec<_>>()
+        .join("-")
+}
+
+pub(crate) fn create_join_profile_with(
+    address: &str,
+    identity_hex: &str,
+    account_handle: &str,
+    profile_id: &str,
+    create_key: impl FnOnce(&str) -> Result<String, AuthError>,
+    save_profile: impl FnOnce(&auth::Profile) -> Result<(), AuthError>,
+) -> Result<JoinedRealm, String> {
+    osfr_launcher::validate_endpoint(address)?;
+    let identity = parse_server_identity(identity_hex)
+        .ok_or_else(|| "Paste the host's 64-digit hexadecimal server identity.".to_owned())?;
+    let fingerprint = short_fingerprint(&identity);
+    let display_name = format!("{account_handle} ({fingerprint})");
+    let profile = auth::Profile::new(
+        profile_id,
+        &display_name,
+        AUTH_BROKER_ENDPOINT,
+        identity,
+        account_handle,
+    )
+    .map_err(auth_error_message)?;
+    let public_key = create_key(profile_id).map_err(auth_error_message)?;
+    save_profile(&profile).map_err(auth_error_message)?;
+    Ok(JoinedRealm {
+        profile,
+        address: address.to_owned(),
+        public_key,
+    })
+}
+
+pub(crate) fn register_joined_profile(
+    joined: &JoinedRealm,
+    servers: &mut Vec<Server>,
+    profiles: &mut Vec<(String, String)>,
+) -> usize {
+    let profile = &joined.profile;
+    if !profiles.iter().any(|(id, _)| id == &profile.id) {
+        profiles.push((profile.id.clone(), profile.display_name.clone()));
+        profiles.sort_by(|a, b| a.1.cmp(&b.1));
+    }
+    servers.push(Server {
+        name: format!("Realm ({})", short_fingerprint(&profile.server_identity)),
+        address: joined.address.clone(),
+        profile_id: profile.id.clone(),
+        patch: PatchSource::default(),
+    });
+    servers.len() - 1
+}
+
+pub(crate) fn profile_label<'a>(id: &str, profiles: &'a [(String, String)]) -> &'a str {
+    profiles
+        .iter()
+        .find(|(profile_id, _)| profile_id == id)
+        .map(|(_, name)| name.as_str())
+        .unwrap_or("Local login")
+}
+
+pub(crate) fn copy_public_key(public_key: &str, copy: impl FnOnce(String)) {
+    copy(public_key.to_owned());
+}
+
+fn next_profile_id(profiles: &[(String, String)]) -> String {
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos();
+    let base = format!("realm-{now:x}");
+    let mut candidate = base.clone();
+    let mut suffix = 2;
+    while profiles.iter().any(|(id, _)| id == &candidate) {
+        candidate = format!("{base}-{suffix}");
+        suffix += 1;
+    }
+    candidate
+}
+
 struct RealmLogin {
     profile_id: String,
 }
@@ -117,8 +230,13 @@ impl LoginProvider for RealmLogin {
     }
 }
 
-fn auth_error_message(error: AuthError) -> String {
-    error.to_string()
+pub(crate) fn auth_error_message(error: AuthError) -> String {
+    match error {
+        AuthError::Refused => {
+            "Login refused. If your key is not enrolled, send the public key from Settings and wait for the host to add it.".into()
+        }
+        _ => error.to_string(),
+    }
 }
 
 fn login_profile(
@@ -129,7 +247,7 @@ fn login_profile(
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum FocusTarget {
+pub(crate) enum FocusTarget {
     RealmsTab,
     SettingsTab,
     RealmRow(usize),
@@ -137,6 +255,11 @@ enum FocusTarget {
     AddRealm,
     LoginProfile,
     Play,
+    JoinAddress,
+    JoinIdentity,
+    JoinHandle,
+    CreateKey,
+    CopyPublicKey,
     ClientFolder,
     LocaleFolder,
     WindowWidth,
@@ -152,16 +275,34 @@ enum FocusTarget {
     Back,
 }
 
-fn focus_order(settings: bool, realm_count: usize) -> Vec<FocusTarget> {
+pub(crate) fn focus_order(
+    settings: bool,
+    realm_count: usize,
+    patch_active: bool,
+    public_key_ready: bool,
+) -> Vec<FocusTarget> {
     let mut order = vec![FocusTarget::RealmsTab, FocusTarget::SettingsTab];
     if settings {
+        order.extend([
+            FocusTarget::JoinAddress,
+            FocusTarget::JoinIdentity,
+            FocusTarget::JoinHandle,
+            FocusTarget::CreateKey,
+        ]);
+        if public_key_ready {
+            order.push(FocusTarget::CopyPublicKey);
+        }
         order.extend([
             FocusTarget::ClientFolder,
             FocusTarget::LocaleFolder,
             FocusTarget::PatchUrl,
             FocusTarget::PatchMirror,
             FocusTarget::PatchPin,
-            FocusTarget::CancelPatch,
+        ]);
+        if patch_active {
+            order.push(FocusTarget::CancelPatch);
+        }
+        order.extend([
             FocusTarget::WindowWidth,
             FocusTarget::WindowHeight,
             FocusTarget::ResolutionSmall,
@@ -172,19 +313,23 @@ fn focus_order(settings: bool, realm_count: usize) -> Vec<FocusTarget> {
         ]);
     } else {
         order.extend((0..realm_count).map(FocusTarget::RealmRow));
-        order.extend([
-            FocusTarget::AddAddress,
-            FocusTarget::AddRealm,
-            FocusTarget::CancelPatch,
-            FocusTarget::Play,
-            FocusTarget::LoginProfile,
-        ]);
+        order.extend([FocusTarget::AddAddress, FocusTarget::AddRealm]);
+        if patch_active {
+            order.push(FocusTarget::CancelPatch);
+        }
+        order.extend([FocusTarget::Play, FocusTarget::LoginProfile]);
     }
     order
 }
 
-fn focus_sequence_matches(actual: &[FocusTarget], settings: bool, realm_count: usize) -> bool {
-    actual == focus_order(settings, realm_count)
+pub(crate) fn focus_sequence_matches(
+    actual: &[FocusTarget],
+    settings: bool,
+    realm_count: usize,
+    patch_active: bool,
+    public_key_ready: bool,
+) -> bool {
+    actual == focus_order(settings, realm_count, patch_active, public_key_ready)
 }
 
 fn next_focus_index(current: Option<usize>, len: usize, forward: bool) -> Option<usize> {
@@ -200,12 +345,17 @@ fn next_focus_index(current: Option<usize>, len: usize, forward: bool) -> Option
     })
 }
 
-struct Launcher {
+pub(crate) struct Launcher {
     banner: egui::TextureHandle,
     art: theme::UiArt,
     servers: Vec<Server>,
     selected: usize,
     new_address: String,
+    join_address: String,
+    join_identity: String,
+    join_handle: String,
+    join_public_key: Option<String>,
+    join_preview: bool,
     client: String,
     locale: String,
     settings: LaunchSettings,
@@ -220,7 +370,7 @@ struct Launcher {
     screenshot_requested: bool,
     capture_ok: Rc<Cell<bool>>,
     started: Instant,
-    focus_targets: Vec<(FocusTarget, egui::Id)>,
+    pub(crate) focus_targets: Vec<(FocusTarget, egui::Id)>,
     focus_play_on_start: bool,
     focus_play_requested: bool,
     test_vine_growth: Option<f32>,
@@ -233,7 +383,7 @@ struct Launcher {
 }
 
 impl Launcher {
-    fn new(
+    pub(crate) fn new(
         cc: &eframe::CreationContext<'_>,
         screenshot: Option<PathBuf>,
         settings_page: bool,
@@ -259,6 +409,11 @@ impl Launcher {
             }],
             selected: 0,
             new_address: String::new(),
+            join_address: String::new(),
+            join_identity: String::new(),
+            join_handle: String::new(),
+            join_public_key: None,
+            join_preview: false,
             client: String::new(),
             locale: String::new(),
             settings: LaunchSettings::default(),
@@ -344,6 +499,48 @@ impl Launcher {
                 .trim()
                 .is_empty()
                 || self.patch_ready.as_ref() == Some(&self.patch_selection()))
+    }
+
+    fn patch_active(&self) -> bool {
+        self.patch_job.is_some() || self.patch_preview
+    }
+
+    fn create_join_profile(&mut self) {
+        if self.servers.len() >= 16 {
+            self.message =
+                "This launcher already has 16 realms. Remove one before adding another.".into();
+            return;
+        }
+        let profile_id = next_profile_id(&self.profiles);
+        match create_join_profile_with(
+            self.join_address.trim(),
+            self.join_identity.trim(),
+            self.join_handle.trim(),
+            &profile_id,
+            auth::new_key,
+            auth::save_profile,
+        ) {
+            Ok(joined) => {
+                self.selected =
+                    register_joined_profile(&joined, &mut self.servers, &mut self.profiles);
+                self.join_public_key = Some(joined.public_key);
+                self.message =
+                    "Key created. Send the public key shown here to your host for enrollment."
+                        .into();
+            }
+            Err(error) => self.message = error,
+        }
+    }
+
+    pub(crate) fn load_join_preview(&mut self) {
+        self.settings_page = true;
+        self.join_preview = true;
+        self.join_address = "192.0.2.42:20042".into();
+        self.join_identity =
+            "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff".into();
+        self.join_handle = "your_handle".into();
+        self.join_public_key = Some("ab".repeat(32));
+        self.message = "Preview only. No key or profile was written.".into();
     }
 
     fn start_patch(&mut self) {
@@ -436,19 +633,22 @@ impl Launcher {
             .lock()
             .map(|p| p.clone())
             .unwrap_or_default();
-        let active = self.patch_job.is_some() || self.patch_preview;
-        ui.horizontal(|ui| {
-            let cancel = ui.add_enabled(
-                active && !self.patch_preview,
-                egui::Button::new("Cancel").small(),
-            );
-            self.record_focus(FocusTarget::CancelPatch, &cancel);
-            if cancel.clicked() {
-                if let Some(job) = &self.patch_job {
-                    job.cancel.store(true, Ordering::Relaxed);
+        if self.patch_active() {
+            ui.horizontal(|ui| {
+                let cancel = theme::button(
+                    ui,
+                    &self.art,
+                    "Cancel",
+                    Vec2::new(96.0, 36.0),
+                    !self.patch_preview,
+                    theme::ButtonSkin::Standard,
+                );
+                self.record_focus(FocusTarget::CancelPatch, &cancel);
+                if cancel.clicked() {
+                    if let Some(job) = &self.patch_job {
+                        job.cancel.store(true, Ordering::Relaxed);
+                    }
                 }
-            }
-            if active {
                 let fraction = if progress.bytes_total > 0 {
                     progress.bytes_done as f32 / progress.bytes_total as f32
                 } else {
@@ -473,14 +673,14 @@ impl Launcher {
                             .color(Color32::from_rgb(10, 42, 46)),
                         ),
                 );
-            } else if self.patch_ready.as_ref() == Some(&self.patch_selection()) {
-                ui.small("Patch verified. Ready to play.");
-            } else if self.servers[self.selected].patch.manifest_url.is_empty() {
-                ui.small("Local client. Set a realm patch URL in Settings to receive updates.");
-            } else {
-                ui.small("Patch required. Use Verify and repair in Settings to retry.");
-            }
-        });
+            });
+        } else if self.patch_ready.as_ref() == Some(&self.patch_selection()) {
+            ui.small("Patch verified. Ready to play.");
+        } else if self.servers[self.selected].patch.manifest_url.is_empty() {
+            ui.small("Local client. Set a realm patch URL in Settings to receive updates.");
+        } else {
+            ui.small("Patch required. Use Verify and repair in Settings to retry.");
+        }
     }
 
     fn record_focus(&mut self, target: FocusTarget, response: &egui::Response) {
@@ -690,12 +890,7 @@ impl Launcher {
             }
             ui.vertical(|ui| {
                 let id = &mut self.servers[self.selected].profile_id;
-                let label = self
-                    .profiles
-                    .iter()
-                    .find(|(value, _)| value == id)
-                    .map(|(_, name)| name.as_str())
-                    .unwrap_or("Local login");
+                let label = profile_label(id, &self.profiles);
                 let profile = egui::ComboBox::from_id_salt("login-profile")
                     .selected_text(label)
                     .width(ui.available_width().min(300.0))
@@ -711,6 +906,101 @@ impl Launcher {
         });
     }
 
+    pub(crate) fn join_realm_ui(&mut self, ui: &mut egui::Ui, compact: bool) {
+        ui.label(
+            RichText::new("Join a realm").font(theme::display(if compact { 22.0 } else { 25.0 })),
+        );
+        ui.small("Get the game address and 64-digit server identity from your host.");
+        let height = if compact { 34.0 } else { 40.0 };
+        let address = theme::text_field(
+            ui,
+            &self.art,
+            &mut self.join_address,
+            "Realm address, for example 192.0.2.42:20042",
+            Vec2::new(ui.available_width(), height),
+            261,
+        );
+        self.record_focus(FocusTarget::JoinAddress, &address);
+        let identity = theme::text_field(
+            ui,
+            &self.art,
+            &mut self.join_identity,
+            "Server identity (64 hexadecimal digits, from host)",
+            Vec2::new(ui.available_width(), height),
+            64,
+        );
+        self.record_focus(FocusTarget::JoinIdentity, &identity);
+        if address.changed() || identity.changed() {
+            self.join_public_key = None;
+        }
+        if let Some(identity) = parse_server_identity(&self.join_identity) {
+            ui.small(format!(
+                "Short fingerprint to compare: {}",
+                short_fingerprint(&identity)
+            ));
+        } else {
+            ui.small("Paste the host's 64-digit server identity to see its fingerprint.");
+        }
+        let handle = theme::text_field(
+            ui,
+            &self.art,
+            &mut self.join_handle,
+            "Account handle supplied by the host",
+            Vec2::new(ui.available_width(), height),
+            32,
+        );
+        self.record_focus(FocusTarget::JoinHandle, &handle);
+        if handle.changed() {
+            self.join_public_key = None;
+        }
+        let create = theme::button(
+            ui,
+            &self.art,
+            "Create my key",
+            Vec2::new(178.0, if compact { 38.0 } else { 42.0 }),
+            self.screenshot.is_none() && self.servers.len() < 16,
+            theme::ButtonSkin::Standard,
+        );
+        self.record_focus(FocusTarget::CreateKey, &create);
+        if create.clicked() {
+            self.create_join_profile();
+        }
+        if let Some(public_key) = self.join_public_key.clone() {
+            ui.horizontal(|ui| {
+                let field_width = (ui.available_width() - 102.0).max(120.0);
+                theme::read_only_text_field(
+                    ui,
+                    &self.art,
+                    &public_key,
+                    "Your public key",
+                    Vec2::new(field_width, height),
+                );
+                let copy = theme::button(
+                    ui,
+                    &self.art,
+                    "Copy",
+                    Vec2::new(92.0, if compact { 38.0 } else { 42.0 }),
+                    true,
+                    theme::ButtonSkin::Standard,
+                );
+                self.record_focus(FocusTarget::CopyPublicKey, &copy);
+                if copy.clicked() {
+                    copy_public_key(&public_key, |text| ui.ctx().copy_text(text));
+                    self.message = "Public key copied. Send it to your host for enrollment.".into();
+                }
+            });
+            ui.small("Send this public key to your host so they can add it to your account.");
+            if self.join_preview {
+                ui.small("Example only: a real profile is saved on this PC and appears in PLAY.");
+            } else {
+                ui.small("Your profile is saved on this PC and appears in the PLAY login list.");
+            }
+        }
+        ui.small("Login uses the local secure tunnel at 127.0.0.1:20043.");
+        ui.add_space(4.0);
+        ui.separator();
+    }
+
     fn settings_ui(&mut self, ui: &mut egui::Ui) {
         let compact = ui.ctx().content_rect().height() < 650.0;
         theme::heading(
@@ -722,6 +1012,7 @@ impl Launcher {
                 "Use a separate, writable copy of your supplied client."
             },
         );
+        self.join_realm_ui(ui, compact);
         let field_height = if compact { 34.0 } else { 42.0 };
         let client = theme::text_field(
             ui,
@@ -993,6 +1284,8 @@ impl eframe::App for Launcher {
                         &actual,
                         rendered_settings,
                         rendered_realms,
+                        self.patch_active(),
+                        self.join_public_key.is_some(),
                     ));
                     if !compact {
                         ui.add_space(4.0);
@@ -1080,6 +1373,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut focus_play = false;
     let mut test_vine_growth = None;
     let mut patch_preview = false;
+    let mut join_preview = false;
     let mut window_size = [940.0, 790.0];
     let mut args = raw_args.into_iter();
     while let Some(arg) = args.next() {
@@ -1104,6 +1398,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             test_vine_growth = Some(millis as f32 / 1500.0);
         } else if arg == "--test-patch-progress" {
             patch_preview = true;
+        } else if arg == "--test-join-flow" {
+            join_preview = true;
         } else if arg == "--window-size" {
             let size = args
                 .next()
@@ -1129,6 +1425,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err(
             "--test-patch-progress requires --screenshot; it performs no downloads.".into(),
         );
+    }
+    if join_preview && screenshot.is_none() {
+        return Err("--test-join-flow requires --screenshot; it creates no profile or key.".into());
     }
     if let Some(path) = &screenshot {
         if path.extension().is_none_or(|ext| ext != "png")
@@ -1167,6 +1466,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
             .map_err(std::io::Error::other)?;
             launcher.patch_preview = patch_preview;
+            if join_preview {
+                launcher.load_join_preview();
+            }
             if patch_preview {
                 if let Ok(mut progress) = launcher.patch_progress.lock() {
                     *progress = Progress {
@@ -1322,7 +1624,7 @@ mod tests {
             ),
             (
                 AuthError::Refused,
-                "Login refused. Check key enrolment or try again later.",
+                "Login refused. If your key is not enrolled, send the public key from Settings and wait for the host to add it.",
             ),
             (
                 AuthError::TryLater,
@@ -1383,6 +1685,24 @@ mod tests {
             (
                 false,
                 2,
+                false,
+                false,
+                vec![
+                    FocusTarget::RealmsTab,
+                    FocusTarget::SettingsTab,
+                    FocusTarget::RealmRow(0),
+                    FocusTarget::RealmRow(1),
+                    FocusTarget::AddAddress,
+                    FocusTarget::AddRealm,
+                    FocusTarget::Play,
+                    FocusTarget::LoginProfile,
+                ],
+            ),
+            (
+                false,
+                2,
+                true,
+                false,
                 vec![
                     FocusTarget::RealmsTab,
                     FocusTarget::SettingsTab,
@@ -1398,9 +1718,42 @@ mod tests {
             (
                 true,
                 2,
+                false,
+                false,
                 vec![
                     FocusTarget::RealmsTab,
                     FocusTarget::SettingsTab,
+                    FocusTarget::JoinAddress,
+                    FocusTarget::JoinIdentity,
+                    FocusTarget::JoinHandle,
+                    FocusTarget::CreateKey,
+                    FocusTarget::ClientFolder,
+                    FocusTarget::LocaleFolder,
+                    FocusTarget::PatchUrl,
+                    FocusTarget::PatchMirror,
+                    FocusTarget::PatchPin,
+                    FocusTarget::WindowWidth,
+                    FocusTarget::WindowHeight,
+                    FocusTarget::ResolutionSmall,
+                    FocusTarget::ResolutionLarge,
+                    FocusTarget::ControllerToggle,
+                    FocusTarget::VerifyPatch,
+                    FocusTarget::Back,
+                ],
+            ),
+            (
+                true,
+                2,
+                true,
+                true,
+                vec![
+                    FocusTarget::RealmsTab,
+                    FocusTarget::SettingsTab,
+                    FocusTarget::JoinAddress,
+                    FocusTarget::JoinIdentity,
+                    FocusTarget::JoinHandle,
+                    FocusTarget::CreateKey,
+                    FocusTarget::CopyPublicKey,
                     FocusTarget::ClientFolder,
                     FocusTarget::LocaleFolder,
                     FocusTarget::PatchUrl,
@@ -1417,14 +1770,40 @@ mod tests {
                 ],
             ),
         ];
-        for (settings, realm_count, expected) in cases {
-            assert_eq!(focus_order(settings, realm_count), expected);
+        for (settings, realm_count, patch_active, public_key_ready, expected) in cases {
+            assert_eq!(
+                focus_order(settings, realm_count, patch_active, public_key_ready),
+                expected
+            );
             let mut broken = expected.clone();
             broken.pop();
-            assert!(!focus_sequence_matches(&broken, settings, realm_count));
+            assert!(!focus_sequence_matches(
+                &broken,
+                settings,
+                realm_count,
+                patch_active,
+                public_key_ready
+            ));
             let mut reordered = expected.clone();
             reordered.swap(0, 1);
-            assert!(!focus_sequence_matches(&reordered, settings, realm_count));
+            assert!(!focus_sequence_matches(
+                &reordered,
+                settings,
+                realm_count,
+                patch_active,
+                public_key_ready
+            ));
+            if settings {
+                let mut missing_new_control = expected.clone();
+                missing_new_control.retain(|target| *target != FocusTarget::CreateKey);
+                assert!(!focus_sequence_matches(
+                    &missing_new_control,
+                    settings,
+                    realm_count,
+                    patch_active,
+                    public_key_ready
+                ));
+            }
 
             let ctx = egui::Context::default();
             let mut actual = Vec::new();
@@ -1447,6 +1826,9 @@ mod tests {
                         for target in &expected {
                             let response = match target {
                                 FocusTarget::AddAddress
+                                | FocusTarget::JoinAddress
+                                | FocusTarget::JoinIdentity
+                                | FocusTarget::JoinHandle
                                 | FocusTarget::LoginProfile
                                 | FocusTarget::ClientFolder => {
                                     ui.add(egui::TextEdit::singleline(&mut path))
@@ -1485,6 +1867,47 @@ mod tests {
             let previous = next_focus_index(Some(0), actual.len(), false).unwrap();
             assert_eq!(actual[previous].0, *expected.last().unwrap());
         }
+    }
+
+    #[test]
+    fn patch_cancel_is_rendered_only_while_patch_is_active() {
+        let ctx = egui::Context::default();
+        let cc = eframe::CreationContext::_new_kittest(ctx.clone());
+        let mut app = Launcher::new(
+            &cc,
+            None,
+            false,
+            Rc::new(Cell::new(false)),
+            false,
+            Some(1.0),
+        )
+        .unwrap();
+        let frame = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(
+                egui::Pos2::ZERO,
+                Vec2::new(900.0, 120.0),
+            )),
+            ..Default::default()
+        };
+        let _ = ctx.run(frame.clone(), |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| app.patch_progress_ui(ui));
+        });
+        assert!(
+            !app.focus_targets
+                .iter()
+                .any(|(target, _)| *target == FocusTarget::CancelPatch)
+        );
+
+        app.focus_targets.clear();
+        app.patch_preview = true;
+        let _ = ctx.run(frame, |ctx| {
+            egui::CentralPanel::default().show(ctx, |ui| app.patch_progress_ui(ui));
+        });
+        assert!(
+            app.focus_targets
+                .iter()
+                .any(|(target, _)| *target == FocusTarget::CancelPatch)
+        );
     }
 
     #[test]

@@ -687,6 +687,39 @@ pub fn text_field(
     size: Vec2,
     max_chars: usize,
 ) -> egui::Response {
+    text_field_impl(ui, art, value, hint, size, max_chars, true, false)
+}
+
+pub fn read_only_text_field(
+    ui: &mut egui::Ui,
+    art: &UiArt,
+    value: &str,
+    hint: &str,
+    size: Vec2,
+) -> egui::Response {
+    let mut displayed = value.to_owned();
+    text_field_impl(
+        ui,
+        art,
+        &mut displayed,
+        hint,
+        size,
+        value.chars().count(),
+        false,
+        true,
+    )
+}
+
+fn text_field_impl(
+    ui: &mut egui::Ui,
+    art: &UiArt,
+    value: &mut String,
+    hint: &str,
+    size: Vec2,
+    max_chars: usize,
+    interactive: bool,
+    monospace: bool,
+) -> egui::Response {
     let painter = ui.painter().clone();
     let slot = painter.add(egui::Shape::Noop);
     let inner = ui.allocate_ui_with_layout(
@@ -695,13 +728,18 @@ pub fn text_field(
         |ui| {
             ui.add_space(18.0);
             ui.visuals_mut().override_text_color = Some(DARK_INK);
+            let mut editor = egui::TextEdit::singleline(value)
+                .hint_text(hint)
+                .vertical_align(egui::Align::Center)
+                .char_limit(max_chars)
+                .frame(false)
+                .interactive(interactive);
+            if monospace {
+                editor = editor.font(egui::TextStyle::Monospace);
+            }
             ui.add_sized(
                 Vec2::new((size.x - 36.0).max(40.0), (size.y - 12.0).max(32.0)),
-                egui::TextEdit::singleline(value)
-                    .hint_text(hint)
-                    .vertical_align(egui::Align::Center)
-                    .char_limit(max_chars)
-                    .frame(false),
+                editor,
             )
         },
     );
