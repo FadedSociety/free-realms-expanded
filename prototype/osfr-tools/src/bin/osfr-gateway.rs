@@ -464,6 +464,7 @@ impl SharedWorld {
         &mut self,
         session: &Session,
         state: &CharacterState,
+        look: osfr_tools::players::PlayerPresentation,
     ) -> io::Result<Vec<Delivery>> {
         let zone = ZoneInstance {
             zone_id: state.zone_id,
@@ -471,13 +472,14 @@ impl SharedWorld {
         };
         let messages = self
             .players
-            .join(
+            .join_with_presentation(
                 session.id,
                 session.account_guid,
                 session.character_guid,
                 zone,
                 state.position,
                 heading(state.rotation),
+                look,
             )
             .map_err(invalid_io)?;
         self.joined.insert(session.id);
@@ -1248,13 +1250,18 @@ impl Session {
         if previous.zone_id != current.zone_id && staged_world.joined.contains(&self.id) {
             deliveries.extend(staged_world.leave_player(self.id));
         }
-        let moved = previous.position != current.position || previous.rotation != current.rotation;
+        // A state-only change (e.g. jump or crouch flags) is relayed like a move.
+        let (state, unknown) = staged_gateway.movement_bytes();
+        let moved = previous.position != current.position
+            || previous.rotation != current.rotation
+            || (state, unknown) != self.gateway.movement_bytes();
         if outcome.entered_world && !staged_world.joined.contains(&self.id) {
-            deliveries.extend(staged_world.join_player(self, &current)?);
+            let look = staged_gateway.player_presentation(self.is_member)?;
+            deliveries.extend(staged_world.join_player(self, &current, look)?);
         } else if moved && staged_world.joined.contains(&self.id) {
             let messages = staged_world
                 .players
-                .update_pose(
+                .update_pose_with_state(
                     self.id,
                     ZoneInstance {
                         zone_id: current.zone_id,
@@ -1262,6 +1269,8 @@ impl Session {
                     },
                     current.position,
                     heading(current.rotation),
+                    state,
+                    unknown,
                 )
                 .map_err(invalid_io)?;
             deliveries.extend(messages.into_iter().map(|message| Delivery {

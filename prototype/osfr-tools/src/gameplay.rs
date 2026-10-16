@@ -1446,6 +1446,16 @@ impl Gameplay {
         Ok(())
     }
 
+    /// The active job profile, when profiles are loaded (other players' AddPc).
+    pub fn active_profile(&self) -> Option<i32> {
+        self.profiles.as_ref().map(|p| p.state().active)
+    }
+
+    /// One profile's outfit as the native attachment list (count + rows).
+    pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
+        self.inventory.profile_attachments(profile_id)
+    }
+
     pub fn state(&self) -> GameplayState {
         GameplayState {
             inventory: self.inventory.state().clone(),

@@ -509,6 +509,27 @@ fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
     moved.extend(first.drain(&mut server));
     assert!(moved.iter().any(|message| is_opcode(message, 125)));
 
+    // Build Plan 1.3: the other player's AddPc carries their real name, and a
+    // flags-only movement change still reaches the other client.
+    let sees_name = |messages: &[Vec<u8>], name: &[u8]| {
+        messages
+            .iter()
+            .any(|m| is_family(m, 35, 1) && m.windows(name.len()).any(|w| w == name))
+    };
+    assert!(sees_name(&second_login, b"Aster"));
+    assert!(sees_name(&first_spawn, b"Beryl"));
+    let mut state_only = move_fields.clone();
+    let end = state_only.len();
+    state_only[end - 2] = 1;
+    second.send(&mut server, &packet(125, &state_only));
+    let relayed = first.drain(&mut server);
+    assert!(
+        relayed
+            .iter()
+            .any(|m| is_opcode(m, 125) && m.ends_with(&[1, 0])),
+        "state-only change was not relayed"
+    );
+
     let say = chat_request(0, "synthetic say", None);
     let mut say_delivery = first.send(&mut server, &application(6, &say));
     say_delivery.extend(second.drain(&mut server));

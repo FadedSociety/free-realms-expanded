@@ -15,6 +15,7 @@ use crate::movement::{
     SpeedModifiers,
 };
 use crate::{
+    players::PlayerPresentation,
     profiles::ProfileState,
     startup_selfdata::{self, SelfData},
     startup_snapshot::StartupSnapshot,
@@ -750,6 +751,49 @@ impl Gateway {
 
     pub fn state(&self) -> &CharacterState {
         &self.state
+    }
+
+    /// The public look other players get in AddPc (Build Plan 1.3), from the
+    /// same identity, profile and inventory inputs as `build_self_message`.
+    /// (R) Name ids stay zero (literal-name mode); speed and wield type keep
+    /// the players.rs defaults until those are server-owned.
+    pub fn player_presentation(&self, member: bool) -> io::Result<PlayerPresentation> {
+        let mut look = PlayerPresentation {
+            character_guid: self.state.guid,
+            member,
+            ..PlayerPresentation::default()
+        };
+        if let Some(identity) = &self.identity {
+            look.first_name.clone_from(&identity.first_name);
+            look.last_name.clone_from(&identity.last_name);
+            look.model = identity.model;
+            look.head.clone_from(&identity.head);
+            look.hair.clone_from(&identity.hair);
+            look.hair_color = identity.hair_color;
+            look.eye_color = identity.eye_color;
+            look.skin_tone.clone_from(&identity.skin_tone);
+            look.face_paint.clone_from(&identity.face_paint);
+            look.model_customization
+                .clone_from(&identity.model_customization);
+        }
+        // Without loaded profiles, self-data keeps the template's job; match it.
+        let profile = self.gameplay.as_ref().and_then(Gameplay::active_profile).or_else(|| {
+            self.self_data_template
+                .as_ref()
+                .map(|data| data.jobs.active_profile_id as i32)
+        });
+        if let Some(profile) = profile {
+            look.active_profile = profile;
+            if let Some(game) = &self.gameplay {
+                look.attachments_wire = game.profile_attachments(profile)?;
+            }
+        }
+        Ok(look)
+    }
+
+    /// The last accepted movement state and unknown byte, relayed to others.
+    pub fn movement_bytes(&self) -> (u8, u8) {
+        (self.movement_state.state, self.movement_state.unknown)
     }
 
     pub fn enable_gameplay(

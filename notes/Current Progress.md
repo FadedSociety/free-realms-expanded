@@ -18,7 +18,7 @@
 
 **Biggest gaps to a playtest:**
 - Servers are loopback-only, and login takes one session at a time.
-- Other players have never been seen natively (the AddPc stub).
+- Other players have never been seen natively. The real AddPc is built and tested (2026-10-15); the native two-player run is next.
 - Ninja, Warrior and Wizard can't attack.
 - About 639 quests are hollow.
 - 16.5k item ids can't be granted.
