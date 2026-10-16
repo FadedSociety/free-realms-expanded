@@ -153,6 +153,8 @@ pub struct PlayerRegistry {
     sessions: BTreeMap<SessionId, PlayerSession>,
     // (R) At most one live session may own either its account or character GUID.
     guid_owners: BTreeMap<u64, SessionId>,
+    // (R) Uniform 3D broad phase; exact distance and directed caps are unchanged.
+    cells: BTreeMap<(ZoneInstance, [i64; 3]), BTreeSet<SessionId>>,
 }
 
 impl PlayerRegistry {
@@ -161,6 +163,7 @@ impl PlayerRegistry {
             policy,
             sessions: BTreeMap::new(),
             guid_owners: BTreeMap::new(),
+            cells: BTreeMap::new(),
         }
     }
 
@@ -219,8 +222,10 @@ impl PlayerRegistry {
             }
         }
 
-        let before_sessions = self.sessions.clone();
-        let before_views = self.visible_sets();
+        let mut affected = self.nearby(zone, position);
+        affected.insert(session_id);
+        let before_views = self.visible_sets(&affected);
+        self.insert_cell(session_id, zone, position);
         self.sessions.insert(
             session_id,
             PlayerSession {
@@ -237,8 +242,8 @@ impl PlayerRegistry {
         );
         self.guid_owners.insert(account_guid, session_id);
         self.guid_owners.insert(character_guid, session_id);
-        let after_views = self.visible_sets();
-        Ok(self.diff_messages(&before_sessions, &before_views, &after_views, None))
+        let after_views = self.visible_sets(&affected);
+        Ok(self.diff_messages(None, &before_views, &after_views, None))
     }
 
     pub fn leave(&mut self, session_id: SessionId) -> Vec<OutboundMessage> {
@@ -246,16 +251,17 @@ impl PlayerRegistry {
         let Some(removed) = self.sessions.get(&session_id).cloned() else {
             return Vec::new();
         };
-        let before_sessions = self.sessions.clone();
-        let before_views = self.visible_sets();
+        let affected = self.nearby(removed.zone, removed.position);
+        let before_views = self.visible_sets(&affected);
+        self.remove_cell(session_id, removed.zone, removed.position);
         self.sessions.remove(&session_id);
         for guid in [removed.account_guid, removed.character_guid] {
             if self.guid_owners.get(&guid) == Some(&session_id) {
                 self.guid_owners.remove(&guid);
             }
         }
-        let after_views = self.visible_sets();
-        self.diff_messages(&before_sessions, &before_views, &after_views, None)
+        let after_views = self.visible_sets(&affected);
+        self.diff_messages(Some(&removed), &before_views, &after_views, None)
     }
 
     /// Change pose and/or zone while preserving accepted relay bytes. Interest
@@ -299,39 +305,105 @@ impl PlayerRegistry {
             return Ok(Vec::new());
         }
 
-        let before_sessions = self.sessions.clone();
-        let before_views = self.visible_sets();
+        let mut affected = self.nearby(current.zone, current.position);
+        affected.extend(self.nearby(zone, position));
+        affected.insert(session_id);
+        let before_views = self.visible_sets(&affected);
+        let old_cell = (current.zone, self.cell(current.position));
+        let new_cell = (zone, self.cell(position));
+        if old_cell != new_cell {
+            let (old_zone, old_position) = (current.zone, current.position);
+            self.remove_cell(session_id, old_zone, old_position);
+            self.insert_cell(session_id, zone, position);
+        }
         let changed = self.sessions.get_mut(&session_id).unwrap();
         changed.zone = zone;
         changed.position = position;
         changed.heading = heading;
         changed.movement_state = state;
         changed.movement_unknown = unknown;
-        let after_views = self.visible_sets();
-        Ok(self.diff_messages(
-            &before_sessions,
-            &before_views,
-            &after_views,
-            Some(session_id),
-        ))
+        let after_views = self.visible_sets(&affected);
+        Ok(self.diff_messages(None, &before_views, &after_views, Some(session_id)))
     }
 
-    fn visible_sets(&self) -> BTreeMap<SessionId, BTreeSet<SessionId>> {
+    fn cell(&self, position: [f32; 3]) -> [i64; 3] {
+        // Zero-radius policy only sees coincident positions. Unit cells avoid
+        // division by zero. Saturating casts keep every finite pose valid.
+        let width = if self.policy.radius == 0.0 {
+            1.0
+        } else {
+            f64::from(self.policy.radius)
+        };
+        position.map(|value| (f64::from(value) / width).floor() as i64)
+    }
+
+    fn insert_cell(&mut self, id: SessionId, zone: ZoneInstance, position: [f32; 3]) {
+        self.cells
+            .entry((zone, self.cell(position)))
+            .or_default()
+            .insert(id);
+    }
+
+    fn remove_cell(&mut self, id: SessionId, zone: ZoneInstance, position: [f32; 3]) {
+        let key = (zone, self.cell(position));
+        if let Some(occupants) = self.cells.get_mut(&key) {
+            occupants.remove(&id);
+            if occupants.is_empty() {
+                self.cells.remove(&key);
+            }
+        }
+    }
+
+    fn nearby(&self, zone: ZoneInstance, position: [f32; 3]) -> BTreeSet<SessionId> {
+        let cell = self.cell(position);
+        let mut nearby = BTreeSet::new();
+        // One guard cell beyond the usual adjacent cells preserves the old
+        // inclusive f64 radius when subtraction rounds at a cell boundary:
+        // e.g. -f32::from_bits(1) and radius=100 are distance 100 in f64.
+        // checked_add handles saturated coordinates without overflow/panics.
+        for dx in -2..=2 {
+            for dy in -2..=2 {
+                for dz in -2..=2 {
+                    let (Some(x), Some(y), Some(z)) = (
+                        cell[0].checked_add(dx),
+                        cell[1].checked_add(dy),
+                        cell[2].checked_add(dz),
+                    ) else {
+                        continue;
+                    };
+                    if let Some(occupants) = self.cells.get(&(zone, [x, y, z])) {
+                        nearby.extend(occupants);
+                    }
+                }
+            }
+        }
+        // Only viewers within the old/new radius can change their directed
+        // selection. Broad-phase false positives need no visibility rebuild.
+        let radius_squared = f64::from(self.policy.radius).powi(2);
+        nearby
+            .retain(|id| distance_squared(position, self.sessions[id].position) <= radius_squared);
+        nearby
+    }
+
+    fn visible_sets(
+        &self,
+        affected: &BTreeSet<SessionId>,
+    ) -> BTreeMap<SessionId, BTreeSet<SessionId>> {
         let mut visible = BTreeMap::new();
         let radius_squared = f64::from(self.policy.radius).powi(2);
         // (R) Visibility is directed under a per-viewer cap. Distance ties use
         // session id, and the radius boundary is included.
-        for viewer in self.sessions.values() {
+        // ponytail: dense crowds still scan/sort local candidates per affected
+        // viewer; incremental ranked views are a separate measured upgrade.
+        for viewer in affected.iter().filter_map(|id| self.sessions.get(id)) {
             let mut candidates: Vec<(f64, SessionId)> = self
-                .sessions
-                .values()
-                .filter(|candidate| {
-                    candidate.session_id != viewer.session_id && candidate.zone == viewer.zone
-                })
-                .filter_map(|candidate| {
+                .nearby(viewer.zone, viewer.position)
+                .into_iter()
+                .filter(|id| *id != viewer.session_id)
+                .filter_map(|id| {
+                    let candidate = &self.sessions[&id];
                     let distance_squared = distance_squared(viewer.position, candidate.position);
-                    (distance_squared <= radius_squared)
-                        .then_some((distance_squared, candidate.session_id))
+                    (distance_squared <= radius_squared).then_some((distance_squared, id))
                 })
                 .collect();
             candidates.sort_by(|left, right| {
@@ -351,7 +423,7 @@ impl PlayerRegistry {
 
     fn diff_messages(
         &self,
-        before_sessions: &BTreeMap<SessionId, PlayerSession>,
+        removed: Option<&PlayerSession>,
         before_views: &BTreeMap<SessionId, BTreeSet<SessionId>>,
         after_views: &BTreeMap<SessionId, BTreeSet<SessionId>>,
         updated_session: Option<SessionId>,
@@ -360,7 +432,11 @@ impl PlayerRegistry {
         for (viewer, current_view) in after_views {
             let old_view = before_views.get(viewer).cloned().unwrap_or_default();
             for subject in old_view.difference(current_view) {
-                if let Some(player) = before_sessions.get(subject) {
+                if let Some(player) = self
+                    .sessions
+                    .get(subject)
+                    .or_else(|| removed.filter(|player| player.session_id == *subject))
+                {
                     messages.push(OutboundMessage {
                         recipient: *viewer,
                         kind: MessageKind::Despawn,
