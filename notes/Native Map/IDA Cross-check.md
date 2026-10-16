@@ -83,3 +83,7 @@ The full command was attempted with `--binary ../lab/working/ida/FreeRealms.exe 
 Caller agreement is low by method, not by label error: the map counts vtable and indirect callers, the checker counts only direct `call` instructions.
 
 **Review queue: 1,281 labels (1.9%)**, 656 confirmed and 625 likely. 340 *high*: IDA's function starts elsewhere (`existing_function_boundary_mismatch`); many sit at odd addresses inside larger functions (for example the `DebugDump*` cluster at `008dddf1`, `008dde8a`, `008ddf2c`), which suggests Ghidra split one function into pieces. 941 *medium*: the label cites strings IDA does not reference. Most queued subsystems: `engine.gfc.core` 110, `debug` 76, `engine.gfc.control` 63, `ui.datasource` 61, `engine.gfc.serialization` 46. Next step: feed the 340 high entries to the recheck pipeline (`recheck.py`).
+
+## High-severity review applied (2026-10-16)
+
+W115 classified all 340 high boundary disagreements: 248 pieces of a larger function (IDA owner plus a proven internal branch, no direct call or vtable target), 91 real functions IDA merged (46 direct calls, 44 vtable entries, 1 callback; the map stays as it is) and 1 unclear (`006ca9c3`, inside an instruction). The lead applied the 248 corrections as recheck batch `B0024` (`recheck.py done --apply-fixes`; 248 applied, 0 rejected; map backed up first). Each becomes `<name>_Chunk` at confidence *likely*, keeps its original annotation and audit history, and queues the normal independent fix check. Details: [[Native Map/IDA Boundary Review]].
