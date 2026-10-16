@@ -7,9 +7,10 @@
 
 use std::collections::BTreeMap;
 use std::fmt;
+use std::time::{Duration, Instant};
 
 use miniz_oxide::deflate::compress_to_vec_zlib;
-use miniz_oxide::inflate::stream::{InflateState, inflate};
+use miniz_oxide::inflate::stream::{inflate, InflateState};
 use miniz_oxide::{DataFormat, MZFlush, MZStatus};
 
 pub const RELIABLE_DATA: u16 = 9;
@@ -17,6 +18,13 @@ pub const RELIABLE_FRAGMENT: u16 = 13;
 pub const SELECTIVE_ACK: u16 = 17;
 pub const CUMULATIVE_ACK: u16 = 21;
 const MAX_DATAGRAM: usize = 65_507;
+/// (R) Match the gateway parser's existing 1 MiB inbound-message limit.
+pub const MAX_LOGICAL_MESSAGE: usize = 1_048_576;
+// (R) Keep one receiver's out-of-order payload budget at the gateway's current cap.
+const MAX_REORDER_BUFFERED: usize = 2 * 1024 * 1024;
+// (R) Bound an incomplete logical message to 30 seconds; a reliable fragment has
+// no independent continuation marker, so expiry makes this receiver unusable.
+const REASSEMBLY_TIMEOUT: Duration = Duration::from_secs(30);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Error {
@@ -75,6 +83,8 @@ pub struct Packet {
 
 /// A negotiated post-session envelope. Compression flag bytes are present only
 /// when `compression_enabled` is true. CRC length zero is supported explicitly.
+/// The requested expanded-payload ceiling is additionally capped at
+/// `MAX_LOGICAL_MESSAGE`.
 #[derive(Debug, Clone)]
 pub struct Codec {
     seed: u32,
@@ -97,7 +107,7 @@ impl Codec {
             seed,
             crc_len: crc_len.into(),
             compression_enabled,
-            max_payload,
+            max_payload: max_payload.min(MAX_LOGICAL_MESSAGE),
         })
     }
 
@@ -287,15 +297,15 @@ pub struct ReceiveOutcome {
     pub disposition: ReceiveDisposition,
     /// A queued future packet can only be fully checked once its predecessor
     /// arrives. This reports that failure while preserving earlier deliveries.
-    /// The rejected sequence is not advanced or acknowledged cumulatively.
-    /// Because it was already selectively acknowledged, this is session-fatal:
-    /// the receiver is poisoned and rejects all subsequent receive calls.
+    /// The rejected sequence is not advanced or acknowledged cumulatively, and
+    /// the receiver rejects subsequent calls because ordered state is unusable.
     pub rejected_buffered: Option<(u16, Error)>,
 }
 
 struct PartialMessage {
     expected_length: usize,
     bytes: Vec<u8>,
+    started_at: Instant,
 }
 
 /// Ordered reliable channel 0, with bounded reordering and fragment assembly.
@@ -315,6 +325,9 @@ pub struct ReliableReceiver {
 }
 
 impl ReliableReceiver {
+    /// Construct a receiver with per-instance limits. Larger requested logical
+    /// and reorder-buffer limits are capped at the transport's 1 MiB and 2 MiB
+    /// ceilings respectively.
     pub fn new(
         next_sequence: u16,
         window: u16,
@@ -327,8 +340,8 @@ impl ReliableReceiver {
         Ok(Self {
             next: next_sequence,
             window,
-            max_message,
-            max_buffered,
+            max_message: max_message.min(MAX_LOGICAL_MESSAGE),
+            max_buffered: max_buffered.min(MAX_REORDER_BUFFERED),
             buffered_bytes: 0,
             buffered: BTreeMap::new(),
             partial: None,
@@ -349,11 +362,19 @@ impl ReliableReceiver {
             .map_or(0, |partial| partial.bytes.len())
     }
 
-    /// A direct `Err` leaves sequence, fragment and queue state unchanged; the
-    /// caller may discard the offending packet without acknowledging it. An
-    /// outcome with `rejected_buffered` is terminal because that earlier packet
-    /// was selectively acknowledged. Subsequent calls return `ReceiverPoisoned`.
+    /// A direct `Err` leaves sequence, fragment and queue state unchanged unless
+    /// it first expires a timed-out fragment. Future fragments are buffered but
+    /// not selectively acknowledged because their role cannot be validated
+    /// until missing predecessors arrive.
     pub fn receive(&mut self, packet: &Packet) -> Result<ReceiveOutcome, Error> {
+        self.receive_at(packet, Instant::now())
+    }
+
+    /// Process one reliable packet against a caller-supplied monotonic time.
+    /// The gateway should also call `expire_reassembly` when its deadline fires,
+    /// including while processing KeepAlive packets.
+    pub fn receive_at(&mut self, packet: &Packet, now: Instant) -> Result<ReceiveOutcome, Error> {
+        self.expire_reassembly(now);
         if self.poisoned {
             return Err(Error::ReceiverPoisoned);
         }
@@ -391,17 +412,19 @@ impl ReliableReceiver {
             if packet.payload.len() > self.max_message.saturating_add(header_length) {
                 return Err(Error::PayloadTooLarge);
             }
-            result.acknowledgement = Some(Ack {
-                opcode: SELECTIVE_ACK,
-                sequence,
-            });
+            if packet.opcode == RELIABLE_DATA {
+                result.acknowledgement = Some(Ack {
+                    opcode: SELECTIVE_ACK,
+                    sequence,
+                });
+            }
             if let Some(previous) = self.buffered.get(&sequence) {
                 if previous != packet {
                     return Err(Error::ConflictingDuplicate);
                 }
                 result.disposition = ReceiveDisposition::Duplicate;
             } else {
-                if packet.payload.len() > self.max_buffered - self.buffered_bytes {
+                if packet.payload.len() > self.max_buffered.saturating_sub(self.buffered_bytes) {
                     return Err(Error::BufferLimit);
                 }
                 self.buffered_bytes += packet.payload.len();
@@ -411,13 +434,13 @@ impl ReliableReceiver {
             return Ok(result);
         }
 
-        if let Some(message) = self.process_ordered(packet)? {
+        if let Some(message) = self.process_ordered(packet, now)? {
             result.messages.push(message);
         }
         self.advance();
         while let Some(queued) = self.buffered.remove(&self.next) {
             self.buffered_bytes -= queued.payload.len();
-            match self.process_ordered(&queued) {
+            match self.process_ordered(&queued, now) {
                 Ok(Some(message)) => result.messages.push(message),
                 Ok(None) => {}
                 Err(error) => {
@@ -432,6 +455,29 @@ impl ReliableReceiver {
         Ok(result)
     }
 
+    /// Expire an incomplete message at its fixed deadline. KeepAlive and later
+    /// fragments never extend it. The deadline must be polled by the session
+    /// owner even when no reliable packet arrives.
+    pub fn expire_reassembly(&mut self, now: Instant) -> bool {
+        let expired = self.partial.as_ref().is_some_and(|partial| {
+            now.saturating_duration_since(partial.started_at) >= REASSEMBLY_TIMEOUT
+        });
+        if expired {
+            self.partial = None;
+            self.buffered.clear();
+            self.buffered_bytes = 0;
+            self.poisoned = true;
+        }
+        expired
+    }
+
+    /// Absolute monotonic deadline for the event loop's next timer wakeup.
+    pub fn reassembly_deadline(&self) -> Option<Instant> {
+        self.partial
+            .as_ref()
+            .map(|partial| partial.started_at + REASSEMBLY_TIMEOUT)
+    }
+
     fn advance(&mut self) {
         self.next = self.next.wrapping_add(1);
         self.accepted_any = true;
@@ -444,7 +490,7 @@ impl ReliableReceiver {
         })
     }
 
-    fn process_ordered(&mut self, packet: &Packet) -> Result<Option<Vec<u8>>, Error> {
+    fn process_ordered(&mut self, packet: &Packet, now: Instant) -> Result<Option<Vec<u8>>, Error> {
         let bytes = &packet.payload[2..];
         if packet.opcode == RELIABLE_DATA {
             if self.partial.is_some() {
@@ -457,19 +503,23 @@ impl ReliableReceiver {
         }
 
         if let Some(partial) = self.partial.as_mut() {
-            if bytes.len() > partial.expected_length - partial.bytes.len() {
+            if bytes.len() > partial.expected_length.saturating_sub(partial.bytes.len()) {
                 return Err(Error::InvalidFragment);
             }
             partial.bytes.extend_from_slice(bytes);
             if partial.bytes.len() == partial.expected_length {
-                return Ok(Some(self.partial.take().unwrap().bytes));
+                return self
+                    .partial
+                    .take()
+                    .map(|complete| Some(complete.bytes))
+                    .ok_or(Error::InvalidFragment);
             }
             return Ok(None);
         }
         if bytes.len() < 5 {
             return Err(Error::InvalidFragment);
         }
-        let expected_length = u32::from_be_bytes(bytes[..4].try_into().unwrap()) as usize;
+        let expected_length = u32::from_be_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]) as usize;
         let fragment = &bytes[4..];
         if expected_length == 0 || fragment.len() > expected_length {
             return Err(Error::InvalidFragment);
@@ -483,6 +533,7 @@ impl ReliableReceiver {
         self.partial = Some(PartialMessage {
             expected_length,
             bytes: fragment.to_vec(),
+            started_at: now,
         });
         Ok(None)
     }

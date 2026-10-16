@@ -14,16 +14,19 @@ pub struct SessionRequest {
 
 impl SessionRequest {
     pub fn parse(wire: &[u8]) -> Result<Self, &'static str> {
-        if wire.len() != 24 || wire[..2] != [0, 1] || &wire[14..] != b"CGAPI_527\0" {
+        if wire.len() != 24 {
             return Err("expected a CGAPI_527 session request");
         }
-        let crc = u32::from_be_bytes(wire[2..6].try_into().unwrap());
-        let buffer = u32::from_be_bytes(wire[10..14].try_into().unwrap());
+        if wire[0] != 0 || wire[1] != 1 || &wire[14..] != b"CGAPI_527\0" {
+            return Err("expected a CGAPI_527 session request");
+        }
+        let crc = u32::from_be_bytes([wire[2], wire[3], wire[4], wire[5]]);
+        let buffer = u32::from_be_bytes([wire[10], wire[11], wire[12], wire[13]]);
         if crc > 4 || !(64..=65_507).contains(&buffer) {
             return Err("unsupported CRC length or UDP buffer size");
         }
         Ok(Self {
-            id: u32::from_be_bytes(wire[6..10].try_into().unwrap()),
+            id: u32::from_be_bytes([wire[6], wire[7], wire[8], wire[9]]),
             crc_length: crc as u8,
             buffer_size: buffer as usize,
         })

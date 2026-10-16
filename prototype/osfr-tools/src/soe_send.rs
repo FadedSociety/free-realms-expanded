@@ -10,7 +10,8 @@ use std::collections::VecDeque;
 use std::fmt;
 
 use crate::soe::{
-    CUMULATIVE_ACK, Codec, Error, Packet, RELIABLE_DATA, RELIABLE_FRAGMENT, SELECTIVE_ACK,
+    Codec, Error, Packet, CUMULATIVE_ACK, MAX_LOGICAL_MESSAGE, RELIABLE_DATA, RELIABLE_FRAGMENT,
+    SELECTIVE_ACK,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -111,6 +112,11 @@ impl ReliableSender {
         {
             return Err(SendError::InvalidConfiguration);
         }
+        // (R) Keep transmitted logical messages within the gateway parser's cap.
+        let config = SenderConfig {
+            max_message: config.max_message.min(MAX_LOGICAL_MESSAGE),
+            ..config
+        };
         Ok(Self {
             data_capacity: config.datagram_limit - empty_wire.len(),
             codec,
