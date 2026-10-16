@@ -25,7 +25,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 - **R4:** [[Reviews/Native Round4 NPCs 035300]]
 - **R5:** [[Reviews/Native Round5 050310]] (a running log through 10-15)
 
-**Test suite:** 2065 passed, 0 failed (2026-10-15, after World Builder text).
+**Test suite:** 2215 passed, 0 failed, 123 ignored (private-content or scratch-gateway gates) across 243 targets (2026-10-16, at `e409a96`, clean worktree).
 
 ## Platform and network
 
