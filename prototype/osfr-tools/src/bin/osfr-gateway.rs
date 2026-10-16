@@ -1918,6 +1918,10 @@ impl Server {
                 .and_then(|_| current.flush(&self.socket, now_ms));
             if let Err(error) = result {
                 self.end_session(key, current, &error.to_string())?;
+            } else if current.receiver.expire_reassembly(Instant::now()) {
+                // A fragmented message left incomplete past its fixed deadline
+                // (KeepAlive cannot extend it; Security Model L7).
+                self.end_session(key, current, "reassembly_timeout")?;
             } else if current.last_activity.elapsed() > Duration::from_secs(60) {
                 self.end_session(key, current, "idle_timeout")?;
             } else {
