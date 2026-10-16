@@ -219,6 +219,274 @@
           "icon_id": 730
         }
       ]
+    },
+    {
+      "id": 12301,
+      "title_id": 75452,
+      "description_id": 76503,
+      "objective_id": 76505,
+      "difficulty": 1,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100001230100,
+        "definition_id": 1230100,
+        "model_id": 220,
+        "name_id": 440711,
+        "name": "Bixie Soldier",
+        "texture_alias": "",
+        "position": [
+          -726,
+          -7.1,
+          152
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001230101,
+          "definition_id": 1230101,
+          "model_id": 220,
+          "name_id": 440711,
+          "name": "Bixie Soldier",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false
+        },
+        {
+          "guid": 100001230102,
+          "definition_id": 1230102,
+          "model_id": 220,
+          "name_id": 440711,
+          "name": "Bixie Soldier",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false
+        },
+        {
+          "guid": 100001230103,
+          "definition_id": 1230103,
+          "model_id": 220,
+          "name_id": 440711,
+          "name": "Bixie Soldier",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Native-run client locale/en_us_data.dat via Global.Text ids 75452, 76503, 76505, 440711; Resources/Models.txt model 220; Resources/Images/Images.txt icon 662. Exact rows/hashes: lab/reports/field-battles-w123/provenance.json."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Battles revision 48953, difficulty 1; https://freerealms.fandom.com/wiki/Battles. Regional context: notes/Design/Field Enemies.md; battle roster/count/scene assignment is NOT recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Content-only playable slice: local battle id 12301, kill ids and GUIDs, Sanctuary / Queensfields marker position, recommended level band 1-2, three Bixie Soldier melee actors (not a recovered original roster), base 140 HP/3 damage before existing difficulty scaling, arena scene sg_random_encounter_clearing shared with battle 96, 25 coins and the same four-item random prize list as battle 96. No original final-2014 roster, transforms, reward wheel or arena binding recovered. This is not historical completeness."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Marker uses visible enemy model rather than non-rendering tent spawner; overhead image 11970 reuses native battle 96. Terrain/safety gate checks the full 5 m marker wander disc; collision, water and native road access remain unverified."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": 662,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
+    },
+    {
+      "id": 12302,
+      "title_id": 42054,
+      "description_id": 42068,
+      "objective_id": 42066,
+      "difficulty": 2,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100001230200,
+        "definition_id": 1230200,
+        "model_id": 4,
+        "name_id": 2232,
+        "name": "Robgoblin",
+        "texture_alias": "",
+        "position": [
+          -540,
+          0.5,
+          1010
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001230201,
+          "definition_id": 1230201,
+          "model_id": 4,
+          "name_id": 2232,
+          "name": "Robgoblin",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false
+        },
+        {
+          "guid": 100001230202,
+          "definition_id": 1230202,
+          "model_id": 4,
+          "name_id": 2232,
+          "name": "Robgoblin",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false
+        },
+        {
+          "guid": 100001230203,
+          "definition_id": 1230203,
+          "model_id": 4,
+          "name_id": 2232,
+          "name": "Robgoblin",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 3,
+          "boss": false
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Native-run client locale/en_us_data.dat via Global.Text ids 42054, 42068, 42066, 2232; Resources/Models.txt model 4; Resources/Images/Images.txt icon 4540. Exact rows/hashes: lab/reports/field-battles-w123/provenance.json."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Battles revision 48953, difficulty 2; https://freerealms.fandom.com/wiki/Battles. Regional context: notes/Design/Field Enemies.md; battle roster/count/scene assignment is NOT recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Content-only playable slice: local battle id 12302, kill ids and GUIDs, Lakeshore / northeast Wilds marker position, recommended level band 3-4, three Robgoblin melee actors (not a recovered original roster), base 140 HP/3 damage before existing difficulty scaling, arena scene sg_random_encounter_clearing shared with battle 96, 25 coins and the same four-item random prize list as battle 96. No original final-2014 roster, transforms, reward wheel or arena binding recovered. This is not historical completeness."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Marker uses visible enemy model rather than non-rendering tent spawner; overhead image 11970 reuses native battle 96. Terrain/safety gate checks the full 5 m marker wander disc; collision, water and native road access remain unverified."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": 4540,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
     }
   ]
 }
