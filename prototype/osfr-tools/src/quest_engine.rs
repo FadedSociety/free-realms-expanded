@@ -1160,6 +1160,39 @@ impl QuestEngine {
         self.state.quests.get(&quest_id)
     }
 
+    /// Unfinished goals of an active quest that can be worked on now: all of them, or only
+    /// the first one when the quest is ordered (R; the same rule as `accept`). Empty for a
+    /// quest that is not active, which keeps a forged or stale selection from tracking.
+    pub fn current_objectives(&self, quest_id: u32) -> Vec<&QuestObjective> {
+        let (Some(definition), Some(progress)) = (
+            self.definitions.get(&quest_id),
+            self.state.quests.get(&quest_id),
+        ) else {
+            return Vec::new();
+        };
+        if progress.status != QuestStatus::Active {
+            return Vec::new();
+        }
+        let open = definition
+            .objectives
+            .iter()
+            .zip(&progress.counts)
+            .filter(|(objective, count)| **count < objective.required)
+            .map(|(objective, _)| objective);
+        if definition.ordered {
+            open.take(1).collect()
+        } else {
+            open.collect()
+        }
+    }
+
+    /// Zone and position of a reach-POI objective's target.
+    pub fn poi_location(&self, poi_id: u32) -> Option<(u32, [f32; 3])> {
+        self.poi_locations
+            .get(&poi_id)
+            .map(|(zone, position, _)| (*zone, *position))
+    }
+
     pub fn title_string_id(&self, quest_id: u32) -> Option<u32> {
         self.definitions
             .get(&quest_id)

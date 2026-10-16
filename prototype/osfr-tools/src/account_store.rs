@@ -69,6 +69,7 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
                 | "reload enemies"
                 | "reload abilities"
                 | "reload behaviours"
+                | "reload power_ups"
                 | "reload placements"
         ),
         AccountRole::Player => false,

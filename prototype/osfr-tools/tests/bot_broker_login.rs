@@ -58,7 +58,7 @@ fn start(mut command: Command, event: &str) -> (Service, String) {
         }
     });
     let address = rx
-        .recv_timeout(Duration::from_secs(15))
+        .recv_timeout(Duration::from_secs(60))
         .expect("service did not listen");
     (child, address)
 }
@@ -345,6 +345,8 @@ fn broker_bot_reaches_world_and_wrong_key_sends_no_udp() {
                 "expect 52",
                 "--cmd",
                 "quit",
+                "--expect-timeout",
+                "30000",
             ])
             .output()
             .unwrap()

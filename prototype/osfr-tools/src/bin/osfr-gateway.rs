@@ -1749,6 +1749,16 @@ impl Session {
         {
             return self.route_player_radial(inner, world);
         }
+        if inner.starts_with(&[59, 0]) {
+            // W156: player trade is not offered (R). Close any window the sender believes in.
+            return osfr_tools::trade::unavailable_replies(inner)
+                .iter()
+                .map(|reply| Delivery {
+                    recipient: self.id,
+                    bytes: wrap_application(reply),
+                })
+                .collect();
+        }
         if inner.starts_with(&[15, 0, 1, 0]) {
             return self.route_typed_chat(inner, world);
         }

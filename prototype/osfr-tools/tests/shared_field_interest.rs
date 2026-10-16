@@ -87,7 +87,7 @@ fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
         server.shutdown().unwrap();
     });
     Fixture {
-        addr: addr_rx.recv_timeout(Duration::from_secs(10)).unwrap(),
+        addr: addr_rx.recv_timeout(PATIENCE).unwrap(),
         tx: Some(tx),
         handle: Some(handle),
         root,
@@ -108,9 +108,9 @@ fn interest_login(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) -> [Vec<Vec<u
                 "1",
             )
             .unwrap();
-        client.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        client.wait_for(PATIENCE, |_| true).unwrap();
         client.send_message(&packet(13, &[]), "13").unwrap();
-        client.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        client.wait_for(PATIENCE, |_| true).unwrap();
     }
     a.send_message(&packet(10, &[]), "10").unwrap();
     let mut out = f.ready(101, a, b);
@@ -119,7 +119,7 @@ fn interest_login(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) -> [Vec<Vec<u
     for i in 0..2 {
         out[i].extend(batch[i].clone());
     }
-    let deadline = Instant::now() + Duration::from_secs(10);
+    let deadline = Instant::now() + PATIENCE;
     loop {
         let tail = collect(a, b, Duration::from_millis(20));
         for i in 0..2 {
@@ -163,7 +163,15 @@ fn w127_two_bot_observer_death_respawn_route() {
         assert_eq!(actor_packets(packets, 2, E), 1);
         assert_eq!(hp_values(packets), vec![300]);
     }
-    let damage = collect(&mut a, &mut b, Duration::from_millis(1100));
+    let mut damage = [Vec::new(), Vec::new()];
+    let enemy_hit_101 = |p: &Vec<u8>| {
+        is_sub(p, 32, 7)
+            && p.get(4..12) == Some(E.to_le_bytes().as_slice())
+            && p.get(20..28) == Some(101_u64.to_le_bytes().as_slice())
+    };
+    settle(&mut a, &mut b, &mut damage, |d| {
+        d[0].iter().any(|p| is_sub(p, 38, 1)) && d.iter().all(|m| m.iter().any(enemy_hit_101))
+    });
     assert!(
         damage[0].iter().any(|p| is_sub(p, 38, 1)),
         "victim receives private HUD HP"
@@ -481,7 +489,10 @@ fn w127_two_bot_npc_cap_cutoff() {
     assert!(hp_values(&first[0]).is_empty());
     assert_eq!(hp_values(&first[1]), vec![200]);
     f.host(|s| s.test_observer_position(101, [-1., 0., 0.]));
-    let entered = collect(&mut a, &mut b, Duration::from_millis(100));
+    let mut entered = [Vec::new(), Vec::new()];
+    settle(&mut a, &mut b, &mut entered, |e| {
+        actor_packets(&e[0], 2, E) >= 1 && removals(&e[0], 130000000063) >= 1
+    });
     assert_eq!(actor_packets(&entered[0], 2, E), 1);
     assert_eq!(hp_values(&entered[0]), vec![200]);
     assert_eq!(
@@ -507,6 +518,10 @@ fn w127_two_bot_npc_cap_cutoff() {
     );
 }
 
+/// Longest a due respawn may sit undelivered once the server clock passed it. It guards
+/// "the tick delivers it", not a latency target: 24 parallel suites measured >2 s stalls (W157).
+const RESPAWN_LATENESS_MS: u64 = 5_000;
+
 fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
     let (_, deadline) = f.host(|s| s.test_field_clock(E));
     let deadline = deadline.unwrap();
@@ -524,7 +539,7 @@ fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
         assert_eq!(actor_packets(packets, 2, E), 0);
     }
     let mut respawn = [Vec::new(), Vec::new()];
-    let limit = Instant::now() + Duration::from_secs(3);
+    let limit = Instant::now() + PATIENCE;
     loop {
         let batch = collect(a, b, Duration::from_millis(5));
         let now = f.host(|s| s.test_field_clock(E).0);
@@ -536,7 +551,7 @@ fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
         }
         if respawn.iter().all(|p| actor_packets(p, 2, E) == 1) {
             assert!(
-                now <= deadline + 250,
+                now <= deadline + RESPAWN_LATENESS_MS,
                 "respawn exceeded serviced delivery tolerance"
             );
             break;
@@ -554,7 +569,8 @@ fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
         s.test_observer_position(101, [-1., 0., 0.]);
         s.test_observer_position(202, [-101., 0., 0.]);
     });
-    let left = collect(a, b, Duration::from_millis(500));
+    let mut left = [Vec::new(), Vec::new()];
+    settle(a, b, &mut left, |l| removals(&l[1], E) >= 1);
     assert_eq!(removals(&left[1], E), 1);
     assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
     assert!(
@@ -590,7 +606,7 @@ fn interest_committed_result(
     recipient: usize,
 ) -> [Vec<Vec<u8>>; 2] {
     let mut packets = [Vec::new(), Vec::new()];
-    let deadline = Instant::now() + Duration::from_secs(3);
+    let deadline = Instant::now() + PATIENCE;
     loop {
         let batch = collect(a, b, Duration::from_millis(5));
         for i in 0..2 {
@@ -606,7 +622,7 @@ fn interest_committed_result(
             f.host(|s| s.test_known_npcs(101)).contains(&E)
         );
     }
-    let delivery_deadline = Instant::now() + Duration::from_millis(250);
+    let delivery_deadline = Instant::now() + PATIENCE;
     while hp_values(&packets[recipient]).is_empty() {
         let batch = collect(a, b, Duration::from_millis(5));
         for i in 0..2 {
@@ -617,10 +633,7 @@ fn interest_committed_result(
             "committed HP delivery missing"
         );
     }
-    let tail = collect(a, b, Duration::from_millis(100));
-    for i in 0..2 {
-        packets[i].extend(tail[i].clone());
-    }
+    drain_deliveries(f, a, b, &mut packets);
     packets
 }
 

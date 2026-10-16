@@ -33,6 +33,7 @@ use std::{
         mpsc,
     },
     thread,
+    time::Duration,
 };
 
 static NEXT_DIR: AtomicU64 = AtomicU64::new(0);
@@ -409,30 +410,84 @@ fn bot_fails_cleanly_on_unmet_expectation() {
     assert!(error.contains("expect 999/1"), "{error}");
 }
 
+/// Upper bound for any wait on another thread or the server; never a pace.
+/// Parallel suites starve the gateway thread for seconds, so a fixed delay
+/// between the bots made the listener miss the chat (W157).
+const PATIENCE_MS: u64 = 30_000;
+
+/// Connect, retrying on a fresh socket if no SessionResponse arrives. Under 48 parallel
+/// suites about 1 handshake in 500 never completed on one socket for the whole 5 s
+/// window while a new socket connected at once (W157 probe; the gateway was responsive).
+/// Only for account-store gateways: a stale half-open session there is harmless, but a
+/// single-save gateway would refuse the retry.
+fn connect_bot(make: impl Fn() -> bot::BotConfig) -> bot::Bot {
+    let mut failure = String::new();
+    for _ in 0..3 {
+        match bot::Bot::connect(make()) {
+            Ok(bot) => return bot,
+            Err(error) => failure = error,
+        }
+    }
+    panic!("no handshake on three fresh sockets: {failure}");
+}
+
 #[test]
 fn two_bots_share_an_account_store_gateway() {
     let temp = TempDir::new();
     let reference = create_reference(&temp.0);
     let store = create_account_store(&temp.0);
     let gateway = RunningGateway::start(options(&temp.0, reference, Some(store.clone())));
-    let listener = config(gateway.addr, "beryl", 72, 3, binding_ticket(&store, 3));
-    let speaker = config(gateway.addr, "aster", 71, 2, binding_ticket(&store, 2));
+    let make = |name: &str, connection_id, guid| {
+        let mut config = config(
+            gateway.addr,
+            name,
+            connection_id,
+            guid,
+            binding_ticket(&store, guid),
+        );
+        config.expect_timeout_ms = PATIENCE_MS;
+        config
+    };
+    // Bot::login clears the inbox, so the speaker may only talk once the
+    // listener is in the world; a fixed `wait` raced a slow listener login.
+    let (in_world, listener_ready) = mpsc::channel();
     thread::scope(|scope| {
-        let listening = scope.spawn(move || {
+        let listening = scope.spawn(|| {
             let steps = bot::parse_script("expect-text hello from aster\nwait 200").unwrap();
-            bot::run(listener, &steps)
+            let mut bot = connect_bot(|| make("beryl", 72, 3));
+            let result = bot.login().and_then(|_| {
+                in_world.send(()).unwrap();
+                for step in &steps {
+                    if !bot.run_step(step)? {
+                        break;
+                    }
+                }
+                Ok(())
+            });
+            bot.disconnect();
+            result
         });
         let speaking = scope.spawn(move || {
-            let steps =
-                bot::parse_script("wait 1500\nchat hello from aster\nexpect 15 1\nwait 300")
-                    .unwrap();
-            bot::run(speaker, &steps)
+            listener_ready
+                .recv_timeout(Duration::from_millis(PATIENCE_MS))
+                .map_err(|_| "listener never reached the world".to_string())?;
+            let steps = bot::parse_script("chat hello from aster\nexpect 15 1\nwait 300").unwrap();
+            let mut bot = connect_bot(|| make("aster", 71, 2));
+            let result = bot.login().and_then(|_| {
+                for step in &steps {
+                    bot.run_step(step)?;
+                }
+                Ok(())
+            });
+            bot.disconnect();
+            result
         });
-        speaking.join().unwrap().expect("speaker passes");
-        listening
-            .join()
-            .unwrap()
-            .expect("listener hears the speaker");
+        let heard = listening.join().unwrap();
+        let spoke = speaking.join().unwrap();
+        assert!(
+            heard.is_ok() && spoke.is_ok(),
+            "listener hears the speaker: {heard:?}; speaker passes: {spoke:?}"
+        );
     });
 }
 

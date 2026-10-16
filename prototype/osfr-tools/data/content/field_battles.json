@@ -258,6 +258,7 @@
           ],
           "max_health": 140,
           "damage": 3,
+          "power_up_table": "standard",
           "boss": false
         },
         {
@@ -274,6 +275,7 @@
           ],
           "max_health": 140,
           "damage": 3,
+          "power_up_table": "standard",
           "boss": false
         },
         {
@@ -290,6 +292,7 @@
           ],
           "max_health": 140,
           "damage": 3,
+          "power_up_table": "standard",
           "boss": false
         }
       ],
@@ -392,6 +395,7 @@
           ],
           "max_health": 140,
           "damage": 3,
+          "power_up_table": "standard",
           "boss": false
         },
         {
@@ -408,6 +412,7 @@
           ],
           "max_health": 140,
           "damage": 3,
+          "power_up_table": "standard",
           "boss": false
         },
         {
@@ -424,6 +429,7 @@
           ],
           "max_health": 140,
           "damage": 3,
+          "power_up_table": "standard",
           "boss": false
         }
       ],

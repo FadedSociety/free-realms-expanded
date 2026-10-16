@@ -716,6 +716,48 @@ impl TradeService {
     }
 }
 
+/// Answer a client trade request while player trade is not offered (R).
+///
+/// No client path creates a trade: Lua `Trade` has no invite entry, the chat commands are
+/// say/tell/groupsay/yell/lfg/area/tradechat/guildsay/mo (`00b15450`, `tradechat` is a chat
+/// channel) and the console ones attack/hit/report (`00aa06a0`), and the player radial offers
+/// Inspect only. The six requests a client can still send (Trade.md "Client to server": sub 3
+/// reply `00c6cee0`, 6 accept `00c6d060`, 7 cancel `00c6d100`, 8 lock `00c6cf80`, 9 item
+/// `00c6d160`, 10 coins `00c6d240`) therefore only come from a stale or forged client. Nothing
+/// is created, read or changed here, so replays cannot mutate anything.
+///
+/// The only window-close message is sub 5 (`00c6c530`), and a status alone does not close it, so
+/// every request that could mean an open window or an accepted toast is answered to the sender
+/// with sub 5 for the same session id; actions that imply an open window get status 1 first.
+/// A decline (sub 3, accepted 0) already cleared the client, and a malformed packet, the
+/// client's idle id `0xFFFFFFFF` or another family gets no reply (R).
+pub fn unavailable_replies(inner: &[u8]) -> Vec<Vec<u8>> {
+    // Layout: u16 family 59, u8 sub, u32 session, then the body.
+    let [0x3b, 0, sub, session @ ..] = inner else {
+        return Vec::new();
+    };
+    let Some((session, body)) = session.split_first_chunk::<4>() else {
+        return Vec::new();
+    };
+    let session = u32::from_le_bytes(*session);
+    let body_len = match sub {
+        3 => 1,
+        6 | 10 => 4,
+        7 => 0,
+        8 => 5,
+        9 => 8,
+        _ => return Vec::new(),
+    };
+    if session == u32::MAX || body.len() != body_len {
+        return Vec::new();
+    }
+    match (*sub, body.first()) {
+        (3, Some(0)) => Vec::new(),
+        (3 | 7, _) => vec![end_packet(session)],
+        _ => vec![status_packet(TradeStatus::Cancelled), end_packet(session)],
+    }
+}
+
 fn clear_acceptance(session: &mut Session) -> bool {
     let had_lock = session.locked.iter().any(|value| *value);
     session.locked = [false, false];

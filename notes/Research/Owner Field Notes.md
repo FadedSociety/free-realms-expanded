@@ -129,3 +129,8 @@ Observations the owner gathers from original-game videos and screenshots. They a
   - **Earth Shard:** damages all enemies in your area and stuns them briefly.
   - **Super Shield:** raises your speed and makes you invulnerable for a short time.
 - Client evidence so far (lead, 2026-10-16): the locale has "Flame Wave Power Up", "earth shards power up buff - tier 4" and "spawn healt powerup npc", which suggests a power-up spawns as a pickup actor that grants a buff. Drop chances were not found yet. If they are server-side only, we reconstruct a chance per kind and mark it (R).
+- **Drop model (the owner decision, 2026-10-16):** every player who took part in a kill gets their own drop, which only they can see. Nobody sees or can take another player's drops, so pickups are never shared or contested. The server still tracks each player's pickups (the client is never trusted to create one).
+  - Lead refinements: "took part" means dealt damage or was engaged in that fight, not bystanders.
+  - Chances stay tunable for group play.
+  - The big heart's group heal must not stack absurdly.
+  - The original game's behaviour is unrecorded, so this is (R).

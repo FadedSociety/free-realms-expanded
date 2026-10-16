@@ -17,17 +17,18 @@
 //! Every server rule below is reconstructed policy (R): the original server's
 //! reply to these requests is unrecovered. The client has already applied the
 //! selection and lock locally, so success sends nothing back and refusal is
-//! silent. 47/14 `ObjectiveTargetUpdate` (the "tracked target" pin) is not sent
-//! here: its reader `00a8b440` is recovered (u8 active, then only when active
-//! 12+8+4+16+4 bytes) but which dword is which is not, see the W145 report.
+//! silent. The 47/14 `ObjectiveTargetUpdate` pin ("Take Me There") is built by `Pin`,
+//! `tracked_pin` and `Tracker` below.
 //!
 //! Nothing here awards or completes a quest. Selection only reads QuestEngine
 //! state, and a breadcrumb only makes the regular 49/1 offer; the player still
 //! has to accept it and earn its objectives from server events.
 
 use crate::quest_engine::{
-    OutboundMessage, QuestDenial, QuestEngine, QuestMessage, QuestOutcome, QuestStatus,
+    ObjectiveKind, OutboundMessage, QuestDenial, QuestEngine, QuestMessage, QuestObjective,
+    QuestOutcome, QuestStatus,
 };
+use crate::world::OPEN_WORLD_ZONE;
 use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -123,4 +124,132 @@ fn breadcrumb(
     // Prerequisites, level, job, membership, limit and hollow content are all
     // checked by the engine's regular offer path.
     engine.offer(quest_id, giver)
+}
+
+/// What the client's "Take Me There" pin needs (47/14 `ObjectiveTargetUpdate`).
+///
+/// Recovered from the client (FreeRealms.exe). Dispatch `00a91bf0` case 14 reads the body
+/// with `00a8db30` -> `00a8b440` and requires it to end exactly, then calls the handler
+/// `00a8fab0`. Wire after `u16 47`, `u8 14`: `u8 active`; only when active:
+/// `u32 a`, `u32 b`, `u32 c` (handler cache `+0x10/+0x14/+0x18`), `u64 guid`
+/// (`+0x20/+0x24`), `u32 name string id` (`+0x28`), `f32 x4` (`+0x30`), `u32 zone id`
+/// (`+0x40`). Inactive is just the zero byte (4 bytes in all); active is 48.
+/// - `a`, `b`, `c` only identify the tracked task: the handler compares them with its
+///   cache to decide whether to restart the path (`009cd6c0` flag), and `c` is the argument
+///   of Lua `ObjectiveWindow:SelectTask` (the goals-window row key). The client's 47/6
+///   `SelectTaskRequest` (`00a86b30`, sent by `00a976a0`) appears to carry the cached `a`
+///   and `b` plus the chosen row id back. The meaning of `a` and `b` is not recovered; this
+///   server sends the quest id in `a`, 0 in `b`, and the objective id in `c` (R).
+/// - guid: key of the minimap indicator (`00a8e660` -> `MiniMap:SelectIndicator`; a key
+///   with no indicator just clears the selection) and `BaseClient.ObjectiveTarget` column 1.
+/// - name string id: looked up by `00cb85b0` into column 2; 0 gives an empty name and Lua
+///   `MiniMap:SetObjectiveTarget` shows locale 139655 "Objective Destination".
+/// - vec4: `x, y, z, w`. Column 3 is `x` and column 4 is `z` (`00cb8810`); the whole vec4
+///   is also stored by `009ce260` as the vector `Ui.TakeMeToObjective` (`00c17c70` ->
+///   `008a8e50` -> `009cef10` -> `009ce560`) walks the player to, and `009cd6c0` asks for
+///   a path to it. The client's own constant for `w` is 1.0 (`0175b420`).
+/// - zone id: column 5 ("Zone ID"); no Lua reads it. Sent as the zone of the position.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Pin {
+    pub quest_id: u32,
+    pub objective_id: u32,
+    pub guid: u64,
+    pub zone_id: u32,
+    pub position: [f32; 3],
+}
+
+impl Pin {
+    /// `None` is the "no pin" message, which clears the client's pin.
+    pub fn encode(pin: Option<&Pin>) -> Vec<u8> {
+        let mut packet = vec![47, 0, 14];
+        let Some(pin) = pin else {
+            packet.push(0);
+            return packet;
+        };
+        packet.push(1);
+        for dword in [pin.quest_id, 0, pin.objective_id] {
+            packet.extend(dword.to_le_bytes());
+        }
+        packet.extend(pin.guid.to_le_bytes());
+        packet.extend(0u32.to_le_bytes());
+        for float in [pin.position[0], pin.position[1], pin.position[2], 1.0] {
+            packet.extend(float.to_le_bytes());
+        }
+        packet.extend(pin.zone_id.to_le_bytes());
+        packet
+    }
+}
+
+/// Where the server knows things are. Each lookup answers "unknown" with `None`.
+pub struct Places<'a> {
+    /// NPC id -> position (zone 0, the one continent; regional labels are not zones).
+    pub npc: &'a dyn Fn(u64) -> Option<[f32; 3]>,
+    /// Actor kind -> (guid, home position) of a field enemy of that kind.
+    pub enemy: &'a dyn Fn(u32) -> Option<(u64, [f32; 3])>,
+    /// Reach-POI id -> (zone, position).
+    pub poi: &'a dyn Fn(u32) -> Option<(u32, [f32; 3])>,
+}
+
+/// The pin for one objective, or `None` when the content gives it no single known place
+/// (items, jobs, crafting, minigames, a whole zone). Never a guess (R).
+pub fn locate(quest_id: u32, objective: &QuestObjective, places: &Places) -> Option<Pin> {
+    let (guid, zone_id, position) = match objective.kind {
+        ObjectiveKind::TalkToNpc { npc_id } | ObjectiveKind::InteractNpc { npc_id } => {
+            (npc_id, OPEN_WORLD_ZONE, (places.npc)(npc_id)?)
+        }
+        ObjectiveKind::KillActorKind { actor_kind_id } => {
+            let (guid, position) = (places.enemy)(actor_kind_id)?;
+            (guid, OPEN_WORLD_ZONE, position)
+        }
+        ObjectiveKind::ReachPoi { poi_id } => {
+            let (zone, position) = (places.poi)(poi_id)?;
+            (0, zone, position)
+        }
+        ObjectiveKind::VisitPosition {
+            zone_id, position, ..
+        } => (0, zone_id, position),
+        _ => return None,
+    };
+    position.iter().all(|v| v.is_finite()).then_some(Pin {
+        quest_id,
+        objective_id: objective.id,
+        guid,
+        zone_id,
+        position,
+    })
+}
+
+/// The tracked-target pin of the character's own selected quest (R): its first open
+/// objective that has a place, as long as the place is in the character's current zone.
+/// `objectives` are the quest's open objectives (`QuestEngine::current_objectives`).
+pub fn tracked_pin(
+    selected: Option<u32>,
+    objectives: &[&QuestObjective],
+    zone_id: u32,
+    places: &Places,
+) -> Option<Pin> {
+    let quest_id = selected?;
+    objectives
+        .iter()
+        .find_map(|objective| locate(quest_id, objective, places))
+        .filter(|pin| pin.zone_id == zone_id)
+}
+
+/// What the client currently shows. `update` returns the 47/14 to send when the wanted pin
+/// differs from it: a changed pin is sent, a vanished pin is cleared, and nothing is sent
+/// while there is no pin and none was shown. Not saved: a new session starts empty and the
+/// first call sends the pin again.
+#[derive(Clone, Debug, Default)]
+pub struct Tracker {
+    sent: Option<Pin>,
+}
+
+impl Tracker {
+    pub fn update(&mut self, wanted: Option<Pin>) -> Option<Vec<u8>> {
+        if wanted == self.sent {
+            return None;
+        }
+        self.sent = wanted;
+        Some(Pin::encode(wanted.as_ref()))
+    }
 }

@@ -394,7 +394,7 @@ impl Fixture {
             server.shutdown().unwrap();
         });
         Self {
-            addr: addr_rx.recv_timeout(Duration::from_secs(10)).unwrap(),
+            addr: addr_rx.recv_timeout(PATIENCE).unwrap(),
             tx: Some(tx),
             handle: Some(handle),
             root,
@@ -411,7 +411,7 @@ impl Fixture {
                 tx.send(f(server)).unwrap();
             }))
             .unwrap();
-        rx.recv_timeout(Duration::from_secs(10)).unwrap()
+        rx.recv_timeout(PATIENCE).unwrap()
     }
 
     fn bot(&self, guid: u64, connection_id: u32) -> bot::Bot {
@@ -426,14 +426,14 @@ impl Fixture {
             guid,
             ticket: login::gateway_binding_ticket(HANDOFF_KEY, account, guid),
             version: VERSION.into(),
-            expect_timeout_ms: 3000,
+            expect_timeout_ms: PATIENCE.as_millis() as u64,
             quiet: true,
         })
         .unwrap()
     }
 
     fn ready(&self, guid: u64, a: &mut bot::Bot, b: &mut bot::Bot) -> [Vec<Vec<u8>>; 2] {
-        let deadline = Instant::now() + Duration::from_secs(3);
+        let deadline = Instant::now() + PATIENCE;
         let mut messages = [Vec::new(), Vec::new()];
         let mut load_sent = false;
         loop {
@@ -461,6 +461,48 @@ impl Drop for Fixture {
             handle.join().unwrap();
         }
         // Keep the numeric-only scratch saves as review evidence.
+    }
+}
+
+/// Upper bound for any wait on the server or the other bot; never a pace. Parallel
+/// suites starve the gateway thread for seconds, so fixed 3 s / 250 ms waits flaked (W157).
+const PATIENCE: Duration = Duration::from_secs(30);
+
+/// Collect into `acc` until `done` holds (or PATIENCE), then keep listening 500 ms so a
+/// duplicate delivery still fails the exact-count assertions that follow.
+fn settle(
+    a: &mut bot::Bot,
+    b: &mut bot::Bot,
+    acc: &mut [Vec<Vec<u8>>; 2],
+    done: impl Fn(&[Vec<Vec<u8>>; 2]) -> bool,
+) {
+    let deadline = Instant::now() + PATIENCE;
+    while !done(acc) && Instant::now() < deadline {
+        let batch = collect(a, b, Duration::from_millis(5));
+        for i in 0..2 {
+            acc[i].extend(batch[i].clone());
+        }
+    }
+    let grace = collect(a, b, Duration::from_millis(500));
+    for i in 0..2 {
+        acc[i].extend(grace[i].clone());
+    }
+}
+
+/// After a committed result reached its recipient, keep servicing both bots until the
+/// server's reliable queues are acknowledged (the other bot's copy has landed), then
+/// 100 ms more so a duplicate still fails the exact-count assertions.
+fn drain_deliveries(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot, acc: &mut [Vec<Vec<u8>>; 2]) {
+    let deadline = Instant::now() + PATIENCE;
+    while !f.host(|s| s.test_queues_idle()) && Instant::now() < deadline {
+        let batch = collect(a, b, Duration::from_millis(5));
+        for i in 0..2 {
+            acc[i].extend(batch[i].clone());
+        }
+    }
+    let tail = collect(a, b, Duration::from_millis(100));
+    for i in 0..2 {
+        acc[i].extend(tail[i].clone());
     }
 }
 
@@ -686,9 +728,9 @@ fn two_bot_socket_shared_hp_route() {
             "1",
         )
         .unwrap();
-        bot.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        bot.wait_for(PATIENCE, |_| true).unwrap();
         bot.send_message(&packet(13, &[]), "13").unwrap();
-        bot.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        bot.wait_for(PATIENCE, |_| true).unwrap();
     }
     a.send_message(&packet(10, &[]), "10").unwrap();
     let mut startup = f.ready(101, &mut a, &mut b);
@@ -698,7 +740,7 @@ fn two_bot_socket_shared_hp_route() {
         startup[i].extend(batch[i].clone());
     }
     // Barrier on server-observed reliable drain, while servicing both sockets.
-    let deadline = Instant::now() + Duration::from_secs(10);
+    let deadline = Instant::now() + PATIENCE;
     loop {
         let batch = collect(&mut a, &mut b, Duration::from_millis(20));
         for i in 0..2 {
@@ -729,11 +771,11 @@ fn two_bot_socket_shared_hp_route() {
     self_cast[16..24].copy_from_slice(&101_u64.to_le_bytes());
     a.send_message(&bot::wrap(&self_cast), "36/10 self")
         .unwrap();
-    let first = attack_result(&mut a, &mut b, 0);
+    let first = attack_result(&f, &mut a, &mut b, 0);
     assert_eq!(hp_values(&first[0]), vec![200]);
     b.send_message(&bot::wrap(&cast), "36/10").unwrap();
     a.send_message(&bot::wrap(&cast), "36/10 early").unwrap();
-    let second = attack_result(&mut a, &mut b, 1);
+    let second = attack_result(&f, &mut a, &mut b, 1);
     assert_eq!(
         hp_values(&second[1]),
         vec![100],
@@ -793,7 +835,7 @@ fn two_bot_socket_shared_hp_route() {
         client
             .send_message(&bot::wrap(&interact), "26/8 marker")
             .unwrap();
-        let deadline = Instant::now() + Duration::from_secs(3);
+        let deadline = Instant::now() + PATIENCE;
         loop {
             let packets = collect(&mut a, &mut b, Duration::from_millis(10));
             if packets[who].iter().any(|p| is_sub(p, 41, 114)) {
@@ -804,7 +846,7 @@ fn two_bot_socket_shared_hp_route() {
         let client = if who == 0 { &mut a } else { &mut b };
         client.send_message(&bot::wrap(&go), "41/108").unwrap();
         let guid = if who == 0 { 101 } else { 202 };
-        let deadline = Instant::now() + Duration::from_secs(3);
+        let deadline = Instant::now() + PATIENCE;
         loop {
             collect(&mut a, &mut b, Duration::from_millis(10));
             if f.host(move |s| {
@@ -819,7 +861,7 @@ fn two_bot_socket_shared_hp_route() {
         client.send_message(&packet(13, &[]), "13").unwrap();
         client.send_message(&packet(10, &[]), "10").unwrap();
         let mut packets = f.ready(guid, &mut a, &mut b);
-        let deadline = Instant::now() + Duration::from_secs(10);
+        let deadline = Instant::now() + PATIENCE;
         loop {
             let batch = collect(&mut a, &mut b, Duration::from_millis(20));
             for i in 0..2 {
@@ -858,8 +900,13 @@ fn two_bot_socket_shared_hp_route() {
     );
 }
 
-fn attack_result(a: &mut bot::Bot, b: &mut bot::Bot, recipient: usize) -> [Vec<Vec<u8>>; 2] {
-    let deadline = Instant::now() + Duration::from_millis(250);
+fn attack_result(
+    f: &Fixture,
+    a: &mut bot::Bot,
+    b: &mut bot::Bot,
+    recipient: usize,
+) -> [Vec<Vec<u8>>; 2] {
+    let deadline = Instant::now() + PATIENCE;
     let mut messages = [Vec::new(), Vec::new()];
     loop {
         let batch = collect(a, b, Duration::from_millis(5));
@@ -871,9 +918,6 @@ fn attack_result(a: &mut bot::Bot, b: &mut bot::Bot, recipient: usize) -> [Vec<V
         }
         assert!(Instant::now() < deadline, "committed HP did not arrive");
     }
-    let tail = collect(a, b, Duration::from_millis(100));
-    for i in 0..2 {
-        messages[i].extend(tail[i].clone());
-    }
+    drain_deliveries(f, a, b, &mut messages);
     messages
 }

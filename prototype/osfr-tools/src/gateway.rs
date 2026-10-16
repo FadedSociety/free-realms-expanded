@@ -494,6 +494,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(49), Some(2 | 14 | 15)) => "quest_engine",
         // Family 47 carries a one-byte subtype; word(2) would swallow the first body byte.
         (Some(47), _) if matches!(body.get(2), Some(12 | 13)) => "quest_engine",
+        // Family 59 also has a one-byte subtype: trade requests, answered as unavailable (W156, R).
+        (Some(59), _) if matches!(body.get(2), Some(3 | 6..=10)) => "trade_unavailable",
         (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
             "kart"
         }
@@ -1968,5 +1970,22 @@ mod radial_routing {
             application_handler(&[149, 0, 3]),
             "gameplay.handle_in_world"
         );
+    }
+
+    #[test]
+    fn trade_requests_are_forwarded_to_the_unavailable_answer() {
+        // Client trade senders: sub 3 reply, 6 accept, 7 cancel, 8 lock, 9 item, 10 coins.
+        for sub in [3u8, 6, 7, 8, 9, 10] {
+            assert_eq!(
+                application_handler(&[0x3b, 0, sub, 1, 0, 0, 0]),
+                "trade_unavailable"
+            );
+        }
+        // Server-only subs stay unknown, and so does a bare header.
+        assert_eq!(
+            application_handler(&[0x3b, 0, 5, 1, 0, 0, 0]),
+            "gameplay.handle_in_world"
+        );
+        assert_eq!(application_handler(&[0x3b, 0]), "gameplay.handle_in_world");
     }
 }

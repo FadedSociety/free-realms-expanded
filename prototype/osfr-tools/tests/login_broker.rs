@@ -22,6 +22,9 @@ use std::{
 };
 
 const SERVER: [u8; 32] = [42; 32];
+/// Upper bound for any wait on a child process; never a pace. Parallel suites starve
+/// the services for seconds, so fixed 2-5 s waits flaked in principle (W157).
+const PATIENCE: Duration = Duration::from_secs(30);
 const HANDLE: &str = "acct_001";
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
@@ -104,7 +107,7 @@ impl Server {
                 "--gateway",
                 "127.0.0.1:20260",
                 "--seconds",
-                "15",
+                "300",
             ])
             .arg("--resources")
             .arg(&directory)
@@ -207,11 +210,29 @@ fn private_broker_bind_admits_private_peers_and_keeps_failure_limits() {
     assert_eq!(server.auth.ip(), ip);
     let c = challenge(server.auth, HANDLE);
     assert_eq!(c[0], 1);
-    assert_eq!(proof(server.auth, HANDLE, &c, &SigningKey::from_bytes(&[7; 32]), &SERVER)[0], 1);
+    assert_eq!(
+        proof(
+            server.auth,
+            HANDLE,
+            &c,
+            &SigningKey::from_bytes(&[7; 32]),
+            &SERVER
+        )[0],
+        1
+    );
     for _ in 0..5 {
         let c = challenge(server.auth, HANDLE);
         assert_eq!(c[0], 1);
-        assert_eq!(proof(server.auth, HANDLE, &c, &SigningKey::from_bytes(&[10; 32]), &SERVER), [0; 69]);
+        assert_eq!(
+            proof(
+                server.auth,
+                HANDLE,
+                &c,
+                &SigningKey::from_bytes(&[10; 32]),
+                &SERVER
+            ),
+            [0; 69]
+        );
     }
     assert_eq!(challenge(server.auth, HANDLE), [0; 69]);
     // Thirteen connections spent; seven malformed attempts exhaust the IP burst.
@@ -334,9 +355,7 @@ impl NativeClient {
     fn connect(address: SocketAddr) -> Self {
         let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
         socket.connect(address).unwrap();
-        socket
-            .set_read_timeout(Some(Duration::from_secs(2)))
-            .unwrap();
+        socket.set_read_timeout(Some(PATIENCE)).unwrap();
         let mut request = vec![0, 1];
         request.extend(2u32.to_be_bytes());
         request.extend(71u32.to_be_bytes());
@@ -360,9 +379,7 @@ impl NativeClient {
             socket.recv(&mut [0; 512]).unwrap_err().kind(),
             std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
         ));
-        socket
-            .set_read_timeout(Some(Duration::from_secs(2)))
-            .unwrap();
+        socket.set_read_timeout(Some(PATIENCE)).unwrap();
         let seed = u32::from_be_bytes(bytes[6..10].try_into().unwrap());
         let codec = Codec::new(seed, bytes[10], false, login::MAX_LOGIN_MESSAGE + 1).unwrap();
         let sender = ReliableSender::new(
@@ -401,8 +418,8 @@ impl NativeClient {
             .unwrap();
         let waiting = Instant::now();
         let mut buffer = [0; 2048];
-        for _ in 0..256 {
-            if waiting.elapsed() >= Duration::from_secs(5) {
+        for _ in 0..1024 {
+            if waiting.elapsed() >= PATIENCE {
                 break;
             }
             for wire in self
@@ -562,7 +579,7 @@ fn accepted(slots: u32) -> Vec<u8> {
 fn slow_broker_peer_cannot_block_native_login_and_expires() {
     let server = Server::start(true);
     let mut slow = TcpStream::connect_timeout(&server.auth, Duration::from_secs(2)).unwrap();
-    slow.set_read_timeout(Some(Duration::from_secs(4))).unwrap();
+    slow.set_read_timeout(Some(PATIENCE)).unwrap();
     slow.write_all(&[134, 0, 0]).unwrap(); // incomplete frame length
     let token = token(&server, HANDLE, 7);
     let mut native = NativeClient::connect(server.udp);

@@ -168,6 +168,8 @@ pub struct Gameplay {
     saved_npc_quests: Option<crate::quest_engine::QuestState>,
     /// Quests a player may start remotely with 49/15 (R), each with its giver NPC.
     breadcrumb_quests: std::collections::BTreeMap<u32, u64>,
+    /// The "Take Me There" pin (47/14) the client currently shows; not saved.
+    tracked_pin: crate::quest_journal::Tracker,
     /// Regional quest state is sent once per network session, not after every zone load.
     npc_quests_synced: bool,
     game_rules: GameRuleSet,
@@ -683,6 +685,11 @@ impl Gameplay {
             if behaviours.is_file() {
                 engine.load_behaviours(&behaviours)?;
             }
+            // W158: combat power-up drop tables (slice 1 data, slice 2 drops).
+            let power_ups = npc_content.join("power_ups.json");
+            if power_ups.is_file() {
+                engine.load_power_ups(&power_ups)?;
+            }
             let job_abilities = npc_content.join("job_abilities.json");
             if job_abilities.is_file() {
                 if let Some(abilities) = abilities.as_mut() {
@@ -843,6 +850,7 @@ impl Gameplay {
             npc_quests: None,
             saved_npc_quests,
             breadcrumb_quests: std::collections::BTreeMap::new(),
+            tracked_pin: crate::quest_journal::Tracker::default(),
             npc_quests_synced: false,
             game_rules: GameRuleSet::default(),
             profile_content_directory: directory
@@ -2260,6 +2268,7 @@ impl Gameplay {
         if self.opening.is_none() {
             let mut out = self.initialization(character.position)?;
             self.append_npc_quest_login_sync(&mut out)?;
+            self.sync_tracked_target(character, &mut out);
             self.append_warp_definitions(character, &mut out);
             self.append_activity_list(&mut out);
             self.append_item_bar(now_ms, &mut out)?;
@@ -2348,6 +2357,7 @@ impl Gameplay {
         self.apply_encounter(result, &mut out)?;
         self.append_journal_updates(&before, &mut out)?;
         self.append_npc_quest_login_sync(&mut out)?;
+        self.sync_tracked_target(character, &mut out);
         self.append_warp_definitions(character, &mut out);
         self.append_activity_list(&mut out);
         self.append_item_bar(now_ms, &mut out)?;
@@ -2530,6 +2540,41 @@ impl Gameplay {
     }
 
     pub fn handle_in_world(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
+        self.sync_tracked_target(character, &mut out);
+        Ok(out)
+    }
+
+    /// Send the "Take Me There" pin (47/14) when the target of the character's own
+    /// selected quest changed: after selecting, progress, a zone change or login (R trigger
+    /// rules in `quest_journal::Tracker`). No place known means nothing is sent.
+    fn sync_tracked_target(&mut self, character: &CharacterState, out: &mut Outcome) {
+        let Some(engine) = &self.npc_quests else {
+            return;
+        };
+        let npc = |id: u64| {
+            let npcs = self.npc_interaction.as_ref()?.lock().ok()?;
+            npcs.location(id).map(|(_, position)| position)
+        };
+        let enemy = |kind: u32| self.encounter.as_ref()?.field_enemy_site(kind);
+        let poi = |id: u32| engine.poi_location(id);
+        let places = crate::quest_journal::Places {
+            npc: &npc,
+            enemy: &enemy,
+            poi: &poi,
+        };
+        let selected = engine.state().selected_quest_id;
+        let open = selected.map_or_else(Vec::new, |id| engine.current_objectives(id));
+        let wanted = crate::quest_journal::tracked_pin(selected, &open, character.zone_id, &places);
+        out.replies.extend(self.tracked_pin.update(wanted));
+    }
+
+    fn handle_in_world_inner(
         &mut self,
         inner: &[u8],
         character: &CharacterState,
@@ -3140,6 +3185,15 @@ impl Gameplay {
                 self.sync_field_quests(out)?;
             }
         }
+        if all || what == "power_ups" {
+            let path = dir.join("power_ups.json");
+            if path.is_file() {
+                if let Some(encounter) = self.encounter.as_mut() {
+                    encounter.load_power_ups(&path)?;
+                    done.push("power-ups");
+                }
+            }
+        }
         if all || what == "behaviours" {
             let path = dir.join("behaviours.json");
             if path.is_file() {
@@ -3166,7 +3220,7 @@ impl Gameplay {
         }
         if done.is_empty() {
             return Err(invalid(
-                "unknown target; use realm reload [all|battles|enemies|abilities|behaviours|placements]",
+                "unknown target; use realm reload [all|battles|enemies|abilities|behaviours|power_ups|placements]",
             ));
         }
         Ok(done.join(", "))
@@ -3187,6 +3241,8 @@ impl Gameplay {
         let mut lines = vec![format!("Battle {battle}, job {profile} (scripted bot):")];
         for level in [1_u32, 5, 10, 15, 20] {
             let mut engine = base.clone();
+            // The scripted bot must not be helped by power-up hearts.
+            engine.unload_power_ups();
             engine.set_player_job(profile, level);
             if let Err(error) = engine.begin(battle, character.clone(), profile) {
                 return Ok(vec![format!("Cannot simulate battle {battle}: {error}")]);
@@ -7041,6 +7097,121 @@ mod w64_regional_quest_tests {
         assert_eq!(state(&game), before);
     }
 
+    fn tracked_pins(out: &Outcome) -> Vec<Vec<u8>> {
+        out.replies
+            .iter()
+            .filter(|packet| packet.starts_with(&[47, 0, 14]))
+            .cloned()
+            .collect()
+    }
+
+    fn select_packet(quest_id: u32) -> Vec<u8> {
+        let mut select = vec![47, 0, 12];
+        select.extend((quest_id as i32).to_le_bytes());
+        select
+    }
+
+    #[test]
+    fn take_me_there_pin_follows_the_selected_quest() {
+        let (mut game, character) = offer_test_game(false);
+        let mut accept = vec![49, 0, 2, 0, 0, 0];
+        accept.extend((INTRODUCE_YOURSELF_ID as i32).to_le_bytes());
+        accept.push(1);
+        let out = game.handle_in_world(&accept, &character, 1_005).unwrap();
+        // Accepting does not select the quest, and nothing is pinned for an unselected one.
+        assert_eq!(
+            game.npc_quests.as_ref().unwrap().state().selected_quest_id,
+            None
+        );
+        assert!(tracked_pins(&out).is_empty());
+
+        // Selecting the active quest pins its talk objective once: Ricky Danger's spot.
+        let select = select_packet(INTRODUCE_YOURSELF_ID);
+        let first = game.handle_in_world(&select, &character, 1_006).unwrap();
+        let mut expected = vec![47, 0, 14, 1];
+        expected.extend(INTRODUCE_YOURSELF_ID.to_le_bytes());
+        expected.extend(0u32.to_le_bytes());
+        expected.extend(1u32.to_le_bytes());
+        expected.extend(9_500_000_254u64.to_le_bytes());
+        expected.extend(0u32.to_le_bytes());
+        for float in [-1909.511f32, -44.3937, 462.83, 1.0] {
+            expected.extend(float.to_le_bytes());
+        }
+        expected.extend(0u32.to_le_bytes());
+        assert_eq!(tracked_pins(&first), vec![expected]);
+
+        // Repeating the selection, or any unrelated packet, does not resend it.
+        let again = game.handle_in_world(&select, &character, 1_007).unwrap();
+        assert!(tracked_pins(&again).is_empty());
+
+        // A forged id is refused by the engine, so the pin stays where it was.
+        let forged = select_packet(999_999);
+        let out = game.handle_in_world(&forged, &character, 1_008).unwrap();
+        assert!(tracked_pins(&out).is_empty());
+
+        // Leaving the pin's zone clears it; coming back sends it again.
+        let away = CharacterState {
+            zone_id: 9_600,
+            ..character.clone()
+        };
+        let out = game.handle_in_world(&select, &away, 1_009).unwrap();
+        assert_eq!(tracked_pins(&out), vec![vec![47, 0, 14, 0]]);
+        let out = game.handle_in_world(&select, &character, 1_010).unwrap();
+        assert_eq!(tracked_pins(&out).len(), 1);
+        assert_eq!(tracked_pins(&out)[0].len(), 48);
+    }
+
+    #[test]
+    fn kill_objective_pins_its_field_enemy() {
+        let (mut game, character) = offer_test_game(false);
+        let engine = game.npc_quests.as_mut().unwrap();
+        // "Defeat the Hooligan Delinquents" (kind 930050), a real enabled quest.
+        assert!(engine.dev_mark_offered(3_030_007));
+        assert!(engine.accept(3_030_007).changed);
+        let content = bundled_content();
+        let file: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(content.join("field_enemies.json")).unwrap())
+                .unwrap();
+        let home = file["enemies"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|enemy| enemy["definition_id"] == 930_050)
+            .min_by_key(|enemy| enemy["guid"].as_u64().unwrap())
+            .unwrap();
+        let out = game
+            .handle_in_world(&select_packet(3_030_007), &character, 1_005)
+            .unwrap();
+        let pins = tracked_pins(&out);
+        assert_eq!(pins.len(), 1);
+        assert_eq!(
+            pins[0][16..24],
+            home["guid"].as_u64().unwrap().to_le_bytes()
+        );
+        let position: [f32; 3] = serde_json::from_value(home["position"].clone()).unwrap();
+        for (axis, value) in position.iter().enumerate() {
+            assert_eq!(pins[0][28 + 4 * axis..32 + 4 * axis], value.to_le_bytes());
+        }
+    }
+
+    #[test]
+    fn an_objective_without_a_known_place_sends_no_pin() {
+        let (mut game, character) = offer_test_game(false);
+        let engine = game.npc_quests.as_mut().unwrap();
+        // Kind 930096 has no field enemy, so the kill step has no known place.
+        assert!(engine.dev_mark_offered(3_110_002));
+        assert!(engine.accept(3_110_002).changed);
+        let out = game
+            .handle_in_world(&select_packet(3_110_002), &character, 1_005)
+            .unwrap();
+        assert!(out.changed);
+        assert!(tracked_pins(&out).is_empty());
+        let again = game
+            .handle_in_world(&select_packet(3_110_002), &character, 1_006)
+            .unwrap();
+        assert!(tracked_pins(&again).is_empty());
+    }
+
     #[test]
     fn native_save_samantha_uses_localized_quest_offer_and_reply_state() {
         let content = bundled_content();
@@ -7868,6 +8039,29 @@ mod w64_regional_quest_tests {
             level_five.last().unwrap().len()
         );
         std::fs::remove_dir_all(dir).ok();
+    }
+
+    /// W158 patch B: `realm reload power_ups` loads the drop tables (it used to
+    /// be an unknown target), and a broken file is refused with the old tables kept.
+    #[test]
+    fn power_up_tables_reload_by_name() {
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        let dir = std::env::temp_dir().join(format!("osfr-power-reload-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::copy(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/power_ups.json"),
+            dir.join("power_ups.json"),
+        )
+        .unwrap();
+        game.content_dir = dir.clone();
+        let mut out = Outcome::default();
+        let reply = game.reload_content("power_ups", &mut out).unwrap();
+        assert!(reply.contains("power-ups"), "{reply}");
+        std::fs::write(dir.join("power_ups.json"), b"{ not json").unwrap();
+        assert!(game.reload_content("power_ups", &mut out).is_err());
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     /// Lead: a 4-byte 167/1/4 refresh returns the whole activity list, so it is

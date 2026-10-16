@@ -7,6 +7,7 @@
 use crate::{
     abilities::{EffectRecipient, JobEffect},
     character_store::CharacterState,
+    power_ups::{self, PowerUps, Rng},
     terrain::Terrain,
 };
 use serde::{Deserialize, Serialize};
@@ -102,6 +103,14 @@ const COMBAT_PROFILE_TYPE: i32 = 2;
 const ENERGY_STEP: i32 = 2;
 const ENERGY_STEP_MS: u64 = 500;
 pub const GUIDE_GUID: u64 = 0x4f50_454e_0000_f001;
+/// Power-up pickup actors get `"PWUP"` plus a per-player serial (R). They are
+/// personal to the killer, so the serial only has to be unique per engine.
+const PICKUP_GUID_BASE: u64 = 0x5057_5550_0000_0000;
+/// SFX_PowerUp_Pickup composite (ActorCompositeEffectDefinitions.xml 15509,
+/// Combat Power-ups note 1.1); played at the pickup when it is collected.
+const POWER_UP_PICKUP_EFFECT: i32 = 15509;
+/// The client's own tutorial line, shown when a second stored kind is refused.
+const ONE_POWER_UP_TEXT: &str = "You can have one power up active at a time.";
 /// Local reconstructed objective award. The original encounter scoring table
 /// was not recovered, so the completed objective's value doubles as the won
 /// total; a loss awards nothing and no per-kill points are invented.
@@ -218,6 +227,11 @@ struct Actor {
     /// A `behaviours.json` preset name, or `{"preset": ..., overrides}`.
     #[serde(default)]
     behaviour: Option<serde_json::Value>,
+    /// Drop table id in `power_ups.json`; absent means this enemy drops nothing
+    /// (training dummies and summoned minions stay off the table so they cannot
+    /// be farmed).
+    #[serde(default)]
+    power_up_table: Option<String>,
 }
 
 /// Summon presentation (R): the arm-swirl cast and the client's troll spawn
@@ -623,6 +637,10 @@ pub struct EncounterOutcome {
     pub completed: Option<u32>,
     pub defeated: Vec<i32>,
     pub feedback: Option<String>,
+    /// A group heal power-up was picked up: percent of max health for the other
+    /// group members (the engine heals only its own player; the gateway routes
+    /// this to the rest of the group).
+    pub group_heal_percent: Option<u32>,
 }
 
 #[derive(Clone)]
@@ -690,6 +708,26 @@ pub struct EncounterEngine {
     // (rebuilt whenever content or presets load).
     behaviour_presets: BTreeMap<String, Behaviour>,
     behaviour_of: BTreeMap<u64, Behaviour>,
+    // Combat power-ups (session only, never saved: a pickup lasts seconds and
+    // the held kind is not a bag item, so it cannot be traded or duplicated).
+    power_ups: Option<Arc<PowerUps>>,
+    power_up_rng: Option<Rng>,
+    pickups: Vec<PowerUpDrop>,
+    next_pickup: u64,
+    /// The single stored power-up (kind id in `power_ups.json`). Slice 3 shows
+    /// it in the key-3 slot and takes it on use; nothing else reads it.
+    held_power_up: Option<String>,
+}
+
+/// A pickup actor on the ground, owned by the player whose kill dropped it.
+#[derive(Clone)]
+struct PowerUpDrop {
+    guid: u64,
+    kind: String,
+    position: [f32; 3],
+    expires_ms: u64,
+    /// The one-at-a-time refusal was already shown for this pickup.
+    told: bool,
 }
 
 #[derive(Clone)]
@@ -1511,9 +1549,37 @@ impl EncounterEngine {
             terrain: None,
             behaviour_presets: BTreeMap::new(),
             behaviour_of: BTreeMap::new(),
+            power_ups: None,
+            power_up_rng: None,
+            pickups: Vec::new(),
+            next_pickup: 0,
+            held_power_up: None,
         };
         engine.rebuild_behaviours()?;
         Ok(engine)
+    }
+
+    /// Load `power_ups.json` (also a hot reload). A bad file is an `Err` and
+    /// the previous tables stay in force.
+    pub fn load_power_ups(&mut self, path: &Path) -> io::Result<()> {
+        let power_ups = PowerUps::load(path)?;
+        if self.power_up_rng.is_none() {
+            self.power_up_rng = Some(Rng::from_entropy()?);
+        }
+        self.power_ups = Some(Arc::new(power_ups));
+        Ok(())
+    }
+
+    /// Drop nothing from now on. The balance simulator fights on a clone of
+    /// this engine and must not be helped by hearts it never earned.
+    pub fn unload_power_ups(&mut self) {
+        self.power_ups = None;
+        self.pickups.clear();
+    }
+
+    /// The stored power-up, if any (slice 3 reads it for the key-3 slot).
+    pub fn held_power_up(&self) -> Option<&str> {
+        self.held_power_up.as_deref()
     }
 
     /// Load `behaviours.json` presets (also a hot reload).
@@ -1658,6 +1724,18 @@ impl EncounterEngine {
         }
         self.field = field;
         self.rebuild_behaviours()
+    }
+
+    /// Guid and home position of the lowest-guid field enemy of this kind: where a kill
+    /// objective's "Take Me There" pin points (R). Present or not, so it works for a quest
+    /// whose enemies appear only once it is active.
+    pub fn field_enemy_site(&self, definition_id: u32) -> Option<(u64, [f32; 3])> {
+        let definition_id = i32::try_from(definition_id).ok()?;
+        self.field
+            .iter()
+            .filter(|f| f.actor.definition_id == definition_id)
+            .min_by_key(|f| f.actor.guid)
+            .map(|f| (f.actor.guid, f.actor.position))
     }
 
     /// Developer teleport targets for living field enemies (zone 0).
@@ -2608,6 +2686,9 @@ impl EncounterEngine {
         self.enemy_attacks.clear();
         self.moving.clear();
         self.kiting.clear();
+        // Zoning wipes the client's actors, so the pickups go with them. The
+        // held power-up stays: it belongs to the player, not the zone.
+        self.pickups.clear();
     }
     fn dungeon(&self) -> Option<&Dungeon> {
         self.state.active.as_ref().and_then(|a| {
@@ -3185,7 +3266,9 @@ impl EncounterEngine {
         }
         let (definition, max_health, boss) = (a.definition_id, a.max_health, a.boss);
         let target_name = a.name.clone();
+        let drop_table = a.power_up_table.clone();
         let health = s.health;
+        let killed_at = s.position;
         // A summoner is shielded while its minions stand: clear them first.
         let damage = if self.shielded(guid) {
             0
@@ -3354,8 +3437,147 @@ impl EncounterEngine {
                 ]);
             }
         }
+        // A won encounter is over: its zone is about to close, nothing to pick up.
+        if hp == 0
+            && self
+                .state
+                .active
+                .as_ref()
+                .is_none_or(|a| a.phase == EncounterPhase::Fighting)
+        {
+            if let Some(table) = drop_table {
+                self.drop_power_ups(&table, killed_at, now_ms, &mut out);
+            }
+        }
         self.present_results(&mut out);
         Ok(out)
+    }
+
+    /// Roll `table` for a kill at `at` and spawn each drop as a pickup actor.
+    /// An unknown table, no loaded file or a full ground drops nothing.
+    fn drop_power_ups(
+        &mut self,
+        table: &str,
+        at: [f32; 3],
+        now_ms: u64,
+        out: &mut EncounterOutcome,
+    ) {
+        let ground = self.ground();
+        let Some(power_ups) = self.power_ups.clone() else {
+            return;
+        };
+        let (Some(table), Some(rng)) = (power_ups.table(table), self.power_up_rng.as_mut()) else {
+            return;
+        };
+        let kinds = power_ups::roll(table, rng);
+        for (i, kind_id) in kinds.into_iter().enumerate() {
+            let Some(kind) = power_ups.kind(kind_id) else {
+                continue;
+            };
+            if self.pickups.len() >= power_ups.pickup.max_alive_per_instance as usize {
+                break;
+            }
+            self.next_pickup += 1;
+            let guid = PICKUP_GUID_BASE | self.next_pickup;
+            // (R) Several drops from one kill sit side by side, not stacked.
+            let position = ground.snapped([at[0] + i as f32 * 0.8, at[1], at[2]]);
+            let actor = Actor {
+                guid,
+                definition_id: 0,
+                model_id: kind.model_id as i32,
+                name_id: kind.name_id.unwrap_or(0) as i32,
+                name: kind_id.to_owned(),
+                texture_alias: String::new(),
+                position,
+                max_health: 1,
+                damage: 0,
+                level: 1,
+                boss: false,
+                stages: Vec::new(),
+                summon_below_percent: None,
+                skittish: false,
+                scale: kind.scale.map(|s| s as f32),
+                behaviour: None,
+                power_up_table: None,
+            };
+            // Disposition 1 (neutral): 0 is hostile and would be Tab-targeted.
+            out.replies.push(self.spawn(&actor, position, 1));
+            self.pickups.push(PowerUpDrop {
+                guid,
+                kind: kind_id.to_owned(),
+                position,
+                expires_ms: now_ms.saturating_add(u64::from(power_ups.pickup.ttl_ms)),
+                told: false,
+            });
+        }
+    }
+
+    /// Despawn expired pickups and collect the ones the player stands on. The
+    /// position is the server's own (never a client claim).
+    fn tick_power_ups(&mut self, position: [f32; 3], now_ms: u64, out: &mut EncounterOutcome) {
+        let Some(power_ups) = self.power_ups.clone() else {
+            return;
+        };
+        let radius = power_ups.pickup.radius as f32;
+        for mut drop in std::mem::take(&mut self.pickups) {
+            let collected = now_ms < drop.expires_ms
+                && self.state.player_health > 0
+                && horizontal_distance(position, drop.position) <= radius
+                && self.collect_power_up(&mut drop, &power_ups, out);
+            if collected || now_ms >= drop.expires_ms {
+                out.replies.push(remove(drop.guid));
+            } else {
+                self.pickups.push(drop);
+            }
+        }
+    }
+
+    /// Apply one pickup. `false` leaves it on the ground (the player already
+    /// holds a power-up and this kind is stored, not automatic).
+    fn collect_power_up(
+        &mut self,
+        drop: &mut PowerUpDrop,
+        power_ups: &PowerUps,
+        out: &mut EncounterOutcome,
+    ) -> bool {
+        // A reload that removed the kind just clears the stale pickup.
+        let Some(kind) = power_ups.kind(&drop.kind) else {
+            return true;
+        };
+        if !kind.auto {
+            if self.held_power_up.is_some() {
+                if !drop.told && out.feedback.is_none() {
+                    out.feedback = Some(ONE_POWER_UP_TEXT.into());
+                    drop.told = true;
+                }
+                return false;
+            }
+            self.held_power_up = Some(drop.kind.clone());
+        }
+        if let Some(percent) = kind.heal_pct_max {
+            let before = self.state.player_health;
+            out.replies.extend(self.heal_player_percent(percent));
+            let healed = (self.state.player_health - before) as i32;
+            if healed > 0 {
+                out.replies
+                    .push(crate::abilities::build_hitpoint_delta(1, 1, healed));
+                out.changed = true;
+            }
+            if kind.group {
+                out.group_heal_percent = Some(percent.min(100));
+            }
+        }
+        if let Some(energy) = kind.energy {
+            self.energy = self.energy.saturating_add(energy as i32).min(ENERGY_MAX);
+            out.replies
+                .push(crate::abilities::build_energy(self.energy, ENERGY_MAX));
+        }
+        out.replies.push(composite_effect(
+            self.shared_sender.unwrap_or(1),
+            POWER_UP_PICKUP_EFFECT,
+            drop.position,
+        ));
+        true
     }
 
     /// The summoner was hit down to `hp`: every dormant minion whose
@@ -3418,6 +3640,17 @@ impl EncounterEngine {
     }
 
     pub fn tick(
+        &mut self,
+        position: [f32; 3],
+        profile_id: i32,
+        now_ms: u64,
+    ) -> io::Result<EncounterOutcome> {
+        let mut out = self.tick_encounter(position, profile_id, now_ms)?;
+        self.tick_power_ups(position, now_ms, &mut out);
+        Ok(out)
+    }
+
+    fn tick_encounter(
         &mut self,
         position: [f32; 3],
         _profile_id: i32,
@@ -4219,6 +4452,9 @@ fn validate_actor(a: &Actor) -> io::Result<()> {
         || a.max_health > 100000
         || a.damage > 1000
         || a.stages.len() > 32
+        || a.power_up_table
+            .as_ref()
+            .is_some_and(|t| t.is_empty() || t.len() > 64)
     {
         return Err(invalid("invalid encounter actor"));
     }

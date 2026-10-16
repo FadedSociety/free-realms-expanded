@@ -483,6 +483,14 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("quest_engine", select));
     result.push(("quest_engine", vec![47, 0, 13, 2]));
     result.push(("quest_engine", vec![47, 0, 0xff, 0xff]));
+    // Family 59 uses a one-byte subtype like 47: every client trade sub, then the wildcard.
+    for sub in [3u8, 6, 7, 8, 9, 10] {
+        let mut p = vec![59, 0, sub];
+        p.extend(u32::MAX.to_le_bytes());
+        p.extend(vec![0xff; 8]);
+        result.push(("trade_unavailable", p));
+    }
+    result.push(("trade_unavailable", vec![59, 0, 0xff, 0xff]));
     result.push(("kart", words(26, 42, &[])));
     // 33/* routes as a family, even unknown subtypes. Include all implemented client cases.
     for sub in [2, 6, 7, 9, 10, 17, 19, 22, 0xffff] {
@@ -651,6 +659,26 @@ fn t3_routed_hostile_corpus_content_and_trace_on_off() {
         start.elapsed()
     );
     assert!(start.elapsed() < Duration::from_secs(60));
+}
+
+#[test]
+fn trade_requests_reach_the_binary_with_gameplay_loaded() {
+    // W156: gameplay answers nothing for family 59, so only the handler label forwards it
+    // to the gateway binary's trade_unavailable route (otherwise it is rejected as unknown).
+    let fixture = Fixture::new();
+    for trace in [false, true] {
+        let mut gateway = fixture.gateway(true, trace);
+        let mut offer = vec![59, 0, 9];
+        offer.extend(7u32.to_le_bytes());
+        offer.extend([1, 0, 0, 0, 2, 0, 0, 0]);
+        let out = gateway.handle_at(&wrap(&offer), NOW).unwrap();
+        assert!(
+            out.applications
+                .iter()
+                .any(|application| *application == offer),
+            "59/9 must be forwarded, trace={trace}"
+        );
+    }
 }
 
 #[test]
