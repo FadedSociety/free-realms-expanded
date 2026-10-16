@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "basics": [
+    {
+      "profile_id": 2,
+      "definition_id": 4895,
+      "name_id": 20217,
+      "description_id": 0,
+      "icon_id": 14813,
+      "weapon_name_id": 131975
+    },
+    {
+      "profile_id": 32,
+      "definition_id": 4895,
+      "name_id": 420252,
+      "description_id": 0,
+      "icon_id": 14104,
+      "weapon_name_id": 13699
+    },
+    {
+      "profile_id": 12,
+      "definition_id": 4895,
+      "name_id": 17071,
+      "description_id": 0,
+      "icon_id": 14434,
+      "weapon_name_id": 11056
+    }
+  ],
+  "provenance": {
+    "scope": "W85 additive basic rows only. Merge by profile_id into the private campaign's opening-abilities.json; preserve its Brawler, Medic and Archer rows. Gameplay does not load this repository file automatically. See notes/Research/Job Basic Attacks.md.",
+    "source": [
+      {
+        "kind": "client",
+        "evidence": "Shipped locale Global.Text.20217 = Lightning Strike, 420252 = Sweeping Slash, 17071 = Zap; weapon names 131975, 13699, 11056. Resources/Images/Images.txt rows 10898, 10189, 10519 confirm icon ids 14813, 14104, 14434. Resources/WieldTypeAnimationMappings.txt rows 11, 14, 12 map Ninja/Warrior/Wizard wield types 9/12/10 to swing group 1099. Ability-definition reader 00a32930 and lookup/request 00a34d10 consume server-supplied ids; no original job ability id is recovered here."
+      },
+      {
+        "kind": "reference",
+        "evidence": "Sanctuary 4f028dcc274f628b65ef665fd59b184f5f3d3e3e Resources/CombatJobs.json profiles 2,32,12 and CombatAbilities.json rows 2154,5011,4011 supply the starter/name/icon bindings and definition_id 4895. Those combat row ids are community keys, not retail ids. https://github.com/Open-Source-Free-Realms/Sanctuary (AGPL-3.0); data reference only, no source code copied."
+      },
+      {
+        "kind": "reference",
+        "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Resources/ClientItemDefinitions.json items 75091 (Ninja), 29963 (Warrior), 4914 (Wizard) supply weapon_name_id. https://github.com/raisingkaines/FreeRealms-Legacy (AGPL-3.0); weapon-to-ability bindings remain reference evidence. W82 owns starter inventory/equipment delivery."
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "(R) Reuse the existing basic slot 0, zero-cost immediate single-target strike and definition id 4895. Runtime encounter.rs already sets Ninja 3m/100, Warrior 3m/110, Wizard 20m/130, 600ms repeat gate, and damage x1.75^(tier-1) at levels 1/4/5/8/12. No balance, AoE, projectile, weapon enforcement or timing code is added. Original ids, clip duration, range, recast and historical damage are not recovered."
+      }
+    ]
+  }
+}

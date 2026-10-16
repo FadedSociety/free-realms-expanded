@@ -1,0 +1,19 @@
+# Scratch gateway only. Unlock profile 12 in the scratch profiles.json default_state.
+# Existing 26/13 class switch; this checkout has no realm job command.
+raw 1a000d000c000000
+expect 38 21
+expect 36 13
+expect 36 5
+chat realm level 4
+expect 15 3
+chat realm battle 411
+expect 41 114
+wait 700
+move 291 28 289
+wait 100
+ability 0 5715144128442986753
+expect 32 7
+expect 35 3
+chat realm fightlog
+expect-text dealt 150
+quit
