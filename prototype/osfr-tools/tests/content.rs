@@ -5,8 +5,11 @@ use serde_json::Value;
 use std::{
     fs,
     path::{Path, PathBuf},
+    sync::atomic::{AtomicU64, Ordering},
     time::{SystemTime, UNIX_EPOCH},
 };
+
+static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
 struct FixtureDir(PathBuf);
 
@@ -25,7 +28,11 @@ fn copied_fixture() -> FixtureDir {
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_nanos();
-    let target = std::env::temp_dir().join(format!("osfr-content-{}-{stamp}", std::process::id()));
+    let target = std::env::temp_dir().join(format!(
+        "osfr-content-{}-{stamp}-{}",
+        std::process::id(),
+        NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
+    ));
     fs::create_dir(&target).unwrap();
     for entry in fs::read_dir(fixture_dir()).unwrap() {
         let entry = entry.unwrap();

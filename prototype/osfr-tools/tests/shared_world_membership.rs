@@ -46,8 +46,12 @@ impl Fixture {
         let root = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../..")
             .join(format!(
-                "lab/reports/shared-world-w108/slice-1/socket-{}",
-                std::process::id()
+                "lab/reports/shared-world-w108/slice-1/socket-{}-{}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .expect("fixture clock precedes Unix epoch")
+                    .as_nanos()
             ));
         assert!(!root.exists(), "scratch fixture already exists");
         fs::create_dir_all(&root).unwrap();

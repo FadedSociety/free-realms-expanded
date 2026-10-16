@@ -13,9 +13,11 @@
 //!   expect-text <text>          wait for a server message whose bytes contain <text>
 //!   quit                        disconnect and stop
 //! `expect` looks at messages received since the latest sending step.
+use ed25519_dalek::{Signer, SigningKey};
 use osfr_tools::{
     account_store::AccountStore,
     chat, login,
+    login_auth::{login_handle_hash, signing_message},
     session::decode_controls,
     soe::{
         CUMULATIVE_ACK, Codec, RELIABLE_DATA, RELIABLE_FRAGMENT, ReliableReceiver, SELECTIVE_ACK,
@@ -25,8 +27,9 @@ use osfr_tools::{
 use std::{
     collections::VecDeque,
     fs,
-    net::{SocketAddr, UdpSocket},
-    path::PathBuf,
+    io::{Read, Write},
+    net::{SocketAddr, TcpStream, UdpSocket},
+    path::{Path, PathBuf},
     time::{Duration, Instant},
 };
 
@@ -246,19 +249,33 @@ pub struct Bot {
     /// Set by ClientBeginZoning (31); the gateway waits for ready/loaded again.
     rezone: bool,
     in_world: bool,
+    login_crypto: Option<(login::Rc4, login::Rc4)>,
 }
 
 impl Bot {
     pub fn connect(config: BotConfig) -> Result<Self, String> {
-        let socket = UdpSocket::bind("127.0.0.1:0").map_err(|e| format!("bind: {e}"))?;
+        Self::connect_protocol(config, None)
+    }
+
+    fn connect_protocol(config: BotConfig, key: Option<&[u8]>) -> Result<Self, String> {
+        let socket = UdpSocket::bind(if config.gateway.is_ipv6() {
+            "[::1]:0"
+        } else {
+            "127.0.0.1:0"
+        })
+        .map_err(|e| format!("bind: {e}"))?;
         socket
             .set_read_timeout(Some(Duration::from_millis(10)))
             .map_err(|e| e.to_string())?;
         let mut request = vec![0, 1];
-        request.extend(3u32.to_be_bytes()); // CRC length
+        request.extend(if key.is_some() { 2u32 } else { 3 }.to_be_bytes());
         request.extend(config.connection_id.to_be_bytes());
         request.extend(512u32.to_be_bytes()); // buffer size
-        request.extend(b"CGAPI_527\0");
+        request.extend(if key.is_some() {
+            b"LoginUdp_6\0".as_slice()
+        } else {
+            b"CGAPI_527\0"
+        });
         let mut response = [0u8; 64];
         let mut handshake = None;
         for _ in 0..10 {
@@ -294,14 +311,19 @@ impl Bot {
         let seed = u32::from_be_bytes(response[6..10].try_into().unwrap());
         let crc_length = response[10];
         let compression = response[11] != 0;
+        let max_message = if key.is_some() {
+            login::MAX_LOGIN_MESSAGE + 1
+        } else {
+            MAX_MESSAGE
+        };
         let codec =
-            Codec::new(seed, crc_length, compression, MAX_MESSAGE).map_err(|e| e.to_string())?;
+            Codec::new(seed, crc_length, compression, max_message).map_err(|e| e.to_string())?;
         let sender = ReliableSender::new(
             codec.clone(),
             SenderConfig {
                 datagram_limit: 512,
                 window: 32,
-                max_message: MAX_MESSAGE,
+                max_message,
                 max_queued_bytes: 32 * 1024 * 1024,
                 retry_ms: 250,
                 max_retries: 40,
@@ -309,7 +331,7 @@ impl Bot {
         )
         .map_err(|e| e.to_string())?;
         let bot = Self {
-            receiver: ReliableReceiver::new(0, 1024, MAX_MESSAGE, 2 * 1024 * 1024)
+            receiver: ReliableReceiver::new(0, 1024, max_message, 2 * 1024 * 1024)
                 .map_err(|e| e.to_string())?,
             config,
             socket,
@@ -321,6 +343,14 @@ impl Bot {
             received: Vec::new(),
             rezone: false,
             in_world: false,
+            login_crypto: key
+                .map(|key| {
+                    Ok::<_, String>((
+                        login::Rc4::new(key).map_err(|_| "invalid login transport key")?,
+                        login::Rc4::new(key).map_err(|_| "invalid login transport key")?,
+                    ))
+                })
+                .transpose()?,
         };
         bot.log(&format!("connected seed={seed:08x} crc={crc_length}"));
         Ok(bot)
@@ -368,8 +398,18 @@ impl Bot {
     pub fn send_message(&mut self, message: &[u8], what: &str) -> Result<(), String> {
         self.inbox.clear();
         self.log(&format!("-> {what} len={}", message.len()));
+        let mut framed = Vec::new();
+        if let Some((_, tx)) = &mut self.login_crypto {
+            framed.extend_from_slice(message);
+            tx.apply(&mut framed);
+            framed = login::frame_ciphertext(&framed).map_err(|_| "invalid login frame")?;
+        }
         self.sender
-            .queue_message(message)
+            .queue_message(if self.login_crypto.is_some() {
+                &framed
+            } else {
+                message
+            })
             .map_err(|e| format!("queue: {e}"))?;
         self.flush()
     }
@@ -382,7 +422,14 @@ impl Bot {
         let mut buffer = [0u8; 65_535];
         let (mut cumulative, mut selective) = (None::<u16>, Vec::<u16>::new());
         let mut received_any = false;
-        loop {
+        // (R) A flooding login peer must not keep service() past the caller's
+        // deadline. Leave ordinary gateway draining unchanged.
+        let budget = if self.login_crypto.is_some() {
+            256
+        } else {
+            usize::MAX
+        };
+        for _ in 0..budget {
             let length = match self.socket.recv_from(&mut buffer) {
                 Ok((length, peer)) if peer == self.config.gateway => length,
                 Ok(_) => continue,
@@ -426,11 +473,24 @@ impl Bot {
                         }
                         let mut messages = Vec::new();
                         for message in outcome.messages {
-                            logical_messages(message, &mut messages);
+                            if let Some((rx, _)) = &mut self.login_crypto {
+                                for chunk in login::ciphertext_messages(&message)
+                                    .map_err(|_| "invalid login frame")?
+                                {
+                                    let mut plain = chunk.to_vec();
+                                    rx.apply(&mut plain);
+                                    messages.push(plain);
+                                }
+                            } else {
+                                logical_messages(message, &mut messages);
+                            }
                         }
                         for inner in messages {
+                            if self.login_crypto.is_some() && self.inbox.len() >= 32 {
+                                return Err("native login reply queue exceeds bound".into());
+                            }
                             let (family, sub) = family_of(&inner);
-                            if !self.config.quiet {
+                            if !self.config.quiet && self.login_crypto.is_none() {
                                 // Some families (39, 45) carry a one-byte sub-code.
                                 let label = sub.map_or(String::new(), |s| match s {
                                     0..=255 => format!("/{s}"),
@@ -594,9 +654,281 @@ pub fn run(config: BotConfig, steps: &[Step]) -> Result<Bot, String> {
     result.map(|_| bot)
 }
 
+// (R) Trusted local/tunnel profile. Paths resolve relative to this file. The
+// native RC4 key is transport configuration, never the Ed25519 private seed.
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BrokerProfile {
+    handle: String,
+    key_file: PathBuf,
+    server_id_file: PathBuf,
+    broker: SocketAddr,
+    login: SocketAddr,
+    login_key_file: PathBuf,
+}
+
+fn read_bounded(path: &Path, limit: u64) -> Result<Vec<u8>, String> {
+    let mut bytes = Vec::new();
+    fs::File::open(path)
+        .and_then(|f| f.take(limit + 1).read_to_end(&mut bytes))
+        .map_err(|_| "cannot read profile/key file")?;
+    if bytes.len() as u64 > limit {
+        return Err("profile/key file exceeds bound".into());
+    }
+    Ok(bytes)
+}
+
+fn auth_exchange(address: SocketAddr, body: &[u8]) -> Result<[u8; 69], String> {
+    let mut stream = TcpStream::connect_timeout(&address, Duration::from_secs(2))
+        .map_err(|_| "broker connection failed")?;
+    let deadline = Instant::now() + Duration::from_secs(3);
+    let mut frame = (body.len() as u32).to_le_bytes().to_vec();
+    frame.extend_from_slice(body);
+    let mut remaining = frame.as_slice();
+    while !remaining.is_empty() {
+        let timeout = deadline
+            .checked_duration_since(Instant::now())
+            .filter(|d| !d.is_zero())
+            .ok_or("broker deadline")?;
+        stream
+            .set_write_timeout(Some(timeout))
+            .map_err(|_| "broker I/O failed")?;
+        let n = stream.write(remaining).map_err(|_| "broker I/O failed")?;
+        if n == 0 {
+            return Err("broker closed".into());
+        }
+        remaining = &remaining[n..];
+    }
+    let mut reply = [0; 69];
+    let mut at = 0;
+    while at < reply.len() {
+        let timeout = deadline
+            .checked_duration_since(Instant::now())
+            .filter(|d| !d.is_zero())
+            .ok_or("broker deadline")?;
+        stream
+            .set_read_timeout(Some(timeout))
+            .map_err(|_| "broker I/O failed")?;
+        let n = stream
+            .read(&mut reply[at..])
+            .map_err(|_| "broker I/O failed")?;
+        if n == 0 {
+            return Err("broker closed".into());
+        }
+        at += n;
+    }
+    Ok(reply)
+}
+
+fn take<'a>(input: &mut &'a [u8], count: usize) -> Result<&'a [u8], String> {
+    let bytes = input.get(..count).ok_or("malformed native login reply")?;
+    *input = &input[count..];
+    Ok(bytes)
+}
+
+fn word(input: &mut &[u8]) -> Result<u32, String> {
+    Ok(u32::from_le_bytes(take(input, 4)?.try_into().unwrap()))
+}
+
+fn login_string<'a>(input: &mut &'a [u8], limit: usize) -> Result<&'a str, String> {
+    let count = word(input)? as usize;
+    if count > limit {
+        return Err("native login string exceeds bound".into());
+    }
+    std::str::from_utf8(take(input, count)?).map_err(|_| "invalid native login string".into())
+}
+
+fn login_request(client: &mut Bot, body: &[u8]) -> Result<Vec<u8>, String> {
+    client.send_message(body, "native login request")?;
+    client.wait_for(Duration::from_secs(5), |_| true)
+}
+
+/// AUTH2 is reconstructed policy (R). Native layouts reuse login.rs and the
+/// W94 reference client; provenance is in Key-pair Login Contract.md.
+fn broker_handoff(
+    path: &Path,
+    selected: Option<u64>,
+    connection_id: u32,
+) -> Result<(SocketAddr, u64, String), String> {
+    let profile: BrokerProfile =
+        serde_json::from_slice(&read_bounded(path, 4096)?).map_err(|_| "invalid broker profile")?;
+    login_handle_hash(&profile.handle).map_err(|_| "invalid account handle")?;
+    if !profile.broker.ip().is_loopback() || !profile.login.ip().is_loopback() {
+        return Err("broker/native login requires loopback or an encrypted tunnel".into());
+    }
+    let base = path.parent().unwrap_or(Path::new("."));
+    let pin = read_bounded(&base.join(profile.server_id_file), 32)?;
+    if pin.len() != 32 {
+        return Err("server identity must contain 32 raw bytes".into());
+    }
+    // (R) A harness may deliver its disposable seed through a private parent pipe.
+    let mut seed = if profile.key_file == Path::new("-") {
+        let mut seed = Vec::new();
+        std::io::stdin()
+            .take(33)
+            .read_to_end(&mut seed)
+            .map_err(|_| "cannot read key pipe")?;
+        seed
+    } else {
+        read_bounded(&base.join(profile.key_file), 32)?
+    };
+    let raw: &mut [u8; 32] = seed
+        .as_mut_slice()
+        .try_into()
+        .map_err(|_| "Ed25519 key must contain 32 raw bytes")?;
+    let signing = SigningKey::from_bytes(raw);
+    raw.fill(0);
+    let transport_key = read_bounded(&base.join(profile.login_key_file), 256)?;
+    login::Rc4::new(&transport_key).map_err(|_| "invalid login transport key")?;
+    let mut challenge = b"AUTH2\x01".to_vec();
+    put_string(&mut challenge, &profile.handle);
+    let challenge = auth_exchange(profile.broker, &challenge)?;
+    if challenge[0] != 1 {
+        return Err("broker refused".into());
+    }
+    if challenge[1..33] != pin {
+        return Err("server identity mismatch".into());
+    }
+    if u32::from_le_bytes(challenge[65..69].try_into().unwrap()) != 60 {
+        return Err("invalid broker lifetime".into());
+    }
+    let mut proof = b"AUTH2\x02".to_vec();
+    proof.extend_from_slice(&challenge[33..65]);
+    proof.extend(signing.verifying_key().to_bytes());
+    proof.extend(
+        signing
+            .sign(
+                &signing_message(
+                    pin.as_slice().try_into().unwrap(),
+                    challenge[33..65].try_into().unwrap(),
+                    &profile.handle,
+                )
+                .map_err(|_| "invalid signing transcript")?,
+            )
+            .to_bytes(),
+    );
+    let mut token = auth_exchange(profile.broker, &proof)?;
+    if token[0] != 1 {
+        return Err("broker refused".into());
+    }
+    if !token[1..33]
+        .iter()
+        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(b))
+        || token[33..].iter().any(|b| *b != 0)
+    {
+        return Err("invalid broker token reply".into());
+    }
+    println!("broker authenticated");
+    // No native UDP socket exists until the proof and identity have passed.
+    let mut client = Bot::connect_protocol(
+        BotConfig {
+            gateway: profile.login,
+            name: "login".into(),
+            connection_id,
+            guid: 0,
+            ticket: String::new(),
+            version: String::new(),
+            expect_timeout_ms: 5000,
+            quiet: true,
+        },
+        Some(&transport_key),
+    )?;
+    let result = (|| {
+        let mut body = vec![1];
+        body.extend(32u32.to_le_bytes());
+        body.extend_from_slice(&token[1..33]);
+        body.extend(0u32.to_le_bytes()); // Fingerprint: empty, no authority.
+        token.fill(0);
+        let sent = client.send_message(&body, "native Session login");
+        body.fill(0);
+        sent?;
+        let accepted = client.wait_for(Duration::from_secs(5), |_| true)?;
+        if accepted.get(..6) != Some(&[2, 1, 1, 0, 0, 0]) {
+            return Err("native login refused".into());
+        }
+        let list = login_request(&mut client, &[11])?;
+        let mut input = list.as_slice();
+        if take(&mut input, 1)? != [12] || word(&mut input)? != 1 {
+            return Err("character list refused".into());
+        }
+        if take(&mut input, 1)?[0] > 1 {
+            return Err("invalid character list".into());
+        }
+        let count = word(&mut input)?;
+        if count > 32 {
+            return Err("character list exceeds bound".into());
+        }
+        let mut choice = None;
+        for _ in 0..count {
+            let guid = u64::from_le_bytes(take(&mut input, 8)?.try_into().unwrap());
+            let server = word(&mut input)?;
+            let status = word(&mut input)?;
+            let length = word(&mut input)? as usize;
+            take(&mut input, length)?;
+            if status == 1 && selected.is_none_or(|id| id == guid) && choice.is_none() {
+                choice = Some((guid, server));
+            }
+        }
+        if !input.is_empty() {
+            return Err("trailing character list data".into());
+        }
+        let (guid, server) = choice.ok_or("selected character unavailable")?;
+        let mut body = vec![7];
+        body.extend(guid.to_le_bytes());
+        body.extend(server.to_le_bytes());
+        let mut data = Vec::new();
+        put_string(&mut data, "en_US");
+        data.extend(8i32.to_le_bytes());
+        data.extend([0, 0]);
+        data.extend([0; 8]);
+        body.extend((data.len() as u32).to_le_bytes());
+        body.extend(data);
+        let reply = login_request(&mut client, &body)?;
+        let mut input = reply.as_slice();
+        if take(&mut input, 1)? != [8]
+            || take(&mut input, 8)? != guid.to_le_bytes()
+            || word(&mut input)? != server
+            || word(&mut input)? != 1
+        {
+            return Err("character selection refused".into());
+        }
+        let length = word(&mut input)? as usize;
+        if input.len() != length {
+            return Err("invalid gateway handoff length".into());
+        }
+        let address: SocketAddr = login_string(&mut input, 128)?
+            .parse()
+            .map_err(|_| "invalid gateway address")?;
+        if !address.ip().is_loopback() {
+            return Err("gateway handoff requires loopback or an encrypted tunnel".into());
+        }
+        let ticket = login_string(&mut input, 128)?.to_owned();
+        let key = login_string(&mut input, 128)?;
+        if !matches!(ticket.len(), 16 | 24 | 32)
+            || !ticket.is_ascii()
+            || key != ticket
+            || take(&mut input, 8)? != guid.to_le_bytes()
+        {
+            return Err("invalid gateway credentials".into());
+        }
+        take(&mut input, 8)?;
+        for _ in 0..3 {
+            login_string(&mut input, 128)?;
+        }
+        if !input.is_empty() {
+            return Err("trailing gateway handoff data".into());
+        }
+        println!("native login selected character {guid}");
+        Ok((address, guid, ticket))
+    })();
+    client.disconnect();
+    result
+}
+
 const USAGE: &str = "usage: osfr-bot --gateway 127.0.0.1:PORT [--script FILE] [--cmd STEP]...
   [--guid N] [--ticket T] [--version V] [--reference DIR]
   [--account-store FILE --handoff-key-file FILE [--account N | --guid N]]
+  [--broker-profile FILE] (instead of direct gateway credentials; --guid selects a listed character)
   [--name NAME] [--connection-id N] [--expect-timeout MS] [--quiet]";
 
 fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
@@ -607,6 +939,7 @@ fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
         (None::<PathBuf>, None::<PathBuf>, None::<u64>);
     let (mut name, mut connection_id, mut expect_timeout_ms, mut quiet) = (None, None, 5000, false);
     let mut steps = Vec::new();
+    let mut broker_profile = None::<PathBuf>;
     while let Some(key) = args.next() {
         if key == "--quiet" {
             quiet = true;
@@ -630,6 +963,7 @@ fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
                         .map_err(|e| format!("--gateway: {e}"))?,
                 )
             }
+            "--broker-profile" => broker_profile = Some(value.into()),
             "--script" => {
                 let text = fs::read_to_string(&value).map_err(|e| format!("{value}: {e}"))?;
                 steps.extend(parse_script(&text).map_err(|e| format!("{value}: {e}"))?);
@@ -648,7 +982,25 @@ fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
             _ => return Err(format!("unknown option {key}\n{USAGE}")),
         }
     }
-    let gateway = gateway.ok_or_else(|| format!("--gateway is required\n{USAGE}"))?;
+    if let Some(profile) = broker_profile {
+        if gateway.is_some()
+            || ticket.is_some()
+            || reference.is_some()
+            || account_store.is_some()
+            || key_file.is_some()
+            || account.is_some()
+        {
+            return Err(
+                "--broker-profile cannot be combined with direct gateway credentials".into(),
+            );
+        }
+        let handoff = broker_handoff(&profile, guid, connection_id.unwrap_or(std::process::id()))?;
+        gateway = Some(handoff.0);
+        guid = Some(handoff.1);
+        ticket = Some(handoff.2);
+    }
+    let gateway =
+        gateway.ok_or_else(|| format!("--gateway or --broker-profile is required\n{USAGE}"))?;
     if let Some(reference) = &reference {
         // Default guid/version from the gateway reference manifest (single-save mode).
         let path = reference.join("manifest.json");

@@ -30,6 +30,48 @@ CLIENT_VERSION = "1.910.1.530630"
 MAX_EXPECT_MS = 15000
 
 
+def login_summary(run_dir: Path) -> dict:
+    if not list(run_dir.glob("*.profile.json")):
+        return {"broker_refusals": 0, "login_failures": 0, "native_logins": 0}
+    # Admission refusals are intentionally silent on the server. Count fixed
+    # client messages too, without treating an absent server event as success.
+    outputs = []
+    for path in (run_dir / "bots").glob("bot-*.stdout.log"):
+        outputs.append("\n".join(read_lines(path) + read_lines(path.with_name(path.name.replace(".stdout.", ".stderr.")))))
+    outputs.extend("\n".join(read_lines(p)) for p in (run_dir / "bots").glob("save-load-*.log"))
+    probe = run_dir / "bots" / "duplicate-session-probe.log"
+    if probe.is_file():
+        outputs.append("\n".join(read_lines(probe)))
+    server_events = sum('"event":"auth_refused"' in line
+        for name in ("login.stdout.log", "login.stderr.log") for line in read_lines(run_dir / name))
+    return {"broker_refusals": max(server_events, sum("broker refused" in text for text in outputs)),
+        "login_failures": sum("native login selected character" not in text for text in outputs),
+        "native_logins": sum("native login selected character" in text for text in outputs)}
+
+
+def scan_private_keys(run_dir: Path, records: list[dict]) -> dict:
+    import base64
+    secrets = []
+    for record in records:
+        value = record.get("private_seed")
+        if value:
+            secrets.extend([value, value.hex().encode(), base64.b64encode(value)])
+    matches = []
+    logs = [p for p in run_dir.rglob("*") if p.is_file() and p.suffix in (".log", ".jsonl")]
+    for path in logs:
+        data = path.read_bytes()
+        if any(secret in data for secret in secrets) or re.search(rb'(?i)(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', data):
+            matches.append(str(path.relative_to(run_dir)))
+    return {"files_scanned": len(logs), "private_keys_checked": len(secrets) // 3, "matches": matches}
+
+
+def run_bot(args: list[str], record: dict, run_dir: Path, timeout: float):
+    # Private seeds never enter argv, environment variables or persisted files.
+    result = subprocess.run(args, cwd=run_dir, input=record.get("private_seed"), capture_output=True, timeout=timeout)
+    return subprocess.CompletedProcess(args, result.returncode,
+        result.stdout.decode("utf-8", errors="replace"), result.stderr.decode("utf-8", errors="replace"))
+
+
 def now_utc() -> dt.datetime:
     return dt.datetime.now(dt.timezone.utc)
 
@@ -300,7 +342,7 @@ def write_login_resources(run_dir: Path) -> None:
     (creator / "ItemDefinitions.txt").write_text("\n".join(rows) + "\n", encoding="utf-8")
 
 
-def create_accounts(account_exe: Path, run_dir: Path, scenario: dict, bots: int) -> tuple[Path, list[dict]]:
+def create_accounts(account_exe: Path, run_dir: Path, scenario: dict, bots: int, broker_login: bool = False) -> tuple[Path, list[dict]]:
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
@@ -321,7 +363,18 @@ def create_accounts(account_exe: Path, run_dir: Path, scenario: dict, bots: int)
                 break
         if result is None or result.returncode:
             raise RuntimeError(f"osfr-account failed to create scratch account {index + 1}: {result.stderr.strip() if result else 'no result'}")
-        records.append({"account_id": index + 1, "guid": 1001 + index, "first": f"Test{chr(ord('A') + index)}", "last": BOT_LAST_NAME})
+        if broker_login:
+            private = Ed25519PrivateKey.generate()
+            login_public = private.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+            seed = private.private_bytes(serialization.Encoding.Raw, serialization.PrivateFormat.Raw, serialization.NoEncryption())
+            del private
+            # Exercise operator enrolment explicitly; remove the discarded bootstrap key.
+            for operation, enrolled in (("add-key", login_public), ("remove-key", public)):
+                result = run_command([str(account_exe), operation, "--store", str(store_path),
+                    "--account-id", str(index + 1), "--public-key", enrolled.hex()], run_dir)
+                if result.returncode:
+                    raise RuntimeError(f"osfr-account {operation} failed for scratch account {index + 1}")
+        records.append({"handle": handle, "account_id": index + 1, "guid": 1001 + index, "first": f"Test{chr(ord('A') + index)}", "last": BOT_LAST_NAME, **({"private_seed": seed} if broker_login else {})})
 
     document = load_json(store_path)
     store = document["store"]
@@ -490,6 +543,9 @@ def make_bot_script(index: int, record: dict, records: list[dict], scenario: dic
 
 
 def bot_args(bot_exe: Path, gateway_port: int, store: Path, handoff: Path, record: dict, name: str, script: Path) -> list[str]:
+    if "broker_profile" in record:
+        return [str(bot_exe), "--broker-profile", str(record["broker_profile"]), "--guid", str(record["guid"]),
+            "--name", name, "--version", CLIENT_VERSION, "--script", str(script), "--expect-timeout", str(MAX_EXPECT_MS)]
     return [
         str(bot_exe), "--gateway", f"127.0.0.1:{gateway_port}", "--account-store", str(store),
         "--handoff-key-file", str(handoff), "--guid", str(record["guid"]), "--name", name,
@@ -528,7 +584,15 @@ def bot_worker(index: int, state: dict, stop: threading.Event, registry: dict, r
             stderr_path = run_dir / "bots" / f"bot-{index + 1:02d}-session-{session_no:02d}.stderr.log"
             stdout_path.parent.mkdir(parents=True, exist_ok=True)
             with stdout_path.open("w", encoding="utf-8", buffering=1) as out, stderr_path.open("w", encoding="utf-8", buffering=1) as err:
-                proc = subprocess.Popen(args, cwd=run_dir, stdout=out, stderr=err, text=True, encoding="utf-8", errors="replace")
+                proc = subprocess.Popen(args, cwd=run_dir, stdout=out, stderr=err,
+                    stdin=subprocess.PIPE if "private_seed" in record else subprocess.DEVNULL)
+                if proc.stdin is not None:
+                    try:
+                        proc.stdin.write(record["private_seed"])
+                    except BrokenPipeError:
+                        pass  # The ordinary bot result records early profile/config refusal.
+                    finally:
+                        proc.stdin.close()
                 with registry_lock:
                     registry[record["guid"]] = proc
                 timeline("bot_session_started", {"bot": index + 1, "session": session_no, "phase": phase_no + 1, "pid": proc.pid})
@@ -564,7 +628,7 @@ def bot_worker(index: int, state: dict, stop: threading.Event, registry: dict, r
                 probe_args = bot_args(bin_dir / ("osfr-bot.exe" if os.name == "nt" else "osfr-bot"), gateway_port, store, handoff, record, bot_name, probe_path)
                 try:
                     # Login, ready, and the script expect each have their own deadline.
-                    probe = subprocess.run(probe_args, cwd=run_dir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=3 * MAX_EXPECT_MS / 1000 + 10)
+                    probe = run_bot(probe_args, record, run_dir, 3 * MAX_EXPECT_MS / 1000 + 10)
                 except subprocess.TimeoutExpired as error:
                     partial = error.stdout or ""
                     partial = partial.decode("utf-8", errors="replace") if isinstance(partial, bytes) else partial
@@ -694,7 +758,7 @@ def sample_save_load(gateway_exe: Path, bin_dir: Path, records: list[dict], veri
         script = run_dir / "bots" / f"save-load-{record['guid']}.txt"
         script.write_text("wait 200\nquit\n", encoding="utf-8")
         args = bot_args(bin_dir / ("osfr-bot.exe" if os.name == "nt" else "osfr-bot"), verify_port, store, handoff, record, f"Load{record['guid']}", script)
-        result = subprocess.run(args, cwd=run_dir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=20)
+        result = run_bot(args, record, run_dir, 20)
         (run_dir / "bots" / f"save-load-{record['guid']}.log").write_text(result.stdout + result.stderr, encoding="utf-8")
         results.append({"guid": record["guid"], "returncode": result.returncode, "loaded": result.returncode == 0, "error": "" if result.returncode == 0 else result.stderr[-1000:]})
     return process, results
@@ -855,6 +919,7 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         "",
         f"- Service exit codes: gateway `{gateway_exit}`, login `{login_exit}`.",
         f"- Bot sessions started: {bot_sessions}; bot errors: {bot_errors}.",
+        f"- Broker login: {metadata.get('broker_login', False)}; broker refusals: {login_summary(run_dir)['broker_refusals']}; login failures: {login_summary(run_dir)['login_failures']}.",
         f"- Duplicate-session refusals: {duplicate_refusals}; immediate reconnect probe refusals: {immediate_refusals}.",
         f"- Captured refusal/error events across service, bot, trace, and security logs: {len(error_events)}; security-log rows: {len(security_lines)}.",
         f"- SOE checksum mismatch rejections indexed: {len(checksum_mismatches) if metadata.get('trace', True) else 'unavailable (packet tracing disabled; not a zero-rejection claim)'}.",
@@ -937,7 +1002,8 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         "",
         "## Evidence boundaries and open gaps",
         "",
-        "- Bot actions use `osfr-bot`'s direct gateway HMAC-ticket path. The scratch `osfr-login` UDP service and loopback AUTH2 broker were started and their output captured, but this existing bot client does not authenticate through that login service.",
+        ("- Every bot session, including save reload, uses AUTH2, native Session login and character-select handoff. Profiles contain key paths and trusted identity; no HMAC key is given to bots."
+            if metadata.get("broker_login") else "- Bot actions use the direct gateway HMAC-ticket path; login/broker services are idle."),
         "- Accounts were created by the `osfr-account` CLI. Synthetic character identity/world-state records were added to the scratch account store because no standalone character-creation CLI exists; the gateway loader validated them at startup/reconnect. Native login UI character creation was not exercised.",
         "- The original packet layouts and client behavior are distinguished from local policy in the source and native notes. Quest/enemy gating, starting coordinates and wallet seed, movement pacing, stock mapping, and reconstructed quest rewards remain server/content policy (R), not recovered retail rules.",
         "- Field-enemy placements are reconstructed zone-0 data in `notes/Design/Field Enemies.md`; this run does not establish historical spawn geometry or production balance.",
@@ -963,6 +1029,7 @@ def main() -> int:
     parser.add_argument("--bots", type=int, default=10)
     parser.add_argument("--duration-seconds", type=int, default=3600)
     parser.add_argument("--trace", action="store_true", help="opt in to synchronous per-packet tracing (affects latency)")
+    parser.add_argument("--broker-login", action="store_true", help="AUTH2, native login and character-select handoff for every bot")
     parser.add_argument("--working-tree", action="store_true", help="freeze current crate sources over the HEAD snapshot")
     args = parser.parse_args()
     if not 1 <= args.bots <= 10:
@@ -970,6 +1037,8 @@ def main() -> int:
     if args.duration_seconds < 1:
         parser.error("--duration-seconds must be positive")
 
+    # Broker mode must exercise the owned uncommitted bot implementation.
+    args.working_tree = args.working_tree or args.broker_login
     script_path = Path(__file__).resolve()
     root = script_path.parents[2]
     lab = root.parent / "lab"
@@ -977,7 +1046,7 @@ def main() -> int:
     # stage_head may recursively remove only this exact child of the lab build root.
     if build_dir.parent != (lab / "build").resolve():
         raise RuntimeError("CARGO_TARGET_DIR must name one directory directly under lab/build")
-    reports = lab / "reports" / "stress-w124"
+    reports = lab / "reports" / ("broker-login-w130" if args.broker_login else "stress-w124")
     run_dir = reports / utc_stamp()
     run_dir.mkdir(parents=True, exist_ok=False)
     build_dir.mkdir(parents=True, exist_ok=True)
@@ -997,8 +1066,9 @@ def main() -> int:
         raise RuntimeError("git rev-parse HEAD failed")
     commit = commit_result.stdout.strip()
     (run_dir / "build.commit.txt").write_text(commit + "\n", encoding="ascii")
-    metadata = {"commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds, "expect_timeout_ms": MAX_EXPECT_MS, "startup_stagger_max_seconds": 8, "trace": args.trace, "working_tree": args.working_tree}
+    metadata = {"commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds, "expect_timeout_ms": MAX_EXPECT_MS, "startup_stagger_max_seconds": 8, "trace": args.trace, "working_tree": args.working_tree, "broker_login": args.broker_login}
     login_process = gateway_process = None
+    records = []
     bot_registry: dict[int, subprocess.Popen] = {}
     registry_lock = threading.Lock()
     stop = threading.Event()
@@ -1020,7 +1090,7 @@ def main() -> int:
         content = copy_runtime_content(head_content, root, run_dir)
         scenario = scenario_from_content(content)
         metadata["scenario"] = scenario
-        store, records = create_accounts(account_exe, run_dir, scenario, args.bots)
+        store, records = create_accounts(account_exe, run_dir, scenario, args.bots, args.broker_login)
         metadata["account_count"] = len(records)
         write_login_resources(run_dir)
         reference = lab / "references" / "rust-gateway-reference"
@@ -1034,6 +1104,13 @@ def main() -> int:
         server_id.write_bytes(os.urandom(32))
         state_path = run_dir / "state" / "gateway.json"
         login_port, auth_port, gateway_port = free_port("udp"), free_port("tcp"), free_port("udp")
+        if args.broker_login:
+            for index, record in enumerate(records):
+                profile = run_dir / f"bot-{index + 1:02d}.profile.json"
+                write_json(profile, {"handle": record["handle"], "key_file": "-",
+                    "server_id_file": str(server_id), "broker": f"127.0.0.1:{auth_port}",
+                    "login": f"127.0.0.1:{login_port}", "login_key_file": str(login_key)})
+                record["broker_profile"] = profile
         login_process = ProcessLogs("login", login_exe, [
             "--bind", f"127.0.0.1:{login_port}", "--auth-bind", f"127.0.0.1:{auth_port}",
             "--server-id-file", str(server_id), "--resources", str(run_dir / "login-resources"),
@@ -1106,7 +1183,7 @@ def main() -> int:
                 gateway_process.process.wait(timeout=5)
         gateway_process.close_logs()
         if not service_crashed:
-            gateway_process, save_load = sample_save_load(gateway_exe, bin_dir, records, free_port("udp"), store, handoff, reference, content, state_path, run_dir, args.trace)
+            gateway_process, save_load = sample_save_load(gateway_exe, bin_dir, records, gateway_port if args.broker_login else free_port("udp"), store, handoff, reference, content, state_path, run_dir, args.trace)
             if gateway_process.process.poll() is None:
                 gateway_process.process.terminate()
                 try:
@@ -1135,14 +1212,24 @@ def main() -> int:
         timeline("save_reload_complete", {"loaded": sum(row["loaded"] for row in save_load), "total": len(save_load)})
         metadata["elapsed_seconds"] = round(time.time() - playtest_start, 1) if playtest_start else 0
         (run_dir / "REPORT.md").write_text(report(run_dir, metadata, service_exit["gateway"], service_exit["login"], save_load, save_rows, latency_samples(run_dir), samples, timeline_events), encoding="utf-8")
+        authentication = login_summary(run_dir)
         print(json.dumps({
             "run_dir": str(run_dir), "commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds,
             "elapsed_seconds": metadata["elapsed_seconds"], "gateway_exit": service_exit["gateway"], "login_exit": service_exit["login"],
+            "bot_errors": sum(event["event"] == "bot_error" for event in timeline_events),
+            **authentication,
+            "latency_p50_s": percentile(latency_samples(run_dir), .50),
+            "latency_p95_s": percentile(latency_samples(run_dir), .95),
+            "latency_p99_s": percentile(latency_samples(run_dir), .99),
             "latency_samples": len(latency_samples(run_dir)), "save_load": f"{sum(row['loaded'] for row in save_load)}/{len(save_load)}",
             "coins_nonnegative": f"{sum(row['coins_nonnegative'] for row in save_rows)}/{len(save_rows)}",
             "purchase_persisted": f"{sum(row['purchase_persisted_across_reconnect'] for row in save_rows)}/{len(save_rows)}",
         }, indent=2))
-        return 1 if service_crashed else 0
+        return 1 if service_crashed or (args.broker_login and (
+            any(event["event"] == "bot_error" for event in timeline_events)
+            or authentication["broker_refusals"] or authentication["login_failures"]
+            or any(not row["loaded"] for row in save_load)
+        )) else 0
     except Exception as exc:
         timeline("runner_error", {"error": f"{type(exc).__name__}: {exc}"})
         capture_error_events(run_dir)
@@ -1170,9 +1257,17 @@ def main() -> int:
                         process.process.kill()
                         process.process.wait(timeout=3)
                 process.close_logs()
+        # Check every in-memory stress seed before dropping it; none are persisted.
+        scan = scan_private_keys(run_dir, records) if args.broker_login else {"matches": []}
+        if args.broker_login:
+            write_json(run_dir / "secret-scan.json", scan)
+            for record in records:
+                record.pop("private_seed", None)
         for key_name in ("handoff.key", "login.key", "server.id"):
             (run_dir / key_name).unlink(missing_ok=True)
         perf.close()
+        if scan["matches"]:
+            raise RuntimeError("secret scan failed; see secret-scan.json")
 
 
 if __name__ == "__main__":
