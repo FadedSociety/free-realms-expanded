@@ -66,3 +66,20 @@ W97's two `packet_writer_without_labeled_serializer_callee` flags were substring
 ## W109 run blocker
 
 The full command was attempted with `--binary ../lab/working/ida/FreeRealms.exe --all-accepted --batch-size 250`. `uv run --project %USERPROFILE%/.claude/plugins/cache/mrexodia/ida-pro-mcp/0.1.0 python -I scripts/native_map/ida_check.py ...` exited 1 without an IDA diagnostic. The same IDALib initialization exit stopped the real-IDA test after its two pure path/sampling tests. Pure tests, including a fake-API in-memory creation check, pass; the required `where.exe` add-function check and full 68,411-label pass remain unverified.
+
+## Full run (lead, 2026-10-16)
+
+`ida_check.py --all-accepted --batch-size 250 --run-name full-20261016` against the chunk-analysed client database (`lab/working/ida/FreeRealms.exe.i64`), 16 minutes. Outputs: `lab/native-map/run/ida-check/full-20261016/` (`summary.json`, `labels.jsonl`, `review-queue.jsonl`, `review-queue.txt`).
+
+| Measure | All 68,411 labels | Confirmed (26,777) |
+|---|---|---|
+| IDA function at the labelled address | 68,406 (20,332 created on demand at vtable-only code) | |
+| Exact boundaries | 68,066 (99.5%) | 26,665 (99.6%) |
+| Map callee edges confirmed by IDA | 96.6% (Jaccard 0.96) | 96.2% (Jaccard 0.96) |
+| Map caller edges confirmed by IDA | 69.3% (Jaccard 0.54) | 55.1% |
+| Strings the label relies on, present | 92.9% | 94.2% |
+| Hex-Rays pseudocode produced | 57,195 (83.6%) | |
+
+Caller agreement is low by method, not by label error: the map counts vtable and indirect callers, the checker counts only direct `call` instructions.
+
+**Review queue: 1,281 labels (1.9%)**, 656 confirmed and 625 likely. 340 *high*: IDA's function starts elsewhere (`existing_function_boundary_mismatch`); many sit at odd addresses inside larger functions (for example the `DebugDump*` cluster at `008dddf1`, `008dde8a`, `008ddf2c`), which suggests Ghidra split one function into pieces. 941 *medium*: the label cites strings IDA does not reference. Most queued subsystems: `engine.gfc.core` 110, `debug` 76, `engine.gfc.control` 63, `ui.datasource` 61, `engine.gfc.serialization` 46. Next step: feed the 340 high entries to the recheck pipeline (`recheck.py`).
