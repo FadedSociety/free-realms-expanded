@@ -15,9 +15,61 @@ use std::{
 };
 
 // (R) Local envelope version; no original account save format was recovered.
-const SCHEMA_VERSION: u32 = 1;
+const SCHEMA_VERSION: u32 = 2;
+const LEGACY_SCHEMA_VERSION: u32 = 1;
 // (R) Local defensive file bound.
 pub const MAX_FILE_BYTES: usize = 1024 * 1024;
+
+/// Local account authority. No original Free Realms role model was recovered.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AccountRole {
+    Player,
+    Builder,
+    Admin,
+}
+
+impl AccountRole {
+    /// Parse the exact role names stored in accounts.json and accepted by `realm role`.
+    pub fn parse(value: &str) -> Option<Self> {
+        match value {
+            "player" => Some(Self::Player),
+            "builder" => Some(Self::Builder),
+            "admin" => Some(Self::Admin),
+            _ => None,
+        }
+    }
+}
+
+/// Reconstructed local authority for developer/tool `realm` commands; unknown
+/// commands are admin-only. Ordinary gameplay commands bypass this check.
+/// `command` must be the route's canonical lowercase command key. Content reloads
+/// include their subtype (for example, `reload battles`).
+pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
+    match role {
+        AccountRole::Admin => true,
+        AccountRole::Builder => matches!(
+            command,
+            "place"
+                | "unplace"
+                | "mark"
+                | "unmark"
+                | "marks"
+                | "placements"
+                | "text"
+                | "texts"
+                | "goto"
+                | "here"
+                | "reload all"
+                | "reload battles"
+                | "reload enemies"
+                | "reload abilities"
+                | "reload behaviours"
+                | "reload placements"
+        ),
+        AccountRole::Player => false,
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -28,6 +80,9 @@ struct StoreData {
     next_character_guid: u64,
     accounts: BTreeMap<u64, Account>,
     characters: BTreeMap<u64, CharacterRecord>,
+    /// (R) Authority is local policy, stored by account ID outside the recovered account record.
+    #[serde(default)]
+    roles: BTreeMap<u64, AccountRole>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -60,6 +115,7 @@ impl AccountStore {
                 next_character_guid: 1,
                 accounts: BTreeMap::new(),
                 characters: BTreeMap::new(),
+                roles: BTreeMap::new(),
             },
         }
     }
@@ -95,11 +151,43 @@ impl AccountStore {
                 character_guids: Vec::new(),
             },
         );
+        // (R) Keep every new account, including ID 1, at player. The login path
+        // auto-creates accounts from client-selected names, so first-login admin
+        // would let a client race to seize authority. Bootstrap an admin locally.
+        self.data.roles.insert(id, AccountRole::Player);
         Ok(id)
     }
 
     pub fn account(&self, id: u64) -> Option<&Account> {
         self.data.accounts.get(&id)
+    }
+
+    pub fn account_role(&self, id: u64) -> Option<AccountRole> {
+        self.data.roles.get(&id).copied()
+    }
+
+    /// Change a role only when `actor_account_id` is already an admin.
+    /// The caller must persist the store after a successful change.
+    pub fn set_account_role(
+        &mut self,
+        actor_account_id: u64,
+        target_account_id: u64,
+        role: AccountRole,
+    ) -> io::Result<()> {
+        if self.account_role(actor_account_id) != Some(AccountRole::Admin) {
+            return Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "admin role required",
+            ));
+        }
+        if !self.data.accounts.contains_key(&target_account_id) {
+            return Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "target account does not exist",
+            ));
+        }
+        self.data.roles.insert(target_account_id, role);
+        Ok(())
     }
 
     pub fn account_id_by_login_hash(&self, login_name_hash: &[u8; 32]) -> Option<u64> {
@@ -267,12 +355,22 @@ impl AccountStore {
             return Err(invalid_data("account store exceeds 1 MiB"));
         }
         let document: Document = serde_json::from_slice(&bytes).map_err(invalid_data)?;
-        if document.schema_version != SCHEMA_VERSION {
-            return Err(invalid_data("unsupported account store schema version"));
+        let mut data = document.store;
+        match document.schema_version {
+            LEGACY_SCHEMA_VERSION => {
+                if !data.roles.is_empty() {
+                    return Err(invalid_data("schema 1 account store contains roles"));
+                }
+                data.roles = data
+                    .accounts
+                    .keys()
+                    .map(|id| (*id, AccountRole::Player))
+                    .collect();
+            }
+            SCHEMA_VERSION => {}
+            _ => return Err(invalid_data("unsupported account store schema version")),
         }
-        let store = Self {
-            data: document.store,
-        };
+        let store = Self { data };
         store.validate()?;
         Ok(store)
     }
@@ -305,6 +403,15 @@ impl AccountStore {
     fn validate(&self) -> io::Result<()> {
         if self.data.next_account_id == 0 || self.data.next_character_guid == 0 {
             return Err(invalid_data("account store allocator is invalid"));
+        }
+        if self.data.roles.len() != self.data.accounts.len()
+            || self
+                .data
+                .roles
+                .keys()
+                .any(|account_id| !self.data.accounts.contains_key(account_id))
+        {
+            return Err(invalid_data("account role records do not match accounts"));
         }
         let mut hashes = BTreeSet::new();
         let mut owned = BTreeSet::new();
