@@ -643,7 +643,163 @@ pub struct World {
     empty_instance_grace_ms: u64,
 }
 
+/// (R) Only touched membership data is staged. No packets or world-wide clone.
+/// Constructed by World and committed by the single writer after persistence.
+pub struct MembershipChange {
+    player: PlayerId,
+    location: PlayerLocation,
+    instance: Option<ZoneInstance>,
+    next_instance_id: Option<InstanceId>,
+    now_ms: u64,
+}
+
+impl MembershipChange {
+    pub fn instance_id(&self) -> InstanceId {
+        self.location.instance_id
+    }
+}
+
 impl World {
+    /// (R) Live scene descriptors come from Gateway's validated scene route,
+    /// not the regional labels in zones.json. NPC startup remains Gateway-owned.
+    pub fn runtime() -> Self {
+        let mut world = Self::new(
+            ContentDb {
+                zones: Vec::new(),
+                npcs: Vec::new(),
+                pois: Vec::new(),
+                items: Vec::new(),
+                quests: Vec::new(),
+                jobs: Vec::new(),
+                dungeons: Vec::new(),
+                minigames: Vec::new(),
+            },
+            60_000,
+        );
+        world
+            .register_runtime_zone(Zone {
+                id: 0,
+                name: String::new(),
+                geometry_id: Some(0),
+                zone_type: Some(2),
+                tutorial: Some(false),
+                sky: Some(String::new()),
+                source: Vec::new(),
+            })
+            .expect("constant public scene is valid");
+        let public = world
+            .make_instance(0, 0, InstanceKind::Public, None, 0)
+            .unwrap();
+        world.instances.insert(0, public);
+        world.public_instances.insert(0, 0);
+        world
+    }
+
+    pub fn register_runtime_zone(&mut self, zone: Zone) -> Result<(), WorldError> {
+        i32::try_from(zone.id).map_err(|_| WorldError::NumericRange("zone id"))?;
+        if !self.zones.contains_key(&zone.id) && self.zones.len() >= 16 {
+            return Err(WorldError::NumericRange("runtime scene count")); // (R) bounded host metadata.
+        }
+        self.zones.insert(zone.id, zone);
+        Ok(())
+    }
+
+    /// (R) Existing targets are supplied only by server-authorized entry paths.
+    /// A scene change to nonzero allocates a solo child until group consent is wired.
+    pub fn prepare_membership(
+        &self,
+        player: PlayerId,
+        zone_id: u32,
+        target: Option<InstanceId>,
+        pose: WorldPose,
+        ready: bool,
+        now_ms: u64,
+    ) -> Result<MembershipChange, WorldError> {
+        if !pose.is_finite() {
+            return Err(WorldError::InvalidPose);
+        }
+        if !self.zones.contains_key(&zone_id) {
+            return Err(WorldError::UnknownZone(zone_id));
+        }
+        let mut instance = None;
+        let mut next_instance_id = None;
+        let id = if let Some(id) = target {
+            let row = self
+                .instances
+                .get(&id)
+                .ok_or(WorldError::UnknownInstance(id))?;
+            if row.zone_id != zone_id {
+                return Err(WorldError::UnknownZone(zone_id));
+            }
+            id
+        } else if zone_id == 0 {
+            let id = self.public_instance(zone_id).unwrap_or(0);
+            if !self.instances.contains_key(&id) {
+                instance =
+                    Some(self.make_instance(id, zone_id, InstanceKind::Public, None, now_ms)?);
+            }
+            id
+        } else {
+            if !self.instances.contains_key(&0) {
+                return Err(WorldError::UnknownParent(0));
+            }
+            let (id, next) = self.available_instance_id()?;
+            instance = Some(self.make_instance(
+                id,
+                zone_id,
+                InstanceKind::Encounter { encounter_id: 0 },
+                Some(0),
+                now_ms,
+            )?);
+            next_instance_id = Some(next);
+            id
+        };
+        Ok(MembershipChange {
+            player,
+            location: PlayerLocation {
+                instance_id: id,
+                pose,
+                ready,
+            },
+            instance,
+            next_instance_id,
+            now_ms,
+        })
+    }
+
+    /// Infallible install after save; no other writer may run between prepare/install.
+    pub fn commit_membership(&mut self, change: MembershipChange) {
+        if let Some(instance) = change.instance {
+            if instance.kind == InstanceKind::Public {
+                self.public_instances.insert(instance.zone_id, instance.id);
+            }
+            self.instances.insert(instance.id, instance);
+        }
+        if let Some(next) = change.next_instance_id {
+            self.next_instance_id = next;
+        }
+        self.leave(change.player, change.now_ms);
+        let row = self
+            .instances
+            .get_mut(&change.location.instance_id)
+            .expect("prepared instance remains owned by the single writer");
+        row.members.insert(change.player);
+        row.empty_since_ms = None;
+        let ready = change.location.ready;
+        let target = change.location.instance_id;
+        self.players.insert(
+            change.player,
+            PlayerLocation {
+                ready: false,
+                ..change.location
+            },
+        );
+        if ready {
+            self.mark_zone_ready(change.player, target)
+                .expect("prepared membership matches its ready instance");
+        }
+    }
+
     /// Build indexes from a `ContentDb` already accepted by `ContentDb::load`.
     pub fn new(content: ContentDb, empty_instance_grace_ms: u64) -> Self {
         let zones: BTreeMap<_, _> = content.zones.into_iter().map(|row| (row.id, row)).collect();
@@ -920,9 +1076,26 @@ impl World {
     }
 
     fn allocate_instance_id(&mut self) -> Result<InstanceId, WorldError> {
+        let (id, next) = self.available_instance_id()?;
+        self.next_instance_id = next;
+        Ok(id)
+    }
+
+    fn available_instance_id(&self) -> Result<(InstanceId, InstanceId), WorldError> {
+        // (R) Retained empty children also count toward the M4 instance bound.
+        if self
+            .instances
+            .values()
+            .filter(|row| row.kind != InstanceKind::Public)
+            .count()
+            >= 16
+        {
+            return Err(WorldError::InstanceIdsExhausted);
+        }
+        let mut next = self.next_instance_id;
         loop {
-            let id = self.next_instance_id;
-            self.next_instance_id = id.checked_add(1).ok_or(WorldError::InstanceIdsExhausted)?;
+            let id = next;
+            next = id.checked_add(1).ok_or(WorldError::InstanceIdsExhausted)?;
             if id > 0
                 && !self.instances.contains_key(&id)
                 && !self.public_instances.values().any(|value| *value == id)
@@ -930,7 +1103,7 @@ impl World {
                     .ok()
                     .is_some_and(|zone_id| self.zones.contains_key(&zone_id))
             {
-                return Ok(id);
+                return Ok((id, next));
             }
         }
     }

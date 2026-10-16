@@ -27,6 +27,7 @@ use osfr_tools::soe::{
 };
 use osfr_tools::soe_send::{ReliableSender, SendError, SenderConfig};
 use osfr_tools::studio;
+use osfr_tools::world::{World, WorldPose};
 
 /// Studio savestates sit next to the character save.
 fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
@@ -506,11 +507,8 @@ impl SharedWorld {
         session: &Session,
         state: &CharacterState,
         look: osfr_tools::players::PlayerPresentation,
+        zone: ZoneInstance,
     ) -> io::Result<Vec<Delivery>> {
-        let zone = ZoneInstance {
-            zone_id: state.zone_id,
-            instance_id: 0, // (R) The current CharacterState has no instance field.
-        };
         let messages = self
             .players
             .join_with_presentation(
@@ -597,6 +595,33 @@ impl SharedWorld {
         for chat in self.chat_sessions.values_mut() {
             chat.group_id = self.social.group_of(chat.character_guid).map(u64::from);
         }
+    }
+
+    fn chat_candidates(
+        &self,
+        sender: SessionId,
+        channel: social_chat::ChatChannel,
+    ) -> Vec<ChatSession> {
+        // (R) Spatial channels share canonical membership; tells and party chat cross instances.
+        let local = matches!(
+            channel,
+            social_chat::ChatChannel::Say
+                | social_chat::ChatChannel::Yell
+                | social_chat::ChatChannel::Area
+        );
+        let zone = self.players.get(sender).map(|player| player.zone);
+        self.chat_sessions
+            .iter()
+            .filter(|(id, _)| {
+                !local
+                    || zone.is_some_and(|zone| {
+                        self.players
+                            .get(**id)
+                            .is_some_and(|player| player.zone == zone)
+                    })
+            })
+            .map(|(_, chat)| chat.clone())
+            .collect()
     }
 }
 
@@ -933,6 +958,7 @@ impl Session {
         options: &Options,
         now_ms: u64,
         world: &mut SharedWorld,
+        membership: &mut World,
         sessions: &mut SessionMap,
     ) -> Result<bool, Box<dyn std::error::Error>> {
         if wire.first() == Some(&5) {
@@ -967,6 +993,7 @@ impl Session {
                 options,
                 now_ms,
                 world,
+                membership,
                 sessions,
                 Some((5, None, "direct", false)),
             )?;
@@ -1048,6 +1075,7 @@ impl Session {
                             options,
                             now_ms,
                             world,
+                            membership,
                             sessions,
                             Some((
                                 packet.opcode,
@@ -1225,6 +1253,7 @@ impl Session {
         options: &Options,
         now_ms: u64,
         world: &mut SharedWorld,
+        membership: &mut World,
         sessions: &mut SessionMap,
         transport: Option<(u16, Option<u16>, &'static str, bool)>,
     ) -> Result<(), Box<dyn std::error::Error>> {
@@ -1286,75 +1315,143 @@ impl Session {
                 trace_gateway_message(trace, self.id.0, self.peer, transport, detail)?;
             }
         }
-        self.commit_outcome(staged_gateway, previous, outcome, world, sessions)?;
+        self.commit_outcome(
+            staged_gateway,
+            previous,
+            outcome,
+            world,
+            membership,
+            sessions,
+            now_ms,
+        )?;
         Ok(())
     }
 
     fn commit_outcome(
         &mut self,
-        staged_gateway: Gateway,
+        mut staged_gateway: Gateway,
         previous: CharacterState,
         outcome: GatewayOutcome,
         world: &mut SharedWorld,
+        membership: &mut World,
         sessions: &mut SessionMap,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+        now_ms: u64,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
         let current = staged_gateway.state().clone();
-        let mut staged_world = world.clone();
-        let mut deliveries = Vec::new();
-        if previous.zone_id != current.zone_id && staged_world.joined.contains(&self.id) {
-            deliveries.extend(staged_world.leave_player(self.id));
-        }
-        // A state-only change (e.g. jump or crouch flags) is relayed like a move.
-        let (state, unknown) = staged_gateway.movement_bytes();
-        let moved = previous.position != current.position
-            || previous.rotation != current.rotation
-            || (state, unknown) != self.gateway.movement_bytes();
-        if outcome.entered_world && !staged_world.joined.contains(&self.id) {
-            let look = staged_gateway.player_presentation(self.is_member)?;
-            deliveries.extend(staged_world.join_player(self, &current, look)?);
-        } else if moved && staged_world.joined.contains(&self.id) {
-            let messages = staged_world
-                .players
-                .update_pose_with_state(
-                    self.id,
-                    ZoneInstance {
-                        zone_id: current.zone_id,
-                        instance_id: 0,
-                    },
-                    current.position,
-                    heading(current.rotation),
-                    state,
-                    unknown,
-                )
-                .map_err(invalid_io)?;
-            deliveries.extend(messages.into_iter().map(|message| Delivery {
-                recipient: message.recipient,
-                bytes: message.bytes,
-            }));
-            if let Some(chat) = staged_world.chat_sessions.get_mut(&self.id) {
-                chat.zone_id = current.zone_id;
-                chat.position = current.position;
-            }
-        }
-
-        if staged_world.joined.contains(&self.id) {
-            for application in &outcome.applications {
-                if osfr_tools::chat::request(application, self.character_guid)
-                    .ok()
-                    .flatten()
-                    .is_some_and(|text| text.trim().to_ascii_lowercase().starts_with("realm "))
-                {
-                    continue; // Gameplay's developer command path ran first.
+        let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
+        let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
+            let pending = staged_gateway.take_pending_transfer();
+            let old_instance = membership
+                .player_location(self.character_guid)
+                .map(|row| row.instance_id);
+            let change = if staged_gateway.is_logged_in() {
+                if pending.is_none() {
+                    membership.register_runtime_zone(staged_gateway.runtime_zone()?)?;
                 }
-                deliveries.extend(self.route_application(application, &mut staged_world));
-                staged_world.refresh_group_ids();
+                let target = pending
+                    .map(ZoneInstance::world_instance_id)
+                    .transpose()?
+                    .or_else(|| (!transfer).then_some(old_instance).flatten());
+                Some(membership.prepare_membership(
+                    self.character_guid,
+                    current.zone_id,
+                    target,
+                    WorldPose {
+                        position: [
+                            current.position[0],
+                            current.position[1],
+                            current.position[2],
+                            1.0,
+                        ],
+                        rotation: [
+                            current.rotation[0],
+                            current.rotation[1],
+                            current.rotation[2],
+                            1.0,
+                        ],
+                    },
+                    staged_gateway.is_world_loaded(),
+                    now_ms,
+                )?)
+            } else {
+                None
+            };
+            let instance = ZoneInstance::from_world(
+                current.zone_id,
+                change
+                    .as_ref()
+                    .map(|change| change.instance_id())
+                    .or(old_instance)
+                    .unwrap_or(0),
+            )?;
+            let mut staged_world = world.clone();
+            let mut deliveries = Vec::new();
+            if transfer && staged_world.joined.contains(&self.id) {
+                deliveries.extend(staged_world.leave_player(self.id));
             }
-        }
+            // A state-only change (e.g. jump or crouch flags) is relayed like a move.
+            let (state, unknown) = staged_gateway.movement_bytes();
+            let moved = previous.position != current.position
+                || previous.rotation != current.rotation
+                || (state, unknown) != self.gateway.movement_bytes();
+            if outcome.entered_world
+                && staged_gateway.is_world_loaded()
+                && !staged_world.joined.contains(&self.id)
+            {
+                let look = staged_gateway.player_presentation(self.is_member)?;
+                deliveries.extend(staged_world.join_player(self, &current, look, instance)?);
+            } else if moved && staged_world.joined.contains(&self.id) {
+                let messages = staged_world
+                    .players
+                    .update_pose_with_state(
+                        self.id,
+                        instance,
+                        current.position,
+                        heading(current.rotation),
+                        state,
+                        unknown,
+                    )
+                    .map_err(invalid_io)?;
+                deliveries.extend(messages.into_iter().map(|message| Delivery {
+                    recipient: message.recipient,
+                    bytes: message.bytes,
+                }));
+                if let Some(chat) = staged_world.chat_sessions.get_mut(&self.id) {
+                    chat.zone_id = current.zone_id;
+                    chat.position = current.position;
+                }
+            }
 
-        if outcome.state_changed {
-            save(&self.state_path, &staged_gateway.snapshot())?;
+            if staged_world.joined.contains(&self.id) {
+                for application in &outcome.applications {
+                    if osfr_tools::chat::request(application, self.character_guid)
+                        .ok()
+                        .flatten()
+                        .is_some_and(|text| text.trim().to_ascii_lowercase().starts_with("realm "))
+                    {
+                        continue; // Gameplay's developer command path ran first.
+                    }
+                    deliveries.extend(self.route_application(application, &mut staged_world));
+                    staged_world.refresh_group_ids();
+                }
+            }
+
+            if outcome.state_changed {
+                save(&self.state_path, &staged_gateway.snapshot())?;
+            }
+            persist_social_changes(world, &staged_world)?;
+            Ok((staged_world, deliveries, change))
+        })();
+        let (staged_world, deliveries, change) = match prepared {
+            Ok(staged) => staged,
+            // (R) A precommit transfer refusal keeps the live session/location/members.
+            // Postcommit queue errors below still disconnect; they cannot roll back saves.
+            Err(_) if transfer => return Ok(false),
+            Err(error) => return Err(error),
+        };
+        if let Some(change) = change {
+            membership.commit_membership(change);
         }
-        persist_social_changes(world, &staged_world)?;
         self.gateway = staged_gateway;
         *world = staged_world;
         self.character_guid = self.gateway.state().guid;
@@ -1416,13 +1513,16 @@ impl Session {
             }
             event(json!({"event":"world_ready","state":self.gateway.state()}));
         }
-        Ok(())
+        Ok(true)
     }
 
     fn route_application(&mut self, inner: &[u8], world: &mut SharedWorld) -> Vec<Delivery> {
         // One social action budget per account (W91); a refusal is a silent drop (R).
         let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
-        if !security.budgets.allow(self.account_guid, inner, Instant::now()) {
+        if !security
+            .budgets
+            .allow(self.account_guid, inner, Instant::now())
+        {
             security.record(
                 EventKind::BudgetRefusal,
                 Some(self.account_guid),
@@ -1521,7 +1621,7 @@ impl Session {
         {
             return Vec::new();
         }
-        let sessions = world.chat_sessions.values().cloned().collect::<Vec<_>>();
+        let sessions = world.chat_candidates(self.id, request.channel);
         let ignores = world.social.chat_ignore_lists();
         let recipients =
             match social_chat::resolve_recipients(&request, self.id.0, &sessions, &ignores) {
@@ -1557,7 +1657,11 @@ impl Session {
             Ok(request) => request,
             Err(error) => return chat_error_delivery(error, self.id),
         };
-        let sessions = world.chat_sessions.values().cloned().collect::<Vec<_>>();
+        let channel = match &request {
+            QuickChatRequest::Channel { channel, .. } => *channel,
+            QuickChatRequest::Tell { .. } => social_chat::ChatChannel::Tell,
+        };
+        let sessions = world.chat_candidates(self.id, channel);
         let ignores = world.social.chat_ignore_lists();
         let recipients = match social_chat::resolve_quick_chat_recipients(
             &request, self.id.0, &sessions, &ignores,
@@ -1616,12 +1720,22 @@ impl Session {
         _options: &Options,
         now_ms: u64,
         world: &mut SharedWorld,
+        membership: &mut World,
         sessions: &mut SessionMap,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
         let outcome = staged_gateway.tick_at(now_ms)?;
-        self.commit_outcome(staged_gateway, previous, outcome, world, sessions)
+        self.commit_outcome(
+            staged_gateway,
+            previous,
+            outcome,
+            world,
+            membership,
+            sessions,
+            now_ms,
+        )
+        .map(|_| ())
     }
 }
 
@@ -1860,6 +1974,8 @@ pub struct Server {
     socket: UdpSocket,
     sessions: SessionMap,
     world: SharedWorld,
+    // (R) Single writer, deliberately outside SharedWorld staging.
+    membership: World,
     start: Instant,
     generation: u32,
     trace: Option<trace::Trace>,
@@ -1920,9 +2036,9 @@ impl Server {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {
                 Ok(log) => world.security.lock().unwrap().log = Some(log),
-                Err(error) => event(
-                    json!({"event":"security_log_unavailable","reason":error.to_string()}),
-                ),
+                Err(error) => {
+                    event(json!({"event":"security_log_unavailable","reason":error.to_string()}))
+                }
             }
         }
         Ok(Self {
@@ -1930,6 +2046,7 @@ impl Server {
             socket,
             sessions: BTreeMap::new(),
             world,
+            membership: World::runtime(),
             start: Instant::now(),
             generation: SystemTime::now().duration_since(UNIX_EPOCH)?.subsec_nanos(),
             trace: None,
@@ -1967,7 +2084,11 @@ impl Server {
 
     /// Write any batched security counts (timer and shutdown).
     pub fn flush_security(&mut self) {
-        let mut security = self.world.security.lock().unwrap_or_else(|e| e.into_inner());
+        let mut security = self
+            .world
+            .security
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         if let Some(Err(error)) = security.log.as_mut().map(SecurityLog::flush) {
             eprintln!("security log: {error}");
         }
@@ -1975,6 +2096,100 @@ impl Server {
 
     pub fn active_session_count(&self) -> usize {
         self.sessions.len()
+    }
+
+    // (R) Socket-test setup is host-only and absent from the shipped binary.
+    #[cfg(test)]
+    pub fn test_child(&mut self) -> i32 {
+        self.membership
+            .register_runtime_zone(osfr_tools::content::Zone {
+                id: 9600,
+                name: 9600.to_string(),
+                geometry_id: Some(9600),
+                zone_type: Some(2),
+                tutorial: Some(false),
+                sky: Some(String::new()),
+                source: Vec::new(),
+            })
+            .unwrap();
+        self.membership
+            .create_child_instance(
+                0,
+                9600,
+                osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
+                self.start.elapsed().as_millis() as u64,
+            )
+            .unwrap()
+    }
+
+    #[cfg(test)]
+    pub fn test_location(&self, guid: u64) -> Option<(CharacterState, i32, bool, BTreeSet<u64>)> {
+        let session_id = self.world.active_sessions.get(&guid)?;
+        let key = self.world.session_keys.get(session_id)?;
+        let session = self.sessions.get(key)?;
+        let location = self.membership.player_location(guid)?;
+        Some((
+            session.gateway.state().clone(),
+            location.instance_id,
+            location.ready,
+            self.membership
+                .instance(location.instance_id)?
+                .members
+                .clone(),
+        ))
+    }
+
+    #[cfg(test)]
+    pub fn test_transfer(&mut self, guid: u64, target: i32, fail_save: bool) -> Result<(), String> {
+        let zone = self
+            .membership
+            .instance(target)
+            .ok_or("unknown instance")?
+            .zone_id;
+        let id = self.world.active_sessions.get(&guid).ok_or("not joined")?;
+        let key = *self.world.session_keys.get(id).ok_or("missing session")?;
+        let mut session = self.sessions.remove(&key).ok_or("missing session")?;
+        let original_path = session.state_path.clone();
+        if fail_save {
+            session.state_path = original_path.parent().unwrap().to_owned();
+        }
+        let result = (|| -> Result<(), Box<dyn std::error::Error>> {
+            let mut staged = session.gateway.clone();
+            let outcome = staged.stage_instance_transfer(
+                ZoneInstance::from_world(zone, target)?,
+                osfr_tools::encounter::ZoneTransition {
+                    zone_id: zone,
+                    name: zone.to_string(),
+                    sky: String::new(),
+                    geometry_id: zone as i32,
+                    position: [1.0, 0.0, 0.0],
+                    rotation: [0.0, 0.0, 1.0],
+                    tutorial: false,
+                },
+                self.start.elapsed().as_millis() as u64,
+            )?;
+            let previous = session.gateway.state().clone();
+            session
+                .commit_outcome(
+                    staged,
+                    previous,
+                    outcome,
+                    &mut self.world,
+                    &mut self.membership,
+                    &mut self.sessions,
+                    self.start.elapsed().as_millis() as u64,
+                )
+                .and_then(|committed| {
+                    if committed {
+                        Ok(())
+                    } else {
+                        Err("transfer refused before commit".into())
+                    }
+                })
+        })();
+        session.state_path = original_path;
+        self.sessions.insert(key, session);
+        result.map_err(|error| error.to_string())
     }
 
     /// Close sessions through the same persistence path as disconnects.
@@ -1992,6 +2207,7 @@ impl Server {
     pub fn step(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // One event loop serializes all shared world mutations; session state stays per entry.
         let now_ms = self.start.elapsed().as_millis() as u64;
+        self.membership.collect_empty_instances(now_ms);
         self.poll_studio(now_ms);
         if self.security_flushed.elapsed() >= Duration::from_secs(5) {
             self.flush_security();
@@ -2054,6 +2270,7 @@ impl Server {
                                 &self.options,
                                 now_ms,
                                 &mut self.world,
+                                &mut self.membership,
                                 &mut self.sessions,
                             );
                             match result {
@@ -2085,7 +2302,13 @@ impl Server {
                 continue;
             };
             let result = current
-                .tick(&self.options, now_ms, &mut self.world, &mut self.sessions)
+                .tick(
+                    &self.options,
+                    now_ms,
+                    &mut self.world,
+                    &mut self.membership,
+                    &mut self.sessions,
+                )
                 .and_then(|_| current.flush(&self.socket, now_ms));
             if let Err(error) = result {
                 self.end_session(key, current, &error.to_string())?;
@@ -2568,6 +2791,7 @@ impl Server {
                     &self.options,
                     now_ms,
                     &mut self.world,
+                    &mut self.membership,
                     &mut self.sessions,
                     None,
                 );
@@ -2701,6 +2925,10 @@ impl Server {
             }
         }
         if owns_active {
+            self.membership.leave(
+                session.character_guid,
+                self.start.elapsed().as_millis() as u64,
+            );
             self.world.active_sessions.remove(&session.character_guid);
         }
         self.world.session_keys.remove(&session.id);
@@ -2826,6 +3054,7 @@ mod tests {
         )
         .unwrap();
         let mut world = SharedWorld::new();
+        let mut membership = World::runtime();
         let mut sessions = SessionMap::new();
         world.session_keys.insert(
             session.id,
@@ -2922,6 +3151,7 @@ mod tests {
                 &options,
                 20_110,
                 &mut world,
+                &mut membership,
                 &mut sessions,
             )
             .unwrap();
@@ -2932,6 +3162,7 @@ mod tests {
                 &options,
                 20_111,
                 &mut world,
+                &mut membership,
                 &mut sessions,
             )
             .unwrap();
@@ -2947,6 +3178,7 @@ mod tests {
                     &options,
                     20_120,
                     &mut world,
+                    &mut membership,
                     &mut sessions,
                 )
                 .unwrap();
@@ -2966,6 +3198,7 @@ mod tests {
                 &options,
                 20_130,
                 &mut world,
+                &mut membership,
                 &mut sessions,
             )
             .unwrap();

@@ -118,6 +118,8 @@ pub struct Gateway {
     expected_discontinuity: Option<ExpectedDiscontinuity>,
     last_movement_ms: Option<u64>,
     trace_enabled: bool,
+    // (R) Server-only authorization seam; no client parser sets an instance id.
+    pending_transfer: Option<crate::players::ZoneInstance>,
 }
 
 #[derive(Debug, Default)]
@@ -128,6 +130,8 @@ pub struct GatewayOutcome {
     pub state_changed: bool,
     pub entered_world: bool,
     pub gameplay_changed: bool,
+    /// (R) Also true for same-scene transfers, which must reset interest membership.
+    pub began_zoning: bool,
     /// Populated only when the owning local server explicitly enables tracing.
     pub trace: Vec<GatewayTraceEvent>,
 }
@@ -448,14 +452,19 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
 /// The handler that owns an application message body, by family/subtype.
 /// Routing uses it as well as tracing, so behaviour never depends on --trace.
 fn application_handler(body: &[u8]) -> &'static str {
-    let word = |at: usize| body.get(at..at + 2).map(|b| u16::from_le_bytes([b[0], b[1]]));
+    let word = |at: usize| {
+        body.get(at..at + 2)
+            .map(|b| u16::from_le_bytes([b[0], b[1]]))
+    };
     match (word(0), word(2)) {
         (Some(15), Some(1)) => "social_chat",
         (Some(67), Some(2 | 3)) => "quick_chat",
         (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
         (Some(26), Some(14 | 15 | 17 | 30)) | (Some(40), Some(1 | 3 | 4 | 6)) => "social_router",
         (Some(49), Some(2 | 14)) => "quest_engine",
-        (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => "kart",
+        (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
+            "kart"
+        }
         (Some(36), Some(10)) => "combat",
         (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
         (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
@@ -741,6 +750,7 @@ impl Gateway {
             expected_discontinuity: None,
             last_movement_ms: None,
             trace_enabled: false,
+            pending_transfer: None,
         })
     }
 
@@ -751,6 +761,112 @@ impl Gateway {
 
     pub fn state(&self) -> &CharacterState {
         &self.state
+    }
+
+    pub fn is_logged_in(&self) -> bool {
+        self.logged_in
+    }
+    pub fn is_world_loaded(&self) -> bool {
+        self.loaded
+    }
+
+    pub fn take_pending_transfer(&mut self) -> Option<crate::players::ZoneInstance> {
+        self.pending_transfer.take()
+    }
+
+    /// (R) Host-authorized transfer only. Do not expose this through raw packets
+    /// or developer chat. Ordinary encounter consent is a later build slice.
+    pub fn stage_instance_transfer(
+        &mut self,
+        target: crate::players::ZoneInstance,
+        scene: ZoneTransition,
+        now_ms: u64,
+    ) -> io::Result<GatewayOutcome> {
+        target
+            .world_instance_id()
+            .map_err(|_| invalid("instance id outside world range"))?;
+        if target.zone_id != scene.zone_id || !self.loaded {
+            return Err(invalid("instance transfer scene/readiness mismatch"));
+        }
+        i32::try_from(scene.zone_id).map_err(|_| invalid("scene id outside wire range"))?;
+        let state = CharacterState {
+            guid: self.state.guid,
+            zone_id: scene.zone_id,
+            position: scene.position,
+            rotation: scene.rotation,
+        };
+        state.validate()?;
+        let packet = wrapped(&zone_begin_packet(&scene));
+        // Reuse opcode-31 layout, native reader 008e4ae0 (zone_transition.rs).
+        crate::zone_transition::decode(&packet)?;
+        self.state = state;
+        self.movement_state = MovementState::new(scene.zone_id, scene.position, scene.rotation);
+        self.expected_discontinuity = Some(ExpectedDiscontinuity::zone_change(
+            scene.zone_id,
+            scene.position,
+        ));
+        self.last_movement_ms = Some(now_ms);
+        self.ready = false;
+        self.loaded = false;
+        self.pending_transfer = Some(target);
+        Ok(GatewayOutcome {
+            replies: vec![packet],
+            state_changed: true,
+            began_zoning: true,
+            ..Default::default()
+        })
+    }
+
+    /// (R) Runtime membership adapter: regional content labels are not scene ids.
+    /// Scene geometry/tutorial values reuse the existing startup/transition route.
+    pub fn runtime_zone(&self) -> io::Result<crate::content::Zone> {
+        if let Some(scene) = self.gameplay.as_ref().and_then(Gameplay::current_zone) {
+            return Ok(crate::content::Zone {
+                id: scene.zone_id,
+                name: scene.name,
+                geometry_id: Some(
+                    u32::try_from(scene.geometry_id)
+                        .map_err(|_| invalid("negative scene geometry"))?,
+                ),
+                zone_type: Some(2),
+                tutorial: Some(scene.tutorial),
+                sky: Some(scene.sky),
+                source: Vec::new(),
+            });
+        }
+        if let Some(snapshot) = &self.startup_snapshot {
+            let scene = &snapshot.login.zone;
+            return Ok(crate::content::Zone {
+                id: self.state.zone_id,
+                name: scene.name.clone(),
+                geometry_id: Some(scene.geometry_id),
+                zone_type: Some(scene.zone_type),
+                tutorial: Some(scene.tutorial),
+                sky: Some(scene.sky.clone()),
+                source: Vec::new(),
+            });
+        }
+        // Preserve the opt-in captured-template fallback using its already validated 43 row.
+        let (_, payload) = tunnel(&self.templates[3].bytes)?;
+        let mut reader = Reader::new(payload);
+        reader.u16()?;
+        let name = reader.string(4096)?.to_owned();
+        let zone_type = i32::try_from(reader.u32()?).map_err(|_| invalid("zone type overflow"))?;
+        let tutorial = reader.bool()?;
+        reader.bool()?;
+        let sky = reader.string(4096)?.to_owned();
+        reader.bool()?;
+        reader.u32()?;
+        let geometry_id = reader.u32()?;
+        Ok(crate::content::Zone {
+            id: self.state.zone_id,
+            name,
+            geometry_id: Some(geometry_id),
+            zone_type: Some(zone_type),
+            tutorial: Some(tutorial),
+            sky: Some(sky),
+            source: Vec::new(),
+        })
     }
 
     /// The public look other players get in AddPc (Build Plan 1.3), from the
@@ -777,11 +893,15 @@ impl Gateway {
                 .clone_from(&identity.model_customization);
         }
         // Without loaded profiles, self-data keeps the template's job; match it.
-        let profile = self.gameplay.as_ref().and_then(Gameplay::active_profile).or_else(|| {
-            self.self_data_template
-                .as_ref()
-                .map(|data| data.jobs.active_profile_id as i32)
-        });
+        let profile = self
+            .gameplay
+            .as_ref()
+            .and_then(Gameplay::active_profile)
+            .or_else(|| {
+                self.self_data_template
+                    .as_ref()
+                    .map(|data| data.jobs.active_profile_id as i32)
+            });
         if let Some(profile) = profile {
             look.active_profile = profile;
             if let Some(game) = &self.gameplay {
@@ -1187,8 +1307,8 @@ impl Gateway {
                             // social router runs after this); decided from the
                             // bytes, not from trace records, which exist only
                             // with --trace (chat was dropped without it).
-                            let known_no_reply = application_handler(&inner)
-                                != "gameplay.handle_in_world";
+                            let known_no_reply =
+                                application_handler(&inner) != "gameplay.handle_in_world";
                             if !known_no_reply {
                                 set_trace(
                                     &mut trace,
@@ -1231,6 +1351,7 @@ impl Gateway {
                             .replies
                             .extend(result.replies.iter().map(|reply| wrapped(reply)));
                         if let Some(zone) = result.zoning {
+                            outcome.began_zoning = true;
                             state.zone_id = zone.zone_id;
                             state.position = zone.position;
                             state.rotation = zone.rotation;
@@ -1247,6 +1368,7 @@ impl Gateway {
                             outcome.replies.push(wrapped(&zone_begin_packet(&zone)));
                         }
                         if let Some(scene) = result.scene_zoning {
+                            outcome.began_zoning = true;
                             state.zone_id = u32::try_from(scene.id)
                                 .map_err(|_| invalid("negative native scene instance"))?;
                             state.position = scene.position[..3].try_into().unwrap();
@@ -1317,6 +1439,7 @@ impl Gateway {
             ..Default::default()
         };
         if let Some(zone) = result.zoning {
+            outcome.began_zoning = true;
             self.state.zone_id = zone.zone_id;
             self.state.position = zone.position;
             self.state.rotation = zone.rotation;
@@ -1333,6 +1456,7 @@ impl Gateway {
             outcome.replies.push(wrapped(&zone_begin_packet(&zone)));
         }
         if let Some(scene) = result.scene_zoning {
+            outcome.began_zoning = true;
             self.state.zone_id =
                 u32::try_from(scene.id).map_err(|_| invalid("negative native scene instance"))?;
             self.state.position = scene.position[..3].try_into().unwrap();

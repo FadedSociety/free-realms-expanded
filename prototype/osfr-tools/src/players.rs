@@ -20,6 +20,25 @@ pub struct ZoneInstance {
     pub instance_id: u64,
 }
 
+impl ZoneInstance {
+    /// (R) Registry ids are a checked view of World's allocator, never a second allocator.
+    pub fn from_world(
+        zone_id: u32,
+        instance_id: crate::world::InstanceId,
+    ) -> Result<Self, crate::world::WorldError> {
+        Ok(Self {
+            zone_id,
+            instance_id: u64::try_from(instance_id)
+                .map_err(|_| crate::world::WorldError::NumericRange("instance id"))?,
+        })
+    }
+
+    pub fn world_instance_id(self) -> Result<crate::world::InstanceId, crate::world::WorldError> {
+        i32::try_from(self.instance_id)
+            .map_err(|_| crate::world::WorldError::NumericRange("instance id"))
+    }
+}
+
 /// Public AddPc presentation built from authenticated character and account
 /// state. `attachments_wire` is the existing inventory helper's count plus
 /// encoded attachment rows; the registry validates it before storing it.
