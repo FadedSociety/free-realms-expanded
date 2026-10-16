@@ -97,7 +97,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 
 | System | Status | Entry today | Open gaps |
 |---|---|---|---|
-| Kart | Native-verified (3 laps, 50 coins and 25 XP paid once, reload); NPC entry built | `realm race` (dev) or a gate NPC's menu (W149, `5f06115`) | Gate NPCs (R picks) and a saved, tunable reward cooldown. NPC entry never run natively. |
+| Kart | Native-verified (3 laps, 50 coins and 25 XP paid once, reload); NPC entry built | `realm race` (dev) or a gate NPC's menu (W149, `5f06115`) | Gate NPCs (R picks) and a saved, tunable reward cooldown; NPC entry never run natively. Solo only. Weapon effects partly done. Entering a race switches the job to Kart Driver (48); leaving restores the previous job (R). Kart Driver's native default outfit (4 items) is not in our starter content, so a Kart Driver shows no clothes. |
 | Mining | Wired | `realm mine` (dev) | No native win so far (runs 151307, 200750 lost). **W140 (`f4e397b`):** reconnect releases an unfinished run (unpaid run forfeited, R); once-only payout and Quit paths pinned by tests. No ordinary entry; no Miner XP on win. |
 | Harvesting | Wired | `realm harvest` (dev) | Goal names show placeholders. W140 found no Quit/Leave defect in the live route and fixed reconnect; payout tested in-process, not natively. Full bag at win loses the win (open decision). |
 | Minigame framework (`minigame.rs`) | Built | — | Unrouted modules use it. The combat encounter path is the proven one. |
