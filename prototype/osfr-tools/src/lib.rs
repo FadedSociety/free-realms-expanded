@@ -65,6 +65,7 @@ pub mod quests;
 pub mod recipes;
 pub mod rewards;
 pub mod session;
+pub mod security_log;
 pub mod smelting;
 pub mod soccer;
 pub mod soccer_match;

@@ -5,6 +5,9 @@
 //! enforcement, text filtering, and ignore behavior are reconstructed policy (R).
 
 use std::collections::{HashMap, HashSet, VecDeque};
+use std::time::Instant;
+
+use crate::net_policy::Bucket;
 
 pub const MAX_MESSAGE_BYTES: usize = 2048; // (R) Bounded input limit; the client's maximum is unknown.
 pub const MAX_NAME_BYTES: usize = 128; // (R) Bounded decoded names; no typed-chat maximum is recovered.
@@ -15,6 +18,58 @@ pub const CHAT_SPEED_DUP3_MS: u64 = 2_000;
 pub const CHAT_SPEED_MAX_MS: u64 = 30_000;
 pub const CHAT_SPEED_SIMILARITY: f32 = 0.2;
 const MAX_SPAM_ENTRIES: usize = 256;
+
+// (R) Security Model L6/L9 requires an action budget but specifies no chat rate.
+// Start with L6's 5/s, burst 10; 1024 retained accounts is a playtest memory cap.
+const ACTION_RATE: f64 = 5.0;
+const ACTION_BURST: f64 = 10.0;
+const MAX_ACTION_ACCOUNTS: usize = 1024;
+
+/// One shared budget per authenticated account, never per connection/character.
+/// Keep one instance for the gateway's lifetime, outside staged/cloned gameplay.
+/// Do not remove keys on logout. Evict only buckets that could already pay a full
+/// burst: reconnect/key churn then grants no extra allowance. Process restart
+/// resets this in-memory policy (R).
+#[derive(Debug, Default)]
+pub struct ActionBudgets {
+    buckets: HashMap<u64, Bucket>,
+}
+
+impl ActionBudgets {
+    /// Check each validated INNER application before cloning, parsing text,
+    /// SpamGate, mutation or fanout, including every application-bundle child.
+    /// `account_id` must come from the authenticated server binding, never wire ids.
+    /// Typed tells and realm commands use 15/1, so share typed chat's allowance.
+    /// False means silent drop (R): no disconnect and no refusal amplification.
+    /// This guard supplements all existing parsers, permissions and SpamGate.
+    pub fn allow(&mut self, account_id: u64, inner: &[u8], now: Instant) -> bool {
+        let Some(header) = inner.get(..4) else {
+            return true; // Existing parsers reject malformed messages.
+        };
+        let family = u16::from_le_bytes([header[0], header[1]]);
+        let sub = u16::from_le_bytes([header[2], header[3]]);
+        if !matches!(
+            (family, sub),
+            (15, 1) | (67, 2 | 3) | (26, 14 | 15 | 17 | 30) | (40, 1 | 3 | 4 | 6)
+        ) {
+            return true;
+        }
+        if !self.buckets.contains_key(&account_id) && self.buckets.len() >= MAX_ACTION_ACCOUNTS {
+            // ponytail: at most 1024 probes on new keys at capacity; no LRU/cache dependency.
+            self.buckets.retain(|_, bucket| {
+                let mut probe = *bucket;
+                !probe.take(ACTION_BURST, ACTION_RATE, ACTION_BURST, now)
+            });
+            if self.buckets.len() >= MAX_ACTION_ACCOUNTS {
+                return false;
+            }
+        }
+        self.buckets
+            .entry(account_id)
+            .or_insert_with(|| Bucket::full(ACTION_BURST, now))
+            .take(1.0, ACTION_RATE, ACTION_BURST, now)
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum ChatChannel {
@@ -950,4 +1005,93 @@ pub fn intake_report(
     };
     inbox.0.push(report.clone());
     Ok(report)
+}
+
+#[cfg(test)]
+mod action_budget_tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    const TYPED: &[u8] = &[15, 0, 1, 0];
+
+    #[test]
+    fn one_burst_is_shared_by_chat_quick_tells_friends_and_groups() {
+        let now = Instant::now();
+        let mut budgets = ActionBudgets::default();
+        let actions: [&[u8]; 5] = [
+            TYPED,
+            &[67, 0, 3, 0],
+            &[67, 0, 2, 0],
+            &[26, 0, 14, 0],
+            &[40, 0, 1, 0],
+        ];
+        for action in actions.into_iter().cycle().take(ACTION_BURST as usize) {
+            assert!(budgets.allow(7, action, now));
+        }
+        for action in actions {
+            assert!(!budgets.allow(7, action, now));
+        }
+        assert!(budgets.allow(8, TYPED, now));
+        assert!(budgets.allow(7, &[125, 0], now)); // Movement has its own policy.
+    }
+
+    #[test]
+    fn refill_is_monotonic_and_reconnect_does_not_reset_account_budget() {
+        let now = Instant::now();
+        let mut budgets = ActionBudgets::default();
+        assert!((0..ACTION_BURST as usize).all(|_| budgets.allow(7, TYPED, now)));
+        // Reconnecting or changing character supplies the same authenticated account id;
+        // no session/character id participates in the limiter and disconnect removes nothing.
+        assert!(!budgets.allow(7, &[40, 0, 1, 0], now));
+        let later = now + Duration::from_millis(400);
+        assert!(budgets.allow(7, TYPED, later));
+        assert!(budgets.allow(7, TYPED, later));
+        assert!(!budgets.allow(7, TYPED, later));
+        assert!(!budgets.allow(7, TYPED, later)); // Refusal does not grant tokens.
+    }
+
+    #[test]
+    fn full_key_map_refuses_new_accounts_until_existing_buckets_refill() {
+        let now = Instant::now();
+        let mut budgets = ActionBudgets::default();
+        for account in 0..MAX_ACTION_ACCOUNTS as u64 {
+            assert!(budgets.allow(account, TYPED, now));
+        }
+        assert!(!budgets.allow(MAX_ACTION_ACCOUNTS as u64, TYPED, now));
+        assert_eq!(budgets.buckets.len(), MAX_ACTION_ACCOUNTS);
+        // A busy account cannot be evicted to gain a new burst on reconnect.
+        assert!((1..ACTION_BURST as usize).all(|_| budgets.allow(0, TYPED, now)));
+        let later = now + Duration::from_millis(200);
+        assert!(budgets.allow(MAX_ACTION_ACCOUNTS as u64, TYPED, later));
+        assert!(budgets.buckets.len() <= MAX_ACTION_ACCOUNTS);
+        assert!(budgets.allow(0, TYPED, later));
+        assert!(!budgets.allow(0, TYPED, later));
+    }
+
+    #[test]
+    fn header_guard_covers_social_mutations_and_never_reads_payload_text() {
+        let now = Instant::now();
+        for header in [
+            [15, 0, 1, 0],
+            [67, 0, 2, 0],
+            [67, 0, 3, 0],
+            [26, 0, 14, 0],
+            [26, 0, 15, 0],
+            [26, 0, 17, 0],
+            [26, 0, 30, 0],
+            [40, 0, 1, 0],
+            [40, 0, 3, 0],
+            [40, 0, 4, 0],
+            [40, 0, 6, 0],
+        ] {
+            let mut budgets = ActionBudgets::default();
+            assert!((0..ACTION_BURST as usize).all(|_| budgets.allow(9, &header, now)));
+            assert!(!budgets.allow(9, &header, now), "{header:?}");
+        }
+        let mut budgets = ActionBudgets::default();
+        for len in 0..4 {
+            assert!(budgets.allow(9, &TYPED[..len], now));
+        }
+        assert!(budgets.buckets.is_empty()); // Full parser remains responsible for malformed input.
+    }
 }
