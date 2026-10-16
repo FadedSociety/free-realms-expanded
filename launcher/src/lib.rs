@@ -1,4 +1,36 @@
-//! Local client preparation; no network access or credential implementation.
+//! Local client preparation and per-server key-pair authentication.
+
+pub mod auth;
+
+/// Handle enrolment commands before opening the UI. `None` leaves ordinary UI
+/// arguments to the caller. The only successful output is a public key (hex).
+/// The binary's entry-point dispatch is wired by the lead, outside W100's scope.
+pub fn key_command<I, S>(args: I) -> Option<Result<String>>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    let mut args = args.into_iter();
+    let command = args.next()?;
+    let command = command.as_ref();
+    if command != "--new-key" && command != "--print-public-key" {
+        return None;
+    }
+    let profile = match args.next() {
+        Some(profile) => profile,
+        None => return Some(Err("Key commands require exactly one profile ID.".into())),
+    };
+    if args.next().is_some() {
+        return Some(Err("Key commands require exactly one profile ID.".into()));
+    }
+    Some(
+        match command {
+            "--new-key" => auth::new_key(profile.as_ref()),
+            _ => auth::print_public_key(profile.as_ref()),
+        }
+        .map_err(|error| error.to_string()),
+    )
+}
 
 use std::{
     fs::{self, File, OpenOptions},

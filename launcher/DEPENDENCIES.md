@@ -20,9 +20,9 @@ serde/serde_json licences were also read from the private registry's cached
 Cargo.toml files. This workspace already uses the serde/serde_json family; these
 exact versions are present in its private Cargo cache.
 
-The launch core uses only std and one documented Kernel32 function. There is no
-direct Windows wrapper crate, regex crate, HTTP client, async runtime, Python
-runtime, authentication implementation or game-content dependency.
+The client-preparation core uses std and one documented Kernel32 function.
+W100 adds authentication below; there is no direct Windows wrapper crate, regex
+crate, HTTP client, async runtime, Python runtime or game-content dependency.
 
 Before distribution, retain the full lockfile; collect the licences
 of the actual Windows dependency closure and bundled default fonts (their font
@@ -65,3 +65,26 @@ The other four notices were copied without modification from the private cache's
 There are no newly generated decorative PNGs or cut-outs. The font notices are
 complete for the five fonts compiled into this launcher; the earlier full
 transitive/runtime distribution audit remains a separate packaging gate.
+
+## W100 key-pair authentication (2026-10-16)
+
+Only the four explicitly approved direct dependencies were added. Licence fields
+were read from their exact cached registry `Cargo.toml` files, not inferred.
+
+| Dependency | Locked version | Declared licence | Reason |
+|---|---|---|---|
+| ed25519-dalek | 2.2.0 | BSD-3-Clause | Vetted Ed25519 signing; exactly the server's `std`, `fast`, no-default-features declaration |
+| getrandom | 0.2.17 | MIT OR Apache-2.0 | OS CSPRNG for per-profile seeds; remains on 0.2 for gnullvm compatibility |
+| subtle | 2.6.1 | BSD-3-Clause | Fixed-width server identity comparison before key loading/signing |
+| zeroize | 1.9.1 | Apache-2.0 OR MIT | Wipe seed/reply buffers and the existing SessionToken on drop |
+
+`cargo tree --edges features --invert ed25519-dalek` confirms that `std` enables
+`alloc`, which enables dalek's `zeroize` feature in this locked graph. Its signing
+key therefore also wipes its seed on drop. No dependency version was changed in
+the pre-existing lock graph; additions are the approved crypto closure only.
+
+Private Windows directories/files use documented Advapi32/Kernel32 APIs with
+protected OWNER RIGHTS DACLs attached at creation. Existing ACLs are verified,
+never silently broadened or rewritten. No extra Windows crate is needed.
+`tests/auth_canary.py` is development-only and does not add a launcher runtime.
+Scoped gates, limitations and lead handoff are recorded in `tests/W100.md`.
