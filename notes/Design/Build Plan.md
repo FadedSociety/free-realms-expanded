@@ -48,12 +48,14 @@ Gate: two real clients on two PCs see each other move with real appearances, cha
 
 | # | Work | Owner | Gate |
 |---|---|---|---|
-| 1.0 | **Security model first:** a threat model for exposing login and gateway beyond loopback (packet fuzzing and malformed input, login brute force, ticket replay, impersonating another session, flooding, save tampering, Studio exposure). Uses `security-reviewer` plus `secure-code-guardian`. | Sol → lead | `notes/Design/Security Model.md` reviewed; 1.1 to 1.5 cite it |
+| 1.0 | ✅ **Done 2026-10-15 (W75, lead-reviewed): [[Security Model]].** Twelve ordered must-haves: L1 to L9 block a LAN playtest, I10 to I12 block internet play. **Bare-internet UDP stays closed; remote friends join over an encrypted VPN.** **Security model first:** a threat model for exposing login and gateway beyond loopback (packet fuzzing and malformed input, login brute force, ticket replay, impersonating another session, flooding, save tampering, Studio exposure). Uses `security-reviewer` plus `secure-code-guardian`. | Sol → lead | `notes/Design/Security Model.md` reviewed; 1.1 to 1.5 cite it |
 | 1.1 | Remote connections: a `--bind` option for non-loopback addresses on login and gateway, plus the matching launcher option | Lead | A second PC on the LAN reaches character select |
 | 1.2 | Login for many players: several concurrent sessions and accounts, simple per-account credentials, a real native test of the HMAC ticket path | Sol design → Luna build → lead | Two clients log in at once with different accounts |
-| 1.3 | Real AddPc: appearance, name, equipment and job from self data; keep the position relay's state bytes | Sol research (AddPc layout from the native map) → Luna | Native: the other player renders correctly and animates |
+| 1.3 | **Research done 2026-10-15 (W77, lead-reviewed): [[Research/AddPc Layout]].** 78 fields with native provenance. It found that our AddPc facing is sent as a quaternion where the client reads a direction (the same bug already fixed for NPCs), and that state-only movement relays are suppressed. Real AddPc: appearance, name, equipment and job from self data; keep the position relay's state bytes | Sol research (AddPc layout from the native map) → Luna | Native: the other player renders correctly and animates |
 | 1.4 | Fix bugs the 10-15 audit found: social packets dropped without `--trace`; account-id/GUID collision; stale save on duplicate login | Lead | Regression tests plus a bot chat test with content loaded |
 | 1.5 | Roles: player, builder and admin per account; `realm` cheats only for builders and admins | Luna (to a spec) → lead | A player account can't run `realm god`; the admin can |
+| 1.8 | **Admission and packet hardening** (Security Model L6, L7): session caps (16 total, 4 per IP), handshake and credential rate buckets, per-family packet caps, a reassembly deadline, and removal of reachable panics; runs fuzz tests T1 to T3 and T9. | Luna (to spec) → lead | T1, T2, T3 and T9 pass; second bot unaffected |
+| 1.9 | **Safe administration and audit** (L5, L8, L9): refuse `--dev-tools` and Studio on exposed servers; per-account action budget for chat, social and commands; a bounded security log without names, chat or tickets. | Luna → lead | T7, T8 and T10 pass |
 | 1.6 | Native two-player run: client plus bot, then two clients | Lead | Review note with run ids |
 | 1.7 | **Minimal friend launcher** (moved up from M3, 2026-10-15). Set up a client copy, apply our overlay (world text locale, settings, server address), then launch. There is no launcher today: `run-local-baseline.py` is a dev harness that needs the private `lab/`. | Luna → lead | A clean second PC goes from launcher to character select |
 
@@ -95,6 +97,12 @@ Run it, collect bug reports and field notes, and feed them back into this plan.
 The remaining dungeons, housing (missing scene assets), pets, mounts (including the community "Mounts and Pets" update, licence check first), fishing, soccer, chess, derby, the card game, the guild, trade and matchmaking routes, a native Rust 3D editor (whose renderer becomes the Rust client), a database for saves, public hosting, and restarting the native map (6 stuck shards to reset).
 
 ## Update log
+
+- **2026-10-15 (night):**
+  - **Fixed, tested and pushed:** chat and social packets dropped without `--trace`; the coin store overwriting the live inventory; a duplicate login saving a stale copy.
+  - **W75 security model and W77 AddPc research** were reviewed and accepted.
+  - **Added items** 1.8 (admission and packet hardening) and 1.9 (safe administration and audit).
+  - **Decision pending (the owner):** the `argon2` crate for password hashing.
 
 - **2026-10-15 (later):** Installed 17 MIT skills for Claude and Codex (security, Rust, review, testing, operations, design; provenance in `lab/downloads/skills-20261015/PROVENANCE.md`). Added the security gates rule and item 1.0 (security model before any non-loopback exposure).
 
