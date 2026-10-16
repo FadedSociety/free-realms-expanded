@@ -118,9 +118,11 @@ fn vendor_stock_is_loadable_and_supported_by_content_evidence() {
             let item_id = item["item_id"]
                 .as_i64()
                 .expect("mapped item ID is an integer");
+            // Any definition the runtime can grant counts: captured rows plus the
+            // generated catalogue (W84/W88) that W118's stock draws on.
             assert!(
-                catalogue_ids.contains(&item_id),
-                "item {item_id} is absent from startup catalogue"
+                catalogue_ids.contains(&item_id) || inventory.has_definition(item_id as i32),
+                "item {item_id} is absent from the item catalogue"
             );
             assert!(
                 seen_ids.insert(item_id),
