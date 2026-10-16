@@ -196,6 +196,18 @@ fn job_fixture(profile: i32) -> (Fixture, Value) {
     (fixture, jobs)
 }
 
+// The other tests re-serialize the roster compactly; the gateway loads the shipped,
+// pretty-printed file. W125's provenance pushed it past the old 64 KiB cap unnoticed.
+#[test]
+fn shipped_job_abilities_file_loads_through_the_real_loader() {
+    let fixture = Fixture::new();
+    let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/job_abilities.json");
+    let path = fixture.path.join("job_abilities.json");
+    fs::copy(&shipped, &path).unwrap();
+    let mut abilities = fixture.load();
+    abilities.load_job_abilities(&path).unwrap();
+}
+
 fn load_jobs(fixture: &Fixture, jobs: &Value) -> std::io::Result<OpeningAbilities> {
     let path = fixture.path.join("job_abilities.json");
     fs::write(&path, serde_json::to_vec(jobs).unwrap()).unwrap();

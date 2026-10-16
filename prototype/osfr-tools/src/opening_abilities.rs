@@ -194,10 +194,13 @@ impl OpeningAbilities {
     /// Load the full roster independently of a campaign's basic-attack subset.
     /// Slots run 1, 2, ...; a job needs a loaded basic before activation/casting.
     pub fn load_job_abilities(&mut self, path: &Path) -> io::Result<()> {
+        // (R) Operator-authored file with per-field provenance (24 skills was ~66 KB
+        // after W125); 1 MiB stays bounded with room for every job's roster.
+        const MAX_JOB_CONTENT: u64 = 1024 * 1024;
         let file = File::open(path)?;
         let mut bytes = Vec::new();
-        file.take(65537).read_to_end(&mut bytes)?;
-        if bytes.len() > 65536 {
+        file.take(MAX_JOB_CONTENT + 1).read_to_end(&mut bytes)?;
+        if bytes.len() as u64 > MAX_JOB_CONTENT {
             return Err(invalid("job ability content exceeds bounds"));
         }
         let content: JobContent =
