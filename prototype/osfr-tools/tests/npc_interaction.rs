@@ -289,10 +289,11 @@ fn typed_quest_giver_id_fills_an_unlisted_regional_npc_offer() {
     let data = content_dir();
     let mut service = NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
         .expect("NPC and store content load");
-    // Quest 3000008 is keyed to Cleetus Farnum (9000000050) in quests/adventurer.json;
-    // that relationship is absent from the NPC record's quest_ids_given array.
-    let npc_id = 9_000_000_050;
-    let quest_id = 3_000_008;
+    // Quest 3000020 is keyed to giver 9000000402 in quests/adventurer.json; that
+    // relationship is absent from the NPC record's quest_ids_given array. (3000008,
+    // used before, is now disabled until its craft step is routable: W110.)
+    let npc_id = 9_000_000_402;
+    let quest_id = 3_000_020;
     let eligibility = CharacterEligibility {
         player_level: 1,
         nonmember_quest_limit: 100,
@@ -637,14 +638,22 @@ fn named_target_npc_matches_active_quest_content_and_starts_turnin() {
         interaction.named_target_quest_for_talk(9_500_000_254, &engine),
         Some(3_000_021)
     );
-    let turnin = engine.begin_named_target_turnin(3_000_021);
-    assert!(turnin.changed);
-    assert!(matches!(
-        turnin.outbound.as_slice(),
-        [osfr_tools::quest_engine::OutboundMessage::Quest(
+    // W92 gave 3000021 an explicit talk objective for this target: the talk
+    // completes it and starts the turn-in in the same outcome (QuestEnd), so a
+    // second explicit begin is refused as already pending.
+    let talk = engine
+        .on_event(osfr_tools::quest_engine::QuestEvent::TalkToNpc {
+            npc_id: 9_500_000_254,
+        })
+        .unwrap();
+    assert!(talk.changed);
+    assert!(talk.outbound.iter().any(|message| matches!(
+        message,
+        osfr_tools::quest_engine::OutboundMessage::Quest(
             osfr_tools::quest_engine::QuestMessage::QuestEnd {
                 quest_id: 3_000_021
             }
-        )]
-    ));
+        )
+    )));
+    assert!(!engine.begin_named_target_turnin(3_000_021).changed);
 }
