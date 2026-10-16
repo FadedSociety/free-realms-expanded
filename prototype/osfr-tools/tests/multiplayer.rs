@@ -477,6 +477,7 @@ fn start_server(temp: &TempDir) -> (Server, PathBuf) {
         world: None,
         stock_text: None,
         allow_lan: false,
+        security_log: Some(temp.0.join("security.jsonl")),
     })
     .unwrap();
     (server, account_store)
@@ -488,6 +489,35 @@ fn log_in(server: &mut Server, connection_id: u32, guid: u64, store: &Path) -> (
     messages.extend(client.send(server, &packet(13, &[])));
     messages.extend(client.send(server, &packet(10, &[])));
     (client, messages)
+}
+
+/// Security Model L6/L9 (W91): one account's social actions share a 5/s, burst-10
+/// budget; the excess is dropped silently and counted in the security log.
+#[test]
+fn an_account_past_its_action_budget_is_dropped_and_logged() {
+    let temp = TempDir::new();
+    let (mut server, store) = start_server(&temp);
+    let (mut first, _) = log_in(&mut server, 81, 2, &store);
+    let (_second, _) = log_in(&mut server, 82, 3, &store);
+    // Ignore toggles always answer the sender (112/2 add, 112/3 remove), so silence means a drop.
+    let start = std::time::Instant::now();
+    let replies: Vec<usize> = (0..30)
+        .map(|n| {
+            first
+                .send(&mut server, &application(6, &ignore_request(n % 2 == 0, "Beryl", "Two")))
+                .iter()
+                .filter(|m| is_family_byte_sub(m, 112, 2) || is_family_byte_sub(m, 112, 3))
+                .count()
+        })
+        .collect();
+    let refill = start.elapsed().as_secs_f64() * 5.0;
+    server.flush_security();
+    let log = fs::read_to_string(temp.0.join("security.jsonl")).unwrap();
+    assert!(replies[..10].iter().all(|n| *n > 0), "{replies:?}");
+    let accepted = replies.iter().sum::<usize>() as f64;
+    assert!(accepted < 30.0 && accepted <= 10.0 + refill.ceil(), "{replies:?}");
+    assert!(log.contains(r#""kind":"budget_refusal""#), "{log}");
+    assert!(!log.contains("Beryl"), "names never reach the log");
 }
 
 /// Security Model L6: the gateway admits at most 16 sessions (pending included).

@@ -102,6 +102,8 @@ The remaining dungeons, housing (missing scene assets), pets, mounts (including 
 
 ## Update log
 
+- **2026-10-16, 1.9 wired (lead), PARTLY:** the gateway checks every routed social application against `ActionBudgets` by account (shared across staged world clones, so rollback never refunds), and `--security-log FILE` records budget and admission refusals (flushed every 5 s and at shutdown; an unusable file disables logging, never the server). Gate: `multiplayer::an_account_past_its_action_budget_is_dropped_and_logged` (canary: disabling the check fails it). Open: `realm` commands bypass the budget (dev-only path), dev-command denials and auth failures aren't logged yet (auth comes with 1.2 wiring); the launcher doesn't pass `--security-log` yet.
+
 - **2026-10-16, quest audit (W92, for 2.4/2.5):** `scripts/quest_audit.py` classifies all 653 regional quests (639 hollow). Talk is the largest class the routed engine already supports (86, 74 hollow); 8 talk referrals staged privately in `lab/reports/quest-audit-20261016/review/`, 3 bot-completed on scratch gateways. Classes are text inference (R). Not merged into the play content; see [[Research/Quest Audit]].
 
 - **2026-10-16, T3 application fuzz (W90), PARTLY:** `tests/app_fuzz.rs` drives ~19k mutated messages through the real gateway (10/10 routed labels, 30/30 selectors); no parser panic. Its one finding (Low: a Mystery Chest Use for an unknown instance cancelled another chest's pending confirmation) is fixed in `mystery_chest_loot.rs`, and the reproducer is now a live test. Open: social parsing through the CLI's private `Session::dispatch_message`.

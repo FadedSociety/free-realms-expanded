@@ -312,6 +312,7 @@ fn options(root: &Path, reference: PathBuf, account_store: Option<PathBuf>) -> O
         world: None,
         stock_text: None,
         allow_lan: false,
+        security_log: None,
     }
 }
 

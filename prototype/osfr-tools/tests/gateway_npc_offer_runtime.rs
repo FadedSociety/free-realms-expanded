@@ -210,6 +210,7 @@ fn account_store_gateway_talk_to_samantha_sends_quest_offer() {
         world: None,
         stock_text: None,
         allow_lan: false,
+        security_log: None,
     })
     .unwrap();
     let socket = UdpSocket::bind("127.0.0.1:0").unwrap();

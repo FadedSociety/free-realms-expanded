@@ -12,6 +12,7 @@ use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
 use osfr_tools::net_policy::{Bucket, IpLimiter};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
+use osfr_tools::security_log::{EventKind, SecurityEvent, SecurityLog};
 use osfr_tools::session::{CRC_SEED, SessionRequest, clock_reflect, decode_controls};
 use osfr_tools::social_chat::{
     self, AccountChatPermissions, ChatHistory, ChatLine, ChatSession, NameData, QuickChatCatalog,
@@ -88,7 +89,7 @@ use std::{
     env, fs, io,
     net::{SocketAddr, TcpListener, UdpSocket},
     path::{Path, PathBuf},
-    sync::Arc,
+    sync::{Arc, Mutex},
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
@@ -286,6 +287,8 @@ pub struct Options {
     pub stock_text: Option<Arc<std::collections::HashSet<u32>>>,
     /// Accept a private-network bind and peers (Security Model L1).
     pub allow_lan: bool,
+    /// Bounded refusal log (Security Model L9) in a host-protected folder.
+    pub security_log: Option<PathBuf>,
 }
 
 impl Options {
@@ -293,7 +296,7 @@ impl Options {
         let mut args = env::args().skip(1);
         let bind: SocketAddr = args
             .next()
-            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--dev-tools]")?
+            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--security-log FILE] [--dev-tools]")?
             .parse()?;
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
@@ -306,6 +309,7 @@ impl Options {
         let mut terrain = None;
         let mut world = None;
         let mut stock_text = None;
+        let mut security_log = None;
         while let Some(key) = args.next() {
             if key == "--dev-tools" {
                 dev_tools = true;
@@ -328,6 +332,7 @@ impl Options {
                 "--studio-port" => studio_port = value.parse()?,
                 "--client-logs" => client_logs = Some(PathBuf::from(value)),
                 "--world" => world = Some(PathBuf::from(value)),
+                "--security-log" => security_log = Some(PathBuf::from(value)),
                 "--client-locale" => {
                     let dat = Path::new(&value).join("en_us_data.dat");
                     stock_text = Some(Arc::new(osfr_tools::world_text::stock_hashes(&dat)?));
@@ -375,6 +380,7 @@ impl Options {
             world,
             stock_text,
             allow_lan,
+            security_log,
         })
     }
 }
@@ -429,6 +435,35 @@ struct SharedWorld {
     joined: BTreeSet<SessionId>,
     chat_sessions: BTreeMap<SessionId, ChatSession>,
     chat_history: ChatHistory,
+    security: Arc<Mutex<Security>>,
+}
+
+/// Security Model L6/L9 state. Every staged clone of the world shares it, so a
+/// rolled-back message neither duplicates nor refunds an account's budget.
+#[derive(Default)]
+struct Security {
+    budgets: social_chat::ActionBudgets,
+    log: Option<SecurityLog>,
+}
+
+impl std::fmt::Debug for Security {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str("Security")
+    }
+}
+
+impl Security {
+    /// The log batches and throttles its own I/O; a log error never drops a peer.
+    fn record(&mut self, kind: EventKind, account_id: Option<u64>, session_id: Option<u64>) {
+        let Some(log) = &mut self.log else { return };
+        if let Err(error) = log.record(SecurityEvent {
+            kind,
+            account_id,
+            session_id,
+        }) {
+            eprintln!("security log: {error}");
+        }
+    }
 }
 
 impl SharedWorld {
@@ -444,6 +479,7 @@ impl SharedWorld {
             joined: BTreeSet::new(),
             chat_sessions: BTreeMap::new(),
             chat_history: ChatHistory::default(),
+            security: Arc::default(),
         }
     }
 
@@ -1373,6 +1409,17 @@ impl Session {
     }
 
     fn route_application(&mut self, inner: &[u8], world: &mut SharedWorld) -> Vec<Delivery> {
+        // One social action budget per account (W91); a refusal is a silent drop (R).
+        let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
+        if !security.budgets.allow(self.account_guid, inner, Instant::now()) {
+            security.record(
+                EventKind::BudgetRefusal,
+                Some(self.account_guid),
+                Some(self.id.0),
+            );
+            return Vec::new();
+        }
+        drop(security);
         if inner.starts_with(&[15, 0, 1, 0]) {
             return self.route_typed_chat(inner, world);
         }
@@ -1798,6 +1845,7 @@ pub struct Server {
     handshakes: IpLimiter,
     refused: u64,
     refusal_logged: Option<Instant>,
+    security_flushed: Instant,
     socket: UdpSocket,
     sessions: SessionMap,
     world: SharedWorld,
@@ -1856,11 +1904,21 @@ impl Server {
         } else {
             None
         };
+        let world = SharedWorld::new();
+        if let Some(path) = &options.security_log {
+            // Logging is best effort: an unusable file disables it, never the server.
+            match SecurityLog::open(path) {
+                Ok(log) => world.security.lock().unwrap().log = Some(log),
+                Err(error) => event(
+                    json!({"event":"security_log_unavailable","reason":error.to_string()}),
+                ),
+            }
+        }
         Ok(Self {
             options,
             socket,
             sessions: BTreeMap::new(),
-            world: SharedWorld::new(),
+            world,
             start: Instant::now(),
             generation: SystemTime::now().duration_since(UNIX_EPOCH)?.subsec_nanos(),
             trace: None,
@@ -1869,6 +1927,7 @@ impl Server {
             handshakes: IpLimiter::new(HANDSHAKES_PER_IP.0, HANDSHAKES_PER_IP.1, 1024),
             refused: 0,
             refusal_logged: None,
+            security_flushed: Instant::now(),
         })
     }
 
@@ -1880,6 +1939,11 @@ impl Server {
     /// cannot grow the log.
     fn refuse(&mut self, reason: &'static str) {
         self.refused += 1;
+        self.world
+            .security
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .record(EventKind::AdmissionRefusal, None, None);
         if self
             .refusal_logged
             .is_none_or(|at| at.elapsed() >= Duration::from_secs(10))
@@ -1887,6 +1951,14 @@ impl Server {
             event(json!({"event":"admission_refused","reason":reason,"count":self.refused}));
             self.refused = 0;
             self.refusal_logged = Some(Instant::now());
+        }
+    }
+
+    /// Write any batched security counts (timer and shutdown).
+    pub fn flush_security(&mut self) {
+        let mut security = self.world.security.lock().unwrap_or_else(|e| e.into_inner());
+        if let Some(Err(error)) = security.log.as_mut().map(SecurityLog::flush) {
+            eprintln!("security log: {error}");
         }
     }
 
@@ -1898,6 +1970,10 @@ impl Server {
         // One event loop serializes all shared world mutations; session state stays per entry.
         let now_ms = self.start.elapsed().as_millis() as u64;
         self.poll_studio(now_ms);
+        if self.security_flushed.elapsed() >= Duration::from_secs(5) {
+            self.flush_security();
+            self.security_flushed = Instant::now();
+        }
         let mut buffer = [0; 65_535];
         match self.socket.recv_from(&mut buffer) {
             Ok((length, peer))
@@ -2640,6 +2716,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             server.end_session(key, session, "server_shutdown")?;
         }
     }
+    server.flush_security();
     event(json!({"event":"stopped"}));
     Ok(())
 }
@@ -2716,6 +2793,7 @@ mod tests {
             world: None,
             stock_text: None,
             allow_lan: false,
+            security_log: None,
         };
         let mut session = Session::new(
             SessionId(17),
