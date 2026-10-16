@@ -53,3 +53,28 @@ All new sprites are derived from imagegen output. Coordinates below are half-ope
 The vine roots are local delivered-image coordinates, measured at the cut end that anchors on the banner wordmark. Four to 39 detached antialias specks per vine were removed; every remaining opaque pixel belongs to the root-connected component used by the runtime BFS reveal.
 
 `slices.json` is the complete machine-readable record, including sampled magenta key values, normalized-atlas placements and detached-pixel counts.
+
+## W112 polish (2026-10-16)
+
+W112 keeps the W98 panel, buttons, tabs and vine source art. It reslices only the
+realm row, text field and hint plank from the existing generated `sheet-a.png`
+(SHA-256 `57b85ab4b731daf1ec59bb873196e0ca87deed8c71753cbe924b6c8fe7a91c26`).
+No promotional art was cut out or added. The normalized banner protection boxes
+and all slice metadata are in `slices.json`.
+
+| Sprite | Source box | Trimmed box | Delivered size | Centre box | Rim |
+|---|---:|---:|---:|---:|---|
+| `list_row.png` | `[707, 497, 1304, 601)` | `[708, 498, 1303, 601)` | `595 x 103` | `[48, 17, 547, 86)` | smooth bevel |
+| `text_field.png` | `[707, 659, 1425, 739)` | `[708, 663, 1423, 737)` | `715 x 74` | `[24, 16, 691, 58)` | smooth bevel |
+| `plank.png` | `[922, 844, 1484, 955)` | `[928, 850, 1477, 954)` | `549 x 104` | `[60, 32, 489, 72)` | smooth bevel |
+
+The panel uses a 400 px tile with 16 complete 25 px cyan bead periods. Measured
+top-edge pitches differ across control sprites: normal, hover, pressed and
+disabled buttons use 22, 25, 24 and 23 px; PLAY uses 24 px; tabs use 23 px.
+The renderer preserves corner sizes, crops a centered strip with whole bead
+periods and fits a whole tile count to the destination edge. The panel centre
+box is plain; the quiet-control centres are tested against cyan and gold rim
+pixel thresholds. Vines use roots `[10,161]`, `[11,180]`, `[8,161]`,
+`[9,189]` and are anchored along the banner wordmark's right edge; a pixel test
+checks full reveal and the 0.3/0.8 growth states against the protected wordmark,
+starburst and other banner copy boxes.

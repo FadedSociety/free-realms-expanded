@@ -10,9 +10,28 @@ backdrop. Four orange vines grow from the banner wordmark on launch. Art sources
 hashes and slice boxes are listed in `assets/ui/README.md`; review captures and
 the readability audit are in `lab/reports/rust-launcher-w98/`.
 
-Login is visibly a **local compatibility stub**, behind `LoginProvider` in
-`src/lib.rs`. Only literal loopback endpoints work until remote key-pair login
-is available.
+Login uses the local compatibility stub when a realm has no profile ID; that
+path accepts literal loopback endpoints only. Enter a stored profile ID beside
+PLAY to use the selected realm's trusted key-pair profile. The launcher loads
+the profile from the current user's `APPDATA` and runs `auth::login` before the
+existing launch handoff. The profile's broker endpoint and server identity are
+trusted local settings; the UI never learns a pin from the network. Login
+errors appear in the status plank. Profiles are selected per realm for the
+current launcher session.
+
+Create a key and print its public half with the launcher executable:
+
+```powershell
+& $exe --new-key my-realm
+& $exe --print-public-key my-realm
+```
+
+`--new-key` writes an owner-only key under the current user's
+`APPDATA\FreeRealmsExpanded\profiles\<id>` directory and prints only the
+public key. Enroll that public key with the trusted local broker, provision the
+matching pinned profile through `auth::save_profile`, then enter its profile ID
+for that realm. A profile ID alone does not create a profile or enroll a key.
+Key commands run before UI startup and return their output directly.
 The controller option controls this launcher window. It does not inject game
 input or start the existing in-game Python bridge. Settings are session-only.
 
@@ -97,3 +116,14 @@ edge strips, and stretches only the plain panel centre. The capture-only options
 images; screenshot mode disables Play and closes after capture. Build and test
 results, including any host-specific test limitations, are recorded in
 `lab/reports/rust-launcher-w98/README.md`.
+
+## W112 art and login evidence (2026-10-16)
+
+W112 moves vine growth to the banner's right edge and checks every revealed
+pixel against protected text and starburst rectangles. It gives the list row,
+text field and status plank smooth bevels, aligns repeating button/panel edges
+to complete bead periods, and draws a cover-fitted backdrop over the full
+viewport. PLAY uses the selected realm's stored profile when its profile ID is
+set and passes the resulting session token through the existing launch path.
+The W112 report contains before/after captures, per-gate test output, art
+provenance and remaining limitations.

@@ -6,7 +6,10 @@ mod theme;
 
 use controller::{Controller, Navigation};
 use eframe::egui::{self, Color32, RichText, Vec2};
-use osfr_launcher::{LaunchPlan, LaunchSettings, LocalLoginStub, LoginProvider};
+use osfr_launcher::{
+    LaunchPlan, LaunchSettings, LocalLoginStub, LoginProvider, SessionToken,
+    auth::{self, AuthError},
+};
 use std::{
     cell::Cell,
     fs::File,
@@ -52,6 +55,43 @@ fn save_capture(path: &Path, screenshot: &egui::ColorImage) -> Result<(), image:
 struct Server {
     name: String,
     address: String,
+    profile_id: String,
+}
+
+struct RealmLogin {
+    profile_id: String,
+}
+
+impl RealmLogin {
+    fn session_with(
+        &self,
+        endpoint: &str,
+        load_profile: impl FnOnce(&str) -> Result<auth::Profile, AuthError>,
+        authenticate: impl FnOnce(&auth::Profile) -> Result<SessionToken, AuthError>,
+    ) -> osfr_launcher::Result<SessionToken> {
+        if self.profile_id.trim().is_empty() {
+            return LocalLoginStub.session(endpoint);
+        }
+        let profile = load_profile(self.profile_id.trim()).map_err(auth_error_message)?;
+        login_profile(&profile, authenticate)
+    }
+}
+
+impl LoginProvider for RealmLogin {
+    fn session(&mut self, endpoint: &str) -> osfr_launcher::Result<SessionToken> {
+        self.session_with(endpoint, auth::load_profile, auth::login)
+    }
+}
+
+fn auth_error_message(error: AuthError) -> String {
+    error.to_string()
+}
+
+fn login_profile(
+    profile: &auth::Profile,
+    authenticate: impl FnOnce(&auth::Profile) -> Result<SessionToken, AuthError>,
+) -> osfr_launcher::Result<SessionToken> {
+    authenticate(profile).map_err(auth_error_message)
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -61,6 +101,7 @@ enum FocusTarget {
     RealmRow(usize),
     AddAddress,
     AddRealm,
+    LoginProfile,
     Play,
     ClientFolder,
     LocaleFolder,
@@ -91,6 +132,7 @@ fn focus_order(settings: bool, realm_count: usize) -> Vec<FocusTarget> {
             FocusTarget::AddAddress,
             FocusTarget::AddRealm,
             FocusTarget::Play,
+            FocusTarget::LoginProfile,
         ]);
     }
     order
@@ -126,8 +168,7 @@ struct Launcher {
     controller_on: bool,
     controller: Option<Controller>,
     controller_status: String,
-    login: Option<Box<dyn LoginProvider + Send>>,
-    pending: Option<mpsc::Receiver<(Box<dyn LoginProvider + Send>, Result<Child, String>)>>,
+    pending: Option<mpsc::Receiver<Result<Child, String>>>,
     child: Option<Child>,
     message: String,
     screenshot: Option<PathBuf>,
@@ -162,6 +203,7 @@ impl Launcher {
             servers: vec![Server {
                 name: "Local realm".into(),
                 address: "127.0.0.1:20042".into(),
+                profile_id: String::new(),
             }],
             selected: 0,
             new_address: String::new(),
@@ -172,7 +214,6 @@ impl Launcher {
             controller_on: true,
             controller,
             controller_status,
-            login: Some(Box::new(LocalLoginStub)),
             pending: None,
             child: None,
             message: "Choose your client copy in Settings, then select a realm.".into(),
@@ -197,18 +238,18 @@ impl Launcher {
             self.message = "Choose the client folder before playing.".into();
             return;
         }
-        let Some(mut login) = self.login.take() else {
-            return;
-        };
         let client = PathBuf::from(&self.client);
         let locale = (!self.locale.trim().is_empty()).then(|| PathBuf::from(&self.locale));
-        let address = self.servers[self.selected].address.clone();
+        let server = &self.servers[self.selected];
+        let address = server.address.clone();
+        let profile_id = server.profile_id.trim().to_owned();
         let settings = self.settings;
         let (sender, receiver) = mpsc::channel();
         self.pending = Some(receiver);
         self.message = "Preparing client files and backups...".into();
         // One bounded preparation job; keep the window responsive during locale I/O.
         std::thread::spawn(move || {
+            let mut login: Box<dyn LoginProvider + Send> = Box::new(RealmLogin { profile_id });
             let result = LaunchPlan::build(
                 &client,
                 &address,
@@ -220,7 +261,7 @@ impl Launcher {
                 plan.apply()?;
                 plan.launch()
             });
-            let _ = sender.send((login, result));
+            let _ = sender.send(result);
         });
     }
 
@@ -372,10 +413,11 @@ impl Launcher {
                         self.servers.push(Server {
                             name: "Custom realm".into(),
                             address: self.new_address.clone(),
+                            profile_id: String::new(),
                         });
                         self.selected = self.servers.len() - 1;
                         self.new_address.clear();
-                        self.message = "Realm added. Remote key-pair login is coming soon.".into();
+                        self.message = "Realm added. Set a stored key-pair profile ID or use local loopback login.".into();
                     }
                     Err(error) => self.message = error,
                 }
@@ -418,8 +460,21 @@ impl Launcher {
                 self.play();
             }
             ui.vertical(|ui| {
-                ui.label(RichText::new("Local login preview").strong());
-                ui.small("Key-pair login coming soon.");
+                ui.label(RichText::new("Login profile ID").strong());
+                let profile = theme::text_field(
+                    ui,
+                    &self.art,
+                    &mut self.servers[self.selected].profile_id,
+                    "Optional; blank uses local login",
+                    Vec2::new(ui.available_width().max(220.0), 38.0),
+                    64,
+                );
+                self.record_focus(FocusTarget::LoginProfile, &profile);
+                if self.servers[self.selected].profile_id.trim().is_empty() {
+                    ui.small("Local compatibility login; loopback only.");
+                } else {
+                    ui.small("Stored key-pair profile; broker login on Play.");
+                }
             });
         });
     }
@@ -547,8 +602,7 @@ impl eframe::App for Launcher {
         self.navigation(ctx);
         if let Some(receiver) = &self.pending {
             match receiver.try_recv() {
-                Ok((login, result)) => {
-                    self.login = Some(login);
+                Ok(result) => {
                     self.pending = None;
                     match result {
                         Ok(child) => {
@@ -582,10 +636,13 @@ impl eframe::App for Launcher {
         let rendered_settings = self.settings_page;
         let rendered_realms = self.servers.len();
         self.focus_targets.clear();
+        self.art.draw_backdrop(
+            &ctx.layer_painter(egui::LayerId::background()),
+            ctx.content_rect(),
+        );
         egui::CentralPanel::default()
             .frame(egui::Frame::new().fill(Color32::TRANSPARENT).inner_margin(10))
             .show(ctx, |ui| {
-                self.art.draw_backdrop(ui.painter(), ui.max_rect());
                 egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
                     let width = ui.available_width().min(1080.0);
                     ui.set_max_width(width);
@@ -613,13 +670,7 @@ impl eframe::App for Launcher {
                             theme::unit_uv(),
                             Color32::WHITE,
                         );
-                        let anchors = [
-                            theme::VineAnchor { x: 0.49, y: 0.39, width: 0.18 },
-                            theme::VineAnchor { x: 0.59, y: 0.28, width: 0.17 },
-                            theme::VineAnchor { x: 0.78, y: 0.42, width: 0.18 },
-                            theme::VineAnchor { x: 0.88, y: 0.30, width: 0.17 },
-                        ];
-                        self.art.draw_vines(ui.painter(), banner_rect, &anchors);
+                        self.art.draw_vines(ui.painter(), banner_rect, &theme::VINE_ANCHORS);
                     });
                     ui.add_space(2.0);
                     let panel_slot = ui.painter().add(egui::Shape::Noop);
@@ -745,13 +796,28 @@ impl eframe::App for Launcher {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let raw_args: Vec<_> = std::env::args_os().skip(1).collect();
+    if let Some(result) =
+        osfr_launcher::key_command(raw_args.iter().map(|arg| arg.to_str().unwrap_or("")))
+    {
+        match result {
+            Ok(output) => {
+                println!("{output}");
+                return Ok(());
+            }
+            Err(error) => {
+                eprintln!("{error}");
+                std::process::exit(2);
+            }
+        }
+    }
     diagnostics::init()?;
     let mut screenshot = None;
     let mut settings_page = false;
     let mut focus_play = false;
     let mut test_vine_growth = None;
     let mut window_size = [940.0, 790.0];
-    let mut args = std::env::args_os().skip(1);
+    let mut args = raw_args.into_iter();
     while let Some(arg) = args.next() {
         if arg == "--screenshot" {
             screenshot = args.next().map(PathBuf::from);
@@ -850,6 +916,82 @@ mod tests {
     use super::*;
 
     #[test]
+    fn play_profile_login_calls_authenticator_and_maps_each_error_message() {
+        let profile = auth::Profile::new(
+            "fixture",
+            "Fixture realm",
+            "127.0.0.1:20043",
+            [42; 32],
+            "acct_001",
+        )
+        .unwrap();
+        let cases = [
+            (
+                AuthError::ServerUnreachable,
+                "Server unreachable. Check the broker or secure tunnel.",
+            ),
+            (
+                AuthError::WrongServerIdentity,
+                "Wrong server identity. Check the trusted server profile.",
+            ),
+            (
+                AuthError::Refused,
+                "Login refused. Check key enrolment or try again later.",
+            ),
+            (
+                AuthError::TryLater,
+                "Server closed the login request. Try again later.",
+            ),
+            (
+                AuthError::Timeout,
+                "Login timed out. Check the broker or try again later.",
+            ),
+            (
+                AuthError::InvalidReply,
+                "Server returned an invalid login reply.",
+            ),
+            (
+                AuthError::InvalidProfile,
+                "Invalid server profile. Check the trusted profile settings.",
+            ),
+            (
+                AuthError::KeyStorage,
+                "Cannot access the private profile files. Check their permissions.",
+            ),
+            (
+                AuthError::RandomUnavailable,
+                "The operating system could not generate a secure key.",
+            ),
+        ];
+        for (error, message) in cases {
+            let mut called = false;
+            let mut loaded = false;
+            let login = RealmLogin {
+                profile_id: "fixture".into(),
+            };
+            let result = login.session_with(
+                "127.0.0.1:20042",
+                |id| {
+                    loaded = true;
+                    assert_eq!(id, "fixture");
+                    Ok(profile.clone())
+                },
+                |selected| {
+                    called = true;
+                    assert_eq!(selected, &profile);
+                    Err(error)
+                },
+            );
+            assert!(loaded, "PLAY must load the selected realm's profile");
+            assert!(called, "PLAY must call the selected profile's login");
+            match result {
+                Err(error) => assert_eq!(error, message),
+                Ok(_) => panic!("PLAY unexpectedly accepted an authentication error"),
+            }
+        }
+    }
+
+    #[test]
     fn controller_focus_walk_covers_every_home_and_settings_control() {
         let cases = [
             (
@@ -863,6 +1005,7 @@ mod tests {
                     FocusTarget::AddAddress,
                     FocusTarget::AddRealm,
                     FocusTarget::Play,
+                    FocusTarget::LoginProfile,
                 ],
             ),
             (
@@ -887,6 +1030,9 @@ mod tests {
             let mut broken = expected.clone();
             broken.pop();
             assert!(!focus_sequence_matches(&broken, settings, realm_count));
+            let mut reordered = expected.clone();
+            reordered.swap(0, 1);
+            assert!(!focus_sequence_matches(&reordered, settings, realm_count));
 
             let ctx = egui::Context::default();
             let mut actual = Vec::new();
@@ -908,7 +1054,9 @@ mod tests {
                     egui::CentralPanel::default().show(ctx, |ui| {
                         for target in &expected {
                             let response = match target {
-                                FocusTarget::AddAddress | FocusTarget::ClientFolder => {
+                                FocusTarget::AddAddress
+                                | FocusTarget::LoginProfile
+                                | FocusTarget::ClientFolder => {
                                     ui.add(egui::TextEdit::singleline(&mut path))
                                 }
                                 FocusTarget::LocaleFolder => {

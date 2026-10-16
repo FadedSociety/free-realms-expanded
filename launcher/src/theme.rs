@@ -6,6 +6,13 @@ pub const INK: Color32 = Color32::from_rgb(243, 249, 255);
 pub const DARK_INK: Color32 = Color32::from_rgb(38, 50, 66);
 pub const BLUE: Color32 = Color32::from_rgb(7, 42, 91);
 pub const FOCUS_GLOW: Color32 = Color32::from_rgb(113, 237, 255);
+const BUTTON_NORMAL_BEAD_PERIOD: f32 = 22.0;
+const BUTTON_HOVER_BEAD_PERIOD: f32 = 25.0;
+const BUTTON_PRESSED_BEAD_PERIOD: f32 = 24.0;
+const BUTTON_DISABLED_BEAD_PERIOD: f32 = 23.0;
+const PLAY_BEAD_PERIOD: f32 = 24.0;
+const TAB_BEAD_PERIOD: f32 = 23.0;
+const PANEL_BEAD_PERIOD: f32 = 25.0;
 
 pub fn unit_uv() -> egui::Rect {
     egui::Rect::from_min_max(egui::Pos2::ZERO, egui::pos2(1.0, 1.0))
@@ -30,11 +37,36 @@ struct GrowingVine {
     last_cutoff: Option<u32>,
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct VineAnchor {
     pub x: f32,
     pub y: f32,
     pub width: f32,
 }
+
+pub const VINE_ROOTS: [[usize; 2]; 4] = [[10, 161], [11, 180], [8, 161], [9, 189]];
+pub const VINE_ANCHORS: [VineAnchor; 4] = [
+    VineAnchor {
+        x: 0.945,
+        y: 0.56,
+        width: 0.24,
+    },
+    VineAnchor {
+        x: 0.945,
+        y: 0.65,
+        width: 0.24,
+    },
+    VineAnchor {
+        x: 0.93,
+        y: 0.74,
+        width: 0.24,
+    },
+    VineAnchor {
+        x: 0.91,
+        y: 0.83,
+        width: 0.24,
+    },
+];
 
 pub struct UiArt {
     backdrop: egui::TextureHandle,
@@ -62,25 +94,25 @@ impl UiArt {
                 ctx,
                 "vine 1",
                 include_bytes!("../assets/ui/vine_1.png"),
-                [10, 161],
+                VINE_ROOTS[0],
             )?,
             load_vine(
                 ctx,
                 "vine 2",
                 include_bytes!("../assets/ui/vine_2.png"),
-                [11, 180],
+                VINE_ROOTS[1],
             )?,
             load_vine(
                 ctx,
                 "vine 3",
                 include_bytes!("../assets/ui/vine_3.png"),
-                [8, 161],
+                VINE_ROOTS[2],
             )?,
             load_vine(
                 ctx,
                 "vine 4",
                 include_bytes!("../assets/ui/vine_4.png"),
-                [9, 189],
+                VINE_ROOTS[3],
             )?,
         ];
         Ok(Self {
@@ -134,21 +166,7 @@ impl UiArt {
 
     pub fn draw_backdrop(&self, painter: &egui::Painter, rect: egui::Rect) {
         let [width, height] = self.backdrop.size();
-        let source_aspect = width as f32 / height as f32;
-        let target_aspect = rect.width() / rect.height().max(1.0);
-        let uv = if source_aspect > target_aspect {
-            let visible = target_aspect / source_aspect;
-            egui::Rect::from_min_max(
-                egui::pos2((1.0 - visible) * 0.5, 0.0),
-                egui::pos2((1.0 + visible) * 0.5, 1.0),
-            )
-        } else {
-            let visible = source_aspect / target_aspect;
-            egui::Rect::from_min_max(
-                egui::pos2(0.0, (1.0 - visible) * 0.5),
-                egui::pos2(1.0, (1.0 + visible) * 0.5),
-            )
-        };
+        let uv = cover_uv([width, height], rect);
         painter.image(self.backdrop.id(), rect, uv, Color32::WHITE);
         painter.rect_filled(rect, 0, Color32::from_rgba_unmultiplied(5, 20, 43, 102));
     }
@@ -307,38 +325,65 @@ fn tile_horizontal(
     texture_size: [usize; 2],
     dst: egui::Rect,
     src: egui::Rect,
+    bead_period: f32,
 ) {
-    let mut x = dst.left();
-    while x < dst.right() {
-        let width = src.width().min(dst.right() - x);
-        let used_source = src.width() * width / src.width().max(1.0);
+    if dst.width() <= 0.0 || src.width() <= 0.0 || bead_period <= 0.0 {
+        return;
+    }
+    let (tiles, periods_per_tile) = horizontal_tile_layout(dst.width(), src.width(), bead_period);
+    let source_width = periods_per_tile as f32 * bead_period;
+    let source_left =
+        (src.center().x - source_width * 0.5).clamp(0.0, texture_size[0] as f32 - source_width);
+    let tile_src = egui::Rect::from_min_max(
+        egui::pos2(source_left, src.top()),
+        egui::pos2(source_left + source_width, src.bottom()),
+    );
+    let tile_width = dst.width() / tiles as f32;
+    for index in 0..tiles {
         add_quad(
             mesh,
             texture_size,
-            egui::Rect::from_min_size(egui::pos2(x, dst.top()), Vec2::new(width, dst.height())),
-            egui::Rect::from_min_size(src.min, Vec2::new(used_source, src.height())),
+            egui::Rect::from_min_size(
+                egui::pos2(dst.left() + tile_width * index as f32, dst.top()),
+                Vec2::new(tile_width, dst.height()),
+            ),
+            tile_src,
         );
-        x += width;
     }
 }
 
-fn tile_vertical(
-    mesh: &mut egui::Mesh,
-    texture_size: [usize; 2],
-    dst: egui::Rect,
-    src: egui::Rect,
-) {
-    let mut y = dst.top();
-    while y < dst.bottom() {
-        let height = src.height().min(dst.bottom() - y);
-        let used_source = src.height() * height / src.height().max(1.0);
-        add_quad(
-            mesh,
-            texture_size,
-            egui::Rect::from_min_size(egui::pos2(dst.left(), y), Vec2::new(dst.width(), height)),
-            egui::Rect::from_min_size(src.min, Vec2::new(src.width(), used_source)),
-        );
-        y += height;
+fn horizontal_tile_layout(dst_width: f32, src_width: f32, bead_period: f32) -> (usize, usize) {
+    let source_periods = (src_width / bead_period).round().max(1.0) as usize;
+    let destination_periods = (dst_width / bead_period).round().max(1.0) as usize;
+    let tiles = destination_periods.div_ceil(source_periods);
+    let ideal = dst_width / (tiles as f32 * bead_period);
+    let lower = (ideal.floor() as usize).clamp(1, source_periods);
+    let upper = (ideal.ceil() as usize).clamp(1, source_periods);
+    let lower_error = (dst_width / (tiles * lower) as f32 - bead_period).abs();
+    let upper_error = (dst_width / (tiles * upper) as f32 - bead_period).abs();
+    let periods_per_tile = if lower_error <= upper_error {
+        lower
+    } else {
+        upper
+    };
+    (tiles, periods_per_tile)
+}
+
+fn cover_uv(texture_size: [usize; 2], rect: egui::Rect) -> egui::Rect {
+    let source_aspect = texture_size[0] as f32 / texture_size[1] as f32;
+    let target_aspect = rect.width() / rect.height().max(1.0);
+    if source_aspect > target_aspect {
+        let visible = target_aspect / source_aspect;
+        egui::Rect::from_min_max(
+            egui::pos2((1.0 - visible) * 0.5, 0.0),
+            egui::pos2((1.0 + visible) * 0.5, 1.0),
+        )
+    } else {
+        let visible = source_aspect / target_aspect;
+        egui::Rect::from_min_max(
+            egui::pos2(0.0, (1.0 - visible) * 0.5),
+            egui::pos2(1.0, (1.0 + visible) * 0.5),
+        )
     }
 }
 
@@ -348,6 +393,7 @@ fn nine_slice(
     rect: egui::Rect,
     corner_x: f32,
     corner_y: f32,
+    bead_period: Option<f32>,
 ) -> egui::Shape {
     let [width, height] = texture.size();
     let sw = width as f32;
@@ -383,25 +429,24 @@ fn nine_slice(
             ),
         );
     }
-    tile_horizontal(
-        &mut mesh,
-        [width, height],
-        egui::Rect::from_min_max(egui::pos2(dx[1], dy[0]), egui::pos2(dx[2], dy[1])),
-        egui::Rect::from_min_max(egui::pos2(sx[1], sy[0]), egui::pos2(sx[2], sy[1])),
-    );
-    tile_horizontal(
-        &mut mesh,
-        [width, height],
-        egui::Rect::from_min_max(egui::pos2(dx[1], dy[2]), egui::pos2(dx[2], dy[3])),
-        egui::Rect::from_min_max(egui::pos2(sx[1], sy[2]), egui::pos2(sx[2], sy[3])),
-    );
-    tile_vertical(
+    let top_dst = egui::Rect::from_min_max(egui::pos2(dx[1], dy[0]), egui::pos2(dx[2], dy[1]));
+    let top_src = egui::Rect::from_min_max(egui::pos2(sx[1], sy[0]), egui::pos2(sx[2], sy[1]));
+    let bottom_dst = egui::Rect::from_min_max(egui::pos2(dx[1], dy[2]), egui::pos2(dx[2], dy[3]));
+    let bottom_src = egui::Rect::from_min_max(egui::pos2(sx[1], sy[2]), egui::pos2(sx[2], sy[3]));
+    if let Some(period) = bead_period {
+        tile_horizontal(&mut mesh, [width, height], top_dst, top_src, period);
+        tile_horizontal(&mut mesh, [width, height], bottom_dst, bottom_src, period);
+    } else {
+        add_quad(&mut mesh, [width, height], top_dst, top_src);
+        add_quad(&mut mesh, [width, height], bottom_dst, bottom_src);
+    }
+    add_quad(
         &mut mesh,
         [width, height],
         egui::Rect::from_min_max(egui::pos2(dx[0], dy[1]), egui::pos2(dx[1], dy[2])),
         egui::Rect::from_min_max(egui::pos2(sx[0], sy[1]), egui::pos2(sx[1], sy[2])),
     );
-    tile_vertical(
+    add_quad(
         &mut mesh,
         [width, height],
         egui::Rect::from_min_max(egui::pos2(dx[2], dy[1]), egui::pos2(dx[3], dy[2])),
@@ -447,16 +492,48 @@ fn button_texture<'a>(
     enabled: bool,
     hovered: bool,
     pressed: bool,
-) -> (&'a egui::TextureHandle, f32, f32) {
+) -> (&'a egui::TextureHandle, f32, f32, Option<f32>) {
     match skin {
-        ButtonSkin::Tab { selected } => (&art.tabs[if selected { 0 } else { 1 }], 42.0, 22.0),
-        ButtonSkin::Play if enabled && !pressed => (&art.play[usize::from(hovered)], 56.0, 30.0),
-        ButtonSkin::Play if !enabled => (&art.buttons[3], 48.0, 22.0),
-        ButtonSkin::Play => (&art.buttons[2], 48.0, 22.0),
-        ButtonSkin::Standard if !enabled => (&art.buttons[3], 44.0, 22.0),
-        ButtonSkin::Standard if pressed => (&art.buttons[2], 44.0, 22.0),
-        ButtonSkin::Standard if hovered => (&art.buttons[1], 44.0, 22.0),
-        ButtonSkin::Standard => (&art.buttons[0], 44.0, 22.0),
+        ButtonSkin::Tab { selected } => (
+            &art.tabs[if selected { 0 } else { 1 }],
+            42.0,
+            22.0,
+            Some(TAB_BEAD_PERIOD),
+        ),
+        ButtonSkin::Play if enabled && !pressed => (
+            &art.play[usize::from(hovered)],
+            56.0,
+            30.0,
+            Some(PLAY_BEAD_PERIOD),
+        ),
+        ButtonSkin::Play if !enabled => (
+            &art.buttons[3],
+            48.0,
+            22.0,
+            Some(BUTTON_DISABLED_BEAD_PERIOD),
+        ),
+        ButtonSkin::Play => (
+            &art.buttons[2],
+            48.0,
+            22.0,
+            Some(BUTTON_PRESSED_BEAD_PERIOD),
+        ),
+        ButtonSkin::Standard if !enabled => (
+            &art.buttons[3],
+            44.0,
+            22.0,
+            Some(BUTTON_DISABLED_BEAD_PERIOD),
+        ),
+        ButtonSkin::Standard if pressed => (
+            &art.buttons[2],
+            44.0,
+            22.0,
+            Some(BUTTON_PRESSED_BEAD_PERIOD),
+        ),
+        ButtonSkin::Standard if hovered => {
+            (&art.buttons[1], 44.0, 22.0, Some(BUTTON_HOVER_BEAD_PERIOD))
+        }
+        ButtonSkin::Standard => (&art.buttons[0], 44.0, 22.0, Some(BUTTON_NORMAL_BEAD_PERIOD)),
     }
 }
 
@@ -491,14 +568,20 @@ pub fn button(
             },
         )
         .inner;
-    let (texture, cx, cy) = button_texture(
+    let (texture, cx, cy, bead_period) = button_texture(
         art,
         skin,
         enabled,
         response.hovered(),
         response.is_pointer_button_down_on(),
     );
-    let mut shapes = vec![nine_slice(texture, response.rect.shrink(1.0), cx, cy)];
+    let mut shapes = vec![nine_slice(
+        texture,
+        response.rect.shrink(1.0),
+        cx,
+        cy,
+        bead_period,
+    )];
     if response.has_focus() {
         shapes.extend(focus_shapes(response.rect));
     }
@@ -553,6 +636,7 @@ pub fn row_button(
         response.rect.shrink(1.0),
         48.0,
         17.0,
+        None,
     )];
     if response.has_focus() {
         shapes.extend(focus_shapes(response.rect));
@@ -576,21 +660,21 @@ pub fn row_button(
         egui::Align2::LEFT_TOP,
         name,
         display(19.0),
-        INK,
+        DARK_INK,
     );
     copy.text(
         egui::pos2(rect.left() + 50.0, rect.top() + 31.0),
         egui::Align2::LEFT_TOP,
         address,
         FontId::monospace(14.0),
-        INK,
+        DARK_INK,
     );
     painter.text(
         egui::pos2(rect.right() - 16.0, rect.center().y),
         egui::Align2::RIGHT_CENTER,
         "Status pending",
         FontId::proportional(12.0),
-        Color32::from_rgb(226, 242, 255),
+        DARK_INK,
     );
     response
 }
@@ -622,7 +706,13 @@ pub fn text_field(
     );
     let response = inner.inner;
     let rect = inner.response.rect;
-    let mut shapes = vec![nine_slice(&art.text_field, rect.shrink(1.0), 24.0, 16.0)];
+    let mut shapes = vec![nine_slice(
+        &art.text_field,
+        rect.shrink(1.0),
+        24.0,
+        16.0,
+        None,
+    )];
     painter.set(slot, egui::Shape::Vec(shapes));
     if response.has_focus() {
         shapes = focus_shapes(rect).into();
@@ -642,7 +732,7 @@ pub fn panel() -> egui::Frame {
 }
 
 pub fn panel_shape(art: &UiArt, rect: egui::Rect) -> egui::Shape {
-    nine_slice(&art.panel, rect, 88.0, 24.0)
+    nine_slice(&art.panel, rect, 88.0, 25.0, Some(PANEL_BEAD_PERIOD))
 }
 
 pub fn plank(ui: &mut egui::Ui, art: &UiArt, text: &str, height: f32) {
@@ -664,7 +754,7 @@ pub fn plank(ui: &mut egui::Ui, art: &UiArt, text: &str, height: f32) {
         },
     );
     let rect = inner.response.rect;
-    painter.set(slot, nine_slice(&art.plank, rect, 60.0, 32.0));
+    painter.set(slot, nine_slice(&art.plank, rect, 60.0, 32.0, None));
 }
 
 pub fn install(ctx: &egui::Context) {
@@ -843,5 +933,223 @@ mod tests {
                 .into();
             assert!(counts.windows(2).all(|pair| pair[0] <= pair[1]));
         }
+    }
+
+    #[test]
+    fn vines_stay_outside_banner_wordmark_and_starburst() {
+        // Banner-normalized protected zones: FREE REALMS, NEW!, expanded title,
+        // subtitle, and PLAY NOW. The four roots sit along the wordmark's right edge.
+        let manifest: serde_json::Value =
+            serde_json::from_str(include_str!("../assets/ui/slices.json")).unwrap();
+        let protected: Vec<[f32; 4]> = manifest["banner_protected_zones"]["rectangles"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|zone| serde_json::from_value(zone["box"].clone()).unwrap())
+            .collect();
+        let vines = [
+            include_bytes!("../assets/ui/vine_1.png").as_slice(),
+            include_bytes!("../assets/ui/vine_2.png").as_slice(),
+            include_bytes!("../assets/ui/vine_3.png").as_slice(),
+            include_bytes!("../assets/ui/vine_4.png").as_slice(),
+        ];
+        for ((bytes, root), anchor) in vines.into_iter().zip(VINE_ROOTS).zip(VINE_ANCHORS) {
+            let (image, order) = transparent_root(bytes, root);
+            let width = image.size[0];
+            for growth in [0.3, 0.8, 1.0] {
+                let cutoff = growth_cutoff(&order, growth);
+                for (index, pixel) in image.pixels.iter().enumerate() {
+                    if pixel.a() == 0 || order[index] >= cutoff {
+                        continue;
+                    }
+                    let x = index % width;
+                    let y = index / width;
+                    let banner_x =
+                        anchor.x + (x as f32 + 0.5 - root[0] as f32) * anchor.width / width as f32;
+                    let banner_y = anchor.y
+                        + (y as f32 + 0.5 - root[1] as f32) * anchor.width * 3.0 / width as f32;
+                    assert!(
+                        protected.iter().all(|[left, top, right, bottom]| {
+                            banner_x < *left
+                                || banner_x >= *right
+                                || banner_y < *top
+                                || banner_y >= *bottom
+                        }),
+                        "vine pixel entered a protected banner region at growth {growth}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn nine_slice_centres_have_no_bead_rim_pixels() {
+        fn check(bytes: &[u8], center: [usize; 4]) {
+            let image = image::load_from_memory(bytes).unwrap().into_rgba8();
+            let [left, top, right, bottom] = center;
+            for y in top..bottom {
+                for x in left..right {
+                    let [r, g, b, a] = image.get_pixel(x as u32, y as u32).0;
+                    let cyan_bead = a > 100
+                        && b > 230
+                        && g > 150
+                        && r < 120
+                        && u16::from(b) > u16::from(g) + 20
+                        && u16::from(b) > u16::from(r) * 3 / 2;
+                    let gold_bead = a > 100
+                        && r > 225
+                        && (120..210).contains(&g)
+                        && b < 80
+                        && u16::from(r) > u16::from(g) + 30;
+                    assert!(!cyan_bead && !gold_bead, "bead rim pixel at ({x}, {y})");
+                }
+            }
+        }
+
+        let manifest: serde_json::Value =
+            serde_json::from_str(include_str!("../assets/ui/slices.json")).unwrap();
+        let panel_center = serde_json::from_value(
+            manifest["nine_slice"]["beaded"]["panel.png"]["center_box"].clone(),
+        )
+        .unwrap();
+        check(include_bytes!("../assets/ui/panel.png"), panel_center);
+        for (name, bytes) in [
+            (
+                "list_row.png",
+                include_bytes!("../assets/ui/list_row.png").as_slice(),
+            ),
+            (
+                "text_field.png",
+                include_bytes!("../assets/ui/text_field.png").as_slice(),
+            ),
+            (
+                "plank.png",
+                include_bytes!("../assets/ui/plank.png").as_slice(),
+            ),
+        ] {
+            let center =
+                serde_json::from_value(manifest["nine_slice"]["quiet"][name]["center_box"].clone())
+                    .unwrap();
+            check(bytes, center);
+        }
+    }
+
+    #[test]
+    fn beaded_edges_tile_on_whole_periods_without_a_partial_last_tile() {
+        let manifest: serde_json::Value =
+            serde_json::from_str(include_str!("../assets/ui/slices.json")).unwrap();
+        let panel_period = manifest["nine_slice"]["beaded"]["panel.png"]["bead_period_px"]
+            .as_u64()
+            .unwrap() as f32;
+        let control_period = |name: &str| {
+            manifest["nine_slice"]["beaded"]["buttons_and_tabs"][name]["bead_period_px"]
+                .as_u64()
+                .unwrap() as f32
+        };
+        let panel_center: [usize; 4] = serde_json::from_value(
+            manifest["nine_slice"]["beaded"]["panel.png"]["center_box"].clone(),
+        )
+        .unwrap();
+        assert_eq!(panel_period, PANEL_BEAD_PERIOD);
+        assert_eq!(
+            (panel_center[2] - panel_center[0]) as f32 / panel_period,
+            manifest["nine_slice"]["beaded"]["panel.png"]["periods_per_edge_tile"]
+                .as_u64()
+                .unwrap() as f32
+        );
+        assert_eq!(
+            control_period("button_normal.png"),
+            BUTTON_NORMAL_BEAD_PERIOD
+        );
+        assert_eq!(control_period("button_hover.png"), BUTTON_HOVER_BEAD_PERIOD);
+        assert_eq!(
+            control_period("button_pressed.png"),
+            BUTTON_PRESSED_BEAD_PERIOD
+        );
+        assert_eq!(
+            control_period("button_disabled.png"),
+            BUTTON_DISABLED_BEAD_PERIOD
+        );
+        assert_eq!(control_period("play_normal.png"), PLAY_BEAD_PERIOD);
+        assert_eq!(control_period("play_hover.png"), PLAY_BEAD_PERIOD);
+        assert_eq!(control_period("tab_selected.png"), TAB_BEAD_PERIOD);
+        assert_eq!(control_period("tab_unselected.png"), TAB_BEAD_PERIOD);
+        for (width, corner, period) in [
+            (566, 88.0, panel_period),
+            (337, 44.0, control_period("button_normal.png")),
+            (336, 44.0, control_period("button_hover.png")),
+            (336, 44.0, control_period("button_pressed.png")),
+            (340, 44.0, control_period("button_disabled.png")),
+            (397, 56.0, control_period("play_normal.png")),
+            (398, 56.0, control_period("play_hover.png")),
+            (286, 42.0, control_period("tab_selected.png")),
+            (287, 42.0, control_period("tab_unselected.png")),
+        ] {
+            let source_tile = width as f32 - 2.0 * corner;
+            for destination in [180.0, 420.0, 560.0, 1080.0] {
+                let (tiles, periods) = horizontal_tile_layout(destination, source_tile, period);
+                assert!(tiles > 0 && periods > 0);
+                let source_width = periods as f32 * period;
+                assert!((source_width / period - periods as f32).abs() < 0.001);
+                let rendered_period = destination / (tiles * periods) as f32;
+                assert!(
+                    (rendered_period - period).abs() <= 2.0,
+                    "edge {width}px at {destination}px used {tiles} tiles x {periods} periods: {period} -> {rendered_period}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn backdrop_image_covers_the_full_viewport_with_cover_fit() {
+        let ctx = egui::Context::default();
+        let art = UiArt::load(&ctx).unwrap();
+        let viewport = egui::Rect::from_min_size(egui::Pos2::ZERO, Vec2::new(1280.0, 800.0));
+        let output = ctx.run(
+            egui::RawInput {
+                screen_rect: Some(viewport),
+                ..Default::default()
+            },
+            |ctx| {
+                art.draw_backdrop(
+                    &ctx.layer_painter(egui::LayerId::background()),
+                    ctx.content_rect(),
+                );
+            },
+        );
+        let bounds = output.shapes.iter().find_map(|shape| match &shape.shape {
+            egui::Shape::Mesh(mesh) => {
+                let min_x = mesh
+                    .vertices
+                    .iter()
+                    .map(|v| v.pos.x)
+                    .fold(f32::INFINITY, f32::min);
+                let min_y = mesh
+                    .vertices
+                    .iter()
+                    .map(|v| v.pos.y)
+                    .fold(f32::INFINITY, f32::min);
+                let max_x = mesh
+                    .vertices
+                    .iter()
+                    .map(|v| v.pos.x)
+                    .fold(f32::NEG_INFINITY, f32::max);
+                let max_y = mesh
+                    .vertices
+                    .iter()
+                    .map(|v| v.pos.y)
+                    .fold(f32::NEG_INFINITY, f32::max);
+                Some(egui::Rect::from_min_max(
+                    egui::pos2(min_x, min_y),
+                    egui::pos2(max_x, max_y),
+                ))
+            }
+            _ => None,
+        });
+        assert_eq!(bounds, Some(viewport));
+        let uv = cover_uv([1280, 720], viewport);
+        assert!(uv.min.x > 0.0 && uv.max.x < 1.0);
+        assert_eq!(uv.min.y, 0.0);
+        assert_eq!(uv.max.y, 1.0);
     }
 }
