@@ -1361,12 +1361,13 @@ impl QuestEngine {
         }
     }
 
-    /// Persist selection locking after decoding inverted 47/13 (R policy).
-    pub fn set_auto_switch_selected(&mut self, locked: bool) -> QuestOutcome {
-        if self.state.auto_switch_selected == locked {
+    /// Persist the client's auto-switch flag (`manager+0x10f8`). The 47/13 wire byte is its
+    /// inverse (`00c7c5d0` sends `sete`), so `quest_journal::handle` passes `!locked` (R policy).
+    pub fn set_auto_switch_selected(&mut self, auto_switch: bool) -> QuestOutcome {
+        if self.state.auto_switch_selected == auto_switch {
             return QuestOutcome::default();
         }
-        self.state.auto_switch_selected = locked;
+        self.state.auto_switch_selected = auto_switch;
         QuestOutcome {
             changed: true,
             ..QuestOutcome::default()
@@ -1433,6 +1434,11 @@ impl QuestEngine {
 
     pub fn can_offer(&self, quest_id: u32, giver_npc_id: u64) -> bool {
         self.offer_denial(quest_id, giver_npc_id).is_none()
+    }
+
+    /// The NPC that gives `quest_id`; a breadcrumb start offers through this giver (R).
+    pub fn giver_npc_id(&self, quest_id: u32) -> Option<u64> {
+        self.definitions.get(&quest_id).map(|d| d.giver_npc_id)
     }
 
     pub fn is_enabled(&self, quest_id: u32) -> bool {

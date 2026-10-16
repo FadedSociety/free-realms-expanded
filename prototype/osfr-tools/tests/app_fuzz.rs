@@ -466,7 +466,7 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     for sub in [1, 3, 4, 6] {
         result.push(("social_router", words(40, sub, &[u32::MAX; 4])));
     }
-    for sub in [2, 14] {
+    for sub in [2, 14, 15] {
         let mut p = vec![49, 0, sub, 0, 0, 0];
         p.extend(u32::MAX.to_le_bytes());
         if sub == 2 {
@@ -474,6 +474,13 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         }
         result.push(("quest_engine", p));
     }
+    // Family 47 uses a one-byte subtype: 47/12 select, 47/13 lock (2 is not a
+    // valid lock byte), and the family wildcard's unknown subtype.
+    let mut select = vec![47, 0, 12];
+    select.extend(u32::MAX.to_le_bytes());
+    result.push(("quest_engine", select));
+    result.push(("quest_engine", vec![47, 0, 13, 2]));
+    result.push(("quest_engine", vec![47, 0, 0xff, 0xff]));
     result.push(("kart", words(26, 42, &[])));
     // 33/* routes as a family, even unknown subtypes. Include all implemented client cases.
     for sub in [2, 6, 7, 9, 10, 17, 19, 22, 0xffff] {

@@ -542,7 +542,7 @@ fn save_reconnect_and_cancel_paths_release_the_run() {
     say(&mut gateway, "realm mine", 2_000);
     let instance = active_instance(&gateway).unwrap();
 
-    // Save/reconnect keeps the live run exactly.
+    // (R) Save/reconnect releases the live run: the new client has no movie to resume.
     let snapshot = gateway.snapshot();
     let path = fixture.directory.join("type8-save.json");
     game_store::save(&path, &snapshot).unwrap();
@@ -557,12 +557,12 @@ fn save_reconnect_and_cancel_paths_release_the_run() {
     restored.set_dev_tools(true);
     restored.set_role(osfr_tools::account_store::AccountRole::Admin);
     login(&mut restored);
-    assert_eq!(active_instance(&restored), Some(instance));
-
-    // The native movie leave cancels once and emits the removal packet once.
-    let left = send(&mut restored, &[26, 0, 42, 0], 3_000);
-    assert!(has_inner(&left, &[39, 0, 19]));
     assert!(active_instance(&restored).is_none());
+    assert_eq!(count(&restored, ORE_DEFINITION), 0);
+
+    // A stale results Close from the old movie changes nothing.
+    let left = send(&mut restored, &[26, 0, 42, 0], 3_000);
+    assert!(left.replies.is_empty());
 
     let after = restored.snapshot();
     let replay = send(&mut restored, &[26, 0, 42, 0], 3_100);

@@ -61,6 +61,7 @@ pub mod players;
 pub mod profiles;
 pub mod progression_extras;
 pub mod quest_engine;
+pub mod quest_journal;
 pub mod quests;
 pub mod recipes;
 pub mod rewards;

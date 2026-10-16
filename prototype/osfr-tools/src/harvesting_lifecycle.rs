@@ -270,13 +270,22 @@ impl HarvestingLifecycle {
         let mut engine = self.engine.clone();
         let mut runs = self.runs.clone();
         let closed = runs.handle_client(&[26, 0, 42, 0])?;
+        let mut removal = Vec::new();
         if closed.changed {
-            let _ = engine.cancel();
+            let cancelled = engine.cancel();
+            // Native offer cancel is `26/42` followed by the instance removal `39/19`
+            // (review Native Crafting Quit 005748). Closing a finished run needs no reply:
+            // the results sequence already sent one.
+            if closed.state == Some(RunState::Cancelled) {
+                removal = cancelled.replies;
+            }
             validate_pair(&engine, &runs)?;
             self.engine = engine;
             self.runs = runs;
         }
-        Ok(from_run(closed))
+        let mut out = from_run(closed);
+        out.replies.extend(removal);
+        Ok(out)
     }
 
     fn handle_movie(

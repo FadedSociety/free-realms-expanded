@@ -665,7 +665,7 @@ fn save_reconnect_cancel_and_restart_rebind_the_run() {
     let state = fixture.chef_state();
     let mut gateway = fixture.gateway(state, true);
     say(&mut gateway, "realm harvest", 2_000);
-    let instance = active_instance(&gateway).unwrap();
+    assert!(active_instance(&gateway).is_some());
 
     let snapshot = gateway.snapshot();
     let path = fixture.directory.join("harvesting-save.json");
@@ -681,12 +681,15 @@ fn save_reconnect_cancel_and_restart_rebind_the_run() {
     restored.set_dev_tools(true);
     restored.set_role(osfr_tools::account_store::AccountRole::Admin);
     login(&mut restored);
-    assert_eq!(active_instance(&restored), Some(instance));
-
-    // The native movie leave cancels once and emits the removal packet once.
-    let left = send(&mut restored, &[26, 0, 42, 0], 3_000);
-    assert!(has_inner(&left, &[39, 0, 19]));
+    // (R) Reconnect releases the run: the new client has no movie to resume.
     assert!(active_instance(&restored).is_none());
+    for definition in FIXTURE_OUTPUTS {
+        assert_eq!(count(&restored, definition), 0);
+    }
+
+    // A stale results Close from the old movie changes nothing.
+    let left = send(&mut restored, &[26, 0, 42, 0], 3_000);
+    assert!(left.replies.is_empty());
     let after = restored.snapshot();
     let replay = send(&mut restored, &[26, 0, 42, 0], 3_100);
     assert!(replay.replies.is_empty());
@@ -870,7 +873,8 @@ fn full_bag_rolls_back_the_win_and_retry_grants_after_space() {
         assert_eq!(count(&gateway, definition), 0);
     }
 
-    // Free a row per pending output; the same frame now commits exactly once.
+    // (R) Reconnect releases the unpaid run: no payout and no stuck state. With space freed, a
+    // fresh run pays exactly once.
     let mut state = gateway.snapshot().gameplay.unwrap();
     for _ in 0..FIXTURE_OUTPUTS.len() {
         state.inventory.items.pop();
@@ -886,7 +890,17 @@ fn full_bag_rolls_back_the_win_and_retry_grants_after_space() {
     reopened.set_dev_tools(true);
     reopened.set_role(osfr_tools::account_store::AccountRole::Admin);
     login(&mut reopened);
-    let win = send(&mut reopened, &payload(instance, "OnNextLevelMsg"), 2_900);
+    assert!(active_instance(&reopened).is_none());
+    for definition in FIXTURE_OUTPUTS {
+        assert_eq!(count(&reopened, definition), 0);
+    }
+    say(&mut reopened, "realm harvest", 2_850);
+    let retry = active_instance(&reopened).unwrap() as i32;
+    play_handshake(&mut reopened, retry, 2_900);
+    for slot in 0..FIXTURE_OUTPUTS.len() {
+        fall(&mut reopened, retry, slot, 3_500 + slot as u64 * 10);
+    }
+    let win = send(&mut reopened, &payload(retry, "OnNextLevelMsg"), 3_600);
     assert!(has_text(&win, "OnGameWonMsg"));
     for definition in FIXTURE_OUTPUTS {
         assert_eq!(count(&reopened, definition), 1);

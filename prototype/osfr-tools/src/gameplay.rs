@@ -156,6 +156,8 @@ pub struct Gameplay {
     npc_coin_shop: Option<Arc<Mutex<crate::coin_shop::CoinShop>>>,
     npc_quests: Option<crate::quest_engine::QuestEngine>,
     saved_npc_quests: Option<crate::quest_engine::QuestState>,
+    /// Quests a player may start remotely with 49/15 (R), each with its giver NPC.
+    breadcrumb_quests: std::collections::BTreeMap<u32, u64>,
     /// Regional quest state is sent once per network session, not after every zone load.
     npc_quests_synced: bool,
     game_rules: GameRuleSet,
@@ -808,6 +810,7 @@ impl Gameplay {
             npc_coin_shop,
             npc_quests: None,
             saved_npc_quests,
+            breadcrumb_quests: std::collections::BTreeMap::new(),
             npc_quests_synced: false,
             game_rules: GameRuleSet::default(),
             profile_content_directory: directory
@@ -904,6 +907,18 @@ impl Gameplay {
         )?);
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         Ok(())
+    }
+
+    /// Allow `quest_ids` to be started by a 49/15 breadcrumb request. Ids without a quest
+    /// definition are dropped (R).
+    pub fn register_breadcrumb_quests(&mut self, quest_ids: impl IntoIterator<Item = u32>) {
+        let Some(engine) = &self.npc_quests else {
+            return;
+        };
+        self.breadcrumb_quests = quest_ids
+            .into_iter()
+            .filter_map(|id| Some((id, engine.giver_npc_id(id)?)))
+            .collect();
     }
 
     /// Replace account rules after account configuration or membership changes.
@@ -1075,6 +1090,28 @@ impl Gameplay {
                     .close_dialogue();
             }
             return Ok(Some(Outcome::default()));
+        }
+        if let Some(request) = crate::quest_journal::decode(inner)
+            .map_err(|_| invalid("invalid quest journal request"))?
+        {
+            let Some(engine) = self.npc_quests.as_mut() else {
+                return Ok(Some(Outcome::default()));
+            };
+            let result = crate::quest_journal::handle(engine, request, &self.breadcrumb_quests);
+            npc_event(serde_json::json!({
+                "event": "quest_journal",
+                "request": format!("{request:?}"),
+                "outcome": if result.changed {
+                    "changed"
+                } else if result.denial.is_some() {
+                    "rejected"
+                } else {
+                    "unchanged"
+                }
+            }));
+            let mut out = Outcome::default();
+            self.append_npc_quest_outcome(result, &mut out)?;
+            return Ok(Some(out));
         }
         if inner.starts_with(&[49, 0, 2, 0]) {
             let (quest_id, accept) = npc_interaction::decode_quest_reply_49_2(inner)
@@ -2143,6 +2180,15 @@ impl Gameplay {
             out.changed |= cancelled.changed;
             out.replies.extend(cancelled.replies);
         }
+        // (R) Same rule for the Type8 movies: a reconnecting client has no board or tile queue,
+        // so an unfinished Mining/Harvesting run (even a paid Won run waiting for results Close)
+        // is released here instead of blocking jobs, equipment and interaction forever.
+        for engine in [&mut self.mining, &mut self.harvesting].into_iter().flatten() {
+            let cancelled = engine.cancel();
+            out.changed |= cancelled.changed;
+            out.replies.extend(cancelled.replies);
+        }
+        self.type8_tick_ms = None;
         self.forging_tick_ms = None;
         out.replies.push(self.categories.initialization());
         let profile = self.profiles.as_ref().unwrap().active();
@@ -6649,6 +6695,46 @@ mod w64_regional_quest_tests {
             Some(&expected_samantha_dialogue())
         );
         (game, character)
+    }
+
+    #[test]
+    fn journal_requests_route_through_the_npc_quest_engine() {
+        let (mut game, character) = offer_test_game(false);
+        let mut accept = vec![49, 0, 2, 0, 0, 0];
+        accept.extend((INTRODUCE_YOURSELF_ID as i32).to_le_bytes());
+        accept.push(1);
+        game.handle_in_world(&accept, &character, 1_005).unwrap();
+        let state = |game: &Gameplay| game.npc_quests.as_ref().unwrap().state().clone();
+
+        // 47/12 selects the owned active quest and the state is marked for saving.
+        let mut select = vec![47, 0, 12];
+        select.extend((INTRODUCE_YOURSELF_ID as i32).to_le_bytes());
+        let out = game.handle_in_world(&select, &character, 1_006).unwrap();
+        assert!(out.changed);
+        assert_eq!(state(&game).selected_quest_id, Some(INTRODUCE_YOURSELF_ID));
+
+        // A forged id changes nothing and answers nothing; a malformed one is an error.
+        let before = state(&game);
+        let mut forged = vec![47, 0, 12];
+        forged.extend(999_999i32.to_le_bytes());
+        let out = game.handle_in_world(&forged, &character, 1_007).unwrap();
+        assert!(!out.changed && out.replies.is_empty());
+        assert_eq!(state(&game), before);
+        assert!(game.handle_in_world(&[47, 0, 12, 1, 0, 0], &character, 1_008).is_err());
+
+        // 47/13: wire 0 = unlocked = client auto-switch set; wire 1 = locked.
+        assert!(game.handle_in_world(&[47, 0, 13, 0], &character, 1_009).unwrap().changed);
+        assert!(state(&game).auto_switch_selected);
+        assert!(game.handle_in_world(&[47, 0, 13, 1], &character, 1_010).unwrap().changed);
+        assert!(!state(&game).auto_switch_selected);
+
+        // 49/15 for an id the server never registered offers nothing.
+        let before = state(&game);
+        let mut crumb = vec![49, 0, 15, 0, 0, 0];
+        crumb.extend(999_999i32.to_le_bytes());
+        let out = game.handle_in_world(&crumb, &character, 1_011).unwrap();
+        assert!(!out.changed && out.replies.is_empty());
+        assert_eq!(state(&game), before);
     }
 
     #[test]

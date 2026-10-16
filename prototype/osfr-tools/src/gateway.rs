@@ -485,7 +485,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(67), Some(2 | 3)) => "quick_chat",
         (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
         (Some(26), Some(14 | 15 | 17 | 30)) | (Some(40), Some(1 | 3 | 4 | 6)) => "social_router",
-        (Some(49), Some(2 | 14)) => "quest_engine",
+        (Some(49), Some(2 | 14 | 15)) => "quest_engine",
+        // Family 47 carries a one-byte subtype; word(2) would swallow the first body byte.
+        (Some(47), _) if matches!(body.get(2), Some(12 | 13)) => "quest_engine",
         (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
             "kart"
         }
