@@ -42,6 +42,7 @@ parser.add_argument("--character-select-title", type=Path, help="Opt-in versione
 parser.add_argument("--lua-probe", action="store_true", help="Replace per-run UI/ScriptsBase.bin with syntax-checked Lua source and an automatic quest-offer probe")
 parser.add_argument("--live-capture", action="store_true", help="Publish a non-authoritative live UDP prefix in the new run via a background writer")
 parser.add_argument("--keep-client", action="store_true", help="Keep the full per-run client copy (default: delete it after the run, keeping client/Logs)")
+parser.add_argument("--gamepad", action="store_true", help="Drive this run's client with an XInput controller (launcher/gamepad_bridge.py, layout in launcher/gamepad.json)")
 parser.add_argument("--native-hook", metavar="SET", help="Attach the Frida native hook set (see native_hook.py --list) to this run's client")
 parser.add_argument("--live-log", action=argparse.BooleanOptionalAction, default=True, help="Write server/login packet traces and open the merged live log in a console beside the client (default on; --no-live-log to disable)")
 parser.add_argument("--dev-tools", action="store_true", help="Opt in to local developer entity teleport commands for this test run")
@@ -304,6 +305,14 @@ try:
                                    startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW)
         processes.append((name, process))
         result[name + "_pid"] = process.pid
+        if name == "client" and run_options.gamepad:
+            # First in the list, so it is stopped last: it exits by itself
+            # when the client does, releasing any held keys first.
+            processes.insert(0, ("gamepad", subprocess.Popen(
+                [sys.executable, "-I", str(Path(__file__).with_name("launcher") / "gamepad_bridge.py"),
+                 "--pid", str(process.pid)],
+                stdout=(run / "gamepad-stdout.log").open("wb"), stderr=subprocess.STDOUT,
+                creationflags=subprocess.CREATE_NO_WINDOW)))
         if name == "client" and run_options.native_hook:
             # Frida native hooks on this run's client copy; hits go to native-hook.jsonl.
             subprocess.Popen(
