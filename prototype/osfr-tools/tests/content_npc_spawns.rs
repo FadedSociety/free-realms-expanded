@@ -196,8 +196,10 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     assert_eq!(broken_model_rows.len(), 3);
     assert!(!catalog_names.contains("knocker_m_boss.dme"));
 
-    assert_eq!(regional_legacy, 578);
-    assert_eq!(regional_reconstructed, 621);
+    // Placing a guessed NPC with evidence moves it between these two counts (W117 moved 4);
+    // the regional total is the invariant, not either count.
+    assert_eq!(regional_legacy + regional_reconstructed, 1199);
+    assert!(regional_legacy >= 578, "regional NPCs dropped to {regional_legacy}");
     assert_eq!(extra_rows.len(), 3265);
     assert_eq!(captured_actors.len(), 9);
     println!(

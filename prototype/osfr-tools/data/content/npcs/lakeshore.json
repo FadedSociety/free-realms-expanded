@@ -14759,7 +14759,7 @@
       ],
       "name": "Ty",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5101579,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -14774,7 +14774,7 @@
           "id": 1818787563
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": null,
       "zone": "Lakeshore",
       "zone_id": 8,
       "zone_reason": null,
@@ -15079,29 +15079,23 @@
       ],
       "services_reason": null,
       "position": [
-        -731.010612,
-        9.09,
-        944.10193
+        -798.9908,
+        -4.946,
+        703.8625
       ],
-      "position_w": null,
+      "position_w": 1.0,
       "rotation": [
         0.0,
-        -0.9726779459158872,
+        0.03396196790033778,
         0.0,
-        0.2321585956385215
+        0.9994231259763486
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 9,
-          "poi_name": "Lakeshore",
-          "match_score": 9
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification. ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081.",
       "source": [
         {
           "kind": "client",
@@ -15118,6 +15112,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
         }
       ],
       "field_sources": {
@@ -15205,16 +15211,16 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 39; source cell: [client][video][wiki]"
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 39; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 39; source cell: [client][video][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "name_string_ids": [
@@ -15233,16 +15239,16 @@
         ],
         "name_string_id_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 39; source cell: [client][video][wiki]"
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 39; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 39; source cell: [client][video][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "zone": [
@@ -15683,58 +15689,114 @@
         ],
         "position": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=9 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=9 NameId=18899 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_w": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "rotation": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=9 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=9 NameId=18899 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_source": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "capture_match": [
@@ -15742,8 +15804,53 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1824; src/Resources/Npcs.json Id=3081."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:908: 907=human_m_ty_downtrodden.agr; lab/reports/locale-id-to-text.json Global.Text.5101579 is 'Ty'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
         ]
-      }
+      },
+      "heading": 0.067937,
+      "model_id": 907,
+      "model_file_name": "human_m_ty_downtrodden.agr"
     },
     {
       "npc_id": 9500000367,

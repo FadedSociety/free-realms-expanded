@@ -5450,7 +5450,7 @@
       "reference_ids": [],
       "name": "Burt 'Wrecking' Crewe",
       "name_reason": null,
-      "name_string_id": 2003942166,
+      "name_string_id": 100244,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5490,29 +5490,23 @@
       ],
       "services_reason": null,
       "position": [
-        -234.70736,
-        1.18629,
-        -48.916067
+        -237.3089,
+        1.1,
+        -61.32073
       ],
-      "position_w": null,
+      "position_w": 1.0,
       "rotation": [
         0.0,
-        0.6847204084465704,
+        -0.569077052839022,
         0.0,
-        0.7288058467498472
+        0.8222842014364942
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 33,
-          "poi_name": "Frost Ridge Speedway",
-          "match_score": 20
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification. ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988.",
       "source": [
         {
           "kind": "client",
@@ -5525,6 +5519,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
         }
       ],
       "field_sources": {
@@ -5592,12 +5598,16 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 128; source cell: [client][video]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 128; source cell: [client][video]"
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "name_string_ids": [
@@ -5612,12 +5622,16 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 128; source cell: [client][video]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 128; source cell: [client][video]"
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "zone": [
@@ -5798,58 +5812,114 @@
         ],
         "position": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=33 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=33 NameId=382855 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_w": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "rotation": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=33 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=33 NameId=382855 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_source": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "capture_match": [
@@ -5857,8 +5927,53 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1731; src/Resources/Npcs.json Id=2988."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:830: 829=human_m_burt_crewe.agr; lab/reports/locale-id-to-text.json Global.Text.100244 is \"Burt 'Wrecking' Crewe\"; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
         ]
-      }
+      },
+      "heading": -1.210766,
+      "model_id": 829,
+      "model_file_name": "human_m_burt_crewe.agr"
     },
     {
       "npc_id": 9500000732,
@@ -7285,7 +7400,7 @@
       "reference_ids": [],
       "name": "Chad Fastflutter",
       "name_reason": null,
-      "name_string_id": 339634038,
+      "name_string_id": 104056,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -7322,29 +7437,23 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -232.815359,
-        1.18629,
-        -53.089932
+        -249.1389,
+        1.043,
+        -60.34922
       ],
-      "position_w": null,
+      "position_w": 1.0,
       "rotation": [
         0.0,
-        0.6847204084465704,
+        -0.1565953251182799,
         0.0,
-        0.7288058467498472
+        0.9876628494334999
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 33,
-          "poi_name": "Frost Ridge Speedway",
-          "match_score": 20
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification. ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989.",
       "source": [
         {
           "kind": "client",
@@ -7357,6 +7466,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
         }
       ],
       "field_sources": {
@@ -7424,12 +7545,16 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 129; source cell: [client][video]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 129; source cell: [client][video]"
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "name_string_ids": [
@@ -7444,12 +7569,16 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 129; source cell: [client][video]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 129; source cell: [client][video]"
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "zone": [
@@ -7626,58 +7755,114 @@
         ],
         "position": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=33 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=33 NameId=382855 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_w": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "rotation": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=33 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=33 NameId=382855 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_source": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "capture_match": [
@@ -7685,8 +7870,53 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1732; src/Resources/Npcs.json Id=2989."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:444: 443=fairy_m_freestyle_01.agr; lab/reports/locale-id-to-text.json Global.Text.104056 is 'Chad Fastflutter'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
         ]
-      }
+      },
+      "heading": -0.314485,
+      "model_id": 443,
+      "model_file_name": "fairy_m_freestyle_01.agr"
     },
     {
       "npc_id": 9500000736,
@@ -28389,7 +28619,7 @@
       "reference_ids": [],
       "name": "Mustang Alli",
       "name_reason": null,
-      "name_string_id": 1938923827,
+      "name_string_id": 100843,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -28429,34 +28659,23 @@
       ],
       "services_reason": null,
       "position": [
-        -231.233884,
-        1.18629,
-        -48.069362
+        -237.1163,
+        1.1,
+        -46.70612
       ],
-      "position_w": null,
+      "position_w": 1.0,
       "rotation": [
         0.0,
-        0.6847204084465704,
+        -0.838076045797953,
         0.0,
-        0.7288058467498472
+        0.5455534267692462
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 33,
-          "poi_name": "Frost Ridge Speedway",
-          "match_score": 20
-        },
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification. ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986.",
       "source": [
         {
           "kind": "client",
@@ -28473,6 +28692,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
         }
       ],
       "field_sources": {
@@ -28560,16 +28791,16 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 127; source cell: [client][video][wiki]"
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 127; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 127; source cell: [client][video][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "name_string_ids": [
@@ -28588,16 +28819,16 @@
         ],
         "name_string_id_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 127; source cell: [client][video][wiki]"
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 127; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 127; source cell: [client][video][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "zone": [
@@ -28826,58 +29057,114 @@
         ],
         "position": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=33 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=33 NameId=382855 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "position_w": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "rotation": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=33 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=33 NameId=382855 matches native name_string_id."
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_source": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
         ],
         "capture_match": [
@@ -28885,8 +29172,53 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:1729; src/Resources/Npcs.json Id=2986."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/runs/client-baseline-20261014T203930Z/client/Resources/Models.txt:821: 820=fairy_f_mustang_alli.agr; lab/reports/locale-id-to-text.json Global.Text.100843 is 'Mustang Alli'; lab/terrain/zone_0.hgt supplies ground height."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
+          }
         ]
-      }
+      },
+      "heading": -1.987494,
+      "model_id": 820,
+      "model_file_name": "fairy_f_mustang_alli.agr"
     },
     {
       "npc_id": 9500000760,
