@@ -4,6 +4,7 @@
 mod npc_interaction;
 
 use npc_interaction::NpcInteraction;
+use osfr_tools::inventory::Inventory;
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -13,6 +14,15 @@ use std::{
 
 fn content_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
+}
+
+fn inventory_content_dir() -> PathBuf {
+    std::env::var_os("OSFR_VENDOR_CONTENT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../lab/reports/round70-native-20261016T061000Z/content")
+        })
 }
 
 fn read_json(path: &Path) -> Value {
@@ -81,6 +91,8 @@ fn vendor_stock_is_loadable_and_supported_by_content_evidence() {
     let vendor_rows = vendor_data["vendors"]
         .as_array()
         .expect("resolved vendors are an array");
+    let inventory = Inventory::load(&inventory_content_dir(), None)
+        .expect("active package and item catalogue load");
     let mut vendor_keys = BTreeSet::new();
     let mut item_rows = 0usize;
     let mut runtime_items = 0usize;
@@ -212,6 +224,35 @@ fn vendor_stock_is_loadable_and_supported_by_content_evidence() {
     }
     assert_eq!(unresolved_keys.len(), 192);
 
+    let resolved_by_id: BTreeMap<u64, &Value> = vendor_rows
+        .iter()
+        .map(|vendor| {
+            (
+                vendor["npc_id"].as_u64().expect("vendor NPC ID is an integer"),
+                vendor,
+            )
+        })
+        .collect();
+    let mut vendors_with_grantable_stock = 0usize;
+    for npc_id in &unresolved_keys {
+        let Some(vendor) = resolved_by_id.get(npc_id) else {
+            continue;
+        };
+        let item_ids = vendor["item_ids"]
+            .as_array()
+            .expect("runtime item_ids are an array");
+        if !item_ids.is_empty()
+            && item_ids.iter().all(|value| {
+                value
+                    .as_i64()
+                    .and_then(|id| i32::try_from(id).ok())
+                    .is_some_and(|id| inventory.has_definition(id))
+            })
+        {
+            vendors_with_grantable_stock += 1;
+        }
+    }
+
     let candidate_vendor_ids: BTreeSet<u64> = unresolved["unresolved_stock_claims"]
         .as_array()
         .expect("unresolved cross-source claims are an array")
@@ -237,9 +278,10 @@ fn vendor_stock_is_loadable_and_supported_by_content_evidence() {
     );
     assert_eq!(coverage["member_only_flags_recovered"].as_u64(), Some(0));
     println!(
-        "vendor coverage: {} vendor keys; {} have runtime stock; {} mapped items ({} priced/runtime-ready, {} ambiguous, {} unmatched)",
+        "vendor coverage: {} vendor keys; {} have runtime stock; {} fully grantable stock; {} mapped items ({} priced/runtime-ready, {} ambiguous, {} unmatched)",
         unresolved_keys.len(),
         runtime_vendors,
+        vendors_with_grantable_stock,
         item_rows,
         runtime_items,
         coverage["items_ambiguous"].as_u64().unwrap_or_default(),

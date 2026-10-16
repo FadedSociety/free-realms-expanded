@@ -482,6 +482,30 @@ impl NpcInteraction {
         decode_merchant_buy_66_43(packet)
     }
 
+    /// (R) Enforce reconstructed stock, active-shop and proximity policy for a 66/43 buy.
+    pub fn validate_merchant_item_66_43(
+        &self,
+        item_id: i32,
+        zone_id: u32,
+        position: [f32; 3],
+    ) -> Result<(), NpcInteractionError> {
+        let active = self
+            .active
+            .as_ref()
+            .ok_or(NpcInteractionError::NoOpenShop)?;
+        if !active.shop_open {
+            return Err(NpcInteractionError::NoOpenShop);
+        }
+        if !active.shop_items.contains(&item_id) {
+            return Err(NpcInteractionError::InvalidOption);
+        }
+        let npc = self
+            .npcs
+            .get(&active.npc_id)
+            .ok_or(NpcInteractionError::UnknownNpc)?;
+        check_range(npc, zone_id, position)
+    }
+
     /// Return the native 66/46 hide message and clear this session's active merchant.
     pub fn close(&mut self, npc_id: u64) -> Result<Vec<u8>, NpcInteractionError> {
         let active = self
@@ -1106,7 +1130,10 @@ pub fn decode_merchant_list_66_42(packet: &[u8]) -> Result<MerchantListV2, NpcIn
     })
 }
 
-/// Client 66/43 buy fields in serializer order (`00b3ab20`). Meaning remains unresolved.
+/// Client 66/43 buy fields in serializer order (`00b3ab20`). `initial_dwords[0]`
+/// is the Lua-selected item key, `trailing_dwords[0]` the quantity and
+/// `trailing_dwords[2]` the generated request id (`00b43310`); mapping those to
+/// our catalogue is reconstructed policy (R). The supplied client price is ignored.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantBuyRequestV2 {
     pub initial_dwords: [u32; 2],

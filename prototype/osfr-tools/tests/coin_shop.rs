@@ -37,6 +37,13 @@ fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
         .sum()
 }
 
+fn merchant_status(result: &coin_shop::CoinShopOutcome) -> u32 {
+    let packet = result.replies.last().expect("vendor reply exists");
+    assert_eq!(packet.len(), 56);
+    assert_eq!(&packet[..4], &[66, 0, 44, 0]);
+    u32::from_le_bytes(packet[48..52].try_into().unwrap())
+}
+
 #[test]
 fn buy_debits_exact_cost_and_retry_is_idempotent() {
     let directory = inventory_content();
@@ -197,6 +204,10 @@ fn marketplace_purchase_is_disabled_and_does_not_change_inventory() {
     assert_eq!(u16::from_le_bytes(response[2..4].try_into().unwrap()), 4);
     assert_eq!(i32::from_le_bytes(response[4..8].try_into().unwrap()), 0);
     assert!(String::from_utf8_lossy(response).contains("Not available in this restoration."));
+
+    let fallback = shop.handle(&[66, 0, 43, 0]).unwrap();
+    assert_eq!(fallback.result_code, coin_shop::MARKETPLACE_RESULT_DISABLED);
+    assert_eq!(merchant_status(&fallback), 0);
 }
 
 #[test]
@@ -243,4 +254,74 @@ fn purchase_uses_the_synced_live_inventory() {
     let result = shop.buy(71001, 8, 1).unwrap();
     assert_eq!(result.result_code, coin_shop::RESULT_SUCCESS);
     assert_eq!(shop.inventory().state().coins, 85);
+}
+
+#[test]
+fn vendor_buy_debits_grants_and_retries_without_replaying() {
+    let directory = inventory_content();
+    let mut shop = shop(
+        &directory,
+        inventory_with_coins(&directory, 100),
+        usize::MAX,
+    );
+    let before = count_definition(shop.inventory().state(), 8);
+
+    let result = shop.buy_vendor(72001, 8, 1).unwrap();
+
+    assert_eq!(result.result_code, coin_shop::RESULT_SUCCESS);
+    assert!(result.changed);
+    assert_eq!(merchant_status(&result), 1);
+    assert_eq!(shop.inventory().state().coins, 85);
+    assert_eq!(count_definition(shop.inventory().state(), 8), before + 1);
+    let saved = shop.inventory().state().clone();
+
+    let retry = shop.buy_vendor(72001, 8, 1).unwrap();
+    assert_eq!(retry.result_code, coin_shop::RESULT_SUCCESS);
+    assert!(!retry.changed);
+    assert_eq!(retry.replies.len(), 1);
+    assert_eq!(merchant_status(&retry), 1);
+    assert_eq!(shop.inventory().state(), &saved);
+}
+
+#[test]
+fn vendor_refusals_report_low_balance_unknown_item_and_full_stack() {
+    let directory = inventory_content();
+    let mut poor = shop(&directory, inventory_with_coins(&directory, 5), usize::MAX);
+    let before = poor.inventory().state().clone();
+    let low_balance = poor.buy_vendor(72002, 8, 1).unwrap();
+    assert_eq!(
+        low_balance.result_code,
+        coin_shop::RESULT_INSUFFICIENT_COINS
+    );
+    assert_eq!(merchant_status(&low_balance), 0);
+    assert!(!low_balance.changed);
+    assert_eq!(poor.inventory().state(), &before);
+    poor.sync_inventory(inventory_with_coins(&directory, 100));
+    let recovered = poor.buy_vendor(72002, 8, 1).unwrap();
+    assert_eq!(recovered.result_code, coin_shop::RESULT_SUCCESS);
+    assert!(recovered.changed);
+    assert_eq!(merchant_status(&recovered), 1);
+
+    let mut stocked = shop(
+        &directory,
+        inventory_with_coins(&directory, 100),
+        usize::MAX,
+    );
+    let unknown = stocked.buy_vendor(72003, i32::MAX, 1).unwrap();
+    assert_eq!(unknown.result_code, coin_shop::RESULT_INVALID_ITEM);
+    assert_eq!(merchant_status(&unknown), 0);
+    assert!(!unknown.changed);
+
+    let mut inventory = inventory_with_coins(&directory, 100);
+    let mut state = inventory.state().clone();
+    state.items.retain(|item| item.definition_id != 8);
+    inventory = Inventory::load(&directory, Some(state)).expect("test inventory loads");
+    inventory.grant(0, 8, 1).expect("max stack is filled");
+    let mut full_stack = shop(&directory, inventory, usize::MAX);
+    let before = full_stack.inventory().state().clone();
+    let full = full_stack.buy_vendor(72004, 8, 2).unwrap();
+    assert_eq!(full.result_code, coin_shop::RESULT_SERVICE_UNAVAILABLE);
+    assert_eq!(merchant_status(&full), 0);
+    assert!(!full.changed);
+    assert_eq!(full_stack.inventory().state(), &before);
 }

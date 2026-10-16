@@ -141,6 +141,7 @@ pub struct CoinShop {
     bag_capacity: usize,
     is_member: bool,
     client_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
+    vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
 }
@@ -160,6 +161,7 @@ impl CoinShop {
             // (R) The caller must set the verified account flag after construction.
             is_member: false,
             client_transactions: BTreeMap::new(),
+            vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
         })
@@ -177,6 +179,61 @@ impl CoinShop {
 
     pub fn set_member_status(&mut self, is_member: bool) {
         self.is_member = is_member;
+    }
+
+    /// Apply one 66/43 vendor buy using the store catalogue's server-side price.
+    /// The request field mapping and transaction id are reconstructed policy (R).
+    pub fn buy_vendor(
+        &mut self,
+        client_transaction_id: u32,
+        item_id: i32,
+        quantity: u32,
+    ) -> io::Result<CoinShopOutcome> {
+        if let Some((result_code, response)) = self.vendor_transactions.get(&client_transaction_id)
+        {
+            return Ok(CoinShopOutcome {
+                result_code: *result_code,
+                transaction_id: client_transaction_id,
+                replies: vec![response.clone()],
+                changed: false,
+            });
+        }
+        // (R) Keep the session idempotency cache bounded under client-controlled IDs.
+        if self.vendor_transactions.len() >= MAX_CLIENT_TRANSACTIONS {
+            return Ok(vendor_refusal(
+                client_transaction_id,
+                RESULT_SERVICE_UNAVAILABLE,
+            ));
+        }
+
+        let mut outcome = self.buy_once(client_transaction_id, item_id, quantity, 0)?;
+        outcome.replies.pop();
+        let response = merchant_buy_result_packet(outcome.result_code == RESULT_SUCCESS);
+        outcome.replies.push(response.clone());
+        outcome.transaction_id = client_transaction_id;
+        if outcome.changed {
+            self.vendor_transactions
+                .insert(client_transaction_id, (outcome.result_code, response));
+        }
+        Ok(outcome)
+    }
+
+    /// (R) Refusals are retryable; return the native-visible 66/44 response without caching them.
+    pub fn refuse_vendor_buy(
+        &mut self,
+        client_transaction_id: u32,
+        result_code: u32,
+    ) -> CoinShopOutcome {
+        if let Some((result_code, response)) = self.vendor_transactions.get(&client_transaction_id)
+        {
+            return CoinShopOutcome {
+                result_code: *result_code,
+                transaction_id: client_transaction_id,
+                replies: vec![response.clone()],
+                changed: false,
+            };
+        }
+        vendor_refusal(client_transaction_id, result_code)
     }
 
     /// Handle one inner client packet. Unsupported messages remain outside this service.
@@ -343,7 +400,7 @@ impl CoinShop {
         let mut next_state = self.inventory.state().clone();
         next_state.coins -= total_price;
         let mut staged = Inventory::load(&self.inventory_content, Some(next_state))?;
-        let granted = match staged.grant_bundle(0, &[(item_id, quantity)]) {
+        let granted = match staged.grant(0, item_id, quantity) {
             Ok(granted) => granted,
             Err(_) => {
                 return Ok(self.failure(
@@ -738,7 +795,7 @@ impl CoinShop {
             22 => (1, empty_product_list(23)),
             25 => (1, account_info_packet()),
             // NpcMerchantV2 buy reply: every result other than 1 is a client-visible refusal.
-            43 => (MARKETPLACE_RESULT_DISABLED, merchant_buy_disabled_packet()),
+            43 => (MARKETPLACE_RESULT_DISABLED, merchant_buy_result_packet(false)),
             _ => return Ok(CoinShopOutcome::default()),
         };
         Ok(CoinShopOutcome {
@@ -859,10 +916,28 @@ fn order_disabled_packet(message: &str) -> Vec<u8> {
     bytes
 }
 
-fn merchant_buy_disabled_packet() -> Vec<u8> {
+/// 66/44 response. Native reader `00b32430` consumes seven dwords, an empty
+/// length-prefixed string, then five dwords; object field +0x58 (wire offset 48)
+/// is the status compared with 1 by dispatcher `00b48a10`. Other fields are R.
+pub fn merchant_buy_result_packet(success: bool) -> Vec<u8> {
     let mut bytes = header(MARKETPLACE_FAMILY, 44);
-    put_u32(&mut bytes, MARKETPLACE_RESULT_DISABLED);
+    for _ in 0..7 {
+        put_u32(&mut bytes, 0);
+    }
+    put_i32(&mut bytes, 0);
+    for field in 0..5 {
+        put_u32(&mut bytes, u32::from(success && field == 3));
+    }
     bytes
+}
+
+fn vendor_refusal(transaction_id: u32, result_code: u32) -> CoinShopOutcome {
+    CoinShopOutcome {
+        result_code,
+        transaction_id,
+        replies: vec![merchant_buy_result_packet(false)],
+        changed: false,
+    }
 }
 
 fn header(family: u16, opcode: u16) -> Vec<u8> {
