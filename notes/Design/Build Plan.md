@@ -30,7 +30,7 @@ You and about 10 friends log into our server from your own PCs and play together
 
 - [x] Audit the true state and rewrite the [[Build Ledger]] (2026-10-15).
 - [x] Write this plan.
-- [x] **Version control** (2026-10-15). First commit `ffef740` (5,458 files). Commit at every milestone and integration. The GitHub remote is pending: the repo must be **private**, because the content carries client-derived text and Legacy-derived data.
+- [x] **Version control** (2026-10-15). First commit `ffef740` (5,458 files). Commit at every milestone and integration. It is pushed to the **private** GitHub repo https://github.com/FadedSociety/free-realms-expanded. Push after every commit. Going public is the owner's call, because the content carries client-derived text and Legacy-derived data.
 - [x] **Code memory** (2026-10-15). `codebase-memory-mcp` 0.12.0 is installed for Claude Code, Codex and VS Code, with project `cartoonmmo` indexed (57,693 nodes, 168,877 edges). Use `trace_path` (inbound callers) to check whether a module is wired before planning work. Re-index after big changes with `codebase-memory-mcp cli index_repository --repo-path <project> --name cartoonmmo`.
 - [x] **Worker preamble** (2026-10-15, `lab/runs/luna/prompts/preamble.md`). Add the current toolkit (Studio API, bot client, terrain, behaviours, content checker, asset graph, World Builder, `realm` commands), the gate rule, and "read Build Plan and Build Ledger first, not older notes".
 - [x] **Brought stale notes up to date** (2026-10-15; originals in `lab/snapshots/notes-20261015/`): AGENTS.md (the captured-init and search-crash lines), Tasks.md, Current Progress top section, and MODLOG entries for 10-13 and 10-14.
