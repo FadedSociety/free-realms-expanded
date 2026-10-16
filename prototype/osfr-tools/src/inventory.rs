@@ -1,11 +1,20 @@
 //! Typed local inventory state and evidenced inventory packet shapes.
 //! Private content is prepared from supplied JSON and byte-checked captures.
+//!
+//! W88 integration: place W84's catalogue.json at CONTENT/item-catalogue.json.
+//! Inventory::load merges it automatically; inventory.json rows always win.
+//! The existing 35/34 Inventory::handle route uses definition_replies(inner).
+//! A lead adding a separate route should forward
+//! `out.replies.extend(self.inventory.definition_replies(inner)?);` and leave
+//! inventory/save state unchanged. Apply the session's packet/rate budget first.
+//! No bulk-ID wire format is inferred: W87 proves one ID per 12-byte request.
 use std::{
-    collections::{BTreeMap, BTreeSet},
-    fs::File,
+    collections::{BTreeMap, BTreeSet, HashMap},
+    fs::{self, File},
     io::{self, Read},
-    path::Path,
-    sync::Arc,
+    path::{Path, PathBuf},
+    sync::{Arc, Mutex, OnceLock},
+    time::SystemTime,
 };
 
 use serde::{Deserialize, Serialize};
@@ -16,6 +25,10 @@ mod v2_fixes;
 
 const MAX_ITEMS: usize = 4096;
 const MAX_CONTENT: usize = 4 * 1024 * 1024;
+// Reconstructed resource limits (R), separate from the player-owned item cap.
+const MAX_CATALOGUE_FILE: u64 = 128 * 1024 * 1024;
+const MAX_CATALOGUE_ROWS: usize = 65_536;
+const MAX_CATALOGUE_BYTES: usize = 32 * 1024 * 1024;
 
 #[path = "restoration/piece_081.rs"]
 pub mod instance_ids;
@@ -99,6 +112,94 @@ struct Definition {
     bytes: Vec<u8>,
 }
 
+impl Definition {
+    fn decode(mut self) -> io::Result<Self> {
+        self.bytes = decode_hex(&self.serialized_hex)?;
+        if self.bytes.len() < 4
+            || self.bytes.len() > 65_536
+            || self.bytes[..4] != self.id.to_le_bytes()
+            || hash(&self.bytes) != self.sha256
+            || self.id <= 0
+            || [self.model.len(), self.texture.len(), self.tint_alias.len()]
+                .iter()
+                .any(|size| *size > 4096)
+        {
+            return Err(invalid("invalid inventory definition content"));
+        }
+        // Keep one wire copy, not its hex and hash as well, for all 58k rows.
+        self.serialized_hex = String::new();
+        self.sha256 = String::new();
+        Ok(self)
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Catalogue {
+    schema_version: u32,
+    #[serde(deserialize_with = "catalogue_definitions")]
+    definitions: BTreeMap<i32, Definition>,
+}
+
+fn catalogue_definitions<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<BTreeMap<i32, Definition>, D::Error> {
+    // Stream rows through serde's parser: never hold a JSON DOM or a second
+    // vector of all decoded definitions. Source/default tags stay in
+    // W84's private file; generated server values remain reconstructed (R).
+    struct Rows;
+    impl<'de> serde::de::Visitor<'de> for Rows {
+        type Value = BTreeMap<i32, Definition>;
+        fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            f.write_str("a bounded item definition array")
+        }
+        fn visit_seq<A: serde::de::SeqAccess<'de>>(
+            self,
+            mut rows: A,
+        ) -> Result<Self::Value, A::Error> {
+            use serde::de::Error;
+            let mut definitions = BTreeMap::new();
+            let mut total = 0usize;
+            while let Some(definition) = rows.next_element::<Definition>()? {
+                if definitions.len() >= MAX_CATALOGUE_ROWS {
+                    return Err(A::Error::custom("item catalogue row limit exceeded"));
+                }
+                let definition = definition.decode().map_err(A::Error::custom)?;
+                total += definition.bytes.len(); // bounded row and row count
+                if total > MAX_CATALOGUE_BYTES {
+                    return Err(A::Error::custom("item catalogue byte limit exceeded"));
+                }
+                if definitions.insert(definition.id, definition).is_some() {
+                    return Err(A::Error::custom("duplicate item catalogue definition"));
+                }
+            }
+            Ok(definitions)
+        }
+    }
+    deserializer.deserialize_seq(Rows)
+}
+
+fn load_catalogue(file: File) -> io::Result<BTreeMap<i32, Definition>> {
+    let metadata = file.metadata()?;
+    if !metadata.is_file() || metadata.len() > MAX_CATALOGUE_FILE {
+        return Err(invalid(
+            "item catalogue must be a regular file of at most 128 MiB",
+        ));
+    }
+    // One bounded temporary source buffer avoids serde's per-byte Read overhead.
+    // Pre-size from metadata so the normal 68 MiB input does not double capacity.
+    let mut bytes = Vec::with_capacity(metadata.len() as usize);
+    file.take(MAX_CATALOGUE_FILE + 1).read_to_end(&mut bytes)?;
+    if bytes.len() as u64 > MAX_CATALOGUE_FILE {
+        return Err(invalid("item catalogue exceeds 128 MiB"));
+    }
+    let catalogue: Catalogue = serde_json::from_slice(&bytes).map_err(invalid)?;
+    if catalogue.schema_version != 1 {
+        return Err(invalid("unsupported item catalogue"));
+    }
+    Ok(catalogue.definitions)
+}
+
 #[derive(Deserialize)]
 struct Profile {
     id: i32,
@@ -134,6 +235,8 @@ struct Content {
     profiles: BTreeMap<i32, Profile>,
     spans: Vec<Span>,
     definitions: BTreeMap<i32, Definition>,
+    captured_definition_ids: BTreeSet<i32>,
+    initial_state: Option<InventoryState>,
 }
 
 #[derive(Clone)]
@@ -142,8 +245,49 @@ pub struct Inventory {
     state: InventoryState,
 }
 
+/// Parsed content is shared by every session and Coin Store transaction that
+/// loads the same files: parsing the generated catalogue (~58k rows) per login
+/// or per purchase cost seconds and ~50 MiB each. The key includes each file's
+/// size and modification time, so edited content is parsed again.
+fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
+    type Key = (PathBuf, Option<(u64, SystemTime)>, Option<(u64, SystemTime)>);
+    static CACHE: OnceLock<Mutex<HashMap<Key, Arc<Content>>>> = OnceLock::new();
+    let stamp = |name: &str| {
+        fs::metadata(directory.join(name))
+            .ok()
+            .and_then(|m| Some((m.len(), m.modified().ok()?)))
+    };
+    let key = (
+        directory.to_path_buf(),
+        stamp("inventory.json"),
+        stamp("item-catalogue.json"),
+    );
+    let cache = CACHE.get_or_init(Default::default);
+    if let Some(content) = cache.lock().unwrap_or_else(|e| e.into_inner()).get(&key) {
+        return Ok(content.clone());
+    }
+    let content = Inventory::parse_content(directory)?;
+    let mut cache = cache.lock().unwrap_or_else(|e| e.into_inner());
+    if cache.len() >= 8 {
+        cache.clear(); // a handful of content folders per process; never unbounded
+    }
+    cache.insert(key, content.clone());
+    Ok(content)
+}
+
 impl Inventory {
     pub fn load(directory: &Path, state: Option<InventoryState>) -> io::Result<Self> {
+        let content = shared_content(directory)?;
+        let state = state
+            .or_else(|| content.initial_state.clone())
+            .unwrap_or_else(|| content.default_state.clone());
+        let result = Self { content, state };
+        result.validate_content_state()?;
+        result.warn_undefined_items();
+        Ok(result)
+    }
+
+    fn parse_content(directory: &Path) -> io::Result<Arc<Content>> {
         let file = File::open(directory.join("inventory.json"))?;
         if !file.metadata()?.is_file() {
             return Err(invalid("inventory content must be a regular file"));
@@ -165,23 +309,8 @@ impl Inventory {
         }
         Self::validate_state(&manifest.default_state)?;
         let mut definitions: BTreeMap<i32, Definition> = BTreeMap::new();
-        for mut definition in manifest.definitions {
-            definition.bytes = decode_hex(&definition.serialized_hex)?;
-            if definition.bytes.len() < 4
-                || definition.bytes.len() > 65_536
-                || definition.bytes[..4] != definition.id.to_le_bytes()
-                || hash(&definition.bytes) != definition.sha256
-                || definition.id <= 0
-                || [
-                    definition.model.len(),
-                    definition.texture.len(),
-                    definition.tint_alias.len(),
-                ]
-                .iter()
-                .any(|size| *size > 4096)
-            {
-                return Err(invalid("invalid inventory definition content"));
-            }
+        for definition in manifest.definitions {
+            let definition = definition.decode()?;
             if let Some(previous) = definitions.get(&definition.id) {
                 // The captured catalog repeats several byte-identical entries.
                 // Conflicting definitions still fail instead of changing meaning.
@@ -191,6 +320,17 @@ impl Inventory {
             } else {
                 definitions.insert(definition.id, definition);
             }
+        }
+        let captured_definition_ids = definitions.keys().copied().collect();
+        // Fixed operator-selected content path; remote item IDs never become paths.
+        match File::open(directory.join("item-catalogue.json")) {
+            Ok(file) => {
+                for (id, definition) in load_catalogue(file)? {
+                    definitions.entry(id).or_insert(definition);
+                }
+            }
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error),
         }
         let mut profiles = BTreeMap::new();
         for profile in manifest.profiles {
@@ -215,28 +355,13 @@ impl Inventory {
             profiles,
             spans: manifest.spans,
             definitions,
+            captured_definition_ids,
+            initial_state,
         });
-        let state = state
-            .or(initial_state)
-            .unwrap_or_else(|| content.default_state.clone());
-        let result = Self { content, state };
-        result.validate_content_state()?;
-        let missing: BTreeSet<_> = result
-            .state
-            .items
-            .iter()
-            .filter(|item| !result.content.definitions.contains_key(&item.definition_id))
-            .map(|item| item.definition_id)
-            .collect();
-        if !missing.is_empty() {
-            // (R) Preserve these instances in saved state, but withhold them
-            // from every startup inventory/equipment packet until definitions exist.
-            eprintln!("inventory: withholding undefined owned item definitions {missing:?}");
-        }
         let mut end = 13;
         let mut kinds = BTreeSet::new();
-        for span in &result.content.spans {
-            let expected = span_bytes(&result.content.default_state, &span.kind, span.profile_id)?;
+        for span in &content.spans {
+            let expected = span_bytes(&content.default_state, &span.kind, span.profile_id)?;
             if span.offset < end
                 || span.offset > 4 * 1024 * 1024
                 || span.length != expected.len()
@@ -252,15 +377,30 @@ impl Inventory {
         }
         if !kinds.contains(&("coins".into(), 0))
             || !kinds.contains(&("items".into(), 0))
-            || result
-                .content
+            || content
                 .profiles
                 .keys()
                 .any(|id| !kinds.contains(&("equipment".into(), *id)))
         {
             return Err(invalid("missing proven inventory span"));
         }
-        Ok(result)
+        Ok(content)
+    }
+
+    fn warn_undefined_items(&self) {
+        let result = self;
+        let missing: BTreeSet<_> = result
+            .state
+            .items
+            .iter()
+            .filter(|item| !result.content.definitions.contains_key(&item.definition_id))
+            .map(|item| item.definition_id)
+            .collect();
+        if !missing.is_empty() {
+            // (R) Preserve these instances in saved state, but withhold them
+            // from every startup inventory/equipment packet until definitions exist.
+            eprintln!("inventory: withholding undefined owned item definitions {missing:?}");
+        }
     }
 
     pub fn state(&self) -> &InventoryState {
@@ -317,18 +457,20 @@ impl Inventory {
     }
 
     pub fn definitions_packet(&self) -> Vec<u8> {
-        let definitions: Vec<_> = self
-            .content
-            .definitions
-            .values()
-            .map(|definition| definition.bytes.clone())
-            .collect();
         let visible_owned_ids: Vec<_> = self
             .state
             .items
             .iter()
             .filter(|item| self.content.definitions.contains_key(&item.definition_id))
             .map(|item| item.definition_id)
+            .collect();
+        // (R) Send captured rows plus owned additions, not the full 58k map.
+        let mut ids = self.content.captured_definition_ids.clone();
+        ids.extend(visible_owned_ids.iter().copied());
+        let definitions: Vec<_> = ids
+            .iter()
+            .filter_map(|id| self.content.definitions.get(id))
+            .map(|definition| definition.bytes.clone())
             .collect();
         // `client_visible_state` applies the fail-closed (R) policy to the
         // corresponding self/equipment packets; this verifies their coverage.
@@ -583,6 +725,18 @@ impl Inventory {
         if !fits(quantity) {
             return Err(invalid("reward exceeds maximum stack"));
         }
+        if !staged
+            .content
+            .captured_definition_ids
+            .contains(&definition_id)
+        {
+            // (R) Re-send this small batch even for a stack update. No per-client
+            // cache bookkeeping: the definition always precedes its inventory use.
+            outcome.replies.push(
+                v2_fixes::encode_definition_batch_v2(&[definition.bytes.clone()], &[definition_id])
+                    .map_err(invalid)?,
+            );
+        }
         if let Some(item) = staged.state.items.iter_mut().find(|item| {
             item.definition_id == definition_id
                 && item.tint == tint
@@ -688,6 +842,28 @@ impl Inventory {
         Ok(outcome)
     }
 
+    /// Pure lookup/encoding: no I/O or mutation. W87's 00a3da40 writer and
+    /// 008d7980 reader carry family, subtype, ID, blob length and blob.
+    /// (R) Cap at one ID, require an empty request blob and ignore unknown IDs.
+    /// Replies are bounded by the validated 65,536-byte row limit plus header.
+    pub fn definition_replies(&self, inner: &[u8]) -> io::Result<Vec<Vec<u8>>> {
+        if inner.len() != 12 || !inner.starts_with(&[35, 0, 34, 0]) || read(inner, 8)? != 0 {
+            return Err(invalid("invalid item definition request"));
+        }
+        let id = read(inner, 4)?;
+        if id <= 0 {
+            return Err(invalid("invalid item definition ID"));
+        }
+        let Some(definition) = self.content.definitions.get(&id) else {
+            return Ok(Vec::new());
+        };
+        let mut reply = header(35, 34);
+        put(&mut reply, id);
+        put(&mut reply, definition.bytes.len() as i32);
+        reply.extend_from_slice(&definition.bytes);
+        Ok(vec![reply])
+    }
+
     pub fn handle(&mut self, inner: &[u8]) -> io::Result<InventoryOutcome> {
         if inner.len() < 4 || inner.len() > 4096 {
             return Err(invalid("invalid inventory message length"));
@@ -695,19 +871,8 @@ impl Inventory {
         let family = u16::from_le_bytes(inner[..2].try_into().unwrap());
         let opcode = u16::from_le_bytes(inner[2..4].try_into().unwrap());
         if family == 35 && opcode == 34 {
-            if inner.len() != 12 || read(inner, 8)? != 0 {
-                return Err(invalid("invalid item definition request"));
-            }
-            let id = read(inner, 4)?;
-            let Some(definition) = self.content.definitions.get(&id) else {
-                return Ok(InventoryOutcome::default());
-            };
-            let mut reply = header(35, 34);
-            put(&mut reply, id);
-            put(&mut reply, definition.bytes.len() as i32);
-            reply.extend_from_slice(&definition.bytes);
             return Ok(InventoryOutcome {
-                replies: vec![reply],
+                replies: self.definition_replies(inner)?,
                 changed: false,
             });
         }
