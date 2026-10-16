@@ -809,6 +809,7 @@ impl Session {
         &mut self,
         options: &Options,
         message: &[u8],
+        sessions: &SessionMap,
     ) -> Result<(), Box<dyn std::error::Error>> {
         if self.selected_character || options.account_store.is_none() {
             return Ok(());
@@ -828,6 +829,16 @@ impl Session {
             && !login::verify_gateway_binding_ticket(&options.handoff_key, account, guid, &ticket)
         {
             return Err("gateway character binding ticket is invalid".into());
+        }
+        // (R) First selected session owns the account and character, including
+        // before Ready/Loaded. Reject duplicates before reading or writing a
+        // save; a snapshot loaded here could otherwise outlive its active owner
+        // and overwrite later progress on disconnect or shutdown.
+        if sessions.values().any(|session| {
+            session.selected_character
+                && (session.account_guid == account.id || session.character_guid == guid)
+        }) {
+            return Err("account or character already has a selected session".into());
         }
         let mut identity = record.identity.clone();
         identity.guid = guid;
@@ -1237,7 +1248,7 @@ impl Session {
             }
             return Err("account character selection is required before gateway use".into());
         }
-        if let Err(error) = self.select_character_from_login(options, message) {
+        if let Err(error) = self.select_character_from_login(options, message, sessions) {
             if let Some(trace) = &self.trace {
                 trace_gateway_rejected(
                     trace,
@@ -1964,6 +1975,18 @@ impl Server {
 
     pub fn active_session_count(&self) -> usize {
         self.sessions.len()
+    }
+
+    /// Close sessions through the same persistence path as disconnects.
+    pub fn shutdown(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let keys = self.sessions.keys().copied().collect::<Vec<_>>();
+        for key in keys {
+            if let Some(session) = self.sessions.remove(&key) {
+                self.end_session(key, session, "server_shutdown")?;
+            }
+        }
+        self.flush_security();
+        Ok(())
     }
 
     pub fn step(&mut self) -> Result<(), Box<dyn std::error::Error>> {
@@ -2710,13 +2733,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     {
         server.step()?;
     }
-    let keys = server.sessions.keys().copied().collect::<Vec<_>>();
-    for key in keys {
-        if let Some(session) = server.sessions.remove(&key) {
-            server.end_session(key, session, "server_shutdown")?;
-        }
-    }
-    server.flush_security();
+    server.shutdown()?;
     event(json!({"event":"stopped"}));
     Ok(())
 }

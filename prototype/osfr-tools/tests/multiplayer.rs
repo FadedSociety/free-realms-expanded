@@ -72,6 +72,10 @@ fn packet(opcode: u16, fields: &[u8]) -> Vec<u8> {
 }
 
 fn login(guid: u64, account_store_path: &Path) -> Vec<u8> {
+    login_version(guid, account_store_path, VERSION)
+}
+
+fn login_version(guid: u64, account_store_path: &Path, version: &str) -> Vec<u8> {
     let store = AccountStore::load(account_store_path).unwrap();
     let record = store.character(guid).unwrap();
     let account = store.account(record.owner_account_id).unwrap();
@@ -83,7 +87,7 @@ fn login(guid: u64, account_store_path: &Path) -> Vec<u8> {
     let mut out = 1u16.to_le_bytes().to_vec();
     put_string(&mut out, &ticket);
     out.extend_from_slice(&guid.to_le_bytes());
-    put_string(&mut out, VERSION);
+    put_string(&mut out, version);
     put_string(&mut out, "");
     out
 }
@@ -290,7 +294,7 @@ impl Client {
         let mut request = vec![0, 1];
         request.extend_from_slice(&3u32.to_be_bytes());
         request.extend_from_slice(&connection_id.to_be_bytes());
-        request.extend_from_slice(&512u32.to_be_bytes());
+        request.extend_from_slice(&8192u32.to_be_bytes());
         request.extend_from_slice(b"CGAPI_527\0");
         socket
             .send_to(&request, server.local_addr().unwrap())
@@ -458,13 +462,21 @@ fn is_opcode(message: &[u8], opcode: u16) -> bool {
 }
 
 fn start_server(temp: &TempDir) -> (Server, PathBuf) {
-    let reference = create_reference(&temp.0);
+    start_server_with_content(temp, None)
+}
+
+fn start_server_with_content(temp: &TempDir, content: Option<PathBuf>) -> (Server, PathBuf) {
+    let reference = if content.is_some() {
+        PathBuf::from(std::env::var_os("OSFR_AUDIT_REFERENCE").expect("private reference"))
+    } else {
+        create_reference(&temp.0)
+    };
     let account_store = create_account_store(&temp.0);
     let server = Server::new(Options {
         bind: "127.0.0.1:0".parse().unwrap(),
         reference,
         state: temp.0.join("gateway-state.json"),
-        content: None,
+        content,
         identity: None,
         account_store: Some(account_store.clone()),
         gateway_ticket: "synthetic-ticket".into(),
@@ -483,12 +495,384 @@ fn start_server(temp: &TempDir) -> (Server, PathBuf) {
     (server, account_store)
 }
 
-fn log_in(server: &mut Server, connection_id: u32, guid: u64, store: &Path) -> (Client, Vec<Vec<u8>>) {
+fn log_in(
+    server: &mut Server,
+    connection_id: u32,
+    guid: u64,
+    store: &Path,
+) -> (Client, Vec<Vec<u8>>) {
+    log_in_version(server, connection_id, guid, store, VERSION)
+}
+
+fn log_in_version(
+    server: &mut Server,
+    connection_id: u32,
+    guid: u64,
+    store: &Path,
+    version: &str,
+) -> (Client, Vec<Vec<u8>>) {
     let mut client = Client::connect(server, connection_id);
-    let mut messages = client.send(server, &login(guid, store));
+    let mut messages = client.send(server, &login_version(guid, store, version));
     messages.extend(client.send(server, &packet(13, &[])));
     messages.extend(client.send(server, &packet(10, &[])));
     (client, messages)
+}
+
+fn disconnect(client: &Client, server: &mut Server) {
+    let mut fields = client.connection_id.to_be_bytes().to_vec();
+    fields.extend_from_slice(&[0, 0]);
+    let wire = client.codec.encode(5, &fields).unwrap();
+    client.socket.send_to(&wire, client.server).unwrap();
+    server.step().unwrap();
+}
+
+fn move_player(client: &mut Client, server: &mut Server, guid: u64, x: f32) {
+    let mut fields = guid.to_le_bytes().to_vec();
+    for value in [x, 2.0, 3.0, 0.0, 0.0, 1.0] {
+        fields.extend_from_slice(&value.to_le_bytes());
+    }
+    fields.extend_from_slice(&[0, 0]);
+    client.send(server, &packet(125, &fields));
+}
+
+/// W103: reproduce the crossed numeric domains without renumbering existing saves.
+#[test]
+#[ignore = "W103 confirmed failure: players.rs mixes ID namespaces; lead-owned fix required"]
+fn audit_crossed_account_and_character_ids_can_join_together() {
+    let temp = TempDir::new();
+    let (mut server, store_path) = start_server(&temp);
+    let mut document: serde_json::Value =
+        serde_json::from_slice(&fs::read(&store_path).unwrap()).unwrap();
+    document["store"]["accounts"]["2"]["character_guids"] = json!([3]);
+    document["store"]["accounts"]["3"]["character_guids"] = json!([2]);
+    document["store"]["characters"]["2"]["owner_account_id"] = json!(3);
+    document["store"]["characters"]["3"]["owner_account_id"] = json!(2);
+    fs::write(&store_path, serde_json::to_vec(&document).unwrap()).unwrap();
+    let store = AccountStore::load(&store_path).unwrap();
+    assert_eq!(store.character(3).unwrap().owner_account_id, 2);
+    assert_eq!(store.character(2).unwrap().owner_account_id, 3);
+    // Persist/reload keeps both numeric namespaces and character save filenames intact.
+    store.save(&store_path).unwrap();
+    assert_eq!(store, AccountStore::load(&store_path).unwrap());
+    let (mut first, _) = log_in(&mut server, 201, 3, &store_path);
+    let (_second, replies) = log_in(&mut server, 202, 2, &store_path);
+    assert_eq!(
+        server.active_session_count(),
+        2,
+        "crossed IDs rejected a valid owner"
+    );
+    assert!(replies.iter().any(|m| is_family(m, 35, 1)));
+    assert!(first.drain(&mut server).iter().any(|m| is_family(m, 35, 1)));
+}
+
+/// W103 threat: a second authenticated connection holds an old snapshot before Loaded.
+/// Atomic file replacement alone does not establish which session may write it.
+fn check_duplicate_snapshot(shutdown: bool) {
+    let temp = TempDir::new();
+    let (mut server, store) = start_server(&temp);
+    let mut survivor = Client::connect(&mut server, 211);
+    let mut duplicate = Client::connect(&mut server, 212);
+    if survivor.socket.local_addr().unwrap() > duplicate.socket.local_addr().unwrap() {
+        std::mem::swap(&mut survivor, &mut duplicate);
+    }
+    survivor.send(&mut server, &login(2, &store));
+    survivor.send(&mut server, &packet(13, &[]));
+    survivor.send(&mut server, &packet(10, &[]));
+    duplicate.send(&mut server, &login(2, &store));
+    // The survivor advances after the other connection could have loaded its snapshot.
+    move_player(&mut survivor, &mut server, 2, 4.0);
+    let path = temp.0.join("characters/2.json");
+    let progress = fs::read(&path).unwrap();
+    let saved: serde_json::Value = serde_json::from_slice(&progress).unwrap();
+    assert_eq!(saved["character"]["position"][0], 4.0);
+    if shutdown {
+        // Shutdown visits the older owner's socket first, then the duplicate.
+        server.shutdown().unwrap();
+    } else {
+        disconnect(&survivor, &mut server);
+        disconnect(&duplicate, &mut server);
+    }
+    let after: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    assert_eq!(
+        after["character"], saved["character"],
+        "stale snapshot restored; shutdown={shutdown}"
+    );
+    assert_eq!(fs::read(&path).unwrap(), progress);
+    assert_eq!(server.active_session_count(), 0);
+}
+
+#[test]
+fn audit_duplicate_snapshot_cannot_overwrite_progress_on_disconnect() {
+    check_duplicate_snapshot(false);
+}
+
+#[test]
+fn audit_duplicate_snapshot_cannot_overwrite_progress_on_shutdown() {
+    check_duplicate_snapshot(true);
+}
+
+#[test]
+fn audit_duplicate_account_is_rejected_before_loading_another_character_save() {
+    let temp = TempDir::new();
+    let (mut server, store) = start_server(&temp);
+    let mut document: serde_json::Value =
+        serde_json::from_slice(&fs::read(&store).unwrap()).unwrap();
+    document["store"]["accounts"]["2"]["character_guids"] = json!([2, 3]);
+    document["store"]["accounts"]["2"]["slots"]["max_characters"] = json!(2);
+    document["store"]["accounts"]["3"]["character_guids"] = json!([]);
+    document["store"]["characters"]["3"]["owner_account_id"] = json!(2);
+    fs::write(&store, serde_json::to_vec(&document).unwrap()).unwrap();
+    AccountStore::load(&store).unwrap();
+    let mut survivor = Client::connect(&mut server, 231);
+    survivor.send(&mut server, &login(2, &store)); // Reserve before Ready/Loaded, too.
+    let mut duplicate = Client::connect(&mut server, 232);
+    let replies = duplicate.send(&mut server, &login(3, &store));
+    assert!(
+        !replies.iter().any(|m| is_opcode(m, 12)),
+        "duplicate received self data"
+    );
+    assert_eq!(server.active_session_count(), 1);
+    assert!(
+        !temp.0.join("characters/3.json").exists(),
+        "rejected login wrote a save"
+    );
+    survivor.send(&mut server, &packet(13, &[]));
+    survivor.send(&mut server, &packet(10, &[]));
+    move_player(&mut survivor, &mut server, 2, 4.0);
+    server.shutdown().unwrap();
+    let saved: serde_json::Value =
+        serde_json::from_slice(&fs::read(temp.0.join("characters/2.json")).unwrap()).unwrap();
+    assert_eq!(saved["character"]["position"][0], 4.0);
+}
+
+#[test]
+#[ignore = "requires OSFR_AUDIT_CONTENT pointing at a scratch copy of round70 content"]
+fn audit_content_social_delivers_without_trace() {
+    for outer in [5, 6] {
+        let temp = TempDir::new();
+        let content = PathBuf::from(std::env::var_os("OSFR_AUDIT_CONTENT").unwrap());
+        let (mut server, store_path) = start_server_with_content(&temp, Some(content));
+        let store = AccountStore::load(&store_path).unwrap();
+        let first_name = &store.character(2).unwrap().identity;
+        let second_name = &store.character(3).unwrap().identity;
+        let reference = PathBuf::from(std::env::var_os("OSFR_AUDIT_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&fs::read(reference.join("manifest.json")).unwrap()).unwrap();
+        let version = manifest["client_version"].as_str().unwrap();
+        let (mut first, first_login) = log_in_version(&mut server, 221, 2, &store_path, version);
+        let (mut second, second_login) = log_in_version(&mut server, 222, 3, &store_path, version);
+        assert!(
+            first_login.iter().any(|m| is_opcode(m, 12)),
+            "first login failed"
+        );
+        assert!(
+            second_login.iter().any(|m| is_opcode(m, 12)),
+            "second login failed"
+        );
+        first.drain(&mut server);
+        let say = format!("{:032x}", 0x15u128);
+        first.send(
+            &mut server,
+            &application(outer, &chat_request(0, &say, None)),
+        );
+        let delivered = second.drain(&mut server);
+        assert!(
+            delivered
+                .iter()
+                .any(|m| is_family(m, 15, 1) && m.windows(say.len()).any(|w| w == say.as_bytes())),
+            "say outer={outer}"
+        );
+        let tell = format!("{:032x}", u128::MAX);
+        second.send(
+            &mut server,
+            &application(
+                outer,
+                &chat_request(
+                    1,
+                    &tell,
+                    Some((&first_name.first_name, &first_name.last_name)),
+                ),
+            ),
+        );
+        let delivered = first.drain(&mut server);
+        assert!(delivered.iter().any(|m| is_family(m, 15, 1)
+            && m.windows(tell.len()).any(|w| w == tell.as_bytes())), "tell outer={outer}");
+        first.send(
+            &mut server,
+            &application(
+                outer,
+                &friend_request(&second_name.first_name, &second_name.last_name),
+            ),
+        );
+        assert!(
+            second
+                .drain(&mut server)
+                .iter()
+                .any(|m| is_family(m, 26, 16)),
+            "friend request outer={outer}"
+        );
+        first.send(&mut server, &application(outer, &group_invite()));
+        assert!(
+            second
+                .drain(&mut server)
+                .iter()
+                .any(|m| is_family(m, 40, 1)),
+            "group invite outer={outer}"
+        );
+        server.shutdown().unwrap();
+    }
+}
+
+#[test]
+#[ignore = "requires OSFR_AUDIT_CONTENT and OSFR_AUDIT_REFERENCE scratch copies"]
+fn audit_two_bots_deliver_say_and_tell_with_content() {
+    use std::process::{Child, Command, Stdio};
+    use std::time::Instant;
+
+    // Own every helper handle, including cleanup after a failed assertion.
+    struct Helper(Child);
+    impl Drop for Helper {
+        fn drop(&mut self) {
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+        }
+    }
+    let temp = TempDir::new();
+    let content = PathBuf::from(std::env::var_os("OSFR_AUDIT_CONTENT").unwrap());
+    let reference = PathBuf::from(std::env::var_os("OSFR_AUDIT_REFERENCE").unwrap());
+    let store_path = create_account_store(&temp.0);
+    let key_path = temp.0.join("handoff.key");
+    fs::write(&key_path, b"synthetic-handoff-key").unwrap();
+    let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+    let address = socket.local_addr().unwrap().to_string();
+    drop(socket);
+    let output = std::env::var_os("OSFR_AUDIT_EVIDENCE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| temp.0.clone());
+    fs::create_dir_all(&output).unwrap();
+    let gateway_log = output.join("bot-gateway.txt");
+    let log = fs::File::create(&gateway_log).unwrap();
+    let mut gateway = Helper(
+        Command::new(env!("CARGO_BIN_EXE_osfr-gateway"))
+            .arg(&address)
+            .arg("--reference")
+            .arg(&reference)
+            .arg("--state")
+            .arg(temp.0.join("gateway.json"))
+            .arg("--content")
+            .arg(&content)
+            .arg("--account-store")
+            .arg(&store_path)
+            .arg("--handoff-key-file")
+            .arg(&key_path)
+        .args(["--studio-port", "0", "--seconds", "30"])
+            .stdout(Stdio::from(log.try_clone().unwrap()))
+            .stderr(Stdio::from(log))
+            .spawn()
+            .unwrap(),
+    );
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while !fs::read_to_string(&gateway_log)
+        .unwrap()
+        .contains("\"event\":\"listening\"")
+    {
+        assert!(
+            gateway.0.try_wait().unwrap().is_none(),
+            "{}",
+            fs::read_to_string(&gateway_log).unwrap()
+        );
+        assert!(Instant::now() < deadline, "scratch gateway did not listen");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    let store = AccountStore::load(&store_path).unwrap();
+    let target = &store.character(2).unwrap().identity;
+    let say = format!("{:032x}", 0x15u128);
+    let tell = format!("{:032x}", u128::MAX);
+    let tell_wire = chat_request(1, &tell, Some((&target.first_name, &target.last_name)))
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect::<String>();
+    let mut bots = Vec::new();
+    for (guid, commands) in [
+        (
+            3,
+            vec![
+                format!("expect-text {say}"),
+                format!("raw {tell_wire}"),
+                "wait 300".into(),
+                "quit".into(),
+            ],
+        ),
+        (
+            2,
+            vec![
+                format!("chat {say}"),
+                format!("expect-text {say}"),
+                format!("expect-text {tell}"),
+                "quit".into(),
+            ],
+        ),
+    ] {
+        let log_path = output.join(format!("bot-{guid}.txt"));
+        let log = fs::File::create(&log_path).unwrap();
+        let mut command = Command::new(env!("CARGO_BIN_EXE_osfr-bot"));
+        command
+            .arg("--gateway")
+            .arg(&address)
+            .arg("--reference")
+            .arg(&reference)
+            .arg("--account-store")
+            .arg(&store_path)
+            .arg("--handoff-key-file")
+            .arg(&key_path)
+            .arg("--guid")
+            .arg(guid.to_string())
+            .args(["--expect-timeout", "12000"]);
+        for step in commands {
+            command.arg("--cmd").arg(step);
+        }
+        bots.push((
+            Helper(
+                command
+                    .stdout(Stdio::from(log.try_clone().unwrap()))
+                    .stderr(Stdio::from(log))
+                    .spawn()
+                    .unwrap(),
+            ),
+            log_path,
+        ));
+        if guid == 3 {
+            // Bot::login clears its inbox. Start the sender only after the
+            // receiver has finished login and can retain the say notification.
+            let deadline = Instant::now() + Duration::from_secs(12);
+            let (receiver, log_path) = bots.last_mut().unwrap();
+            while !fs::read_to_string(&log_path).unwrap().contains("in world") {
+                assert!(receiver.0.try_wait().unwrap().is_none(),
+                    "{}", fs::read_to_string(&log_path).unwrap());
+                assert!(Instant::now() < deadline, "receiver did not finish login");
+                std::thread::sleep(Duration::from_millis(20));
+            }
+        }
+    }
+    let deadline = Instant::now() + Duration::from_secs(20);
+    for (bot, log) in &mut bots {
+        loop {
+            if let Some(status) = bot.0.try_wait().unwrap() {
+                assert!(status.success(), "{}", fs::read_to_string(&log).unwrap());
+                break;
+            }
+            assert!(Instant::now() < deadline, "bot exceeded bounded runtime");
+            std::thread::sleep(Duration::from_millis(20));
+        }
+    }
+    let first = fs::read_to_string(output.join("bot-2.txt")).unwrap();
+    let second = fs::read_to_string(output.join("bot-3.txt")).unwrap();
+    assert!(first.contains(&format!("ok expect-text {say:?}")));
+    assert!(first.contains(&format!("ok expect-text {tell:?}")));
+    assert!(second.contains(&format!("ok expect-text {say:?}")));
+    println!(
+        "two osfr-bot processes: say received by both; tell received by target; tracing off; Studio disabled"
+    );
 }
 
 /// Security Model L6/L9 (W91): one account's social actions share a 5/s, burst-10
