@@ -42,7 +42,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 415142
+      "description_string_id": 415142,
+      "enabled": false
     },
     {
       "id": 3120002,
@@ -91,7 +92,8 @@
       ],
       "description_string_id": 141146,
       "intro_text_string_id": 141144,
-      "end_text_string_id": 141147
+      "end_text_string_id": 141147,
+      "enabled": false
     },
     {
       "id": 3120003,
@@ -140,7 +142,8 @@
       ],
       "description_string_id": 141151,
       "intro_text_string_id": 141149,
-      "end_text_string_id": 141152
+      "end_text_string_id": 141152,
+      "enabled": false
     },
     {
       "id": 3120004,
@@ -189,7 +192,8 @@
       ],
       "description_string_id": 141155,
       "intro_text_string_id": 141153,
-      "end_text_string_id": 141156
+      "end_text_string_id": 141156,
+      "enabled": false
     },
     {
       "id": 3120005,
@@ -238,7 +242,8 @@
       ],
       "description_string_id": 90020,
       "intro_text_string_id": 90018,
-      "end_text_string_id": 90021
+      "end_text_string_id": 90021,
+      "enabled": false
     },
     {
       "id": 3120006,
@@ -287,7 +292,8 @@
       ],
       "description_string_id": 90028,
       "intro_text_string_id": 90026,
-      "end_text_string_id": 90029
+      "end_text_string_id": 90029,
+      "enabled": false
     },
     {
       "id": 3120007,
@@ -336,7 +342,8 @@
       ],
       "description_string_id": 90032,
       "intro_text_string_id": 90030,
-      "end_text_string_id": 90033
+      "end_text_string_id": 90033,
+      "enabled": false
     },
     {
       "id": 3120008,
@@ -385,7 +392,8 @@
       ],
       "description_string_id": 90036,
       "intro_text_string_id": 90034,
-      "end_text_string_id": 90037
+      "end_text_string_id": 90037,
+      "enabled": false
     },
     {
       "id": 3120009,
@@ -431,14 +439,31 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3120010,
       "title_string_id": 90039,
       "giver_npc_id": 9000000184,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000231,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:8191; Global.Text.90040: Find Vidor Stormshroud the Pet Trainer in Shrouded Glade."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -529,7 +554,8 @@
       ],
       "description_string_id": 90044,
       "intro_text_string_id": 90042,
-      "end_text_string_id": 90045
+      "end_text_string_id": 90045,
+      "enabled": false
     },
     {
       "id": 3120012,
@@ -578,7 +604,8 @@
       ],
       "description_string_id": 90048,
       "intro_text_string_id": 90046,
-      "end_text_string_id": 90049
+      "end_text_string_id": 90049,
+      "enabled": false
     },
     {
       "id": 3120013,
@@ -627,7 +654,8 @@
       ],
       "description_string_id": 90052,
       "intro_text_string_id": 90050,
-      "end_text_string_id": 90053
+      "end_text_string_id": 90053,
+      "enabled": false
     },
     {
       "id": 3120014,
@@ -676,7 +704,8 @@
       ],
       "description_string_id": 90056,
       "intro_text_string_id": 90054,
-      "end_text_string_id": 90057
+      "end_text_string_id": 90057,
+      "enabled": false
     },
     {
       "id": 3120015,
@@ -722,7 +751,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3120016,
@@ -832,7 +862,8 @@
       ],
       "description_string_id": 90064,
       "intro_text_string_id": 90062,
-      "end_text_string_id": 90065
+      "end_text_string_id": 90065,
+      "enabled": false
     },
     {
       "id": 3120018,
@@ -881,7 +912,8 @@
       ],
       "description_string_id": 90068,
       "intro_text_string_id": 90066,
-      "end_text_string_id": 90069
+      "end_text_string_id": 90069,
+      "enabled": false
     },
     {
       "id": 3120019,
@@ -930,7 +962,8 @@
       ],
       "description_string_id": 90076,
       "intro_text_string_id": 90074,
-      "end_text_string_id": 90077
+      "end_text_string_id": 90077,
+      "enabled": false
     },
     {
       "id": 3120020,
@@ -976,7 +1009,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3120021,
@@ -1025,14 +1059,31 @@
       ],
       "description_string_id": 90089,
       "intro_text_string_id": 90087,
-      "end_text_string_id": 90090
+      "end_text_string_id": 90090,
+      "enabled": false
     },
     {
       "id": 3120022,
       "title_string_id": 90092,
       "giver_npc_id": 9000000228,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000153,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:109146; Global.Text.90093: Find Moanna the Pet Trainer in Seaside."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -1123,14 +1174,31 @@
       ],
       "description_string_id": 90099,
       "intro_text_string_id": 90097,
-      "end_text_string_id": 90100
+      "end_text_string_id": 90100,
+      "enabled": false
     },
     {
       "id": 3120024,
       "title_string_id": 90102,
       "giver_npc_id": 9000000153,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000130,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:54911; Global.Text.90103: Find Kirill Moonrunner the Master Pet Trainer in Sanctuary."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -1221,7 +1289,8 @@
       ],
       "description_string_id": 90107,
       "intro_text_string_id": 90105,
-      "end_text_string_id": 90108
+      "end_text_string_id": 90108,
+      "enabled": false
     },
     {
       "id": 3120026,
@@ -1270,7 +1339,8 @@
       ],
       "description_string_id": 90111,
       "intro_text_string_id": 90109,
-      "end_text_string_id": 90112
+      "end_text_string_id": 90112,
+      "enabled": false
     }
   ]
 }

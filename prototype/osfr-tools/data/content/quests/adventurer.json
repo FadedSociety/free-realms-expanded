@@ -48,7 +48,8 @@
       ],
       "description_string_id": 4419552,
       "intro_text_string_id": 4419550,
-      "end_text_string_id": 4419553
+      "end_text_string_id": 4419553,
+      "enabled": false
     },
     {
       "id": 3000002,
@@ -99,7 +100,8 @@
       ],
       "description_string_id": 4419556,
       "intro_text_string_id": 4419554,
-      "end_text_string_id": 4419557
+      "end_text_string_id": 4419557,
+      "enabled": false
     },
     {
       "id": 3000003,
@@ -154,7 +156,8 @@
       ],
       "description_string_id": 4419560,
       "intro_text_string_id": 4419558,
-      "end_text_string_id": 4419561
+      "end_text_string_id": 4419561,
+      "enabled": false
     },
     {
       "id": 3000004,
@@ -225,7 +228,8 @@
       ],
       "description_string_id": 4419564,
       "intro_text_string_id": 4419562,
-      "end_text_string_id": 4419565
+      "end_text_string_id": 4419565,
+      "enabled": false
     },
     {
       "id": 3000005,
@@ -288,7 +292,8 @@
       ],
       "description_string_id": 4420043,
       "intro_text_string_id": 4420041,
-      "end_text_string_id": 4420044
+      "end_text_string_id": 4420044,
+      "enabled": false
     },
     {
       "id": 3000006,
@@ -337,7 +342,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 4420054
+      "description_string_id": 4420054,
+      "enabled": false
     },
     {
       "id": 3000007,
@@ -384,7 +390,8 @@
       ],
       "description_string_id": 4420059,
       "intro_text_string_id": 4420057,
-      "end_text_string_id": 4420060
+      "end_text_string_id": 4420060,
+      "enabled": false
     },
     {
       "id": 3000008,
@@ -445,7 +452,8 @@
       ],
       "description_string_id": 4420067,
       "intro_text_string_id": 4420065,
-      "end_text_string_id": 4420068
+      "end_text_string_id": 4420068,
+      "enabled": false
     },
     {
       "id": 3000009,
@@ -508,7 +516,8 @@
       ],
       "description_string_id": 4420075,
       "intro_text_string_id": 4420073,
-      "end_text_string_id": 4420076
+      "end_text_string_id": 4420076,
+      "enabled": false
     },
     {
       "id": 3000010,
@@ -555,7 +564,8 @@
       ],
       "description_string_id": 4420083,
       "intro_text_string_id": 4420081,
-      "end_text_string_id": 4420084
+      "end_text_string_id": 4420084,
+      "enabled": false
     },
     {
       "id": 3000011,
@@ -602,7 +612,8 @@
       ],
       "description_string_id": 4420091,
       "intro_text_string_id": 4420089,
-      "end_text_string_id": 4420092
+      "end_text_string_id": 4420092,
+      "enabled": false
     },
     {
       "id": 3000012,
@@ -649,7 +660,8 @@
       ],
       "description_string_id": 4420099,
       "intro_text_string_id": 4420097,
-      "end_text_string_id": 4420100
+      "end_text_string_id": 4420100,
+      "enabled": false
     },
     {
       "id": 3000013,
@@ -700,7 +712,8 @@
       ],
       "description_string_id": 4420107,
       "intro_text_string_id": 4420105,
-      "end_text_string_id": 4420108
+      "end_text_string_id": 4420108,
+      "enabled": false
     },
     {
       "id": 3000014,
@@ -751,7 +764,8 @@
       ],
       "description_string_id": 4420115,
       "intro_text_string_id": 4420113,
-      "end_text_string_id": 4420116
+      "end_text_string_id": 4420116,
+      "enabled": false
     },
     {
       "id": 3000015,
@@ -796,7 +810,8 @@
       ],
       "description_string_id": 5100480,
       "intro_text_string_id": 5100478,
-      "end_text_string_id": 5100481
+      "end_text_string_id": 5100481,
+      "enabled": false
     },
     {
       "id": 3000016,
@@ -841,7 +856,8 @@
       ],
       "description_string_id": 5100484,
       "intro_text_string_id": 5100482,
-      "end_text_string_id": 5100485
+      "end_text_string_id": 5100485,
+      "enabled": false
     },
     {
       "id": 3000017,
@@ -886,7 +902,8 @@
       ],
       "description_string_id": 5100488,
       "intro_text_string_id": 5100486,
-      "end_text_string_id": 5100489
+      "end_text_string_id": 5100489,
+      "enabled": false
     },
     {
       "id": 3000018,
@@ -934,7 +951,8 @@
         }
       ],
       "description_string_id": 37703,
-      "intro_text_string_id": 37701
+      "intro_text_string_id": 37701,
+      "enabled": false
     },
     {
       "id": 3000019,
@@ -986,7 +1004,8 @@
         }
       ],
       "description_string_id": 5101947,
-      "intro_text_string_id": 5101945
+      "intro_text_string_id": 5101945,
+      "enabled": false
     },
     {
       "id": 3000020,
@@ -1034,7 +1053,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3000021,
@@ -1043,7 +1063,23 @@
       "description_string_id": 94248,
       "giver_npc_id": 9000000189,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000254,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:85249; Global.Text.94248: Introduce yourself to Ricky Danger in Cobblestone Village."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 5,
@@ -1101,7 +1137,23 @@
       "title_string_id": 94247,
       "giver_npc_id": 9000000227,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000786,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:90990; Global.Text.116637: Introduce yourself to Francis Panic in Stillwater Crossing."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -1193,7 +1245,8 @@
         }
       ],
       "description_string_id": 45852,
-      "intro_text_string_id": 45850
+      "intro_text_string_id": 45850,
+      "enabled": false
     },
     {
       "id": 3000024,
@@ -1262,7 +1315,8 @@
       ],
       "description_string_id": 389188,
       "intro_text_string_id": 389186,
-      "end_text_string_id": 389189
+      "end_text_string_id": 389189,
+      "enabled": false
     },
     {
       "id": 3000025,
@@ -1311,7 +1365,8 @@
       ],
       "description_string_id": 390256,
       "intro_text_string_id": 390254,
-      "end_text_string_id": 390257
+      "end_text_string_id": 390257,
+      "enabled": false
     },
     {
       "id": 3000026,
@@ -1359,7 +1414,8 @@
         }
       ],
       "description_string_id": 391031,
-      "intro_text_string_id": 391029
+      "intro_text_string_id": 391029,
+      "enabled": false
     },
     {
       "id": 3000027,
@@ -1407,7 +1463,8 @@
         }
       ],
       "description_string_id": 391045,
-      "intro_text_string_id": 391043
+      "intro_text_string_id": 391043,
+      "enabled": false
     },
     {
       "id": 3000028,
@@ -1460,7 +1517,8 @@
       ],
       "description_string_id": 140649,
       "intro_text_string_id": 140647,
-      "end_text_string_id": 140650
+      "end_text_string_id": 140650,
+      "enabled": false
     },
     {
       "id": 3000029,
@@ -1513,7 +1571,8 @@
       ],
       "description_string_id": 90623,
       "intro_text_string_id": 90621,
-      "end_text_string_id": 90624
+      "end_text_string_id": 90624,
+      "enabled": false
     },
     {
       "id": 3000030,
@@ -1564,7 +1623,8 @@
       ],
       "description_string_id": 90660,
       "intro_text_string_id": 90658,
-      "end_text_string_id": 90661
+      "end_text_string_id": 90661,
+      "enabled": false
     },
     {
       "id": 3000031,
@@ -1619,7 +1679,8 @@
       ],
       "description_string_id": 90685,
       "intro_text_string_id": 90683,
-      "end_text_string_id": 90686
+      "end_text_string_id": 90686,
+      "enabled": false
     },
     {
       "id": 3000032,
@@ -1674,7 +1735,8 @@
       ],
       "description_string_id": 90704,
       "intro_text_string_id": 90702,
-      "end_text_string_id": 90705
+      "end_text_string_id": 90705,
+      "enabled": false
     },
     {
       "id": 3000033,
@@ -1725,7 +1787,8 @@
       ],
       "description_string_id": 90727,
       "intro_text_string_id": 90725,
-      "end_text_string_id": 90728
+      "end_text_string_id": 90728,
+      "enabled": false
     },
     {
       "id": 3000034,
@@ -1776,7 +1839,8 @@
       ],
       "description_string_id": 90772,
       "intro_text_string_id": 90770,
-      "end_text_string_id": 90773
+      "end_text_string_id": 90773,
+      "enabled": false
     },
     {
       "id": 3000035,
@@ -1820,7 +1884,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3000036,
@@ -1871,7 +1936,8 @@
       ],
       "description_string_id": 90815,
       "intro_text_string_id": 90813,
-      "end_text_string_id": 90816
+      "end_text_string_id": 90816,
+      "enabled": false
     },
     {
       "id": 3000037,
@@ -1922,7 +1988,8 @@
       ],
       "description_string_id": 90836,
       "intro_text_string_id": 90834,
-      "end_text_string_id": 90837
+      "end_text_string_id": 90837,
+      "enabled": false
     },
     {
       "id": 3000038,
@@ -1973,7 +2040,8 @@
       ],
       "description_string_id": 90851,
       "intro_text_string_id": 90849,
-      "end_text_string_id": 90852
+      "end_text_string_id": 90852,
+      "enabled": false
     },
     {
       "id": 3000039,
@@ -2024,7 +2092,8 @@
       ],
       "description_string_id": 90862,
       "intro_text_string_id": 90860,
-      "end_text_string_id": 90863
+      "end_text_string_id": 90863,
+      "enabled": false
     },
     {
       "id": 3000040,
@@ -2079,7 +2148,8 @@
       ],
       "description_string_id": 90873,
       "intro_text_string_id": 90871,
-      "end_text_string_id": 90874
+      "end_text_string_id": 90874,
+      "enabled": false
     },
     {
       "id": 3000041,
@@ -2134,7 +2204,8 @@
       ],
       "description_string_id": 90888,
       "intro_text_string_id": 90886,
-      "end_text_string_id": 90889
+      "end_text_string_id": 90889,
+      "enabled": false
     },
     {
       "id": 3000042,
@@ -2189,7 +2260,8 @@
       ],
       "description_string_id": 91465,
       "intro_text_string_id": 91463,
-      "end_text_string_id": 91466
+      "end_text_string_id": 91466,
+      "enabled": false
     },
     {
       "id": 3000043,
@@ -2244,7 +2316,8 @@
       ],
       "description_string_id": 90905,
       "intro_text_string_id": 90903,
-      "end_text_string_id": 90906
+      "end_text_string_id": 90906,
+      "enabled": false
     },
     {
       "id": 3000044,
@@ -2295,7 +2368,8 @@
       ],
       "description_string_id": 93896,
       "intro_text_string_id": 93894,
-      "end_text_string_id": 93897
+      "end_text_string_id": 93897,
+      "enabled": false
     },
     {
       "id": 3000045,
@@ -2346,7 +2420,8 @@
       ],
       "description_string_id": 90914,
       "intro_text_string_id": 90912,
-      "end_text_string_id": 90915
+      "end_text_string_id": 90915,
+      "enabled": false
     },
     {
       "id": 3000046,
@@ -2397,7 +2472,8 @@
       ],
       "description_string_id": 90923,
       "intro_text_string_id": 90921,
-      "end_text_string_id": 90924
+      "end_text_string_id": 90924,
+      "enabled": false
     },
     {
       "id": 3000047,
@@ -2448,7 +2524,8 @@
       ],
       "description_string_id": 90934,
       "intro_text_string_id": 90932,
-      "end_text_string_id": 90935
+      "end_text_string_id": 90935,
+      "enabled": false
     },
     {
       "id": 3000048,
@@ -2503,7 +2580,8 @@
       ],
       "description_string_id": 90945,
       "intro_text_string_id": 90943,
-      "end_text_string_id": 90946
+      "end_text_string_id": 90946,
+      "enabled": false
     },
     {
       "id": 3000049,
@@ -2558,7 +2636,8 @@
       ],
       "description_string_id": 90958,
       "intro_text_string_id": 90956,
-      "end_text_string_id": 90959
+      "end_text_string_id": 90959,
+      "enabled": false
     },
     {
       "id": 3000050,
@@ -2613,7 +2692,8 @@
       ],
       "description_string_id": 90971,
       "intro_text_string_id": 90969,
-      "end_text_string_id": 90972
+      "end_text_string_id": 90972,
+      "enabled": false
     },
     {
       "id": 3000051,
@@ -2662,7 +2742,8 @@
       ],
       "description_string_id": 391184,
       "intro_text_string_id": 391182,
-      "end_text_string_id": 391185
+      "end_text_string_id": 391185,
+      "enabled": false
     },
     {
       "id": 3000052,
@@ -2711,7 +2792,8 @@
       ],
       "description_string_id": 391248,
       "intro_text_string_id": 391246,
-      "end_text_string_id": 391249
+      "end_text_string_id": 391249,
+      "enabled": false
     },
     {
       "id": 3000053,
@@ -2760,7 +2842,8 @@
       ],
       "description_string_id": 391256,
       "intro_text_string_id": 391254,
-      "end_text_string_id": 391257
+      "end_text_string_id": 391257,
+      "enabled": false
     },
     {
       "id": 3000054,
@@ -2811,7 +2894,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 389987
+      "description_string_id": 389987,
+      "enabled": false
     },
     {
       "id": 3000055,
@@ -2864,7 +2948,8 @@
       ],
       "description_string_id": 5100413,
       "intro_text_string_id": 5100411,
-      "end_text_string_id": 5100414
+      "end_text_string_id": 5100414,
+      "enabled": false
     },
     {
       "id": 3000056,
@@ -2917,7 +3002,8 @@
       ],
       "description_string_id": 5100417,
       "intro_text_string_id": 5100415,
-      "end_text_string_id": 5100418
+      "end_text_string_id": 5100418,
+      "enabled": false
     },
     {
       "id": 3000057,
@@ -2966,7 +3052,8 @@
       ],
       "description_string_id": 5100421,
       "intro_text_string_id": 5100419,
-      "end_text_string_id": 5100422
+      "end_text_string_id": 5100422,
+      "enabled": false
     },
     {
       "id": 3000058,
@@ -3035,7 +3122,8 @@
       ],
       "description_string_id": 5100425,
       "intro_text_string_id": 5100423,
-      "end_text_string_id": 5100426
+      "end_text_string_id": 5100426,
+      "enabled": false
     },
     {
       "id": 3000059,

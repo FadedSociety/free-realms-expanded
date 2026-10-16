@@ -46,7 +46,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 412491
+      "description_string_id": 412491,
+      "enabled": false
     },
     {
       "id": 3070002,
@@ -90,7 +91,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3070003,
@@ -134,7 +136,8 @@
         }
       ],
       "description_string_id": 417056,
-      "intro_text_string_id": 417054
+      "intro_text_string_id": 417054,
+      "enabled": false
     },
     {
       "id": 3070004,
@@ -185,7 +188,8 @@
       ],
       "description_string_id": 408260,
       "intro_text_string_id": 408258,
-      "end_text_string_id": 408261
+      "end_text_string_id": 408261,
+      "enabled": false
     },
     {
       "id": 3070005,
@@ -236,7 +240,8 @@
       ],
       "description_string_id": 408610,
       "intro_text_string_id": 408608,
-      "end_text_string_id": 408611
+      "end_text_string_id": 408611,
+      "enabled": false
     },
     {
       "id": 3070006,
@@ -283,7 +288,8 @@
       ],
       "description_string_id": 408625,
       "intro_text_string_id": 408623,
-      "end_text_string_id": 408626
+      "end_text_string_id": 408626,
+      "enabled": false
     },
     {
       "id": 3070007,
@@ -332,7 +338,8 @@
       ],
       "description_string_id": 409214,
       "intro_text_string_id": 409212,
-      "end_text_string_id": 409215
+      "end_text_string_id": 409215,
+      "enabled": false
     },
     {
       "id": 3070008,
@@ -377,7 +384,8 @@
       ],
       "description_string_id": 408685,
       "intro_text_string_id": 408683,
-      "end_text_string_id": 408686
+      "end_text_string_id": 408686,
+      "enabled": false
     },
     {
       "id": 3070009,
@@ -426,7 +434,8 @@
       ],
       "description_string_id": 409690,
       "intro_text_string_id": 409688,
-      "end_text_string_id": 409691
+      "end_text_string_id": 409691,
+      "enabled": false
     },
     {
       "id": 3070010,
@@ -473,7 +482,8 @@
       ],
       "description_string_id": 409698,
       "intro_text_string_id": 409696,
-      "end_text_string_id": 409699
+      "end_text_string_id": 409699,
+      "enabled": false
     },
     {
       "id": 3070011,
@@ -520,7 +530,8 @@
       ],
       "description_string_id": 419157,
       "intro_text_string_id": 419155,
-      "end_text_string_id": 419158
+      "end_text_string_id": 419158,
+      "enabled": false
     },
     {
       "id": 3070012,
@@ -567,7 +578,8 @@
       ],
       "description_string_id": 409706,
       "intro_text_string_id": 409704,
-      "end_text_string_id": 409707
+      "end_text_string_id": 409707,
+      "enabled": false
     },
     {
       "id": 3070013,
@@ -614,7 +626,8 @@
       ],
       "description_string_id": 409702,
       "intro_text_string_id": 409700,
-      "end_text_string_id": 409703
+      "end_text_string_id": 409703,
+      "enabled": false
     },
     {
       "id": 3070014,
@@ -659,7 +672,8 @@
       ],
       "description_string_id": 419011,
       "intro_text_string_id": 419009,
-      "end_text_string_id": 419012
+      "end_text_string_id": 419012,
+      "enabled": false
     },
     {
       "id": 3070015,
@@ -708,7 +722,8 @@
       ],
       "description_string_id": 409077,
       "intro_text_string_id": 409075,
-      "end_text_string_id": 409078
+      "end_text_string_id": 409078,
+      "enabled": false
     },
     {
       "id": 3070016,
@@ -755,7 +770,8 @@
       ],
       "description_string_id": 409096,
       "intro_text_string_id": 409094,
-      "end_text_string_id": 409097
+      "end_text_string_id": 409097,
+      "enabled": false
     },
     {
       "id": 3070017,
@@ -800,7 +816,8 @@
       ],
       "description_string_id": 419000,
       "intro_text_string_id": 418998,
-      "end_text_string_id": 419001
+      "end_text_string_id": 419001,
+      "enabled": false
     },
     {
       "id": 3070018,
@@ -845,7 +862,8 @@
       ],
       "description_string_id": 410334,
       "intro_text_string_id": 410332,
-      "end_text_string_id": 410335
+      "end_text_string_id": 410335,
+      "enabled": false
     },
     {
       "id": 3070019,
@@ -890,7 +908,8 @@
       ],
       "description_string_id": 409371,
       "intro_text_string_id": 409369,
-      "end_text_string_id": 409372
+      "end_text_string_id": 409372,
+      "enabled": false
     },
     {
       "id": 3070020,
@@ -935,7 +954,8 @@
       ],
       "description_string_id": 409303,
       "intro_text_string_id": 409301,
-      "end_text_string_id": 409304
+      "end_text_string_id": 409304,
+      "enabled": false
     },
     {
       "id": 3070021,
@@ -982,7 +1002,8 @@
       ],
       "description_string_id": 409327,
       "intro_text_string_id": 409325,
-      "end_text_string_id": 409328
+      "end_text_string_id": 409328,
+      "enabled": false
     },
     {
       "id": 3070022,
@@ -1029,7 +1050,8 @@
       ],
       "description_string_id": 409359,
       "intro_text_string_id": 409357,
-      "end_text_string_id": 409360
+      "end_text_string_id": 409360,
+      "enabled": false
     },
     {
       "id": 3070023,
@@ -1074,7 +1096,8 @@
       ],
       "description_string_id": 409454,
       "intro_text_string_id": 409452,
-      "end_text_string_id": 409455
+      "end_text_string_id": 409455,
+      "enabled": false
     },
     {
       "id": 3070024,
@@ -1119,7 +1142,8 @@
       ],
       "description_string_id": 409923,
       "intro_text_string_id": 409921,
-      "end_text_string_id": 409924
+      "end_text_string_id": 409924,
+      "enabled": false
     },
     {
       "id": 3070025,
@@ -1166,7 +1190,8 @@
       ],
       "description_string_id": 409721,
       "intro_text_string_id": 409719,
-      "end_text_string_id": 409722
+      "end_text_string_id": 409722,
+      "enabled": false
     },
     {
       "id": 3070026,
@@ -1211,7 +1236,8 @@
       ],
       "description_string_id": 409227,
       "intro_text_string_id": 409225,
-      "end_text_string_id": 409228
+      "end_text_string_id": 409228,
+      "enabled": false
     },
     {
       "id": 3070027,
@@ -1258,7 +1284,8 @@
       ],
       "description_string_id": 412251,
       "intro_text_string_id": 412249,
-      "end_text_string_id": 412252
+      "end_text_string_id": 412252,
+      "enabled": false
     },
     {
       "id": 3070028,
@@ -1305,7 +1332,8 @@
       ],
       "description_string_id": 409247,
       "intro_text_string_id": 409245,
-      "end_text_string_id": 409248
+      "end_text_string_id": 409248,
+      "enabled": false
     },
     {
       "id": 3070029,
@@ -1352,7 +1380,8 @@
       ],
       "description_string_id": 409269,
       "intro_text_string_id": 409267,
-      "end_text_string_id": 409270
+      "end_text_string_id": 409270,
+      "enabled": false
     },
     {
       "id": 3070030,
@@ -1397,7 +1426,8 @@
       ],
       "description_string_id": 409747,
       "intro_text_string_id": 409745,
-      "end_text_string_id": 409748
+      "end_text_string_id": 409748,
+      "enabled": false
     },
     {
       "id": 3070031,
@@ -1442,7 +1472,8 @@
       ],
       "description_string_id": 409893,
       "intro_text_string_id": 409891,
-      "end_text_string_id": 409894
+      "end_text_string_id": 409894,
+      "enabled": false
     },
     {
       "id": 3070032,
@@ -1489,7 +1520,8 @@
       ],
       "description_string_id": 409976,
       "intro_text_string_id": 409974,
-      "end_text_string_id": 409977
+      "end_text_string_id": 409977,
+      "enabled": false
     },
     {
       "id": 3070033,
@@ -1534,7 +1566,8 @@
       ],
       "description_string_id": 409414,
       "intro_text_string_id": 409412,
-      "end_text_string_id": 409415
+      "end_text_string_id": 409415,
+      "enabled": false
     },
     {
       "id": 3070034,
@@ -1581,7 +1614,8 @@
       ],
       "description_string_id": 409998,
       "intro_text_string_id": 409996,
-      "end_text_string_id": 409999
+      "end_text_string_id": 409999,
+      "enabled": false
     },
     {
       "id": 3070035,
@@ -1628,7 +1662,8 @@
       ],
       "description_string_id": 410033,
       "intro_text_string_id": 410031,
-      "end_text_string_id": 410034
+      "end_text_string_id": 410034,
+      "enabled": false
     },
     {
       "id": 3070036,
@@ -1675,7 +1710,8 @@
       ],
       "description_string_id": 410440,
       "intro_text_string_id": 410438,
-      "end_text_string_id": 410441
+      "end_text_string_id": 410441,
+      "enabled": false
     },
     {
       "id": 3070037,
@@ -1722,7 +1758,8 @@
       ],
       "description_string_id": 410175,
       "intro_text_string_id": 410173,
-      "end_text_string_id": 410176
+      "end_text_string_id": 410176,
+      "enabled": false
     },
     {
       "id": 3070038,
@@ -1767,7 +1804,8 @@
       ],
       "description_string_id": 410501,
       "intro_text_string_id": 410499,
-      "end_text_string_id": 410502
+      "end_text_string_id": 410502,
+      "enabled": false
     },
     {
       "id": 3070039,
@@ -1814,7 +1852,8 @@
       ],
       "description_string_id": 412145,
       "intro_text_string_id": 412143,
-      "end_text_string_id": 412146
+      "end_text_string_id": 412146,
+      "enabled": false
     },
     {
       "id": 3070040,
@@ -1861,7 +1900,8 @@
       ],
       "description_string_id": 409041,
       "intro_text_string_id": 409039,
-      "end_text_string_id": 409042
+      "end_text_string_id": 409042,
+      "enabled": false
     },
     {
       "id": 3070041,
@@ -1906,7 +1946,8 @@
       ],
       "description_string_id": 410252,
       "intro_text_string_id": 410250,
-      "end_text_string_id": 410253
+      "end_text_string_id": 410253,
+      "enabled": false
     },
     {
       "id": 3070042,
@@ -1951,7 +1992,8 @@
       ],
       "description_string_id": 410110,
       "intro_text_string_id": 410108,
-      "end_text_string_id": 410111
+      "end_text_string_id": 410111,
+      "enabled": false
     },
     {
       "id": 3070043,
@@ -1996,7 +2038,8 @@
       ],
       "description_string_id": 412263,
       "intro_text_string_id": 412261,
-      "end_text_string_id": 412264
+      "end_text_string_id": 412264,
+      "enabled": false
     },
     {
       "id": 3070044,
@@ -2043,7 +2086,8 @@
       ],
       "description_string_id": 409521,
       "intro_text_string_id": 409519,
-      "end_text_string_id": 409522
+      "end_text_string_id": 409522,
+      "enabled": false
     },
     {
       "id": 3070045,
@@ -2090,7 +2134,8 @@
       ],
       "description_string_id": 412196,
       "intro_text_string_id": 412194,
-      "end_text_string_id": 412197
+      "end_text_string_id": 412197,
+      "enabled": false
     },
     {
       "id": 3070046,
@@ -2137,7 +2182,8 @@
       ],
       "description_string_id": 412291,
       "intro_text_string_id": 412289,
-      "end_text_string_id": 412292
+      "end_text_string_id": 412292,
+      "enabled": false
     },
     {
       "id": 3070047,
@@ -2184,7 +2230,8 @@
       ],
       "description_string_id": 410202,
       "intro_text_string_id": 410200,
-      "end_text_string_id": 410203
+      "end_text_string_id": 410203,
+      "enabled": false
     },
     {
       "id": 3070048,
@@ -2231,7 +2278,8 @@
       ],
       "description_string_id": 410275,
       "intro_text_string_id": 410273,
-      "end_text_string_id": 410276
+      "end_text_string_id": 410276,
+      "enabled": false
     },
     {
       "id": 3070049,
@@ -2278,7 +2326,8 @@
       ],
       "description_string_id": 410230,
       "intro_text_string_id": 410228,
-      "end_text_string_id": 410231
+      "end_text_string_id": 410231,
+      "enabled": false
     },
     {
       "id": 3070050,
@@ -2325,7 +2374,8 @@
       ],
       "description_string_id": 409059,
       "intro_text_string_id": 409057,
-      "end_text_string_id": 409060
+      "end_text_string_id": 409060,
+      "enabled": false
     }
   ]
 }

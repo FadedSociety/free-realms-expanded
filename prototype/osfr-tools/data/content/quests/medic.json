@@ -46,7 +46,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 23049
+      "description_string_id": 23049,
+      "enabled": false
     },
     {
       "id": 3090002,
@@ -90,7 +91,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090003,
@@ -139,7 +141,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 22990
+      "description_string_id": 22990,
+      "enabled": false
     },
     {
       "id": 3090004,
@@ -190,7 +193,8 @@
       ],
       "description_string_id": 77438,
       "intro_text_string_id": 77436,
-      "end_text_string_id": 77439
+      "end_text_string_id": 77439,
+      "enabled": false
     },
     {
       "id": 3090005,
@@ -239,7 +243,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 23020
+      "description_string_id": 23020,
+      "enabled": false
     },
     {
       "id": 3090006,
@@ -292,7 +297,8 @@
       ],
       "description_string_id": 387464,
       "intro_text_string_id": 387462,
-      "end_text_string_id": 387465
+      "end_text_string_id": 387465,
+      "enabled": false
     },
     {
       "id": 3090007,
@@ -336,7 +342,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090008,
@@ -387,7 +394,8 @@
       ],
       "description_string_id": 76749,
       "intro_text_string_id": 76747,
-      "end_text_string_id": 76750
+      "end_text_string_id": 76750,
+      "enabled": false
     },
     {
       "id": 3090009,
@@ -438,7 +446,8 @@
       ],
       "description_string_id": 73362,
       "intro_text_string_id": 73360,
-      "end_text_string_id": 73363
+      "end_text_string_id": 73363,
+      "enabled": false
     },
     {
       "id": 3090010,
@@ -493,7 +502,8 @@
       ],
       "description_string_id": 73494,
       "intro_text_string_id": 73492,
-      "end_text_string_id": 73495
+      "end_text_string_id": 73495,
+      "enabled": false
     },
     {
       "id": 3090011,
@@ -544,7 +554,8 @@
       ],
       "description_string_id": 73753,
       "intro_text_string_id": 73751,
-      "end_text_string_id": 73754
+      "end_text_string_id": 73754,
+      "enabled": false
     },
     {
       "id": 3090012,
@@ -599,7 +610,8 @@
       ],
       "description_string_id": 73784,
       "intro_text_string_id": 73782,
-      "end_text_string_id": 73785
+      "end_text_string_id": 73785,
+      "enabled": false
     },
     {
       "id": 3090013,
@@ -641,7 +653,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090014,
@@ -685,7 +698,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090015,
@@ -729,7 +743,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090016,
@@ -780,7 +795,8 @@
       ],
       "description_string_id": 73829,
       "intro_text_string_id": 73827,
-      "end_text_string_id": 73830
+      "end_text_string_id": 73830,
+      "enabled": false
     },
     {
       "id": 3090017,
@@ -831,7 +847,8 @@
       ],
       "description_string_id": 74027,
       "intro_text_string_id": 74025,
-      "end_text_string_id": 74028
+      "end_text_string_id": 74028,
+      "enabled": false
     },
     {
       "id": 3090018,
@@ -882,7 +899,8 @@
       ],
       "description_string_id": 74065,
       "intro_text_string_id": 74063,
-      "end_text_string_id": 74066
+      "end_text_string_id": 74066,
+      "enabled": false
     },
     {
       "id": 3090019,
@@ -933,7 +951,8 @@
       ],
       "description_string_id": 74074,
       "intro_text_string_id": 74072,
-      "end_text_string_id": 74075
+      "end_text_string_id": 74075,
+      "enabled": false
     },
     {
       "id": 3090020,
@@ -984,7 +1003,8 @@
       ],
       "description_string_id": 74714,
       "intro_text_string_id": 74712,
-      "end_text_string_id": 74715
+      "end_text_string_id": 74715,
+      "enabled": false
     },
     {
       "id": 3090021,
@@ -1033,7 +1053,8 @@
       ],
       "description_string_id": 387568,
       "intro_text_string_id": 387566,
-      "end_text_string_id": 387569
+      "end_text_string_id": 387569,
+      "enabled": false
     },
     {
       "id": 3090022,
@@ -1077,7 +1098,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090023,
@@ -1128,7 +1150,8 @@
       ],
       "description_string_id": 93133,
       "intro_text_string_id": 93131,
-      "end_text_string_id": 93134
+      "end_text_string_id": 93134,
+      "enabled": false
     },
     {
       "id": 3090024,
@@ -1179,7 +1202,8 @@
       ],
       "description_string_id": 74726,
       "intro_text_string_id": 74724,
-      "end_text_string_id": 74727
+      "end_text_string_id": 74727,
+      "enabled": false
     },
     {
       "id": 3090025,
@@ -1230,7 +1254,8 @@
       ],
       "description_string_id": 74769,
       "intro_text_string_id": 74767,
-      "end_text_string_id": 74770
+      "end_text_string_id": 74770,
+      "enabled": false
     },
     {
       "id": 3090026,
@@ -1281,7 +1306,8 @@
       ],
       "description_string_id": 74784,
       "intro_text_string_id": 74782,
-      "end_text_string_id": 74785
+      "end_text_string_id": 74785,
+      "enabled": false
     },
     {
       "id": 3090027,
@@ -1330,7 +1356,8 @@
       ],
       "description_string_id": 387578,
       "intro_text_string_id": 387576,
-      "end_text_string_id": 387579
+      "end_text_string_id": 387579,
+      "enabled": false
     },
     {
       "id": 3090028,
@@ -1374,7 +1401,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3090029,
@@ -1425,7 +1453,8 @@
       ],
       "description_string_id": 74800,
       "intro_text_string_id": 74798,
-      "end_text_string_id": 74801
+      "end_text_string_id": 74801,
+      "enabled": false
     },
     {
       "id": 3090030,
@@ -1476,7 +1505,8 @@
       ],
       "description_string_id": 74836,
       "intro_text_string_id": 74834,
-      "end_text_string_id": 74837
+      "end_text_string_id": 74837,
+      "enabled": false
     },
     {
       "id": 3090031,
@@ -1527,7 +1557,8 @@
       ],
       "description_string_id": 76048,
       "intro_text_string_id": 76046,
-      "end_text_string_id": 76049
+      "end_text_string_id": 76049,
+      "enabled": false
     },
     {
       "id": 3090032,
@@ -1578,7 +1609,8 @@
       ],
       "description_string_id": 76152,
       "intro_text_string_id": 76150,
-      "end_text_string_id": 76153
+      "end_text_string_id": 76153,
+      "enabled": false
     },
     {
       "id": 3090033,
@@ -1622,7 +1654,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     }
   ]
 }

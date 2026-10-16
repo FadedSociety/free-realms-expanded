@@ -47,7 +47,8 @@
         }
       ],
       "description_string_id": 42126,
-      "intro_text_string_id": 42124
+      "intro_text_string_id": 42124,
+      "enabled": false
     },
     {
       "id": 3050002,
@@ -97,7 +98,8 @@
         }
       ],
       "description_string_id": 42174,
-      "intro_text_string_id": 42172
+      "intro_text_string_id": 42172,
+      "enabled": false
     },
     {
       "id": 3050003,
@@ -147,7 +149,8 @@
         }
       ],
       "description_string_id": 42121,
-      "intro_text_string_id": 42119
+      "intro_text_string_id": 42119,
+      "enabled": false
     },
     {
       "id": 3050004,
@@ -195,7 +198,8 @@
         }
       ],
       "description_string_id": 4420051,
-      "intro_text_string_id": 4420049
+      "intro_text_string_id": 4420049,
+      "enabled": false
     },
     {
       "id": 3050005,
@@ -242,7 +246,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 4420054
+      "description_string_id": 4420054,
+      "enabled": false
     },
     {
       "id": 3050006,
@@ -291,7 +296,8 @@
       ],
       "description_string_id": 94276,
       "intro_text_string_id": 94274,
-      "end_text_string_id": 94277
+      "end_text_string_id": 94277,
+      "enabled": false
     },
     {
       "id": 3050007,
@@ -342,7 +348,8 @@
       ],
       "description_string_id": 94292,
       "intro_text_string_id": 94290,
-      "end_text_string_id": 94293
+      "end_text_string_id": 94293,
+      "enabled": false
     },
     {
       "id": 3050008,
@@ -393,7 +400,8 @@
       ],
       "description_string_id": 94300,
       "intro_text_string_id": 94298,
-      "end_text_string_id": 94301
+      "end_text_string_id": 94301,
+      "enabled": false
     },
     {
       "id": 3050009,
@@ -444,7 +452,8 @@
       ],
       "description_string_id": 100544,
       "intro_text_string_id": 100542,
-      "end_text_string_id": 100545
+      "end_text_string_id": 100545,
+      "enabled": false
     },
     {
       "id": 3050010,
@@ -495,7 +504,8 @@
       ],
       "description_string_id": 71057,
       "intro_text_string_id": 71055,
-      "end_text_string_id": 71058
+      "end_text_string_id": 71058,
+      "enabled": false
     },
     {
       "id": 3050011,
@@ -611,7 +621,8 @@
       ],
       "description_string_id": 104139,
       "intro_text_string_id": 104137,
-      "end_text_string_id": 104140
+      "end_text_string_id": 104140,
+      "enabled": false
     },
     {
       "id": 3050013,
@@ -662,7 +673,8 @@
       ],
       "description_string_id": 104143,
       "intro_text_string_id": 104141,
-      "end_text_string_id": 104144
+      "end_text_string_id": 104144,
+      "enabled": false
     },
     {
       "id": 3050014,
@@ -717,7 +729,8 @@
       ],
       "description_string_id": 139212,
       "intro_text_string_id": 139210,
-      "end_text_string_id": 139213
+      "end_text_string_id": 139213,
+      "enabled": false
     },
     {
       "id": 3050015,
@@ -765,7 +778,8 @@
         }
       ],
       "description_string_id": 116478,
-      "intro_text_string_id": 116476
+      "intro_text_string_id": 116476,
+      "enabled": false
     },
     {
       "id": 3050016,
@@ -816,7 +830,8 @@
       ],
       "description_string_id": 116494,
       "intro_text_string_id": 116492,
-      "end_text_string_id": 116495
+      "end_text_string_id": 116495,
+      "enabled": false
     },
     {
       "id": 3050017,
@@ -867,7 +882,8 @@
       ],
       "description_string_id": 116498,
       "intro_text_string_id": 116496,
-      "end_text_string_id": 116499
+      "end_text_string_id": 116499,
+      "enabled": false
     },
     {
       "id": 3050018,
@@ -918,7 +934,8 @@
       ],
       "description_string_id": 100544,
       "intro_text_string_id": 100542,
-      "end_text_string_id": 100545
+      "end_text_string_id": 100545,
+      "enabled": false
     },
     {
       "id": 3050019,
@@ -967,7 +984,8 @@
       ],
       "description_string_id": 139272,
       "intro_text_string_id": 139270,
-      "end_text_string_id": 139273
+      "end_text_string_id": 139273,
+      "enabled": false
     },
     {
       "id": 3050020,
@@ -1016,7 +1034,8 @@
       ],
       "description_string_id": 387248,
       "intro_text_string_id": 387246,
-      "end_text_string_id": 387249
+      "end_text_string_id": 387249,
+      "enabled": false
     },
     {
       "id": 3050021,
@@ -1064,7 +1083,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3050022,
@@ -1115,7 +1135,8 @@
       ],
       "description_string_id": 71785,
       "intro_text_string_id": 71783,
-      "end_text_string_id": 71786
+      "end_text_string_id": 71786,
+      "enabled": false
     },
     {
       "id": 3050023,
@@ -1164,7 +1185,8 @@
       ],
       "description_string_id": 387256,
       "intro_text_string_id": 387254,
-      "end_text_string_id": 387257
+      "end_text_string_id": 387257,
+      "enabled": false
     },
     {
       "id": 3050024,
@@ -1215,7 +1237,8 @@
       ],
       "description_string_id": 72107,
       "intro_text_string_id": 72105,
-      "end_text_string_id": 72108
+      "end_text_string_id": 72108,
+      "enabled": false
     },
     {
       "id": 3050025,
@@ -1266,7 +1289,8 @@
       ],
       "description_string_id": 72242,
       "intro_text_string_id": 72240,
-      "end_text_string_id": 72243
+      "end_text_string_id": 72243,
+      "enabled": false
     },
     {
       "id": 3050026,
@@ -1317,7 +1341,8 @@
       ],
       "description_string_id": 72538,
       "intro_text_string_id": 72536,
-      "end_text_string_id": 72539
+      "end_text_string_id": 72539,
+      "enabled": false
     },
     {
       "id": 3050027,
@@ -1367,7 +1392,8 @@
         }
       ],
       "description_string_id": 24314,
-      "end_text_string_id": 24315
+      "end_text_string_id": 24315,
+      "enabled": false
     },
     {
       "id": 3050028,
@@ -1416,7 +1442,8 @@
       ],
       "description_string_id": 387260,
       "intro_text_string_id": 387258,
-      "end_text_string_id": 387261
+      "end_text_string_id": 387261,
+      "enabled": false
     },
     {
       "id": 3050029,
@@ -1466,7 +1493,8 @@
         }
       ],
       "description_string_id": 72676,
-      "end_text_string_id": 72677
+      "end_text_string_id": 72677,
+      "enabled": false
     },
     {
       "id": 3050030,
@@ -1521,7 +1549,8 @@
       ],
       "description_string_id": 73079,
       "intro_text_string_id": 73077,
-      "end_text_string_id": 73080
+      "end_text_string_id": 73080,
+      "enabled": false
     },
     {
       "id": 3050031,
@@ -1574,7 +1603,8 @@
       ],
       "description_string_id": 387264,
       "intro_text_string_id": 387262,
-      "end_text_string_id": 387265
+      "end_text_string_id": 387265,
+      "enabled": false
     },
     {
       "id": 3050032,
@@ -1624,7 +1654,8 @@
         }
       ],
       "description_string_id": 73273,
-      "intro_text_string_id": 73271
+      "intro_text_string_id": 73271,
+      "enabled": false
     },
     {
       "id": 3050033,
@@ -1674,7 +1705,8 @@
         }
       ],
       "description_string_id": 73252,
-      "intro_text_string_id": 73250
+      "intro_text_string_id": 73250,
+      "enabled": false
     }
   ]
 }

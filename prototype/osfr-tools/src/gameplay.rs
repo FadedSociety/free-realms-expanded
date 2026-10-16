@@ -1480,6 +1480,91 @@ impl Gameplay {
         Ok(())
     }
 
+    fn npc_quest_event(
+        &mut self,
+        event: crate::quest_engine::QuestEvent,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if let Some(engine) = &mut self.npc_quests {
+            let result = engine.on_event(event)?;
+            self.append_npc_quest_outcome(result, out)?;
+        }
+        Ok(())
+    }
+
+    // (R) Collect counts newly granted, non-rental items, not login snapshots
+    // or existing stock. Equip counts changed owned slots, not packet claims.
+    fn npc_inventory_events(
+        &mut self,
+        before: &InventoryState,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if self.npc_quests.is_none() {
+            return Ok(());
+        }
+        let totals = |state: &InventoryState| {
+            let mut counts = std::collections::BTreeMap::<i32, u64>::new();
+            for item in state.items.iter().filter(|item| item.rental.is_none()) {
+                *counts.entry(item.definition_id).or_default() += u64::from(item.count);
+            }
+            counts
+        };
+        let previous = totals(before);
+        for (item_id, total) in totals(self.inventory.state()) {
+            let quantity = total
+                .saturating_sub(*previous.get(&item_id).unwrap_or(&0))
+                .min(1_000_000) as u32;
+            if quantity > 0 {
+                self.npc_quest_event(
+                    crate::quest_engine::QuestEvent::CollectItem { item_id, quantity },
+                    out,
+                )?;
+            }
+        }
+        let equipped: BTreeSet<_> = self
+            .inventory
+            .state()
+            .equipment
+            .iter()
+            .filter(|slot| slot.item_id != 0 && !before.equipment.contains(slot))
+            .filter_map(|slot| {
+                self.inventory
+                    .state()
+                    .items
+                    .iter()
+                    .find(|item| item.id == slot.item_id && item.rental.is_none())
+                    .map(|item| item.definition_id)
+            })
+            .collect();
+        for definition_id in equipped {
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::EquipItem { definition_id },
+                out,
+            )?;
+        }
+        Ok(())
+    }
+
+    // Only inspect server-generated results after a successful payout. Never
+    // interpret an incoming win/score packet as quest authority (R policy).
+    fn npc_minigame_win(&mut self, replies: &[Vec<u8>], out: &mut Outcome) -> io::Result<()> {
+        if let Some(packet) = replies.iter().find(|p| {
+            (p.len() >= 16 && p.starts_with(&[39, 0, 18]) && p[15] == 1)
+                || (p.len() >= 19 && p.starts_with(&[39, 0, 14]) && &p[19..] == b"OnGameWonMsg\0")
+        }) {
+            let id = i32::from_le_bytes(packet[11..15].try_into().unwrap());
+            if id > 0 {
+                self.npc_quest_event(
+                    crate::quest_engine::QuestEvent::FinishMinigame {
+                        minigame_id: id as u32,
+                    },
+                    out,
+                )?;
+            }
+        }
+        Ok(())
+    }
+
     fn append_npc_quest_login_sync(&mut self, out: &mut Outcome) -> io::Result<()> {
         if self.npc_quests_synced {
             return Ok(());
@@ -1660,7 +1745,13 @@ impl Gameplay {
     /// Grant and equip a job's starter outfit from the content's starter table.
     /// With `reuse_owned`, a piece the player already owns is equipped instead
     /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.
-    fn give_starter_outfit(&mut self, job: i32, reuse_owned: bool, out: &mut Outcome) -> io::Result<()> {
+    fn give_starter_outfit(
+        &mut self,
+        job: i32,
+        reuse_owned: bool,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let before = self.inventory.state().clone();
         let items = self.profiles.as_ref().unwrap().starter_items(job).to_vec();
         let inactive = job != self.profiles.as_ref().unwrap().active();
         for definition in items {
@@ -1694,6 +1785,7 @@ impl Gameplay {
                     .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
             );
         }
+        self.npc_inventory_events(&before, out)?;
         Ok(())
     }
 
@@ -1901,11 +1993,23 @@ impl Gameplay {
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             return Ok(Outcome::default());
         }
+        let mut out = Outcome::default();
+        // gateway.rs calls this only after movement validation accepted/clamped
+        // the pose. Engine checks active objectives indexed by current zone.
+        self.npc_quest_event(
+            crate::quest_engine::QuestEvent::VisitPosition {
+                zone_id: character.zone_id,
+                position: character.position,
+            },
+            &mut out,
+        )?;
         if self.opening.is_none() {
-            return self.on_position(character.position, now_ms);
+            let result = self.on_position(character.position, now_ms)?;
+            out.changed |= result.changed;
+            out.replies.extend(result.replies);
+            return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
-        let mut out = Outcome::default();
         let result = self
             .opening
             .as_mut()
@@ -2093,7 +2197,9 @@ impl Gameplay {
                 }
             }
         }
-        if let Some(outcome) = self.handle_npc_packet(inner, character)? {
+        let inventory_before = self.inventory.state().clone();
+        if let Some(mut outcome) = self.handle_npc_packet(inner, character)? {
+            self.npc_inventory_events(&inventory_before, &mut outcome)?;
             return Ok(outcome);
         }
         if self.opening.is_none() {
@@ -2970,7 +3076,9 @@ impl Gameplay {
             return Ok(USAGE.into());
         };
         if character.zone_id != crate::world::OPEN_WORLD_ZONE {
-            return Ok("Placing NPCs works in the main world (zone 0) for now. Nothing changed.".into());
+            return Ok(
+                "Placing NPCs works in the main world (zone 0) for now. Nothing changed.".into(),
+            );
         }
         let (mut name_string_id, mut at, mut literal) = (0_u32, None, None);
         let mut words = rest.iter().enumerate();
@@ -2984,8 +3092,11 @@ impl Gameplay {
                 break;
             }
             if *word == "at" {
-                let mut number =
-                    || words.next().and_then(|(_, w)| w.trim_end_matches(',').parse::<f32>().ok());
+                let mut number = || {
+                    words
+                        .next()
+                        .and_then(|(_, w)| w.trim_end_matches(',').parse::<f32>().ok())
+                };
                 match (number(), number()) {
                     (Some(x), Some(z)) if x.is_finite() && z.is_finite() => at = Some((x, z)),
                     _ => return Ok(USAGE.into()),
@@ -3067,7 +3178,9 @@ impl Gameplay {
         let guid = if which == "nearest" {
             records
                 .iter()
-                .min_by(|a, b| flat_distance(a.position, me).total_cmp(&flat_distance(b.position, me)))
+                .min_by(|a, b| {
+                    flat_distance(a.position, me).total_cmp(&flat_distance(b.position, me))
+                })
                 .map(|r| r.guid)
         } else {
             which.parse::<u64>().ok()
@@ -3242,6 +3355,11 @@ impl Gameplay {
             return Ok(true);
         };
 
+        if !engine.is_enabled(quest_id) {
+            out.replies
+                .push(chat::system("This quest is disabled or has no objectives."));
+            return Ok(true);
+        }
         let normal_intro = engine.intro_text_string_id(quest_id).unwrap_or(0);
         let title_id = engine.title_string_id(quest_id).unwrap_or(0);
         let (send_dialogue, blank_dialogue, offers): (bool, bool, Vec<(u16, Option<u32>)>) =
@@ -3772,6 +3890,7 @@ impl Gameplay {
             return Ok(result);
         }
         if inner.len() >= 4 && (inner[..2] == [42, 0] || inner[..4] == [35, 0, 34, 0]) {
+            let inventory_before = self.inventory.state().clone();
             let result = self.inventory.handle(inner)?;
             out.changed |= result.changed;
             let target_profile = if inner.starts_with(&[42, 0, 3, 0]) && inner.len() == 16 {
@@ -3790,6 +3909,7 @@ impl Gameplay {
                     .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
             );
             if result.changed {
+                self.npc_inventory_events(&inventory_before, &mut out)?;
                 self.opening_equipment_events(&mut out)?;
                 self.sync_world_stage(&mut out)?;
             }
@@ -3962,6 +4082,12 @@ impl Gameplay {
                         return Ok(out);
                     }
                     let gather_before = self.gather_count(1003);
+                    let resource_before = match actor.action {
+                        Some(crate::opening::OpeningTrigger::Gather { resource_id }) => {
+                            Some((resource_id, self.gather_count(resource_id)))
+                        }
+                        _ => None,
+                    };
                     let chef_resource = match actor.action {
                         Some(crate::opening::OpeningTrigger::Gather {
                             resource_id: id @ (1001 | 1002),
@@ -3971,6 +4097,18 @@ impl Gameplay {
                     let chef_before = chef_resource.map(|id| self.gather_count(id));
                     let result = self.opening.as_mut().unwrap().on_interaction(guid)?;
                     self.apply_opening(result, &mut out)?;
+                    if let Some((resource_id, before)) = resource_before {
+                        let quantity = self.gather_count(resource_id).saturating_sub(before);
+                        if quantity > 0 {
+                            self.npc_quest_event(
+                                crate::quest_engine::QuestEvent::GatherResource {
+                                    resource_id,
+                                    quantity,
+                                },
+                                &mut out,
+                            )?;
+                        }
+                    }
                     if self.smelting.is_some()
                         && self.profiles.as_ref().unwrap().active() == 14
                         && matches!(
@@ -4240,6 +4378,20 @@ impl Gameplay {
                     quantity,
                 })?;
             self.apply_opening(progress, out)?;
+            // (R) The opening binding is the fallback for the unnumbered sample.
+            let recipe_id = self
+                .recipe_catalog
+                .by_key(self.smelting.as_ref().unwrap().recipe_key())
+                .and_then(|r| r.recipe_id)
+                .unwrap_or(2002);
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::CraftRecipe {
+                    recipe_id,
+                    quantity: 1,
+                },
+                out,
+            )?;
+            self.npc_minigame_win(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -4259,6 +4411,18 @@ impl Gameplay {
             }
             self.consume_materials(transaction.consumes, out)?;
             self.grant_reward(0, &transaction.grants, out)?;
+            // (R) TYPE8 resource keys use the configured output item definition;
+            // no retail regional resource-to-quest table has been recovered.
+            for (id, quantity) in transaction.grants {
+                self.npc_quest_event(
+                    crate::quest_engine::QuestEvent::GatherResource {
+                        resource_id: id as u32,
+                        quantity,
+                    },
+                    out,
+                )?;
+            }
+            self.npc_minigame_win(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -4279,6 +4443,17 @@ impl Gameplay {
             }
             self.consume_materials(transaction.consumes, out)?;
             self.grant_reward(0, &transaction.grants, out)?;
+            // (R) Resource identity is the configured output item definition.
+            for (id, quantity) in transaction.grants {
+                self.npc_quest_event(
+                    crate::quest_engine::QuestEvent::GatherResource {
+                        resource_id: id as u32,
+                        quantity,
+                    },
+                    out,
+                )?;
+            }
+            self.npc_minigame_win(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -4363,6 +4538,20 @@ impl Gameplay {
                     quantity: 1,
                 })?;
             self.apply_opening(progress, out)?;
+            // (R) Reuse the opening's reconstructed recipe binding.
+            let recipe_id = self
+                .recipe_catalog
+                .by_key(self.cooking.as_ref().unwrap().recipe_key())
+                .and_then(|r| r.recipe_id)
+                .unwrap_or(2001);
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::CraftRecipe {
+                    recipe_id,
+                    quantity: 1,
+                },
+                out,
+            )?;
+            self.npc_minigame_win(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -4416,6 +4605,20 @@ impl Gameplay {
                     quantity: 1,
                 })?;
             self.apply_opening(progress, out)?;
+            // (R) Reuse the opening's reconstructed recipe binding.
+            let recipe_id = self
+                .recipe_catalog
+                .by_key(self.forging.as_ref().unwrap().recipe_key())
+                .and_then(|r| r.recipe_id)
+                .unwrap_or(2003);
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::CraftRecipe {
+                    recipe_id,
+                    quantity: 1,
+                },
+                out,
+            )?;
+            self.npc_minigame_win(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -4700,17 +4903,20 @@ impl Gameplay {
         let Some(request) = mystery_chest::parse_request(inner)? else {
             return Ok(None);
         };
+        let before = self.inventory.state().clone();
         let result = content.handle(
             &mut self.inventory,
             &mut self.pending_chest,
             request,
             player_guid,
         )?;
-        Ok(Some(Outcome {
+        let mut out = Outcome {
             replies: result.replies,
             changed: result.changed,
             ..Outcome::default()
-        }))
+        };
+        self.npc_inventory_events(&before, &mut out)?;
+        Ok(Some(out))
     }
 
     /// Job level on the local rank curve (R): one base rank, one per 100 XP,
@@ -4780,9 +4986,11 @@ impl Gameplay {
         items: &[(i32, u32)],
         out: &mut Outcome,
     ) -> io::Result<()> {
+        let before = self.inventory.state().clone();
         let result = self.inventory.grant_bundle(coins, items)?;
         out.changed |= result.changed;
         out.replies.extend(result.replies);
+        self.npc_inventory_events(&before, out)?;
         Ok(())
     }
 
@@ -4882,6 +5090,7 @@ impl Gameplay {
             let inventory = self.inventory.handle(inner)?;
             out.changed |= inventory.changed;
             out.replies.extend(inventory.replies);
+            self.npc_inventory_events(&before, &mut out)?;
             out.replies.extend(self.learn_consumed_patterns(&before)?);
         }
         if inner.starts_with(&[26, 0, 13, 0]) {
@@ -4957,6 +5166,16 @@ impl Gameplay {
                     self.quests = quests;
                     out.changed |= result.changed;
                     out.replies.extend(result.replies);
+                    for (item_id, quantity) in reward.items.iter().copied().filter(|(_, n)| *n > 0)
+                    {
+                        self.npc_quest_event(
+                            crate::quest_engine::QuestEvent::CollectItem {
+                                item_id,
+                                quantity: quantity.min(1_000_000),
+                            },
+                            out,
+                        )?;
+                    }
                 }
                 Err(error) => out.replies.push(chat::system(&format!(
                     "Cannot collect this reward yet: {error}. Quest reward remains pending."
@@ -5161,8 +5380,16 @@ mod developer_teleport {
         )
         .unwrap();
         let corner = |dx: f32, dz: f32| [p[0] + dx, height, p[2] + dz];
-        grid.add_triangle([corner(-100.0, -100.0), corner(100.0, -100.0), corner(100.0, 100.0)]);
-        grid.add_triangle([corner(-100.0, -100.0), corner(100.0, 100.0), corner(-100.0, 100.0)]);
+        grid.add_triangle([
+            corner(-100.0, -100.0),
+            corner(100.0, -100.0),
+            corner(100.0, 100.0),
+        ]);
+        grid.add_triangle([
+            corner(-100.0, -100.0),
+            corner(100.0, 100.0),
+            corner(-100.0, 100.0),
+        ]);
         let dir = std::env::temp_dir().join(format!("osfr-{name}-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("zone_0.hgt"), grid.to_bytes()).unwrap();
@@ -5270,11 +5497,21 @@ mod developer_teleport {
         };
         game.handle_in_world(&chat("realm place 166"), &raised, 1_002).unwrap();
         assert_eq!(game.load_placements()[2].position[1], 12.0);
-        game.handle_in_world(&chat(&format!("realm unplace {}", second + 1)), &start, 1_002)
-            .unwrap();
+        game.handle_in_world(
+            &chat(&format!("realm unplace {}", second + 1)),
+            &start,
+            1_002,
+        )
+        .unwrap();
         assert_eq!(placed[0].extra["note"], "guards the bridge");
-        let list = game.handle_in_world(&chat("realm placements"), &start, 1_003).unwrap();
-        assert!(reply_text(&list).contains("2 placed NPCs"), "{}", reply_text(&list));
+        let list = game
+            .handle_in_world(&chat("realm placements"), &start, 1_003)
+            .unwrap();
+        assert!(
+            reply_text(&list).contains("2 placed NPCs"),
+            "{}",
+            reply_text(&list)
+        );
 
         // The nearest is the one where the character stands.
         let out = game
@@ -5284,7 +5521,11 @@ mod developer_teleport {
         assert_eq!(game.load_placements().len(), 1);
 
         // Editing the file then reloading swaps the placed NPCs live.
-        std::fs::write(dir.join("npc_placements.json"), r#"{"schema_version":1,"records":[]}"#).unwrap();
+        std::fs::write(
+            dir.join("npc_placements.json"),
+            r#"{"schema_version":1,"records":[]}"#,
+        )
+        .unwrap();
         let out = game
             .handle_in_world(&chat("realm reload placements"), &start, 1_005)
             .unwrap();
@@ -5357,7 +5598,9 @@ mod developer_teleport {
         game.set_role(crate::account_store::AccountRole::Admin);
         game.set_world_dir(Some(world.clone())).unwrap();
         let first = crate::world_text::FIRST_WORLD_TEXT_ID;
-        game.set_stock_text(Some(Arc::new(HashSet::from([crate::world_text::locale_hash(first)]))));
+        game.set_stock_text(Some(Arc::new(HashSet::from([
+            crate::world_text::locale_hash(first),
+        ]))));
         let start = character();
         let out = game
             .handle_in_world(&chat("realm text Find Bob the Lost!"), &start, 1_000)
@@ -5427,7 +5670,11 @@ mod developer_teleport {
         let list = game.handle_in_world(&chat("realm marks"), &start, 1_001).unwrap();
         assert!(reply_text(&list).contains("troll bridge (zone 0"), "{}", reply_text(&list));
         let elsewhere = CharacterState {
-            position: [start.position[0] + 50.0, start.position[1], start.position[2]],
+            position: [
+                start.position[0] + 50.0,
+                start.position[1],
+                start.position[2],
+            ],
             ..start.clone()
         };
         let back = game
@@ -5789,7 +6036,7 @@ mod w64_regional_quest_tests {
             .find(|record| record["npc_id"].as_u64() == Some(SAMANTHA_ID))
             .unwrap();
         let position: [f32; 3] = serde_json::from_value(samantha["position"].clone()).unwrap();
-        let character = CharacterState {
+        let mut character = CharacterState {
             guid: 1,
             zone_id: 0,
             position,
@@ -5895,7 +6142,7 @@ mod w64_regional_quest_tests {
             .unwrap()
             .clone()
             .on_event(crate::quest_engine::QuestEvent::TalkToNpc {
-                npc_id: SAMANTHA_ID,
+                npc_id: 9_500_000_254,
             })
             .unwrap();
         assert!(direct_talk.outbound.iter().any(|message| matches!(
@@ -5905,10 +6152,21 @@ mod w64_regional_quest_tests {
             ) if *quest_id == INTRODUCE_YOURSELF_ID
         )));
 
-        game.handle_in_world(&packet_for_npc(SAMANTHA_ID), &character, 1_006)
+        // W92 now requires the explicit referral target, rather than a hollow
+        // quest's accepting conversation. Exercise the real target route.
+        let target_id = 9_500_000_254;
+        let target = npc_file["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["npc_id"].as_u64() == Some(target_id))
+            .unwrap();
+        character.position = serde_json::from_value(target["position"].clone()).unwrap();
+        game.update_npc_visibility(&character).unwrap();
+        game.handle_in_world(&packet_for_npc(target_id), &character, 1_006)
             .unwrap();
         let talk = game
-            .handle_in_world(&select_npc_option(SAMANTHA_ID, 1), &character, 1_007)
+            .handle_in_world(&select_npc_option(target_id, 1), &character, 1_007)
             .unwrap();
         // The end screen waits behind a dialog choice, like the offer.
         assert!(
@@ -5926,7 +6184,7 @@ mod w64_regional_quest_tests {
                 .iter()
                 .any(|packet| packet.starts_with(&[49, 0, 13, 0, 0, 0])
                     && packet.len() == 99
-                    && u64::from_le_bytes(packet[6..14].try_into().unwrap()) == SAMANTHA_ID
+                    && u64::from_le_bytes(packet[6..14].try_into().unwrap()) == target_id
                     && u32::from_le_bytes(packet[14..18].try_into().unwrap())
                         == INTRODUCE_YOURSELF_ID)
         );
@@ -5934,14 +6192,8 @@ mod w64_regional_quest_tests {
             .replies
             .iter()
             .find(|packet| packet.starts_with(&[26, 0, 3, 0]))
-            .expect("Samantha talk returns a ShowDialog packet");
-        assert_eq!(
-            npc_interaction::decode_dialogue_26_3(dialogue)
-                .unwrap()
-                .initial_dwords[0],
-            24_940,
-            "the dialogue body is Samantha's greeting, never her name id"
-        );
+            .expect("referral target returns a ShowDialog packet");
+        assert!(npc_interaction::decode_dialogue_26_3(dialogue).is_ok());
 
         let mut end_reply = vec![49, 0, 14, 0, 0, 0];
         end_reply.extend(INTRODUCE_YOURSELF_ID.to_le_bytes());
@@ -6822,7 +7074,10 @@ mod w64_regional_quest_tests {
         );
 
         // Twice the default speed: two 250 ms ticks cover 3 m, not 1.5 m.
-        let path = with(&mut enemies, serde_json::json!({"preset": "melee", "move_speed": 6.0}));
+        let path = with(
+            &mut enemies,
+            serde_json::json!({"preset": "melee", "move_speed": 6.0}),
+        );
         encounter.reload_field_enemies(&path).unwrap();
         encounter.set_active_quests(&BTreeSet::from([3_030_007]));
         encounter.tick(near, 2, 70_000).unwrap();
@@ -6831,12 +7086,21 @@ mod w64_regional_quest_tests {
         assert!((travelled - 3.0).abs() < 0.05, "moved {travelled} m");
 
         // Reach is tunable on the fly; nonsense is refused.
-        let path = with(&mut enemies, serde_json::json!({"preset": "melee", "reach": 4.0}));
+        let path = with(
+            &mut enemies,
+            serde_json::json!({"preset": "melee", "reach": 4.0}),
+        );
         encounter.reload_field_enemies(&path).unwrap();
         assert_eq!(encounter.behaviour(HOOLIGAN).unwrap().reach, 4.0);
-        let path = with(&mut enemies, serde_json::json!({"preset": "melee", "reach": -1.0}));
+        let path = with(
+            &mut enemies,
+            serde_json::json!({"preset": "melee", "reach": -1.0}),
+        );
         assert!(encounter.reload_field_enemies(&path).is_err());
-        let path = with(&mut enemies, serde_json::json!({"preset": "melee", "move_speed": 6.0}));
+        let path = with(
+            &mut enemies,
+            serde_json::json!({"preset": "melee", "move_speed": 6.0}),
+        );
         encounter.reload_field_enemies(&path).unwrap();
 
         // Mistakes are refused and change nothing.
@@ -6845,7 +7109,11 @@ mod w64_regional_quest_tests {
         assert!(error.contains("unknown behaviour preset 'sneaky'"), "{error}");
         assert_eq!(encounter.behaviour(HOOLIGAN).unwrap().move_speed, 6.0);
         let typo = dir.join("behaviours.json");
-        std::fs::write(&typo, r#"{"schema_version":1,"presets":{"melee":{"move_sped":9}}}"#).unwrap();
+        std::fs::write(
+            &typo,
+            r#"{"schema_version":1,"presets":{"melee":{"move_sped":9}}}"#,
+        )
+        .unwrap();
         assert!(encounter.load_behaviours(&typo).is_err());
         assert_eq!(encounter.behaviour(100_000_096_001).unwrap().run_ms, 4000);
         std::fs::remove_dir_all(&dir).unwrap();
@@ -7211,9 +7479,8 @@ mod w95_vendor_coin_store_regressions {
                 context_dwords: [0; 3],
                 context_bytes: Vec::new(),
                 trailing_dwords: [1, 0, 99002],
-            },
-        )
-        .expect("vendor request encodes");
+            })
+            .expect("vendor request encodes");
         let vendor_outcome = game
             .handle_in_world(&vendor_request, &character, 2_000)
             .expect("66/43 vendor request routes");
@@ -7233,9 +7500,8 @@ mod w95_vendor_coin_store_regressions {
                 context_dwords: [0; 3],
                 context_bytes: Vec::new(),
                 trailing_dwords: [1, 1, 99003],
-            },
-        )
-        .expect("unknown-item request encodes");
+            })
+            .expect("unknown-item request encodes");
         let refusal = game
             .handle_in_world(&unknown_request, &character, 3_000)
             .expect("unknown vendor item gets a refusal");
@@ -7252,5 +7518,433 @@ mod w95_vendor_coin_store_regressions {
         assert_eq!(restored.inventory.state().coins, coins_before - (price * 2));
         assert_eq!(count_definition(&restored, item_id), purchased_before + 2);
         assert_eq!(count_definition(&restored, 8), 1);
+    }
+}
+
+#[cfg(test)]
+mod w104_quest_tests {
+    use super::*;
+    use crate::quest_engine::{
+        CharacterEligibility, ObjectiveKind, QuestDefinition, QuestEngine, QuestObjective,
+        QuestRequirements,
+    };
+    use crate::rewards::{RewardDisplay, RewardGrant};
+
+    fn content() -> PathBuf {
+        std::env::var_os("W104_CONTENT")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| {
+                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../../lab/build/w104/scratch/content")
+            })
+    }
+
+    fn game(kind: ObjectiveKind, required: u32) -> Gameplay {
+        let mut game = Gameplay::load(&content(), None).unwrap();
+        let definition = QuestDefinition {
+            id: 1,
+            title: "Synthetic hook (R)".into(),
+            description: String::new(),
+            giver_npc_id: 1,
+            turnin_npc_id: 1,
+            prerequisite_quest_ids: vec![],
+            requirements: QuestRequirements::default(),
+            ordered: true,
+            objectives: vec![QuestObjective {
+                id: 1,
+                required,
+                description: "Synthetic (R)".into(),
+                kind,
+            }],
+            reward: RewardGrant {
+                coins: 0,
+                items: vec![],
+                job_xp: Default::default(),
+                display: RewardDisplay {
+                    source_guid: 1,
+                    player_guid: 1,
+                    reward_kind: 0,
+                    icon_id: 0,
+                    name_id: 0,
+                    rows: vec![],
+                },
+            },
+        };
+        let mut inactive = definition.clone();
+        inactive.id = 2;
+        let mut engine = QuestEngine::new(
+            1,
+            vec![definition, inactive],
+            CharacterEligibility {
+                member: true,
+                member_quest_limit: 30,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        assert!(engine.offer(1, 1).changed);
+        assert!(engine.accept(1).changed);
+        game.npc_quests = Some(engine);
+        game
+    }
+
+    fn count(game: &Gameplay, expected: u32) {
+        let engine = game.npc_quests.as_ref().unwrap();
+        assert_eq!(engine.progress(1).unwrap().counts, [expected]);
+        assert!(engine.progress(2).is_none());
+    }
+
+    fn stage(
+        game: &mut Gameplay,
+        stage_id: u32,
+        profile: i32,
+        trigger: OpeningEvent,
+    ) -> CharacterState {
+        let mut state = game.opening.as_ref().unwrap().state().clone();
+        for definition in game.opening.as_ref().unwrap().stages() {
+            let progress = state.stages.get_mut(&definition.id).unwrap();
+            if definition.id < stage_id {
+                progress.accepted = true;
+                progress.completed = true;
+                progress.rewarded = true;
+                progress.counts = definition.objectives.iter().map(|g| g.required).collect();
+            } else if definition.id == stage_id {
+                progress.accepted = true;
+                progress.counts = definition.objectives.iter().map(|g| g.required).collect();
+                *progress.counts.last_mut().unwrap() = 0;
+            }
+        }
+        // Memory-only fixture; no campaign content or user save changes.
+        game.opening = Some(OpeningEngine::load(&content(), Some(state)).unwrap());
+        let profiles = game.profiles.as_mut().unwrap();
+        profiles.unlock(profile).unwrap();
+        profiles.select(profile, &game.inventory).unwrap();
+        let target = game
+            .opening
+            .as_ref()
+            .unwrap()
+            .actors()
+            .iter()
+            .find(|a| match (&a.action, &trigger) {
+                (
+                    Some(crate::opening::OpeningTrigger::Craft { recipe_id: a }),
+                    OpeningEvent::Craft { recipe_id: b, .. },
+                ) => a == b,
+                _ => false,
+            })
+            .unwrap();
+        CharacterState {
+            guid: 1,
+            zone_id: target.zone_id,
+            position: target.position,
+            rotation: [0., 0., 1.],
+        }
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn collect_hook_grant_failure_and_inactive_quest() {
+        let mut game = game(ObjectiveKind::CollectItem { item_id: 1195 }, 2);
+        let mut out = Outcome::default();
+        assert!(game.grant_reward(0, &[(i32::MAX, 1)], &mut out).is_err());
+        count(&game, 0);
+        game.grant_reward(0, &[(1195, 1)], &mut out).unwrap();
+        count(&game, 1);
+        game.grant_reward(0, &[(1195, 5)], &mut out).unwrap();
+        count(&game, 2);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn equip_hook_accepts_owned_slot_and_ignores_replay() {
+        let mut game = game(
+            ObjectiveKind::EquipItem {
+                definition_id: 68878,
+            },
+            1,
+        );
+        let mut out = Outcome::default();
+        game.grant_reward(0, &[(68878, 1)], &mut out).unwrap();
+        let item = game
+            .inventory
+            .state()
+            .items
+            .iter()
+            .filter(|i| i.definition_id == 68878)
+            .max_by_key(|i| i.id)
+            .unwrap()
+            .id;
+        let mut packet = vec![42, 0, 3, 0];
+        packet.extend(item.to_le_bytes());
+        packet.extend(1i32.to_le_bytes());
+        packet.extend(4i32.to_le_bytes());
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [0.; 3],
+            rotation: [0., 0., 1.],
+        };
+        game.handle_in_world(&packet, &character, 1_000).unwrap();
+        count(&game, 1);
+        game.handle_in_world(&packet, &character, 1_001).unwrap();
+        count(&game, 1);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn gathering_payout_hook_and_minigame_hook() {
+        let mut game = game(ObjectiveKind::GatherResource { resource_id: 2884 }, 2);
+        game.profiles.as_mut().unwrap().unlock(45).unwrap();
+        game.profiles
+            .as_mut()
+            .unwrap()
+            .select(45, &game.inventory)
+            .unwrap();
+        let mut out = Outcome::default();
+        game.apply_harvesting(Type8Outcome::default(), &mut out)
+            .unwrap();
+        count(&game, 0);
+        let mut win = mining::payload_packet(111_000_001, "OnGameWonMsg").unwrap();
+        win[11..15].copy_from_slice(&111i32.to_le_bytes());
+        game.apply_harvesting(
+            Type8Outcome {
+                transaction: Some(crate::mining::Type8Transaction {
+                    consumes: vec![],
+                    grants: vec![(2884, 2)],
+                }),
+                completed: true,
+                replies: vec![win.clone()],
+                ..Default::default()
+            },
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 2);
+        let mut minigame = self::game(ObjectiveKind::FinishMinigame { minigame_id: 111 }, 1);
+        minigame.profiles.as_mut().unwrap().unlock(45).unwrap();
+        minigame
+            .profiles
+            .as_mut()
+            .unwrap()
+            .select(45, &minigame.inventory)
+            .unwrap();
+        // A server result without a payout never emits a completion event.
+        minigame
+            .apply_harvesting(
+                Type8Outcome {
+                    replies: vec![win.clone()],
+                    ..Default::default()
+                },
+                &mut out,
+            )
+            .unwrap();
+        count(&minigame, 0);
+        minigame
+            .apply_harvesting(
+                Type8Outcome {
+                    transaction: Some(crate::mining::Type8Transaction {
+                        consumes: vec![],
+                        grants: vec![(2884, 1)],
+                    }),
+                    completed: true,
+                    replies: vec![win],
+                    ..Default::default()
+                },
+                &mut out,
+            )
+            .unwrap();
+        count(&minigame, 1);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn gather_node_hook_checks_accepted_progress() {
+        let mut game = game(ObjectiveKind::GatherResource { resource_id: 1001 }, 2);
+        stage(
+            &mut game,
+            910004,
+            45,
+            OpeningEvent::Craft {
+                recipe_id: 2001,
+                quantity: 1,
+            },
+        );
+        let opening = game.opening.as_ref().unwrap();
+        let definition = opening.active_stage().unwrap();
+        let index = definition
+            .objectives
+            .iter()
+            .position(|g| {
+                matches!(
+                    g.trigger,
+                    crate::opening::OpeningTrigger::Gather { resource_id: 1001 }
+                )
+            })
+            .unwrap();
+        let mut state = opening.state().clone();
+        state.stages.get_mut(&definition.id).unwrap().counts = definition
+            .objectives
+            .iter()
+            .enumerate()
+            .map(|(i, g)| if i < index { g.required } else { 0 })
+            .collect();
+        let actor = opening
+            .actors()
+            .iter()
+            .find(|a| {
+                matches!(
+                    a.action,
+                    Some(crate::opening::OpeningTrigger::Gather { resource_id: 1001 })
+                )
+            })
+            .unwrap()
+            .clone();
+        game.opening = Some(OpeningEngine::load(&content(), Some(state)).unwrap());
+        let mut character = CharacterState {
+            guid: 1,
+            zone_id: actor.zone_id,
+            position: [0.; 3],
+            rotation: [0., 0., 1.],
+        };
+        game.opening
+            .as_mut()
+            .unwrap()
+            .on_event(OpeningEvent::ClassSelected { profile_id: 45 })
+            .unwrap();
+        game.on_location(&character, 999).unwrap();
+        let mut packet = vec![26, 0, 10, 0];
+        packet.extend(actor.guid.to_le_bytes());
+        packet.extend(1i32.to_le_bytes());
+        game.handle_in_world(&packet, &character, 1_000).unwrap();
+        count(&game, 0);
+        character.position = actor.position;
+        game.on_location(&character, 1_001).unwrap();
+        game.handle_in_world(&packet, &character, 1_001).unwrap();
+        count(&game, 1);
+        game.handle_in_world(&packet, &character, 1_002).unwrap();
+        count(&game, 2);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn cooking_craft_hook() {
+        let mut game = game(ObjectiveKind::CraftRecipe { recipe_id: 70 }, 1);
+        let character = stage(
+            &mut game,
+            910004,
+            45,
+            OpeningEvent::Craft {
+                recipe_id: 2001,
+                quantity: 1,
+            },
+        );
+        let mut out = Outcome::default();
+        game.apply_cooking(CookingOutcome::default(), &character, &mut out)
+            .unwrap();
+        count(&game, 0);
+        game.apply_cooking(
+            CookingOutcome {
+                transaction: Some(crate::cooking::CookingTransaction {
+                    consumes: vec![],
+                    grants: vec![(2884, 1)],
+                    experience_points: 0,
+                }),
+                completed: true,
+                ..Default::default()
+            },
+            &character,
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 1);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn smelting_craft_hook() {
+        let mut game = game(ObjectiveKind::CraftRecipe { recipe_id: 2002 }, 1);
+        let character = stage(
+            &mut game,
+            910005,
+            14,
+            OpeningEvent::Craft {
+                recipe_id: 2002,
+                quantity: 1,
+            },
+        );
+        let mut out = Outcome::default();
+        game.apply_smelting(
+            SmeltingOutcome {
+                transaction: Some(crate::smelting::SmeltingTransaction {
+                    consumes: vec![],
+                    grants: vec![(21785, 1)],
+                    experience_points: 0,
+                }),
+                completed: true,
+                ..Default::default()
+            },
+            &character,
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 1);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn forging_craft_hook() {
+        let mut game = game(ObjectiveKind::CraftRecipe { recipe_id: 11 }, 1);
+        let character = stage(
+            &mut game,
+            910006,
+            16,
+            OpeningEvent::Craft {
+                recipe_id: 2003,
+                quantity: 1,
+            },
+        );
+        let mut out = Outcome::default();
+        game.apply_forging(
+            ForgingOutcome {
+                transaction: Some(crate::forging::ForgingTransaction {
+                    consumes: vec![],
+                    grants: vec![(1195, 1)],
+                    experience_points: 0,
+                }),
+                completed: true,
+                ..Default::default()
+            },
+            &character,
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 1);
+    }
+
+    #[test]
+    #[ignore = "private W104 scratch package; no native client"]
+    fn movement_hook_area_and_radius() {
+        for kind in [
+            ObjectiveKind::EnterArea { area_id: 0 },
+            ObjectiveKind::VisitPosition {
+                zone_id: 0,
+                position: [0.; 3],
+                radius: 1.,
+            },
+        ] {
+            let mut game = game(kind, 1);
+            let mut character = CharacterState {
+                guid: 1,
+                zone_id: 1,
+                position: [0.; 3],
+                rotation: [0., 0., 1.],
+            };
+            game.on_location(&character, 1_000).unwrap();
+            count(&game, 0);
+            character.zone_id = 0;
+            game.on_location(&character, 1_001).unwrap();
+            count(&game, 1);
+        }
     }
 }

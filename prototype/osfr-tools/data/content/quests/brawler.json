@@ -47,7 +47,8 @@
         }
       ],
       "description_string_id": 42131,
-      "intro_text_string_id": 42129
+      "intro_text_string_id": 42129,
+      "enabled": false
     },
     {
       "id": 3030002,
@@ -97,7 +98,8 @@
         }
       ],
       "description_string_id": 45308,
-      "intro_text_string_id": 45306
+      "intro_text_string_id": 45306,
+      "enabled": false
     },
     {
       "id": 3030003,
@@ -148,7 +150,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 139687
+      "description_string_id": 139687,
+      "enabled": false
     },
     {
       "id": 3030004,
@@ -197,7 +200,8 @@
       ],
       "description_string_id": 140532,
       "intro_text_string_id": 140530,
-      "end_text_string_id": 140533
+      "end_text_string_id": 140533,
+      "enabled": false
     },
     {
       "id": 3030005,
@@ -248,7 +252,8 @@
       ],
       "description_string_id": 94284,
       "intro_text_string_id": 94282,
-      "end_text_string_id": 94285
+      "end_text_string_id": 94285,
+      "enabled": false
     },
     {
       "id": 3030006,
@@ -388,7 +393,23 @@
       "prerequisite_quest_ids": [
         3030007
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000446,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:91539; Global.Text.103355: Find Sabastian Cabet somewhere in Blackspore. The entrance to Blackspore is a large cave directly east of Cobblestone Village."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -481,7 +502,8 @@
       ],
       "description_string_id": 130858,
       "intro_text_string_id": 130856,
-      "end_text_string_id": 130859
+      "end_text_string_id": 130859,
+      "enabled": false
     },
     {
       "id": 3030010,
@@ -534,7 +556,8 @@
       ],
       "description_string_id": 104127,
       "intro_text_string_id": 104125,
-      "end_text_string_id": 104128
+      "end_text_string_id": 104128,
+      "enabled": false
     },
     {
       "id": 3030011,
@@ -585,7 +608,8 @@
       ],
       "description_string_id": 104147,
       "intro_text_string_id": 104145,
-      "end_text_string_id": 104148
+      "end_text_string_id": 104148,
+      "enabled": false
     },
     {
       "id": 3030012,
@@ -636,7 +660,8 @@
       ],
       "description_string_id": 104151,
       "intro_text_string_id": 104149,
-      "end_text_string_id": 104152
+      "end_text_string_id": 104152,
+      "enabled": false
     },
     {
       "id": 3030013,
@@ -687,7 +712,8 @@
       ],
       "description_string_id": 104155,
       "intro_text_string_id": 104153,
-      "end_text_string_id": 104156
+      "end_text_string_id": 104156,
+      "enabled": false
     },
     {
       "id": 3030014,
@@ -738,7 +764,8 @@
       ],
       "description_string_id": 130792,
       "intro_text_string_id": 130790,
-      "end_text_string_id": 130793
+      "end_text_string_id": 130793,
+      "enabled": false
     },
     {
       "id": 3030015,
@@ -787,7 +814,8 @@
       ],
       "description_string_id": 116486,
       "intro_text_string_id": 116484,
-      "end_text_string_id": 116487
+      "end_text_string_id": 116487,
+      "enabled": false
     },
     {
       "id": 3030016,
@@ -838,7 +866,8 @@
       ],
       "description_string_id": 116506,
       "intro_text_string_id": 116504,
-      "end_text_string_id": 116507
+      "end_text_string_id": 116507,
+      "enabled": false
     },
     {
       "id": 3030017,
@@ -893,7 +922,8 @@
       ],
       "description_string_id": 116510,
       "intro_text_string_id": 116508,
-      "end_text_string_id": 116511
+      "end_text_string_id": 116511,
+      "enabled": false
     },
     {
       "id": 3030018,
@@ -944,7 +974,8 @@
       ],
       "description_string_id": 116514,
       "intro_text_string_id": 116512,
-      "end_text_string_id": 116515
+      "end_text_string_id": 116515,
+      "enabled": false
     },
     {
       "id": 3030019,
@@ -995,7 +1026,8 @@
       ],
       "description_string_id": 130862,
       "intro_text_string_id": 130860,
-      "end_text_string_id": 130863
+      "end_text_string_id": 130863,
+      "enabled": false
     },
     {
       "id": 3030020,
@@ -1044,7 +1076,8 @@
       ],
       "description_string_id": 72487,
       "intro_text_string_id": 72485,
-      "end_text_string_id": 72488
+      "end_text_string_id": 72488,
+      "enabled": false
     },
     {
       "id": 3030021,
@@ -1097,7 +1130,8 @@
       ],
       "description_string_id": 387360,
       "intro_text_string_id": 387358,
-      "end_text_string_id": 387361
+      "end_text_string_id": 387361,
+      "enabled": false
     },
     {
       "id": 3030022,
@@ -1148,7 +1182,8 @@
       ],
       "description_string_id": 388504,
       "intro_text_string_id": 388502,
-      "end_text_string_id": 388505
+      "end_text_string_id": 388505,
+      "enabled": false
     },
     {
       "id": 3030023,
@@ -1199,7 +1234,8 @@
       ],
       "description_string_id": 72497,
       "intro_text_string_id": 72495,
-      "end_text_string_id": 72498
+      "end_text_string_id": 72498,
+      "enabled": false
     },
     {
       "id": 3030024,
@@ -1250,7 +1286,8 @@
       ],
       "description_string_id": 72508,
       "intro_text_string_id": 72506,
-      "end_text_string_id": 72509
+      "end_text_string_id": 72509,
+      "enabled": false
     },
     {
       "id": 3030025,
@@ -1299,7 +1336,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 95080
+      "description_string_id": 95080,
+      "enabled": false
     },
     {
       "id": 3030026,
@@ -1350,7 +1388,8 @@
       ],
       "description_string_id": 95158,
       "intro_text_string_id": 95156,
-      "end_text_string_id": 95159
+      "end_text_string_id": 95159,
+      "enabled": false
     },
     {
       "id": 3030027,
@@ -1401,7 +1440,8 @@
       ],
       "description_string_id": 140996,
       "intro_text_string_id": 140994,
-      "end_text_string_id": 140997
+      "end_text_string_id": 140997,
+      "enabled": false
     },
     {
       "id": 3030028,
@@ -1452,7 +1492,8 @@
       ],
       "description_string_id": 141011,
       "intro_text_string_id": 141009,
-      "end_text_string_id": 141012
+      "end_text_string_id": 141012,
+      "enabled": false
     },
     {
       "id": 3030029,
@@ -1503,7 +1544,8 @@
       ],
       "description_string_id": 141066,
       "intro_text_string_id": 141064,
-      "end_text_string_id": 141067
+      "end_text_string_id": 141067,
+      "enabled": false
     },
     {
       "id": 3030030,
@@ -1552,7 +1594,8 @@
       ],
       "description_string_id": 387372,
       "intro_text_string_id": 387370,
-      "end_text_string_id": 387373
+      "end_text_string_id": 387373,
+      "enabled": false
     },
     {
       "id": 3030031,
@@ -1596,7 +1639,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3030032,
@@ -1647,7 +1691,8 @@
       ],
       "description_string_id": 141081,
       "intro_text_string_id": 141079,
-      "end_text_string_id": 141082
+      "end_text_string_id": 141082,
+      "enabled": false
     },
     {
       "id": 3030033,
@@ -1698,7 +1743,8 @@
       ],
       "description_string_id": 72747,
       "intro_text_string_id": 72745,
-      "end_text_string_id": 72748
+      "end_text_string_id": 72748,
+      "enabled": false
     },
     {
       "id": 3030034,
@@ -1748,7 +1794,8 @@
         }
       ],
       "description_string_id": 39712,
-      "intro_text_string_id": 39710
+      "intro_text_string_id": 39710,
+      "enabled": false
     },
     {
       "id": 3030035,
@@ -1801,7 +1848,8 @@
       ],
       "description_string_id": 387376,
       "intro_text_string_id": 387374,
-      "end_text_string_id": 387377
+      "end_text_string_id": 387377,
+      "enabled": false
     },
     {
       "id": 3030036,
@@ -1845,7 +1893,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3030037,
@@ -1900,7 +1949,8 @@
       ],
       "description_string_id": 72802,
       "intro_text_string_id": 72800,
-      "end_text_string_id": 72803
+      "end_text_string_id": 72803,
+      "enabled": false
     },
     {
       "id": 3030038,
@@ -1954,7 +2004,8 @@
         }
       ],
       "description_string_id": 39828,
-      "intro_text_string_id": 39826
+      "intro_text_string_id": 39826,
+      "enabled": false
     },
     {
       "id": 3030039,
@@ -2005,7 +2056,8 @@
       ],
       "description_string_id": 72869,
       "intro_text_string_id": 72867,
-      "end_text_string_id": 72870
+      "end_text_string_id": 72870,
+      "enabled": false
     },
     {
       "id": 3030040,
@@ -2053,7 +2105,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3030041,
@@ -2095,7 +2148,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3030042,
@@ -2139,7 +2193,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3030043,
@@ -2183,7 +2238,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     }
   ]
 }

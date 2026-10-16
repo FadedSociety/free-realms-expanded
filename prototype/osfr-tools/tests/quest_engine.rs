@@ -259,7 +259,7 @@ fn content_db_definitions_drive_accept_progress_and_turnin_packets() {
 }
 
 #[test]
-fn empty_objective_quest_offers_accepts_and_completes_on_talk_back() {
+fn empty_objective_quest_cannot_be_offered_or_turned_in() {
     let giver = 9_000_000_189;
     let mut engine = QuestEngine::new(
         CHARACTER,
@@ -269,16 +269,18 @@ fn empty_objective_quest_offers_accepts_and_completes_on_talk_back() {
     )
     .unwrap();
 
-    assert!(engine.can_offer(3_000_021, giver));
-    assert_eq!(
-        quest_opcodes(&engine.offer(3_000_021, giver)),
-        vec![(49, 1)]
+    assert!(!engine.can_offer(3_000_021, giver));
+    assert!(!engine.offer(3_000_021, giver).changed);
+    assert!(!engine.dev_mark_offered(3_000_021));
+    assert!(!engine.accept(3_000_021).changed);
+    assert!(!engine.begin_turnin(3_000_021, giver).changed);
+    assert!(
+        !engine
+            .on_event(QuestEvent::TalkToNpc { npc_id: giver })
+            .unwrap()
+            .changed
     );
-    assert_eq!(quest_opcodes(&engine.accept(3_000_021)), vec![(49, 3)]);
-    let end = engine
-        .on_event(QuestEvent::TalkToNpc { npc_id: giver })
-        .unwrap();
-    assert_eq!(quest_opcodes(&end), vec![(49, 13)]);
+    // Packet encoding remains independently testable for historical snapshots.
     let packet = engine.empty_reward_quest_end_packet(3_000_021).unwrap();
     assert_eq!(packet.len(), 99);
     assert_eq!(&packet[..10], &[49, 0, 13, 0, 0, 0, 0xd5, 0xc6, 0x2d, 0]);
@@ -289,16 +291,6 @@ fn empty_objective_quest_offers_accepts_and_completes_on_talk_back() {
             .iter()
             .chain(&packet[18..])
             .all(|byte| *byte == 0)
-    );
-
-    let inventory = InventoryFixture::new();
-    let (completed, _) = engine
-        .finish_turnin(3_000_021, &inventory.reward_state())
-        .unwrap();
-    assert_eq!(quest_opcodes(&completed), vec![(49, 4), (49, 12)]);
-    assert_eq!(
-        engine.progress(3_000_021).unwrap().status,
-        QuestStatus::Completed
     );
 }
 
@@ -829,9 +821,13 @@ fn split_regional_quest_catalogue_accepts_and_restores_an_npc_offer() {
     let quest = quests
         .iter()
         .find(|quest| {
-            quest["prerequisite_quest_ids"]
-                .as_array()
-                .is_some_and(Vec::is_empty)
+            quest["enabled"].as_bool().unwrap_or(true)
+                && quest["objectives"]
+                    .as_array()
+                    .is_some_and(|goals| !goals.is_empty())
+                && quest["prerequisite_quest_ids"]
+                    .as_array()
+                    .is_some_and(Vec::is_empty)
                 && quest["id"].as_u64().is_some_and(|id| {
                     quest["giver_npc_id"]
                         .as_u64()

@@ -46,7 +46,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 412446
+      "description_string_id": 412446,
+      "enabled": false
     },
     {
       "id": 3130002,
@@ -92,7 +93,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3130003,
@@ -145,7 +147,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 93382
+      "description_string_id": 93382,
+      "enabled": false
     },
     {
       "id": 3130004,
@@ -198,7 +201,8 @@
       ],
       "description_string_id": 103918,
       "intro_text_string_id": 103916,
-      "end_text_string_id": 103919
+      "end_text_string_id": 103919,
+      "enabled": false
     },
     {
       "id": 3130005,
@@ -247,7 +251,8 @@
       ],
       "description_string_id": 104218,
       "intro_text_string_id": 104216,
-      "end_text_string_id": 104219
+      "end_text_string_id": 104219,
+      "enabled": false
     },
     {
       "id": 3130006,
@@ -296,7 +301,8 @@
       ],
       "description_string_id": 104360,
       "intro_text_string_id": 104358,
-      "end_text_string_id": 104361
+      "end_text_string_id": 104361,
+      "enabled": false
     },
     {
       "id": 3130007,
@@ -345,7 +351,8 @@
       ],
       "description_string_id": 141810,
       "intro_text_string_id": 141808,
-      "end_text_string_id": 141811
+      "end_text_string_id": 141811,
+      "enabled": false
     },
     {
       "id": 3130008,
@@ -394,7 +401,8 @@
       ],
       "description_string_id": 115008,
       "intro_text_string_id": 115006,
-      "end_text_string_id": 115009
+      "end_text_string_id": 115009,
+      "enabled": false
     },
     {
       "id": 3130009,
@@ -443,7 +451,8 @@
       ],
       "description_string_id": 115048,
       "intro_text_string_id": 115046,
-      "end_text_string_id": 115049
+      "end_text_string_id": 115049,
+      "enabled": false
     },
     {
       "id": 3130010,
@@ -492,7 +501,8 @@
       ],
       "description_string_id": 387932,
       "intro_text_string_id": 387930,
-      "end_text_string_id": 387933
+      "end_text_string_id": 387933,
+      "enabled": false
     },
     {
       "id": 3130011,
@@ -610,7 +620,8 @@
       ],
       "description_string_id": 117037,
       "intro_text_string_id": 117035,
-      "end_text_string_id": 117038
+      "end_text_string_id": 117038,
+      "enabled": false
     },
     {
       "id": 3130013,
@@ -659,7 +670,8 @@
       ],
       "description_string_id": 117076,
       "intro_text_string_id": 117074,
-      "end_text_string_id": 117077
+      "end_text_string_id": 117077,
+      "enabled": false
     },
     {
       "id": 3130014,
@@ -708,7 +720,8 @@
       ],
       "description_string_id": 117170,
       "intro_text_string_id": 117168,
-      "end_text_string_id": 117171
+      "end_text_string_id": 117171,
+      "enabled": false
     },
     {
       "id": 3130015,
@@ -757,7 +770,8 @@
       ],
       "description_string_id": 117018,
       "intro_text_string_id": 117016,
-      "end_text_string_id": 117019
+      "end_text_string_id": 117019,
+      "enabled": false
     },
     {
       "id": 3130016,
@@ -810,7 +824,8 @@
       ],
       "description_string_id": 117307,
       "intro_text_string_id": 117305,
-      "end_text_string_id": 117308
+      "end_text_string_id": 117308,
+      "enabled": false
     },
     {
       "id": 3130017,
@@ -863,7 +878,8 @@
       ],
       "description_string_id": 387936,
       "intro_text_string_id": 387934,
-      "end_text_string_id": 387937
+      "end_text_string_id": 387937,
+      "enabled": false
     },
     {
       "id": 3130018,
@@ -916,7 +932,8 @@
       ],
       "description_string_id": 130183,
       "intro_text_string_id": 130181,
-      "end_text_string_id": 130184
+      "end_text_string_id": 130184,
+      "enabled": false
     },
     {
       "id": 3130019,
@@ -969,7 +986,8 @@
       ],
       "description_string_id": 130194,
       "intro_text_string_id": 130192,
-      "end_text_string_id": 130195
+      "end_text_string_id": 130195,
+      "enabled": false
     },
     {
       "id": 3130020,
@@ -1018,7 +1036,8 @@
       ],
       "description_string_id": 130204,
       "intro_text_string_id": 130202,
-      "end_text_string_id": 130205
+      "end_text_string_id": 130205,
+      "enabled": false
     },
     {
       "id": 3130021,
@@ -1067,7 +1086,8 @@
       ],
       "description_string_id": 130221,
       "intro_text_string_id": 130219,
-      "end_text_string_id": 130222
+      "end_text_string_id": 130222,
+      "enabled": false
     },
     {
       "id": 3130022,
@@ -1116,7 +1136,8 @@
       ],
       "description_string_id": 387940,
       "intro_text_string_id": 387938,
-      "end_text_string_id": 387941
+      "end_text_string_id": 387941,
+      "enabled": false
     },
     {
       "id": 3130023,
@@ -1165,7 +1186,8 @@
       ],
       "description_string_id": 130233,
       "intro_text_string_id": 130231,
-      "end_text_string_id": 130234
+      "end_text_string_id": 130234,
+      "enabled": false
     },
     {
       "id": 3130024,
@@ -1214,7 +1236,8 @@
       ],
       "description_string_id": 130265,
       "intro_text_string_id": 130263,
-      "end_text_string_id": 130266
+      "end_text_string_id": 130266,
+      "enabled": false
     },
     {
       "id": 3130025,
@@ -1263,7 +1286,8 @@
       ],
       "description_string_id": 130283,
       "intro_text_string_id": 130281,
-      "end_text_string_id": 130284
+      "end_text_string_id": 130284,
+      "enabled": false
     },
     {
       "id": 3130026,
@@ -1312,7 +1336,8 @@
       ],
       "description_string_id": 130296,
       "intro_text_string_id": 130294,
-      "end_text_string_id": 130297
+      "end_text_string_id": 130297,
+      "enabled": false
     },
     {
       "id": 3130027,
@@ -1361,7 +1386,8 @@
       ],
       "description_string_id": 130306,
       "intro_text_string_id": 130304,
-      "end_text_string_id": 130307
+      "end_text_string_id": 130307,
+      "enabled": false
     },
     {
       "id": 3130028,
@@ -1410,7 +1436,8 @@
       ],
       "description_string_id": 130315,
       "intro_text_string_id": 130313,
-      "end_text_string_id": 130316
+      "end_text_string_id": 130316,
+      "enabled": false
     },
     {
       "id": 3130029,
@@ -1459,7 +1486,8 @@
       ],
       "description_string_id": 130371,
       "intro_text_string_id": 130369,
-      "end_text_string_id": 130372
+      "end_text_string_id": 130372,
+      "enabled": false
     },
     {
       "id": 3130030,
@@ -1508,7 +1536,8 @@
       ],
       "description_string_id": 130398,
       "intro_text_string_id": 130396,
-      "end_text_string_id": 130399
+      "end_text_string_id": 130399,
+      "enabled": false
     },
     {
       "id": 3130031,
@@ -1553,7 +1582,8 @@
       ],
       "description_string_id": 387944,
       "intro_text_string_id": 387942,
-      "end_text_string_id": 387945
+      "end_text_string_id": 387945,
+      "enabled": false
     },
     {
       "id": 3130032,
@@ -1663,7 +1693,8 @@
       ],
       "description_string_id": 130253,
       "intro_text_string_id": 130251,
-      "end_text_string_id": 130254
+      "end_text_string_id": 130254,
+      "enabled": false
     }
   ]
 }

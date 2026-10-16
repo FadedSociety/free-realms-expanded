@@ -71,8 +71,13 @@ fn saved_regional_quest_syncs_on_world_entry_and_bad_application_messages_are_dr
     .unwrap();
     assert!(quests.offer(QUEST_ID, GIVER_ID).changed);
     assert!(quests.accept(QUEST_ID).changed);
+    quests
+        .on_event(osfr_tools::quest_engine::QuestEvent::TalkToNpc {
+            npc_id: 9_500_000_254,
+        })
+        .unwrap();
+    assert_eq!(quests.state().pending_turnin, Some(QUEST_ID));
     let accepted_record = quests.quest_add_packet(QUEST_ID).unwrap();
-    assert!(quests.begin_turnin(QUEST_ID, GIVER_ID).changed);
 
     let mut saved = base.state();
     saved.npc_quests = Some(quests.state().clone());

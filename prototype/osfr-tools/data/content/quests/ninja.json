@@ -182,7 +182,8 @@
       ],
       "description_string_id": 78846,
       "intro_text_string_id": 78844,
-      "end_text_string_id": 78847
+      "end_text_string_id": 78847,
+      "enabled": false
     },
     {
       "id": 3110004,
@@ -233,7 +234,8 @@
       ],
       "description_string_id": 78850,
       "intro_text_string_id": 78848,
-      "end_text_string_id": 78851
+      "end_text_string_id": 78851,
+      "enabled": false
     },
     {
       "id": 3110005,
@@ -288,7 +290,8 @@
       ],
       "description_string_id": 78854,
       "intro_text_string_id": 78852,
-      "end_text_string_id": 78855
+      "end_text_string_id": 78855,
+      "enabled": false
     },
     {
       "id": 3110006,
@@ -343,7 +346,8 @@
       ],
       "description_string_id": 78858,
       "intro_text_string_id": 78856,
-      "end_text_string_id": 78859
+      "end_text_string_id": 78859,
+      "enabled": false
     },
     {
       "id": 3110007,
@@ -392,7 +396,8 @@
       ],
       "description_string_id": 387202,
       "intro_text_string_id": 387200,
-      "end_text_string_id": 387203
+      "end_text_string_id": 387203,
+      "enabled": false
     },
     {
       "id": 3110008,
@@ -443,7 +448,8 @@
       ],
       "description_string_id": 388401,
       "intro_text_string_id": 388399,
-      "end_text_string_id": 388402
+      "end_text_string_id": 388402,
+      "enabled": false
     },
     {
       "id": 3110009,
@@ -494,7 +500,8 @@
       ],
       "description_string_id": 78862,
       "intro_text_string_id": 78860,
-      "end_text_string_id": 78863
+      "end_text_string_id": 78863,
+      "enabled": false
     },
     {
       "id": 3110010,
@@ -549,7 +556,8 @@
       ],
       "description_string_id": 78866,
       "intro_text_string_id": 78864,
-      "end_text_string_id": 78867
+      "end_text_string_id": 78867,
+      "enabled": false
     },
     {
       "id": 3110011,
@@ -600,7 +608,8 @@
       ],
       "description_string_id": 78870,
       "intro_text_string_id": 78868,
-      "end_text_string_id": 78871
+      "end_text_string_id": 78871,
+      "enabled": false
     },
     {
       "id": 3110012,
@@ -609,7 +618,23 @@
       "prerequisite_quest_ids": [
         3110011
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000223,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "%USERPROFILE%/Documents/Projects/CartoonMMO/lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat:52274; Global.Text.78874: Speak to Ty in Lakeshore and inform him of your findings thus far."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -699,7 +724,8 @@
         }
       ],
       "description_string_id": 387206,
-      "end_text_string_id": 387207
+      "end_text_string_id": 387207,
+      "enabled": false
     },
     {
       "id": 3110014,
@@ -750,7 +776,8 @@
       ],
       "description_string_id": 388405,
       "intro_text_string_id": 388403,
-      "end_text_string_id": 388406
+      "end_text_string_id": 388406,
+      "enabled": false
     },
     {
       "id": 3110015,
@@ -801,7 +828,8 @@
       ],
       "description_string_id": 78878,
       "intro_text_string_id": 78876,
-      "end_text_string_id": 78879
+      "end_text_string_id": 78879,
+      "enabled": false
     },
     {
       "id": 3110016,
@@ -852,7 +880,8 @@
       ],
       "description_string_id": 78882,
       "intro_text_string_id": 78880,
-      "end_text_string_id": 78883
+      "end_text_string_id": 78883,
+      "enabled": false
     },
     {
       "id": 3110017,
@@ -903,7 +932,8 @@
       ],
       "description_string_id": 78890,
       "intro_text_string_id": 78888,
-      "end_text_string_id": 78891
+      "end_text_string_id": 78891,
+      "enabled": false
     },
     {
       "id": 3110018,
@@ -951,7 +981,8 @@
         }
       ],
       "description_string_id": 387210,
-      "end_text_string_id": 387211
+      "end_text_string_id": 387211,
+      "enabled": false
     },
     {
       "id": 3110019,
@@ -1002,7 +1033,8 @@
       ],
       "description_string_id": 388409,
       "intro_text_string_id": 388407,
-      "end_text_string_id": 388410
+      "end_text_string_id": 388410,
+      "enabled": false
     },
     {
       "id": 3110020,
@@ -1046,7 +1078,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3110021,
@@ -1097,7 +1130,8 @@
       ],
       "description_string_id": 78894,
       "intro_text_string_id": 78892,
-      "end_text_string_id": 78895
+      "end_text_string_id": 78895,
+      "enabled": false
     },
     {
       "id": 3110022,
@@ -1152,7 +1186,8 @@
       ],
       "description_string_id": 78902,
       "intro_text_string_id": 78900,
-      "end_text_string_id": 78903
+      "end_text_string_id": 78903,
+      "enabled": false
     },
     {
       "id": 3110023,
@@ -1203,7 +1238,8 @@
       ],
       "description_string_id": 78906,
       "intro_text_string_id": 78904,
-      "end_text_string_id": 78907
+      "end_text_string_id": 78907,
+      "enabled": false
     },
     {
       "id": 3110024,
@@ -1251,7 +1287,8 @@
         }
       ],
       "description_string_id": 387214,
-      "end_text_string_id": 387215
+      "end_text_string_id": 387215,
+      "enabled": false
     },
     {
       "id": 3110025,
@@ -1302,7 +1339,8 @@
       ],
       "description_string_id": 388413,
       "intro_text_string_id": 388411,
-      "end_text_string_id": 388414
+      "end_text_string_id": 388414,
+      "enabled": false
     }
   ]
 }

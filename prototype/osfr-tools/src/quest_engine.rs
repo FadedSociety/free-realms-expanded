@@ -23,6 +23,10 @@ const MAX_QUESTS: usize = 1024;
 const MAX_COUNT: u32 = 1_000_000;
 const MAX_SPLIT_CONTENT_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_SPLIT_TOTAL_BYTES: u64 = 32 * 1024 * 1024;
+// W92's eight objective-only replacements; all previously had empty lists.
+const REAUTHORED_HOLLOW_QUESTS: &[u32] = &[
+    3000021, 3000022, 3020014, 3030008, 3110012, 3120010, 3120022, 3120024,
+];
 
 #[derive(Deserialize)]
 struct SplitNpcFile {
@@ -35,6 +39,146 @@ struct SplitNpcFile {
 struct SplitQuestFile {
     schema_version: u32,
     records: Vec<Value>,
+}
+
+// (R) Additional server objective bindings. The client consumes counters,
+// not these event identities; authors must supply provenance in `source`.
+#[derive(Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
+enum RuntimeGoal {
+    GatherResource {
+        id: u32,
+        resource_id: u32,
+        quantity: u32,
+        source: Vec<crate::content::SourceTag>,
+    },
+    CraftRecipe {
+        id: u32,
+        recipe_id: u32,
+        quantity: u32,
+        source: Vec<crate::content::SourceTag>,
+    },
+    FinishMinigame {
+        id: u32,
+        minigame_id: u32,
+        count: u32,
+        source: Vec<crate::content::SourceTag>,
+    },
+    EquipItem {
+        id: u32,
+        definition_id: i32,
+        source: Vec<crate::content::SourceTag>,
+    },
+    VisitPosition {
+        id: u32,
+        zone_id: u32,
+        position: [f32; 3],
+        radius: f32,
+        source: Vec<crate::content::SourceTag>,
+    },
+    // Explicit reach geometry avoids guessing a radius from a POI id.
+    ReachPoi {
+        id: u32,
+        poi_id: u32,
+        zone_id: u32,
+        position: [f32; 3],
+        radius: f32,
+        source: Vec<crate::content::SourceTag>,
+    },
+}
+
+fn runtime_objective(
+    value: Value,
+) -> io::Result<(QuestObjective, Option<(u32, u32, [f32; 3], f32)>)> {
+    let goal: RuntimeGoal =
+        serde_json::from_value(value).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+    let mut location = None;
+    let (id, required, kind, source) = match goal {
+        RuntimeGoal::GatherResource {
+            id,
+            resource_id,
+            quantity,
+            source,
+        } => (
+            id,
+            quantity,
+            ObjectiveKind::GatherResource { resource_id },
+            source,
+        ),
+        RuntimeGoal::CraftRecipe {
+            id,
+            recipe_id,
+            quantity,
+            source,
+        } => (
+            id,
+            quantity,
+            ObjectiveKind::CraftRecipe { recipe_id },
+            source,
+        ),
+        RuntimeGoal::FinishMinigame {
+            id,
+            minigame_id,
+            count,
+            source,
+        } => (
+            id,
+            count,
+            ObjectiveKind::FinishMinigame { minigame_id },
+            source,
+        ),
+        RuntimeGoal::EquipItem {
+            id,
+            definition_id,
+            source,
+        } => (id, 1, ObjectiveKind::EquipItem { definition_id }, source),
+        RuntimeGoal::VisitPosition {
+            id,
+            zone_id,
+            position,
+            radius,
+            source,
+        } => (
+            id,
+            1,
+            ObjectiveKind::VisitPosition {
+                zone_id,
+                position,
+                radius,
+            },
+            source,
+        ),
+        RuntimeGoal::ReachPoi {
+            id,
+            poi_id,
+            zone_id,
+            position,
+            radius,
+            source,
+        } => {
+            if !valid_objective_kind(&ObjectiveKind::VisitPosition {
+                zone_id,
+                position,
+                radius,
+            }) {
+                return Err(invalid("invalid reach geometry"));
+            }
+            location = Some((poi_id, zone_id, position, radius));
+            (id, 1, ObjectiveKind::ReachPoi { poi_id }, source)
+        }
+    };
+    if source.is_empty() {
+        return Err(invalid("runtime quest objective requires provenance"));
+    }
+    Ok((
+        QuestObjective {
+            id,
+            required,
+            description: format!("Objective {id}"),
+            kind,
+        },
+        location,
+    ))
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -234,7 +378,7 @@ pub enum QuestDenial {
 
 /// Semantic quest message. `encode_exact` only returns bytes where the body is
 /// decoded by the reviewed guide; 49/1, 49/3 and 49/13 remain typed intents.
-/// See Build Guides/Gameplay/Quests and Objectives.md §Network for reader/writer
+/// See Build Guides/Gameplay/Quests and Objectives.md ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§Network for reader/writer
 /// provenance: 49/1 `00c7bb60`/`00a94be0`; 49/3 `00c7cc80`/`00c7ccd0`;
 /// 49/8 `00c7b570`/`00c7a910`; 49/9 `00c7b5e0`/`00c7a990`;
 /// 49/10 `00c7b650`/`00c7aa10`; 49/13 `00c7bbd0`/`00c7c030`;
@@ -281,7 +425,7 @@ pub enum QuestMessage {
 }
 
 impl QuestMessage {
-    /// Family and subtype, matching the headers in Quests and Objectives.md §Network.
+    /// Family and subtype, matching the headers in Quests and Objectives.md ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§Network.
     pub fn opcode(&self) -> (u16, u32) {
         match self {
             Self::QuestInfo { .. } => (49, 1),
@@ -477,6 +621,9 @@ pub struct QuestEngine {
     /// Quest offered by the developer `realm offer` command; its accept skips
     /// the prerequisite, level, job and membership checks.
     dev_offer: Option<u32>,
+    disabled: BTreeSet<u32>,
+    location_quests: BTreeMap<u32, BTreeSet<u32>>,
+    poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
 }
 
 /// 49/13 fields before the reward bundle: an 8-byte value (quest id, 0), then
@@ -504,7 +651,7 @@ impl QuestEngine {
         directory: &Path,
         character_id: u64,
         eligibility: CharacterEligibility,
-        state: Option<QuestState>,
+        mut state: Option<QuestState>,
     ) -> io::Result<Self> {
         let quest_dir = directory.join("quests");
         let npc_dir = directory.join("npcs");
@@ -519,12 +666,54 @@ impl QuestEngine {
         let mut total_bytes = 0u64;
         let mut quests = Vec::new();
         let mut split_locale_fields = BTreeMap::new();
+        let mut disabled = BTreeSet::new();
+        let mut runtime_goals = BTreeMap::new();
+        let mut poi_locations = BTreeMap::new();
         for path in quest_paths {
             let file: SplitQuestFile = read_split_file(&path, &mut total_bytes)?;
             if file.schema_version != crate::content::SCHEMA_VERSION {
                 return Err(invalid("unsupported split quest schema"));
             }
             for mut record in file.records {
+                let object = record
+                    .as_object_mut()
+                    .ok_or_else(|| invalid("split quest record is not an object"))?;
+                let enabled = object.remove("enabled").unwrap_or(Value::Bool(true));
+                let enabled = enabled
+                    .as_bool()
+                    .ok_or_else(|| invalid("quest enabled must be boolean"))?;
+                let goals = object
+                    .remove("objectives")
+                    .ok_or_else(|| invalid("quest objectives missing"))?;
+                let goals = goals
+                    .as_array()
+                    .ok_or_else(|| invalid("quest objectives must be a list"))?;
+                if goals.len() > MAX_OBJECTIVES {
+                    return Err(invalid("too many quest objectives"));
+                }
+                let mut standard = Vec::new();
+                let mut extras = BTreeMap::new();
+                for (index, goal) in goals.iter().enumerate() {
+                    match goal.get("kind").and_then(Value::as_str) {
+                        Some(
+                            "gather_resource" | "craft_recipe" | "finish_minigame" | "equip_item"
+                            | "visit_position" | "reach_poi",
+                        ) => {
+                            let (objective, location) = runtime_objective(goal.clone())?;
+                            if let Some((id, zone, position, radius)) = location {
+                                if poi_locations
+                                    .insert(id, (zone, position, radius))
+                                    .is_some_and(|old| old != (zone, position, radius))
+                                {
+                                    return Err(invalid("conflicting quest POI geometry"));
+                                }
+                            }
+                            extras.insert(index, objective);
+                        }
+                        _ => standard.push(goal.clone()),
+                    }
+                }
+                object.insert("objectives".into(), Value::Array(standard));
                 let locale_fields = QuestLocaleFields {
                     intro_text_string_id: take_optional_locale_id(
                         &mut record,
@@ -543,6 +732,12 @@ impl QuestEngine {
                             format!("{}: {error}", path.display()),
                         )
                     })?;
+                if !enabled {
+                    disabled.insert(quest.id);
+                }
+                if !extras.is_empty() {
+                    runtime_goals.insert(quest.id, extras);
+                }
                 if locale_fields.intro_text_string_id.is_some()
                     || locale_fields.description_string_id.is_some()
                     || locale_fields.end_text_string_id.is_some()
@@ -650,6 +845,20 @@ impl QuestEngine {
             .map(|quest| definition_from_content(quest, character_id))
             .collect::<io::Result<Vec<_>>>()?;
         for definition in &mut definitions {
+            if let Some(extras) = runtime_goals.remove(&definition.id) {
+                let mut standard = definition.objectives.drain(..);
+                let total = standard.len() + extras.len();
+                let mut extras = extras;
+                let objectives = (0..total)
+                    .map(|index| {
+                        extras
+                            .remove(&index)
+                            .unwrap_or_else(|| standard.next().expect("validated objective order"))
+                    })
+                    .collect();
+                drop(standard);
+                definition.objectives = objectives;
+            }
             if let Some(npc_id) = turnins.get(&definition.id) {
                 definition.turnin_npc_id = *npc_id;
             }
@@ -667,7 +876,41 @@ impl QuestEngine {
                 })
             })
             .collect();
+        // (R) Split-catalogue rollout: a formerly hollow quest has no saved
+        // counters. Preserve historical completions without paying again;
+        // unfinished quests must earn the newly authored objectives. Other
+        // counter mismatches still fail validation instead of resetting saves.
+        if let Some(saved) = &mut state {
+            for definition in &definitions {
+                if let Some(progress) = saved.quests.get_mut(&definition.id) {
+                    if progress.counts.is_empty()
+                        && !definition.objectives.is_empty()
+                        && REAUTHORED_HOLLOW_QUESTS.contains(&definition.id)
+                    {
+                        let completed = progress.status == QuestStatus::Completed;
+                        progress.counts = definition
+                            .objectives
+                            .iter()
+                            .map(|goal| if completed { goal.required } else { 0 })
+                            .collect();
+                        if !completed && saved.pending_turnin == Some(definition.id) {
+                            saved.pending_turnin = None;
+                        }
+                    }
+                }
+            }
+        }
         let mut engine = Self::new(character_id, definitions, eligibility, state)?;
+        engine.disabled = disabled;
+        engine.poi_locations = poi_locations;
+        engine.index_location_quests();
+        if let Some(id) = engine
+            .state
+            .pending_offer
+            .filter(|id| !engine.is_enabled(*id))
+        {
+            engine.decline(id);
+        }
         engine.job_profile_ids = job_profile_ids;
         engine.split_locale_fields = split_locale_fields;
         engine.step_dialogue = step_dialogue;
@@ -792,7 +1035,7 @@ impl QuestEngine {
             auto_switch_selected: false,
         });
         validate_state(&state, character_id, &indexed)?;
-        Ok(Self {
+        let mut engine = Self {
             character_id,
             eligibility,
             definitions: indexed,
@@ -800,11 +1043,38 @@ impl QuestEngine {
             step_dialogue: BTreeMap::new(),
             job_profile_ids: BTreeMap::new(),
             dev_offer: None,
+            disabled: BTreeSet::new(),
+            location_quests: BTreeMap::new(),
+            poi_locations: BTreeMap::new(),
             state,
             options: EngineOptions {
                 opening_order: None,
             },
-        })
+        };
+        engine.index_location_quests();
+        Ok(engine)
+    }
+
+    fn index_location_quests(&mut self) {
+        self.location_quests.clear();
+        for definition in self.definitions.values() {
+            for objective in &definition.objectives {
+                let zone = match &objective.kind {
+                    ObjectiveKind::EnterArea { area_id } => Some(*area_id),
+                    ObjectiveKind::VisitPosition { zone_id, .. } => Some(*zone_id),
+                    ObjectiveKind::ReachPoi { poi_id } => {
+                        self.poi_locations.get(poi_id).map(|p| p.0)
+                    }
+                    _ => None,
+                };
+                if let Some(zone) = zone {
+                    self.location_quests
+                        .entry(zone)
+                        .or_default()
+                        .insert(definition.id);
+                }
+            }
+        }
     }
 
     pub fn state(&self) -> &QuestState {
@@ -1135,6 +1405,9 @@ impl QuestEngine {
         let Some(definition) = self.definitions.get(&quest_id) else {
             return false;
         };
+        if definition.objectives.is_empty() || self.disabled.contains(&quest_id) {
+            return false;
+        }
         if self.state.quests.get(&quest_id).is_some_and(|progress| {
             matches!(
                 progress.status,
@@ -1159,10 +1432,23 @@ impl QuestEngine {
         self.offer_denial(quest_id, giver_npc_id).is_none()
     }
 
+    pub fn is_enabled(&self, quest_id: u32) -> bool {
+        !self.disabled.contains(&quest_id)
+            && self
+                .definitions
+                .get(&quest_id)
+                .is_some_and(|d| !d.objectives.is_empty())
+    }
+
     fn offer_denial(&self, quest_id: u32, giver_npc_id: u64) -> Option<QuestDenial> {
         let Some(definition) = self.definitions.get(&quest_id) else {
             return Some(QuestDenial::Unavailable);
         };
+        // (R) Incomplete content stays available to editors and saved state,
+        // but cannot be offered, even when `enabled` is accidentally true.
+        if definition.objectives.is_empty() || self.disabled.contains(&quest_id) {
+            return Some(QuestDenial::Unavailable);
+        }
         if definition.giver_npc_id != giver_npc_id {
             return Some(QuestDenial::WrongGiver);
         }
@@ -1200,7 +1486,7 @@ impl QuestEngine {
 
     /// Accept a matching 49/2 reply after a pending 49/1 offer.
     pub fn accept(&mut self, quest_id: u32) -> QuestOutcome {
-        if self.state.pending_offer != Some(quest_id) {
+        if self.state.pending_offer != Some(quest_id) || !self.is_enabled(quest_id) {
             return denied(QuestDenial::Unavailable);
         }
         let definition = &self.definitions[&quest_id];
@@ -1296,7 +1582,20 @@ impl QuestEngine {
         if self.state.pending_turnin.is_some() {
             return Ok(outcome);
         }
-        let ids: Vec<u32> = self.definitions.keys().copied().collect();
+        let ids: Vec<u32> = self
+            .state
+            .quests
+            .iter()
+            .filter(|(_, progress)| progress.status == QuestStatus::Active)
+            .filter(|(id, _)| match &event {
+                QuestEvent::VisitPosition { zone_id, .. } => self
+                    .location_quests
+                    .get(zone_id)
+                    .is_some_and(|ids| ids.contains(id)),
+                _ => true,
+            })
+            .map(|(id, _)| *id)
+            .collect();
         for quest_id in ids {
             let definition = self.definitions[&quest_id].clone();
             let Some(progress) = self.state.quests.get_mut(&quest_id) else {
@@ -1321,7 +1620,21 @@ impl QuestEngine {
                 {
                     continue;
                 }
-                let increment = event_matches(&objective.kind, &event);
+                let increment = match (&objective.kind, &event) {
+                    (
+                        ObjectiveKind::EnterArea { area_id },
+                        QuestEvent::VisitPosition { zone_id, .. },
+                    ) if area_id == zone_id => 1,
+                    (
+                        ObjectiveKind::ReachPoi { poi_id },
+                        QuestEvent::VisitPosition { zone_id, position },
+                    ) => u32::from(self.poi_locations.get(poi_id).is_some_and(
+                        |(zone, target, radius)| {
+                            zone == zone_id && within(*target, *position, *radius)
+                        },
+                    )),
+                    _ => event_matches(&objective.kind, &event),
+                };
                 if increment == 0 {
                     continue;
                 }
@@ -1371,11 +1684,12 @@ impl QuestEngine {
                         required,
                     }));
             }
-            let ready = progress
-                .counts
-                .iter()
-                .zip(&definition.objectives)
-                .all(|(count, objective)| *count == objective.required);
+            let ready = !definition.objectives.is_empty()
+                && progress
+                    .counts
+                    .iter()
+                    .zip(&definition.objectives)
+                    .all(|(count, objective)| *count == objective.required);
             let named_objective_target = match &event {
                 QuestEvent::TalkToNpc { npc_id } => definition.objectives.iter().any(|objective| {
                     matches!(
@@ -1424,7 +1738,10 @@ impl QuestEngine {
         let Some(progress) = self.state.quests.get(&quest_id) else {
             return denied(QuestDenial::Unavailable);
         };
-        if progress.status != QuestStatus::Active || !is_complete(definition, &progress.counts) {
+        if definition.objectives.is_empty()
+            || progress.status != QuestStatus::Active
+            || !is_complete(definition, &progress.counts)
+        {
             return denied(QuestDenial::Incomplete);
         }
         self.state.pending_turnin = Some(quest_id);

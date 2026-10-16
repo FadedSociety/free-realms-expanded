@@ -52,7 +52,8 @@
       ],
       "description_string_id": 383066,
       "intro_text_string_id": 383064,
-      "end_text_string_id": 383067
+      "end_text_string_id": 383067,
+      "enabled": false
     },
     {
       "id": 3040002,
@@ -101,7 +102,8 @@
       ],
       "description_string_id": 103264,
       "intro_text_string_id": 103262,
-      "end_text_string_id": 103265
+      "end_text_string_id": 103265,
+      "enabled": false
     },
     {
       "id": 3040003,
@@ -150,7 +152,8 @@
       ],
       "description_string_id": 103501,
       "intro_text_string_id": 103499,
-      "end_text_string_id": 103502
+      "end_text_string_id": 103502,
+      "enabled": false
     },
     {
       "id": 3040004,
@@ -201,7 +204,8 @@
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 103241
+      "description_string_id": 103241,
+      "enabled": false
     },
     {
       "id": 3040005,
@@ -250,7 +254,8 @@
       ],
       "description_string_id": 103209,
       "intro_text_string_id": 103207,
-      "end_text_string_id": 103210
+      "end_text_string_id": 103210,
+      "enabled": false
     },
     {
       "id": 3040006,
@@ -299,7 +304,8 @@
       ],
       "description_string_id": 103536,
       "intro_text_string_id": 103534,
-      "end_text_string_id": 103537
+      "end_text_string_id": 103537,
+      "enabled": false
     },
     {
       "id": 3040007,
@@ -348,7 +354,8 @@
       ],
       "description_string_id": 103557,
       "intro_text_string_id": 103555,
-      "end_text_string_id": 103558
+      "end_text_string_id": 103558,
+      "enabled": false
     },
     {
       "id": 3040008,
@@ -397,7 +404,8 @@
       ],
       "description_string_id": 103581,
       "intro_text_string_id": 103579,
-      "end_text_string_id": 103582
+      "end_text_string_id": 103582,
+      "enabled": false
     },
     {
       "id": 3040009,
@@ -446,7 +454,8 @@
       ],
       "description_string_id": 103650,
       "intro_text_string_id": 103648,
-      "end_text_string_id": 103651
+      "end_text_string_id": 103651,
+      "enabled": false
     },
     {
       "id": 3040010,
@@ -495,7 +504,8 @@
       ],
       "description_string_id": 103706,
       "intro_text_string_id": 103704,
-      "end_text_string_id": 103707
+      "end_text_string_id": 103707,
+      "enabled": false
     },
     {
       "id": 3040011,
@@ -544,7 +554,8 @@
       ],
       "description_string_id": 103745,
       "intro_text_string_id": 103743,
-      "end_text_string_id": 103746
+      "end_text_string_id": 103746,
+      "enabled": false
     },
     {
       "id": 3040012,
@@ -593,7 +604,8 @@
       ],
       "description_string_id": 103803,
       "intro_text_string_id": 103801,
-      "end_text_string_id": 103804
+      "end_text_string_id": 103804,
+      "enabled": false
     },
     {
       "id": 3040013,
@@ -642,7 +654,8 @@
       ],
       "description_string_id": 103834,
       "intro_text_string_id": 103832,
-      "end_text_string_id": 103835
+      "end_text_string_id": 103835,
+      "enabled": false
     },
     {
       "id": 3040014,
@@ -695,7 +708,8 @@
       ],
       "description_string_id": 103884,
       "intro_text_string_id": 103882,
-      "end_text_string_id": 103885
+      "end_text_string_id": 103885,
+      "enabled": false
     },
     {
       "id": 3040015,
@@ -744,7 +758,8 @@
       ],
       "description_string_id": 103935,
       "intro_text_string_id": 103933,
-      "end_text_string_id": 103936
+      "end_text_string_id": 103936,
+      "enabled": false
     },
     {
       "id": 3040016,
@@ -793,7 +808,8 @@
       ],
       "description_string_id": 103956,
       "intro_text_string_id": 103954,
-      "end_text_string_id": 103957
+      "end_text_string_id": 103957,
+      "enabled": false
     },
     {
       "id": 3040017,
@@ -842,7 +858,8 @@
       ],
       "description_string_id": 104174,
       "intro_text_string_id": 104172,
-      "end_text_string_id": 104175
+      "end_text_string_id": 104175,
+      "enabled": false
     },
     {
       "id": 3040018,
@@ -891,7 +908,8 @@
       ],
       "description_string_id": 104192,
       "intro_text_string_id": 104190,
-      "end_text_string_id": 104193
+      "end_text_string_id": 104193,
+      "enabled": false
     },
     {
       "id": 3040019,
@@ -940,7 +958,8 @@
       ],
       "description_string_id": 104210,
       "intro_text_string_id": 104208,
-      "end_text_string_id": 104211
+      "end_text_string_id": 104211,
+      "enabled": false
     },
     {
       "id": 3040020,
@@ -993,7 +1012,8 @@
       ],
       "description_string_id": 104231,
       "intro_text_string_id": 104229,
-      "end_text_string_id": 104232
+      "end_text_string_id": 104232,
+      "enabled": false
     },
     {
       "id": 3040021,
@@ -1046,7 +1066,8 @@
       ],
       "description_string_id": 104254,
       "intro_text_string_id": 104252,
-      "end_text_string_id": 104255
+      "end_text_string_id": 104255,
+      "enabled": false
     },
     {
       "id": 3040022,
@@ -1095,7 +1116,8 @@
       ],
       "description_string_id": 104272,
       "intro_text_string_id": 104270,
-      "end_text_string_id": 104273
+      "end_text_string_id": 104273,
+      "enabled": false
     },
     {
       "id": 3040023,
@@ -1144,7 +1166,8 @@
       ],
       "description_string_id": 115418,
       "intro_text_string_id": 115416,
-      "end_text_string_id": 115419
+      "end_text_string_id": 115419,
+      "enabled": false
     },
     {
       "id": 3040024,
@@ -1193,7 +1216,8 @@
       ],
       "description_string_id": 104285,
       "intro_text_string_id": 104283,
-      "end_text_string_id": 104286
+      "end_text_string_id": 104286,
+      "enabled": false
     },
     {
       "id": 3040025,
@@ -1242,7 +1266,8 @@
       ],
       "description_string_id": 115445,
       "intro_text_string_id": 115443,
-      "end_text_string_id": 115446
+      "end_text_string_id": 115446,
+      "enabled": false
     },
     {
       "id": 3040026,
@@ -1291,7 +1316,8 @@
       ],
       "description_string_id": 104315,
       "intro_text_string_id": 104313,
-      "end_text_string_id": 104316
+      "end_text_string_id": 104316,
+      "enabled": false
     },
     {
       "id": 3040027,
@@ -1344,7 +1370,8 @@
       ],
       "description_string_id": 104329,
       "intro_text_string_id": 104327,
-      "end_text_string_id": 104330
+      "end_text_string_id": 104330,
+      "enabled": false
     },
     {
       "id": 3040028,
@@ -1397,7 +1424,8 @@
       ],
       "description_string_id": 104346,
       "intro_text_string_id": 104344,
-      "end_text_string_id": 104347
+      "end_text_string_id": 104347,
+      "enabled": false
     },
     {
       "id": 3040029,
@@ -1446,7 +1474,8 @@
       ],
       "description_string_id": 407009,
       "intro_text_string_id": 407007,
-      "end_text_string_id": 407010
+      "end_text_string_id": 407010,
+      "enabled": false
     },
     {
       "id": 3040030,
@@ -1495,7 +1524,8 @@
       ],
       "description_string_id": 407030,
       "intro_text_string_id": 407028,
-      "end_text_string_id": 407031
+      "end_text_string_id": 407031,
+      "enabled": false
     },
     {
       "id": 3040031,
@@ -1540,7 +1570,8 @@
       ],
       "description_string_id": 413776,
       "intro_text_string_id": 413774,
-      "end_text_string_id": 413777
+      "end_text_string_id": 413777,
+      "enabled": false
     },
     {
       "id": 3040032,
@@ -1578,7 +1609,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3040033,
@@ -1627,7 +1659,8 @@
       ],
       "description_string_id": 407025,
       "intro_text_string_id": 407023,
-      "end_text_string_id": 407026
+      "end_text_string_id": 407026,
+      "enabled": false
     },
     {
       "id": 3040034,
@@ -1676,7 +1709,8 @@
       ],
       "description_string_id": 407020,
       "intro_text_string_id": 407018,
-      "end_text_string_id": 407021
+      "end_text_string_id": 407021,
+      "enabled": false
     },
     {
       "id": 3040035,
@@ -1721,7 +1755,8 @@
       ],
       "description_string_id": 413788,
       "intro_text_string_id": 413786,
-      "end_text_string_id": 413789
+      "end_text_string_id": 413789,
+      "enabled": false
     },
     {
       "id": 3040036,
@@ -1766,7 +1801,8 @@
       ],
       "description_string_id": 413772,
       "intro_text_string_id": 413770,
-      "end_text_string_id": 413773
+      "end_text_string_id": 413773,
+      "enabled": false
     },
     {
       "id": 3040037,
@@ -1811,7 +1847,8 @@
       ],
       "description_string_id": 413792,
       "intro_text_string_id": 413790,
-      "end_text_string_id": 413793
+      "end_text_string_id": 413793,
+      "enabled": false
     },
     {
       "id": 3040038,
@@ -1856,7 +1893,8 @@
       ],
       "description_string_id": 413796,
       "intro_text_string_id": 413794,
-      "end_text_string_id": 413797
+      "end_text_string_id": 413797,
+      "enabled": false
     },
     {
       "id": 3040039,
@@ -1909,7 +1947,8 @@
       ],
       "description_string_id": 413768,
       "intro_text_string_id": 413766,
-      "end_text_string_id": 413769
+      "end_text_string_id": 413769,
+      "enabled": false
     },
     {
       "id": 3040040,
@@ -1958,7 +1997,8 @@
       ],
       "description_string_id": 413812,
       "intro_text_string_id": 413810,
-      "end_text_string_id": 413813
+      "end_text_string_id": 413813,
+      "enabled": false
     },
     {
       "id": 3040041,
@@ -2007,7 +2047,8 @@
       ],
       "description_string_id": 413808,
       "intro_text_string_id": 413806,
-      "end_text_string_id": 413809
+      "end_text_string_id": 413809,
+      "enabled": false
     },
     {
       "id": 3040042,
@@ -2052,7 +2093,8 @@
       ],
       "description_string_id": 436539,
       "intro_text_string_id": 436537,
-      "end_text_string_id": 436540
+      "end_text_string_id": 436540,
+      "enabled": false
     },
     {
       "id": 3040043,
@@ -2090,7 +2132,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3040044,
@@ -2143,7 +2186,8 @@
       ],
       "description_string_id": 436479,
       "intro_text_string_id": 436477,
-      "end_text_string_id": 436480
+      "end_text_string_id": 436480,
+      "enabled": false
     },
     {
       "id": 3040045,
@@ -2185,7 +2229,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3040046,
@@ -2234,7 +2279,8 @@
       ],
       "description_string_id": 436543,
       "intro_text_string_id": 436541,
-      "end_text_string_id": 436544
+      "end_text_string_id": 436544,
+      "enabled": false
     },
     {
       "id": 3040047,
@@ -2276,7 +2322,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3040048,
@@ -2325,7 +2372,8 @@
       ],
       "description_string_id": 436547,
       "intro_text_string_id": 436545,
-      "end_text_string_id": 436548
+      "end_text_string_id": 436548,
+      "enabled": false
     },
     {
       "id": 3040049,
@@ -2367,7 +2415,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3040050,
@@ -2416,7 +2465,8 @@
       ],
       "description_string_id": 436551,
       "intro_text_string_id": 436549,
-      "end_text_string_id": 436552
+      "end_text_string_id": 436552,
+      "enabled": false
     },
     {
       "id": 3040051,
@@ -2462,7 +2512,8 @@
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
         }
-      ]
+      ],
+      "enabled": false
     },
     {
       "id": 3040052,
@@ -2511,7 +2562,8 @@
       ],
       "description_string_id": 436555,
       "intro_text_string_id": 436553,
-      "end_text_string_id": 436556
+      "end_text_string_id": 436556,
+      "enabled": false
     },
     {
       "id": 3040053,
@@ -2560,7 +2612,8 @@
       ],
       "description_string_id": 439672,
       "intro_text_string_id": 439670,
-      "end_text_string_id": 439673
+      "end_text_string_id": 439673,
+      "enabled": false
     },
     {
       "id": 3040054,
@@ -2609,7 +2662,8 @@
       ],
       "description_string_id": 7948,
       "intro_text_string_id": 7946,
-      "end_text_string_id": 7949
+      "end_text_string_id": 7949,
+      "enabled": false
     },
     {
       "id": 3040055,
@@ -2658,7 +2712,8 @@
       ],
       "description_string_id": 7952,
       "intro_text_string_id": 7950,
-      "end_text_string_id": 7953
+      "end_text_string_id": 7953,
+      "enabled": false
     },
     {
       "id": 3040056,
@@ -2711,7 +2766,8 @@
       ],
       "description_string_id": 7956,
       "intro_text_string_id": 7954,
-      "end_text_string_id": 7957
+      "end_text_string_id": 7957,
+      "enabled": false
     },
     {
       "id": 3040057,
@@ -2760,7 +2816,8 @@
       ],
       "description_string_id": 7960,
       "intro_text_string_id": 7958,
-      "end_text_string_id": 7961
+      "end_text_string_id": 7961,
+      "enabled": false
     },
     {
       "id": 3040058,
@@ -2809,7 +2866,8 @@
       ],
       "description_string_id": 5100176,
       "intro_text_string_id": 5100174,
-      "end_text_string_id": 5100177
+      "end_text_string_id": 5100177,
+      "enabled": false
     },
     {
       "id": 3040059,
@@ -2862,7 +2920,8 @@
       ],
       "description_string_id": 5100184,
       "intro_text_string_id": 5100182,
-      "end_text_string_id": 5100185
+      "end_text_string_id": 5100185,
+      "enabled": false
     },
     {
       "id": 3040060,
@@ -2915,7 +2974,8 @@
       ],
       "description_string_id": 5100180,
       "intro_text_string_id": 5100178,
-      "end_text_string_id": 5100181
+      "end_text_string_id": 5100181,
+      "enabled": false
     },
     {
       "id": 3040061,
@@ -2968,7 +3028,8 @@
       ],
       "description_string_id": 5100188,
       "intro_text_string_id": 5100186,
-      "end_text_string_id": 5100189
+      "end_text_string_id": 5100189,
+      "enabled": false
     },
     {
       "id": 3040062,
@@ -3021,7 +3082,8 @@
       ],
       "description_string_id": 5100192,
       "intro_text_string_id": 5100190,
-      "end_text_string_id": 5100193
+      "end_text_string_id": 5100193,
+      "enabled": false
     },
     {
       "id": 3040063,
@@ -3074,7 +3136,8 @@
       ],
       "description_string_id": 5100631,
       "intro_text_string_id": 5100629,
-      "end_text_string_id": 5100632
+      "end_text_string_id": 5100632,
+      "enabled": false
     }
   ]
 }

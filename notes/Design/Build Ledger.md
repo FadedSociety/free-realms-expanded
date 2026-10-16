@@ -74,8 +74,8 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 | System | Status | Evidence | Open gaps |
 |---|---|---|---|
 | Regional quest engine (49/1 offer, 49/2, 49/3, 49/13, 49/14) | Native-verified | `quest_engine.rs`; R5 143124, 212855, 215840 | `player_level` is hard-coded to 1 (`gameplay.rs:737`). Quests loaded from content get empty requirements, so no gate applies. |
-| Quest content (653 records) | Mostly hollow | `data/content/quests/*.json` | **Only 14 have objectives; about 639 complete the moment they are accepted.** Only 7 have rewards (coins only). 215 name a giver that isn't in the NPC content. |
-| Objective events | Partly wired | Only `TalkToNpc` and `KillActorKind` reach the engine | Collect, gather, craft, minigame, area, reach and equip events are never sent. |
+| Quest content (653 records) | Hollow quests hidden | `data/content/quests/*.json` | **W104 (2026-10-16):** the 631 quests that still have no objectives carry `"enabled": false` and are never offered (World Builder can flip them), so no offered quest completes on accept. W92's eight talk referrals are merged. Only 7 have rewards (coins only). 215 name a giver that isn't spawned. |
+| Objective events | Wired, bot-proven (talk, collect) | `gameplay.rs` hooks, `quest_engine.rs`; W104 | Talk, kill, collect, equip, gather, craft, minigame, area and reach events reach the engine and only advance the player's active quests; area checks are indexed by zone. Bots completed talk quest 3000022 and a scratch collect quest. Not seen natively. |
 | Completable quests | Native-verified (5) | Through play: 3000021, 3000059, 3000060, 3050011. With a dev offer: 3030007 | 3110002 Ninja "Stolen Away" (kill objective) and 7 talk quests are wired but untried. Carlos Brazenfist doesn't spawn, which blocks the Brawler chain. |
 | Journal sync on relog | Wired | `active_login_packets` | A native relog check is pending. |
 | Inventory, categories, equip | Native-verified | [[Reviews/Native Inventory Repair 173814]]; SB | Only 1,649 item definitions. Search: SB shows "hammer" no longer crashes, but the cause isn't proven for every query. |

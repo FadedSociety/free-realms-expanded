@@ -597,6 +597,65 @@ class Checker:
                     seen[v] = i
 
     # -- cross-file -----------------------------------------------------------
+    def check_quest(self, rel, path, quest):
+        # (R) Catalogue publication policy. Incomplete definitions remain editable.
+        def error(field, value, message):
+            self.add("error", "quest_objective_invalid", rel, path + "." + field,
+                     field, value, message)
+
+        enabled = quest.get("enabled", True)
+        if not isinstance(enabled, bool):
+            error("enabled", enabled, "quest enabled must be boolean")
+        goals = quest.get("objectives")
+        if not isinstance(goals, list) or len(goals) > 64:
+            error("objectives", goals, "quest objectives must be a list of at most 64")
+            return
+        if enabled and not goals:
+            error("objectives", goals, "an enabled quest must have objectives")
+        positive = lambda v: type(v) is int and 1 <= v <= 1_000_000
+        identity = lambda v: type(v) is int and 1 <= v <= 0xffffffff
+        kinds = {
+            "defeat": ("model_id", "count"), "talk_to_npc": ("npc_id", None),
+            "collect_item": ("item_id", "quantity"), "reach_poi": ("poi_id", None),
+            "visit_zone": ("zone_id", None), "gather_resource": ("resource_id", "quantity"),
+            "craft_recipe": ("recipe_id", "quantity"), "finish_minigame": ("minigame_id", "count"),
+            "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
+        }
+        seen = set()
+        for index, goal in enumerate(goals):
+            field = f"objectives[{index}]"
+            if (not isinstance(goal, dict) or not isinstance(goal.get("kind"), str)
+                    or goal["kind"] not in kinds):
+                error(field, goal, "unknown quest objective kind")
+                continue
+            key, count = kinds[goal["kind"]]
+            goal_id = goal.get("id")
+            if not identity(goal_id) or goal_id in seen:
+                error(field + ".id", goal_id, "objective id must be unique and positive u32")
+            if type(goal_id) is int:
+                seen.add(goal_id)
+            target = goal.get(key)
+            valid_target = identity(target)
+            if key == "zone_id":
+                valid_target = type(target) is int and 0 <= target <= 0xffffffff
+            elif key == "npc_id":
+                valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
+            elif key in ("item_id", "definition_id"):
+                valid_target = type(target) is int and 1 <= target <= 0x7fffffff
+            if not valid_target:
+                error(field + "." + key, target, "invalid quest objective target")
+            if count and not positive(goal.get(count)):
+                error(field + "." + count, goal.get(count), "objective count must be 1..1000000")
+            if goal["kind"] in ("visit_position", "reach_poi"):
+                position, radius, zone = goal.get("position"), goal.get("radius"), goal.get("zone_id")
+                if not (type(zone) is int and 0 <= zone <= 0xffffffff
+                        and isinstance(position, list) and len(position) == 3
+                        and all(type(v) in (int, float) and -1_000_000 <= v <= 1_000_000 for v in position)
+                        and type(radius) in (int, float) and 0.1 <= radius <= 1000):
+                    error(field, goal, "invalid quest zone, position or radius")
+            if not isinstance(goal.get("source"), list) or not goal["source"]:
+                error(field + ".source", goal.get("source"), "quest objective requires provenance")
+
     def collect_ids(self, files):
         quest_owner, npc_owner = {}, {}
         for rel, data in files:
@@ -605,6 +664,7 @@ class Checker:
             if rel.startswith("quests/"):
                 for i, r in enumerate(data.get("records") or []):
                     if isinstance(r, dict) and isinstance(r.get("id"), int):
+                        self.check_quest(rel, f"records[{i}]", r)
                         q = r["id"]
                         if q in quest_owner and quest_owner[q][0] != rel:
                             self.add("error", "duplicate_quest_id", rel, f"records[{i}].id", "id", q,
