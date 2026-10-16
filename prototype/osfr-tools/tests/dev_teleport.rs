@@ -572,3 +572,20 @@ fn private_dev_teleport_location_setter_is_progress_free_but_visit_rules_are_not
     );
     assert_eq!(relocated.state(), &before);
 }
+
+/// Regression (2026-10-15 audit): with gameplay loaded and tracing off, a chat
+/// message the gameplay layer does not answer must still be handed to the
+/// gateway binary's social router (`applications`), not rejected as unknown.
+#[test]
+#[ignore = "requires private opening campaign and gateway reference; no native launch"]
+fn private_chat_reaches_the_social_router_without_trace() {
+    let (mut gateway, _content, _reference) = fixture(false);
+    let outcome = say(&mut gateway, "hello everyone");
+    assert!(
+        outcome
+            .applications
+            .iter()
+            .any(|application| application.starts_with(&[15, 0, 1, 0])),
+        "15/1 chat must reach the social router with --trace off"
+    );
+}

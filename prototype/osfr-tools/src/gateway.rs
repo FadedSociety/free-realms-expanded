@@ -422,22 +422,7 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
         Event::Position(_) => "movement",
         Event::Camera => "gateway.camera",
         Event::Time => "gateway.time_sync",
-        Event::Application(_) => match (family, subtype) {
-            (Some(15), Some(1)) => "social_chat",
-            (Some(67), Some(2 | 3)) => "quick_chat",
-            (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
-            (Some(26), Some(14 | 15 | 17 | 30)) | (Some(40), Some(1 | 3 | 4 | 6)) => {
-                "social_router"
-            }
-            (Some(49), Some(2 | 14)) => "quest_engine",
-            (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
-                "kart"
-            }
-            (Some(36), Some(10)) => "combat",
-            (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
-            (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
-            _ => "gameplay.handle_in_world",
-        },
+        Event::Application(_) => application_handler(body),
     };
     GatewayTraceEvent {
         event: if matches!(event, Event::Position(_)) {
@@ -455,6 +440,24 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
         outcome: "handled",
         reason: None,
         movement: None,
+    }
+}
+
+/// The handler that owns an application message body, by family/subtype.
+/// Routing uses it as well as tracing, so behaviour never depends on --trace.
+fn application_handler(body: &[u8]) -> &'static str {
+    let word = |at: usize| body.get(at..at + 2).map(|b| u16::from_le_bytes([b[0], b[1]]));
+    match (word(0), word(2)) {
+        (Some(15), Some(1)) => "social_chat",
+        (Some(67), Some(2 | 3)) => "quick_chat",
+        (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
+        (Some(26), Some(14 | 15 | 17 | 30)) | (Some(40), Some(1 | 3 | 4 | 6)) => "social_router",
+        (Some(49), Some(2 | 14)) => "quest_engine",
+        (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => "kart",
+        (Some(36), Some(10)) => "combat",
+        (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
+        (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
+        _ => "gameplay.handle_in_world",
     }
 }
 
@@ -1125,23 +1128,12 @@ impl Gateway {
                             && result.zoning.is_none()
                             && result.scene_zoning.is_none()
                         {
-                            let known_no_reply = trace
-                                .as_ref()
-                                .and_then(|records| records.get(event_index))
-                                .is_some_and(|record| {
-                                    matches!(
-                                        record.handler,
-                                        "social_chat"
-                                            | "quick_chat"
-                                            | "npc_interaction"
-                                            | "quest_engine"
-                                            | "social_router"
-                                            | "kart"
-                                            | "combat"
-                                            | "inventory"
-                                            | "merchant"
-                                    )
-                                });
+                            // Known handlers may legitimately reply later (the
+                            // social router runs after this); decided from the
+                            // bytes, not from trace records, which exist only
+                            // with --trace (chat was dropped without it).
+                            let known_no_reply = application_handler(&inner)
+                                != "gameplay.handle_in_world";
                             if !known_no_reply {
                                 set_trace(
                                     &mut trace,
