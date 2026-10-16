@@ -732,6 +732,9 @@ fn load_gateway_from(
     let mut gateway = gateway;
     gateway.take_shared_fields();
     gateway.set_dev_tools(options.dev_tools);
+    // Decision 1: account-store roles are server-owned, so builder/admin
+    // `realm` commands run by role without --dev-tools (Studio stays off).
+    gateway.set_role_commands(options.account_store.is_some());
     gateway.set_terrain(options.terrain.clone());
     gateway.set_world_dir(options.world.clone())?;
     gateway.set_stock_text(options.stock_text.clone());

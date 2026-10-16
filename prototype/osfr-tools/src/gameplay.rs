@@ -122,6 +122,9 @@ pub struct Gameplay {
     // Who may run developer `realm` commands (Build Plan 1.5). Player until
     // the gateway sets it from the account store (or admin for local solo).
     role: crate::account_store::AccountRole,
+    // Security Model decision 1: with an account store the role is
+    // server-owned, so role-checked commands run without --dev-tools.
+    role_commands: bool,
     // Stock locale row keys, so authored text ids never collide with them.
     stock_text: Option<Arc<HashSet<u32>>>,
     /// Optional native five-table test catalogue. Not character progression.
@@ -821,6 +824,7 @@ impl Gameplay {
             world_dir: None,
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
+            role_commands: false,
             kart_lobby_reply,
             kart_entry,
             content_dir: npc_content.to_path_buf(),
@@ -831,6 +835,12 @@ impl Gameplay {
     /// launcher exposes it only through its explicit `--dev-tools` flag.
     pub fn set_dev_tools(&mut self, enabled: bool) {
         self.dev_tools = enabled;
+    }
+
+    /// Trust the account-store role for `realm` commands (decision 1).
+    /// Diagnostics and wire experiments still need `--dev-tools`.
+    pub fn set_role_commands(&mut self, enabled: bool) {
+        self.role_commands = enabled;
     }
 
     pub fn set_terrain(&mut self, terrain: Option<std::sync::Arc<crate::terrain::Terrain>>) {
@@ -3202,8 +3212,8 @@ impl Gameplay {
         self.role = role;
     }
 
-    /// Developer commands need both `--dev-tools` and a role that may run
-    /// this command (`reload` is keyed with its target, e.g. `reload battles`).
+    /// Developer commands need `--dev-tools` or a server-owned role
+    /// (account store), plus a role that may run this command (`reload` is keyed with its target, e.g. `reload battles`).
     pub fn may_run(&self, command: &str) -> bool {
         let mut words = command.split_whitespace();
         let first = words.next().unwrap_or_default();
@@ -3212,7 +3222,8 @@ impl Gameplay {
         } else {
             first.to_owned()
         };
-        self.dev_tools && crate::account_store::can_run_realm_command(self.role, &key)
+        (self.dev_tools || self.role_commands)
+            && crate::account_store::can_run_realm_command(self.role, &key)
     }
 
     /// (R) Ordinary play remains available to every role. All other realm routes
@@ -3247,8 +3258,12 @@ impl Gameplay {
         if !self.developer_command_denied(inner, guid)? {
             return Ok(None);
         }
-        let mut message = "Cannot do that: developer command requires --dev-tools and an authorized account role.";
-        if !self.dev_tools {
+        let mut message = if self.role_commands {
+            "Cannot do that: your account role does not allow this command."
+        } else {
+            "Cannot do that: developer command requires --dev-tools and an authorized account role."
+        };
+        if !self.dev_tools && !self.role_commands {
             // Preserve the existing feature-disabled feedback, while recording
             // the same refusal as other authorization failures (R).
             let text = chat::request(inner, guid)?.unwrap_or_default();
@@ -5977,6 +5992,37 @@ mod developer_teleport {
         // No --dev-tools: nothing, whatever the role.
         game.set_dev_tools(false);
         assert!(!try_cmd(&mut game, "realm mark other").contains("Marked"));
+        std::fs::remove_dir_all(&world).unwrap();
+    }
+
+    #[test]
+    fn account_roles_run_realm_commands_without_dev_tools() {
+        use crate::account_store::AccountRole;
+        let content = content_directory();
+        let world = std::env::temp_dir().join(format!("osfr-role-cmds-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&world);
+        let mut game = Gameplay::load(&content, None).unwrap();
+        game.set_world_dir(Some(world.clone())).unwrap();
+        let start = character();
+        let try_cmd = |game: &mut Gameplay, text: &str| {
+            let out = game.handle_in_world(&chat(text), &start, 1_000).unwrap();
+            (reply_text(&out), out.dev_command_denied)
+        };
+        // Canary: neither flag, even an admin runs nothing.
+        game.set_role(AccountRole::Admin);
+        assert!(!try_cmd(&mut game, "realm mark spot").0.contains("Marked"));
+        game.set_role_commands(true);
+        game.set_role(AccountRole::Player);
+        let (text, denied) = try_cmd(&mut game, "realm mark spot");
+        assert!(denied && text.contains("account role"), "{text}");
+        assert!(!world.join("marks.json").exists());
+        game.set_role(AccountRole::Builder);
+        assert!(try_cmd(&mut game, "realm mark spot").0.contains("Marked spot"));
+        assert!(try_cmd(&mut game, "realm god").1, "builder gets no cheats");
+        game.set_role(AccountRole::Admin);
+        assert!(try_cmd(&mut game, "realm god").0.to_lowercase().contains("god"));
+        // Wire experiments stay behind --dev-tools for every role.
+        assert!(try_cmd(&mut game, "realm mine").0.contains("--dev-tools"));
         std::fs::remove_dir_all(&world).unwrap();
     }
 

@@ -110,6 +110,7 @@ pub struct Gateway {
     identity: Option<CharacterIdentity>,
     /// Developer-only chat commands; off unless the launcher opts in.
     dev_tools: bool,
+    role_commands: bool,
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
     world_dir: Option<std::path::PathBuf>,
     stock_text: Option<std::sync::Arc<std::collections::HashSet<u32>>>,
@@ -840,6 +841,7 @@ impl Gateway {
             gameplay,
             identity: None,
             dev_tools: false,
+            role_commands: false,
             terrain: None,
             world_dir: None,
             stock_text: None,
@@ -1032,6 +1034,7 @@ impl Gateway {
             return Err(invalid("saved zone differs from gameplay encounter"));
         }
         gameplay.set_dev_tools(self.dev_tools);
+        gameplay.set_role_commands(self.role_commands);
         gameplay.set_terrain(self.terrain.clone());
         gameplay.set_world_dir(self.world_dir.clone())?;
         gameplay.set_stock_text(self.stock_text.clone());
@@ -1155,6 +1158,14 @@ impl Gateway {
         self.dev_tools = enabled;
         if let Some(gameplay) = self.gameplay.as_mut() {
             gameplay.set_dev_tools(enabled);
+        }
+    }
+
+    /// See `Gameplay::set_role_commands` (Security Model decision 1).
+    pub fn set_role_commands(&mut self, enabled: bool) {
+        self.role_commands = enabled;
+        if let Some(gameplay) = self.gameplay.as_mut() {
+            gameplay.set_role_commands(enabled);
         }
     }
 
