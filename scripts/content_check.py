@@ -8,8 +8,8 @@ recognises fields by name:
   images     (icon_id, *image_id)            -> Resources/Images/Images.txt
   image sets (image_set_id)                  -> Resources/Images/ImageSets.txt
   models     (model_id)                      -> Resources/Models.txt (client, else Legacy)
-  items      (item_id, reward/prize items)   -> runtime inventory.json, data/content item
-                                                definitions, Legacy ClientItemDefinitions.json
+  items      (item_id, reward/prize items)   -> runtime inventory.json, generated catalogue,
+                                                data/content item definitions, Legacy ClientItemDefinitions.json
   animations (*animation* ints)              -> Resources/AnimationTypes.xml AnimationSlot ids
   guids      (guid, spawn_guid)              -> duplicates across all actors
   list ids   (id, npc_id, key)               -> duplicates within a list / across quest files
@@ -19,7 +19,7 @@ It also counts source evidence ({kind, evidence} entries, source tags) by kind
 and "(R)" tags per file. Findings in *_unresolved.json files are warnings, not
 errors: those files hold candidates by design. Nothing is modified.
 
-Usage: python -I project/scripts/content_check.py [--client DIR] [--out FILE] [--strict]
+Usage: python -I project/scripts/content_check.py [--client DIR] [--item-catalogue FILE] [--out FILE] [--strict]
 """
 import argparse
 import collections
@@ -36,6 +36,7 @@ CONTENT = PROJECT / "prototype" / "osfr-tools" / "data" / "content"
 DEFAULT_CLIENT = ROOT / "lab" / "runs" / "client-baseline-20261014T203930Z" / "client"
 DEFAULT_OUT = PROJECT / "prototype" / "osfr-tools" / "studio" / "report.json"
 INVENTORY = ROOT / "lab" / "reports" / "kart-weapons-probe-v20-20261010" / "content" / "inventory.json"
+DEFAULT_ITEM_CATALOGUE = ROOT / "lab" / "reports" / "round70-native-20261016T061000Z" / "content" / "item-catalogue.json"
 LEGACY_RESOURCES = ROOT / "lab" / "references" / "FreeRealms-Legacy" / "src" / "Resources"
 
 MAX_PER_GROUP = 25        # findings kept per (severity, file, field, problem code)
@@ -144,6 +145,23 @@ def items_from_serialized(definitions) -> dict:
     return out
 
 
+def items_from_catalogue(path: Path) -> dict:
+    """Generated item catalogue -> {positive definition id: name id or None}."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or not isinstance(data.get("definitions"), list):
+        raise ValueError(f"item catalogue must contain a definitions array: {path}")
+    out = {}
+    for definition in data["definitions"]:
+        if not isinstance(definition, dict):
+            continue
+        item_id = definition.get("id")
+        if not isinstance(item_id, int) or isinstance(item_id, bool) or item_id <= 0:
+            continue
+        name_id = definition.get("name_id")
+        out[item_id] = name_id if isinstance(name_id, int) and not isinstance(name_id, bool) else None
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Field recognition
 
@@ -212,7 +230,7 @@ def classify_tag(s: str) -> set:
 # ---------------------------------------------------------------------------
 
 class Checker:
-    def __init__(self, client: Path):
+    def __init__(self, client: Path, item_catalogue: Path | None = None):
         self.notes = []
         self.tables = {}
         self.findings = []           # dicts: severity, code, file, path, field, value, problem
@@ -228,10 +246,10 @@ class Checker:
         self.actor_kinds = set()             # enemy definition / actor-kind ids seen in content
         self.defeat_refs = []                # quest defeat objectives: model_id may be an actor kind
         self.npc_unresolved = set()
-        self.load_tables(client)
+        self.load_tables(client, item_catalogue)
 
     # -- tables ------------------------------------------------------------
-    def load_tables(self, client: Path):
+    def load_tables(self, client: Path, item_catalogue: Path | None = None):
         self.locale = self.images = self.image_sets = self.anims = None
         # Job ability animations may use a wield animation GROUP (e.g. 1099),
         # not an AnimationSlot. Validate those against the client's job table.
@@ -290,6 +308,18 @@ class Checker:
             self.tables["items_runtime"] = {"path": str(INVENTORY), "rows": len(self.items_runtime)}
         else:
             self.notes.append(f"runtime inventory.json missing ({INVENTORY})")
+        if item_catalogue is not None:
+            if not item_catalogue.is_file():
+                raise ValueError(f"item catalogue file not found: {item_catalogue}")
+            catalogue_items = items_from_catalogue(item_catalogue)
+            runtime_ids_before = len(self.items_runtime)
+            for item_id, name_id in catalogue_items.items():
+                self.items_runtime.setdefault(item_id, name_id)
+            self.tables["item_catalogue"] = {
+                "path": str(item_catalogue),
+                "rows": len(catalogue_items),
+                "runtime_ids_added": len(self.items_runtime) - runtime_ids_before,
+            }
         self.items_legacy = {}
         legacy_items = LEGACY_RESOURCES / "ClientItemDefinitions.json"
         if legacy_items.is_file():
@@ -405,10 +435,10 @@ class Checker:
         if value in self.items_legacy:
             self.add("warning", "item_not_runtime", file, path, field, value,
                      f"item{self.item_label(value)} exists only in Legacy ClientItemDefinitions, "
-                     "not in the runtime inventory.json (server will reject grant/purchase)")
+                     "not in loaded runtime item definitions (server will reject grant/purchase)")
         else:
             self.add(sev, "item_missing", file, path, field, value,
-                     "item id in no item definition table (runtime inventory.json, content, Legacy)")
+                     "item id in no item definition table (runtime inventory.json, generated catalogue, content, Legacy)")
 
     def check_anim(self, sev, file, path, field, value):
         if file == "job_abilities.json" and value in self.ability_animation_groups:
@@ -769,11 +799,19 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--client", type=Path, default=DEFAULT_CLIENT, help="client install dir")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT, help="JSON report path")
+    ap.add_argument("--item-catalogue", type=Path,
+                    help="optional generated runtime item catalogue (defaults to the round70 play package when present)")
     ap.add_argument("--strict", action="store_true", help="exit 1 when errors exist")
     args = ap.parse_args()
     t0 = time.perf_counter()
 
-    checker = Checker(args.client)
+    item_catalogue = args.item_catalogue
+    if item_catalogue is None and DEFAULT_ITEM_CATALOGUE.is_file():
+        item_catalogue = DEFAULT_ITEM_CATALOGUE
+    try:
+        checker = Checker(args.client, item_catalogue)
+    except (OSError, ValueError) as exc:
+        ap.error(str(exc))
     files = []
     for path in sorted(CONTENT.rglob("*.json")):
         rel = path.relative_to(CONTENT).as_posix()

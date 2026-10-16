@@ -32,6 +32,7 @@ CONFIDENCE = ("confirmed", "likely")
 RUN_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
 SERIALIZER = re.compile(r"\b(?:serializ\w*|marshal\w*|encod\w*)\b", re.I)
 PACKET_WORDS = {"packet", "payload", "request", "response"}
+MAX_STRING_TABLE_POINTERS = 64
 
 
 def _within(path: Path, root: Path) -> bool:
@@ -187,6 +188,129 @@ def _referenced_strings(api: SimpleNamespace, function_start: int) -> list[str]:
     return sorted(strings)
 
 
+def _typed_string(api: SimpleNamespace, address: int) -> tuple[str, str] | None:
+    """Decode an IDA-recognized narrow or UTF-16 C string at address."""
+    get_type = getattr(api.ida_nalt, "get_str_type", None)
+    if not callable(get_type):
+        return None
+    try:
+        string_type = get_type(address)
+    except Exception:
+        return None
+    for name, encoding in (("STRTYPE_C", "utf-8"), ("STRTYPE_C_16", "utf-16le")):
+        expected = getattr(api.ida_nalt, name, None)
+        if expected is None or string_type != expected:
+            continue
+        try:
+            raw = api.ida_bytes.get_strlit_contents(address, -1, string_type)
+        except Exception:
+            return None
+        if isinstance(raw, bytes):
+            value = raw.decode(encoding, errors="replace").rstrip("\0")
+        elif isinstance(raw, str):
+            value = raw.rstrip("\0")
+        else:
+            return None
+        return (value, encoding) if value else None
+    return None
+
+
+def _table_string_evidence(
+    api: SimpleNamespace, function_start: int, instruction: int, table_address: int,
+    via: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
+    """Follow at most 64 consecutive DWORD pointers from an IDA data reference."""
+    byte_api = api.ida_bytes
+    get_flags = getattr(byte_api, "get_flags", None)
+    is_data = getattr(byte_api, "is_data", None)
+    get_dword = getattr(byte_api, "get_dword", None)
+    if not all(callable(item) for item in (get_flags, is_data, get_dword)):
+        return []
+    try:
+        if not is_data(get_flags(table_address)):
+            return []
+    except Exception:
+        return []
+
+    is_mapped = getattr(byte_api, "is_mapped", None)
+    found = []
+    for index in range(MAX_STRING_TABLE_POINTERS):
+        slot = table_address + index * 4
+        try:
+            if callable(is_mapped) and not is_mapped(slot):
+                break
+            target = int(get_dword(slot)) & 0xFFFFFFFF
+        except Exception:
+            break
+        if target in (0, 0xFFFFFFFF):
+            break
+        literal = _typed_string(api, target)
+        if literal is None:
+            continue
+        value, encoding = literal
+        row = {
+            "value": value,
+            "encoding": encoding,
+            "method": "table_pointer",
+            "function": f"{function_start:08x}",
+            "instruction": f"{instruction:08x}",
+            "table": f"{table_address:08x}",
+            "slot": f"{slot:08x}",
+            "target": f"{target:08x}",
+        }
+        if via:
+            row["via"] = via
+        found.append(row)
+    return found
+
+
+def _function_string_evidence(
+    api: SimpleNamespace, function_start: int, via: dict[str, str] | None = None
+) -> list[dict[str, Any]]:
+    evidence = []
+    for instruction in api.idautils.FuncItems(function_start):
+        for target in api.idautils.DataRefsFrom(instruction):
+            literal = _typed_string(api, target)
+            if literal is not None:
+                value, encoding = literal
+                row = {
+                    "value": value,
+                    "encoding": encoding,
+                    "method": "direct",
+                    "function": f"{function_start:08x}",
+                    "instruction": f"{instruction:08x}",
+                    "reference": f"{target:08x}",
+                }
+                if via:
+                    row["via"] = via
+                evidence.append(row)
+            else:
+                evidence.extend(_table_string_evidence(
+                    api, function_start, instruction, target, via
+                ))
+    return evidence
+
+
+def _reachable_string_evidence(api: SimpleNamespace, function_start: int) -> list[dict[str, Any]]:
+    """Collect own strings plus strings from direct callees, without recursion."""
+    evidence = _function_string_evidence(api, function_start)
+    callees = set()
+    for instruction in api.idautils.FuncItems(function_start):
+        if not _is_call(api, instruction):
+            continue
+        for target in api.idautils.CodeRefsFrom(instruction, False):
+            callee = _function_start(api, target)
+            if callee is None or callee == function_start or callee in callees:
+                continue
+            callees.add(callee)
+            via = {"function": f"{callee:08x}", "call": f"{instruction:08x}"}
+            evidence.extend(_function_string_evidence(api, callee, via))
+    unique = {json.dumps(row, sort_keys=True): row for row in evidence}
+    return sorted(unique.values(), key=lambda row: (
+        str(row["value"]).casefold(), row["method"], row["function"], row["instruction"]
+    ))
+
+
 def _is_call(api: SimpleNamespace, address: int) -> bool:
     instruction = api.ida_ua.insn_t()
     return bool(api.ida_ua.decode_insn(instruction, address)) and bool(api.ida_idp.is_call_insn(instruction))
@@ -269,6 +393,24 @@ def _string_agreement(required: list[str], actual: list[str]) -> dict[str, Any]:
     }
 
 
+def _string_evidence_agreement(
+    required: list[str], evidence: list[dict[str, Any]]
+) -> dict[str, Any]:
+    def normalize(value: str) -> str:
+        return " ".join(value.split()).casefold()
+
+    matches = {
+        value: [row for row in evidence if normalize(value) and normalize(value) in normalize(row["value"])]
+        for value in required
+    }
+    return {
+        "required": required,
+        "present": all(matches.values()) if required else None,
+        "matches": matches,
+        "missing": [value for value, found in matches.items() if not found],
+    }
+
+
 def _normalized_name(value: Any) -> str:
     value = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", str(value or ""))
     return re.sub(r"[^A-Za-z0-9]+", " ", value).casefold()
@@ -327,6 +469,15 @@ def inspect_label(
     actual_strings = _referenced_strings(api, start) if exact else []
     required_strings = _required_strings(record)
     string_agreement = _string_agreement(required_strings, actual_strings)
+    detected_string_evidence = (
+        _reachable_string_evidence(api, start) if exact and required_strings else []
+    )
+    string_evidence_agreement = _string_evidence_agreement(required_strings, detected_string_evidence)
+    matched_string_evidence = {
+        json.dumps(item, sort_keys=True): item
+        for rows in string_evidence_agreement["matches"].values()
+        for item in rows
+    }
     caller_edges = _overlap(source["callers"], [item["address"] for item in ida_callers])
     callee_edges = _overlap(source["callees"], [item["address"] for item in ida_callees])
 
@@ -364,6 +515,9 @@ def inspect_label(
         "callers": ida_callers,
         "callees": ida_callees,
         "referenced_strings": actual_strings,
+        "string_evidence": sorted(matched_string_evidence.values(), key=lambda item: (
+            item["value"].casefold(), item["method"], item["function"], item["instruction"]
+        )),
     }
 
     flags = []
@@ -373,8 +527,8 @@ def inspect_label(
         flags.append({"code": "caller_graph_disjoint", "fact": "map reports callers but IDA shares no caller address"})
     if source["callees"] and not callee_edges["shared"]:
         flags.append({"code": "callee_graph_disjoint", "fact": "map reports callees but IDA shares no callee address"})
-    if string_agreement["missing"]:
-        flags.append({"code": "label_string_evidence_missing", "fact": "IDA found no matching function reference for one or more label string claims"})
+    if string_evidence_agreement["missing"]:
+        flags.append({"code": "label_string_evidence_missing", "fact": "IDA found no matching direct, table, or one-level callee string evidence for one or more label claims"})
 
     serializer_targets = []
     if nmq is not None and _label_is_packet_writer(record, [item["name"] for item in ida_callees]):
@@ -413,6 +567,7 @@ def inspect_label(
             "callers": caller_edges,
             "callees": callee_edges,
             "strings": string_agreement,
+            "string_evidence": string_evidence_agreement,
             "serializer_targets_in_map": sorted(serializer_targets),
         },
         "flags": flags,
@@ -593,6 +748,7 @@ def _make_summary(
         "map_database": map_database,
         "ida_library_version": ida_version,
         "selection": selection,
+        "string_evidence_method": "IDA narrow/UTF-16 C literals and bounded DWORD pointer tables; direct callees followed one level",
         **overall,
         "agreement_rates_by_confidence": {
             key: _stats_rates(stats)
@@ -618,10 +774,11 @@ def review_queue_entry(row: dict[str, Any]) -> dict[str, Any] | None:
     )
     if graphs_disjoint:
         reasons.append({"code": "caller_and_callee_graphs_disjoint"})
-    if ida["function_exists"] and agreement["boundary_match"] and agreement["strings"]["missing"]:
+    string_evidence = agreement.get("string_evidence", agreement["strings"])
+    if ida["function_exists"] and agreement["boundary_match"] and string_evidence["missing"]:
         reasons.append({
             "code": "required_strings_missing",
-            "strings": agreement["strings"]["missing"],
+            "strings": string_evidence["missing"],
         })
     if not reasons:
         return None

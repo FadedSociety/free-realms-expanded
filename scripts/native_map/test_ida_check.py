@@ -80,7 +80,8 @@ class Test00ReviewEvidence(unittest.TestCase):
             "ida": {"function_exists": True, "function_start": "00400000", "boundary_match": True,
                     "function_created_on_demand": False, "pseudocode": "int f()", "pseudocode_truncated": False},
             "agreement": {"boundary_match": True, "callers": dict(edges), "callees": dict(edges),
-                          "strings": {"required": [], "missing": []}},
+                          "strings": {"required": [], "missing": []},
+                          "string_evidence": {"required": [], "missing": []}},
             "flags": [],
         }
 
@@ -93,6 +94,17 @@ class Test00ReviewEvidence(unittest.TestCase):
         self.assertEqual(entry["severity"], "high")
         self.assertEqual(entry["reasons"][0]["code"], "caller_and_callee_graphs_disjoint")
 
+    def test_review_queue_uses_expanded_evidence_for_required_string_flags(self) -> None:
+        row = self.row()
+        row["agreement"]["strings"] = {"required": ["wide text"], "missing": ["wide text"]}
+        row["agreement"]["string_evidence"] = {"required": ["wide text"], "missing": []}
+        self.assertIsNone(ida_check.review_queue_entry(row))
+
+        row["agreement"]["string_evidence"]["missing"] = ["wide text"]
+        entry = ida_check.review_queue_entry(row)
+        self.assertEqual(entry["severity"], "medium")
+        self.assertEqual(entry["reasons"], [{"code": "required_strings_missing", "strings": ["wide text"]}])
+
     def test_summary_reports_boundary_rates_by_confidence_and_prefix(self) -> None:
         confirmed = self.row()
         likely = self.row()
@@ -104,6 +116,8 @@ class Test00ReviewEvidence(unittest.TestCase):
         self.assertEqual(confirmed_stats["results"]["processed"], 1)
         self.assertEqual(confirmed_stats["agreement_rates"]["boundaries"]["rate"], 1.0)
         self.assertEqual(summary["agreement_rates_by_subsystem_prefix"]["net"]["results"]["processed"], 1)
+        self.assertEqual(summary["string_method"], "IDA data-reference targets that IDA recognizes as C strings")
+        self.assertIn("string_evidence_method", summary)
 
 
 class Test00OnDemandFunctionWithFake(unittest.TestCase):
@@ -137,6 +151,119 @@ class Test00OnDemandFunctionWithFake(unittest.TestCase):
         self.assertTrue(row["agreement"]["boundary_match"])
 
 
+class Test00EnhancedStringEvidence(unittest.TestCase):
+    class FakeIda:
+        def __init__(self, functions=None, data_refs=None, code_refs=None, strings=None, words=None, calls=None):
+            self.functions = functions or {}
+            self.data_refs = data_refs or {}
+            self.code_refs = code_refs or {}
+            self.strings = strings or {}
+            self.words = words or {}
+            self.calls = set(calls or [])
+            mapped = set(self.words)
+            mapped.update(address for address in self.strings)
+
+            class Insn:
+                ea = 0
+
+            def decode(insn, address):
+                insn.ea = address
+                return 1
+
+            self.ida_bytes = SimpleNamespace(
+                get_strlit_contents=self.get_strlit_contents,
+                get_flags=lambda address: 1 if address in mapped else 0,
+                is_data=lambda flags: flags == 1,
+                is_mapped=lambda address: address in mapped,
+                get_dword=lambda address: self.words.get(address, 0),
+            )
+            self.ida_nalt = SimpleNamespace(
+                STRTYPE_C=0,
+                STRTYPE_C_16=1,
+                get_str_type=lambda address: self.strings.get(address, (-1, None))[0],
+            )
+            self.ida_funcs = SimpleNamespace(
+                get_func=lambda address: next((
+                    SimpleNamespace(start_ea=start, end_ea=start + 8)
+                    for start in self.functions if start <= address < start + 8
+                ), None),
+            )
+            self.idautils = SimpleNamespace(
+                FuncItems=lambda start: self.functions.get(start, []),
+                DataRefsFrom=lambda address: self.data_refs.get(address, []),
+                CodeRefsFrom=lambda address, _flow: self.code_refs.get(address, []),
+                CodeRefsTo=lambda _address, _flow: [],
+            )
+            self.ida_ua = SimpleNamespace(insn_t=Insn, decode_insn=decode)
+            self.ida_idp = SimpleNamespace(is_call_insn=lambda insn: insn.ea in self.calls)
+            self.ida_name = SimpleNamespace(get_name=lambda _address: "")
+            self.imagebase = 0x400000
+            self.hexrays_available = False
+
+        def get_strlit_contents(self, address, _length, kind):
+            expected, value = self.strings.get(address, (-1, None))
+            if expected != kind:
+                return None
+            codec = "utf-16le" if kind == 1 else "utf-8"
+            return value.encode(codec) + (b"\0\0" if kind == 1 else b"\0")
+
+    def test_utf16_literal_is_recorded_as_wide_evidence(self) -> None:
+        api = self.FakeIda(
+            functions={0x401000: [0x401000]},
+            data_refs={0x401000: [0x500000]},
+            strings={0x500000: (1, "Wide text")},
+        )
+        evidence = ida_check._reachable_string_evidence(api, 0x401000)
+        self.assertTrue(any(
+            row["value"] == "Wide text" and row["encoding"] == "utf-16le" and row["method"] == "direct"
+            for row in evidence
+        ))
+
+    def test_simple_pointer_table_records_string_slot_and_target(self) -> None:
+        api = self.FakeIda(
+            functions={0x401000: [0x401000]},
+            data_refs={0x401000: [0x510000]},
+            strings={0x520000: (0, "table text")},
+            words={0x510000: 0x520000, 0x510004: 0},
+        )
+        evidence = ida_check._reachable_string_evidence(api, 0x401000)
+        self.assertTrue(any(
+            row["value"] == "table text" and row["method"] == "table_pointer"
+            and row["table"] == "00510000" and row["slot"] == "00510000"
+            and row["target"] == "00520000"
+            for row in evidence
+        ))
+
+    def test_only_one_direct_callee_level_is_followed(self) -> None:
+        api = self.FakeIda(
+            functions={0x401000: [0x401000], 0x402000: [0x402000], 0x403000: [0x403000]},
+            data_refs={0x402000: [0x520000], 0x403000: [0x530000]},
+            code_refs={0x401000: [0x402000], 0x402000: [0x403000]},
+            strings={0x520000: (0, "callee text"), 0x530000: (0, "grandchild text")},
+            calls=[0x401000, 0x402000],
+        )
+        evidence = ida_check._reachable_string_evidence(api, 0x401000)
+        callee = next(row for row in evidence if row["value"] == "callee text")
+        self.assertEqual(callee["via"]["function"], "00402000")
+        self.assertFalse(any(row["value"] == "grandchild text" for row in evidence))
+
+    def test_new_evidence_resolves_flag_without_changing_direct_string_fields(self) -> None:
+        api = self.FakeIda(
+            functions={0x401000: [0x401000]},
+            data_refs={0x401000: [0x500000]},
+            strings={0x500000: (1, "Wide text")},
+        )
+        label = {"addr": "00401000", "status": "accepted", "record": {
+            "name": "WideStringUser", "evidence": [{"t": "string", "v": "Wide text"}],
+        }}
+        row = ida_check.inspect_label(api, label, {"bytes": 8, "callers": "[]", "callees": "[]", "strings": "[]"})
+        self.assertEqual(row["ida"]["referenced_strings"], [])
+        self.assertEqual(row["agreement"]["strings"]["missing"], ["Wide text"])
+        self.assertTrue(row["agreement"]["string_evidence"]["present"])
+        self.assertNotIn("label_string_evidence_missing", [flag["code"] for flag in row["flags"]])
+
+
+@unittest.skipUnless(os.environ.get("OSFR_RUN_IDA_TESTS") == "1", "IDA-backed fixture tests require OSFR_RUN_IDA_TESTS=1")
 class Test01IdaCheckSmoke(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -218,6 +345,15 @@ class Test01IdaCheckSmoke(unittest.TestCase):
         finally:
             if self.api.ida_funcs.get_func(start) is None:
                 self.api.ida_funcs.add_func(start)
+
+    def test_enhanced_string_evidence_on_small_pe_fixture(self) -> None:
+        evidence = []
+        for address in self.api.idautils.Functions():
+            evidence = ida_check._reachable_string_evidence(self.api, address)
+            if evidence:
+                break
+        self.assertTrue(evidence, "where.exe should expose a deterministic string reference")
+        self.assertTrue(all(row.get("value") and row.get("encoding") for row in evidence))
 
 
 if __name__ == "__main__":
