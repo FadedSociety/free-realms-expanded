@@ -4327,6 +4327,48 @@ impl Gameplay {
             }
             return Ok(out);
         }
+        // Recipe-book start (client 26/24): recipe_book.rs decodes it and checks
+        // learned recipe, active job, idle services, a server-known station in
+        // range, rank and exact inputs before the service's own `begin_recipe`.
+        if let Some(recipe_id) = crate::recipe_book::decode(inner)? {
+            let profile = self.profiles.as_ref().unwrap().active();
+            let stations = crate::recipe_book::stations(self.opening.as_ref().unwrap().actors());
+            let available = self.available_ingredients();
+            let player = crate::recipe_book::Player {
+                zone_id: character.zone_id,
+                position: character.position,
+                active_profile: profile,
+                job_rank: self.recipe_rank(profile),
+                learned: &self.learned_recipes,
+                available: &available,
+                in_encounter: self.encounter.as_ref().is_some_and(EncounterEngine::active),
+            };
+            let started = crate::recipe_book::start(
+                recipe_id,
+                &self.recipe_catalog,
+                &player,
+                &stations,
+                crate::recipe_book::Services {
+                    cooking: self.cooking.as_mut(),
+                    smelting: self.smelting.as_mut(),
+                    forging: self.forging.as_mut(),
+                },
+            );
+            match started {
+                Ok(crate::recipe_book::Started::Cooking(result)) => {
+                    self.apply_cooking(result, character, &mut out)?
+                }
+                Ok(crate::recipe_book::Started::Smelting(result)) => {
+                    self.apply_smelting(result, character, &mut out)?
+                }
+                Ok(crate::recipe_book::Started::Forging(result)) => {
+                    self.forging_tick_ms = Some(now_ms);
+                    self.apply_forging(result, character, &mut out)?
+                }
+                Err(refusal) => out.replies.push(refusal.feedback()),
+            }
+            return Ok(out);
+        }
         if let Some(result) = self.handle_mystery_chest(inner, character.guid)? {
             return Ok(result);
         }
@@ -4847,12 +4889,11 @@ impl Gameplay {
                         Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2002 })
                     )
             });
-            if self.profiles.as_ref().unwrap().active() != 14
-                || !self.opening_craft_pending(2002)
-                || !near_furnace
-            {
+            // (R) A recipe-book run has no tutorial objective; the profile and
+            // station checks still bind the completion.
+            if self.profiles.as_ref().unwrap().active() != 14 || !near_furnace {
                 return Err(invalid(
-                    "smelting completion is outside its accepted Miner objective",
+                    "smelting completion is outside a Miner station",
                 ));
             }
             if transaction
@@ -4870,15 +4911,17 @@ impl Gameplay {
                 .filter(|(id, _)| *id == 21785)
                 .map(|(_, n)| *n)
                 .sum();
-            let progress = self
-                .opening
-                .as_mut()
-                .unwrap()
-                .on_event(OpeningEvent::Craft {
-                    recipe_id: 2002,
-                    quantity,
-                })?;
-            self.apply_opening(progress, out)?;
+            if self.opening_craft_pending(2002) {
+                let progress = self
+                    .opening
+                    .as_mut()
+                    .unwrap()
+                    .on_event(OpeningEvent::Craft {
+                        recipe_id: 2002,
+                        quantity,
+                    })?;
+                self.apply_opening(progress, out)?;
+            }
             // (R) The opening binding is the fallback for the unnumbered sample.
             let recipe_id = self
                 .recipe_catalog
@@ -5013,12 +5056,11 @@ impl Gameplay {
                         Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2001 })
                     )
             });
-            if self.profiles.as_ref().unwrap().active() != 45
-                || !self.opening_craft_pending(2001)
-                || !near_station
-            {
+            // (R) A recipe-book run has no tutorial objective; the profile and
+            // station checks still bind the completion.
+            if self.profiles.as_ref().unwrap().active() != 45 || !near_station {
                 return Err(invalid(
-                    "cooking completion is outside its accepted Chef objective",
+                    "cooking completion is outside a Chef station",
                 ));
             }
             if transaction
@@ -5030,15 +5072,17 @@ impl Gameplay {
             }
             self.consume_materials(transaction.consumes, out)?;
             self.grant_reward(0, &transaction.grants, out)?;
-            let progress = self
-                .opening
-                .as_mut()
-                .unwrap()
-                .on_event(OpeningEvent::Craft {
-                    recipe_id: 2001,
-                    quantity: 1,
-                })?;
-            self.apply_opening(progress, out)?;
+            if self.opening_craft_pending(2001) {
+                let progress = self
+                    .opening
+                    .as_mut()
+                    .unwrap()
+                    .on_event(OpeningEvent::Craft {
+                        recipe_id: 2001,
+                        quantity: 1,
+                    })?;
+                self.apply_opening(progress, out)?;
+            }
             // (R) Reuse the opening's reconstructed recipe binding.
             let recipe_id = self
                 .recipe_catalog
@@ -5080,12 +5124,11 @@ impl Gameplay {
                         Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2003 })
                     )
             });
-            if self.profiles.as_ref().unwrap().active() != 16
-                || !self.opening_craft_pending(2003)
-                || !near_anvil
-            {
+            // (R) A recipe-book run has no tutorial objective; the profile and
+            // station checks still bind the completion.
+            if self.profiles.as_ref().unwrap().active() != 16 || !near_anvil {
                 return Err(invalid(
-                    "forging completion is outside its accepted Blacksmith objective",
+                    "forging completion is outside a Blacksmith station",
                 ));
             }
             if transaction
@@ -5097,15 +5140,17 @@ impl Gameplay {
             }
             self.consume_materials(transaction.consumes, out)?;
             self.grant_reward(0, &transaction.grants, out)?;
-            let progress = self
-                .opening
-                .as_mut()
-                .unwrap()
-                .on_event(OpeningEvent::Craft {
-                    recipe_id: 2003,
-                    quantity: 1,
-                })?;
-            self.apply_opening(progress, out)?;
+            if self.opening_craft_pending(2003) {
+                let progress = self
+                    .opening
+                    .as_mut()
+                    .unwrap()
+                    .on_event(OpeningEvent::Craft {
+                        recipe_id: 2003,
+                        quantity: 1,
+                    })?;
+                self.apply_opening(progress, out)?;
+            }
             // (R) Reuse the opening's reconstructed recipe binding.
             let recipe_id = self
                 .recipe_catalog

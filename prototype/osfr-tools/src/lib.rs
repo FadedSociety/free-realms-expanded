@@ -63,6 +63,7 @@ pub mod progression_extras;
 pub mod quest_engine;
 pub mod quest_journal;
 pub mod quests;
+pub mod recipe_book;
 pub mod recipes;
 pub mod rewards;
 pub mod session;

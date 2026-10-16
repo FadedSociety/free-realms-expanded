@@ -424,6 +424,11 @@ struct Session {
     selected_character: bool,
     spam_gate: SpamGate,
     session_start: Instant,
+    /// (R) Movement-only changes are saved at most every `POSITION_SAVE_MS`:
+    /// time of this session's last save (None: none yet, so the next is written
+    /// at once), and whether a newer pose is unsaved.
+    position_saved_ms: Option<u64>,
+    position_dirty: bool,
     last_activity: Instant,
     packets: Bucket,
     bytes: Bucket,
@@ -857,6 +862,8 @@ impl Session {
             selected_character,
             spam_gate: SpamGate::default(),
             session_start: Instant::now(),
+            position_saved_ms: None,
+            position_dirty: false,
             last_activity: Instant::now(),
             packets: Bucket::full(PACKET_BUDGET.1, Instant::now()),
             bytes: Bucket::full(BYTE_BUDGET.1, Instant::now()),
@@ -1492,8 +1499,8 @@ impl Session {
                     .unwrap_or(0),
             )?;
             // W111 gap: bind the existing solo run before Ready can emit 41/*.
-            outcome.state_changed |=
-                staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
+            let bound = staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
+            outcome.state_changed |= bound;
             let mut staged_world = world.clone();
             let mut deliveries = Vec::new();
             if transfer && staged_world.joined.contains(&self.id) {
@@ -1547,13 +1554,24 @@ impl Session {
                 }
             }
 
-            if outcome.state_changed {
+            // (R) A pose-only change (no gameplay change, zone transfer or run
+            // binding) is written at most every POSITION_SAVE_MS; `tick` and
+            // logout flush it. One save per accepted pose would be thousands of
+            // file writes a second at 1,000 players.
+            let deferred = outcome.state_changed
+                && !outcome.gameplay_changed
+                && !transfer
+                && !bound
+                && self
+                    .position_saved_ms
+                    .is_some_and(|saved| now_ms < saved.saturating_add(POSITION_SAVE_MS));
+            if outcome.state_changed && !deferred {
                 save(&self.state_path, &staged_gateway.snapshot())?;
             }
             persist_social_changes(world, &staged_world)?;
-            Ok((staged_world, deliveries, change))
+            Ok((staged_world, deliveries, change, deferred))
         })();
-        let (staged_world, deliveries, change) = match prepared {
+        let (staged_world, deliveries, change, deferred) = match prepared {
             Ok(staged) => staged,
             // (R) A precommit transfer refusal keeps the live session/location/members.
             // Postcommit queue errors below still disconnect; they cannot roll back saves.
@@ -1576,6 +1594,12 @@ impl Session {
         self.gateway = staged_gateway;
         *world = staged_world;
         self.character_guid = self.gateway.state().guid;
+        if outcome.state_changed {
+            self.position_dirty = deferred;
+            if !deferred {
+                self.position_saved_ms = Some(now_ms);
+            }
+        }
 
         // One `app_out` line per application message, before SOE packing, so
         // combined/fragmented replies (e.g. the 120-byte 49/1) stay visible, with
@@ -1607,7 +1631,7 @@ impl Session {
             }
             queue_delivery(self, sessions, world, delivery)?;
         }
-        if outcome.state_changed {
+        if outcome.state_changed && !deferred {
             if let Some(trace) = &self.trace {
                 trace.record(json!({
                     "event":"character_saved","session":self.id.0,"peer":self.peer.to_string(),
@@ -1784,7 +1808,11 @@ impl Session {
         };
         // (R) Animated phrases follow the recovered emote restrictions; a refusal
         // is a silent drop, like the client's disabled emotes button.
-        if self.quick_chat.authorize_emote(phrase_id, self.emote).is_err() {
+        if self
+            .quick_chat
+            .authorize_emote(phrase_id, self.emote)
+            .is_err()
+        {
             return Vec::new();
         }
         let channel = match &request {
@@ -1875,10 +1903,26 @@ impl Session {
             membership,
             sessions,
             now_ms,
-        )
-        .map(|_| ())
+        )?;
+        self.flush_position(now_ms)
+    }
+
+    /// Write a deferred pose once `POSITION_SAVE_MS` has passed since the last save.
+    fn flush_position(&mut self, now_ms: u64) -> Result<(), Box<dyn std::error::Error>> {
+        let due = self
+            .position_saved_ms
+            .is_none_or(|saved| now_ms >= saved.saturating_add(POSITION_SAVE_MS));
+        if self.position_dirty && due {
+            save(&self.state_path, &self.gateway.snapshot())?;
+            self.position_dirty = false;
+            self.position_saved_ms = Some(now_ms);
+        }
+        Ok(())
     }
 }
+
+/// (R) Longest a pose-only change waits before it is written (crash loss bound).
+const POSITION_SAVE_MS: u64 = 5_000;
 
 fn persist_social_changes(before: &SharedWorld, after: &SharedWorld) -> io::Result<()> {
     for (guid, path) in &after.social_paths {
@@ -3695,6 +3739,119 @@ mod tests {
         drop(server);
         fs::remove_dir_all(scratch).unwrap();
     }
+    #[test]
+    fn pose_only_saves_are_coalesced_and_flushed_by_tick() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+        let scratch = std::env::temp_dir().join(format!("osfr-pose-save-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&scratch);
+        fs::create_dir_all(&scratch).unwrap();
+        let options = Options {
+            bind: "127.0.0.1:0".parse().unwrap(),
+            reference: root.join("references/rust-gateway-reference"),
+            state: scratch.join("character.json"),
+            content: None,
+            identity: None,
+            account_store: None,
+            gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
+            handoff_key: Vec::new(),
+            seconds: 1,
+            dev_tools: false,
+            studio_port: 0,
+            client_logs: None,
+            terrain: None,
+            world: None,
+            stock_text: None,
+            allow_lan: false,
+            security_log: None,
+        };
+        let mut server = Server::new(options).unwrap();
+        let mut session = Session::new(
+            SessionId(7),
+            "127.0.0.1:12346".parse().unwrap(),
+            SessionRequest {
+                id: 7,
+                crc_length: 3,
+                buffer_size: 512,
+            },
+            &server.options,
+            CRC_SEED,
+            None,
+        )
+        .unwrap();
+        let mut login = 1u16.to_le_bytes().to_vec();
+        for (i, value) in ["pose", "1.910.1.530630", ""].into_iter().enumerate() {
+            login.extend((value.len() as u32).to_le_bytes());
+            login.extend(value.as_bytes());
+            if i == 0 {
+                login.extend(1u64.to_le_bytes());
+            }
+        }
+        session.gateway.handle(&login).unwrap();
+        session.gateway.handle(&wrap(&[13, 0])).unwrap();
+        session.gateway.handle(&wrap(&[10, 0])).unwrap();
+        let start = session.gateway.state().clone();
+        let saved_x = || -> f32 {
+            let text = fs::read_to_string(&session_path(&scratch)).unwrap();
+            let doc: serde_json::Value = serde_json::from_str(&text).unwrap();
+            doc["character"]["position"][0].as_f64().unwrap() as f32
+        };
+        let mut step = |session: &mut Session, server: &mut Server, dx: f32, now_ms: u64| {
+            let mut pose = vec![125, 0];
+            pose.extend(start.guid.to_le_bytes());
+            let p = [start.position[0] + dx, start.position[1], start.position[2]];
+            for value in p.into_iter().chain(start.rotation) {
+                pose.extend(value.to_le_bytes());
+            }
+            pose.extend([2, 255]);
+            session
+                .dispatch_message(
+                    &wrap(&pose),
+                    &server.options,
+                    now_ms,
+                    &mut server.world,
+                    &mut server.membership,
+                    &mut server.sessions,
+                    None,
+                )
+                .unwrap();
+        };
+        // The first pose after the interval is written at once.
+        step(&mut session, &mut server, 0.5, 10_000);
+        assert_eq!(saved_x(), start.position[0] + 0.5);
+        // A second pose inside the interval waits: the file keeps the old one.
+        step(&mut session, &mut server, 1.0, 10_500);
+        assert_eq!(session.gateway.state().position[0], start.position[0] + 1.0);
+        assert_eq!(saved_x(), start.position[0] + 0.5);
+        // Canary: the tick before the interval ends writes nothing yet...
+        session
+            .tick(
+                &server.options,
+                14_000,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+            )
+            .unwrap();
+        assert_eq!(saved_x(), start.position[0] + 0.5);
+        // ...and the first tick after it writes the newest pose.
+        session
+            .tick(
+                &server.options,
+                15_000,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+            )
+            .unwrap();
+        assert_eq!(saved_x(), start.position[0] + 1.0);
+        drop(server);
+        fs::remove_dir_all(scratch).unwrap();
+    }
+
+    fn session_path(scratch: &std::path::Path) -> PathBuf {
+        scratch.join("character.json")
+    }
+
     fn direct(app: &[u8], compressed: bool) -> Vec<u8> {
         let mut wire = vec![app[0], u8::from(compressed)];
         if compressed {
