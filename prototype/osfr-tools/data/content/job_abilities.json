@@ -29,9 +29,14 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) damage = basic attack x 3.2 (the wiki's 889/279 ratio on our reconstructed scale); 1 s cooldown; single target in melee reach (the reference's radius-10 area is not implemented)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W113: ALL job_abilities weapon_class fields require the current job weapon in slot 7, including heals/buffs. No unarmed exemptions. Class identities from Sanctuary ItemClasses.txt lines 7,11,18,19,28,72; client wield families WieldTypeAnimationMappings.txt lines 11-16. Per-skill binding unrecovered; see opening-abilities.json provenance."
             }
           ],
-          "min_level": 1
+          "min_level": 1,
+          "weapon_class": 27
         },
         {
           "slot": 2,
@@ -66,7 +71,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 27
         },
         {
           "slot": 3,
@@ -111,7 +117,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 27
         },
         {
           "slot": 4,
@@ -157,7 +164,8 @@
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
             "gaps": "Size change not implemented; crit chance and crit damage are implemented."
-          }
+          },
+          "weapon_class": 27
         },
         {
           "slot": 5,
@@ -199,7 +207,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 27
         }
       ]
     },
@@ -244,7 +253,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 17
         },
         {
           "slot": 2,
@@ -286,7 +296,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 17
         },
         {
           "slot": 3,
@@ -333,7 +344,8 @@
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
             "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
-          }
+          },
+          "weapon_class": 17
         },
         {
           "slot": 4,
@@ -380,7 +392,8 @@
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
             "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
-          }
+          },
+          "weapon_class": 17
         }
       ]
     },
@@ -427,7 +440,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 10
         },
         {
           "slot": 2,
@@ -475,7 +489,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 10
         },
         {
           "slot": 3,
@@ -530,7 +545,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 10
         },
         {
           "slot": 4,
@@ -571,7 +587,8 @@
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
             "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
-          }
+          },
+          "weapon_class": 10
         }
       ]
     },
@@ -618,7 +635,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 6
         },
         {
           "slot": 2,
@@ -664,7 +682,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 6
         },
         {
           "slot": 3,
@@ -699,7 +718,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 6
         },
         {
           "slot": 4,
@@ -745,7 +765,8 @@
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
             "gaps": "(R) circle replaces directional Quake; stun replaces fear/confusion; mitigation replaces dodge; no multiplayer aggro table."
-          }
+          },
+          "weapon_class": 6
         }
       ]
     },
@@ -785,7 +806,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 71
         },
         {
           "slot": 2,
@@ -830,7 +852,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 71
         },
         {
           "slot": 3,
@@ -876,7 +899,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 71
         }
       ]
     },
@@ -923,7 +947,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 18
         },
         {
           "slot": 2,
@@ -965,7 +990,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 18
         },
         {
           "slot": 3,
@@ -1000,7 +1026,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 18
         },
         {
           "slot": 4,
@@ -1046,7 +1073,8 @@
             "range": "(R) explicit metres or 0 to reuse basic-job range",
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
-          }
+          },
+          "weapon_class": 18
         },
         {
           "slot": 5,
@@ -1092,7 +1120,8 @@
             "effects": "(R) all effect numeric fields, recipient/area target limits and geometry; durations follow text where stated; no original server table",
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable",
             "gaps": "(R) active self buff at 20, W99 fifth Archer candidate; original party/passive semantics not recovered."
-          }
+          },
+          "weapon_class": 18
         }
       ]
     }

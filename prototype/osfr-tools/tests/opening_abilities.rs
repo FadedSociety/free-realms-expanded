@@ -348,7 +348,13 @@ fn noncombat_class_clears_all_eight_slots_and_invalid_profile_fails() {
 fn loaded_metadata_rejects_invalid_fields_duplicates_and_oversized_content() {
     let mut f = Fixture::new();
     let original = f.content.clone();
-    for field in ["profile_id", "definition_id", "icon_id", "weapon_name_id"] {
+    for field in [
+        "profile_id",
+        "definition_id",
+        "icon_id",
+        "weapon_name_id",
+        "weapon_class",
+    ] {
         f.content = original.clone();
         f.content["basics"][0][field] = json!(0);
         f.write();

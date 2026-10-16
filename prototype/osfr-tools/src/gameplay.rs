@@ -4187,6 +4187,17 @@ impl Gameplay {
                     .cloned();
                 if let Some(ability) = ability {
                     if inner.len() == 24 && inner[12..16] == 0_i32.to_le_bytes() {
+                        if !self.abilities.as_ref().unwrap().weapon_matches(
+                            &self.inventory,
+                            active_profile,
+                            slot,
+                            self.job_level(active_profile),
+                        ) {
+                            self.encounter.as_mut().unwrap().refuse_weapon(
+                                active_profile, slot, now_ms,
+                            );
+                            return Ok(out);
+                        }
                         let target = u64::from_le_bytes(inner[16..24].try_into().unwrap());
                         let result = self.encounter.as_mut().unwrap().job_ability(
                             &ability,
@@ -4222,6 +4233,30 @@ impl Gameplay {
         {
             out.replies
                 .push(chat::system("Switch to a combat job before attacking."));
+            return Ok(out);
+        }
+        // Both native basic paths share the live equipment guard. (R) Job
+        // weapon classes gate casts, including self-centred basic requests;
+        // no damage, energy, effects or cooldown mutation precedes this check.
+        let basic_cast = (inner.len() == 24
+            && inner.starts_with(&[36, 0, 10, 0])
+            && inner[4..8] == 1_i32.to_le_bytes()
+            && inner[8..16] == [0; 8])
+            || (inner.len() == 16
+                && inner.starts_with(&[26, 0, 10, 0])
+                && inner[12..16] == 103_i32.to_le_bytes());
+        if basic_cast
+            && !self.abilities.as_ref().unwrap().weapon_matches(
+                &self.inventory,
+                active_profile,
+                0,
+                self.job_level(active_profile),
+            )
+        {
+            self.encounter
+                .as_mut()
+                .unwrap()
+                .refuse_weapon(active_profile, 0, now_ms);
             return Ok(out);
         }
         // Go on a battle start screen (41/108): enter the battle's instanced

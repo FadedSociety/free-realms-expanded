@@ -20,6 +20,54 @@ const MAX_ABILITIES: usize = 512;
 const MAX_EFFECTS_PER_ABILITY: usize = 32;
 const KNOCKED_OUT_BIT: i32 = 1 << 7;
 
+/// (R) Require the job's weapon class in native Weapon slot 7. No supported
+/// combat cast is weapon-free. Classes come from pinned Sanctuary
+/// Resources/ItemClasses.txt (reference); the client supplies wield families.
+/// per-skill requirements are not recovered from AbilityDefinition.
+pub fn equipped_weapon_matches(
+    inventory: &crate::inventory::Inventory,
+    profile: i32,
+    required_class: Option<i32>,
+) -> bool {
+    let Some(required_class) = required_class.filter(|class| *class > 0) else {
+        return false;
+    };
+    let state = inventory.state();
+    let Some(equipped) = state
+        .equipment
+        .iter()
+        .find(|e| e.profile_id == profile && e.slot == 7)
+    else {
+        return false;
+    };
+    let Some(item) = state
+        .items
+        .iter()
+        .find(|i| i.id == equipped.item_id && i.count > 0)
+    else {
+        return false;
+    };
+    // Reuse inventory's bounded, validated definition lookup. The native
+    // 008e3760 fixed prefix puts Class/Slot at row bytes 32/40 (packet +12).
+    // Never interpret EquippedItem.category as the item class: equip sets it
+    // to the slot number. Unknown/truncated definitions fail closed.
+    let request = [
+        vec![35, 0, 34, 0],
+        item.definition_id.to_le_bytes().to_vec(),
+        vec![0; 4],
+    ]
+    .concat();
+    inventory
+        .definition_replies(&request)
+        .ok()
+        .is_some_and(|replies| {
+            replies.first().is_some_and(|row| {
+                row.get(44..48) == Some(required_class.to_le_bytes().as_slice())
+                    && row.get(52..56) == Some(7_i32.to_le_bytes().as_slice())
+            })
+        })
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Sourced<T> {

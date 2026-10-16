@@ -7,15 +7,17 @@
       "name_id": 20217,
       "description_id": 0,
       "icon_id": 14813,
-      "weapon_name_id": 131975
+      "weapon_name_id": 131975,
+      "weapon_class": 6
     },
     {
-      "profile_id": 32,
+      "profile_id": 11,
       "definition_id": 4895,
-      "name_id": 420252,
+      "name_id": 420174,
       "description_id": 0,
-      "icon_id": 14104,
-      "weapon_name_id": 13699
+      "icon_id": 14771,
+      "weapon_name_id": 10764,
+      "weapon_class": 27
     },
     {
       "profile_id": 12,
@@ -23,11 +25,39 @@
       "name_id": 17071,
       "description_id": 0,
       "icon_id": 14434,
-      "weapon_name_id": 11056
+      "weapon_name_id": 11056,
+      "weapon_class": 10
+    },
+    {
+      "profile_id": 32,
+      "definition_id": 4895,
+      "name_id": 420252,
+      "description_id": 0,
+      "icon_id": 14104,
+      "weapon_name_id": 13699,
+      "weapon_class": 17
+    },
+    {
+      "profile_id": 35,
+      "definition_id": 4895,
+      "name_id": 420256,
+      "description_id": 420257,
+      "icon_id": 14134,
+      "weapon_name_id": 10408,
+      "weapon_class": 18
+    },
+    {
+      "profile_id": 43,
+      "definition_id": 4895,
+      "name_id": 420172,
+      "description_id": 0,
+      "icon_id": 14290,
+      "weapon_name_id": 131914,
+      "weapon_class": 71
     }
   ],
   "provenance": {
-    "scope": "W85 additive basic rows only. Merge by profile_id into the private campaign's opening-abilities.json; preserve its Brawler, Medic and Archer rows. Gameplay does not load this repository file automatically. See notes/Research/Job Basic Attacks.md.",
+    "scope": "W113 canonical six-job basic roster and weapon requirements. Frozen campaigns retain their own toolbar rows; the loader fills only omitted weapon classes from this roster.",
     "source": [
       {
         "kind": "client",
@@ -44,6 +74,10 @@
       {
         "kind": "reconstructed",
         "evidence": "(R) Reuse the existing basic slot 0, zero-cost immediate single-target strike and definition id 4895. Runtime encounter.rs already sets Ninja 3m/100, Warrior 3m/110, Wizard 20m/130, 600ms repeat gate, and damage x1.75^(tier-1) at levels 1/4/5/8/12. No balance, AoE, projectile, weapon enforcement or timing code is added. Original ids, clip duration, range, recast and historical damage are not recovered."
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "(R) Every supported combat basic and job skill requires its job weapon in slot 7; no weapon-free exemptions. Missing legacy basic requirements inherit this roster; missing skill requirements inherit the basic when loaded. Item class -> wield mapping is Sanctuary Resources/ItemClasses.txt lines 7,11,18,19,28,72 (reference data), matching client WieldTypeAnimationMappings.txt lines 11-16. Native 008e3760 reads item Class/Slot at definition offsets 32/40. AbilityDefinition 00a32930 has no recovered per-skill weapon-class field; no exact weapon refusal string recovered from 009cf430 or locale search. Weapon names/icons are display metadata, never an authorization test. This supersedes W85 no-enforcement statement."
       }
     ]
   }

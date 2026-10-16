@@ -631,6 +631,7 @@ pub struct EncounterEngine {
     god: bool,
     fight_log: Vec<FightEvent>,
     ability_ready: BTreeMap<i32, u64>,
+    last_weapon_refusal: Option<u64>,
     // (R) Session-only skill state. Reapplication refreshes one entry per
     // target/definition; no unbounded stacks or persistent wall-clock timers.
     skill_dots: BTreeMap<(u64, i32), SkillDot>,
@@ -916,6 +917,7 @@ impl EncounterEngine {
             god: false,
             fight_log: Vec::new(),
             ability_ready: BTreeMap::new(),
+            last_weapon_refusal: None,
             skill_dots: BTreeMap::new(),
             skill_stuns: BTreeMap::new(),
             skill_buffs: BTreeMap::new(),
@@ -1218,6 +1220,18 @@ impl EncounterEngine {
                 )
             })
             .collect()
+    }
+
+    /// No weapon-specific refusal message is recovered. (R) The gameplay cast
+    /// gate refuses silently and logs at most once per five seconds per session.
+    pub(crate) fn refuse_weapon(&mut self, profile: i32, slot: i32, now_ms: u64) {
+        if self
+            .last_weapon_refusal
+            .is_none_or(|last| now_ms.saturating_sub(last) >= 5_000)
+        {
+            eprintln!("combat: weapon requirement refused profile={profile} slot={slot}");
+            self.last_weapon_refusal = Some(now_ms);
+        }
     }
 
     /// A job ability (toolbar slot 1..): strike the targeted enemy (or the

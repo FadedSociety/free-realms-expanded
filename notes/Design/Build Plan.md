@@ -102,6 +102,8 @@ The remaining dungeons, housing (missing scene assets), pets, mounts (including 
 
 ## Update log
 
+- **2026-10-16, weapon checks (W113, lead-reviewed), closes W85's Medium finding:** basic attacks and job skills check the player's current equipment against a per-ability wield family (client `WieldTypeAnimationMappings.txt:11-16`; UI gates `00a32930`, `008e3760`, `009cf430`) before any damage, energy, effect or cooldown; unequipping mid-fight stops further casts; refusal is silent (R) pending the client's own text. All six combat jobs' starter outfits still attack (private gate). Wizard scratch bot: wand hit, unequip, refused recast.
+
 - **2026-10-16, shared world slice 1 (W111, lead-reviewed), 3.1 PARTLY:** real instance membership replaces fixed instance 0 (`world.rs` staged membership and bounded allocation, server-only transfers, instance-filtered local chat, save before membership commit). Two-bot socket test: separate children of zone 9600 cannot see each other's movement, say or quick chat; party chat and tells still cross; reunion restores both; forged instance replies refused; failed save rolls back. Canary (force instance 0) fails. Open: the solo encounter engine still assigns its own family-41 run ids (narrow `encounter.rs`/`gameplay.rs` change after W113), native two-client check (lead).
 - **2026-10-16, full IDA cross-check (lead):** 68,411 accepted labels in 16 min: 99.5% exact boundaries, 96.6% of map callee edges confirmed, 92.9% of cited strings present; review queue 1,281 (340 high boundary mismatches, mostly odd-address pieces of larger functions). See [[Native Map/IDA Cross-check]].
 

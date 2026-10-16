@@ -19,6 +19,9 @@ struct Basic {
     description_id: i32,
     icon_id: i32,
     weapon_name_id: i32,
+    /// (R) Required item class in Weapon slot 7, not an instance/definition id.
+    #[serde(default)]
+    weapon_class: Option<i32>,
 }
 
 #[derive(Deserialize)]
@@ -66,6 +69,9 @@ pub struct JobAbility {
     /// Required in authored content: omission must not unlock a later skill.
     /// Weapon abilities are level 1.
     pub min_level: u32,
+    /// (R) Job weapon requirement. Legacy rows inherit their basic's class.
+    #[serde(default)]
+    pub weapon_class: Option<i32>,
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
@@ -86,6 +92,9 @@ impl JobAbility {
             && (0..=100).contains(&self.energy_cost)
             && self.cooldown_ms <= 600_000
             && (1..=20).contains(&self.min_level)
+            && self
+                .weapon_class
+                .is_none_or(|class| (1..=999).contains(&class))
             && self.effects.len() <= 4
             && self.effects.iter().all(crate::abilities::JobEffect::valid)
             && self
@@ -149,13 +158,28 @@ impl OpeningAbilities {
             return Err(invalid("unsupported opening ability content"));
         }
         let mut basics = BTreeMap::new();
-        for basic in content.basics {
+        // (R) Old frozen campaigns predate weapon requirements. Fill only the
+        // missing class from the authored roster; never let omission mean unarmed.
+        let defaults: Content =
+            serde_json::from_str(include_str!("../data/content/opening-abilities.json"))
+                .map_err(|_| invalid("invalid built-in weapon requirements"))?;
+        for mut basic in content.basics {
+            basic.weapon_class = basic.weapon_class.or_else(|| {
+                defaults
+                    .basics
+                    .iter()
+                    .find(|row| row.profile_id == basic.profile_id)
+                    .and_then(|row| row.weapon_class)
+            });
             if basic.profile_id <= 0
                 || basic.definition_id <= 0
                 || basic.name_id < 0
                 || basic.description_id < 0
                 || basic.icon_id <= 0
                 || basic.weapon_name_id <= 0
+                || !basic
+                    .weapon_class
+                    .is_some_and(|class| (1..=999).contains(&class))
                 || basics.insert(basic.profile_id, basic).is_some()
             {
                 return Err(invalid("invalid or duplicate opening basic attack"));
@@ -183,7 +207,14 @@ impl OpeningAbilities {
         }
         let mut jobs = BTreeMap::new();
         let mut ids = std::collections::BTreeSet::new();
-        for row in content.jobs {
+        for mut row in content.jobs {
+            for ability in &mut row.slots {
+                ability.weapon_class = ability.weapon_class.or_else(|| {
+                    self.basics
+                        .get(&row.profile_id)
+                        .and_then(|b| b.weapon_class)
+                });
+            }
             let valid = row.profile_id > 0
                 && !row.slots.is_empty()
                 && row.slots.len() <= 7
@@ -213,6 +244,24 @@ impl OpeningAbilities {
                 .iter()
                 .find(|a| a.slot == slot && a.min_level <= level)
         })
+    }
+
+    /// Resolve server-owned requirements against CURRENT inventory at cast
+    /// time. Equip/unequip needs no cached combat snapshot or resync hook.
+    pub fn weapon_matches(
+        &self,
+        inventory: &crate::inventory::Inventory,
+        profile: i32,
+        slot: i32,
+        level: u32,
+    ) -> bool {
+        let required = if slot == 0 {
+            self.basics.get(&profile).and_then(|b| b.weapon_class)
+        } else {
+            self.job_slot(profile, slot, level)
+                .and_then(|a| a.weapon_class)
+        };
+        crate::abilities::equipped_weapon_matches(inventory, profile, required)
     }
 
     /// Whether `level` unlocks a job ability `previous` did not.
