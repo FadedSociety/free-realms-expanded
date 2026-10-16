@@ -1,13 +1,17 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod controller;
+mod diagnostics;
 
 use controller::{Controller, Navigation};
 use eframe::egui::{self, Color32, FontId, RichText, Stroke, Vec2};
 use osfr_launcher::{LaunchPlan, LaunchSettings, LocalLoginStub, LoginProvider};
 use std::{
+    cell::Cell,
+    fs::File,
     path::{Path, PathBuf},
     process::Child,
+    rc::Rc,
     sync::mpsc,
     time::{Duration, Instant},
 };
@@ -15,6 +19,38 @@ use std::{
 const GREEN: Color32 = Color32::from_rgb(77, 145, 27);
 const INK: Color32 = Color32::from_rgb(36, 57, 28);
 const CREAM: Color32 = Color32::from_rgb(247, 240, 214);
+
+fn load_banner(ctx: &egui::Context) -> Result<egui::TextureHandle, String> {
+    // (R) Fit bundled art to the current limit, including before the first frame.
+    let limit = ctx.input(|input| input.max_texture_side) as u32;
+    let image = image::load_from_memory(include_bytes!("../../docs/images/banner.png"))
+        .map_err(|_| "The bundled banner could not be decoded.".to_owned())?
+        .thumbnail(limit, limit)
+        .into_rgba8();
+    let size = [image.width() as usize, image.height() as usize];
+    Ok(ctx.load_texture(
+        "Free Realms Expanded banner",
+        egui::ColorImage::from_rgba_unmultiplied(size, image.as_raw()),
+        egui::TextureOptions::LINEAR,
+    ))
+}
+
+fn save_capture(path: &Path, screenshot: &egui::ColorImage) -> Result<(), image::ImageError> {
+    use image::ImageEncoder;
+    let rgba: Vec<u8> = screenshot
+        .pixels
+        .iter()
+        .flat_map(|pixel| pixel.to_array())
+        .collect();
+    // Exclusive creation also protects against a file appearing after CLI validation.
+    let file = File::options().write(true).create_new(true).open(path)?;
+    image::codecs::png::PngEncoder::new(file).write_image(
+        &rgba,
+        screenshot.width() as u32,
+        screenshot.height() as u32,
+        image::ExtendedColorType::Rgba8,
+    )
+}
 
 struct Server {
     name: String,
@@ -39,6 +75,7 @@ struct Launcher {
     message: String,
     screenshot: Option<PathBuf>,
     screenshot_requested: bool,
+    capture_ok: Rc<Cell<bool>>,
     started: Instant,
 }
 
@@ -47,25 +84,18 @@ impl Launcher {
         cc: &eframe::CreationContext<'_>,
         screenshot: Option<PathBuf>,
         settings_page: bool,
+        capture_ok: Rc<Cell<bool>>,
     ) -> Result<Self, String> {
-        let image = image::load_from_memory(include_bytes!("../../docs/images/banner.png"))
-            .map_err(|_| "The bundled banner could not be decoded.".to_owned())?
-            .into_rgba8();
-        let size = [image.width() as usize, image.height() as usize];
-        let banner = cc.egui_ctx.load_texture(
-            "Free Realms Expanded banner",
-            egui::ColorImage::from_rgba_unmultiplied(size, image.as_raw()),
-            egui::TextureOptions::LINEAR,
-        );
+        let banner = load_banner(&cc.egui_ctx)?;
         let mut style = (*cc.egui_ctx.style()).clone();
         style.visuals = egui::Visuals::light();
         style.visuals.override_text_color = Some(INK);
         style.visuals.panel_fill = CREAM;
         style.visuals.window_fill = CREAM;
         style.visuals.selection.bg_fill = GREEN;
-        style.visuals.selection.stroke = Stroke::new(2.0, Color32::WHITE);
-        style.visuals.widgets.active.bg_stroke = Stroke::new(2.0, GREEN);
-        style.visuals.widgets.hovered.bg_stroke = Stroke::new(2.0, GREEN);
+        style.visuals.selection.stroke = Stroke::new(2.0_f32, Color32::WHITE);
+        style.visuals.widgets.active.bg_stroke = Stroke::new(2.0_f32, GREEN);
+        style.visuals.widgets.hovered.bg_stroke = Stroke::new(2.0_f32, GREEN);
         style.spacing.item_spacing = Vec2::new(12.0, 10.0);
         style.spacing.button_padding = Vec2::new(18.0, 10.0);
         style
@@ -103,6 +133,7 @@ impl Launcher {
             message: "Choose your client copy in Settings, then select a realm.".into(),
             screenshot,
             screenshot_requested: false,
+            capture_ok,
             started: Instant::now(),
         })
     }
@@ -199,7 +230,7 @@ impl Launcher {
         ui.heading("Pick a realm. Start an adventure.");
         ui.label("Your supplied client, our local revival.");
         ui.add_space(7.0);
-        egui::Frame::new().fill(Color32::from_rgb(225, 231, 192)).stroke(Stroke::new(2.0, Color32::from_rgb(132, 153, 82))).corner_radius(10).inner_margin(16).show(ui, |ui| {
+        egui::Frame::new().fill(Color32::from_rgb(225, 231, 192)).stroke(Stroke::new(2.0_f32, Color32::from_rgb(132, 153, 82))).corner_radius(10).inner_margin(16).show(ui, |ui| {
             ui.set_width(ui.available_width());
             ui.horizontal(|ui| { ui.strong("REALMS"); ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| { ui.small("Status / players: not connected yet"); }); });
             ui.separator();
@@ -239,7 +270,7 @@ impl Launcher {
                 .color(Color32::WHITE),
             )
             .fill(GREEN)
-            .stroke(Stroke::new(3.0, Color32::from_rgb(173, 209, 68)))
+            .stroke(Stroke::new(3.0_f32, Color32::from_rgb(173, 209, 68)))
             .corner_radius(16)
             .min_size(Vec2::new(220.0, 64.0));
             if ui
@@ -404,22 +435,23 @@ impl eframe::App for Launcher {
                 })
             });
             if let Some(screenshot) = screenshot {
-                let rgba: Vec<u8> = screenshot
-                    .pixels
-                    .iter()
-                    .flat_map(|pixel| pixel.to_array())
-                    .collect();
-                if let Err(error) = image::save_buffer(
-                    path,
-                    &rgba,
-                    screenshot.width() as u32,
-                    screenshot.height() as u32,
-                    image::ColorType::Rgba8,
-                ) {
-                    eprintln!("Launcher screenshot failed: {error}");
+                match save_capture(path, &screenshot) {
+                    Ok(()) => {
+                        self.capture_ok.set(true);
+                        log::info!(
+                            "Screenshot saved: {}x{}",
+                            screenshot.width(),
+                            screenshot.height()
+                        );
+                    }
+                    Err(error) => {
+                        log::error!("Launcher screenshot failed: {error}");
+                        eprintln!("Launcher screenshot failed: {error}");
+                    }
                 }
                 ctx.send_viewport_cmd(egui::ViewportCommand::Close);
             } else if self.started.elapsed() > Duration::from_secs(15) {
+                log::error!("Launcher screenshot timed out");
                 eprintln!("Launcher screenshot timed out.");
                 ctx.send_viewport_cmd(egui::ViewportCommand::Close);
             }
@@ -427,7 +459,8 @@ impl eframe::App for Launcher {
     }
 }
 
-fn main() -> eframe::Result {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    diagnostics::init()?;
     let mut screenshot = None;
     let mut settings_page = false;
     let mut args = std::env::args_os().skip(1);
@@ -435,25 +468,27 @@ fn main() -> eframe::Result {
         if arg == "--screenshot" {
             screenshot = args.next().map(PathBuf::from);
             if screenshot.is_none() {
-                eprintln!("--screenshot requires a PNG output path.");
-                return Ok(());
+                return Err("--screenshot requires a PNG output path.".into());
             }
         } else if arg == "--settings-page" {
             settings_page = true;
         } else {
-            eprintln!(
+            return Err(
                 "Usage: osfr-launcher [--settings-page] [--screenshot existing-folder/output.png]"
+                    .into(),
             );
-            return Ok(());
         }
     }
     if let Some(path) = &screenshot {
         if path.extension().is_none_or(|ext| ext != "png")
-            || !path.parent().unwrap_or(Path::new(".")).is_dir()
+            || !path
+                .parent()
+                .filter(|p| !p.as_os_str().is_empty())
+                .unwrap_or(Path::new("."))
+                .is_dir()
             || path.exists()
         {
-            eprintln!("Screenshot needs an unused PNG path in an existing output folder.");
-            return Ok(());
+            return Err("Screenshot needs an unused PNG path in an existing output folder.".into());
         }
     }
     let options = eframe::NativeOptions {
@@ -464,13 +499,58 @@ fn main() -> eframe::Result {
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     };
-    eframe::run_native(
+    let capture_requested = screenshot.is_some();
+    let capture_ok = Rc::new(Cell::new(false));
+    let captured = capture_ok.clone();
+    let result = eframe::run_native(
         "Free Realms Expanded — Launcher",
         options,
         Box::new(move |cc| {
             Ok(Box::new(
-                Launcher::new(cc, screenshot, settings_page).map_err(std::io::Error::other)?,
+                Launcher::new(cc, screenshot, settings_page, captured)
+                    .map_err(std::io::Error::other)?,
             ))
         }),
-    )
+    );
+    if let Err(error) = &result {
+        log::error!("run_native failed: {error}");
+    } else {
+        log::info!("run_native returned successfully");
+    }
+    result?;
+    if capture_requested && !capture_ok.get() {
+        return Err("Launcher closed without saving its screenshot.".into());
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bundled_banner_fits_startup_texture_limit() {
+        // CreationContext still has egui's default limit before its first frame.
+        let ctx = egui::Context::default();
+        let banner = load_banner(&ctx).unwrap();
+        let limit = ctx.input(|input| input.max_texture_side);
+        let [width, height] = banner.size();
+        assert!(width > 0 && height > 0 && width <= limit && height <= limit);
+        assert!((width as f32 / height as f32 - 3.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn capture_refuses_existing_files() {
+        let path = std::env::temp_dir().join(format!("osfr-capture-{}.png", std::process::id()));
+        let _owned = File::options()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .unwrap();
+        let image = egui::ColorImage::filled([2, 2], Color32::GREEN);
+        assert!(save_capture(&path, &image).is_err());
+        assert_eq!(std::fs::metadata(&path).unwrap().len(), 0);
+        drop(_owned);
+        std::fs::remove_file(path).unwrap();
+    }
 }

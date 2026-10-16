@@ -1,19 +1,18 @@
 ---
 type: design
 task: W86
-updated: 2026-10-15
-status: Partly proven - dependency and window gates blocked
+updated: 2026-10-16
+status: W86b build, tests and window captures proven; full launcher partly proven
 plan: Build Plan 3.5 and 1.7
 ---
 
 # Rust Launcher
 
 W86 supplies a standalone `project/launcher/` crate and the toolkit decision.
-**The launch core is tested; the UI is source-only and not yet compile-verified.**
-The full `cargo build`, `cargo test` and running-window screenshot gates could
-not pass because the required GUI/controller crates are absent from the private
-cache and registry access fails through the session's unreachable proxy.
-No game client was launched. This is not acceptance of Build Plan 1.7 or 3.5.
+**W86b now builds and opens the Rust UI on this Windows machine.** Offline build,
+12 tests and both running-window screenshot gates pass; see the W86b evidence
+below. W86's initial cache failure is retained as historical evidence. No game
+client was launched. This is not full acceptance of Build Plan 1.7 or 3.5.
 
 ## Toolkit decision
 
@@ -30,8 +29,8 @@ art generation or replacement asset format is needed.
 | Slint | Native compiled UI; software rendering is an option. It could be compact, but that was not measured here. | Bridge gilrs into Slint's event loop and focus/key APIs. | Declarative custom graphics suit the look, at the cost of a second UI language and build step. | GPLv3, royalty-free desktop licence with attribution conditions, or commercial terms |
 
 The choice is based on the smallest understandable implementation, not an
-unmeasured claim that egui has the smallest binary. This session produced no GUI
-binary, no installed-package measurement and no three-toolkit benchmark.
+unmeasured claim that egui has the smallest binary. W86b produced a debug GUI
+binary; no release-package measurement or three-toolkit benchmark was made.
 Release settings use size optimization, thin LTO and stripped symbols; measure
 the actual Windows artifact once its dependencies can be fetched.
 
@@ -131,7 +130,7 @@ who can inspect processes; key-pair login does not remove that limitation.
 `--screenshot <unused.png>` requests the running window's own egui framebuffer,
 saves PNG and closes. Capture mode disables Play both in the widget and in its
 handler. It has a 15-second deadline and cannot launch the game. This code path
-is not executed/verified yet because the application could not build.
+is now verified by W86b's Home and Settings captures below.
 
 ## Provenance and reconstruction
 
@@ -188,7 +187,7 @@ No known unresolved exploitable high/critical finding was found in the reviewed
 core. That does not establish complete application security. Runtime UI and
 dependency review remain open.
 
-## Executed gates and exact results
+## Executed gates and exact results (initial W86; superseded by W86b below)
 
 All Rust commands ran through `project/scripts/cargo.ps1`. All build output used
 `CARGO_TARGET_DIR=%USERPROFILE%\Documents\Projects\CartoonMMO\lab\build\w86`.
@@ -294,7 +293,7 @@ error: 'cargo-clippy.exe' is not installed for the toolchain 'stable-x86_64-pc-w
 Exit 1
 ```
 
-### Open acceptance gates / lead handoff
+### Initial W86 open gates (superseded where noted by W86b)
 
 - Full launcher build/test and Cargo.lock resolution. Controller source test
   `existing_layout_and_contextual_navigation` is written but has not executed.
@@ -316,3 +315,172 @@ Ponytail: reused the Python launch contract, existing art/layout, std file and
 process APIs, toolkit focus and serde. Deliberately omitted a patcher, downloader,
 new art, second Python runtime path, auth implementation, input injector,
 generalized UI framework and server changes.
+
+## W86b: Windows startup and screenshot acceptance (2026-10-16)
+
+**Verdict: PROVEN for W86b's build, tests and two captures.** Independent lead
+review remains pending. The requested evidence folder retains its 20261015 name.
+No client, gateway, save, Python launcher, shared manifest or shared plan/ledger
+was changed. The lead owns the Build Plan/Ledger integration update.
+
+### Observed causes, with provenance
+
+Two independent startup failures were reproduced. Neither required WGPU.
+
+1. **Loader failure before Rust starts.** Native `System.Diagnostics.Process`
+   reported **-1073741515 / 0xC0000135**, not success, with empty stdout/stderr.
+   `llvm-readobj --coff-imports` showed `libunwind.dll`. Supplying only that DLL
+   beside a lab copy let the same launcher reach Rust and reveal failure 2.
+   The preserved failing artifact's Cargo fingerprint has **`rustflags: []`**;
+   the intended `+crt-static` setting had not reached that build. A diagnostic
+   build with only `-C target-feature=+crt-static` removed the non-system DLL
+   import, as does the final recipe. An initially tried extra linker `-static`
+   was removed as redundant. The final EXE runs with no copied runtime beside
+   it; the toolchain's existing `libunwind.a` supplies the runtime. Evidence is in
+   `lab/build/w86b/root-cause.txt` and `imports-final.txt`.
+2. **Banner upload panics before the first frame.**
+   `lab/build/w86b/startup-before.log` records successful WGL creation, OpenGL
+   3.3 and AMD Radeon 8060S, followed by:
+
+   ```text
+   Texture "Free Realms Expanded banner" has size 2172x724, but the maximum texture side is 2048
+   ```
+
+   The process returned 101. The exact assertion is cached
+   `egui-0.33.3/src/context.rs:2255-2262`; the initial 2048 limit is
+   `src/input_state/mod.rs:371`. Eframe creates the app in
+   `eframe-0.33.3/src/native/glow_integration.rs:294-318`, before the first frame
+   delivers the renderer limit. This is egui's initial limit, not evidence of a
+   2048 GPU hardware limit. `launcher/src/main.rs:23` now uses the existing image
+   crate's aspect-preserving `thumbnail` before upload. The existing banner file
+   remains unchanged.
+
+The upstream [llvm-mingw discussion of dynamic unwind dependencies](https://github.com/mstorsjo/llvm-mingw/issues/525)
+describes static linking as an alternative to supplying runtime DLLs; our
+fingerprints, import inspection and native execution are the acceptance evidence.
+No new original-game facts, native functions, packet
+formats or server rules were recovered. Banner fitting, logging and capture
+failure handling are reconstructed launcher policy (R).
+
+### Minimal changes
+
+- `launcher/build.ps1`: repeatable offline/locked gnullvm recipe through the
+  existing `scripts/cargo.ps1`; explicit clang linker and static unwind runtime.
+  llvm-mingw/bin is never added to PATH. Paths derive from the checkout, with a
+  toolchain override for other machines.
+- `launcher/src/main.rs`: fit banner; check/log `run_native`'s Result; return a
+  failing exit code for invalid or incomplete captures; preserve Play's existing
+  capture-mode guard; create PNGs exclusively, including at the actual write.
+  Explicit f32 stroke widths remove five compiler future-compatibility warnings.
+- `launcher/src/diagnostics.rs`: opt-in `OSFR_LAUNCHER_LOG`, exclusive file
+  creation, 1 MiB budget, rendering/startup targets only, panic/error capture.
+- `Cargo.toml` / `Cargo.lock`: directly use the existing transitive `log 0.4.34`
+  (MIT OR Apache-2.0). No new package was resolved. Glow and toolkit licences
+  stay unchanged. The static LLVM runtime's Apache 2.0 with LLVM exceptions is
+  recorded in `launcher/DEPENDENCIES.md`; complete distribution audit is open.
+- `launcher/README.md`, `DEPENDENCIES.md` and this note: current recipe/evidence.
+
+### Commands and gate outputs
+
+From `project/` in PowerShell:
+
+```powershell
+$env:CARGO_TARGET_DIR = [IO.Path]::GetFullPath('../lab/build/w86-llvm')
+./launcher/build.ps1 build
+# Finished `dev` profile [unoptimized + debuginfo]; exit 0
+./launcher/build.ps1 test
+# lib:  test result: ok. 8 passed; 0 failed
+# main: test result: ok. 4 passed; 0 failed
+# doc:  test result: ok. 0 passed; 0 failed
+# exit 0
+python -I ../lab/build/w86b/verify_capture.py
+# home: exit=0 expected=0
+# settings: exit=0 expected=0
+# existing PNG refused: exit=1 expected=1
+# missing argument refused: exit=1 expected=1
+# missing parent refused: exit=1 expected=1
+# unknown option refused: exit=1 expected=1
+# existing diagnostic log refused: exit=1 expected=1
+```
+
+`verify_capture.py` starts the native EXE with `--screenshot <launcher.png>` and
+`--settings-page --screenshot <settings.png>` using Windows CreateProcess through
+stdlib subprocess, with 25-second bounds. It saves full arguments, exit codes
+and stderr in `capture-results.json`; it never starts the game. Both final logs
+end in `Screenshot saved: 1410x1185` and `run_native returned successfully`.
+
+| Capture in `lab/reports/rust-launcher-20261015/` | Actual renderer output / inspection |
+|---|---|
+| `launcher.png` | 1410 x 1185, 1,540,596 bytes; banner, Realms, local address, stub login and disabled Play all visible |
+| `settings.png` | 1410 x 1185, 1,477,689 bytes; client/locale fields, dimensions, controller toggle and Back all visible |
+
+Both images were opened and visually inspected. At this machine's 150% scale,
+940 x 790 logical units produce 1410 x 1185 pixels. Controller enumeration says
+connected; no physical button-navigation acceptance was performed. Home's
+existing status-dot glyph renders as a small box; status text is readable and
+this follow-up did not restyle the UI.
+
+SHA-256:
+
+```text
+launcher.png 9750ed1473abf9640d296ac9de7307db96c55678175170e149940eff83a1a15c
+settings.png 7fe84a5eae6f5f691fda4f795e81aa70f5160780c506ed18ccab6669bf6cee93
+```
+
+Regression/canary: `bundled_banner_fits_startup_texture_limit` was run **before**
+adding `thumbnail`; it failed with the exact 2172/2048 panic, exit 1. Evidence:
+`lab/build/w86b/banner-regression-before.log`. It passes after the fix. The two
+other new tests prove exclusive capture output and the diagnostic byte budget;
+the original eight core and one controller test still pass.
+
+Only owned Rust files were formatted:
+
+```text
+private rustfmt.exe --edition 2024 --check launcher/src/main.rs launcher/src/diagnostics.rs
+exit 0
+git diff --check -- launcher "notes/Design/Rust Launcher.md"
+exit 0
+```
+
+The final debug EXE is 119,785,472 bytes. No release-size or distribution claim.
+
+### Threat model and self security review (W86b)
+
+Scope is local CLI/environment-selected diagnostic and PNG output. Remote
+players cannot choose these paths. Same-user arbitrary filesystem/process
+access is outside this slice's isolation boundary. No network listener,
+authentication route, shell launch or client preparation change was introduced.
+
+Applied Secure Code Guardian while building. Security Reviewer self-pass used
+automated `rg` searches for writes, paths, processes, network, tokens and unsafe
+code before manually reading the whole owned diff and new files. No installed
+semgrep, gitleaks or cargo-audit was found; this is not a full dependency scan.
+
+| Severity | Finding and resolution |
+|---|---|
+| Low, fixed | A file could appear between screenshot CLI validation and `image::save_buffer`, causing overwrite. PNG encoder now uses `create_new`; unit test and process refusal checks pass. |
+| Low, prevented | New diagnostic output could overwrite files or grow indefinitely. Exclusive creation and 1 MiB cap; existing-log process test and byte-budget test pass. |
+| Info, fixed | Old CLI/capture failures could return success. Invalid arguments and unsuccessful capture now return nonzero; successful PNG requires an explicit completion flag. |
+| No remaining finding in scope | Startup logging is opt-in, target-filtered and excludes form values/launch arguments/tokens. Play's widget and handler remain guarded throughout capture mode. Static linker path is passed via Cargo's environment, never shell-expanded. |
+
+### Remaining gaps and workspace note
+
+W86b's required build/test/window gates are complete. Lead independent review,
+physical controller actions, actual client launch, second-PC acceptance,
+release packaging/licences, key-pair login integration and the rest of 3.5
+remain open. Shared Plan/Ledger/Tasks/MODLOG were outside this worker's ownership.
+
+An early command resolved `../lab` from `project/launcher`, producing accidental
+scratch output at `project/lab/build/w86-llvm` and failing to find the linker.
+All acceptance commands then used the correct sibling lab. Automatic approval
+review rejected recursive cleanup as `blocked by policy`; a safer reversible
+move preserved that scratch target intact at `lab/build/w86b/misplaced-target`
+after checking both absolute locations. No scratch target remains under
+`project/lab/build/w86-llvm`; it is not part of the launcher artifact.
+An attempted PowerShell stderr redirect also hit `NativeCommandError`; gates
+were rerun normally and their actual outputs are recorded above.
+
+Ponytail: reused Glow, the existing image decoder/PNG encoder, std filesystem and
+process APIs, cached `log`, and the private Cargo wrapper. Deliberately did not
+build a WGPU fallback, custom renderer/capture framework, downloader, installer,
+new auth route or game-client changes.
