@@ -11,6 +11,8 @@ M1 item **1.0**, for the approximately ten-player Free Realms playtest. **Do not
 
 Evidence inspected on 2026-10-16 UTC (2026-10-15 in America/Denver). Unless prefixed otherwise, source citations below are relative to `prototype/osfr-tools/src/`; `Cargo.toml` means `prototype/osfr-tools/Cargo.toml`. Ranges are inclusive. All proposed limits, privileges, deployment choices and security rules are **reconstructed policy (R)**, not recovered original server behaviour. No new native-client function facts were recovered in this task.
 
+> **Update 2026-10-15 (lead, the owner's decision):** L2's credential mechanism is now **Ed25519 challenge-response with per-server key pairs**, held by the launcher. Servers store only public keys, so no password goes to any server, including malicious private hosts. Argon2 is dropped. See [[Research/Multi Login Design]].
+
 ## 1. Attack surface inventory
 
 ### Boundaries and evidence
