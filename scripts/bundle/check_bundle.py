@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bundle_common import (  # noqa: E402
     BUNDLE_ROOT,
     PROJECT,
+    check_runtime_content,
     read_json,
     scan_bundle_sources,
     verify_manifest,
@@ -507,6 +508,7 @@ def main() -> int:
     manifest, file_count = verify_manifest(bundle)
     protected_count, _ = scan_bundle_sources(bundle, manifest)
     print(f"Manifest: PASS ({file_count} payload files, SHA-256 and sizes match)")
+    print(f"Runtime content: PASS (optional files present and valid: {check_runtime_content(bundle) or 'none'})")
     print(
         "Security scan: PASS (empty accounts=0, characters=0, public keys=0; "
         f"protected source files checked={protected_count}, matches=0)"

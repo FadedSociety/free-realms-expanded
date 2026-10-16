@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import stat
 from pathlib import Path, PurePosixPath
@@ -19,7 +20,9 @@ JOURNAL_PACKAGE = LAB / "references" / "opening-native-lobby-20261009T163603Z"
 STARTUP_SNAPSHOT = LAB / "content" / "startup-snapshot" / "startup.json"
 TERRAIN = LAB / "terrain"
 CLIENT_RESOURCES = LAB / "working" / "OSFR.Client" / "OSFR Client" / "Resources"
-BUNDLE_ROOT = LAB / "bundles"
+# OSFR_BUNDLE_ROOT moves bundles and the checker's scratch runtime elsewhere
+# (for example lab/build/<worker>/) so a trial build never lands in lab/bundles.
+BUNDLE_ROOT = Path(os.environ.get("OSFR_BUNDLE_ROOT") or LAB / "bundles")
 
 # Runtime inputs only. Captures, prior saves, proofs, receipts, and identity files
 # are intentionally absent. inventory.json loses its saved initial_state;
@@ -51,6 +54,29 @@ PRIVATE_CONTENT_FILES = (
     "smelting-item-definitions.json",
     "smelting.json",
 )
+
+# Optional runtime content tracked in the repository. The gateway falls back to a
+# built-in table (or leaves the feature off) when one is absent, so the builder
+# reports each as included or absent and never fails on a missing one. They reach
+# the bundle through the committed-HEAD copy, so an uncommitted edit is not in it.
+OPTIONAL_REPOSITORY_CONTENT = (
+    "consumables.json",  # item_bar.rs: potion/food effect tuning (built-in table if absent)
+    "power_ups.json",  # power_ups.rs: combat power-up drop tables (W153)
+)
+
+# (R) Generated runtime content: the builder writes each file only when the
+# committed content does not already carry it, so a reviewed repository copy
+# always wins. kart_gates.json lists the NPCs whose menu offers the solo kart
+# race (kart_gateway.rs loads it beside kart_entry.json). The two NPCs are Chase
+# Wheeler (9000000273) and Cale Yardbird (9000000039), chosen from wiki and
+# map-marker evidence, not from a recovered mapping.
+GENERATED_CONTENT = {
+    "kart_gates.json": {
+        "schema_version": 1,
+        "npcs": [9000000273, 9000000039],
+        "reward_cooldown_s": 300,
+    },
+}
 
 LOGIN_RESOURCE_FILES = (
     "Models.txt",
@@ -223,6 +249,40 @@ def verify_manifest(bundle: Path) -> tuple[dict, int]:
         if path.stat().st_size != size or sha256_file(path) != digest:
             raise ValueError(f"manifest check failed: {name}")
     return manifest, len(expected)
+
+
+def check_runtime_content(bundle: Path) -> list[str]:
+    """Check the optional runtime content files that are present; return notes."""
+    content = bundle / "content"
+    notes = []
+    gates_path = content / "kart_gates.json"
+    if gates_path.is_file():
+        gates = read_json(gates_path)
+        npcs = gates.get("npcs") if isinstance(gates, dict) else None
+        cooldown = gates.get("reward_cooldown_s", 0) if isinstance(gates, dict) else None
+        # Mirrors the gateway's own bounds (kart_gateway.rs load_gates).
+        if (
+            not isinstance(gates, dict)
+            or gates.get("schema_version") != 1
+            or not set(gates) <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s"}
+            or not isinstance(npcs, list)
+            or len(npcs) > 16
+            or len(set(npcs)) != len(npcs)
+            or any(type(n) is not int or n <= 0 for n in npcs)
+            or type(cooldown) is not int
+            or not 0 <= cooldown <= 86_400
+            or gates_path.stat().st_size > 16 * 1024
+            or (not gates_path.parent.joinpath("kart_entry.json").is_file())
+        ):
+            raise ValueError("content/kart_gates.json is invalid or has no kart_entry.json beside it")
+        notes.append(f"kart_gates.json ({len(npcs)} gate NPCs)")
+    for name in OPTIONAL_REPOSITORY_CONTENT:
+        path = content / name
+        if path.is_file():
+            if not isinstance(read_json(path), dict) or path.stat().st_size > 1_048_576:
+                raise ValueError(f"content/{name} is not a bounded JSON object")
+            notes.append(name)
+    return notes
 
 
 def empty_account_store() -> dict:

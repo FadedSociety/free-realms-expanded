@@ -36,6 +36,23 @@ source commit in the bundle README. It does not modify the active play package.
   server identifier. Neither is copied from an existing server or player.
 - `README.md` and `manifest.json`: startup instructions and integrity metadata.
 
+Optional runtime content (W159, 2026-10-16). The gateway reads these from `content/`
+when present and runs without them, so the builder never fails on a missing one and
+reports each as included or absent (`Runtime content:` line). `consumables.json`
+(item-bar potion and food tuning, `item_bar.rs`; a built-in table applies without it)
+and `power_ups.json` (combat power-up drop tables, `power_ups.rs`) are tracked
+repository content and enter through the committed-`HEAD` copy, so the same hashing
+and manifest checks cover them; as of 2026-10-16 neither is committed, and the
+builder prints a `WARNING` for uncommitted `data/content` edits. `kart_gates.json`
+(`{"schema_version": 1, "npcs": [9000000273, 9000000039], "reward_cooldown_s": 300}`)
+is written by the builder beside `kart_entry.json` when the committed content does not
+carry it; a committed copy wins. **(R)** Chase Wheeler and Cale Yardbird were picked
+from wiki and map-marker evidence; the original NPC-to-kart mapping is not recovered.
+`check_bundle.py` validates `kart_gates.json` against the gateway's own bounds (schema 1,
+at most 16 distinct non-zero NPCs, cooldown 0 to 86,400 s, `kart_entry.json` present).
+Warpstone and quest-journal data need no entry: quest-journal text is `journal-text.json`
+and `quest-journal.bin`, already in the private overlay.
+
 The round70 content is a playable package, not a claim that all of its rules are
 historically exact. Its per-file provenance distinguishes client-backed data,
 Legacy-derived starting material and reconstructed server policy. `opening.json`
@@ -60,6 +77,10 @@ From the repository root:
 python -I scripts/bundle/make_bundle.py
 python -I scripts/bundle/check_bundle.py --bundle ..\lab\bundles\playtest-<UTC timestamp>
 ```
+
+Setting `OSFR_BUNDLE_ROOT` moves both the bundle folder and the checker's scratch
+runtime (for example to `lab/build/<worker>/`) so a trial build never touches
+`lab/bundles/`.
 
 The generated README contains the complete private-toolchain build, fresh
 runtime directory, account provisioning, login and gateway commands. The login

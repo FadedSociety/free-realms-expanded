@@ -17,6 +17,8 @@ from bundle_common import (  # noqa: E402
     ACTIVE_CONTENT,
     BUNDLE_ROOT,
     CLIENT_RESOURCES,
+    GENERATED_CONTENT,
+    OPTIONAL_REPOSITORY_CONTENT,
     LOGIN_RESOURCE_FILES,
     LOCALE_FILES,
     JOURNAL_PACKAGE,
@@ -25,6 +27,7 @@ from bundle_common import (  # noqa: E402
     REFERENCE,
     STARTUP_SNAPSHOT,
     MANIFEST_VERSION,
+    check_runtime_content,
     sha256_file,
     TERRAIN,
     empty_account_store,
@@ -132,6 +135,30 @@ def copy_private_content(target: Path) -> int:
             copy_file(source, ACTIVE_CONTENT, destination)
         count += 1
     return count
+
+
+def add_generated_content(target: Path) -> list[str]:
+    """Write reconstructed (R) runtime content the committed tree does not carry."""
+    written = []
+    for name, value in GENERATED_CONTENT.items():
+        destination = target / "content" / name
+        if destination.exists():
+            continue  # a committed copy was reviewed; keep it
+        destination.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+        written.append(name)
+    return written
+
+
+def uncommitted_content() -> list[str]:
+    """Content files edited or added in the working tree but absent from HEAD."""
+    result = subprocess.run(
+        ["git", "-C", str(PROJECT), "status", "--porcelain", "--untracked-files=all",
+         "--", "prototype/osfr-tools/data/content"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return sorted(line[3:].rsplit("/", 1)[-1] for line in result.stdout.splitlines() if line[3:])
 
 
 def copy_reference(target: Path) -> int:
@@ -324,6 +351,7 @@ def main() -> int:
     try:
         repo_files = copy_repository_content(target)
         private_files = copy_private_content(target)
+        generated = add_generated_content(target)
         reference_files = copy_reference(target)
         login_files, locale_files, terrain_files = copy_fixed_inputs(target)
         startup_files = copy_startup_snapshot(target)
@@ -342,6 +370,7 @@ def main() -> int:
         (server / "server-id.bin").write_bytes(secrets.token_bytes(32))
         (target / "README.md").write_text(readme(bundle_id, revision), encoding="utf-8")
 
+        present = check_runtime_content(target)
         manifest = make_manifest(target)
         (target / "manifest.json").write_text(
             json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
@@ -359,6 +388,18 @@ def main() -> int:
             f"locale={locale_files}, terrain={terrain_files}, "
             f"startup-snapshot={startup_files}"
         )
+        print(
+            "Runtime content: "
+            f"generated={generated or 'none'}; present={present or 'none'}; "
+            "absent optional="
+            f"{[n for n in OPTIONAL_REPOSITORY_CONTENT if n not in present] or 'none'}"
+        )
+        pending = uncommitted_content()
+        if pending:
+            print(
+                "WARNING: content edited but not committed is NOT in this bundle "
+                f"(it is built from HEAD): {', '.join(pending)}"
+            )
         print(
             "Security scan: PASS; empty accounts=0, characters=0, public keys=0; "
             f"protected source files checked={protected_count}, matches=0"

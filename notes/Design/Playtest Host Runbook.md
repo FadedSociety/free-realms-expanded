@@ -24,6 +24,8 @@ python -I scripts/bundle/make_bundle.py --name $bundleName
 
 The builder creates a fresh 32-byte server identity and an empty schema-3 account store. Keep this identity for the life of this realm. Do not rebuild the bundle to restart the server.
 
+The bundle is built from the committed `HEAD`. Commit the content you want first: the builder prints a `WARNING` naming any edited or new `data/content` file that is not in the bundle (for example a new `power_ups.json`). Its `Runtime content:` line lists the optional files included (`kart_gates.json`, `consumables.json`, `power_ups.json`); a missing optional file is fine, the gateway then uses its built-in table or leaves the feature off.
+
 3. Set the bundle path.
 
 ```powershell
