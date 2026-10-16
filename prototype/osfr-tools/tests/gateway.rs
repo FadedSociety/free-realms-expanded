@@ -557,3 +557,45 @@ fn actual_original_client_capture_when_explicitly_configured() {
         assert_eq!(reply, &expected);
     }
 }
+
+/// W139 (brief #15): the gateway must hand the emote policy the startup rows'
+/// animation ids and the last accepted movement time. Fails to compile before
+/// `Gateway::emote_context` exists and fails the `13` assert with the old
+/// `from_ids` catalog.
+#[test]
+fn quick_chat_catalog_carries_animation_ids_and_emote_context_follows_movement() {
+    use osfr_tools::startup_world::QuickChatRow;
+    let row = |id, animation_id| QuickChatRow {
+        key: id,
+        id,
+        display_string_id: 0,
+        say_string_id: 0,
+        animation_id,
+        parent_id: 0,
+        admin_only: 0,
+        menu_icon_id: 0,
+        item_id: 0,
+        item_category: 0,
+    };
+    let reference = Reference::new();
+    let mut snapshot = StartupSnapshot::empty();
+    snapshot.world.quick_chat = vec![row(11, 0), row(12, 3306), row(13, 3200)];
+    let mut gateway =
+        Gateway::load_with_startup_snapshot(&reference.directory, initial_state(), snapshot)
+            .unwrap();
+    let catalog = gateway.quick_chat_catalog();
+    let standing = osfr_tools::social_chat::piece_093::EmoteContext::standing();
+    assert!(catalog.authorize_emote(11, standing).is_ok());
+    assert!(catalog.authorize_emote(12, standing).is_ok());
+    assert!(catalog.authorize_emote(13, standing).is_err()); // Dance 3200 stays unavailable
+
+    gateway.handle(&login(1, VERSION, "ticket")).unwrap();
+    gateway.handle(&packet(13, &[])).unwrap();
+    assert!(!gateway.emote_context(1_000).moving); // nothing accepted yet
+    gateway
+        .handle_at(&position(1, [-100.0, 42.0, 30.0], [0.8, 0.0, -0.4]), 1_000)
+        .unwrap();
+    assert!(gateway.emote_context(1_200).moving);
+    assert!(!gateway.emote_context(1_600).moving);
+    assert!(!gateway.emote_context(1_200).mounted); // (R) no mount service routed yet
+}

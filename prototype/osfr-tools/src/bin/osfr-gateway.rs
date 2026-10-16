@@ -419,6 +419,8 @@ struct Session {
     chat_permissions: AccountChatPermissions,
     is_member: bool,
     quick_chat: QuickChatCatalog,
+    /// (R) Emote actor state, refreshed from the committed gateway before routing.
+    emote: social_chat::piece_093::EmoteContext,
     selected_character: bool,
     spam_gate: SpamGate,
     session_start: Instant,
@@ -851,6 +853,7 @@ impl Session {
             chat_permissions: AccountChatPermissions::new(false, true),
             is_member,
             quick_chat,
+            emote: social_chat::piece_093::EmoteContext::standing(),
             selected_character,
             spam_gate: SpamGate::default(),
             session_start: Instant::now(),
@@ -1530,6 +1533,7 @@ impl Session {
             }
 
             if staged_world.joined.contains(&self.id) {
+                self.emote = staged_gateway.emote_context(now_ms);
                 for application in &outcome.applications {
                     if osfr_tools::chat::request(application, self.character_guid)
                         .ok()
@@ -1774,6 +1778,15 @@ impl Session {
             Ok(request) => request,
             Err(error) => return chat_error_delivery(error, self.id),
         };
+        let phrase_id = match &request {
+            QuickChatRequest::Channel { phrase_id, .. }
+            | QuickChatRequest::Tell { phrase_id, .. } => *phrase_id,
+        };
+        // (R) Animated phrases follow the recovered emote restrictions; a refusal
+        // is a silent drop, like the client's disabled emotes button.
+        if self.quick_chat.authorize_emote(phrase_id, self.emote).is_err() {
+            return Vec::new();
+        }
         let channel = match &request {
             QuickChatRequest::Channel { channel, .. } => *channel,
             QuickChatRequest::Tell { .. } => social_chat::ChatChannel::Tell,

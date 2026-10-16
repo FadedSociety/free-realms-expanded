@@ -9,6 +9,11 @@ use std::time::Instant;
 
 use crate::net_policy::Bucket;
 
+// Piece 093 is not registered in lib.rs (shared); include the one file here.
+#[path = "restoration/piece_093.rs"]
+pub mod piece_093;
+use piece_093::{EmoteContext, EmoteRejection};
+
 pub const MAX_MESSAGE_BYTES: usize = 2048; // (R) Bounded input limit; the client's maximum is unknown.
 pub const MAX_NAME_BYTES: usize = 128; // (R) Bounded decoded names; no typed-chat maximum is recovered.
 pub const LOCAL_CHAT_RADIUS: f32 = 30.0; // (R) Provisional say radius; no server rule is recovered.
@@ -199,6 +204,8 @@ pub enum ChatError {
     NotMember,
     AreaMismatch,
     UnknownQuickChatId(i32),
+    /// (R) An animated phrase refused by the recovered emote restrictions.
+    EmoteRefused(EmoteRejection),
     UnknownReportTarget,
     NoReportHistory,
 }
@@ -384,16 +391,60 @@ pub fn parse_client_chat(bytes: &[u8]) -> Result<ChatRequest, ChatError> {
     })
 }
 
+/// Startup-table phrase ids with the animation id of each row (0 = plain phrase).
+/// The client packet carries only the phrase id, so the animation always comes
+/// from this server-side table, never from the sender.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct QuickChatCatalog(HashSet<i32>);
+pub struct QuickChatCatalog(HashMap<i32, i32>);
 
 impl QuickChatCatalog {
+    /// Plain phrases only: no row is treated as an emote.
     pub fn from_ids(ids: impl IntoIterator<Item = i32>) -> Self {
-        Self(ids.into_iter().collect())
+        Self::from_rows(ids.into_iter().map(|id| (id, 0)))
+    }
+
+    /// `(row id, animation id)` pairs from the startup quick-chat table.
+    pub fn from_rows(rows: impl IntoIterator<Item = (i32, i32)>) -> Self {
+        Self(rows.into_iter().collect())
     }
 
     pub fn contains(&self, phrase_id: i32) -> bool {
-        self.0.contains(&phrase_id)
+        self.0.contains_key(&phrase_id)
+    }
+
+    /// (R) Apply the recovered emote restrictions (`piece_093`) to one phrase.
+    /// Plain phrases always pass; an animated row must be a recovered emote
+    /// animation (3200 `Dance` stays unavailable) and the actor state must allow
+    /// it. Refusals are silent at the gateway, like the client's disabled button.
+    pub fn authorize_emote(&self, phrase_id: i32, context: EmoteContext) -> Result<(), ChatError> {
+        let animation = *self
+            .0
+            .get(&phrase_id)
+            .ok_or(ChatError::UnknownQuickChatId(phrase_id))?;
+        if animation == 0 {
+            return Ok(());
+        }
+        // A negative id cannot be a recovered animation: map it outside the block.
+        let animation = u32::try_from(animation).unwrap_or(u32::MAX);
+        let phrase = u32::try_from(phrase_id).unwrap_or(u32::MAX);
+        piece_093::validate_emote_phrase(phrase, animation, context)
+            .map_err(ChatError::EmoteRefused)
+    }
+}
+
+/// (R) A `freezeMovement` emote cannot start within this window of the last
+/// accepted position update (opcode 125 carries no velocity, so movement is
+/// inferred from recent updates).
+pub const EMOTE_MOVING_WINDOW_MS: u64 = 500;
+
+/// (R) Actor state for emote validation. `mounted` comes from the mount service
+/// (not routed yet, so callers pass false); `moving` from the last accepted
+/// movement time on the same clock as `now_ms`.
+pub fn emote_context(mounted: bool, last_movement_ms: Option<u64>, now_ms: u64) -> EmoteContext {
+    EmoteContext {
+        mounted,
+        moving: last_movement_ms
+            .is_some_and(|last| now_ms.saturating_sub(last) < EMOTE_MOVING_WINDOW_MS),
     }
 }
 

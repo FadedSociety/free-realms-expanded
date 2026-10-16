@@ -489,7 +489,7 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
             "kart"
         }
-        (Some(36), Some(10)) => "combat",
+        (Some(36), Some(10 | 12)) => "combat",
         (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
         (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
         _ => "gameplay.handle_in_world",
@@ -1207,12 +1207,24 @@ impl Gateway {
 
     /// Phrase IDs are sourced from the same typed startup data sent to this client.
     pub fn quick_chat_catalog(&self) -> crate::social_chat::QuickChatCatalog {
-        crate::social_chat::QuickChatCatalog::from_ids(
+        crate::social_chat::QuickChatCatalog::from_rows(
             self.startup_snapshot
                 .as_ref()
                 .into_iter()
-                .flat_map(|snapshot| snapshot.world.quick_chat.iter().map(|row| row.id)),
+                .flat_map(|snapshot| {
+                    snapshot
+                        .world
+                        .quick_chat
+                        .iter()
+                        .map(|row| (row.id, row.animation_id))
+                }),
         )
+    }
+
+    /// (R) Actor state for emote validation. `mounted` stays false until the
+    /// mount service is routed into gameplay (mounts.rs is not wired yet).
+    pub fn emote_context(&self, now_ms: u64) -> crate::social_chat::piece_093::EmoteContext {
+        crate::social_chat::emote_context(false, self.last_movement_ms, now_ms)
     }
 
     /// Begin a new local session while retaining the latest character snapshot.

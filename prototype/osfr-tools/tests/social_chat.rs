@@ -349,3 +349,19 @@ fn typed_client_request_uses_session_identity_and_decodes_target_name() {
     assert_eq!(rebuilt.sender_guid, sender.character_guid);
     assert_eq!(rebuilt.sender_name, sender.name);
 }
+
+#[test]
+fn catalog_from_rows_keeps_membership_and_plain_rows_stay_unrestricted() {
+    let catalog = QuickChatCatalog::from_rows([(10, 0), (11, 3306)]);
+    assert!(catalog.contains(10) && catalog.contains(11) && !catalog.contains(12));
+    let mounted = social_chat::piece_093::EmoteContext {
+        mounted: true,
+        moving: false,
+    };
+    assert!(catalog.authorize_emote(10, mounted).is_ok());
+    assert!(catalog.authorize_emote(11, mounted).is_err());
+    assert_eq!(
+        QuickChatCatalog::from_ids([10]).authorize_emote(10, mounted),
+        Ok(())
+    );
+}

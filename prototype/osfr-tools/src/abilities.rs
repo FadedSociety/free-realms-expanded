@@ -769,6 +769,73 @@ pub(crate) fn build_failure(message_id: i32) -> Vec<u8> {
     bytes
 }
 
+/// (R) Client string 286 ("You can't use abilities right now.") answers any
+/// cast this server cannot serve; the existing refusals already use it.
+const UNSUPPORTED_CAST_MESSAGE_ID: i32 = 286;
+/// Length of every 36/13 definition the server sends (see `OpeningAbilities::activation`).
+const DEFINITION_LEN: usize = 160;
+
+pub fn unsupported_cast_failure() -> Vec<u8> {
+    build_failure(UNSUPPORTED_CAST_MESSAGE_ID)
+}
+
+/// Parse a client 36/12 request: header plus one `i32` ability id. The native
+/// writer `00a34410` (via `00a32eb0`) emits exactly the int16 pair and a dword
+/// on a definition-cache miss (`00a34d10`). Any other length is malformed.
+pub fn parse_definition_request(inner: &[u8]) -> io::Result<i32> {
+    match inner {
+        [36, 0, 12, 0, a, b, c, d] => Ok(i32::from_le_bytes([*a, *b, *c, *d])),
+        _ => Err(invalid("malformed ability definition request")),
+    }
+}
+
+/// Answer a 36/12 request from the 36/13 definitions already built for the
+/// player's toolbar (`OpeningAbilities::activation`, native-accepted layout
+/// `00a32930`). At most one message is returned; an id that is not in `loaded`
+/// (unknown, another job's, or above the player's level) yields `None`, so a
+/// forged id costs one scan of a handful of messages and leaks nothing. (R)
+/// Silence on a miss: the client queues the id once and never retries
+/// (`00a34d10`), and a failure string would show on a mere tooltip hover.
+pub fn definition_reply(loaded: &[Vec<u8>], id: i32) -> Option<Vec<u8>> {
+    if id <= 0 {
+        return None;
+    }
+    loaded
+        .iter()
+        .find(|m| {
+            m.len() == DEFINITION_LEN
+                && m.starts_with(&[36, 0, 13, 0])
+                && m[4..8] == id.to_le_bytes()
+        })
+        .cloned()
+}
+
+/// Classify a client 36/10 start-ability request this server cannot serve.
+/// Writer `00a342e0`: bar, slot, then a mode dword; mode 0 carries one `u64`
+/// target id (24 bytes in all), any other mode four dwords (ground/pulse
+/// position, 32 bytes). (R) Only mode 0 on bar 1, slots 0..=7 can be served;
+/// ground modes and other bars (the item bar is a separate build) get the
+/// failure packet instead of silence. Pure: it never touches combat state, so
+/// a refusal costs no energy, cooldown or damage. `Ok(None)` means "not 36/10
+/// or supported shape: dispatch as before"; a wrong length is malformed.
+pub fn unsupported_cast(inner: &[u8]) -> io::Result<Option<Vec<u8>>> {
+    if !inner.starts_with(&[36, 0, 10, 0]) {
+        return Ok(None);
+    }
+    let word = |at: usize| {
+        inner
+            .get(at..at + 4)
+            .map(|b| i32::from_le_bytes(b.try_into().unwrap()))
+            .ok_or_else(|| invalid("truncated ability cast request"))
+    };
+    let (bar, slot, mode) = (word(4)?, word(8)?, word(12)?);
+    if inner.len() != if mode == 0 { 24 } else { 32 } {
+        return Err(invalid("malformed ability cast request"));
+    }
+    let served = mode == 0 && bar == 1 && (0..=7).contains(&slot);
+    Ok((!served).then(unsupported_cast_failure))
+}
+
 fn build_attack_processed(
     attacker: u64,
     target: u64,

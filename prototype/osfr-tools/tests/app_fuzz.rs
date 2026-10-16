@@ -494,6 +494,7 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("kart", words(41, 108, &[u32::MAX; 4])));
     result.push(("kart", words(102, 1, &[])));
     result.push(("combat", words(36, 10, &[1, 0, 0, u32::MAX, u32::MAX])));
+    result.push(("combat", words(36, 12, &[u32::MAX])));
     for (sub, length) in [(2, 2), (3, 3), (8, 4), (15, 1), (16, 1)] {
         result.push((
             if sub >= 15 { "chest" } else { "inventory" },

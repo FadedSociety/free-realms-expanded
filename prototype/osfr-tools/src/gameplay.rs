@@ -4443,6 +4443,24 @@ impl Gameplay {
             }
         }
         let active_profile = self.profiles.as_ref().unwrap().active();
+        // 36/12: tooltip/detail lookup. (R) Only the definitions already sent for this
+        // job at this level resolve; any other id is silently dropped (no state change).
+        if inner.starts_with(&[36, 0, 12, 0]) {
+            let id = crate::abilities::parse_definition_request(inner)?;
+            let loaded = self
+                .abilities
+                .as_ref()
+                .unwrap()
+                .activation(active_profile, self.job_level(active_profile))?;
+            out.replies
+                .extend(crate::abilities::definition_reply(&loaded, id));
+            return Ok(out);
+        }
+        // Ground/pulse modes and other bars get a client failure, never silence. (R)
+        if let Some(refusal) = crate::abilities::unsupported_cast(inner)? {
+            out.replies.push(refusal);
+            return Ok(out);
+        }
         if inner.starts_with(&[36, 0, 10, 0]) && inner.len() >= 12 {
             // Native ActionBarData.Id is the bar category (1), not the job.
             // The supplied client's captured basic requests confirm bar1/slot0.
@@ -4482,6 +4500,9 @@ impl Gameplay {
                         )?;
                         self.apply_encounter(result, &mut out)?;
                     }
+                } else {
+                    // Empty or level-locked slot: explicit failure, no state change. (R)
+                    out.replies.push(crate::abilities::unsupported_cast_failure());
                 }
                 return Ok(out);
             }
@@ -4493,6 +4514,8 @@ impl Gameplay {
                     .unwrap()
                     .supports_basic(active_profile)
             {
+                // Slot 0 on a non-combat job: explicit failure. (R)
+                out.replies.push(crate::abilities::unsupported_cast_failure());
                 return Ok(out);
             }
         }
@@ -7332,6 +7355,78 @@ mod w64_regional_quest_tests {
             level_five.last().unwrap().len()
         );
         std::fs::remove_dir_all(dir).ok();
+    }
+
+    /// W141: 36/12 resolves only this job's own toolbar definitions; a miss is
+    /// silent; unsupported 36/10 modes, other bars and empty or level-locked
+    /// slots get the client failure string. None of it touches game state.
+    #[test]
+    fn ability_definition_lookup_and_unsupported_casts_are_explicit() {
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        let profiles = game.profiles.as_mut().unwrap();
+        profiles.unlock(11).unwrap();
+        profiles.select(11, &game.inventory).unwrap();
+        let level = game.job_level(11);
+        let loaded: Vec<Vec<u8>> = game
+            .abilities
+            .as_ref()
+            .unwrap()
+            .activation(11, level)
+            .unwrap()
+            .into_iter()
+            .filter(|p| p.starts_with(&[36, 0, 13, 0]))
+            .collect();
+        assert!(loaded.len() >= 3, "basic, Triage, First Aid at level 1");
+        let who = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [-440.0, 0.8, 1292.0],
+            rotation: [1.0, 0.0, 0.0],
+        };
+        let failure = [vec![36, 0, 1, 0], 286_i32.to_le_bytes().to_vec()].concat();
+        let state = |game: &Gameplay| {
+            (
+                serde_json::to_string(&game.summary()).unwrap(),
+                serde_json::to_string(&game.encounter.as_ref().unwrap().state()).unwrap(),
+            )
+        };
+        let before = state(&game);
+        for definition in &loaded {
+            let mut ask = vec![36, 0, 12, 0];
+            ask.extend(&definition[4..8]);
+            let out = game.handle_in_world(&ask, &who, 5_000).unwrap();
+            assert_eq!(out.replies, vec![definition.clone()]);
+            assert!(!out.changed);
+        }
+        for id in [0, -1, 62_002, 62_004, 999_999, i32::MIN, i32::MAX] {
+            let mut ask = vec![36, 0, 12, 0];
+            ask.extend(id.to_le_bytes());
+            let out = game.handle_in_world(&ask, &who, 5_000).unwrap();
+            assert!(out.replies.is_empty(), "locked, other-job or unknown {id}");
+        }
+        assert!(game.handle_in_world(&[36, 0, 12, 0, 1, 2], &who, 5_000).is_err());
+        let cast = |bar: i32, slot: i32, tail: &[u8], mode: i32| {
+            let mut p = vec![36, 0, 10, 0];
+            for v in [bar, slot, mode] {
+                p.extend(v.to_le_bytes());
+            }
+            p.extend(tail);
+            p
+        };
+        let target = 1_u64.to_le_bytes();
+        for refused in [
+            cast(1, 1, &[0; 16], 1), // ground mode on a real slot
+            cast(1, 0, &[0; 16], 1), // ground mode on the basic slot
+            cast(2, 0, &target, 0),  // another bar
+            cast(1, 9, &target, 0),  // past the toolbar
+            cast(1, 3, &target, 0),  // Medic slot 3 unlocks at level 5
+            cast(1, 7, &target, 0),  // empty slot
+        ] {
+            let out = game.handle_in_world(&refused, &who, 5_000).unwrap();
+            assert_eq!(out.replies, vec![failure.clone()], "{refused:?}");
+        }
+        assert_eq!(state(&game), before, "refusals change nothing");
     }
 
     /// Final-era scaling on the level-1 baseline: max health x1.75 every four

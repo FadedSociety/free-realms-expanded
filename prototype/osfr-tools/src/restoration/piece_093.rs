@@ -902,11 +902,18 @@ pub enum EmoteRejection {
     UnknownCommand,
     /// The row points at an animation id with no recovered slot (id 3200).
     UnrecoveredAnimation { animation_id: u32 },
+    /// The animation id is outside the recovered `Emotes` slot block.
+    ForeignAnimation { animation_id: u32 },
+    /// The quick-chat row's animation differs from the recovered row for that id.
+    AnimationMismatch { animation_id: u32 },
     /// Blocked while mounted, mirroring the recovered button state.
     Mounted,
     /// The slot freezes movement and the actor is moving.
     Moving { animation_id: u32 },
 }
+
+/// `AnimationTypes.xml` id block of the `Emotes` branch (3001-3900).
+pub const EMOTE_ANIMATION_BLOCK: std::ops::RangeInclusive<u32> = 3001..=3900;
 
 /// Resolve an emote command and apply the recovered restrictions.
 pub fn validate_emote(
@@ -920,19 +927,32 @@ pub fn validate_emote(
         // Only reachable for a command whose winning binding has no data row.
         return Err(EmoteRejection::UnknownCommand);
     };
+    validate_emote_phrase(action.quick_chat_id, action.animation_id, context).map(|()| action)
+}
+
+/// Apply the recovered restrictions to one quick-chat row that carries
+/// `animation_id`. RECONSTRUCTED policy (R): the server mirrors the client's
+/// mount gating and `freezeMovement` data; the checks are ordered data first
+/// (the row can never play), then actor state.
+pub fn validate_emote_phrase(
+    quick_chat_id: u32,
+    animation_id: u32,
+    context: EmoteContext,
+) -> Result<(), EmoteRejection> {
+    if UNRECOVERED_ANIMATION_IDS.contains(&animation_id) {
+        return Err(EmoteRejection::UnrecoveredAnimation { animation_id });
+    }
+    if !EMOTE_ANIMATION_BLOCK.contains(&animation_id) {
+        return Err(EmoteRejection::ForeignAnimation { animation_id });
+    }
+    if emote_action(quick_chat_id).is_some_and(|row| row.animation_id != animation_id) {
+        return Err(EmoteRejection::AnimationMismatch { animation_id });
+    }
     if context.mounted {
         return Err(EmoteRejection::Mounted);
     }
-    let restrictions = emote_restrictions(action.animation_id);
-    if restrictions.freeze_movement && context.moving {
-        return Err(EmoteRejection::Moving {
-            animation_id: action.animation_id,
-        });
+    if emote_restrictions(animation_id).freeze_movement && context.moving {
+        return Err(EmoteRejection::Moving { animation_id });
     }
-    if emote_animation_name(action.animation_id).is_none() {
-        return Err(EmoteRejection::UnrecoveredAnimation {
-            animation_id: action.animation_id,
-        });
-    }
-    Ok(action)
+    Ok(())
 }
