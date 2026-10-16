@@ -470,6 +470,8 @@ struct FieldEnemy {
     roam_goal: Option<[f32; 3]>,
     pause_until: u64,
     seed: u64,
+    target: Option<u64>,
+    reset_serial: u64,
 }
 
 impl FieldEnemy {
@@ -478,6 +480,8 @@ impl FieldEnemy {
         self.roam_goal = None;
         self.pause_until = 0;
         self.seed = self.actor.guid;
+        self.target = None;
+        self.reset_serial = self.reset_serial.wrapping_add(1);
     }
 
     /// (R) Per-actor deterministic random stream, same LCG as combat crits.
@@ -653,6 +657,9 @@ pub struct EncounterEngine {
     // encounter until the player closes it; the client's 39/7 is only an ack.
     results_presented: bool,
     field: Vec<FieldEnemy>,
+    // (R) Metadata only after World takes ownership. No local HP copy remains.
+    shared_fields: Option<BTreeSet<u64>>,
+    shared_sender: Option<u64>,
     // Combat rules are on while a field enemy is engaged.
     field_combat: bool,
     // After an overworld knockout, field enemies ignore the player until then.
@@ -684,6 +691,211 @@ struct SkillBuff {
     taken: f32,
     crit: u32,
     crit_damage: f32,
+}
+
+/// (R) Parsed intents only. Session supplies identity, position and instance.
+#[derive(Clone, Debug)]
+pub enum SharedFieldAction {
+    Ability { slot: i32, target: u64 },
+    Interact { target: u64, flag: u8 },
+    Select { target: u64, choice: i32 },
+}
+
+impl SharedFieldAction {
+    pub fn target(&self) -> u64 {
+        match *self {
+            Self::Ability { target, .. }
+            | Self::Interact { target, .. }
+            | Self::Select { target, .. } => target,
+        }
+    }
+    pub(crate) fn request(&self) -> Vec<u8> {
+        match *self {
+            Self::Ability { slot, target } => [
+                header(36, 10),
+                1_i32.to_le_bytes().to_vec(),
+                slot.to_le_bytes().to_vec(),
+                0_i32.to_le_bytes().to_vec(),
+                target.to_le_bytes().to_vec(),
+            ]
+            .concat(),
+            Self::Interact { target, flag } => {
+                [header(26, 8), target.to_le_bytes().to_vec(), vec![flag]].concat()
+            }
+            Self::Select { target, choice } => [
+                header(26, 10),
+                target.to_le_bytes().to_vec(),
+                choice.to_le_bytes().to_vec(),
+            ]
+            .concat(),
+        }
+    }
+}
+
+/// (R) One bounded instance population. No player health, energy or cooldowns.
+/// World owns this outside cloneable session/social staging.
+#[derive(Clone)]
+pub struct SharedFieldState {
+    enemies: Vec<FieldEnemy>,
+    wander: BTreeMap<u32, Wander>,
+    attacks: BTreeMap<u64, u64>,
+    moving: BTreeSet<u64>,
+    dots: BTreeMap<u64, BTreeMap<(u64, i32), SkillDot>>,
+    stuns: BTreeMap<u64, u64>,
+    buffs: BTreeMap<(u64, i32), SkillBuff>,
+    last_tick: Option<u64>,
+    template: Arc<Content>,
+    battles: Arc<Vec<FieldBattle>>,
+}
+
+#[derive(Clone, Debug)]
+pub struct FieldParticipant {
+    pub guid: u64,
+    pub position: [f32; 3],
+    pub health: u32,
+    pub max_health: u32,
+    pub mitigation: f32,
+    pub grace_until: u64,
+    pub combat: bool,
+}
+
+impl SharedFieldState {
+    pub fn enemies_targeting(&self, guid: u64) -> bool {
+        self.enemies.iter().any(|f| {
+            f.state.health > 0 && f.motion == FieldMotion::Chasing && f.target == Some(guid)
+        })
+    }
+    pub(crate) fn restrict_to(&mut self, known: &BTreeSet<u64>) -> Vec<bool> {
+        self.enemies
+            .iter_mut()
+            .map(|f| {
+                let present = f.present;
+                f.present &= known.contains(&f.actor.guid);
+                present
+            })
+            .collect()
+    }
+    pub(crate) fn restore_presence(&mut self, previous: Vec<bool>) {
+        for (f, present) in self.enemies.iter_mut().zip(previous) {
+            f.present = present;
+        }
+    }
+    pub fn health(&self, guid: u64) -> Option<u32> {
+        self.enemies
+            .iter()
+            .find(|f| f.actor.guid == guid)
+            .map(|f| f.state.health)
+    }
+    pub fn position(&self, guid: u64) -> Option<[f32; 3]> {
+        self.enemies
+            .iter()
+            .find(|f| f.actor.guid == guid)
+            .map(|f| f.state.position)
+            .or_else(|| {
+                self.battles
+                    .iter()
+                    .find(|b| b.spawner.guid == guid)
+                    .map(|b| {
+                        self.wander
+                            .get(&b.id)
+                            .map_or(b.spawner.position, |w| w.position)
+                    })
+            })
+    }
+    pub fn attack_clock(&self, guid: u64) -> Option<u64> {
+        self.attacks.get(&guid).copied()
+    }
+    pub fn target(&self, guid: u64) -> Option<u64> {
+        self.enemies
+            .iter()
+            .find(|f| f.actor.guid == guid)
+            .and_then(|f| f.target)
+    }
+    /// (R) Leaving the ready instance drops its caster-owned DoTs. No disconnected
+    /// account can retain an unbounded effect entry or a second ticking path.
+    pub fn retain_casters(&mut self, ready: &BTreeSet<u64>) {
+        self.dots
+            .retain(|caster, dots| ready.contains(caster) && !dots.is_empty());
+    }
+    pub fn due(&mut self, now_ms: u64) -> Option<u64> {
+        let elapsed = self
+            .last_tick
+            .map_or(100, |last| now_ms.saturating_sub(last));
+        if elapsed < 100 {
+            return None;
+        }
+        self.last_tick = Some(now_ms);
+        Some(elapsed)
+    }
+    /// (R) Eligibility changes never reset health or corpse deadlines.
+    pub fn set_active_quests(&mut self, active: &BTreeSet<u32>) {
+        for f in &mut self.enemies {
+            let eligible =
+                f.quest_ids.is_empty() || f.quest_ids.iter().any(|id| active.contains(id));
+            f.present = eligible || f.motion != FieldMotion::Idle && f.state.health > 0;
+            if !eligible && f.motion == FieldMotion::Chasing {
+                f.motion = FieldMotion::Returning;
+                f.target = None;
+            }
+        }
+    }
+    /// (R) Interim field-only interest; slice 3 coordinates the passive NPC budget.
+    pub fn visible(&self, position: [f32; 3]) -> BTreeSet<u64> {
+        let mut rows: Vec<_> = self
+            .enemies
+            .iter()
+            .filter(|f| f.present && f.state.health > 0)
+            .map(|f| (distance(position, f.state.position), f.actor.guid))
+            .chain(self.battles.iter().map(|b| {
+                (
+                    distance(
+                        position,
+                        self.position(b.spawner.guid).unwrap_or(b.spawner.position),
+                    ),
+                    b.spawner.guid,
+                )
+            }))
+            .filter(|(d, _)| *d <= 100.0)
+            .collect();
+        rows.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
+        rows.into_iter().take(64).map(|(_, guid)| guid).collect()
+    }
+    pub fn initialization(&self, guid: u64) -> io::Result<Vec<Vec<u8>>> {
+        if let Some(f) = self
+            .enemies
+            .iter()
+            .find(|f| f.actor.guid == guid && f.present && f.state.health > 0)
+        {
+            return Ok(vec![
+                spawn_actor(&self.template.template, &f.actor, f.state.position, 0),
+                enemy_hp(guid, f.state.health, f.actor.max_health),
+                relevance(&[guid], false),
+            ]);
+        }
+        if let Some(b) = self.battles.iter().find(|b| b.spawner.guid == guid) {
+            let mut spawn = crate::world::content_spawn_template();
+            spawn.actor_id = guid;
+            spawn.name_string_id = b.spawner.name_id;
+            spawn.model_id = b.spawner.model_id;
+            spawn.nameplate_image_id = b.nameplate_image_id;
+            if b.nameplate_image_id > 0 {
+                spawn.active_profile = 0;
+            }
+            let at = self.position(guid).unwrap_or(b.spawner.position);
+            spawn.position = [at[0], at[1], at[2], 1.];
+            spawn.rotation = [0., 0., 1., 0.];
+            // Same literal-name writer used by passive NPC startup.
+            spawn.npc_name = b.spawner.name.clone();
+            return Ok(vec![
+                crate::world::unframe_tunnel(&crate::startup_world::build_add_npc(&spawn))?,
+                relevance(&[guid], false),
+            ]);
+        }
+        Ok(Vec::new())
+    }
+    pub fn removal(guid: u64) -> Vec<u8> {
+        remove(guid)
+    }
 }
 
 fn merge_skill_outcome(out: &mut EncounterOutcome, other: EncounterOutcome) {
@@ -742,6 +954,311 @@ impl Ground {
 }
 
 impl EncounterEngine {
+    /// (R) Transfer mutable field state once; retain immutable target metadata.
+    pub fn take_shared_fields(&mut self) -> Option<SharedFieldState> {
+        if self.shared_fields.is_some() {
+            return None;
+        }
+        self.shared_fields = Some(
+            self.field
+                .iter()
+                .map(|f| f.actor.guid)
+                .chain(self.battles.iter().map(|b| b.spawner.guid))
+                .collect(),
+        );
+        Some(SharedFieldState {
+            enemies: std::mem::take(&mut self.field),
+            wander: std::mem::take(&mut self.wander),
+            attacks: BTreeMap::new(),
+            moving: BTreeSet::new(),
+            dots: BTreeMap::new(),
+            stuns: BTreeMap::new(),
+            buffs: BTreeMap::new(),
+            last_tick: None,
+            template: self.content.clone(),
+            battles: Arc::new(self.battles.clone()),
+        })
+    }
+    pub fn shared_field_guids(&self) -> impl Iterator<Item = u64> + '_ {
+        self.shared_fields
+            .iter()
+            .flat_map(|guids| guids.iter().copied())
+    }
+    pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
+        if instance < 0 {
+            return Err(invalid("negative encounter instance"));
+        }
+        if let Some(active) = &mut self.state.active {
+            let changed = active.instance_id != instance;
+            active.instance_id = instance;
+            self.state.next_instance_id = self.state.next_instance_id.max(
+                instance
+                    .checked_add(1)
+                    .ok_or_else(|| invalid("encounter instance exhausted"))?,
+            );
+            Ok(changed)
+        } else {
+            Ok(false)
+        }
+    }
+    /// Parse once at the existing Gameplay seam. Malformed targets never become intents.
+    pub fn shared_action(
+        &self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<SharedFieldAction>> {
+        if self.shared_fields.is_none()
+            || self.shared_sender.is_some()
+            || self.active()
+            || character.zone_id != self.content.world.zone_id
+        {
+            return Ok(None);
+        }
+        let known = |guid| {
+            self.shared_fields
+                .as_ref()
+                .is_some_and(|s| s.contains(&guid))
+        };
+        if inner.starts_with(&[36, 0, 10, 0]) {
+            if inner.len() < 16 {
+                return Err(invalid("truncated shared ability"));
+            }
+            let bar = i32::from_le_bytes(inner[4..8].try_into().unwrap());
+            let slot = i32::from_le_bytes(inner[8..12].try_into().unwrap());
+            let kind = i32::from_le_bytes(inner[12..16].try_into().unwrap());
+            if kind == 1 {
+                if inner.len() != 32 {
+                    return Err(invalid("malformed shared ground ability"));
+                }
+                return Ok(None);
+            }
+            if kind != 0 || inner.len() != 24 {
+                return Err(invalid("malformed shared target ability"));
+            }
+            if bar != 1 || !(0..=9).contains(&slot) {
+                return Ok(None);
+            }
+            let target = u64::from_le_bytes(inner[16..24].try_into().unwrap());
+            // Personal story actors keep their own route, including self selection.
+            if self.enemy(target).is_some()
+                || (target == character.guid
+                    && self.state.world_enemies.iter().any(|enemy| {
+                        self.enemy(enemy.guid).is_some()
+                            && enemy.health > 0
+                            && distance(character.position, enemy.position)
+                                <= profile_stats(self.player_profile, 0).0
+                    }))
+            {
+                return Ok(None);
+            }
+            return Ok(Some(SharedFieldAction::Ability { slot, target }));
+        }
+        if inner.starts_with(&[26, 0, 8, 0]) || inner.starts_with(&[26, 0, 10, 0]) {
+            let interaction = inner[2] == 8;
+            if inner.len() != if interaction { 13 } else { 16 } || interaction && inner[12] > 1 {
+                return Err(invalid("malformed shared interaction"));
+            }
+            let target = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+            if known(target) {
+                return Ok(Some(if interaction {
+                    SharedFieldAction::Interact {
+                        target,
+                        flag: inner[12],
+                    }
+                } else {
+                    SharedFieldAction::Select {
+                        target,
+                        choice: i32::from_le_bytes(inner[12..16].try_into().unwrap()),
+                    }
+                }));
+            }
+        }
+        Ok(None)
+    }
+    pub fn field_participant(
+        &self,
+        guid: u64,
+        position: [f32; 3],
+        combat: bool,
+    ) -> FieldParticipant {
+        FieldParticipant {
+            guid,
+            position,
+            health: self.state.player_health,
+            max_health: self.max_health,
+            mitigation: if self.god {
+                0.
+            } else {
+                self.skill_mitigation()
+            },
+            grace_until: self.field_grace_until,
+            combat: combat && !self.active(),
+        }
+    }
+    /// (R) Borrow canonical rows only while calculating one staged action. The
+    /// player engine is never stored in World and never retains these rows.
+    pub(crate) fn with_shared_fields<T>(
+        &mut self,
+        runtime: &mut SharedFieldState,
+        sender: u64,
+        action: impl FnOnce(&mut Self) -> io::Result<T>,
+    ) -> io::Result<T> {
+        let resets = runtime
+            .enemies
+            .iter()
+            .map(|f| (f.actor.guid, f.reset_serial))
+            .collect::<BTreeMap<_, _>>();
+        let old_sender = self.shared_sender.replace(sender);
+        std::mem::swap(&mut self.field, &mut runtime.enemies);
+        std::mem::swap(&mut self.wander, &mut runtime.wander);
+        std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
+        std::mem::swap(&mut self.moving, &mut runtime.moving);
+        let personal_dots = std::mem::replace(
+            &mut self.skill_dots,
+            runtime.dots.remove(&sender).unwrap_or_default(),
+        );
+        let personal_stuns =
+            std::mem::replace(&mut self.skill_stuns, std::mem::take(&mut runtime.stuns));
+        let mut personal_buffs =
+            std::mem::replace(&mut self.skill_buffs, std::mem::take(&mut runtime.buffs));
+        for (&key, buff) in &personal_buffs {
+            if key.0 == 0 {
+                self.skill_buffs.insert(key, buff.clone());
+            }
+        }
+        let result = action(self);
+        runtime.dots.insert(
+            sender,
+            std::mem::replace(&mut self.skill_dots, personal_dots),
+        );
+        runtime.dots.retain(|_, dots| !dots.is_empty());
+        runtime.stuns = std::mem::replace(&mut self.skill_stuns, personal_stuns);
+        personal_buffs.retain(|(guid, _), _| *guid != 0);
+        for (&key, buff) in &self.skill_buffs {
+            if key.0 == 0 {
+                personal_buffs.insert(key, buff.clone());
+            }
+        }
+        self.skill_buffs.retain(|(guid, _), _| *guid != 0);
+        runtime.buffs = std::mem::replace(&mut self.skill_buffs, personal_buffs);
+        std::mem::swap(&mut self.field, &mut runtime.enemies);
+        std::mem::swap(&mut self.wander, &mut runtime.wander);
+        std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
+        std::mem::swap(&mut self.moving, &mut runtime.moving);
+        self.shared_sender = old_sender;
+        // Evade/defeat invalidates every caster's effects on that incarnation.
+        for f in &runtime.enemies {
+            if f.state.health == 0
+                || f.motion == FieldMotion::Returning
+                || resets.get(&f.actor.guid) != Some(&f.reset_serial)
+            {
+                for dots in runtime.dots.values_mut() {
+                    dots.retain(|(guid, _), _| *guid != f.actor.guid);
+                }
+            }
+        }
+        result
+    }
+    pub fn shared_attack(
+        &mut self,
+        runtime: &mut SharedFieldState,
+        sender: u64,
+        target: u64,
+        position: [f32; 3],
+        profile: i32,
+        now_ms: u64,
+    ) -> io::Result<EncounterOutcome> {
+        self.with_shared_fields(runtime, sender, |engine| {
+            engine.attack(target, position, profile, 0, now_ms)
+        })
+    }
+    pub fn shared_job_ability(
+        &mut self,
+        runtime: &mut SharedFieldState,
+        sender: u64,
+        ability: &crate::opening_abilities::JobAbility,
+        target: u64,
+        position: [f32; 3],
+        profile: i32,
+        now_ms: u64,
+    ) -> io::Result<EncounterOutcome> {
+        self.with_shared_fields(runtime, sender, |engine| {
+            if target != sender
+                && target != 0
+                && !engine.enemy(target).is_some_and(|(_, s)| s.health > 0)
+            {
+                return Ok(EncounterOutcome::default());
+            }
+            engine.job_ability(ability, target, position, profile, now_ms)
+        })
+    }
+    pub fn shared_effects(
+        &mut self,
+        runtime: &mut SharedFieldState,
+        sender: u64,
+        now_ms: u64,
+    ) -> io::Result<EncounterOutcome> {
+        self.with_shared_fields(runtime, sender, |engine| {
+            let mut out = EncounterOutcome::default();
+            engine.tick_job_effects(now_ms, &mut out)?;
+            Ok(out)
+        })
+    }
+    pub fn shared_motion(
+        &mut self,
+        runtime: &mut SharedFieldState,
+        players: &[FieldParticipant],
+        now_ms: u64,
+        elapsed: u64,
+    ) -> io::Result<(EncounterOutcome, Vec<(u64, u32)>)> {
+        self.with_shared_fields(runtime, 0, |engine| {
+            let mut out = EncounterOutcome::default();
+            let mut damage = 0;
+            let mut hits = Vec::new();
+            engine.tick_field(
+                [0.; 3],
+                now_ms,
+                elapsed,
+                &mut out,
+                &mut damage,
+                Some(players),
+                &mut hits,
+            );
+            // Canonical marker clock/transform; each marker considers the nearest observer.
+            engine.tick_wanderers_shared(players, now_ms, elapsed, &mut out);
+            Ok((out, hits))
+        })
+    }
+    pub(crate) fn receive_field_damage(
+        &mut self,
+        damage: u32,
+        now_ms: u64,
+        engaged: bool,
+    ) -> EncounterOutcome {
+        let mut out = EncounterOutcome::default();
+        if damage > 0 {
+            self.state.player_health = self.state.player_health.saturating_sub(damage);
+            out.changed = true;
+            out.replies
+                .push(player_hp(self.state.player_health, self.max_health));
+            if self.state.player_health == 0 {
+                // (R) Keep the existing recover-in-place policy and grace.
+                self.state.player_health = self.max_health;
+                self.field_grace_until = now_ms.saturating_add(8_000);
+                out.replies
+                    .push(player_hp(self.max_health, self.max_health));
+            }
+        }
+        if self.field_combat != engaged && !self.world_stage_fighting() {
+            self.field_combat = engaged;
+            out.replies.extend([
+                rules(engaged),
+                combat_flag(132, 0, 0, engaged),
+                combat_flag(133, 0, 0, engaged),
+            ]);
+        }
+        out
+    }
     pub fn set_terrain(&mut self, terrain: Option<Arc<Terrain>>) {
         self.terrain = terrain;
     }
@@ -926,6 +1443,8 @@ impl EncounterEngine {
             armed: false,
             results_presented: false,
             field: Vec::new(),
+            shared_fields: None,
+            shared_sender: None,
             field_combat: false,
             field_grace_until: 0,
             battles: Vec::new(),
@@ -1071,6 +1590,8 @@ impl EncounterEngine {
                 motion: FieldMotion::Idle,
                 roam_goal: None,
                 pause_until: 0,
+                target: None,
+                reset_serial: 0,
                 seed: f.actor.guid,
                 actor: f.actor,
                 respawn_at: None,
@@ -1484,7 +2005,7 @@ impl EncounterEngine {
         }
         // (R) Reuse verified same-job swing where exact clips are unrecovered.
         out.replies.push(animation(
-            1,
+            self.shared_sender.unwrap_or(1),
             if ability.animation_id > 0 {
                 ability.animation_id
             } else {
@@ -1493,8 +2014,11 @@ impl EncounterEngine {
             false,
         ));
         if ability.effect_id > 0 {
-            out.replies
-                .push(composite_effect(1, ability.effect_id, position));
+            out.replies.push(composite_effect(
+                self.shared_sender.unwrap_or(1),
+                ability.effect_id,
+                position,
+            ));
         }
         self.energy -= ability.energy_cost;
         if ability.energy_cost > 0 {
@@ -1738,6 +2262,9 @@ impl EncounterEngine {
 
     /// Developer hot reload of `field_battles.json` (outside encounters).
     pub fn reload_field_battles(&mut self, path: &Path) -> io::Result<()> {
+        if self.shared_fields.is_some() {
+            return Err(invalid("shared field reload requires an idle world reload"));
+        }
         if self.active() {
             return Err(invalid(
                 "finish or exit the encounter before reloading battles",
@@ -1761,6 +2288,9 @@ impl EncounterEngine {
 
     /// Developer hot reload of `field_enemies.json`: despawn, reload, respawn.
     pub fn reload_field_enemies(&mut self, path: &Path) -> io::Result<Vec<Vec<u8>>> {
+        if self.shared_fields.is_some() {
+            return Err(invalid("shared field reload requires an idle world reload"));
+        }
         if self.active() {
             return Err(invalid(
                 "finish or exit the encounter before reloading enemies",
@@ -1902,7 +2432,7 @@ impl EncounterEngine {
     /// A newly present enemy spawns at full health at home.
     pub fn set_active_quests(&mut self, active: &BTreeSet<u32>) -> EncounterOutcome {
         let mut out = EncounterOutcome::default();
-        if self.active() {
+        if self.active() || self.shared_fields.is_some() {
             return out;
         }
         let mut shown = Vec::new();
@@ -2415,6 +2945,13 @@ impl EncounterEngine {
     }
 
     fn enemy(&self, guid: u64) -> Option<(&Actor, &EnemyState)> {
+        if self.shared_sender.is_some() {
+            return self
+                .field
+                .iter()
+                .find(|f| f.present && f.actor.guid == guid && f.motion != FieldMotion::Returning)
+                .map(|f| (&f.actor, &f.state));
+        }
         if let Some(active) = &self.state.active {
             if active.phase != EncounterPhase::Fighting {
                 return None;
@@ -2571,13 +3108,21 @@ impl EncounterEngine {
         let mut out = EncounterOutcome {
             changed: true,
             replies: vec![
-                attack_processed(1, guid, dealt, hp, max_health, critical),
+                attack_processed(
+                    self.shared_sender.unwrap_or(1),
+                    guid,
+                    dealt,
+                    hp,
+                    max_health,
+                    critical,
+                ),
                 enemy_hp(guid, hp, max_health),
             ],
             ..Default::default()
         };
         if swing {
-            out.replies.insert(0, animation(1, 1099, false));
+            out.replies
+                .insert(0, animation(self.shared_sender.unwrap_or(1), 1099, false));
         }
         if hp > 0 && self.active() {
             self.summon(guid, hp, max_health, &mut out);
@@ -2586,11 +3131,15 @@ impl EncounterEngine {
             self.skill_dots.retain(|(target, _), _| *target != guid);
             self.skill_buffs.retain(|(target, _), _| *target != guid);
             self.skill_stuns.remove(&guid);
-            out.replies.push(remove(guid));
+            if self.shared_sender.is_none() {
+                out.replies.push(remove(guid));
+            }
             if boss {
                 out.replies.push(boss_display(guid, false));
             }
-            out.defeated.push(definition);
+            if self.shared_sender.is_none() {
+                out.defeated.push(definition);
+            }
             self.kiting.remove(&guid);
             if let Some(i) = field_index {
                 self.moving.remove(&guid);
@@ -2886,8 +3435,16 @@ impl EncounterEngine {
                 total_damage = total_damage.saturating_add(attack_damage);
             }
         }
-        if !self.active() {
-            self.tick_field(position, now_ms, elapsed, &mut out, &mut total_damage);
+        if !self.active() && self.shared_fields.is_none() {
+            self.tick_field(
+                position,
+                now_ms,
+                elapsed,
+                &mut out,
+                &mut total_damage,
+                None,
+                &mut Vec::new(),
+            );
             self.tick_wanderers(position, now_ms, elapsed, &mut out);
         }
         if total_damage > 0 {
@@ -2950,6 +3507,29 @@ impl EncounterEngine {
         elapsed: u64,
         out: &mut EncounterOutcome,
     ) {
+        self.tick_wanderers_for(
+            &[self.field_participant(1, player, true)],
+            now_ms,
+            elapsed,
+            out,
+        );
+    }
+    fn tick_wanderers_shared(
+        &mut self,
+        players: &[FieldParticipant],
+        now_ms: u64,
+        elapsed: u64,
+        out: &mut EncounterOutcome,
+    ) {
+        self.tick_wanderers_for(players, now_ms, elapsed, out);
+    }
+    fn tick_wanderers_for(
+        &mut self,
+        players: &[FieldParticipant],
+        now_ms: u64,
+        elapsed: u64,
+        out: &mut EncounterOutcome,
+    ) {
         let ground = self.ground();
         for b in &self.battles {
             let home = b.spawner.position;
@@ -2958,6 +3538,17 @@ impl EncounterEngine {
                 waypoint: 0,
                 pause_until: 0,
             });
+            let Some(player) = players
+                .iter()
+                .min_by(|a, b| {
+                    distance(a.position, w.position)
+                        .total_cmp(&distance(b.position, w.position))
+                        .then(a.guid.cmp(&b.guid))
+                })
+                .map(|p| p.position)
+            else {
+                continue;
+            };
             let near = distance(player, w.position);
             if near > WANDER_SEEN {
                 continue;
@@ -3030,36 +3621,70 @@ impl EncounterEngine {
         elapsed: u64,
         out: &mut EncounterOutcome,
         total_damage: &mut u32,
+        participants: Option<&[FieldParticipant]>,
+        hits: &mut Vec<(u64, u32)>,
     ) {
         let ground = self.ground();
-        let mitigation = self.skill_mitigation();
+        let solo = [self.field_participant(1, position, true)];
+        let players = participants.unwrap_or(&solo);
+        let shared = participants.is_some();
         let mut engaged = false;
         let mut respawned = Vec::new();
         for (i, f) in self.field.iter_mut().enumerate() {
             let guid = f.actor.guid;
-            if !f.present {
-                continue;
-            }
             if f.state.health == 0 {
                 if f.respawn_at.is_some_and(|at| now_ms >= at) {
                     f.respawn_at = None;
                     f.state = enemy_state(&f.actor);
                     f.reset_motion();
-                    respawned.push(i);
+                    if f.present {
+                        respawned.push(i);
+                    }
                 }
                 continue;
             }
             let b = self.behaviour_of.get(&guid).cloned().unwrap_or_default();
             let home = ground.snapped(f.actor.position);
             let leash = f.leash_radius.unwrap_or(b.leash);
-            let delta = distance(position, f.state.position);
+            if !f.present {
+                continue;
+            }
+            let valid = |p: &&FieldParticipant| {
+                p.combat
+                    && p.health > 0
+                    && now_ms >= p.grace_until
+                    && valid_position(p.position)
+                    && (!shared || horizontal_distance(p.position, home) <= leash + b.reach)
+                    && distance(p.position, f.state.position)
+                        <= if f.motion == FieldMotion::Chasing {
+                            f.aggro_range + 4.0
+                        } else {
+                            f.aggro_range
+                        }
+            };
+            let player = players
+                .iter()
+                .filter(valid)
+                .find(|p| Some(p.guid) == f.target)
+                .or_else(|| {
+                    players.iter().filter(valid).min_by(|a, b| {
+                        distance(a.position, f.state.position)
+                            .total_cmp(&distance(b.position, f.state.position))
+                            .then(a.guid.cmp(&b.guid))
+                    })
+                });
+            let position = player.map_or(home, |p| p.position);
+            let delta = player.map_or(f32::MAX, |_| distance(position, f.state.position));
+            f.target = player.map(|p| p.guid);
+            let mitigation = player.map_or(1., |p| p.mitigation);
             // (R) A 4 m hysteresis margin avoids target flicker at aggro range.
-            if now_ms < self.field_grace_until
+            if !shared && now_ms < self.field_grace_until
                 || horizontal_distance(f.state.position, home) > leash
                 || (f.motion == FieldMotion::Chasing && delta > f.aggro_range + 4.0)
             {
                 f.motion = FieldMotion::Returning;
                 f.roam_goal = None;
+                f.target = None;
             }
             if f.motion == FieldMotion::Idle && delta <= f.aggro_range {
                 f.motion = FieldMotion::Chasing;
@@ -3159,6 +3784,8 @@ impl EncounterEngine {
                         self.skill_stuns.remove(&guid);
                         self.skill_buffs.retain(|(target, _), _| *target != guid);
                         f.motion = FieldMotion::Idle;
+                        f.target = None;
+                        f.reset_serial = f.reset_serial.wrapping_add(1);
                     }
                     f.roam_goal = None;
                     f.pause_until = now_ms.saturating_add(1500 + (f.random() * 1500.0) as u64);
@@ -3182,18 +3809,31 @@ impl EncounterEngine {
                 }
                 self.enemy_attacks.insert(guid, now_ms);
                 out.replies.push(animation(guid, 1001, false));
-                let left = self.state.player_health.saturating_sub(*total_damage);
+                let victim = player.expect("a chasing actor has a valid target in reach");
+                let prior = if shared {
+                    hits.iter()
+                        .filter(|(guid, _)| *guid == victim.guid)
+                        .map(|(_, d)| *d)
+                        .fold(0_u32, u32::saturating_add)
+                } else {
+                    *total_damage
+                };
+                let left = victim.health.saturating_sub(prior);
                 let attack_damage = (f.actor.damage as f32 * mitigation).round() as u32;
                 let damage = attack_damage.min(left);
                 out.replies.push(attack_processed(
                     guid,
-                    1,
+                    victim.guid,
                     damage,
                     left.saturating_sub(damage),
-                    self.max_health,
+                    victim.max_health,
                     false,
                 ));
-                *total_damage = total_damage.saturating_add(attack_damage);
+                if shared {
+                    hits.push((victim.guid, damage));
+                } else {
+                    *total_damage = total_damage.saturating_add(attack_damage);
+                }
             }
         }
         for i in respawned {
@@ -3204,7 +3844,7 @@ impl EncounterEngine {
             out.replies.push(relevance(&[f.actor.guid], false));
             out.changed = true;
         }
-        if engaged != self.field_combat && !self.world_stage_fighting() {
+        if !shared && engaged != self.field_combat && !self.world_stage_fighting() {
             self.field_combat = engaged;
             out.replies.extend([
                 rules(engaged),
@@ -3304,28 +3944,7 @@ impl EncounterEngine {
     }
 
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-        let mut b = self.content.template.clone();
-        b[4..12].copy_from_slice(&a.guid.to_le_bytes());
-        b[12..16].copy_from_slice(&a.name_id.to_le_bytes());
-        b[16..20].copy_from_slice(&a.model_id.to_le_bytes());
-        if let Some(scale) = a.scale {
-            // AddNpc: unknown flag (20), bubble colours and size (21..33), scale.
-            b[33..37].copy_from_slice(&scale.to_le_bytes());
-        }
-        for (i, v) in position.into_iter().enumerate() {
-            b[37 + i * 4..41 + i * 4].copy_from_slice(&v.to_le_bytes());
-        }
-        b[69..73].copy_from_slice(&0_i32.to_le_bytes());
-        b[77..81].copy_from_slice(&disposition.to_le_bytes());
-        b[128..132].copy_from_slice(&3.0_f32.to_le_bytes());
-        b[133..137].copy_from_slice(&(if disposition == 2 { 12_i32 } else { 3_i32 }).to_le_bytes());
-        b[137..141].copy_from_slice(&2_i32.to_le_bytes());
-        b[141..145].copy_from_slice(&3_i32.to_le_bytes());
-        b[145..149].copy_from_slice(&1_i32.to_le_bytes());
-        b[233..237].copy_from_slice(&2_i32.to_le_bytes());
-        replace_string(&mut b, 106, &a.name);
-        replace_string(&mut b, 81, &a.texture_alias);
-        b
+        spawn_actor(&self.content.template, a, position, disposition)
     }
 
     fn details(&self, launch: bool, profile: i32) -> Vec<u8> {
@@ -3834,5 +4453,30 @@ pub fn zone_begin_packet(zone: &ZoneTransition) -> Vec<u8> {
     b.extend(0_f32.to_le_bytes());
     b.extend(zone.geometry_id.to_le_bytes());
     b.extend([1, 0]);
+    b
+}
+
+fn spawn_actor(template: &[u8], a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
+    let mut b = template.to_vec();
+    b[4..12].copy_from_slice(&a.guid.to_le_bytes());
+    b[12..16].copy_from_slice(&a.name_id.to_le_bytes());
+    b[16..20].copy_from_slice(&a.model_id.to_le_bytes());
+    if let Some(scale) = a.scale {
+        // AddNpc: unknown flag (20), bubble colours and size (21..33), scale.
+        b[33..37].copy_from_slice(&scale.to_le_bytes());
+    }
+    for (i, v) in position.into_iter().enumerate() {
+        b[37 + i * 4..41 + i * 4].copy_from_slice(&v.to_le_bytes());
+    }
+    b[69..73].copy_from_slice(&0_i32.to_le_bytes());
+    b[77..81].copy_from_slice(&disposition.to_le_bytes());
+    b[128..132].copy_from_slice(&3.0_f32.to_le_bytes());
+    b[133..137].copy_from_slice(&(if disposition == 2 { 12_i32 } else { 3_i32 }).to_le_bytes());
+    b[137..141].copy_from_slice(&2_i32.to_le_bytes());
+    b[141..145].copy_from_slice(&3_i32.to_le_bytes());
+    b[145..149].copy_from_slice(&1_i32.to_le_bytes());
+    b[233..237].copy_from_slice(&2_i32.to_le_bytes());
+    replace_string(&mut b, 106, &a.name);
+    replace_string(&mut b, 81, &a.texture_alias);
     b
 }

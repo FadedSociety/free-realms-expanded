@@ -102,6 +102,8 @@ The remaining dungeons, housing (missing scene assets), pets, mounts (including 
 
 ## Update log
 
+- **2026-10-16, shared world slice 2 (W116, lead-reviewed), 3.1 PARTLY:** field enemy HP, motion and effects live in the shared World; cooldowns, resources and weapon checks stay per player; solo run ids now match canonical membership (closes W111's gap). Two-bot socket test: HP 200 → 100, independent cooldowns, early swing refused, authenticated attacker GUIDs, unequip refusal, foreign instance isolated; both local-copy canaries fail (HP 200 != 100). Lethal shared hits emit no personal credit or payout yet (slices 3-4). Full suite green (244 targets). Open: native two-client check (lead), slices 3-7.
+
 - **2026-10-16, quest save tolerance and requirements (W114, lead-reviewed), 2.4 PARTLY:** a save whose quest counters no longer match the content now loads and repairs (active quest counters reset, completed history kept, removed or disabled quests dropped, one bounded log line each) instead of rejecting the character; canary restores the strict check and the drift test fails; the three round70 saves load against current content. Quests gain optional `min_level` and `job` fields; only 3000009 = Brawler (43) is set, from the Adventurer guide. Live enforcement waits for two `gameplay.rs` lines (`character_eligibility`: real job level instead of the hard-coded 1; job requirement must be the active job), held until W116 releases the file.
 - **2026-10-16, IDA boundary review applied (W115, lead):** 248 of the 340 high-severity IDA disagreements were pieces of larger functions and are now `*_Chunk` labels (recheck batch B0024, 248 applied); 91 were real functions IDA merged (map unchanged); 1 unclear.
 

@@ -1,7 +1,7 @@
 //! Content-backed zone instances, player membership, and transfer staging.
 //!
-//! This module coordinates ownership only. Movement, encounter combat, player
-//! fanout, and durable instance IDs remain separate systems.
+//! World owns membership and field runtime under the gateway single writer.
+//! Encounter calculates mutations; the gateway stages persistence and delivery.
 
 use crate::{
     content::{ContentDb, Dungeon, NpcSpawn as ContentNpcSpawn, Rotation, Zone},
@@ -462,7 +462,7 @@ impl NpcVisibility {
 /// The derived all-zero default left content NPCs non-interactable natively
 /// (run 034759: `is_interactable` 0, `interact_range` 0). Captured-constant
 /// fields whose meaning is unresolved are copied as-is.
-fn content_spawn_template() -> NpcSpawn {
+pub(crate) fn content_spawn_template() -> NpcSpawn {
     NpcSpawn {
         chat_bubble_foreground_color: 408_679,
         chat_bubble_background_color: 13_951_728,
@@ -515,7 +515,7 @@ fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {
         .map_err(|error| invalid(format!("invalid NPC content JSON: {error}")))
 }
 
-fn unframe_tunnel(bytes: &[u8]) -> io::Result<Vec<u8>> {
+pub(crate) fn unframe_tunnel(bytes: &[u8]) -> io::Result<Vec<u8>> {
     if bytes.len() < 7 || bytes[..3] != [5, 0, 1] {
         return Err(invalid("NPC builder returned an invalid tunnel"));
     }
@@ -631,6 +631,8 @@ pub struct ZoneInstance {
 }
 
 pub struct World {
+    // (R) Single-writer combat state; never part of SharedWorld::clone.
+    fields: BTreeMap<InstanceId, crate::encounter::SharedFieldState>,
     zones: BTreeMap<u32, Zone>,
     npcs_by_zone: BTreeMap<u32, Vec<ContentNpcSpawn>>,
     dungeons: BTreeMap<String, Dungeon>,
@@ -660,6 +662,29 @@ impl MembershipChange {
 }
 
 impl World {
+    /// (R) Shared actions never accept an instance ID from a client.
+    pub fn field_for_player(
+        &self,
+        player: PlayerId,
+        zone: u32,
+    ) -> Option<(InstanceId, &crate::encounter::SharedFieldState)> {
+        let location = self.player_location(player)?;
+        if !location.ready || self.instance(location.instance_id)?.zone_id != zone {
+            return None;
+        }
+        Some((location.instance_id, self.field(location.instance_id)?))
+    }
+    pub fn field(&self, instance: InstanceId) -> Option<&crate::encounter::SharedFieldState> {
+        self.fields.get(&instance)
+    }
+    pub fn install_field(
+        &mut self,
+        instance: InstanceId,
+        field: crate::encounter::SharedFieldState,
+    ) {
+        self.fields.insert(instance, field);
+    }
+
     /// (R) Live scene descriptors come from Gateway's validated scene route,
     /// not the regional labels in zones.json. NPC startup remains Gateway-owned.
     pub fn runtime() -> Self {
@@ -821,6 +846,7 @@ impl World {
             .max(1);
 
         Self {
+            fields: BTreeMap::new(),
             zones,
             npcs_by_zone,
             dungeons,
@@ -1045,6 +1071,7 @@ impl World {
             }
             for id in candidates {
                 self.instances.remove(&id);
+                self.fields.remove(&id);
                 removed.push(id);
             }
         }

@@ -124,6 +124,7 @@ pub struct Gateway {
 
 #[derive(Debug, Default)]
 pub struct GatewayOutcome {
+    pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
@@ -609,6 +610,77 @@ fn initial_zone(zone: &ZoneTransition) -> Vec<u8> {
 }
 
 impl Gateway {
+    /// (R) The server splits a fully parsed bundle into ordered commits before
+    /// resolving shared actions; later movement can never move an earlier hit.
+    pub fn is_combat_request(&self, message: &[u8]) -> io::Result<bool> {
+        Ok(
+            matches!(parse_message(message,&self.state,&self.version)?, Event::Application(inner) if inner.starts_with(&[36,0,10,0]) || inner.starts_with(&[26,0,10,0])),
+        )
+    }
+    pub fn ordered_messages(&self, message: &[u8]) -> io::Result<Vec<Vec<u8>>> {
+        let messages = application_messages(message)?;
+        for message in &messages {
+            parse_message(message, &self.state, &self.version)?;
+        }
+        Ok(messages.into_iter().map(<[u8]>::to_vec).collect())
+    }
+    pub fn take_shared_fields(&mut self) -> Option<crate::encounter::SharedFieldState> {
+        self.gameplay.as_mut()?.take_shared_fields()
+    }
+    pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
+        self.gameplay
+            .as_mut()
+            .map_or(Ok(false), |g| g.bind_run_instance(instance))
+    }
+    pub fn field_participant(&self) -> Option<crate::encounter::FieldParticipant> {
+        self.gameplay.as_ref()?.field_participant(&self.state)
+    }
+    pub fn handle_shared_field(
+        &mut self,
+        action: &crate::encounter::SharedFieldAction,
+        field: &mut crate::encounter::SharedFieldState,
+        known: &std::collections::BTreeSet<u64>,
+        now_ms: u64,
+    ) -> io::Result<crate::gameplay::Outcome> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("shared combat requires gameplay"))?
+            .handle_shared_field(action, field, known, &self.state, now_ms)
+    }
+    pub fn tick_shared_effects(
+        &mut self,
+        field: &mut crate::encounter::SharedFieldState,
+        now_ms: u64,
+    ) -> io::Result<crate::gameplay::Outcome> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("shared effects require gameplay"))?
+            .tick_shared_effects(field, &self.state, now_ms)
+    }
+    pub fn tick_shared_motion(
+        &mut self,
+        field: &mut crate::encounter::SharedFieldState,
+        players: &[crate::encounter::FieldParticipant],
+        now_ms: u64,
+        elapsed: u64,
+    ) -> io::Result<(crate::encounter::EncounterOutcome, Vec<(u64, u32)>)> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("shared motion requires gameplay"))?
+            .tick_shared_motion(field, players, now_ms, elapsed)
+    }
+    pub fn receive_field_damage(
+        &mut self,
+        damage: u32,
+        now_ms: u64,
+        engaged: bool,
+    ) -> io::Result<crate::gameplay::Outcome> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("shared damage requires gameplay"))?
+            .receive_field_damage(damage, now_ms, engaged)
+    }
+
     pub fn reference_state(directory: &Path) -> io::Result<CharacterState> {
         Ok(load_reference(directory)?.0.initial_state)
     }
@@ -1302,6 +1374,7 @@ impl Gateway {
                             && result.relocation.is_none()
                             && result.zoning.is_none()
                             && result.scene_zoning.is_none()
+                            && result.shared_field.is_none()
                         {
                             // Known handlers may legitimately reply later (the
                             // social router runs after this); decided from the
@@ -1321,6 +1394,7 @@ impl Gateway {
                                 continue;
                             }
                         }
+                        outcome.shared_field = result.shared_field;
                         outcome.applications.push(inner.clone());
                         gameplay = Some(staged_game);
                         outcome.state_changed |= result.changed;

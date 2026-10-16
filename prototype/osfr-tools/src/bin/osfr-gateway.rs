@@ -403,6 +403,7 @@ struct Session {
     receiver: ReliableReceiver,
     sender: ReliableSender,
     gateway: Gateway,
+    known_fields: BTreeSet<u64>,
     state_path: PathBuf,
     // Studio packet inspector: the most recent application messages.
     recent: std::collections::VecDeque<serde_json::Value>,
@@ -444,6 +445,7 @@ struct SharedWorld {
 #[derive(Default)]
 struct Security {
     budgets: social_chat::ActionBudgets,
+    combat: BTreeMap<u64, Bucket>,
     log: Option<SecurityLog>,
 }
 
@@ -454,6 +456,23 @@ impl std::fmt::Debug for Security {
 }
 
 impl Security {
+    // (R) Shared, nonrefundable account budget, 10/s burst 20; bounded keys.
+    fn allow_combat(&mut self, account: u64, now: Instant) -> bool {
+        if !self.combat.contains_key(&account) && self.combat.len() >= MAX_SESSIONS {
+            self.combat.retain(|_, bucket| {
+                let mut probe = *bucket;
+                !probe.take(20., 10., 20., now)
+            });
+            if self.combat.len() >= MAX_SESSIONS {
+                return false;
+            }
+        }
+        self.combat
+            .entry(account)
+            .or_insert_with(|| Bucket::full(20., now))
+            .take(1., 10., 20., now)
+    }
+
     /// The log batches and throttles its own I/O; a log error never drops a peer.
     fn record(&mut self, kind: EventKind, account_id: Option<u64>, session_id: Option<u64>) {
         let Some(log) = &mut self.log else { return };
@@ -707,6 +726,7 @@ fn load_gateway_from(
         Gateway::load(&options.reference, snapshot.character)?
     };
     let mut gateway = gateway;
+    gateway.take_shared_fields();
     gateway.set_dev_tools(options.dev_tools);
     gateway.set_terrain(options.terrain.clone());
     gateway.set_world_dir(options.world.clone())?;
@@ -759,6 +779,7 @@ impl Session {
         } else {
             load_gateway(options)?
         };
+        gateway.take_shared_fields();
         gateway.set_trace_enabled(trace.is_some());
         let mut social_identity = None;
         let mut account_guid = gateway.state().guid;
@@ -808,6 +829,7 @@ impl Session {
             state_path: options.state.clone(),
             recent: std::collections::VecDeque::new(),
             recent_on: options.dev_tools,
+            known_fields: BTreeSet::new(),
             social_path: social_identity
                 .as_ref()
                 .map(|_| social_path(&options.state)),
@@ -1291,6 +1313,26 @@ impl Session {
             }
             return Err(error);
         }
+        let children = self.gateway.ordered_messages(message)?;
+        if children.len() > 1 {
+            for child in children {
+                self.dispatch_message(
+                    &child, options, now_ms, world, membership, sessions, transport,
+                )?;
+            }
+            return Ok(());
+        }
+        if self.gateway.is_combat_request(message)? {
+            let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
+            if !security.allow_combat(self.account_guid, Instant::now()) {
+                security.record(
+                    EventKind::BudgetRefusal,
+                    Some(self.account_guid),
+                    Some(self.id.0),
+                );
+                return Ok(());
+            }
+        }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
         let outcome = match staged_gateway.handle_at(message, now_ms) {
@@ -1331,12 +1373,45 @@ impl Session {
         &mut self,
         mut staged_gateway: Gateway,
         previous: CharacterState,
-        outcome: GatewayOutcome,
+        mut outcome: GatewayOutcome,
         world: &mut SharedWorld,
         membership: &mut World,
         sessions: &mut SessionMap,
         now_ms: u64,
     ) -> Result<bool, Box<dyn std::error::Error>> {
+        let mut staged_field = None;
+        let mut field_packets = Vec::new();
+        if let Some(action) = outcome.shared_field.take() {
+            if let Some((instance, field)) = membership
+                .field_for_player(self.character_guid, staged_gateway.state().zone_id)
+                .filter(|_| staged_gateway.is_world_loaded())
+            {
+                let target = action.target();
+                if target == self.character_guid
+                    || target == 0
+                    || self.known_fields.contains(&target)
+                {
+                    // ponytail: at most 64 rows in one instance; no World clone.
+                    let mut field = field.clone();
+                    let result = staged_gateway.handle_shared_field(
+                        &action,
+                        &mut field,
+                        &self.known_fields,
+                        now_ms,
+                    )?;
+                    outcome.state_changed |= result.changed;
+                    outcome.gameplay_changed |= result.changed;
+                    for reply in result.replies {
+                        if field_packet(&reply) {
+                            field_packets.push(reply);
+                        } else {
+                            outcome.replies.push(wrap_application(&reply));
+                        }
+                    }
+                    staged_field = Some((instance, field));
+                }
+            }
+        }
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
         let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
@@ -1384,8 +1459,20 @@ impl Session {
                     .or(old_instance)
                     .unwrap_or(0),
             )?;
+            // W111 gap: bind the existing solo run before Ready can emit 41/*.
+            outcome.state_changed |=
+                staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
             let mut staged_world = world.clone();
             let mut deliveries = Vec::new();
+            if let Some((instance, _)) = &staged_field {
+                deliveries.extend(field_deliveries(
+                    self,
+                    sessions,
+                    membership,
+                    *instance,
+                    &field_packets,
+                ));
+            }
             if transfer && staged_world.joined.contains(&self.id) {
                 deliveries.extend(staged_world.leave_player(self.id));
             }
@@ -1451,6 +1538,12 @@ impl Session {
         };
         if let Some(change) = change {
             membership.commit_membership(change);
+        }
+        if let Some((instance, field)) = staged_field {
+            membership.install_field(instance, field);
+        }
+        if transfer {
+            self.known_fields.clear();
         }
         self.gateway = staged_gateway;
         *world = staged_world;
@@ -1985,6 +2078,142 @@ pub struct Server {
 }
 
 impl Server {
+    fn tick_shared_fields(&mut self, now_ms: u64) -> Result<(), Box<dyn std::error::Error>> {
+        let Some(mut field) = self.membership.field(0).cloned() else {
+            return Ok(());
+        };
+        let mut active = Vec::new();
+        let mut quests = BTreeSet::new();
+        for (key, session) in &self.sessions {
+            if self
+                .membership
+                .player_location(session.character_guid)
+                .is_some_and(|l| l.instance_id == 0 && l.ready)
+                && session.gateway.is_world_loaded()
+            {
+                if let Some(player) = session.gateway.field_participant() {
+                    if let Some(game) = session.gateway.gameplay() {
+                        quests.extend(game.active_field_quests());
+                    }
+                    active.push((*key, player));
+                }
+            }
+        }
+        field.retain_casters(&active.iter().map(|(_, player)| player.guid).collect());
+        field.set_active_quests(&quests);
+        // Reconcile before simulation so startup always precedes deltas.
+        self.sync_field_views(&field)?;
+        let Some(elapsed) = field.due(now_ms) else {
+            self.membership.install_field(0, field);
+            return Ok(());
+        };
+        let mut staged = BTreeMap::new();
+        let mut changed = BTreeSet::new();
+        let mut private = BTreeMap::<SessionKey, Vec<Vec<u8>>>::new();
+        let mut packets = Vec::new();
+        for (key, _) in &active {
+            let mut gateway = self.sessions[key].gateway.clone();
+            let out = gateway.tick_shared_effects(&mut field, now_ms)?;
+            if out.changed {
+                changed.insert(*key);
+            }
+            for reply in out.replies {
+                if field_packet(&reply) {
+                    packets.push(reply);
+                } else {
+                    private.entry(*key).or_default().push(reply);
+                }
+            }
+            staged.insert(*key, gateway);
+        }
+        if let Some((driver, _)) = active.first() {
+            let players = active.iter().map(|(_, p)| p.clone()).collect::<Vec<_>>();
+            let (out, hits) = staged
+                .get_mut(driver)
+                .unwrap()
+                .tick_shared_motion(&mut field, &players, now_ms, elapsed)?;
+            packets.extend(out.replies.into_iter().filter(|p| field_packet(p)));
+            for (key, player) in &active {
+                let damage = hits
+                    .iter()
+                    .filter(|(guid, _)| *guid == player.guid)
+                    .map(|(_, damage)| *damage)
+                    .fold(0_u32, u32::saturating_add);
+                let engaged = field.enemies_targeting(player.guid);
+                let out = staged
+                    .get_mut(key)
+                    .unwrap()
+                    .receive_field_damage(damage, now_ms, engaged)?;
+                if out.changed {
+                    changed.insert(*key);
+                }
+                private.entry(*key).or_default().extend(out.replies);
+            }
+        }
+        // NPC/resource changes and packets publish only after affected saves.
+        for key in &changed {
+            save(&self.sessions[key].state_path, &staged[key].snapshot())?;
+        }
+        for (key, gateway) in staged {
+            self.sessions.get_mut(&key).unwrap().gateway = gateway;
+        }
+        self.membership.install_field(0, field.clone());
+        for (key, replies) in private {
+            for reply in replies {
+                self.sessions
+                    .get_mut(&key)
+                    .unwrap()
+                    .sender
+                    .queue_message(&wrap_application(&reply))?;
+            }
+        }
+        // Known NPC sets are independent of directed player views. Full budget
+        // coordination and death/respawn acceptance remain slice 3.
+        let deliveries = self
+            .sessions
+            .values()
+            .flat_map(|recipient| field_packets_for(recipient, &self.membership, 0, &packets))
+            .collect::<Vec<_>>();
+        for delivery in deliveries {
+            if let Some(key) = self.world.session_keys.get(&delivery.recipient) {
+                if let Some(session) = self.sessions.get_mut(key) {
+                    session.sender.queue_message(&delivery.bytes)?;
+                }
+            }
+        }
+        self.sync_field_views(&field)?;
+        Ok(())
+    }
+    fn sync_field_views(
+        &mut self,
+        field: &osfr_tools::encounter::SharedFieldState,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        for session in self.sessions.values_mut() {
+            let valid = self
+                .membership
+                .player_location(session.character_guid)
+                .is_some_and(|l| l.instance_id == 0 && l.ready)
+                && session.gateway.is_world_loaded();
+            let wanted = if valid {
+                field.visible(session.gateway.state().position)
+            } else {
+                BTreeSet::new()
+            };
+            for guid in wanted.difference(&session.known_fields) {
+                for reply in field.initialization(*guid)? {
+                    session.sender.queue_message(&wrap_application(&reply))?;
+                }
+            }
+            for guid in session.known_fields.difference(&wanted) {
+                session.sender.queue_message(&wrap_application(
+                    &osfr_tools::encounter::SharedFieldState::removal(*guid),
+                ))?;
+            }
+            session.known_fields = wanted;
+        }
+        Ok(())
+    }
+
     pub fn new(options: Options) -> Result<Self, Box<dyn std::error::Error>> {
         if !osfr_tools::net_policy::allowed(options.bind.ip(), options.allow_lan) {
             return Err("gateway binds loopback, or a private-network IP with --allow-lan".into());
@@ -2041,12 +2270,17 @@ impl Server {
                 }
             }
         }
+        let mut membership = World::runtime();
+        let mut seed = load_gateway_template(&options)?;
+        if let Some(fields) = seed.take_shared_fields() {
+            membership.install_field(0, fields);
+        }
         Ok(Self {
             options,
             socket,
             sessions: BTreeMap::new(),
             world,
-            membership: World::runtime(),
+            membership,
             start: Instant::now(),
             generation: SystemTime::now().duration_since(UNIX_EPOCH)?.subsec_nanos(),
             trace: None,
@@ -2098,6 +2332,14 @@ impl Server {
         self.sessions.len()
     }
 
+    #[cfg(test)]
+    pub fn test_queues_idle(&self) -> bool {
+        self.sessions.values().all(|s| s.sender.is_idle())
+    }
+    #[cfg(test)]
+    pub fn test_field_health(&self, guid: u64) -> Option<u32> {
+        self.membership.field(0)?.health(guid)
+    }
     // (R) Socket-test setup is host-only and absent from the shipped binary.
     #[cfg(test)]
     pub fn test_child(&mut self) -> i32 {
@@ -2296,6 +2538,7 @@ impl Server {
                 ) => {}
             Err(error) => return Err(error.into()),
         }
+        self.tick_shared_fields(now_ms)?;
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
             let Some(mut current) = self.sessions.remove(&key) else {
@@ -3221,4 +3464,87 @@ mod tests {
         );
         std::fs::remove_file(saved).unwrap();
     }
+}
+
+fn field_packet(packet: &[u8]) -> bool {
+    packet.starts_with(&[125, 0])
+        || packet.get(..4).is_some_and(|h| {
+            matches!(
+                h,
+                [35, 0, 5, 0] | [35, 0, 8, 0] | [35, 0, 16, 0] | [32, 0, 7, 0]
+            )
+        })
+}
+fn field_packets_for(
+    recipient: &Session,
+    membership: &World,
+    instance: i32,
+    packets: &[Vec<u8>],
+) -> Vec<Delivery> {
+    if !recipient.gateway.is_world_loaded()
+        || !membership
+            .player_location(recipient.character_guid)
+            .is_some_and(|l| l.instance_id == instance && l.ready)
+    {
+        return Vec::new();
+    }
+    let known = |guid| guid == recipient.character_guid || recipient.known_fields.contains(&guid);
+    packets
+        .iter()
+        .filter(|packet| {
+            let offset = if packet.starts_with(&[125, 0]) { 2 } else { 4 };
+            let Some(guid) = packet
+                .get(offset..offset + 8)
+                .and_then(|b| b.try_into().ok())
+                .map(u64::from_le_bytes)
+            else {
+                return false;
+            };
+            if !known(guid) {
+                return false;
+            }
+            if packet.starts_with(&[32, 0, 7, 0]) {
+                let Some(target) = packet
+                    .get(20..28)
+                    .and_then(|b| b.try_into().ok())
+                    .map(u64::from_le_bytes)
+                else {
+                    return false;
+                };
+                return known(target);
+            }
+            true
+        })
+        .map(|packet| Delivery {
+            recipient: recipient.id,
+            bytes: wrap_application(packet),
+        })
+        .collect()
+}
+fn field_deliveries(
+    current: &Session,
+    sessions: &SessionMap,
+    membership: &World,
+    instance: i32,
+    packets: &[Vec<u8>],
+) -> Vec<Delivery> {
+    std::iter::once(current)
+        .chain(sessions.values())
+        .flat_map(|s| field_packets_for(s, membership, instance, packets))
+        .collect()
+}
+
+#[cfg(test)]
+#[test]
+fn shared_combat_budget_cannot_be_refunded_by_staging() {
+    let world = SharedWorld::new();
+    let clone = world.clone();
+    let now = Instant::now();
+    for _ in 0..20 {
+        assert!(clone.security.lock().unwrap().allow_combat(101, now));
+    }
+    assert!(!world.security.lock().unwrap().allow_combat(101, now));
+    drop(clone);
+    assert!(!world.security.lock().unwrap().allow_combat(101, now));
+    assert!(world.security.lock().unwrap().allow_combat(202, now));
 }

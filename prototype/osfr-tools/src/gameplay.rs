@@ -153,6 +153,7 @@ pub struct Gameplay {
 
 #[derive(Default)]
 pub struct Outcome {
+    pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
     pub zoning: Option<ZoneTransition>,
@@ -202,6 +203,159 @@ fn npc_event(value: serde_json::Value) {
 }
 
 impl Gameplay {
+    pub fn take_shared_fields(&mut self) -> Option<crate::encounter::SharedFieldState> {
+        let engine = self.encounter.as_mut()?;
+        let runtime = engine.take_shared_fields()?;
+        if let Some(visibility) = self.npc_visibility.as_mut() {
+            visibility.exclude_actor_guids(engine.shared_field_guids().collect::<Vec<_>>());
+        }
+        Some(runtime)
+    }
+    pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
+        self.encounter
+            .as_mut()
+            .map_or(Ok(false), |e| e.bind_run_instance(instance))
+    }
+    pub fn field_participant(
+        &self,
+        character: &CharacterState,
+    ) -> Option<crate::encounter::FieldParticipant> {
+        let profile = self.profiles.as_ref()?.active();
+        Some(self.encounter.as_ref()?.field_participant(
+            character.guid,
+            character.position,
+            self.abilities.as_ref()?.supports_basic(profile),
+        ))
+    }
+    pub fn active_field_quests(&self) -> BTreeSet<u32> {
+        self.npc_quests
+            .as_ref()
+            .map(|q| {
+                q.state()
+                    .quests
+                    .iter()
+                    .filter(|(_, p)| p.status == crate::quest_engine::QuestStatus::Active)
+                    .map(|(id, _)| *id)
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+    pub fn handle_shared_field(
+        &mut self,
+        action: &crate::encounter::SharedFieldAction,
+        field: &mut crate::encounter::SharedFieldState,
+        known: &BTreeSet<u64>,
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        use crate::encounter::SharedFieldAction;
+        let mut out = Outcome::default();
+        let Some(profiles) = &self.profiles else {
+            return Ok(out);
+        };
+        let profile = profiles.active();
+        let Some(abilities) = &self.abilities else {
+            return Ok(out);
+        };
+        let slot = match *action {
+            SharedFieldAction::Ability { slot, .. } => Some(slot),
+            SharedFieldAction::Select { choice: 103, .. } => Some(0),
+            _ => None,
+        };
+        if let Some(slot) = slot {
+            if !abilities.supports_basic(profile) {
+                return Ok(out);
+            }
+            if !abilities.weapon_matches(&self.inventory, profile, slot, self.job_level(profile)) {
+                self.encounter
+                    .as_mut()
+                    .unwrap()
+                    .refuse_weapon(profile, slot, now_ms);
+                return Ok(out);
+            }
+        }
+        let skill = match *action {
+            SharedFieldAction::Ability { slot, .. } if slot > 0 => abilities
+                .job_slot(profile, slot, self.job_level(profile))
+                .cloned(),
+            _ => None,
+        };
+        let engine = self
+            .encounter
+            .as_mut()
+            .ok_or_else(|| invalid("shared combat requires an encounter engine"))?;
+        if engine.active() || character.zone_id != engine.world().zone_id {
+            return Ok(out);
+        }
+        let presence = field.restrict_to(known);
+        let result: io::Result<EncounterOutcome> = (|| {
+            Ok(match *action {
+                SharedFieldAction::Ability { slot, target } if slot > 0 => match skill {
+                    Some(ref ability) => engine.shared_job_ability(
+                        field,
+                        character.guid,
+                        ability,
+                        target,
+                        character.position,
+                        profile,
+                        now_ms,
+                    )?,
+                    None => return Ok(EncounterOutcome::default()),
+                },
+                _ => engine.with_shared_fields(field, character.guid, |engine| {
+                    engine.handle(
+                        &action.request(),
+                        character.guid,
+                        character.position,
+                        profile,
+                        now_ms,
+                    )
+                })?,
+            })
+        })();
+        field.restore_presence(presence);
+        self.apply_encounter(result?, &mut out)?;
+        Ok(out)
+    }
+    pub fn tick_shared_effects(
+        &mut self,
+        field: &mut crate::encounter::SharedFieldState,
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if let Some(engine) = &mut self.encounter {
+            let result = engine.shared_effects(field, character.guid, now_ms)?;
+            self.apply_encounter(result, &mut out)?;
+        }
+        Ok(out)
+    }
+    pub fn tick_shared_motion(
+        &mut self,
+        field: &mut crate::encounter::SharedFieldState,
+        players: &[crate::encounter::FieldParticipant],
+        now_ms: u64,
+        elapsed: u64,
+    ) -> io::Result<(crate::encounter::EncounterOutcome, Vec<(u64, u32)>)> {
+        self.encounter
+            .as_mut()
+            .ok_or_else(|| invalid("shared motion requires encounter context"))?
+            .shared_motion(field, players, now_ms, elapsed)
+    }
+    pub fn receive_field_damage(
+        &mut self,
+        damage: u32,
+        now_ms: u64,
+        engaged: bool,
+    ) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if let Some(engine) = &mut self.encounter {
+            let result = engine.receive_field_damage(damage, now_ms, engaged);
+            self.apply_encounter(result, &mut out)?;
+        }
+        Ok(out)
+    }
+
     pub fn load(directory: &Path, state: Option<GameplayState>) -> io::Result<Self> {
         let (
             inventory,
@@ -1773,7 +1927,8 @@ impl Gameplay {
             let result = match owned {
                 Some(result) => result,
                 None => {
-                    out.replies.extend(self.inventory.grant(0, definition, 1)?.replies);
+                    out.replies
+                        .extend(self.inventory.grant(0, definition, 1)?.replies);
                     self.inventory.equip_owned_definition(definition, job)?
                 }
             };
@@ -1793,7 +1948,11 @@ impl Gameplay {
     /// becomes active, it gets its starter outfit (the owner, 2026-10-15). Fixes
     /// saves whose job was unlocked by a path that granted no clothes.
     fn ensure_outfit(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
-        if self.inventory.profile_attachments(job)?.starts_with(&0i32.to_le_bytes()) {
+        if self
+            .inventory
+            .profile_attachments(job)?
+            .starts_with(&0i32.to_le_bytes())
+        {
             self.give_starter_outfit(job, true, out)?;
         }
         Ok(())
@@ -2178,6 +2337,14 @@ impl Gameplay {
                 return Ok(out);
             }
         }
+        if let Some(encounter) = &self.encounter {
+            if let Some(action) = encounter.shared_action(inner, character)? {
+                return Ok(Outcome {
+                    shared_field: Some(action),
+                    ..Default::default()
+                });
+            }
+        }
         // ORIGINAL request: opcode102/sub1 has no payload. This opt-in reply
         // serves a caller-authored catalogue; it does not launch a race or
         // mutate quests, classes, inventory, encounters or character state.
@@ -2533,7 +2700,11 @@ impl Gameplay {
                 let text = if recent.is_empty() {
                     "No authored text yet; realm text <words> adds some.".to_owned()
                 } else {
-                    format!("{} texts, newest: {}.", pool.entries.len(), recent.join("; "))
+                    format!(
+                        "{} texts, newest: {}.",
+                        pool.entries.len(),
+                        recent.join("; ")
+                    )
                 };
                 say(out, text);
             }
@@ -2999,7 +3170,9 @@ impl Gameplay {
     /// Where in-game building is saved: the live world (`--world`), or the
     /// content folder when none is set.
     pub fn live_dir(&self) -> PathBuf {
-        self.world_dir.clone().unwrap_or_else(|| self.content_dir.clone())
+        self.world_dir
+            .clone()
+            .unwrap_or_else(|| self.content_dir.clone())
     }
 
     pub fn set_role(&mut self, role: crate::account_store::AccountRole) {
@@ -3153,7 +3326,9 @@ impl Gameplay {
         };
         records.push(placement.clone());
         if let Err(error) = self.save_placements(records) {
-            return Ok(format!("Could not save the placement: {error}. Nothing changed."));
+            return Ok(format!(
+                "Could not save the placement: {error}. Nothing changed."
+            ));
         }
         if let Some(visibility) = &mut self.npc_visibility {
             visibility.place(&placement);
@@ -3192,7 +3367,9 @@ impl Gameplay {
         };
         records.retain(|r| r.guid != guid);
         if let Err(error) = self.save_placements(records) {
-            return Ok(format!("Could not save the placements: {error}. Nothing changed."));
+            return Ok(format!(
+                "Could not save the placements: {error}. Nothing changed."
+            ));
         }
         if let Some(visibility) = &mut self.npc_visibility {
             visibility.remove(guid);
@@ -4194,7 +4371,9 @@ impl Gameplay {
                             self.job_level(active_profile),
                         ) {
                             self.encounter.as_mut().unwrap().refuse_weapon(
-                                active_profile, slot, now_ms,
+                                active_profile,
+                                slot,
+                                now_ms,
                             );
                             return Ok(out);
                         }
@@ -5451,7 +5630,11 @@ mod developer_teleport {
             .handle_in_world(&chat(&format!("realm goto {x} {z}")), &start, 1_000)
             .unwrap();
         assert!(out.relocation.is_none());
-        assert!(reply_text(&out).contains("No terrain heights"), "{}", reply_text(&out));
+        assert!(
+            reply_text(&out).contains("No terrain heights"),
+            "{}",
+            reply_text(&out)
+        );
         let out = game
             .handle_in_world(&chat(&format!("realm goto {x}, 3.5, {z}")), &start, 1_001)
             .unwrap();
@@ -5467,7 +5650,11 @@ mod developer_teleport {
         let here = game
             .handle_in_world(&chat("realm here"), &start, 1_003)
             .unwrap();
-        assert!(reply_text(&here).contains("Ground 42.00"), "{}", reply_text(&here));
+        assert!(
+            reply_text(&here).contains("Ground 42.00"),
+            "{}",
+            reply_text(&here)
+        );
         // Actor names still teleport as before.
         let out = game
             .handle_in_world(&chat("realm goto Roosey"), &start, 1_004)
@@ -5498,7 +5685,11 @@ mod developer_teleport {
         let out = game
             .handle_in_world(&chat("realm place 168 15623"), &start, 1_000)
             .unwrap();
-        assert!(reply_text(&out).contains(&format!("Placed NPC {first}")), "{}", reply_text(&out));
+        assert!(
+            reply_text(&out).contains(&format!("Placed NPC {first}")),
+            "{}",
+            reply_text(&out)
+        );
         assert!(has(&out, 2, first), "AddNpc sent at once");
         let saved = game.load_placements();
         assert_eq!(saved.len(), 1);
@@ -5506,7 +5697,8 @@ mod developer_teleport {
         assert_eq!(saved[0].position, start.position);
         // Hand-added fields survive the next rewrite.
         let mut edited: serde_json::Value =
-            serde_json::from_slice(&std::fs::read(dir.join("npc_placements.json")).unwrap()).unwrap();
+            serde_json::from_slice(&std::fs::read(dir.join("npc_placements.json")).unwrap())
+                .unwrap();
         assert_eq!(edited["records"][0]["source"][0]["kind"], "reconstructed");
         edited["records"][0]["note"] = "guards the bridge".into();
         std::fs::write(dir.join("npc_placements.json"), edited.to_string()).unwrap();
@@ -5530,7 +5722,8 @@ mod developer_teleport {
             position: [start.position[0] - 5.0, 12.5, start.position[2]],
             ..start.clone()
         };
-        game.handle_in_world(&chat("realm place 166"), &raised, 1_002).unwrap();
+        game.handle_in_world(&chat("realm place 166"), &raised, 1_002)
+            .unwrap();
         assert_eq!(game.load_placements()[2].position[1], 12.0);
         game.handle_in_world(
             &chat(&format!("realm unplace {}", second + 1)),
@@ -5601,10 +5794,14 @@ mod developer_teleport {
                 add.windows(12).any(|w| w == b"Bob the Lost"),
                 "the literal name rides in AddNpc"
             );
-            game.handle_in_world(&chat("realm mark hunt start"), &start, 1_001).unwrap();
+            game.handle_in_world(&chat("realm mark hunt start"), &start, 1_001)
+                .unwrap();
             assert!(world.join("npc_placements.json").is_file());
             assert!(world.join("marks.json").is_file());
-            assert!(!game.content_dir.join("npc_placements.json").exists(), "content untouched");
+            assert!(
+                !game.content_dir.join("npc_placements.json").exists(),
+                "content untouched"
+            );
         }
         // A restart loads the live world again and shows the placed NPC.
         let mut game = Gameplay::load(&content, None).unwrap();
@@ -5615,10 +5812,13 @@ mod developer_teleport {
         assert!(
             spawned
                 .iter()
-                .any(|p| p.starts_with(&[35, 0, 2, 0]) && p.windows(8).any(|w| w == guid.to_le_bytes())),
+                .any(|p| p.starts_with(&[35, 0, 2, 0])
+                    && p.windows(8).any(|w| w == guid.to_le_bytes())),
             "placed NPC persists past a restart"
         );
-        let marks = game.handle_in_world(&chat("realm marks"), &start, 1_002).unwrap();
+        let marks = game
+            .handle_in_world(&chat("realm marks"), &start, 1_002)
+            .unwrap();
         assert!(reply_text(&marks).contains("hunt start"));
         std::fs::remove_dir_all(&world).unwrap();
     }
@@ -5641,13 +5841,26 @@ mod developer_teleport {
             .handle_in_world(&chat("realm text Find Bob the Lost!"), &start, 1_000)
             .unwrap();
         let id = first + 1;
-        assert!(reply_text(&out).contains(&format!("Text {id}")), "{}", reply_text(&out));
+        assert!(
+            reply_text(&out).contains(&format!("Text {id}")),
+            "{}",
+            reply_text(&out)
+        );
         let again = game
             .handle_in_world(&chat("realm text Find Bob the Lost!"), &start, 1_001)
             .unwrap();
-        assert!(reply_text(&again).contains(&format!("Text {id}")), "same text keeps its id");
-        let list = game.handle_in_world(&chat("realm texts"), &start, 1_002).unwrap();
-        assert!(reply_text(&list).contains("Find Bob the Lost!"), "case kept: {}", reply_text(&list));
+        assert!(
+            reply_text(&again).contains(&format!("Text {id}")),
+            "same text keeps its id"
+        );
+        let list = game
+            .handle_in_world(&chat("realm texts"), &start, 1_002)
+            .unwrap();
+        assert!(
+            reply_text(&list).contains("Find Bob the Lost!"),
+            "case kept: {}",
+            reply_text(&list)
+        );
         assert!(world.join("text.json").is_file());
         std::fs::remove_dir_all(&world).unwrap();
     }
@@ -5701,9 +5914,19 @@ mod developer_teleport {
         let out = game
             .handle_in_world(&chat("realm mark Troll Bridge"), &start, 1_000)
             .unwrap();
-        assert!(reply_text(&out).contains("Marked troll bridge"), "{}", reply_text(&out));
-        let list = game.handle_in_world(&chat("realm marks"), &start, 1_001).unwrap();
-        assert!(reply_text(&list).contains("troll bridge (zone 0"), "{}", reply_text(&list));
+        assert!(
+            reply_text(&out).contains("Marked troll bridge"),
+            "{}",
+            reply_text(&out)
+        );
+        let list = game
+            .handle_in_world(&chat("realm marks"), &start, 1_001)
+            .unwrap();
+        assert!(
+            reply_text(&list).contains("troll bridge (zone 0"),
+            "{}",
+            reply_text(&list)
+        );
         let elsewhere = CharacterState {
             position: [
                 start.position[0] + 50.0,
@@ -5719,7 +5942,11 @@ mod developer_teleport {
         let gone = game
             .handle_in_world(&chat("realm unmark troll bridge"), &start, 1_003)
             .unwrap();
-        assert!(reply_text(&gone).contains("Removed mark"), "{}", reply_text(&gone));
+        assert!(
+            reply_text(&gone).contains("Removed mark"),
+            "{}",
+            reply_text(&gone)
+        );
         let missing = game
             .handle_in_world(&chat("realm goto mark troll bridge"), &start, 1_004)
             .unwrap();
@@ -7056,15 +7283,21 @@ mod w64_regional_quest_tests {
         let encounter = game.encounter.as_mut().unwrap();
         let melee = encounter.behaviour(HOOLIGAN).unwrap().clone();
         assert_eq!(melee.mode, crate::encounter::Mode::Melee);
-        assert_eq!((melee.move_speed, melee.reach, melee.attack_ms), (3.0, 2.5, 1000));
-        let summoner = encounter.behaviour(100_000_096_001).expect("battle 96 summoner");
+        assert_eq!(
+            (melee.move_speed, melee.reach, melee.attack_ms),
+            (3.0, 2.5, 1000)
+        );
+        let summoner = encounter
+            .behaviour(100_000_096_001)
+            .expect("battle 96 summoner");
         assert_eq!(summoner.mode, crate::encounter::Mode::Skittish);
         assert_eq!((summoner.run_ms, summoner.leash), (4000, 12.0));
 
         // A copy of the field enemies with the Hooligans given a behaviour.
         let dir = std::env::temp_dir().join(format!("osfr-behaviours-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
-        let source = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/field_enemies.json");
+        let source =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/field_enemies.json");
         let mut enemies: serde_json::Value =
             serde_json::from_slice(&std::fs::read(&source).unwrap()).unwrap();
         let with = |enemies: &mut serde_json::Value, behaviour: serde_json::Value| {
@@ -7140,8 +7373,14 @@ mod w64_regional_quest_tests {
 
         // Mistakes are refused and change nothing.
         let path = with(&mut enemies, "sneaky".into());
-        let error = encounter.reload_field_enemies(&path).unwrap_err().to_string();
-        assert!(error.contains("unknown behaviour preset 'sneaky'"), "{error}");
+        let error = encounter
+            .reload_field_enemies(&path)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("unknown behaviour preset 'sneaky'"),
+            "{error}"
+        );
         assert_eq!(encounter.behaviour(HOOLIGAN).unwrap().move_speed, 6.0);
         let typo = dir.join("behaviours.json");
         std::fs::write(
@@ -7463,12 +7702,7 @@ mod w95_vendor_coin_store_regressions {
         let (npc_id, zone_id, position, item_id, price) =
             selected.expect("a priced, defined vendor item exists");
 
-        let mut interaction = game
-            .npc_interaction
-            .as_ref()
-            .unwrap()
-            .lock()
-            .unwrap();
+        let mut interaction = game.npc_interaction.as_ref().unwrap().lock().unwrap();
         let menu = interaction
             .interact(npc_id, zone_id, position, None)
             .expect("vendor interaction opens");
@@ -7508,8 +7742,8 @@ mod w95_vendor_coin_store_regressions {
         assert_eq!(count_definition(&game, item_id), purchased_before + 1);
         assert_eq!(count_definition(&game, 8), 1, "post-login reward survives");
 
-        let vendor_request = npc_interaction::encode_merchant_buy_66_43(
-            &npc_interaction::MerchantBuyRequestV2 {
+        let vendor_request =
+            npc_interaction::encode_merchant_buy_66_43(&npc_interaction::MerchantBuyRequestV2 {
                 initial_dwords: [item_id as u32, 0],
                 context_dwords: [0; 3],
                 context_bytes: Vec::new(),
@@ -7520,17 +7754,24 @@ mod w95_vendor_coin_store_regressions {
             .handle_in_world(&vendor_request, &character, 2_000)
             .expect("66/43 vendor request routes");
         assert!(vendor_outcome.changed);
-        let response = vendor_outcome.replies.last().expect("vendor result reply exists");
+        let response = vendor_outcome
+            .replies
+            .last()
+            .expect("vendor result reply exists");
         assert_eq!(response.len(), 56);
         assert_eq!(&response[..4], &[66, 0, 44, 0]);
         assert_eq!(u32::from_le_bytes(response[48..52].try_into().unwrap()), 1);
         assert_eq!(game.inventory.state().coins, coins_before - (price * 2));
         assert_eq!(count_definition(&game, item_id), purchased_before + 2);
-        assert_eq!(count_definition(&game, 8), 1, "post-login reward still survives");
+        assert_eq!(
+            count_definition(&game, 8),
+            1,
+            "post-login reward still survives"
+        );
 
         let before_refusal = game.state();
-        let unknown_request = npc_interaction::encode_merchant_buy_66_43(
-            &npc_interaction::MerchantBuyRequestV2 {
+        let unknown_request =
+            npc_interaction::encode_merchant_buy_66_43(&npc_interaction::MerchantBuyRequestV2 {
                 initial_dwords: [i32::MAX as u32, 0],
                 context_dwords: [0; 3],
                 context_bytes: Vec::new(),
