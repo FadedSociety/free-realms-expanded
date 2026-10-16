@@ -102,6 +102,8 @@ The remaining dungeons, housing (missing scene assets), pets, mounts (including 
 
 ## Update log
 
+- **2026-10-16, job outfits integrated:** a job unlocked by any path now gets its starter outfit, and activating a job whose outfit is completely empty equips its starter pieces (reusing owned pieces, no duplicates; pieces the catalogue lacks are skipped) (R, the owner's rule). New active play package round70 = round69 + W82 starter lists (14 jobs) + W85 Ninja/Warrior/Wizard attacks. Canary `tests/job_outfits.rs` (private, OSFR_PLAY_PACKAGE; fails on the old code). Kart Driver's jersey 13419 is missing from the catalogue until W88 loads W84's definitions. **W86b:** launcher now opens and draws (causes: missing libunwind.dll; a 2172-px banner over egui's 2048 texture limit). The UI below the banner still needs a Flash-portal skin pass. Suite 2112 passed.
+
 - **2026-10-16 (early), worker batch W82-W87 reviewed and committed:**
   - **1.8 admission (lead), PARTLY:** caps 16 total / 4 per IP, 5 handshakes/IP/s, 5 s login deadline, per-session packet and byte budgets from the measured native peak (41 datagrams/s). Tests: 17th connection refused, never-logged-in peer dropped (both fail on the old gateway). Open: credential-failure limits (needs 1.2 wiring), T3/T9 fuzz and flood runs, refusal logging is a bounded summary only.
   - **1.2 key-pair login core (W83), PARTLY:** `login_auth` (strict Ed25519 over a server-bound one-use challenge; hashed one-use 60 s tokens; constant-time compare), account schema 3 with up to 4 public keys and a writer lock, `osfr-account` CLI. Lead-reviewed. Next: lead wires login and gateway; launcher key storage.

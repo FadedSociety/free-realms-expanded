@@ -1599,6 +1599,56 @@ impl Gameplay {
         location
     }
 
+    /// Grant and equip a job's starter outfit from the content's starter table.
+    /// With `reuse_owned`, a piece the player already owns is equipped instead
+    /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.
+    fn give_starter_outfit(&mut self, job: i32, reuse_owned: bool, out: &mut Outcome) -> io::Result<()> {
+        let items = self.profiles.as_ref().unwrap().starter_items(job).to_vec();
+        let inactive = job != self.profiles.as_ref().unwrap().active();
+        for definition in items {
+            // The inherited Chef defaults include the same hat that
+            // this local story awards at Cooking101 turn-in. Defer only
+            // that cosmetic in the versioned Cooking campaign; older
+            // campaigns and original profile records stay compatible.
+            if job == 45 && definition == 14794 && self.cooking.is_some() {
+                continue;
+            }
+            if !self.inventory.has_definition(definition) {
+                continue;
+            }
+            let owned = if reuse_owned {
+                self.inventory.equip_owned_definition(definition, job).ok()
+            } else {
+                None
+            };
+            let result = match owned {
+                Some(result) => result,
+                None => {
+                    out.replies.extend(self.inventory.grant(0, definition, 1)?.replies);
+                    self.inventory.equip_owned_definition(definition, job)?
+                }
+            };
+            out.changed = true;
+            out.replies.extend(
+                result
+                    .replies
+                    .into_iter()
+                    .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
+            );
+        }
+        Ok(())
+    }
+
+    /// (R) A job never stays bare: when a job with a completely empty outfit
+    /// becomes active, it gets its starter outfit (the owner, 2026-10-15). Fixes
+    /// saves whose job was unlocked by a path that granted no clothes.
+    fn ensure_outfit(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
+        if self.inventory.profile_attachments(job)?.starts_with(&0i32.to_le_bytes()) {
+            self.give_starter_outfit(job, true, out)?;
+        }
+        Ok(())
+    }
+
     /// (R) Leaving a race puts the player back in the job they had before it;
     /// Kart Driver stays only when chosen or required (the owner, 2026-10-15).
     fn restore_job(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
@@ -1614,7 +1664,7 @@ impl Gameplay {
                 .activation(job, self.job_level(job))?,
         );
         self.sync_player_level(out);
-        Ok(())
+        self.ensure_outfit(job, out)
     }
 
     /// A save taken inside a battle arena loads with the battle dropped (the
@@ -2104,8 +2154,12 @@ impl Gameplay {
                 .ok_or_else(|| invalid("kart entry requires class content"))?;
             // Reconstructed local starter unlock, confined to the opt-in test campaign.
             let previous_job = profiles.active();
-            profiles.unlock(48)?;
+            let first_time = profiles.unlock(48)?;
             out.replies.push(profiles.select(48, &self.inventory)?);
+            if first_time {
+                self.give_starter_outfit(48, false, &mut out)?;
+            }
+            self.ensure_outfit(48, &mut out)?;
             let kart = self.kart_entry.as_mut().unwrap();
             let (replies, scene) = kart.begin(character)?;
             kart.set_previous_job(previous_job);
@@ -3646,6 +3700,7 @@ impl Gameplay {
                     );
                     self.sync_player_level(&mut out);
                     out.changed |= changed;
+                    self.ensure_outfit(id, &mut out)?;
                     self.opening_equipment_events(&mut out)?;
                     self.sync_world_stage(&mut out)?;
                 }
@@ -4354,26 +4409,7 @@ impl Gameplay {
         for id in result.unlock_profiles {
             if self.profiles.as_mut().unwrap().unlock(id)? {
                 out.changed = true;
-                let items = self.profiles.as_ref().unwrap().starter_items(id).to_vec();
-                for definition in items {
-                    // The inherited Chef defaults include the same hat that
-                    // this local story awards at Cooking101 turn-in. Defer only
-                    // that cosmetic in the versioned Cooking campaign; older
-                    // campaigns and original profile records stay compatible.
-                    if id == 45 && definition == 14794 && self.cooking.is_some() {
-                        continue;
-                    }
-                    let result = self.inventory.grant(0, definition, 1)?;
-                    out.replies.extend(result.replies);
-                    let result = self.inventory.equip_owned_definition(definition, id)?;
-                    let inactive = id != self.profiles.as_ref().unwrap().active();
-                    out.replies.extend(
-                        result
-                            .replies
-                            .into_iter()
-                            .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
-                    );
-                }
+                self.give_starter_outfit(id, false, out)?;
             }
         }
         for reward in result.rewards {
