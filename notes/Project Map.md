@@ -41,14 +41,14 @@ The request path runs packet → `gateway.rs` (per-character application gateway
 | World entry | `startup_snapshot.rs`, `startup_world.rs`, `startup_selfdata.rs`, `startup_catalogues.rs`, `startup_messages.rs`, `zone_transition.rs` |
 | Shared world | `players.rs` (sessions, interest grid, nearest-64 fanout), `world.rs` (zone instances, membership, transfers), `movement.rs` (pose validation), `terrain.rs` |
 | Gameplay core | `gameplay.rs`, `game_store.rs` (save envelope), `game_rules.rs` (membership policy), `rewards.rs` |
-| Combat and enemies | `encounter.rs` (encounters, shared field fights, HP, revive), `enemies.rs`, `combat.rs`, `abilities.rs` (36/10 casts, 36/12–13 definitions), `opening_abilities.rs` (job bars) |
-| Quests and story | `quest_engine.rs` (definition-driven quests), `quest_journal.rs` (47/12, 47/13, 49/15), `quests.rs`, `opening.rs`, `opening_journal.rs`, `opening_world.rs`, `profiles.rs` (jobs/classes) |
+| Combat and enemies | `encounter.rs` (encounters, shared field fights, HP, revive), `enemies.rs`, `combat.rs`, `abilities.rs` (36/10 casts, 36/12–13 definitions), `opening_abilities.rs` (job bars), `power_ups.rs` (drop tables, roll; pickups live in `encounter.rs`) |
+| Quests and story | `quest_engine.rs` (definition-driven quests), `quest_journal.rs` (47/12, 47/13, 49/15, 47/14 tracked-target pin), `quests.rs`, `opening.rs`, `opening_journal.rs`, `opening_world.rs`, `profiles.rs` (jobs/classes) |
 | NPCs and vendors | `npc_interaction.rs` (menus, quest offers, merchant 66/42), `coin_shop.rs` (165/4 buy, 165/5 sell, 165/6 result) |
 | Items | `inventory.rs` (state, equip with eligibility), `inventory_v2_fixes.rs`, `item_categories.rs`, `item_bar.rs` (four-slot bar, potion), `mystery_chest.rs`, `mystery_chest_loot.rs` |
 | Crafting and gathering | `recipes.rs`, `recipe_book.rs` (26/24 at a station), `cooking.rs`, `smelting.rs`, `forging.rs`, `mining.rs`, `harvesting.rs`, `minigame.rs` (shared run lifecycle), `mining_lifecycle.rs`, `harvesting_lifecycle.rs`, `harvest_nodes.rs` |
-| Social | `chat.rs`, `social_chat.rs` (chat policy, quick chat and emotes, per-account action budget), `social_lists.rs` (friends, ignore, groups), `guilds.rs`, `trade.rs`, `player_radial.rs` (click menu, Inspect) |
-| Travel | `restoration/piece_077.rs` (warpstones: 56/57/90/122/58), `dev_teleport.rs` |
-| Minigames and activities | `kart_*.rs` (8 files: entry, lobby, racing, service, pickups, weapons, rewards, progress), `soccer*.rs`, `derby.rs`, `chess.rs`, `fishing*.rs`, `matchmaking.rs`, `activity_portal.rs` (167) |
+| Social | `chat.rs`, `social_chat.rs` (chat policy, quick chat and emotes, per-account action budget), `social_lists.rs` (friends, ignore, groups), `guilds.rs`, `trade.rs` (59: trade-unavailable close today; real trading in progress), `player_radial.rs` (click menu, Inspect) |
+| Travel | `restoration/piece_077.rs` (warpstones: 56/57/90/122/58), `dev_teleport.rs`, `pathing.rs` (98/1 Take Me There path answer; landing) |
+| Minigames and activities | `kart_*.rs` (8 files: entry, lobby, racing, service, pickups, weapons, rewards, progress; NPC gates and reward cooldown in `kart_gateway.rs` + `kart_gates.json`), `soccer*.rs`, `derby.rs`, `chess.rs`, `fishing*.rs`, `matchmaking.rs`, `activity_portal.rs` (167) |
 | Housing, pets, mounts, progression | `housing*.rs`, `pets.rs`, `mounts.rs` (not routed yet), `progression_extras.rs` |
 | Content loading | `content.rs` (content JSON schema and cross-checks), `world_text.rs` |
 | Developer tools | `studio.rs` (loopback HTTP), World Builder layer (`--world`), `realm` commands (by role on account-store servers) |
