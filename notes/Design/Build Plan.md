@@ -13,6 +13,10 @@ The single living plan from **2026-10-15** onward. The verified current state of
 1. **Verify before you plan.** Before scheduling or claiming a gap, check the code (what is routed) and the newest native review. Notes go stale; the 10-13 ledger did.
 2. **Update after every milestone, integration or native run.** Tick the item, add a line to the [[#Update log]], and update the [[Build Ledger]] row. The same goes for [[Current Progress]].
 3. **Every task has gates:** runnable checks that prove it is done, such as a test name, a bot script, or a native check with a run id. "Tests pass" alone is not a gate. A module that isn't routed isn't done.
+   - Each item closes with a verdict: **PROVEN** (all gates ran and passed, including native where required), **PARTLY PROVEN** (say which gates are missing), or **NOT PROVEN**.
+   - New test suites include one **canary**: a deliberate break that must make a test fail, which proves the tests can catch regressions.
+
+   Both ideas come from Anthropic's code-modernization plugin.
 4. **Security gates** (the owner, 2026-10-15: "make sure it's actually secure"). Every task that touches the network, logins, passwords, roles, saves or file paths:
    - is built with the `secure-code-guardian` skill;
    - passes a `security-reviewer` audit before integration, with findings fixed or logged;
