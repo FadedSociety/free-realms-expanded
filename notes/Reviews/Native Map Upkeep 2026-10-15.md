@@ -260,3 +260,100 @@ Secure-code-guardian and security-reviewer were applied to the local file/SQLite
 SQLite commits the full correction/audit batch atomically. Secondary queue/receipt files are written afterward; an I/O failure then leaves the durable in-row audit authoritative and requires reconciliation of those secondary files. The claim snapshot prevents accidental replay. No such failure occurred in the applied batches. Confidence caps and queued independent fix checks remain distinct from Claude's lead acceptance. No native client or gameplay claim is made.
 
 **Ponytail:** reused `validate`, `check_fix`, recheck batches, the existing independent fix queue, nmq and xreview/Dispatcher full-review gates. Added one opt-in correction path, one scoped reservation filter and a stdlib regression check. Deliberately did not build a second validator, mapper fleet, disassembler, dependency, asset reader, Rust module or global note regeneration.
+
+
+## W128 mapper completion and invalid-entry resolution, 2026-10-16
+
+**Verdict: mapper completion gates passed; both shards staged for independent full review.** W128 authored all 236 missing mapper records: S0215's last 54 and all 182 for S0672. The existing 109 S0215 records are unchanged. Both canonical outputs pass the original validator with zero errors. Neither shard was self-accepted. `006ca9c3` is an invalid instruction entry; its complete rejection fix passes the existing fix checker and is staged only.
+
+### Scope, provenance and method
+
+Writes stayed within the two assigned shard folders, `lab/native-map/run/w128-*`, the dispatcher-owned queue/state/log changes, and this appended section. No pipeline script, Rust code, content, save, binary, shared Plan/Ledger, existing review verdict, commit or native client was changed. No workers or processes other than the scoped analysis commands were launched. The lead retains shared-plan updates and independent review.
+
+The immutable source is `lab/working/OSFR.Client/OSFR Client/FreeRealms.exe`, recomputed SHA-256 `26cc1c522a45e71fb57882da515f65bac45c8c8b8c7e740c0cea81c52a733351`. The supplied IDA full-run `labels.jsonl` hash is `0d84d3da6df5ee1e31e578ccab3ae8f151485f9eb49b41211ec914d2822c3130` (`w128-evidence/inputs.json`). No additional game input or community source was acquired.
+
+`w128-evidence/S0215-facts.json` and `S0672-facts.json` preserve the current `fn` rows. Each newly authored target has a complete `nmq show`, raw-byte and `nmq dis` transcript at `w128-evidence/<addr>.txt`. `w128-provenance.json` indexes all 236 records and their selected anchors. W128 read the bodies and chose the labels/evidence; no script templated records or automatically selected validator-compatible anchors. Stdlib collection reused the existing `nmq` reader and its pinned Capstone environment. The existing 109 records remain prior mapper work awaiting the same independent full-shard review, not a fresh W128 semantic re-audit.
+
+All proposed identifiers are descriptive annotations, not original symbols. These are static client facts. No original server rule, reconstructed policy, runtime gameplay result or packet direction is established by the new records.
+
+| Shard | Existing / new | Complete output | Confidence: confirmed / likely / speculative / unknown | State |
+|---|---:|---:|---|---|
+| S0215 | 109 / 54 | 163 | 129 / 9 / 25 / 0 | `review_pending` |
+| S0672 | 0 / 182 | 182 | 42 / 19 / 121 / 0 | `review_pending` |
+
+Confidence remains conservative for unbound math and STL helpers: mechanical names are speculative when only one selected anchor is available. No fabricated unknown record was used to complete a shard.
+
+Selected recovered facts, with address-specific full transcripts:
+
+- **S0215, `0088be40`, `0088be50`, `0088caf0`, `0088cb00`, `0088c170`:** visibility virtual adapters are tail jumps; stack arguments and target return pass through. Each class is bound by its own RTTI slot. The existing `render.occlusion` subsystem was reused.
+- **S0215, `0088c790` / `0088c7a0`:** the former reads `[ECX+8]`; the latter takes a stack object, returns its +8 DWORD and ends in `ret 4`. `0088cc60` consumes eight stack bytes despite using one pointer. `0088ce70` returns a float through ST0; native `0088cecb: fld [esp+0xc]` contradicts the inferred void return.
+- **S0215, `0088cce0`, `0088cee0`:** three comparisons form an eight-way spatial index; insertion can split a bucket above 16 entries, with byte counts saturated at 255. Ghidra float-typed pointer variables are addresses in the native instructions. This does not identify a gameplay domain.
+- **S0672, `012958c0`, `01295c10`, `01295fe0`:** account context-menu, Friends and Ignores handlers construct local UI actions. `01295ab0` reads ObjectName/AccountID and returns success but contains no image-loader call. Class names do not prove implemented image loading.
+- **S0672, `01296cd0..01297180`:** direct audio handlers call service virtuals; rerouted actions queue local messages. `01296db0` supplies Volume=1.0, whereas `01296f30` reads named Volume. Callbacks consume eight stack bytes. The queues do not prove wire sends.
+- **S0672, `01297520..0129b6d0`:** checked MSVC tree helpers have 24/32-byte nodes, color bytes +0x14/+0x1c and sentinel tags +0x15/+0x1d. Twelve-byte call wrappers return the original iterator (prefix operation); `0129af10..0129b000` return the tree and consume two unused arguments. The full record and byte receipt distinguish each helper, direction and offset; no payload class was inferred from adjacency.
+- **S0672, `01297360`:** RuleSetDB serialization/compression returns the original serialized byte length, not the constant zero inferred by Ghidra. Supporting helper `013c2330` and final EAX load are retained in `w128-boundary/entry-call-and-extra-evidence.txt`. That file also proves `0129b030`'s output-pointer return and `ret 12` beyond the export's short byte count.
+
+### Staging receipts and gates
+
+`python -I -B ../lab/native-map/run/w128-stage.py` invoked **`xreview.make` and the existing `Dispatcher.finish_map(full_review=True)`**, without a dispatcher loop, worker launch, reviewer verdict or `accept` call. It set only S0215 and S0672 to `review_pending`, created round 1's normal 40-record samples and standard prompts, and preserved every live label column. The transaction's before/after digest covers **99,549 unchanged labels**; the only changed shard rows are the two assigned ones. The per-shard receipts are `shards/<sid>/w128-review-receipt.json`; the combined receipt is `w128-stage-receipt.json`.
+
+Both shards have `out.jsonl`, `findings.md`, `mapper`, `review_round`, `review-sample.txt`, `xreview-prompt.md` and their receipt. No `review.jsonl` was fabricated. The independent reviewer can use the existing scoped `xreview.py claim ... --sid` path. Full review of all 163/182 records and acceptance are still open gates.
+
+The repeatable verification command, run from `project/`, is:
+
+```powershell
+python -I -B ../lab/native-map/run/w128-verify.py
+```
+
+It invokes the original CLIs with these results (all exit 0):
+
+```text
+python -I scripts/native_map/validate.py ../lab/native-map/run/map.sqlite S0215 ../lab/native-map/run/shards/S0215/out.jsonl
+valid_records=163 errors=0
+python -I scripts/native_map/validate.py ../lab/native-map/run/map.sqlite S0672 ../lab/native-map/run/shards/S0672/out.jsonl
+valid_records=182 errors=0
+S0215 stage=review_pending round=1 chunk=40 independent_review_required=1
+S0672 stage=review_pending round=1 chunk=40 independent_review_required=1
+S0215_retained_records_unchanged=109/109
+new_mapper_records=236 evidence_transcripts=236
+```
+
+Three `nmq.py label` samples per shard were run after staging, each exit 0:
+
+```text
+S0215 0088be40: (unlabelled)
+S0215 0088c7a0: (unlabelled)
+S0215 0088ce70: (unlabelled)
+S0672 012958c0: (unlabelled)
+S0672 01296cd0: (unlabelled)
+S0672 0129af10: (unlabelled)
+```
+
+These are **not post-acceptance results**: the task's independent-review staging option was used. Post-acceptance sample labels remain the lead/review gate. Exact command/output pairs and exit codes are retained in `w128-gate-commands.txt`; the full verification output is `w128-verification.txt`.
+
+### `006ca9c3`: invalid entry; correction not applied
+
+The real routine is **`006ca9b0..006caa61` (exclusive end, 177 bytes)**. Decoding from its prologue yields `006ca9c1: 8a68fc` (`mov ch, byte ptr [eax-4]`), followed by `006ca9c4: 8d58fd`. Thus `006ca9c3` is the displacement byte `fc`, not an instruction boundary. Returns are at `006caa01` and `006caa60`, followed by `cc` padding. IDA full-run **line 38473** independently recognizes the exact `006ca9b0` entry and produces complete pseudocode; **line 38474** associates `006ca9c3` with that same routine, with `boundary_match=false`. The latter's missing pseudocode/xrefs are exporter behavior and were not used as absence evidence.
+
+An independent raw scan of every initialized executable section found **two direct calls to `006ca9b0`**, at `006caaee` (`e8bdfeffff`) and `006caba3` (`e808feffff`). Both decode from `006caa70`'s real entry; the callers pass the table pointer in EAX, result state in ECX and one stack argument, cleaned by the caller. No raw E8/E9, near Jcc, short Jcc/JMP or LOOP/JECXZ target reaches `006ca9c3`. This scan does not disprove arbitrary computed runtime addresses.
+
+Every initialized section was also scanned for the absolute DWORD `006ca9c3`. Its only three occurrences, at **`01868268`, `01868623`, `0186862b`**, are `c3 a9 6c 00` inside UTF-8 locale words (`?l`, `aqu?l`, `Aqu?l`), not vtable or address operands. Raw bytes, surrounding strings, scans, IDA rows and the two current accepted before-images are in `w128-boundary/`. Commands include `nmq.py dis 006ca9b0 177`, `bytes 006ca9b0 192`, `dis 006ca9c3 32` and the caller decode from `006caa70`; `nmq-evidence.txt` and `entry-call-and-extra-evidence.txt` retain them.
+
+`w128-fixes/B0001/` has exactly the recheck input trio: `sample.txt`, full accepted-record before-image `records.jsonl`, and `review.jsonl` with one complete `reject` fix. `B0001` is an **unreserved staging name**, not a live recheck batch. The fix sets `name=null`, `kind=unknown`, `confidence=unknown`, and records `invalid_entry`, `superseded_by=006ca9b0` and the boundary evidence. It retires the misleading semantic label; a label fix cannot delete the erroneous `fn` row or repair graph/ranges. The valid containing routine already has its own accepted label. No `recheck.py done`, live claim or fix application ran.
+
+```text
+python -I scripts/native_map/validate.py --fixes ../lab/native-map/run/map.sqlite S0822 ../lab/native-map/run/w128-fixes/B0001/review.jsonl
+fixes_ok=1 fixes_invalid=0 fixes_missing=0
+boundary=mid_instruction_invalid_entry real_start=006ca9b0 end_exclusive=006caa61 verified_calls=2 invalid_entry_direct_targets=0 false_text_pointers=3
+fix_checker_canary=PASS batch_shape=PASS invalid_label_unchanged=1 fixes_applied=0
+```
+
+### Files, security and remaining limits
+
+Private outputs are the two shards' mapper/review staging files; `w128-collect.py`, `w128-boundary.py`, `w128-stage.py`, `w128-verify.py`; `w128-evidence/`, `w128-boundary/`, `w128-fixes/`; and the W128 provenance, manifest, gate and staging receipts. The pipeline wrote the two shard-state rows and appended its normal messages to `dispatch.log`. The sole project edit is this section; previous note bytes are preserved at `w128-evidence/upkeep-note-before.md`. No original binary, mapper history directory or existing label/audit was rewritten.
+
+Ponytail (full), Caveman, reverse-engineering and the mapper's REA evidence methodology were applied. Secure-code-guardian and security-reviewer covered the local file/SQLite boundary. The scoped automated stdlib AST pass and manual review found **0 actionable findings**: fixed scoped paths, parameterized SQL, read-only analysis connections, existing dispatcher staging path, replay guard, no `shell=True`, untrusted code evaluation, network listener, credential access or process control. Bandit, Semgrep and Gitleaks were unavailable and were not installed. This is a local helper review, not a production-network security audit.
+
+Open gates: independent full review and acceptance of both shards; the six post-acceptance label samples; independent review and optional application of the staged invalid-entry retirement; lead-owned `fn` boundary/graph repair. The earlier 109 S0215 records passed mechanical validation and were preserved, not independently semantically re-reviewed by their completing mapper. No broader native-map, runtime or gameplay completeness claim is made.
+
+**Ponytail:** reused `nmq`, current exports, the existing PE/Capstone reader, `validate`/`check_fix`, `xreview.make`, `Dispatcher.finish_map` and the recheck trio. Deliberately did not build a mapper fleet, replacement validator/disassembler, dependency, pipeline extension or gameplay code.
