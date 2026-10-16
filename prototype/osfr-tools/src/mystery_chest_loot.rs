@@ -129,7 +129,11 @@ impl MysteryChests {
                 changed: false,
             });
         }
-        let confirmed = pending.take() == Some(id);
+        // A Use for another instance must not cancel this chest's confirmation (W90).
+        let confirmed = *pending == Some(id);
+        if confirmed {
+            *pending = None;
+        }
         let (Some(chest), Some(key)) = (chest, key) else {
             return Ok(InventoryOutcome {
                 replies: vec![chat::system(
