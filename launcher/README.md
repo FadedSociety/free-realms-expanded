@@ -1,11 +1,18 @@
-# Free Realms Expanded launcher (W86)
+# Free Realms Expanded launcher
 
-Standalone Rust skeleton. It prepares an existing, writable client copy and
+Standalone Rust launcher. It prepares an existing, writable client copy and
 starts its local `FreeRealms.exe`. Choose that copy and an optional locale pair
 in Settings. It never downloads a client, executes a batch file, or runs Python.
 
+The current W98 skin follows the owner's direction A: deep-blue glass panels,
+raised bumpy frames, glossy green controls, attached tabs and an imagegen forest
+backdrop. Four orange vines grow from the banner wordmark on launch. Art sources,
+hashes and slice boxes are listed in `assets/ui/README.md`; review captures and
+the readability audit are in `lab/reports/rust-launcher-w98/`.
+
 Login is visibly a **local compatibility stub**, behind `LoginProvider` in
-`src/lib.rs`. Only literal loopback endpoints work until W83 is connected.
+`src/lib.rs`. Only literal loopback endpoints work until remote key-pair login
+is available.
 The controller option controls this launcher window. It does not inject game
 input or start the existing in-game Python bridge. Settings are session-only.
 
@@ -13,7 +20,7 @@ From this directory on Windows, using the project's private toolchain:
 
 ```powershell
 $lab = (Resolve-Path ../../lab).Path
-$env:CARGO_TARGET_DIR = Join-Path $lab 'build/w86-llvm'
+$env:CARGO_TARGET_DIR = Join-Path $lab 'build/w98/target'
 ./build.ps1 build
 ./build.ps1 test
 $exe = Join-Path $env:CARGO_TARGET_DIR 'x86_64-pc-windows-gnullvm/debug/osfr-launcher.exe'
@@ -63,10 +70,10 @@ display scaling, `--window-size 853x533` captures 1280 x 800 physical pixels;
 and tighter spacing, with a visible scrollbar when needed. Captures remain
 unable to prepare or launch the game at any size.
 
-The portal skin bundles Lilita One for titles and captions, keeps readable body
-and address fonts, and uses egui geometry for gloss, bevels and focus rings.
-Font notices and the existing banner's licensing status are in DEPENDENCIES.md.
-W86c's final screenshots and before/after audit are under
+The skin bundles Lilita One for titles and captions, keeps Ubuntu body text and
+readable address fonts, and uses egui's real controls for keyboard/controller
+focus, Space/Enter activation and accessibility. Font and art provenance are in
+DEPENDENCIES.md. W86c's final screenshots and before/after audit are under
 `lab/reports/rust-launcher-20261016/`; `notes/Design/Rust Launcher.md` records the
 13-test result and focus-ring canary. Physical controller actions remain open.
 
@@ -80,3 +87,13 @@ Settings each saved a 1410 x 1185 PNG through their own running-window capture.
 Physical controller navigation, actual client launch, release packaging and
 second-PC acceptance remain unverified. See `notes/Design/Rust Launcher.md` for
 root-cause logs, provenance, security review and the remaining full-launcher gates.
+
+## W98 skin evidence (2026-10-16)
+
+W98 replaces the earlier geometry-only button and panel surfaces with bundled
+imagegen sprites. The nine-slice renderer holds corners fixed, tiles the bumpy
+edge strips, and stretches only the plain panel centre. The capture-only options
+`--test-focus-play` and `--test-vine-growth-ms 0..1500` exist to produce review
+images; screenshot mode disables Play and closes after capture. Build and test
+results, including any host-specific test limitations, are recorded in
+`lab/reports/rust-launcher-w98/README.md`.

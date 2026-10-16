@@ -5,7 +5,7 @@ mod diagnostics;
 mod theme;
 
 use controller::{Controller, Navigation};
-use eframe::egui::{self, Color32, RichText, Stroke, Vec2};
+use eframe::egui::{self, Color32, RichText, Vec2};
 use osfr_launcher::{LaunchPlan, LaunchSettings, LocalLoginStub, LoginProvider};
 use std::{
     cell::Cell,
@@ -54,8 +54,68 @@ struct Server {
     address: String,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum FocusTarget {
+    RealmsTab,
+    SettingsTab,
+    RealmRow(usize),
+    AddAddress,
+    AddRealm,
+    Play,
+    ClientFolder,
+    LocaleFolder,
+    WindowWidth,
+    WindowHeight,
+    ResolutionSmall,
+    ResolutionLarge,
+    ControllerToggle,
+    Back,
+}
+
+fn focus_order(settings: bool, realm_count: usize) -> Vec<FocusTarget> {
+    let mut order = vec![FocusTarget::RealmsTab, FocusTarget::SettingsTab];
+    if settings {
+        order.extend([
+            FocusTarget::ClientFolder,
+            FocusTarget::LocaleFolder,
+            FocusTarget::WindowWidth,
+            FocusTarget::WindowHeight,
+            FocusTarget::ResolutionSmall,
+            FocusTarget::ResolutionLarge,
+            FocusTarget::ControllerToggle,
+            FocusTarget::Back,
+        ]);
+    } else {
+        order.extend((0..realm_count).map(FocusTarget::RealmRow));
+        order.extend([
+            FocusTarget::AddAddress,
+            FocusTarget::AddRealm,
+            FocusTarget::Play,
+        ]);
+    }
+    order
+}
+
+fn focus_sequence_matches(actual: &[FocusTarget], settings: bool, realm_count: usize) -> bool {
+    actual == focus_order(settings, realm_count)
+}
+
+fn next_focus_index(current: Option<usize>, len: usize, forward: bool) -> Option<usize> {
+    if len == 0 {
+        return None;
+    }
+    Some(match current {
+        Some(index) if forward => (index + 1) % len,
+        Some(0) if !forward => len - 1,
+        Some(index) => index - 1,
+        None if forward => 0,
+        None => len - 1,
+    })
+}
+
 struct Launcher {
     banner: egui::TextureHandle,
+    art: theme::UiArt,
     servers: Vec<Server>,
     selected: usize,
     new_address: String,
@@ -74,6 +134,10 @@ struct Launcher {
     screenshot_requested: bool,
     capture_ok: Rc<Cell<bool>>,
     started: Instant,
+    focus_targets: Vec<(FocusTarget, egui::Id)>,
+    focus_play_on_start: bool,
+    focus_play_requested: bool,
+    test_vine_growth: Option<f32>,
 }
 
 impl Launcher {
@@ -82,15 +146,19 @@ impl Launcher {
         screenshot: Option<PathBuf>,
         settings_page: bool,
         capture_ok: Rc<Cell<bool>>,
+        focus_play_on_start: bool,
+        test_vine_growth: Option<f32>,
     ) -> Result<Self, String> {
         let banner = load_banner(&cc.egui_ctx)?;
         theme::install(&cc.egui_ctx);
+        let art = theme::UiArt::load(&cc.egui_ctx)?;
         let (controller, controller_status) = match Controller::new() {
             Ok(controller) => (Some(controller), "Connect a controller to navigate.".into()),
             Err(error) => (None, error),
         };
         Ok(Self {
             banner,
+            art,
             servers: vec![Server {
                 name: "Local realm".into(),
                 address: "127.0.0.1:20042".into(),
@@ -112,6 +180,10 @@ impl Launcher {
             screenshot_requested: false,
             capture_ok,
             started: Instant::now(),
+            focus_targets: Vec::new(),
+            focus_play_on_start,
+            focus_play_requested: false,
+            test_vine_growth,
         })
     }
 
@@ -134,7 +206,7 @@ impl Launcher {
         let settings = self.settings;
         let (sender, receiver) = mpsc::channel();
         self.pending = Some(receiver);
-        self.message = "Preparing client files and backups…".into();
+        self.message = "Preparing client files and backups...".into();
         // One bounded preparation job; keep the window responsive during locale I/O.
         std::thread::spawn(move || {
             let result = LaunchPlan::build(
@@ -150,6 +222,28 @@ impl Launcher {
             });
             let _ = sender.send((login, result));
         });
+    }
+
+    fn record_focus(&mut self, target: FocusTarget, response: &egui::Response) {
+        self.focus_targets.push((target, response.id));
+    }
+
+    fn focus_target(&self, ctx: &egui::Context, target: FocusTarget) {
+        if let Some((_, id)) = self.focus_targets.iter().find(|(item, _)| *item == target) {
+            ctx.memory_mut(|memory| memory.request_focus(*id));
+        }
+    }
+
+    fn move_controller_focus(&self, ctx: &egui::Context, forward: bool) {
+        let current = ctx.memory(|memory| {
+            self.focus_targets
+                .iter()
+                .position(|(_, id)| memory.has_focus(*id))
+        });
+        if let Some(next) = next_focus_index(current, self.focus_targets.len(), forward) {
+            let id = self.focus_targets[next].1;
+            ctx.memory_mut(|memory| memory.request_focus(id));
+        }
     }
 
     fn navigation(&mut self, ctx: &egui::Context) {
@@ -172,16 +266,26 @@ impl Launcher {
         for action in actions {
             match action {
                 Navigation::Previous | Navigation::Next | Navigation::Left | Navigation::Right => {
-                    let direction = match action {
-                        Navigation::Previous => egui::FocusDirection::Previous,
-                        Navigation::Next => egui::FocusDirection::Next,
-                        Navigation::Left => egui::FocusDirection::Left,
-                        _ => egui::FocusDirection::Right,
-                    };
-                    ctx.memory_mut(|memory| memory.move_focus(direction));
+                    self.move_controller_focus(
+                        ctx,
+                        matches!(action, Navigation::Next | Navigation::Right),
+                    );
                 }
-                Navigation::Back => self.settings_page = false,
-                Navigation::Settings => self.settings_page = !self.settings_page,
+                Navigation::Back => {
+                    self.settings_page = false;
+                    self.focus_target(ctx, FocusTarget::RealmsTab);
+                }
+                Navigation::Settings => {
+                    self.settings_page = !self.settings_page;
+                    self.focus_target(
+                        ctx,
+                        if self.settings_page {
+                            FocusTarget::SettingsTab
+                        } else {
+                            FocusTarget::RealmsTab
+                        },
+                    );
+                }
                 Navigation::Confirm => {
                     // egui's existing Space activation handles the focused widget.
                     ctx.input_mut(|i| {
@@ -210,140 +314,218 @@ impl Launcher {
             "Your next adventure starts here",
             "Choose a realm, then jump into Free Realms.",
         );
-        egui::Frame::new().fill(Color32::from_rgb(235, 231, 179)).corner_radius(12).inner_margin(if compact { 8 } else { 12 }).show(ui, |ui| {
-            ui.set_min_width(ui.available_width());
-            ui.horizontal_wrapped(|ui| {
-                ui.label(RichText::new("Realms").font(theme::display(23.0)));
+        ui.horizontal(|ui| {
+            let (icon, _) = ui.allocate_exact_size(Vec2::splat(27.0), egui::Sense::hover());
+            self.art.icon(ui.painter(), 0, icon);
+            ui.label(RichText::new("Realms").font(theme::display(22.0)));
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 ui.small("Status / players: not connected yet");
             });
-            for (index, server) in self.servers.iter().enumerate() {
-                let selected = index == self.selected;
-                ui.horizontal(|ui| {
-                    let mut label = egui::text::LayoutJob::default();
-                    label.append(&format!("{}{}\n", if selected { "Selected: " } else { "" }, server.name), 0.0,
-                        egui::TextFormat { font_id: theme::display(20.0), color: theme::INK, ..Default::default() });
-                    label.append(&server.address, 0.0, egui::TextFormat {
-                        font_id: egui::FontId::monospace(14.0), color: theme::INK, ..Default::default()
-                    });
-                    let row = ui.add(egui::Button::new(label).wrap()
-                        .min_size(Vec2::new((ui.available_width() - 135.0).max(180.0), if compact { 44.0 } else { 52.0 }))
-                        .fill(if selected { Color32::from_rgb(216, 235, 156) } else { theme::PAPER })
-                        .stroke(Stroke::new(if selected { 2.0_f32 } else { 1.0_f32 },
-                            if selected { Color32::from_rgb(85, 127, 30) } else { Color32::from_rgb(160, 146, 86) }))
-                        .corner_radius(10));
-                    if row.has_focus() {
-                        ui.painter().rect_stroke(row.rect.expand(2.0), 12, Stroke::new(3.0_f32, theme::ORANGE), egui::StrokeKind::Outside);
-                    }
-                    if row.clicked() { self.selected = index; }
-                    let (pip, _) = ui.allocate_exact_size(Vec2::splat(12.0), egui::Sense::hover());
-                    ui.painter().circle_filled(pip.center(), 5.0, Color32::from_rgb(187, 116, 14));
-                    ui.painter().circle_filled(pip.center() - Vec2::new(1.0, 1.5), 1.5, theme::PAPER);
-                    ui.small("Status pending");
-                });
-            }
-            ui.add_space(4.0);
-            ui.horizontal(|ui| {
-                ui.add(egui::TextEdit::singleline(&mut self.new_address).hint_text("Add host:port").char_limit(261)
-                    .desired_width((ui.available_width() - 145.0).max(160.0)));
-                if theme::button(ui, "Add realm", Vec2::new(125.0, 38.0), self.servers.len() < 16, false).clicked() {
-                    match osfr_launcher::validate_endpoint(&self.new_address) {
-                        Ok(()) => {
-                            self.servers.push(Server { name: "Custom realm".into(), address: self.new_address.clone() });
-                            self.selected = self.servers.len() - 1;
-                            self.new_address.clear();
-                            self.message = "Realm added. Remote authentication is unavailable in this skeleton.".into();
-                        }
-                        Err(error) => self.message = error,
-                    }
-                }
-            });
         });
-        ui.add_space(10.0);
+        let row_height = if compact { 56.0 } else { 60.0 };
+        let row_width = ui.available_width();
+        for index in 0..self.servers.len() {
+            let server = &self.servers[index];
+            let name = if index == self.selected {
+                format!("Selected: {}", server.name)
+            } else {
+                server.name.clone()
+            };
+            let address = server.address.clone();
+            let row = theme::row_button(
+                ui,
+                &self.art,
+                &name,
+                &address,
+                Vec2::new(row_width, row_height),
+            );
+            self.record_focus(FocusTarget::RealmRow(index), &row);
+            if row.clicked() {
+                self.selected = index;
+            }
+        }
+        ui.add_space(4.0);
+        ui.horizontal(|ui| {
+            let add_width = 142.0;
+            let field_width = (ui.available_width() - add_width - 8.0).max(160.0);
+            let field = theme::text_field(
+                ui,
+                &self.art,
+                &mut self.new_address,
+                "Add host:port",
+                Vec2::new(field_width, 48.0),
+                261,
+            );
+            self.record_focus(FocusTarget::AddAddress, &field);
+            let add = theme::button(
+                ui,
+                &self.art,
+                "Add realm",
+                Vec2::new(add_width, 48.0),
+                self.servers.len() < 16,
+                theme::ButtonSkin::Standard,
+            );
+            self.record_focus(FocusTarget::AddRealm, &add);
+            if add.clicked() {
+                match osfr_launcher::validate_endpoint(&self.new_address) {
+                    Ok(()) => {
+                        self.servers.push(Server {
+                            name: "Custom realm".into(),
+                            address: self.new_address.clone(),
+                        });
+                        self.selected = self.servers.len() - 1;
+                        self.new_address.clear();
+                        self.message = "Realm added. Remote key-pair login is coming soon.".into();
+                    }
+                    Err(error) => self.message = error,
+                }
+            }
+        });
+        ui.add_space(8.0);
         ui.horizontal(|ui| {
             let label = if self.child.is_some() {
                 "GAME RUNNING"
             } else if self.pending.is_some() {
-                "PREPARING…"
+                "PREPARING..."
             } else {
                 "PLAY NOW!"
             };
-            if theme::button(
+            let play = theme::button(
                 ui,
+                &self.art,
                 label,
                 if compact {
                     Vec2::new(208.0, 56.0)
                 } else {
                     Vec2::new(224.0, 64.0)
                 },
-                self.pending.is_none() && self.child.is_none() && self.screenshot.is_none(),
-                false,
-            )
-            .clicked()
-            {
+                self.pending.is_none()
+                    && self.child.is_none()
+                    && (self.screenshot.is_none() || self.focus_play_on_start),
+                theme::ButtonSkin::Play,
+            );
+            self.record_focus(FocusTarget::Play, &play);
+            if self.focus_play_on_start && !self.focus_play_requested {
+                ui.ctx().memory_mut(|memory| memory.request_focus(play.id));
+                self.focus_play_requested = true;
+            }
+            if self.focus_play_on_start && !play.has_focus() {
+                for shape in theme::focus_shapes(play.rect) {
+                    ui.painter().add(shape);
+                }
+            }
+            if play.clicked() {
                 self.play();
             }
             ui.vertical(|ui| {
-                ui.strong("Local login preview");
-                ui.small("Loopback only · key-pair login pending (W83)");
-                if self.screenshot.is_some() {
-                    ui.small("Review capture: Play disabled.");
-                }
+                ui.label(RichText::new("Local login preview").strong());
+                ui.small("Key-pair login coming soon.");
             });
         });
     }
 
     fn settings_ui(&mut self, ui: &mut egui::Ui) {
+        let compact = ui.ctx().content_rect().height() < 650.0;
         theme::heading(
             ui,
             "Make yourself at home",
             "Use a separate, writable copy of your supplied client.",
         );
-        ui.strong("Client folder");
-        ui.add(
-            egui::TextEdit::singleline(&mut self.client)
-                .hint_text("Folder containing FreeRealms.exe")
-                .char_limit(32768)
-                .desired_width(f32::INFINITY),
+        if !compact {
+            ui.label(RichText::new("Client folder").strong());
+        }
+        let client = theme::text_field(
+            ui,
+            &self.art,
+            &mut self.client,
+            "Folder containing FreeRealms.exe",
+            Vec2::new(ui.available_width(), 48.0),
+            32768,
         );
-        ui.strong("Locale overlay folder (optional)");
-        ui.add(
-            egui::TextEdit::singleline(&mut self.locale)
-                .hint_text("Folder with en_us_data.dat and en_us_data.dir")
-                .char_limit(32768)
-                .desired_width(f32::INFINITY),
+        self.record_focus(FocusTarget::ClientFolder, &client);
+        if !compact {
+            ui.label(RichText::new("Locale overlay folder (optional)").strong());
+        }
+        let locale = theme::text_field(
+            ui,
+            &self.art,
+            &mut self.locale,
+            "Folder with en_us_data.dat and en_us_data.dir",
+            Vec2::new(ui.available_width(), 48.0),
+            32768,
         );
+        self.record_focus(FocusTarget::LocaleFolder, &locale);
         ui.horizontal_wrapped(|ui| {
-            ui.strong("Game window");
-            ui.add(
+            ui.label(RichText::new("Game window").strong());
+            ui.add_space(3.0);
+            let width = ui.add_sized(
+                Vec2::new(126.0, 44.0),
                 egui::DragValue::new(&mut self.settings.width)
                     .range(640..=3840)
                     .suffix(" px"),
             );
-            ui.label("×");
-            ui.add(
+            self.record_focus(FocusTarget::WindowWidth, &width);
+            theme::focus_outline(ui, &width);
+            ui.label("x");
+            let height = ui.add_sized(
+                Vec2::new(126.0, 44.0),
                 egui::DragValue::new(&mut self.settings.height)
                     .range(480..=2160)
                     .suffix(" px"),
             );
-            for (label, width, height) in [("1024 × 768", 1024, 768), ("1280 × 720", 1280, 720)] {
-                if theme::button(ui, label, Vec2::new(134.0, 36.0), true, false).clicked() {
+            self.record_focus(FocusTarget::WindowHeight, &height);
+            theme::focus_outline(ui, &height);
+            for (target, label, width, height) in [
+                (FocusTarget::ResolutionSmall, "1024 x 768", 1024, 768),
+                (FocusTarget::ResolutionLarge, "1280 x 720", 1280, 720),
+            ] {
+                let preset = theme::button(
+                    ui,
+                    &self.art,
+                    label,
+                    Vec2::new(130.0, 44.0),
+                    true,
+                    theme::ButtonSkin::Standard,
+                );
+                self.record_focus(target, &preset);
+                if preset.clicked() {
                     self.settings = LaunchSettings { width, height };
                 }
             }
         });
-        ui.checkbox(&mut self.controller_on, "Controller navigation").on_hover_text(
-            "Launcher navigation only, using the existing layout's 0.25 deadzone. In-game controls use the separate Python bridge; this launcher does not start it."
+        let controller = ui
+            .add_sized(
+                Vec2::new(ui.available_width(), 44.0),
+                egui::Checkbox::new(&mut self.controller_on, "Controller navigation"),
+            )
+            .on_hover_text(
+                "Launcher navigation only, using the existing layout's 0.25 deadzone. In-game controls use the separate Python bridge; this launcher does not start it.",
+            );
+        self.record_focus(FocusTarget::ControllerToggle, &controller);
+        theme::focus_outline(ui, &controller);
+        if compact {
+            ui.small(format!(
+                "{} | D-pad/stick: move | A: select | B: back | LB: next | Start: settings",
+                self.controller_status
+            ));
+            ui.small("Settings are session-only; Play keeps configuration and locale backups.");
+        } else {
+            ui.label(&self.controller_status);
+            ui.small("Left stick / D-pad: move | A: select | B: back | LB: next | Start: settings");
+            ui.small(
+                "Settings are session-only. Play backs up configuration and replaced locale files.",
+            );
+        }
+        let back = theme::button(
+            ui,
+            &self.art,
+            "Back to realms",
+            Vec2::new(178.0, 46.0),
+            true,
+            theme::ButtonSkin::Standard,
         );
-        ui.label(&self.controller_status);
-        ui.small("Left stick / D-pad: move · A: select · B: back · LB: next · Start: settings");
-        ui.separator();
-        ui.small(
-            "Settings are session-only. Play backs up configuration and replaced locale files.",
-        )
-        .on_hover_text(
-            "Windowed mode, no maximization, muted audio: same defaults as the minimal launcher.",
-        );
-        if theme::button(ui, "Back to realms", Vec2::new(178.0, 40.0), true, false).clicked() {
+        self.record_focus(FocusTarget::Back, &back);
+        if back.clicked() {
             self.settings_page = false;
         }
     }
@@ -351,7 +533,17 @@ impl Launcher {
 
 impl eframe::App for Launcher {
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
-        ctx.request_repaint_after(Duration::from_millis(33));
+        let elapsed = self.started.elapsed();
+        let t = self
+            .test_vine_growth
+            .unwrap_or_else(|| (elapsed.as_secs_f32() / 1.5).clamp(0.0, 1.0));
+        let growth = 1.0 - (1.0 - t).powi(3);
+        self.art.repaint_vines(growth);
+        let growing = self.test_vine_growth.is_none() && elapsed < Duration::from_millis(1500);
+        let capture_waiting = self.screenshot.is_some() && !self.screenshot_requested;
+        if self.controller_on || self.pending.is_some() || growing || capture_waiting {
+            ctx.request_repaint_after(Duration::from_millis(33));
+        }
         self.navigation(ctx);
         if let Some(receiver) = &self.pending {
             match receiver.try_recv() {
@@ -387,99 +579,134 @@ impl eframe::App for Launcher {
                 Ok(None) => (),
             }
         }
+        let rendered_settings = self.settings_page;
+        let rendered_realms = self.servers.len();
+        self.focus_targets.clear();
         egui::CentralPanel::default()
-            .frame(egui::Frame::new().fill(theme::FOREST).inner_margin(16))
+            .frame(egui::Frame::new().fill(Color32::TRANSPARENT).inner_margin(10))
             .show(ctx, |ui| {
-                egui::ScrollArea::vertical().show(ui, |ui| {
+                self.art.draw_backdrop(ui.painter(), ui.max_rect());
+                egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
                     let width = ui.available_width().min(1080.0);
-                    // Keep the whole banner, with space for controls on smaller windows.
                     ui.set_max_width(width);
                     let compact = ctx.content_rect().height() < 650.0;
                     if compact {
                         ui.spacing_mut().item_spacing.y = 4.0;
                     }
-                    let height = (width / 3.0).min(if compact {
-                        if self.settings_page { 64.0 } else { 80.0 }
-                    } else if self.settings_page {
-                        (ui.available_height() * 0.18).clamp(80.0, 145.0)
+                    let banner_height = (width / 3.0).min(if compact {
+                        if rendered_settings { 34.0 } else { 82.0 }
+                    } else if rendered_settings {
+                        118.0
                     } else {
-                        (ui.available_height() * 0.25).clamp(100.0, 230.0)
+                        220.0
                     });
                     ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
-                        ui.add(
-                            egui::Image::new(&self.banner)
-                                .fit_to_exact_size(Vec2::new(height * 3.0, height)),
+                        let banner_rect = ui
+                            .allocate_exact_size(
+                                Vec2::new(banner_height * 3.0, banner_height),
+                                egui::Sense::hover(),
+                            )
+                            .0;
+                        ui.painter().image(
+                            self.banner.id(),
+                            banner_rect,
+                            theme::unit_uv(),
+                            Color32::WHITE,
                         );
+                        let anchors = [
+                            theme::VineAnchor { x: 0.49, y: 0.39, width: 0.18 },
+                            theme::VineAnchor { x: 0.59, y: 0.28, width: 0.17 },
+                            theme::VineAnchor { x: 0.78, y: 0.42, width: 0.18 },
+                            theme::VineAnchor { x: 0.88, y: 0.30, width: 0.17 },
+                        ];
+                        self.art.draw_vines(ui.painter(), banner_rect, &anchors);
                     });
-                    ui.horizontal(|ui| {
-                        if theme::button(
-                            ui,
-                            "Realms",
-                            Vec2::new(126.0, 40.0),
-                            true,
-                            !self.settings_page,
-                        )
-                        .clicked()
-                        {
-                            self.settings_page = false;
-                        }
-                        if theme::button(
-                            ui,
-                            "Settings",
-                            Vec2::new(126.0, 40.0),
-                            true,
-                            self.settings_page,
-                        )
-                        .clicked()
-                        {
-                            self.settings_page = true;
-                        }
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label(
-                                RichText::new("Launcher preview")
-                                    .color(theme::PAPER)
-                                    .size(13.0),
-                            );
-                        });
-                    });
-                    ui.add_space(4.0);
+                    ui.add_space(2.0);
+                    let panel_slot = ui.painter().add(egui::Shape::Noop);
                     let panel = theme::panel()
-                        .inner_margin(if compact { 12 } else { 16 })
+                        .inner_margin(if compact { 14 } else { 18 })
                         .show(ui, |ui| {
                             ui.set_min_width(ui.available_width());
-                            if self.settings_page {
+                            ui.horizontal(|ui| {
+                                let realms = theme::button(
+                                    ui,
+                                    &self.art,
+                                    "Realms",
+                                    Vec2::new(132.0, 48.0),
+                                    true,
+                                    theme::ButtonSkin::Tab { selected: !rendered_settings },
+                                );
+                                self.record_focus(FocusTarget::RealmsTab, &realms);
+                                self.art.icon(
+                                    ui.painter(),
+                                    0,
+                                    egui::Rect::from_center_size(
+                                        egui::pos2(realms.rect.left() + 23.0, realms.rect.center().y),
+                                        Vec2::new(22.0, 24.0),
+                                    ),
+                                );
+                                if realms.clicked() {
+                                    self.settings_page = false;
+                                }
+                                let settings = theme::button(
+                                    ui,
+                                    &self.art,
+                                    "Settings",
+                                    Vec2::new(142.0, 48.0),
+                                    true,
+                                    theme::ButtonSkin::Tab { selected: rendered_settings },
+                                );
+                                self.record_focus(FocusTarget::SettingsTab, &settings);
+                                self.art.icon(
+                                    ui.painter(),
+                                    1,
+                                    egui::Rect::from_center_size(
+                                        egui::pos2(settings.rect.left() + 23.0, settings.rect.center().y),
+                                        Vec2::new(21.0, 24.0),
+                                    ),
+                                );
+                                if settings.clicked() {
+                                    self.settings_page = true;
+                                }
+                            });
+                            ui.add_space(5.0);
+                            if rendered_settings {
                                 self.settings_ui(ui);
                             } else {
                                 self.home(ui);
                             }
-                            ui.add_space(12.0);
-                            egui::Frame::new()
-                                .fill(Color32::from_rgb(244, 225, 169))
-                                .corner_radius(8)
-                                .inner_margin(9)
-                                .show(ui, |ui| {
-                                    ui.set_min_width(ui.available_width());
-                                    ui.label(RichText::new(&self.message).strong());
-                                });
+                            ui.add_space(if compact { 2.0 } else { 8.0 });
+                            theme::plank(ui, &self.art, &self.message, if compact { 44.0 } else { 48.0 });
                         });
-                    ui.painter().rect_stroke(
-                        panel.response.rect.shrink(3.0),
-                        15,
-                        Stroke::new(1.0_f32, Color32::from_rgb(255, 253, 232)),
-                        egui::StrokeKind::Inside,
+                    ui.painter().set(
+                        panel_slot,
+                        theme::panel_shape(&self.art, panel.response.rect),
                     );
-                    ui.add_space(8.0);
-                    ui.label(
-                        RichText::new(
-                            "A non-commercial fan revival · not affiliated with Daybreak or Sony.",
-                        )
-                        .size(13.0)
-                        .color(Color32::from_rgb(220, 225, 182)),
-                    );
+                    let actual: Vec<_> = self.focus_targets.iter().map(|(target, _)| *target).collect();
+                    debug_assert!(focus_sequence_matches(
+                        &actual,
+                        rendered_settings,
+                        rendered_realms,
+                    ));
+                    if !compact {
+                        ui.add_space(4.0);
+                        ui.label(
+                            RichText::new("A non-commercial fan revival | not affiliated with Daybreak or Sony.")
+                                .size(12.0)
+                                .color(Color32::from_rgb(225, 236, 244)),
+                        );
+                    }
                 });
             });
         if let Some(path) = &self.screenshot {
-            if !self.screenshot_requested && self.started.elapsed() > Duration::from_millis(600) {
+            let capture_delay = if self.test_vine_growth.is_some() {
+                600
+            } else {
+                1700
+            };
+            if !self.screenshot_requested
+                && self.started.elapsed() > Duration::from_millis(capture_delay)
+            {
                 ctx.send_viewport_cmd(egui::ViewportCommand::Screenshot(egui::UserData::default()));
                 self.screenshot_requested = true;
             }
@@ -521,6 +748,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     diagnostics::init()?;
     let mut screenshot = None;
     let mut settings_page = false;
+    let mut focus_play = false;
+    let mut test_vine_growth = None;
     let mut window_size = [940.0, 790.0];
     let mut args = std::env::args_os().skip(1);
     while let Some(arg) = args.next() {
@@ -531,6 +760,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         } else if arg == "--settings-page" {
             settings_page = true;
+        } else if arg == "--test-focus-play" {
+            focus_play = true;
+        } else if arg == "--test-vine-growth-ms" {
+            let millis = args
+                .next()
+                .and_then(|s| s.into_string().ok())
+                .ok_or("--test-vine-growth-ms requires a value from 0 to 1500.")?
+                .parse::<u64>()?;
+            if millis > 1500 {
+                return Err("--test-vine-growth-ms requires a value from 0 to 1500.".into());
+            }
+            test_vine_growth = Some(millis as f32 / 1500.0);
         } else if arg == "--window-size" {
             let size = args
                 .next()
@@ -568,7 +809,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size(window_size)
             .with_min_inner_size([640.0, 480.0])
-            .with_title("Free Realms Expanded — Launcher"),
+            .with_title("Free Realms Expanded - Launcher"),
         renderer: eframe::Renderer::Glow,
         ..Default::default()
     };
@@ -576,12 +817,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let capture_ok = Rc::new(Cell::new(false));
     let captured = capture_ok.clone();
     let result = eframe::run_native(
-        "Free Realms Expanded — Launcher",
+        "Free Realms Expanded - Launcher",
         options,
         Box::new(move |cc| {
             Ok(Box::new(
-                Launcher::new(cc, screenshot, settings_page, captured)
-                    .map_err(std::io::Error::other)?,
+                Launcher::new(
+                    cc,
+                    screenshot,
+                    settings_page,
+                    captured,
+                    focus_play,
+                    test_vine_growth,
+                )
+                .map_err(std::io::Error::other)?,
             ))
         }),
     );
@@ -600,6 +848,104 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn controller_focus_walk_covers_every_home_and_settings_control() {
+        let cases = [
+            (
+                false,
+                2,
+                vec![
+                    FocusTarget::RealmsTab,
+                    FocusTarget::SettingsTab,
+                    FocusTarget::RealmRow(0),
+                    FocusTarget::RealmRow(1),
+                    FocusTarget::AddAddress,
+                    FocusTarget::AddRealm,
+                    FocusTarget::Play,
+                ],
+            ),
+            (
+                true,
+                2,
+                vec![
+                    FocusTarget::RealmsTab,
+                    FocusTarget::SettingsTab,
+                    FocusTarget::ClientFolder,
+                    FocusTarget::LocaleFolder,
+                    FocusTarget::WindowWidth,
+                    FocusTarget::WindowHeight,
+                    FocusTarget::ResolutionSmall,
+                    FocusTarget::ResolutionLarge,
+                    FocusTarget::ControllerToggle,
+                    FocusTarget::Back,
+                ],
+            ),
+        ];
+        for (settings, realm_count, expected) in cases {
+            assert_eq!(focus_order(settings, realm_count), expected);
+            let mut broken = expected.clone();
+            broken.pop();
+            assert!(!focus_sequence_matches(&broken, settings, realm_count));
+
+            let ctx = egui::Context::default();
+            let mut actual = Vec::new();
+            let mut path = String::new();
+            let mut locale = String::new();
+            let mut width = 1024;
+            let mut height = 768;
+            let mut controller = false;
+            let _ = ctx.run(
+                egui::RawInput {
+                    screen_rect: Some(egui::Rect::from_min_size(
+                        egui::Pos2::ZERO,
+                        Vec2::new(900.0, 700.0),
+                    )),
+                    focused: true,
+                    ..Default::default()
+                },
+                |ctx| {
+                    egui::CentralPanel::default().show(ctx, |ui| {
+                        for target in &expected {
+                            let response = match target {
+                                FocusTarget::AddAddress | FocusTarget::ClientFolder => {
+                                    ui.add(egui::TextEdit::singleline(&mut path))
+                                }
+                                FocusTarget::LocaleFolder => {
+                                    ui.add(egui::TextEdit::singleline(&mut locale))
+                                }
+                                FocusTarget::WindowWidth => {
+                                    ui.add(egui::DragValue::new(&mut width))
+                                }
+                                FocusTarget::WindowHeight => {
+                                    ui.add(egui::DragValue::new(&mut height))
+                                }
+                                FocusTarget::ControllerToggle => {
+                                    ui.checkbox(&mut controller, "Controller navigation")
+                                }
+                                target => ui.add(egui::Button::new(format!("{target:?}"))),
+                            };
+                            actual.push((*target, response.id));
+                        }
+                    });
+                },
+            );
+            assert_eq!(
+                actual.iter().map(|(target, _)| *target).collect::<Vec<_>>(),
+                expected
+            );
+            let mut current = None;
+            for index in 0..actual.len() {
+                let next = next_focus_index(current, actual.len(), true).unwrap();
+                assert_eq!(next, index);
+                ctx.memory_mut(|memory| memory.request_focus(actual[next].1));
+                assert!(ctx.memory(|memory| memory.has_focus(actual[next].1)));
+                current = Some(next);
+            }
+            let previous = next_focus_index(Some(0), actual.len(), false).unwrap();
+            assert_eq!(actual[previous].0, *expected.last().unwrap());
+        }
+    }
 
     #[test]
     fn bundled_banner_fits_startup_texture_limit() {

@@ -50,7 +50,7 @@ use Hack. The two existing emoji fallbacks remain in egui's default definitions.
 | Hack Regular (bundled by epaint_default_fonts 0.33.3) | MIT (Source Foundry), Bitstream Vera licence; DejaVu contributions public domain | `assets/fonts/Hack-Regular.txt` |
 | Noto Emoji Regular (bundled by epaint_default_fonts 0.33.3) | SIL Open Font License 1.1 | `assets/fonts/OFL.txt` |
 | emoji-icon-font (bundled by epaint_default_fonts 0.33.3) | MIT; Copyright 2014 John Slegers | `assets/fonts/emoji-icon-font-mit-license.txt` |
-| Pills, bevels, panel frames and status pips | New Rust/egui geometry in `src/theme.rs` / `src/main.rs`, covered by this crate's declared MIT OR Apache-2.0 code licence | No third-party image input |
+| Launcher W98 controls and panels | Imagegen PNGs in `assets/ui/`, with source hashes and slice boxes in `assets/ui/README.md`; no third-party image input or copied promotional art | `assets/ui/README.md` |
 | Existing `../docs/images/banner.png` | Existing project generated art, unchanged; generation brief: `lab/runs/banner/prompt-v6.md`. No separate redistribution grant was found in the repository. This task does not assign rights to game marks/characters. | Inherited art packaging/licensing question for the lead |
 
 Lilita One was read from the primary [Google Fonts directory](https://github.com/google/fonts/tree/main/ofl/lilitaone)
@@ -62,9 +62,9 @@ Content-addressed Git blobs pin the actual downloaded files:
 
 The other four notices were copied without modification from the private cache's
 `epaint_default_fonts-0.33.3/fonts/` directory, matching the locked renderer.
-There are no newly generated decorative PNGs or cut-outs. The font notices are
-complete for the five fonts compiled into this launcher; the earlier full
-transitive/runtime distribution audit remains a separate packaging gate.
+The font notices are complete for the five fonts compiled into this launcher;
+the earlier full transitive/runtime distribution audit remains a separate
+packaging gate.
 
 ## W100 key-pair authentication (2026-10-16)
 
@@ -88,3 +88,20 @@ protected OWNER RIGHTS DACLs attached at creation. Existing ACLs are verified,
 never silently broadened or rewritten. No extra Windows crate is needed.
 `tests/auth_canary.py` is development-only and does not add a launcher runtime.
 Scoped gates, limitations and lead handoff are recorded in `tests/W100.md`.
+
+## W98 generated launcher art (2026-10-16)
+
+No crate was added or updated for the image skin. The forest backdrop and icon
+sheet were reused from the approved first art attempt. The raised component
+sheet and orange vines were generated with the built-in imagegen tool, using
+`lab/runs/launcher-art/mockup-a.png`, `sheet-a.png`,
+`docs/images/banner.png` and `ref-fr-ui-kit.png` as visual references. No
+real-game promotional art was cut out or bundled. The generated source images,
+SHA-256 hashes, sampled magenta keys, exact slice boxes and vine root points
+are recorded in `assets/ui/README.md` and `assets/ui/slices.json`.
+
+The art direction and vine treatment are reconstructed from the owner's remembered
+launcher traits and marked (R) in the rendering source; they are not recovered
+client UI code. Total bundled `assets/ui/*.png` size is reported by the W98
+launcher review record. Existing `docs/images/banner.png` remains unchanged and
+keeps its prior licensing status above.
