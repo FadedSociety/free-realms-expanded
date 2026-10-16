@@ -30,7 +30,8 @@ MAP_ROOT = LAB_ROOT / "native-map"
 OUTPUT_DIR = MAP_ROOT / "run" / "ida-check"
 CONFIDENCE = ("confirmed", "likely")
 RUN_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
-SERIALIZER = re.compile(r"serializ|marshal|encode|write.{0,20}(packet|bytes|blob)|packet.{0,20}write", re.I)
+SERIALIZER = re.compile(r"\b(?:serializ\w*|marshal\w*|encod\w*)\b", re.I)
+PACKET_WORDS = {"packet", "payload", "request", "response"}
 
 
 def _within(path: Path, root: Path) -> bool:
@@ -268,12 +269,24 @@ def _string_agreement(required: list[str], actual: list[str]) -> dict[str, Any]:
     }
 
 
-def _label_is_packet_writer(record: dict[str, Any]) -> bool:
-    claims = " ".join(str(record.get(key) or "") for key in ("name", "does", "purpose", "subsystem"))
-    claims = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", claims).casefold()
-    writes = re.search(r"write|writer|serializ|marshal|encode", claims)
-    packet = re.search(r"packet|payload|request|response|net\.packet", claims)
-    return bool(writes and packet)
+def _normalized_name(value: Any) -> str:
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", str(value or ""))
+    return re.sub(r"[^A-Za-z0-9]+", " ", value).casefold()
+
+
+def _is_serializer_name(value: Any) -> bool:
+    words = _normalized_name(value)
+    tokens = words.split()
+    return bool(SERIALIZER.search(words)) or (
+        bool(PACKET_WORDS.intersection(tokens))
+        and any(token.startswith("write") for token in tokens)
+    )
+
+
+def _label_is_packet_writer(record: dict[str, Any], callee_names: list[str] | None = None) -> bool:
+    return _is_serializer_name(record.get("name")) or any(
+        _is_serializer_name(name) for name in (callee_names or [])
+    )
 
 
 def inspect_label(
@@ -283,6 +296,13 @@ def inspect_label(
     start = int(address, 16)
     record = _record(label_row.get("record"))
     function = api.ida_funcs.get_func(start)
+    function_created_on_demand = False
+    if function is None and api.ida_bytes.is_code(api.ida_bytes.get_flags(start)):
+        function_created_on_demand = bool(api.ida_funcs.add_func(start))
+        function = api.ida_funcs.get_func(start)
+        function_created_on_demand = bool(
+            function_created_on_demand and function and int(function.start_ea) == start
+        )
     exact = bool(function and int(function.start_ea) == start)
 
     source = {
@@ -335,6 +355,7 @@ def inspect_label(
         "function_size": int(function.end_ea - function.start_ea) if function else None,
         "function_name": api.ida_name.get_name(function.start_ea) if function else None,
         "boundary_match": exact,
+        "function_created_on_demand": function_created_on_demand,
         "hexrays_available": api.hexrays_available,
         "pseudocode": pseudocode,
         "pseudocode_chars": len(full_pseudocode) if full_pseudocode is not None else 0,
@@ -356,16 +377,14 @@ def inspect_label(
         flags.append({"code": "label_string_evidence_missing", "fact": "IDA found no matching function reference for one or more label string claims"})
 
     serializer_targets = []
-    if nmq is not None and _label_is_packet_writer(record):
+    if nmq is not None and _label_is_packet_writer(record, [item["name"] for item in ida_callees]):
         target_records = _map_target_records(nmq, source["callees"])
         serializer_targets = [
             address for address, target in target_records.items()
-            if target["status"] == "accepted" and SERIALIZER.search(
-                " ".join(str(target["record"].get(key) or "") for key in ("name", "does", "subsystem"))
-            )
+            if target["status"] == "accepted" and _is_serializer_name(target["record"].get("name"))
         ]
         ida_callee_set = {item["address"] for item in ida_callees}
-        ida_named_serializer = any(SERIALIZER.search(item["name"]) for item in ida_callees)
+        ida_named_serializer = any(_is_serializer_name(item["name"]) for item in ida_callees)
         observed_serializer_targets = sorted(set(serializer_targets) & ida_callee_set)
         if serializer_targets and not observed_serializer_targets and not ida_named_serializer:
             flags.append({
@@ -455,44 +474,116 @@ def _rate(matched: int, total: int) -> float | None:
     return matched / total if total else None
 
 
-def _edge_totals(rows: list[dict[str, Any]], direction: str) -> dict[str, Any]:
-    total_map = total_ida = matched = eligible = 0
-    for row in rows:
-        edges = row["agreement"][direction]
-        total_map += len(edges["map"])
-        total_ida += len(edges["ida"])
-        matched += len(edges["shared"])
-        eligible += bool(edges["map"])
+def _empty_stats() -> dict[str, Any]:
     return {
-        "functions_with_map_edges": eligible,
-        "map_edges": total_map,
-        "ida_edges": total_ida,
-        "shared_edges": matched,
-        "map_edge_coverage": _rate(matched, total_map),
-        "jaccard": _rate(matched, total_map + total_ida - matched),
+        "processed": 0,
+        "functions_found": 0,
+        "exact_boundaries": 0,
+        "functions_created_on_demand": 0,
+        "decompiled": 0,
+        "pseudocode_truncated": 0,
+        "required_strings": 0,
+        "present_strings": 0,
+        "edges": {
+            direction: {"functions_with_map_edges": 0, "map_edges": 0, "ida_edges": 0, "shared_edges": 0}
+            for direction in ("callers", "callees")
+        },
+        "flags": {},
     }
+
+
+def _add_stats(stats: dict[str, Any], row: dict[str, Any]) -> None:
+    stats["processed"] += 1
+    stats["functions_found"] += bool(row["ida"]["function_exists"])
+    stats["exact_boundaries"] += bool(row["agreement"]["boundary_match"])
+    stats["functions_created_on_demand"] += bool(row["ida"].get("function_created_on_demand"))
+    stats["decompiled"] += bool(row["ida"]["pseudocode"])
+    stats["pseudocode_truncated"] += bool(row["ida"]["pseudocode_truncated"])
+    strings = row["agreement"]["strings"]
+    stats["required_strings"] += len(strings["required"])
+    stats["present_strings"] += len(strings["required"]) - len(strings["missing"])
+    for direction in ("callers", "callees"):
+        edges = row["agreement"][direction]
+        total = stats["edges"][direction]
+        total["functions_with_map_edges"] += bool(edges["map"])
+        total["map_edges"] += len(edges["map"])
+        total["ida_edges"] += len(edges["ida"])
+        total["shared_edges"] += len(edges["shared"])
+    for flag in row["flags"]:
+        stats["flags"][flag["code"]] = stats["flags"].get(flag["code"], 0) + 1
+
+
+def _stats_rates(stats: dict[str, Any]) -> dict[str, Any]:
+    def edge_rates(direction: str) -> dict[str, Any]:
+        edges = stats["edges"][direction]
+        matched = edges["shared_edges"]
+        return {
+            **edges,
+            "map_edge_coverage": _rate(matched, edges["map_edges"]),
+            "jaccard": _rate(matched, edges["map_edges"] + edges["ida_edges"] - matched),
+        }
+
+    return {
+        "results": {
+            "processed": stats["processed"],
+            "functions_found": stats["functions_found"],
+            "exact_boundaries": stats["exact_boundaries"],
+            "boundary_match_rate": _rate(stats["exact_boundaries"], stats["processed"]),
+            "functions_created_on_demand": stats["functions_created_on_demand"],
+            "decompiled": stats["decompiled"],
+            "decompile_rate": _rate(stats["decompiled"], stats["processed"]),
+            "functions_with_pseudocode_truncated": stats["pseudocode_truncated"],
+        },
+        "agreement_rates": {
+            "boundaries": {
+                "exact": stats["exact_boundaries"],
+                "processed": stats["processed"],
+                "rate": _rate(stats["exact_boundaries"], stats["processed"]),
+            },
+            "callers": edge_rates("callers"),
+            "callees": edge_rates("callees"),
+            "label_string_evidence": {
+                "required_strings": stats["required_strings"],
+                "present_strings": stats["present_strings"],
+                "rate": _rate(stats["present_strings"], stats["required_strings"]),
+            },
+        },
+        "contradiction_flags": stats["flags"],
+    }
+
+
+def _new_grouped_stats() -> dict[str, Any]:
+    return {"all": _empty_stats(), "confidence": {}, "subsystem_prefix": {}}
+
+
+def _add_grouped_stats(groups: dict[str, Any], row: dict[str, Any]) -> None:
+    source = row["source"]
+    _add_stats(groups["all"], row)
+    confidence = str(source.get("confidence") or "unknown")
+    prefix = str(source.get("subsystem") or "unknown").split(".", 1)[0]
+    for bucket, key in (("confidence", confidence), ("subsystem_prefix", prefix)):
+        if key not in groups[bucket]:
+            groups[bucket][key] = _empty_stats()
+        _add_stats(groups[bucket][key], row)
 
 
 def summarize(
     rows: list[dict[str, Any]], target: Path, target_sha256: str, map_database: str | None,
     selection: dict[str, Any], ida_version: Any,
 ) -> dict[str, Any]:
-    processed = len(rows)
-    boundary_matches = sum(row["agreement"]["boundary_match"] for row in rows)
-    decompiled = sum(bool(row["ida"]["pseudocode"]) for row in rows)
-    required = [
-        value for row in rows for value in row["agreement"]["strings"]["required"]
-    ]
-    present = [
-        value for row in rows for value in row["agreement"]["strings"]["required"]
-        if value not in row["agreement"]["strings"]["missing"]
-    ]
-    flags = {}
+    groups = _new_grouped_stats()
     for row in rows:
-        for flag in row["flags"]:
-            flags[flag["code"]] = flags.get(flag["code"], 0) + 1
+        _add_grouped_stats(groups, row)
+    return _make_summary(groups, target, target_sha256, map_database, selection, ida_version)
+
+
+def _make_summary(
+    groups: dict[str, Any], target: Path, target_sha256: str, map_database: str | None,
+    selection: dict[str, Any], ida_version: Any,
+) -> dict[str, Any]:
+    overall = _stats_rates(groups["all"])
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "analysis": "deterministic IDA facts; no LLM verdicts",
         "call_graph_method": "resolved IDA code xrefs from/to call instructions; indirect targets are omitted",
         "string_method": "IDA data-reference targets that IDA recognizes as C strings",
@@ -502,26 +593,125 @@ def summarize(
         "map_database": map_database,
         "ida_library_version": ida_version,
         "selection": selection,
-        "results": {
-            "processed": processed,
-            "functions_found": sum(row["ida"]["function_exists"] for row in rows),
-            "exact_boundaries": boundary_matches,
-            "boundary_match_rate": _rate(boundary_matches, processed),
-            "decompiled": decompiled,
-            "decompile_rate": _rate(decompiled, processed),
-            "functions_with_pseudocode_truncated": sum(row["ida"]["pseudocode_truncated"] for row in rows),
+        **overall,
+        "agreement_rates_by_confidence": {
+            key: _stats_rates(stats)
+            for key, stats in sorted(groups["confidence"].items())
         },
-        "agreement_rates": {
-            "callers": _edge_totals(rows, "callers"),
-            "callees": _edge_totals(rows, "callees"),
-            "label_string_evidence": {
-                "required_strings": len(required),
-                "present_strings": len(present),
-                "rate": _rate(len(present), len(required)),
-            },
+        "agreement_rates_by_subsystem_prefix": {
+            key: _stats_rates(stats)
+            for key, stats in sorted(groups["subsystem_prefix"].items())
         },
-        "contradiction_flags": flags,
     }
+
+
+def review_queue_entry(row: dict[str, Any]) -> dict[str, Any] | None:
+    source, ida, agreement = row["source"], row["ida"], row["agreement"]
+    reasons = []
+    if ida["function_exists"] and not agreement["boundary_match"]:
+        reasons.append({"code": "existing_function_boundary_mismatch"})
+    graphs_disjoint = all(
+        bool(agreement[direction]["map"])
+        and bool(agreement[direction]["ida"])
+        and not agreement[direction]["shared"]
+        for direction in ("callers", "callees")
+    )
+    if graphs_disjoint:
+        reasons.append({"code": "caller_and_callee_graphs_disjoint"})
+    if ida["function_exists"] and agreement["boundary_match"] and agreement["strings"]["missing"]:
+        reasons.append({
+            "code": "required_strings_missing",
+            "strings": agreement["strings"]["missing"],
+        })
+    if not reasons:
+        return None
+    high = any(reason["code"] != "required_strings_missing" for reason in reasons)
+    confidence = str(source.get("confidence") or "unknown")
+    return {
+        "addr": source["address"],
+        "confidence": confidence,
+        "name": source.get("name"),
+        "subsystem": source.get("subsystem"),
+        "severity": "high" if high else "medium",
+        "reasons": reasons,
+        "ida_function_start": ida.get("function_start"),
+    }
+
+
+def _full_run_directory(run_name: str) -> Path:
+    if not RUN_NAME.fullmatch(run_name):
+        raise ValueError("run name must use 1-80 letters, digits, dots, underscores, or hyphens")
+    lab_root, map_root = LAB_ROOT.resolve(), MAP_ROOT.resolve()
+    output_root = OUTPUT_DIR.resolve()
+    if not _within(map_root, lab_root) or not _within(output_root, map_root):
+        raise ValueError(f"output directory must stay under {lab_root}: {output_root}")
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_root = OUTPUT_DIR.resolve()
+    run_dir = output_root / run_name
+    if not _within(run_dir.resolve(strict=False), output_root):
+        raise ValueError("full-run directory escapes the IDA-check output directory")
+    run_dir.mkdir()
+    if not _within(run_dir.resolve(), output_root):
+        raise ValueError("full-run directory escaped the IDA-check output directory")
+    return run_dir
+
+
+def write_full_report(
+    run_name: str,
+    api: SimpleNamespace,
+    labels: list[dict[str, Any]],
+    nmq: Any,
+    batch_size: int,
+    target: Path,
+    selection: dict[str, Any],
+) -> tuple[Path, Path, Path, Path, dict[str, Any]]:
+    if batch_size < 1:
+        raise ValueError("batch size must be positive")
+    run_dir = _full_run_directory(run_name)
+    report_path = run_dir / "labels.jsonl"
+    queue_path = run_dir / "review-queue.jsonl"
+    address_path = run_dir / "review-queue.txt"
+    summary_path = run_dir / "summary.json"
+    grouped_stats = _new_grouped_stats()
+    queue = []
+    with report_path.open("x", encoding="utf-8", newline="\n") as report:
+        for offset in range(0, len(labels), batch_size):
+            batch = labels[offset:offset + batch_size]
+            for label in batch:
+                row = inspect_label(api, label, label["function"], nmq)
+                report.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+                _add_grouped_stats(grouped_stats, row)
+                queued = review_queue_entry(row)
+                if queued is not None:
+                    queue.append(queued)
+
+    confidence_order = {"confirmed": 0, "likely": 1}
+    severity_order = {"high": 0, "medium": 1}
+    queue.sort(key=lambda item: (
+        confidence_order.get(item["confidence"], 2),
+        severity_order[item["severity"]],
+        item["addr"],
+    ))
+    with queue_path.open("x", encoding="utf-8", newline="\n") as output:
+        for item in queue:
+            output.write(json.dumps(item, ensure_ascii=False, sort_keys=True) + "\n")
+    with address_path.open("x", encoding="utf-8", newline="\n") as output:
+        for item in queue:
+            output.write(item["addr"] + "\n")
+
+    summary = _make_summary(
+        grouped_stats,
+        target=target,
+        target_sha256=sha256_file(target),
+        map_database=str(Path(nmq.DB).resolve()),
+        selection=selection,
+        ida_version=api.version,
+    )
+    summary["review_queue"] = {"entries": len(queue), "jsonl": queue_path.name, "addresses": address_path.name}
+    with summary_path.open("x", encoding="utf-8", newline="\n") as output:
+        json.dump(summary, output, ensure_ascii=False, indent=2, sort_keys=True)
+        output.write("\n")
+    return report_path, summary_path, queue_path, address_path, summary
 
 
 def write_report(run_name: str, rows: list[dict[str, Any]], summary: dict[str, Any]) -> tuple[Path, Path]:
@@ -558,6 +748,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--confirmed-count", type=int, default=200)
     parser.add_argument("--likely-count", type=int, default=100)
     parser.add_argument("--seed", type=int, default=97)
+    parser.add_argument("--all-accepted", action="store_true",
+                        help="inspect every accepted confirmed and likely label in bounded batches")
+    parser.add_argument("--batch-size", type=int, default=250)
     parser.add_argument("--run-name", help="safe output stem; defaults to an UTC timestamp")
     args = parser.parse_args(argv)
 
@@ -566,18 +759,62 @@ def main(argv: list[str] | None = None) -> int:
         target = api.binary
         nmq = _load_nmq()
         all_labels = load_accepted_labels(nmq)
-        chosen = select_labels(all_labels, args.confirmed_count, args.likely_count, args.seed)
-        rows = [inspect_label(api, label, label["function"], nmq) for label in chosen]
-        selected_confirmed = sum(row["record"]["confidence"] == "confirmed" for row in chosen)
+        if args.all_accepted:
+            if not is_client:
+                raise ValueError("--all-accepted requires the FreeRealms client database")
+            if args.batch_size < 1:
+                raise ValueError("batch size must be positive")
+            chosen = sorted(
+                all_labels,
+                key=lambda row: (0 if row["record"].get("confidence") == "confirmed" else 1,
+                                 int(row["addr"], 16)),
+            )
+        else:
+            chosen = select_labels(all_labels, args.confirmed_count, args.likely_count, args.seed)
+        selected_confirmed = sum(label["record"].get("confidence") == "confirmed" for label in chosen)
         selected_likely = len(chosen) - selected_confirmed
+        available_confirmed = sum(r["record"].get("confidence") == "confirmed" for r in all_labels)
+        available_likely = sum(r["record"].get("confidence") == "likely" for r in all_labels)
+        if args.all_accepted:
+            run_name = args.run_name or "full-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            if not run_name.startswith("full-"):
+                raise ValueError("--all-accepted run names must start with 'full-'")
+            report_path, summary_path, queue_path, address_path, summary = write_full_report(
+                run_name,
+                api,
+                chosen,
+                nmq,
+                args.batch_size,
+                target,
+                {
+                    "mode": "all accepted confirmed and likely labels",
+                    "accepted_confirmed_available": available_confirmed,
+                    "accepted_likely_available": available_likely,
+                    "confirmed_selected": selected_confirmed,
+                    "likely_selected": selected_likely,
+                    "order": "confirmed by address, then likely by address",
+                    "batch_size": args.batch_size,
+                },
+            )
+            print(json.dumps({
+                "labels": str(report_path),
+                "summary": str(summary_path),
+                "review_queue": str(queue_path),
+                "review_queue_addresses": str(address_path),
+                "results": summary["results"],
+                "queue_entries": summary["review_queue"]["entries"],
+            }))
+            return 0
+
+        rows = [inspect_label(api, label, label["function"], nmq) for label in chosen]
         summary = summarize(
             rows,
             target=target,
             target_sha256=sha256_file(target),
             map_database=str(Path(nmq.DB).resolve()),
             selection={
-                "accepted_confirmed_available": sum(r["record"].get("confidence") == "confirmed" for r in all_labels),
-                "accepted_likely_available": sum(r["record"].get("confidence") == "likely" for r in all_labels),
+                "accepted_confirmed_available": available_confirmed,
+                "accepted_likely_available": available_likely,
                 "confirmed_selected": selected_confirmed,
                 "likely_selected": selected_likely,
                 "seed": args.seed,
