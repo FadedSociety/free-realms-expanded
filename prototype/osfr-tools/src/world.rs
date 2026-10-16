@@ -15,6 +15,7 @@ use std::{
     fs,
     io::{self, Read},
     path::Path,
+    sync::Arc,
 };
 
 const NPC_VISIBILITY_RADIUS: f64 = 100.0; // (R) Reuses the local player-interest radius.
@@ -69,7 +70,9 @@ struct VisibleNpc {
 
 #[derive(Clone, Default)]
 pub struct NpcVisibility {
-    by_zone: BTreeMap<u32, Vec<VisibleNpc>>,
+    // (R) Parsed content is immutable during play; staged Gameplay clones share
+    // it. Host content edits use copy-on-write, keeping rollback independent.
+    by_zone: Arc<BTreeMap<u32, Vec<VisibleNpc>>>,
     content_keys: HashMap<u64, u64>,
     excluded: HashSet<u64>,
     visible: BTreeSet<u64>,
@@ -77,6 +80,17 @@ pub struct NpcVisibility {
     // Where the last update looked from, so content reloads can resend.
     last_position: Option<[f32; 3]>,
     placed: BTreeSet<u64>,
+    shared: bool,
+    revision: u64,
+}
+
+/// (R) One candidate in the common passive/hostile NPC budget. Engaged actors
+/// retain priority inside the radius; remaining ties use distance then GUID.
+#[derive(Clone, Copy, PartialEq)]
+pub struct NpcInterest {
+    pub guid: u64,
+    pub position: [f32; 3],
+    pub engaged: bool,
 }
 
 #[derive(Deserialize)]
@@ -138,6 +152,73 @@ struct ExtraNpc {
 }
 
 impl NpcVisibility {
+    pub fn revision(&self) -> u64 {
+        self.revision
+    }
+    pub fn enable_shared_interest(&mut self) {
+        self.shared = true;
+    }
+
+    /// (R) Pure directed diff for the single writer. The caller owns the full
+    /// known-NPC set; passive startup/movement/reload cannot bypass this budget.
+    pub fn shared_view(
+        &self,
+        zone: u32,
+        position: [f32; 3],
+        shared: &[NpcInterest],
+        known: &BTreeSet<u64>,
+    ) -> io::Result<(BTreeSet<u64>, Vec<Vec<u8>>)> {
+        if !position.iter().all(|v| v.is_finite()) {
+            return Err(invalid("NPC visibility position is not finite"));
+        }
+        let passive = self
+            .by_zone
+            .get(&zone)
+            .into_iter()
+            .flatten()
+            .filter(|npc| !self.excluded.contains(&npc.spawn.actor_id));
+        let mut candidates: Vec<_> = passive
+            .clone()
+            .map(|npc| NpcInterest {
+                guid: npc.spawn.actor_id,
+                position: npc.position,
+                engaged: false,
+            })
+            .chain(shared.iter().copied())
+            .filter(|npc| npc.position.iter().all(|v| v.is_finite()))
+            .map(|mut npc| {
+                // (R) Retain an observed engagement; do not evict a viewer's
+                // entire passive set for an unrelated fight they never saw.
+                npc.engaged = npc.engaged && known.contains(&npc.guid);
+                (npc, distance_squared(position, npc.position))
+            })
+            .filter(|(_, d)| *d <= NPC_VISIBILITY_RADIUS.powi(2))
+            .collect();
+        candidates.sort_by(|(a, da), (b, db)| {
+            b.engaged
+                .cmp(&a.engaged)
+                .then(da.total_cmp(db))
+                .then(a.guid.cmp(&b.guid))
+        });
+        let mut next = BTreeSet::new();
+        for (npc, _) in candidates {
+            next.insert(npc.guid);
+            if next.len() == NPC_VISIBILITY_LIMIT {
+                break;
+            }
+        }
+        let mut packets = Vec::new();
+        for guid in known.difference(&next) {
+            packets.push(crate::encounter::SharedFieldState::removal(*guid));
+        }
+        for npc in passive {
+            if next.contains(&npc.spawn.actor_id) && !known.contains(&npc.spawn.actor_id) {
+                packets.push(unframe_tunnel(&startup_world::build_add_npc(&npc.spawn))?);
+            }
+        }
+        Ok((next, packets))
+    }
+
     /// Loads regional NPC rows and the zone-less Legacy placement table.
     /// Extra spawn zones use nearest positioned regional NPC as local policy (R).
     pub fn load(content_dir: &Path) -> io::Result<Self> {
@@ -205,8 +286,7 @@ impl NpcVisibility {
             spawn.rotation = rotation;
             spawn.scale = npc.scale.unwrap_or(1.0);
             result.content_keys.insert(npc.npc_id, npc.npc_id);
-            result
-                .by_zone
+            Arc::make_mut(&mut result.by_zone)
                 .entry(OPEN_WORLD_ZONE)
                 .or_default()
                 .push(VisibleNpc {
@@ -256,8 +336,7 @@ impl NpcVisibility {
             ];
             spawn.rotation = facing(npc.heading);
             let _ = zone_id; // nearest-anchor label kept for diagnostics only
-            result
-                .by_zone
+            Arc::make_mut(&mut result.by_zone)
                 .entry(OPEN_WORLD_ZONE)
                 .or_default()
                 .push(VisibleNpc {
@@ -273,7 +352,7 @@ impl NpcVisibility {
                 result.place(placement);
             }
         }
-        for npcs in result.by_zone.values_mut() {
+        for npcs in Arc::make_mut(&mut result.by_zone).values_mut() {
             npcs.sort_by_key(|npc| npc.spawn.actor_id);
         }
         Ok(result)
@@ -285,6 +364,7 @@ impl NpcVisibility {
         if !placement.position.iter().all(|v| v.is_finite()) {
             return;
         }
+        self.revision = self.revision.wrapping_add(1);
         let mut spawn = NpcSpawn {
             actor_id: placement.guid,
             name_string_id: placement.name_string_id as i32,
@@ -298,7 +378,9 @@ impl NpcVisibility {
         // AddNpc's literal name; whether the nameplate shows it without a
         // locale id is the World Builder native text check.
         spawn.npc_name = placement.name.clone().unwrap_or_default();
-        let npcs = self.by_zone.entry(OPEN_WORLD_ZONE).or_default();
+        let npcs = Arc::make_mut(&mut self.by_zone)
+            .entry(OPEN_WORLD_ZONE)
+            .or_default();
         npcs.retain(|npc| npc.spawn.actor_id != placement.guid);
         npcs.push(VisibleNpc {
             spawn,
@@ -334,8 +416,11 @@ impl NpcVisibility {
 
     /// Remove an actor; the next [`Self::update`] sends its 35/3 removal.
     pub fn remove(&mut self, actor_id: u64) -> bool {
+        self.revision = self.revision.wrapping_add(1);
         self.placed.remove(&actor_id);
-        let npcs = self.by_zone.entry(OPEN_WORLD_ZONE).or_default();
+        let npcs = Arc::make_mut(&mut self.by_zone)
+            .entry(OPEN_WORLD_ZONE)
+            .or_default();
         let before = npcs.len();
         npcs.retain(|npc| npc.spawn.actor_id != actor_id);
         npcs.len() != before
@@ -353,6 +438,7 @@ impl NpcVisibility {
         position: [f32; 3],
         nameplate_image_id: i32,
     ) {
+        self.revision = self.revision.wrapping_add(1);
         let mut spawn = NpcSpawn {
             actor_id,
             name_string_id,
@@ -368,7 +454,9 @@ impl NpcVisibility {
         }
         spawn.position = [position[0], position[1], position[2], 1.0];
         spawn.rotation = facing(0.0);
-        let npcs = self.by_zone.entry(OPEN_WORLD_ZONE).or_default();
+        let npcs = Arc::make_mut(&mut self.by_zone)
+            .entry(OPEN_WORLD_ZONE)
+            .or_default();
         npcs.retain(|npc| npc.spawn.actor_id != actor_id);
         npcs.push(VisibleNpc {
             spawn,
@@ -379,6 +467,7 @@ impl NpcVisibility {
     }
 
     pub fn exclude_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
+        self.revision = self.revision.wrapping_add(1);
         self.excluded.extend(actor_guids);
         self.visible.retain(|guid| !self.excluded.contains(guid));
     }
@@ -413,6 +502,9 @@ impl NpcVisibility {
     pub fn update(&mut self, zone_id: u32, position: [f32; 3]) -> io::Result<Vec<Vec<u8>>> {
         if !position.iter().all(|value| value.is_finite()) {
             return Err(invalid("NPC visibility position is not finite"));
+        }
+        if self.shared {
+            return Ok(Vec::new()); // (R) Fan-out only in Server's 20 Hz tick.
         }
         if self.zone_id != Some(zone_id) {
             self.visible.clear();
@@ -633,6 +725,9 @@ pub struct ZoneInstance {
 pub struct World {
     // (R) Single-writer combat state; never part of SharedWorld::clone.
     fields: BTreeMap<InstanceId, crate::encounter::SharedFieldState>,
+    // (R) Committed action deltas wait for the 20 Hz writer, bounded by the
+    // admitted-session combat budgets and the 64-row field content limit.
+    field_packets: BTreeMap<InstanceId, Vec<Vec<u8>>>,
     zones: BTreeMap<u32, Zone>,
     npcs_by_zone: BTreeMap<u32, Vec<ContentNpcSpawn>>,
     dungeons: BTreeMap<String, Dungeon>,
@@ -662,6 +757,15 @@ impl MembershipChange {
 }
 
 impl World {
+    pub fn queue_field_packets(&mut self, instance: InstanceId, packets: Vec<Vec<u8>>) {
+        self.field_packets
+            .entry(instance)
+            .or_default()
+            .extend(packets);
+    }
+    pub fn take_field_packets(&mut self, instance: InstanceId) -> Vec<Vec<u8>> {
+        self.field_packets.remove(&instance).unwrap_or_default()
+    }
     /// (R) Shared actions never accept an instance ID from a client.
     pub fn field_for_player(
         &self,
@@ -847,6 +951,7 @@ impl World {
 
         Self {
             fields: BTreeMap::new(),
+            field_packets: BTreeMap::new(),
             zones,
             npcs_by_zone,
             dungeons,
@@ -1072,6 +1177,7 @@ impl World {
             for id in candidates {
                 self.instances.remove(&id);
                 self.fields.remove(&id);
+                self.field_packets.remove(&id);
                 removed.push(id);
             }
         }

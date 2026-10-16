@@ -204,6 +204,23 @@ impl PlayerRegistry {
         self.sessions.get(&session_id)
     }
 
+    /// (R) Read-only grid query, independent of directed PC visibility caps.
+    pub fn nearby_sessions(&self, zone: ZoneInstance, position: [f32; 3]) -> BTreeSet<SessionId> {
+        if !position.iter().all(|v| v.is_finite()) {
+            return BTreeSet::new();
+        }
+        self.nearby(zone, position)
+    }
+
+    /// A PC reference is safe only after this viewer's directed AddPc.
+    pub fn knows_character(&self, viewer: SessionId, character: u64) -> bool {
+        self.character_owners.get(&character).is_some_and(|owner| {
+            self.views
+                .get(&viewer)
+                .is_some_and(|view| view.members.contains(owner))
+        })
+    }
+
     pub fn join(
         &mut self,
         session_id: SessionId,

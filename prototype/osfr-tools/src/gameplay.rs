@@ -209,8 +209,25 @@ impl Gameplay {
         let runtime = engine.take_shared_fields()?;
         if let Some(visibility) = self.npc_visibility.as_mut() {
             visibility.exclude_actor_guids(engine.shared_field_guids().collect::<Vec<_>>());
+            visibility.enable_shared_interest();
         }
         Some(runtime)
+    }
+
+    /// (R) Common NPC budget, computed without mutating staged Gameplay clones.
+    pub fn npc_visibility_revision(&self) -> u64 {
+        self.npc_visibility.as_ref().map_or(0, |v| v.revision())
+    }
+    pub fn shared_npc_view(
+        &self,
+        character: &CharacterState,
+        fields: &[crate::world::NpcInterest],
+        known: &BTreeSet<u64>,
+    ) -> io::Result<(BTreeSet<u64>, Vec<Vec<u8>>)> {
+        self.npc_visibility
+            .as_ref()
+            .unwrap_or(&crate::world::NpcVisibility::default())
+            .shared_view(character.zone_id, character.position, fields, known)
     }
     pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
         self.encounter

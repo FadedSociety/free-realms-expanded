@@ -757,6 +757,9 @@ pub struct FieldParticipant {
     pub mitigation: f32,
     pub grace_until: u64,
     pub combat: bool,
+    /// (R) Live shared aggro requires an observed NPC. Solo/unit callers use
+    /// None; the gateway supplies its final combined NPC set after reconciliation.
+    pub known_npcs: Option<BTreeSet<u64>>,
 }
 
 impl SharedFieldState {
@@ -785,6 +788,12 @@ impl SharedFieldState {
             .iter()
             .find(|f| f.actor.guid == guid)
             .map(|f| f.state.health)
+    }
+    pub fn respawn_at(&self, guid: u64) -> Option<u64> {
+        self.enemies
+            .iter()
+            .find(|f| f.actor.guid == guid)?
+            .respawn_at
     }
     pub fn position(&self, guid: u64) -> Option<[f32; 3]> {
         self.enemies
@@ -839,7 +848,26 @@ impl SharedFieldState {
             }
         }
     }
-    /// (R) Interim field-only interest; slice 3 coordinates the passive NPC budget.
+    /// (R) Candidates for the common NPC budget. Dead rows are retained only
+    /// for existing observers until their committed lethal HP delta is flushed.
+    pub fn interest_candidates(&self, hold_deaths: bool) -> Vec<crate::world::NpcInterest> {
+        self.enemies
+            .iter()
+            .filter(|f| f.present && (f.state.health > 0 || hold_deaths))
+            .map(|f| crate::world::NpcInterest {
+                guid: f.actor.guid,
+                position: f.state.position,
+                engaged: f.motion == FieldMotion::Chasing,
+            })
+            .chain(self.battles.iter().map(|b| crate::world::NpcInterest {
+                guid: b.spawner.guid,
+                position: self.position(b.spawner.guid).unwrap_or(b.spawner.position),
+                engaged: false,
+            }))
+            .collect()
+    }
+    /// (R) Field-only view retained for the slice-2 oracle. Live delivery uses
+    /// NpcVisibility's combined passive/hostile budget.
     pub fn visible(&self, position: [f32; 3]) -> BTreeSet<u64> {
         let mut rows: Vec<_> = self
             .enemies
@@ -869,6 +897,18 @@ impl SharedFieldState {
             return Ok(vec![
                 spawn_actor(&self.template.template, &f.actor, f.state.position, 0),
                 enemy_hp(guid, f.state.health, f.actor.max_health),
+                // Late observers start with current status and motion (R).
+                animation(
+                    guid,
+                    if self.stuns.contains_key(&guid) {
+                        1401
+                    } else if self.moving.contains(&guid) {
+                        3
+                    } else {
+                        1
+                    },
+                    true,
+                ),
                 relevance(&[guid], false),
             ]);
         }
@@ -1093,6 +1133,7 @@ impl EncounterEngine {
             },
             grace_until: self.field_grace_until,
             combat: combat && !self.active(),
+            known_npcs: None,
         }
     }
     /// (R) Borrow canonical rows only while calculating one staged action. The
@@ -3651,6 +3692,9 @@ impl EncounterEngine {
             }
             let valid = |p: &&FieldParticipant| {
                 p.combat
+                    && p.known_npcs
+                        .as_ref()
+                        .is_none_or(|known| known.contains(&guid))
                     && p.health > 0
                     && now_ms >= p.grace_until
                     && valid_position(p.position)
@@ -3838,6 +3882,12 @@ impl EncounterEngine {
         }
         for i in respawned {
             let f = &self.field[i];
+            if shared {
+                // (R) One observer diff emits AddNpc/full HP, never a second
+                // simulation spawn or HP correction for the same respawn.
+                out.changed = true;
+                continue;
+            }
             out.replies.push(self.spawn(&f.actor, f.state.position, 0));
             out.replies
                 .push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));

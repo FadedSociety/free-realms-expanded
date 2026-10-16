@@ -403,7 +403,11 @@ struct Session {
     receiver: ReliableReceiver,
     sender: ReliableSender,
     gateway: Gateway,
-    known_fields: BTreeSet<u64>,
+    known_npcs: BTreeSet<u64>,
+    npc_visibility_revision: Option<u64>,
+    // (R) W106's directed-view approach: unchanged inputs retain the known set.
+    npc_view_position: Option<[f32; 3]>,
+    npc_view_fields: Vec<osfr_tools::world::NpcInterest>,
     state_path: PathBuf,
     // Studio packet inspector: the most recent application messages.
     recent: std::collections::VecDeque<serde_json::Value>,
@@ -735,13 +739,11 @@ fn load_gateway_from(
     // at startup), so this is the host's own solo dev session: admin only when
     // --dev-tools is on. Account-store sessions get their stored role at
     // character binding and default to player.
-    gateway.set_role(
-        if options.account_store.is_none() && options.dev_tools {
-            osfr_tools::account_store::AccountRole::Admin
-        } else {
-            osfr_tools::account_store::AccountRole::Player
-        },
-    );
+    gateway.set_role(if options.account_store.is_none() && options.dev_tools {
+        osfr_tools::account_store::AccountRole::Admin
+    } else {
+        osfr_tools::account_store::AccountRole::Player
+    });
     Ok(gateway)
 }
 
@@ -832,7 +834,10 @@ impl Session {
             state_path: options.state.clone(),
             recent: std::collections::VecDeque::new(),
             recent_on: options.dev_tools,
-            known_fields: BTreeSet::new(),
+            known_npcs: BTreeSet::new(),
+            npc_visibility_revision: None,
+            npc_view_position: None,
+            npc_view_fields: Vec::new(),
             social_path: social_identity
                 .as_ref()
                 .map(|_| social_path(&options.state)),
@@ -1410,16 +1415,14 @@ impl Session {
                 .filter(|_| staged_gateway.is_world_loaded())
             {
                 let target = action.target();
-                if target == self.character_guid
-                    || target == 0
-                    || self.known_fields.contains(&target)
+                if target == self.character_guid || target == 0 || self.known_npcs.contains(&target)
                 {
                     // ponytail: at most 64 rows in one instance; no World clone.
                     let mut field = field.clone();
                     let result = staged_gateway.handle_shared_field(
                         &action,
                         &mut field,
-                        &self.known_fields,
+                        &self.known_npcs,
                         now_ms,
                     )?;
                     outcome.state_changed |= result.changed;
@@ -1487,15 +1490,6 @@ impl Session {
                 staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
             let mut staged_world = world.clone();
             let mut deliveries = Vec::new();
-            if let Some((instance, _)) = &staged_field {
-                deliveries.extend(field_deliveries(
-                    self,
-                    sessions,
-                    membership,
-                    *instance,
-                    &field_packets,
-                ));
-            }
             if transfer && staged_world.joined.contains(&self.id) {
                 deliveries.extend(staged_world.leave_player(self.id));
             }
@@ -1564,9 +1558,13 @@ impl Session {
         }
         if let Some((instance, field)) = staged_field {
             membership.install_field(instance, field);
+            membership.queue_field_packets(instance, field_packets);
         }
         if transfer {
-            self.known_fields.clear();
+            self.known_npcs.clear();
+            self.npc_visibility_revision = None;
+            self.npc_view_position = None;
+            self.npc_view_fields.clear();
         }
         self.gateway = staged_gateway;
         *world = staged_world;
@@ -1828,6 +1826,17 @@ impl Session {
         for wire in self.sender.poll(now_ms)? {
             self.send(socket, &wire)?;
         }
+        Ok(())
+    }
+
+    fn queue_shared_message(&mut self, message: &[u8]) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(trace) = &self.trace {
+            trace_application_out(trace, self.id.0, self.peer, message, &[], Some(self.id.0))?;
+        }
+        if self.recent_on {
+            self.note_packet("out", message);
+        }
+        self.sender.queue_message(message)?;
         Ok(())
     }
 
@@ -2126,10 +2135,51 @@ impl Server {
         }
         field.retain_casters(&active.iter().map(|(_, player)| player.guid).collect());
         field.set_active_quests(&quests);
-        // Reconcile before simulation so startup always precedes deltas.
-        self.sync_field_views(&field)?;
+        // (R) Current poses/caps first. Hold only already-known corpses through
+        // lethal HP delivery, then remove once. New observers get current HP,
+        // never a replay of action deltas committed before their AddNpc.
+        let previous: BTreeMap<_, _> = self
+            .sessions
+            .values()
+            .map(|s| (s.id, s.known_npcs.clone()))
+            .collect();
+        self.sync_field_views(&field, true)?;
+        for (key, player) in &mut active {
+            player.known_npcs = Some(self.sessions[key].known_npcs.clone());
+        }
+        let committed = self.membership.take_field_packets(0);
+        // (R) Only a lethal committed HP update needs the held corpse removed.
+        // Idle ticks already reconciled poses/readiness above; do not rank the
+        // entire passive population twice when simulation changes nothing.
+        let mut resync = committed.iter().any(|packet| {
+            packet.starts_with(&[35, 0, 5, 0])
+                && packet.get(12..16) == Some(0_u32.to_le_bytes().as_slice())
+        });
+        let deliveries = self
+            .sessions
+            .values()
+            .flat_map(|recipient| {
+                let retained = recipient
+                    .known_npcs
+                    .intersection(&previous[&recipient.id])
+                    .copied()
+                    .collect();
+                field_packets_for(
+                    recipient,
+                    &self.membership,
+                    &self.world.players,
+                    0,
+                    &committed,
+                    &retained,
+                )
+            })
+            .collect::<Vec<_>>();
+        self.queue_field_deliveries(deliveries)?;
         let Some(elapsed) = field.due(now_ms) else {
-            self.membership.install_field(0, field);
+            self.membership.install_field(0, field.clone());
+            if resync {
+                self.sync_field_views(&field, false)?;
+            }
             return Ok(());
         };
         let mut staged = BTreeMap::new();
@@ -2139,6 +2189,7 @@ impl Server {
         for (key, _) in &active {
             let mut gateway = self.sessions[key].gateway.clone();
             let out = gateway.tick_shared_effects(&mut field, now_ms)?;
+            resync |= out.changed;
             if out.changed {
                 changed.insert(*key);
             }
@@ -2157,6 +2208,7 @@ impl Server {
                 .get_mut(driver)
                 .unwrap()
                 .tick_shared_motion(&mut field, &players, now_ms, elapsed)?;
+            resync |= out.changed;
             packets.extend(out.replies.into_iter().filter(|p| field_packet(p)));
             for (key, player) in &active {
                 let damage = hits
@@ -2188,53 +2240,141 @@ impl Server {
                 self.sessions
                     .get_mut(&key)
                     .unwrap()
-                    .sender
-                    .queue_message(&wrap_application(&reply))?;
+                    .queue_shared_message(&wrap_application(&reply))?;
             }
         }
-        // Known NPC sets are independent of directed player views. Full budget
-        // coordination and death/respawn acceptance remain slice 3.
         let deliveries = self
             .sessions
             .values()
-            .flat_map(|recipient| field_packets_for(recipient, &self.membership, 0, &packets))
+            .flat_map(|recipient| {
+                field_packets_for(
+                    recipient,
+                    &self.membership,
+                    &self.world.players,
+                    0,
+                    &packets,
+                    &recipient.known_npcs,
+                )
+            })
             .collect::<Vec<_>>();
-        for delivery in deliveries {
-            if let Some(key) = self.world.session_keys.get(&delivery.recipient) {
-                if let Some(session) = self.sessions.get_mut(key) {
-                    session.sender.queue_message(&delivery.bytes)?;
-                }
-            }
+        self.queue_field_deliveries(deliveries)?;
+        if resync {
+            self.sync_field_views(&field, false)?;
         }
-        self.sync_field_views(&field)?;
         Ok(())
     }
+
+    fn queue_field_deliveries(
+        &mut self,
+        deliveries: Vec<Delivery>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        for delivery in deliveries {
+            if let Some(session) = self
+                .world
+                .session_keys
+                .get(&delivery.recipient)
+                .and_then(|key| self.sessions.get_mut(key))
+            {
+                session.queue_shared_message(&delivery.bytes)?;
+            }
+        }
+        Ok(())
+    }
+
     fn sync_field_views(
         &mut self,
         field: &osfr_tools::encounter::SharedFieldState,
+        hold_deaths: bool,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        let candidates = field.interest_candidates(hold_deaths);
+        let zone = ZoneInstance::from_world(self.membership.instance(0).unwrap().zone_id, 0)?;
+        // Reuse W96's grid for candidates, never the capped PC observer sets.
+        let nearby: BTreeSet<_> = candidates
+            .iter()
+            .flat_map(|npc| self.world.players.nearby_sessions(zone, npc.position))
+            .collect();
         for session in self.sessions.values_mut() {
             let valid = self
                 .membership
                 .player_location(session.character_guid)
                 .is_some_and(|l| l.instance_id == 0 && l.ready)
                 && session.gateway.is_world_loaded();
-            let wanted = if valid {
-                field.visible(session.gateway.state().position)
+            let fields: Vec<_> = candidates
+                .iter()
+                .copied()
+                .filter(|npc| {
+                    nearby.contains(&session.id)
+                        && (field.health(npc.guid) != Some(0)
+                            || session.known_npcs.contains(&npc.guid))
+                })
+                .collect();
+            let revision = session
+                .gateway
+                .gameplay()
+                .map_or(0, |game| game.npc_visibility_revision());
+            if valid
+                && session.npc_visibility_revision == Some(revision)
+                && session.npc_view_position == Some(session.gateway.state().position)
+                && session.npc_view_fields == fields
+            {
+                continue;
+            }
+            let (wanted, packets) = if valid {
+                session
+                    .gateway
+                    .gameplay()
+                    .map(|game| {
+                        let revision = game.npc_visibility_revision();
+                        let mut known = session.known_npcs.clone();
+                        let mut refreshed = Vec::new();
+                        if session
+                            .npc_visibility_revision
+                            .is_some_and(|old| old != revision)
+                        {
+                            // ponytail: admin placement edits resend at most 64
+                            // passive actors; no second per-actor revision cache.
+                            known.retain(|guid| {
+                                if field.position(*guid).is_some() {
+                                    return true;
+                                }
+                                refreshed
+                                    .push(osfr_tools::encounter::SharedFieldState::removal(*guid));
+                                false
+                            });
+                        }
+                        let (wanted, packets) =
+                            game.shared_npc_view(session.gateway.state(), &fields, &known)?;
+                        refreshed.extend(packets);
+                        session.npc_visibility_revision = Some(revision);
+                        Ok::<_, io::Error>((wanted, refreshed))
+                    })
+                    .transpose()?
+                    .unwrap_or_default()
             } else {
-                BTreeSet::new()
+                (
+                    BTreeSet::new(),
+                    session
+                        .known_npcs
+                        .iter()
+                        .map(|guid| osfr_tools::encounter::SharedFieldState::removal(*guid))
+                        .collect(),
+                )
             };
-            for guid in wanted.difference(&session.known_fields) {
-                for reply in field.initialization(*guid)? {
-                    session.sender.queue_message(&wrap_application(&reply))?;
+            for reply in packets {
+                session.queue_shared_message(&wrap_application(&reply))?;
+            }
+            for guid in wanted
+                .difference(&session.known_npcs)
+                .copied()
+                .collect::<Vec<_>>()
+            {
+                for reply in field.initialization(guid)? {
+                    session.queue_shared_message(&wrap_application(&reply))?;
                 }
             }
-            for guid in session.known_fields.difference(&wanted) {
-                session.sender.queue_message(&wrap_application(
-                    &osfr_tools::encounter::SharedFieldState::removal(*guid),
-                ))?;
-            }
-            session.known_fields = wanted;
+            session.known_npcs = wanted;
+            session.npc_view_position = valid.then_some(session.gateway.state().position);
+            session.npc_view_fields = fields;
         }
         Ok(())
     }
@@ -2367,6 +2507,75 @@ impl Server {
     pub fn test_field_health(&self, guid: u64) -> Option<u32> {
         self.membership.field(0)?.health(guid)
     }
+    #[cfg(test)]
+    pub fn test_known_npcs(&self, guid: u64) -> BTreeSet<u64> {
+        let id = self.world.active_sessions[&guid];
+        self.sessions[&self.world.session_keys[&id]]
+            .known_npcs
+            .clone()
+    }
+    #[cfg(test)]
+    pub fn test_field_clock(&self, guid: u64) -> (u64, Option<u64>) {
+        (
+            self.start.elapsed().as_millis() as u64,
+            self.membership.field(0).and_then(|f| f.respawn_at(guid)),
+        )
+    }
+    #[cfg(test)]
+    pub fn test_pc_interest_limit(&mut self, limit: usize) {
+        assert!(self.sessions.is_empty());
+        self.world.players = PlayerRegistry::new(InterestPolicy::new(100.0, limit).unwrap());
+    }
+    /// Test setup only: use the existing authorized teleport/commit path.
+    #[cfg(test)]
+    pub fn test_observer_position(&mut self, guid: u64, position: [f32; 3]) {
+        assert!(position.iter().all(|v| v.is_finite()));
+        let id = self.world.active_sessions[&guid];
+        let key = self.world.session_keys[&id];
+        let mut session = self.sessions.remove(&key).unwrap();
+        let mut staged = session.gateway.clone();
+        let role = staged.role();
+        let path = self.options.account_store.as_ref().unwrap();
+        let mut accounts = AccountStore::load(path).unwrap();
+        accounts
+            .set_account_role_offline(
+                session.account_guid,
+                osfr_tools::account_store::AccountRole::Builder,
+            )
+            .unwrap();
+        accounts.save(path).unwrap();
+        staged.set_dev_tools(true);
+        staged.set_role(osfr_tools::account_store::AccountRole::Builder);
+        let request = osfr_tools::chat::local_request(&format!(
+            "realm goto {} {} {}",
+            position[0], position[1], position[2]
+        ));
+        let now = self.start.elapsed().as_millis() as u64;
+        let result = staged.handle_at(&wrap_application(&request), now);
+        accounts
+            .set_account_role_offline(session.account_guid, role)
+            .unwrap();
+        accounts.save(path).unwrap();
+        let outcome = result.unwrap();
+        staged.set_role(role);
+        staged.set_dev_tools(self.options.dev_tools);
+        let previous = session.gateway.state().clone();
+        assert!(
+            session
+                .commit_outcome(
+                    staged,
+                    previous,
+                    outcome,
+                    &mut self.world,
+                    &mut self.membership,
+                    &mut self.sessions,
+                    now
+                )
+                .unwrap()
+        );
+        assert_eq!(session.gateway.state().position, position);
+        self.sessions.insert(key, session);
+    }
     // (R) Socket-test setup is host-only and absent from the shipped binary.
     #[cfg(test)]
     pub fn test_child(&mut self) -> i32 {
@@ -2485,88 +2694,95 @@ impl Server {
         let mut buffer = [0; 65_535];
         // (R) Bound each receive batch; tick the world after at most 64 packets.
         for _ in 0..64 {
-        match self.socket.recv_from(&mut buffer) {
-            Ok((length, peer))
-                if osfr_tools::net_policy::allowed(peer.ip(), self.options.allow_lan) =>
-            {
-                let wire = &buffer[..length];
-                if wire.starts_with(&[0, 1])
-                    && !peer.ip().is_loopback()
-                    && !self.handshakes.allow(peer.ip(), Instant::now())
+            match self.socket.recv_from(&mut buffer) {
+                Ok((length, peer))
+                    if osfr_tools::net_policy::allowed(peer.ip(), self.options.allow_lan) =>
                 {
-                    self.refuse("handshake_rate");
-                } else if wire.starts_with(&[0, 1]) {
-                    match SessionRequest::parse(wire) {
-                        Ok(request) => {
-                            if let Some(trace) = &self.trace {
-                                trace.record(json!({
+                    let wire = &buffer[..length];
+                    if wire.starts_with(&[0, 1])
+                        && !peer.ip().is_loopback()
+                        && !self.handshakes.allow(peer.ip(), Instant::now())
+                    {
+                        self.refuse("handshake_rate");
+                    } else if wire.starts_with(&[0, 1]) {
+                        match SessionRequest::parse(wire) {
+                            Ok(request) => {
+                                if let Some(trace) = &self.trace {
+                                    trace.record(json!({
                                     "event":"packet","peer":peer.to_string(),"direction":"in",
                                     "transport":{"soe_opcode":1,"soe_name":"SessionRequest","mode":"handshake"},
                                     "body_len":wire.len(),"body_head_hex":null,"outcome":"accepted"
                                 }))?;
+                                }
+                                self.accept_handshake(peer, request)?;
                             }
-                            self.accept_handshake(peer, request)?;
-                        }
-                        Err(error) => {
-                            if let Some(trace) = &self.trace {
-                                trace.record(json!({
+                            Err(error) => {
+                                if let Some(trace) = &self.trace {
+                                    trace.record(json!({
                                     "event":"packet","peer":peer.to_string(),"direction":"in",
                                     "transport":{"soe_opcode":1,"soe_name":"SessionRequest","mode":"handshake"},
                                     "body_len":wire.len(),"body_head_hex":null,"outcome":"rejected","reason":error.to_string()
                                 }))?;
+                                }
                             }
                         }
-                    }
-                } else if let Some(key) = self.session_key_for_peer(peer) {
-                    if let Some(mut current) = self.sessions.remove(&key) {
-                        let now = Instant::now();
-                        let over_budget =
-                            !current
-                                .packets
-                                .take(1.0, PACKET_BUDGET.0, PACKET_BUDGET.1, now)
-                                || !current.bytes.take(
-                                    wire.len() as f64,
-                                    BYTE_BUDGET.0,
-                                    BYTE_BUDGET.1,
-                                    now,
+                    } else if let Some(key) = self.session_key_for_peer(peer) {
+                        if let Some(mut current) = self.sessions.remove(&key) {
+                            let now = Instant::now();
+                            let over_budget =
+                                !current
+                                    .packets
+                                    .take(1.0, PACKET_BUDGET.0, PACKET_BUDGET.1, now)
+                                    || !current.bytes.take(
+                                        wire.len() as f64,
+                                        BYTE_BUDGET.0,
+                                        BYTE_BUDGET.1,
+                                        now,
+                                    );
+                            if over_budget {
+                                // Dropped unread; the session and everyone else keep running.
+                                self.sessions.insert(key, current);
+                                self.refuse("packet_budget");
+                            } else {
+                                let result = current.handle(
+                                    &self.socket,
+                                    wire,
+                                    &self.options,
+                                    now_ms,
+                                    &mut self.world,
+                                    &mut self.membership,
+                                    &mut self.sessions,
                                 );
-                        if over_budget {
-                            // Dropped unread; the session and everyone else keep running.
-                            self.sessions.insert(key, current);
-                            self.refuse("packet_budget");
-                        } else {
-                            let result = current.handle(
-                                &self.socket,
-                                wire,
-                                &self.options,
-                                now_ms,
-                                &mut self.world,
-                                &mut self.membership,
-                                &mut self.sessions,
-                            );
-                            match result {
-                                Ok(false) => {
-                                    self.sessions.insert(key, current);
+                                match result {
+                                    Ok(false) => {
+                                        self.sessions.insert(key, current);
+                                    }
+                                    Ok(true) => {
+                                        self.end_session(key, current, "client_disconnect")?
+                                    }
+                                    Err(error) => {
+                                        self.end_session(key, current, &error.to_string())?
+                                    }
                                 }
-                                Ok(true) => self.end_session(key, current, "client_disconnect")?,
-                                Err(error) => self.end_session(key, current, &error.to_string())?,
                             }
                         }
                     }
                 }
+                Ok(_) => {}
+                // ConnectionReset is Windows reporting that an earlier datagram hit
+                // a closed port (a player whose game exited); it is not fatal.
+                Err(error)
+                    if matches!(
+                        error.kind(),
+                        io::ErrorKind::WouldBlock
+                            | io::ErrorKind::TimedOut
+                            | io::ErrorKind::ConnectionReset
+                    ) =>
+                {
+                    break;
+                }
+                Err(error) => return Err(error.into()),
             }
-            Ok(_) => {}
-            // ConnectionReset is Windows reporting that an earlier datagram hit
-            // a closed port (a player whose game exited); it is not fatal.
-            Err(error)
-                if matches!(
-                    error.kind(),
-                    io::ErrorKind::WouldBlock
-                        | io::ErrorKind::TimedOut
-                        | io::ErrorKind::ConnectionReset
-                ) => break,
-            Err(error) => return Err(error.into()),
-        }
         }
         let now_ms = self.start.elapsed().as_millis() as u64;
         // (R) 20 Hz simulation; ACK/retry flushing still runs every step.
@@ -3208,12 +3424,17 @@ impl Server {
     ) -> Result<(), Box<dyn std::error::Error>> {
         if reason == "login_deadline" {
             if self.retired_handshakes.len() >= MAX_SESSIONS * 4 {
-                if let Some(oldest) = self.retired_handshakes.iter()
-                    .min_by_key(|(_, until)| **until).map(|(key, _)| *key) {
+                if let Some(oldest) = self
+                    .retired_handshakes
+                    .iter()
+                    .min_by_key(|(_, until)| **until)
+                    .map(|(key, _)| *key)
+                {
                     self.retired_handshakes.remove(&oldest);
                 }
             }
-            self.retired_handshakes.insert(key, Instant::now() + Duration::from_secs(60));
+            self.retired_handshakes
+                .insert(key, Instant::now() + Duration::from_secs(60));
         }
         // A duplicate login of a character that another session already owns
         // must not save its stale copy over the live one (10-15 audit).
@@ -3314,7 +3535,8 @@ mod tests {
     #[test]
     fn w120_player_denial_is_logged_and_studio_requires_admin() {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let scratch = std::env::temp_dir().join(format!("osfr-w120-session-{}", std::process::id()));
+        let scratch =
+            std::env::temp_dir().join(format!("osfr-w120-session-{}", std::process::id()));
         fs::create_dir_all(&scratch).unwrap();
         let log_path = scratch.join("security.jsonl");
         let _ = fs::remove_file(&log_path);
@@ -3698,17 +3920,25 @@ fn field_packet(packet: &[u8]) -> bool {
 fn field_packets_for(
     recipient: &Session,
     membership: &World,
+    players: &PlayerRegistry,
     instance: i32,
     packets: &[Vec<u8>],
+    known_npcs: &BTreeSet<u64>,
 ) -> Vec<Delivery> {
-    if !recipient.gateway.is_world_loaded()
-        || !membership
+    if !field_recipient_matches(
+        recipient.gateway.is_world_loaded(),
+        membership
             .player_location(recipient.character_guid)
-            .is_some_and(|l| l.instance_id == instance && l.ready)
-    {
+            .map(|l| (l.instance_id, l.ready)),
+        instance,
+    ) {
         return Vec::new();
     }
-    let known = |guid| guid == recipient.character_guid || recipient.known_fields.contains(&guid);
+    let known = |guid| {
+        guid == recipient.character_guid
+            || known_npcs.contains(&guid)
+            || players.knows_character(recipient.id, guid)
+    };
     packets
         .iter()
         .filter(|packet| {
@@ -3741,17 +3971,27 @@ fn field_packets_for(
         })
         .collect()
 }
-fn field_deliveries(
-    current: &Session,
-    sessions: &SessionMap,
-    membership: &World,
-    instance: i32,
-    packets: &[Vec<u8>],
-) -> Vec<Delivery> {
-    std::iter::once(current)
-        .chain(sessions.values())
-        .flat_map(|s| field_packets_for(s, membership, instance, packets))
-        .collect()
+// (R) A server-owned membership, never the attacker's directed PC view,
+// determines which ready instance may observe a field event.
+fn field_recipient_matches(loaded: bool, location: Option<(i32, bool)>, instance: i32) -> bool {
+    #[cfg(test)]
+    if std::env::var_os("OSFR_W127_CROSS_INSTANCE_CANARY").is_some() {
+        return loaded; // Deliberate test-only broadcast mutation.
+    }
+    loaded && location.is_some_and(|(id, ready)| id == instance && ready)
+}
+
+#[cfg(test)]
+#[test]
+fn w127_other_instance_recipient_canary() {
+    assert!(field_recipient_matches(true, Some((0, true)), 0));
+    assert!(
+        !field_recipient_matches(true, Some((7, true)), 0),
+        "recipient assertion: another instance received field deltas"
+    );
+    assert!(!field_recipient_matches(true, Some((0, false)), 0));
+    assert!(!field_recipient_matches(false, Some((0, true)), 0));
+    assert!(!field_recipient_matches(true, None, 0));
 }
 
 #[cfg(test)]

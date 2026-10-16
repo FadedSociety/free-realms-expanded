@@ -1,0 +1,646 @@
+// Reuse W116's synthetic content, numeric accounts, Bot and serviced barriers.
+// Its historical private socket check remains opt-in; W127's route runs below.
+include!("shared_field_state.rs");
+
+fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
+    static SERIAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/reports/shared-world-w108/slice-3")
+        .join(format!(
+            "socket-{}-{}",
+            std::process::id(),
+            SERIAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ));
+    fs::create_dir_all(&root).unwrap();
+    let accounts = create_account_store(&root);
+    let content = create_content(&root);
+    // Empty passive world except the requested cap fixture. No campaign edits.
+    fs::write(
+        content.join("npc_spawns_extra.json"),
+        json!({"records":[]}).to_string(),
+    )
+    .unwrap();
+    for row in fs::read_dir(content.join("npcs")).unwrap() {
+        fs::remove_file(row.unwrap().path()).unwrap();
+    }
+    fs::write(
+        content.join("npcs/0.json"),
+        json!({"records":[{"npc_id":930108,"zone_id":0,"position":[200,0,200]}]}).to_string(),
+    )
+    .unwrap();
+    let placements: Vec<_> = (0..passive).map(|i| json!({"guid":130000000000_u64+i as u64,"model_id":3,"position":[2,0,0],"heading":0,"scale":1})).collect();
+    fs::write(
+        content.join("npc_placements.json"),
+        json!({"schema_version":1,"records":placements}).to_string(),
+    )
+    .unwrap();
+    // No marker in this fixture: exactly one hostile and passive cap rows.
+    let mut battles: serde_json::Value =
+        serde_json::from_slice(&fs::read(content.join("field_battles.json")).unwrap()).unwrap();
+    battles["battles"] = json!([]);
+    fs::write(content.join("field_battles.json"), battles.to_string()).unwrap();
+    let options = Options {
+        bind: "127.0.0.1:0".parse().unwrap(),
+        reference: Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-gateway-reference"),
+        state: root.join("state.json"),
+        content: Some(content),
+        identity: None,
+        account_store: Some(accounts.clone()),
+        gateway_ticket: String::new(),
+        handoff_key: HANDOFF_KEY.to_vec(),
+        seconds: 0,
+        dev_tools: false,
+        studio_port: 0,
+        client_logs: None,
+        terrain: Some({
+            let directory = root.join("terrain");
+            fs::create_dir_all(&directory).unwrap();
+            let mut grid =
+                osfr_tools::terrain::HeightGrid::new([-256., -256.], [256., 256.], 2.).unwrap();
+            grid.add_triangle([[-256., 0., -256.], [256., 0., -256.], [256., 0., 256.]]);
+            grid.add_triangle([[-256., 0., -256.], [256., 0., 256.], [-256., 0., 256.]]);
+            fs::write(directory.join("zone_0.hgt"), grid.to_bytes()).unwrap();
+            std::sync::Arc::new(osfr_tools::terrain::Terrain::load(&directory).unwrap())
+        }),
+        world: None,
+        stock_text: None,
+        allow_lan: false,
+        security_log: None,
+    };
+    let (tx, rx) = mpsc::channel::<HostAction>();
+    let (addr_tx, addr_rx) = mpsc::channel();
+    let handle = thread::spawn(move || {
+        let mut server = Server::new(options).unwrap();
+        if exclude_pc {
+            server.test_pc_interest_limit(0);
+        }
+        addr_tx.send(server.local_addr().unwrap()).unwrap();
+        loop {
+            match rx.try_recv() {
+                Ok(action) => action(&mut server),
+                Err(mpsc::TryRecvError::Empty) => {}
+                Err(mpsc::TryRecvError::Disconnected) => break,
+            }
+            server.step().unwrap();
+        }
+        server.shutdown().unwrap();
+    });
+    Fixture {
+        addr: addr_rx.recv_timeout(Duration::from_secs(10)).unwrap(),
+        tx: Some(tx),
+        handle: Some(handle),
+        root,
+        accounts,
+    }
+}
+
+fn interest_login(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) -> [Vec<Vec<u8>>; 2] {
+    let store = AccountStore::load(&f.accounts).unwrap();
+    for (guid, client) in [(101, &mut *a), (202, &mut *b)] {
+        client
+            .send_message(
+                &bot::login_message(
+                    guid,
+                    &login::gateway_binding_ticket(HANDOFF_KEY, store.account(guid).unwrap(), guid),
+                    VERSION,
+                ),
+                "1",
+            )
+            .unwrap();
+        client.wait_for(Duration::from_secs(3), |_| true).unwrap();
+        client.send_message(&packet(13, &[]), "13").unwrap();
+        client.wait_for(Duration::from_secs(3), |_| true).unwrap();
+    }
+    a.send_message(&packet(10, &[]), "10").unwrap();
+    let mut out = f.ready(101, a, b);
+    b.send_message(&packet(10, &[]), "10").unwrap();
+    let batch = f.ready(202, a, b);
+    for i in 0..2 {
+        out[i].extend(batch[i].clone());
+    }
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let tail = collect(a, b, Duration::from_millis(20));
+        for i in 0..2 {
+            out[i].extend(tail[i].clone());
+        }
+        if f.host(|s| s.test_queues_idle()) {
+            break;
+        }
+        assert!(Instant::now() < deadline, "startup reliable drain");
+    }
+    out
+}
+
+fn interest_cast(client: &mut bot::Bot) {
+    let request = [
+        vec![36, 0, 10, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        E.to_le_bytes().to_vec(),
+    ]
+    .concat();
+    client.send_message(&bot::wrap(&request), "36/10").unwrap();
+}
+fn hits_from(packets: &[Vec<u8>], actor: u64) -> usize {
+    packets
+        .iter()
+        .filter(|p| {
+            is_sub(p, 32, 7)
+                && p.get(4..12) == Some(actor.to_le_bytes().as_slice())
+                && p.get(20..28) == Some(E.to_le_bytes().as_slice())
+        })
+        .count()
+}
+
+#[test]
+#[ignore = "requires private OSFR_PLAY_PACKAGE; synthetic accounts/content only"]
+fn w127_two_bot_observer_death_respawn_route() {
+    let f = interest_fixture(0, false);
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let startup = interest_login(&f, &mut a, &mut b);
+    for packets in &startup {
+        assert_eq!(actor_packets(packets, 2, E), 1);
+        assert_eq!(hp_values(packets), vec![300]);
+    }
+    let damage = collect(&mut a, &mut b, Duration::from_millis(1100));
+    assert!(
+        damage[0].iter().any(|p| is_sub(p, 38, 1)),
+        "victim receives private HUD HP"
+    );
+    assert!(
+        !damage[1].iter().any(|p| is_sub(p, 38, 1)),
+        "observer must not receive victim HUD HP"
+    );
+    for packets in &damage {
+        assert!(packets.iter().any(|p| is_sub(p, 32, 7)
+            && p.get(4..12) == Some(E.to_le_bytes().as_slice())
+            && p.get(20..28) == Some(101_u64.to_le_bytes().as_slice())));
+    }
+    let banks = interest_banks(&f);
+    interest_cast(&mut a);
+    let first = interest_committed_result(&f, &mut a, &mut b, 200, 0);
+    for packets in &first {
+        assert_eq!(hp_values(packets), vec![200]);
+        assert_eq!(
+            hits_from(packets, 101),
+            1,
+            "observer must know the real attacker PC"
+        );
+    }
+    interest_cast(&mut b);
+    let second = interest_committed_result(&f, &mut a, &mut b, 100, 1);
+    for packets in &second {
+        assert_eq!(hp_values(packets), vec![100]);
+        assert_eq!(hits_from(packets, 202), 1);
+    }
+    let cooldown = collect(&mut a, &mut b, Duration::from_millis(500));
+    for packets in &cooldown {
+        assert!(hp_values(packets).is_empty());
+    }
+    interest_cast(&mut a);
+    let lethal = interest_committed_result(&f, &mut a, &mut b, 0, 0);
+    for packets in &lethal {
+        assert_eq!(hp_values(packets), vec![0]);
+        assert_eq!(hits_from(packets, 101), 1);
+        assert_eq!(removals(packets, E), 1);
+        let hp = packets
+            .iter()
+            .position(|p| is_sub(p, 35, 5) && p.get(4..12) == Some(E.to_le_bytes().as_slice()))
+            .unwrap();
+        let removed = packets
+            .iter()
+            .position(|p| is_sub(p, 35, 3) && p.get(6..14) == Some(E.to_le_bytes().as_slice()))
+            .unwrap();
+        assert!(hp < removed, "lethal HP precedes removal");
+    }
+    interest_respawn_and_range(&f, &mut a, &mut b);
+    assert_eq!(
+        interest_banks(&f),
+        banks,
+        "shared deaths must pay no credit/items/XP"
+    );
+    println!(
+        "W127 socket: startup once; A/B/A HP [200,100,0] and real actors; death once; lethal retries silent; one full-HP respawn; range exit/removal and dead return. {}",
+        f.root.display()
+    );
+}
+
+fn removals(packets: &[Vec<u8>], guid: u64) -> usize {
+    packets
+        .iter()
+        .filter(|p| is_sub(p, 35, 3) && p.get(6..14) == Some(guid.to_le_bytes().as_slice()))
+        .count()
+}
+
+fn interest_engine() -> osfr_tools::encounter::EncounterEngine {
+    let dir = unit::fixture();
+    let mut engine = osfr_tools::encounter::EncounterEngine::load(&dir, None).unwrap();
+    engine
+        .load_field_enemies(&dir.join("field_enemies.json"))
+        .unwrap();
+    engine
+}
+
+#[test]
+fn w127_exact_death_respawn_clock_and_no_personal_credit() {
+    let mut a = interest_engine();
+    let mut b = interest_engine();
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let mut views = [
+        std::collections::BTreeSet::new(),
+        std::collections::BTreeSet::new(),
+    ];
+    let visibility = osfr_tools::world::NpcVisibility::default();
+    for view in &mut views {
+        let (next, _) = visibility
+            .shared_view(0, [1., 0., 0.], &field.interest_candidates(false), view)
+            .unwrap();
+        let init: Vec<_> = next
+            .difference(view)
+            .flat_map(|guid| field.initialization(*guid).unwrap())
+            .collect();
+        assert_eq!(actor_packets(&init, 2, E), 1);
+        assert_eq!(hp_values(&init), vec![300]);
+        *view = next;
+    }
+    for (who, now, hp) in [(101, 0, 200), (202, 100, 100), (101, 600, 0)] {
+        let engine = if who == 101 { &mut a } else { &mut b };
+        let out = engine
+            .shared_attack(&mut field, who, E, [1., 0., 0.], 2, now)
+            .unwrap();
+        assert_eq!(hp_values(&out.replies), vec![hp]);
+        assert_eq!(hits_from(&out.replies, who), 1);
+        assert!(out.defeated.is_empty() && out.rewards.is_empty());
+    }
+    assert_eq!(field.respawn_at(E), Some(2600));
+    for engine in [&mut a, &mut b] {
+        let out = engine
+            .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 1200)
+            .unwrap();
+        assert!(out.replies.is_empty());
+        assert!(out.defeated.is_empty() && out.rewards.is_empty());
+    }
+    assert_eq!(field.respawn_at(E), Some(2600));
+    for view in &mut views {
+        let (next, packets) = visibility
+            .shared_view(0, [20., 0., 0.], &field.interest_candidates(false), view)
+            .unwrap();
+        assert_eq!(removals(&packets, E), 1);
+        *view = next;
+        let (_, retry) = visibility
+            .shared_view(0, [20., 0., 0.], &field.interest_candidates(false), view)
+            .unwrap();
+        assert!(retry.is_empty());
+    }
+    // Exact boundary uses the existing deterministic simulation clock.
+    a.shared_motion(&mut field, &[], 2599, 100).unwrap();
+    assert_eq!(field.health(E), Some(0));
+    assert!(field.initialization(E).unwrap().is_empty());
+    a.shared_motion(&mut field, &[], 2600, 1).unwrap();
+    assert_eq!(field.health(E), Some(300));
+    assert_eq!(field.respawn_at(E), None);
+    for view in &mut views {
+        let (next, _) = visibility
+            .shared_view(0, [20., 0., 0.], &field.interest_candidates(false), view)
+            .unwrap();
+        let init: Vec<_> = next
+            .difference(view)
+            .flat_map(|guid| field.initialization(*guid).unwrap())
+            .collect();
+        assert_eq!(actor_packets(&init, 2, E), 1);
+        assert_eq!(hp_values(&init), vec![300]);
+        *view = next;
+        let (again, packets) = visibility
+            .shared_view(0, [20., 0., 0.], &field.interest_candidates(false), view)
+            .unwrap();
+        assert_eq!(&again, view);
+        assert!(packets.is_empty());
+    }
+    println!(
+        "W127 exact-clock: death 600; 2599 no spawn; 2600 one AddNpc/full HP per observer; replay no death/credit"
+    );
+}
+
+#[test]
+fn w127_common_budget_cutoff_engagement_and_exclusion() {
+    let mut engine = interest_engine();
+    let mut field = engine.take_shared_fields().unwrap();
+    let mut visibility = osfr_tools::world::NpcVisibility::default();
+    for i in 0..64 {
+        visibility.add_static_actor(130000000000 + i, "", 0, 3, [2., 0., 0.], 0);
+    }
+    visibility.exclude_actor_guids([E]); // Shared E still has its independent writer.
+    let empty = std::collections::BTreeSet::new();
+    let (a, _) = visibility
+        .shared_view(0, [1., 0., 0.], &field.interest_candidates(false), &empty)
+        .unwrap();
+    let (b, _) = visibility
+        .shared_view(0, [-1., 0., 0.], &field.interest_candidates(false), &empty)
+        .unwrap();
+    assert_eq!(a.len(), 64);
+    assert!(!a.contains(&E));
+    assert_eq!(b.len(), 64);
+    assert!(b.contains(&E));
+    engine
+        .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 0)
+        .unwrap();
+    let (engaged, _) = visibility
+        .shared_view(0, [1., 0., 0.], &field.interest_candidates(false), &a)
+        .unwrap();
+    assert_eq!(engaged.len(), 64);
+    assert!(!engaged.contains(&E));
+    let (engaged, _) = visibility
+        .shared_view(0, [-1., 0., 0.], &field.interest_candidates(false), &b)
+        .unwrap();
+    assert!(engaged.contains(&E));
+    let init = field.initialization(E).unwrap();
+    assert_eq!(hp_values(&init), vec![200]);
+    let (far, removed) = visibility
+        .shared_view(
+            0,
+            [101., 0., 0.],
+            &field.interest_candidates(false),
+            &engaged,
+        )
+        .unwrap();
+    assert!(!far.contains(&E));
+    assert_eq!(removals(&removed, E), 1);
+    assert!(
+        visibility
+            .shared_view(0, [f32::NAN, 0., 0.], &[], &empty)
+            .is_err()
+    );
+}
+
+#[test]
+fn w127_grid_candidates_are_not_directed_pc_views() {
+    use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
+    let mut registry = PlayerRegistry::new(InterestPolicy::new(100., 0).unwrap());
+    let public = ZoneInstance {
+        zone_id: 0,
+        instance_id: 0,
+    };
+    let private = ZoneInstance {
+        zone_id: 0,
+        instance_id: 7,
+    };
+    registry
+        .join(SessionId(10801), 101, 101, public, [1., 0., 0.], 0.)
+        .unwrap();
+    registry
+        .join(SessionId(10802), 202, 202, public, [-1., 0., 0.], 0.)
+        .unwrap();
+    registry
+        .join(SessionId(10803), 303, 303, private, [0., 0., 0.], 0.)
+        .unwrap();
+    assert_eq!(
+        registry.nearby_sessions(public, [0., 0., 0.]),
+        [SessionId(10801), SessionId(10802)].into()
+    );
+    assert!(!registry.knows_character(SessionId(10802), 101));
+    assert!(
+        registry
+            .nearby_sessions(public, [f32::INFINITY, 0., 0.])
+            .is_empty()
+    );
+}
+
+#[test]
+#[ignore = "requires private OSFR_PLAY_PACKAGE; synthetic accounts/content only"]
+fn w127_two_bot_attacker_pc_excluded() {
+    let f = interest_fixture(0, true);
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let startup = interest_login(&f, &mut a, &mut b);
+    for packets in &startup {
+        assert_eq!(actor_packets(packets, 2, E), 1);
+        assert_eq!(hp_values(packets), vec![300]);
+    }
+    interest_cast(&mut a);
+    let first = interest_committed_result(&f, &mut a, &mut b, 200, 0);
+    interest_cast(&mut b);
+    let second = interest_committed_result(&f, &mut a, &mut b, 100, 1);
+    let _ = collect(&mut a, &mut b, Duration::from_millis(500));
+    interest_cast(&mut a);
+    let lethal = interest_committed_result(&f, &mut a, &mut b, 0, 0);
+    for (batch, hp) in [(&first, 200), (&second, 100), (&lethal, 0)] {
+        for packets in batch {
+            assert_eq!(hp_values(packets), vec![hp]);
+        }
+    }
+    assert_eq!(hits_from(&first[1], 101), 0);
+    assert_eq!(hits_from(&second[0], 202), 0);
+    assert_eq!(hits_from(&lethal[1], 101), 0);
+    for packets in &lethal {
+        assert_eq!(removals(packets, E), 1);
+        assert!(
+            !packets
+                .iter()
+                .any(|p| is_sub(p, 32, 7) && p.get(4..12) == Some(1_u64.to_le_bytes().as_slice()))
+        );
+    }
+    interest_respawn_and_range(&f, &mut a, &mut b);
+    println!("W127 PC cap 0: enemy HP/death converge; unknown-PC feedback omitted");
+}
+
+#[test]
+#[ignore = "requires private OSFR_PLAY_PACKAGE; synthetic accounts/content only"]
+fn w127_two_bot_npc_cap_cutoff() {
+    let f = interest_fixture(64, false);
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let startup = interest_login(&f, &mut a, &mut b);
+    assert_eq!(actor_packets(&startup[0], 2, E), 0);
+    assert_eq!(actor_packets(&startup[1], 2, E), 1);
+    for packets in &startup {
+        assert_eq!(
+            packets
+                .iter()
+                .filter(|p| is_sub(p, 35, 2)
+                    && p.get(4..12)
+                        .and_then(|b| b.try_into().ok())
+                        .map(u64::from_le_bytes)
+                        .is_some_and(
+                            |guid| guid == E || (130000000000..130000000064).contains(&guid)
+                        ))
+                .count(),
+            64
+        );
+    }
+    interest_cast(&mut a);
+    let refused = collect(&mut a, &mut b, Duration::from_millis(500));
+    for packets in &refused {
+        assert!(hp_values(packets).is_empty());
+    }
+    assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
+    interest_cast(&mut b);
+    let first = interest_committed_result(&f, &mut a, &mut b, 200, 1);
+    assert_eq!(actor_packets(&first[0], 2, E), 0);
+    assert!(hp_values(&first[0]).is_empty());
+    assert_eq!(hp_values(&first[1]), vec![200]);
+    f.host(|s| s.test_observer_position(101, [-1., 0., 0.]));
+    let entered = collect(&mut a, &mut b, Duration::from_millis(100));
+    assert_eq!(actor_packets(&entered[0], 2, E), 1);
+    assert_eq!(hp_values(&entered[0]), vec![200]);
+    assert_eq!(
+        removals(&entered[0], 130000000063),
+        1,
+        "entry displaces one passive row"
+    );
+    interest_cast(&mut a);
+    let second = interest_committed_result(&f, &mut a, &mut b, 100, 0);
+    for packets in &second {
+        assert_eq!(hp_values(packets), vec![100]);
+    }
+    let _ = collect(&mut a, &mut b, Duration::from_millis(500));
+    interest_cast(&mut b);
+    let lethal = interest_committed_result(&f, &mut a, &mut b, 0, 1);
+    for packets in &lethal {
+        assert_eq!(hp_values(packets), vec![0]);
+        assert_eq!(removals(packets, E), 1);
+    }
+    interest_respawn_and_range(&f, &mut a, &mut b);
+    println!(
+        "W127 NPC cap 64: unknown-target cast refused; engaged E replaces one passive; current HP then shared death"
+    );
+}
+
+fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
+    let (_, deadline) = f.host(|s| s.test_field_clock(E));
+    let deadline = deadline.unwrap();
+    interest_cast(a);
+    interest_cast(b);
+    // Keep both out of aggro during corpse/respawn assertions.
+    f.host(|s| {
+        s.test_observer_position(101, [-20., 0., 0.]);
+        s.test_observer_position(202, [-20., 0., 0.]);
+    });
+    let retry = collect(a, b, Duration::from_millis(500));
+    for packets in &retry {
+        assert!(hp_values(packets).is_empty());
+        assert_eq!(removals(packets, E), 0);
+        assert_eq!(actor_packets(packets, 2, E), 0);
+    }
+    let mut respawn = [Vec::new(), Vec::new()];
+    let limit = Instant::now() + Duration::from_secs(3);
+    loop {
+        let batch = collect(a, b, Duration::from_millis(5));
+        let now = f.host(|s| s.test_field_clock(E).0);
+        for i in 0..2 {
+            respawn[i].extend(batch[i].clone());
+            if now < deadline {
+                assert_eq!(actor_packets(&respawn[i], 2, E), 0, "early respawn");
+            }
+        }
+        if respawn.iter().all(|p| actor_packets(p, 2, E) == 1) {
+            assert!(
+                now <= deadline + 250,
+                "respawn exceeded serviced delivery tolerance"
+            );
+            break;
+        }
+        assert!(Instant::now() < limit, "due respawn not delivered");
+    }
+    let tail = collect(a, b, Duration::from_millis(500));
+    for i in 0..2 {
+        respawn[i].extend(tail[i].clone());
+        assert_eq!(actor_packets(&respawn[i], 2, E), 1);
+        assert_eq!(hp_values(&respawn[i]), vec![300]);
+    }
+    // Second engagement: B leaves while E lives, then returns during death.
+    f.host(|s| {
+        s.test_observer_position(101, [-1., 0., 0.]);
+        s.test_observer_position(202, [-101., 0., 0.]);
+    });
+    let left = collect(a, b, Duration::from_millis(500));
+    assert_eq!(removals(&left[1], E), 1);
+    assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
+    assert!(
+        f.host(|s| s.test_known_npcs(101)).contains(&E),
+        "A lost E before second engagement"
+    );
+    for (who, hp) in [(0, 200), (0, 100), (0, 0)] {
+        interest_cast(a);
+        let delta = interest_committed_result(f, a, b, hp, who);
+        assert_eq!(hp_values(&delta[0]), vec![hp]);
+        assert!(hp_values(&delta[1]).is_empty());
+        assert_eq!(hits_from(&delta[1], 101), 0);
+        if hp > 0 {
+            let silent = collect(a, b, Duration::from_millis(500));
+            assert!(hp_values(&silent[1]).is_empty());
+        }
+    }
+    f.host(|s| {
+        s.test_observer_position(101, [-20., 0., 0.]);
+        s.test_observer_position(202, [-20., 0., 0.]);
+    });
+    let returned = collect(a, b, Duration::from_millis(500));
+    assert_eq!(actor_packets(&returned[1], 2, E), 0);
+    assert!(hp_values(&returned[1]).is_empty());
+    assert_eq!(removals(&returned[1], E), 0);
+}
+
+fn interest_committed_result(
+    f: &Fixture,
+    a: &mut bot::Bot,
+    b: &mut bot::Bot,
+    hp: u32,
+    recipient: usize,
+) -> [Vec<Vec<u8>>; 2] {
+    let mut packets = [Vec::new(), Vec::new()];
+    let deadline = Instant::now() + Duration::from_secs(3);
+    loop {
+        let batch = collect(a, b, Duration::from_millis(5));
+        for i in 0..2 {
+            packets[i].extend(batch[i].clone());
+        }
+        if f.host(|s| s.test_field_health(E)) == Some(hp) {
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "shared HP commit missing: expected {hp}, A location {:?}, A knows {}",
+            f.host(|s| s.test_location(101).unwrap().0.position),
+            f.host(|s| s.test_known_npcs(101)).contains(&E)
+        );
+    }
+    let delivery_deadline = Instant::now() + Duration::from_millis(250);
+    while hp_values(&packets[recipient]).is_empty() {
+        let batch = collect(a, b, Duration::from_millis(5));
+        for i in 0..2 {
+            packets[i].extend(batch[i].clone());
+        }
+        assert!(
+            Instant::now() < delivery_deadline,
+            "committed HP delivery missing"
+        );
+    }
+    let tail = collect(a, b, Duration::from_millis(100));
+    for i in 0..2 {
+        packets[i].extend(tail[i].clone());
+    }
+    packets
+}
+
+fn interest_banks(f: &Fixture) -> Vec<serde_json::Value> {
+    [101,202].into_iter().map(|guid| {
+        let save:serde_json::Value=serde_json::from_slice(&fs::read(f.root.join(format!("characters/{guid}.json"))).unwrap()).unwrap();
+        json!({"inventory":save["gameplay"]["inventory"],"experience":save["gameplay"]["profiles"]["experience"],"quests":save["gameplay"]["npc_quests"]})
+    }).collect()
+}
+
+#[test]
+fn w127_staged_passive_content_edits_do_not_leak() {
+    let mut live = osfr_tools::world::NpcVisibility::default();
+    live.add_static_actor(130000000001, "", 0, 3, [0., 0., 0.], 0);
+    let mut staged = live.clone();
+    assert!(staged.remove(130000000001));
+    staged.add_static_actor(130000000002, "", 0, 3, [0., 0., 0.], 0);
+    let empty = std::collections::BTreeSet::new();
+    let (before, _) = live.shared_view(0, [0., 0., 0.], &[], &empty).unwrap();
+    let (after, _) = staged.shared_view(0, [0., 0., 0.], &[], &empty).unwrap();
+    assert_eq!(before, [130000000001].into());
+    assert_eq!(after, [130000000002].into());
+}
