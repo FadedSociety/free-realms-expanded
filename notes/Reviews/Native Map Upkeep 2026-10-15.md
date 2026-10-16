@@ -357,3 +357,194 @@ Ponytail (full), Caveman, reverse-engineering and the mapper's REA evidence meth
 Open gates: independent full review and acceptance of both shards; the six post-acceptance label samples; independent review and optional application of the staged invalid-entry retirement; lead-owned `fn` boundary/graph repair. The earlier 109 S0215 records passed mechanical validation and were preserved, not independently semantically re-reviewed by their completing mapper. No broader native-map, runtime or gameplay completeness claim is made.
 
 **Ponytail:** reused `nmq`, current exports, the existing PE/Capstone reader, `validate`/`check_fix`, `xreview.make`, `Dispatcher.finish_map` and the recheck trio. Deliberately did not build a mapper fleet, replacement validator/disassembler, dependency, pipeline extension or gameplay code.
+
+
+## W129 independent review input blocker, 2026-10-16
+
+**Verdict: BLOCKED before semantic review.** The required IDA second opinion is absent for all 345 targets: the supplied `lab/native-map/run/ida-check/full-20261016/labels.jsonl` contains zero S0215 addresses and zero S0672 addresses. It inspected previously accepted confirmed/likely labels, whereas these two shards have no accepted labels. The full run's 99.5% boundary agreement cannot be applied to these targets. No semantic verdict, reviewer fix, reservation or acceptance was issued by W129. Both shards remain `review_pending`.
+
+### Evidence and attempted recovery
+
+W129 read the current Plan/Ledger, AGENTS, worker contract, native-map introduction, W128 section, reviewer prompt, and the dispatch/xreview/validate/recheck/nmq review paths. The normal path is `xreview.py claim --sid`, complete 40-address review chunks, `validate.py --fixes`, then `xreview.py done`, which uses `Dispatcher.finish_review` and ultimately `Dispatcher.accept`. Corrections are complete records, capped at likely; speculative/unknown remain available. W129 did not substitute mapper confidence for evidence or write guessed verdicts to advance that path.
+
+`w129-collect.py ghidra` collected `nmq.show_one`, `cmd_callers`, `cmd_bytes` and `cmd_dis` for every target, with the existing reader and its Capstone subprocess. These are collected source transcripts, **not independently reviewed labels**. Address-specific provenance is `lab/native-map/run/w129-evidence/<address>.txt`; the source is the current `fn` row and the unchanged preserved client executable. Its verified SHA-256 is `26cc1c522a45e71fb57882da515f65bac45c8c8b8c7e740c0cea81c52a733351`. The supplied IDA JSONL SHA-256 is `0d84d3da6df5ee1e31e578ccab3ae8f151485f9eb49b41211ec914d2822c3130`. `baseline.json` retains those hashes, both coverage counts and every before-image label column; both mapper outputs and the prior review note are preserved alongside it.
+
+To recover the missing second opinion without changing the shared IDA database, W129 copied the client and its 350,088,467-byte `.i64` into `lab/native-map/run/w129-ida/`. Source/copy hashes matched. The helper reuses `ida_check.load_ida_api` and `inspect_label`, disables automatic analysis, and requests `close_database(save=False)`. Running the existing IDA plugin environment failed at IDALib initialization, before database opening:
+
+```text
+%USERPROFILE%/.claude/plugins/cache/mrexodia/ida-pro-mcp/0.1.0/.venv/Scripts/python.exe -I -B ../lab/native-map/run/w129-collect.py ida
+exit 1; stdout and stderr empty; IDA records written: 0
+```
+
+A bounded diagnostic loaded `idalib.dll`, enabled console messages before importing `idapro`, and exposed the failure:
+
+```text
+before_idapro_import python=%USERPROFILE%\.claude\plugins\cache\mrexodia\ida-pro-mcp\0.1.0\.venv\Scripts\python.exe
+idalib_dll_loaded
+Fatal registry error: Access is denied. -> OK
+Fatal registry error: Access is denied. -> OK
+```
+
+The permission-denied registry operation is the observed blocker; its specific registry key and root cause are unverified. No global configuration, registry setting, permission or installation was changed. No IDA MCP query tool was exposed in this session. The shared `.i64` still matches the private copy after the attempt. Repairing IDALib access in an authorized environment or providing an address-complete IDA export is required to resume the requested review.
+
+### Gates and receipts
+
+Run from `project`:
+
+```powershell
+python -I -B ../lab/native-map/run/w129-collect.py ghidra
+# ghidra_transcripts= 345; exit 0
+python -I -B ../lab/native-map/run/w129-blocker.py
+```
+
+The latter invokes the original mapper validators and ten `nmq.py label` commands; full command/exit/stdout/stderr pairs are in `w129-gate-commands.txt` and `w129-blocker.json`:
+
+```text
+S0215 valid_records=163 errors=0
+S0215 00887f80 (unlabelled)
+S0215 00887fe0 (unlabelled)
+S0215 00888160 (unlabelled)
+S0215 008881b0 (unlabelled)
+S0215 00888210 (unlabelled)
+S0215 supplied_ida_present=0 missing=163 state=review_pending
+S0672 valid_records=182 errors=0
+S0672 012958c0 (unlabelled)
+S0672 01295ab0 (unlabelled)
+S0672 01295b90 (unlabelled)
+S0672 01295c10 (unlabelled)
+S0672 01295fe0 (unlabelled)
+S0672 supplied_ida_present=0 missing=182 state=review_pending
+labels_changed=0 semantic_verdicts=0 acceptance_calls=0 security_actionable_findings=0
+```
+
+All invoked validation/label commands exit 0. This is **mapper validation, not review validation**. The label samples demonstrate the still-unlabelled state; they are not accepted-address samples. The receipt lists all 345 missing IDA addresses, not a truncated sample.
+
+| Shard | Collected transcripts | Semantic verdicts (agree/refine/downgrade/rename/reject) | Unreviewed | Review validation / acceptance | IDA agreement |
+|---|---:|---|---:|---|---|
+| S0215 | 163 | 0 / 0 / 0 / 0 / 0 | 163 | Not run: required second opinion unavailable | Unavailable; 0 IDA rows |
+| S0672 | 182 | 0 / 0 / 0 / 0 / 0 | 182 | Not run: required second opinion unavailable | Unavailable; 0 IDA rows |
+
+There are no reject/downgrade reasons or acceptance receipts because those operations did not occur. Full per-address semantic review, pipeline fix validation, acceptance, ten accepted-address samples and accepted-record IDA agreement remain open. W128's separate invalid-entry retirement is outside W129's assigned shards and was not applied. No recovered gameplay/server facts are asserted by this blocked input audit.
+
+### Files and local security pass
+
+Writes: `w129-collect.py`, `w129-blocker.py`, `w129-blocker.json`, `w129-gate-commands.txt`, `w129-evidence/` (baseline, mapper/note before-images and 345 transcripts), `w129-ida/` (private client/database copies), and this appended section. No shard output, pipeline script, live map row, shared IDA input, Rust, content, save, release binary or shared Plan/Ledger was modified. No agent, native client, commit or publication was started.
+
+Secure-code-guardian and security-reviewer were applied to the scoped local helper boundary. Threats considered were path escape, accidental shared-database mutation, executing mapper text and unbounded child commands. Helpers use fixed owned paths, read-only parameterized SQLite queries, JSON parsing, argument-list subprocesses and validator/query deadlines. The transcript collector's disassembler is the existing nmq implementation; no mapper-provided code is executed. Compile/AST checks found no `eval`/`exec` or `shell=True`; manual review found zero actionable security findings. No production-network security claim is made.
+
+**Ponytail:** reused nmq, the installed Capstone reader, IDA checker's inspection routines and original validator CLIs. Deliberately did not build a second disassembler/validator, fabricate IDA agreement or semantic verdicts, bypass pipeline acceptance, install dependencies or change global IDA settings.
+
+
+## W129 independent full review and pipeline acceptance, 2026-10-16
+
+**Verdict: PROVEN for the assigned static-map gates.** The previously missing IDA input was supplied by the lead, and all 345 records were independently reviewed against the existing address-specific nmq show/callers/bytes/dis transcripts and the IDA export. Both shards are now `accepted` through the unchanged `xreview.py` full-review path. The earlier W129 blocker above is historical, not the current result. This session was not a mapper; both mapper outputs remain byte-identical to the pre-review copies. No original symbols, original server rules or native gameplay behavior are established by acceptance.
+
+### Scope, evidence and tools
+
+Source client: `lab/working/OSFR.Client/OSFR Client/FreeRealms.exe`, recomputed SHA-256 `26cc1c522a45e71fb57882da515f65bac45c8c8b8c7e740c0cea81c52a733351` (`w129-inputs.json`). No additional game input was acquired. Lead-supplied IDA JSONL: `lab/native-map/run/ida-check/full-20261016/w129-shards-labels.jsonl`, SHA-256 `94e4c3188a2e9e90aee6902d5b1495fa6f71c2979433df5adbd27cf826038baf`.
+
+Every verdict has per-address provenance: `w129-evidence/<address>.txt` contains the reused nmq transcript, and the verdict's `provenance.ida_line` identifies its exact line in the 345-row IDA export. Complete corrected records retain mechanically checked anchors. `w129-supplement.txt` records extended function tails and supporting helper queries. IDA was not launched and its shared database was not changed. The reverse-engineering skill and the pipeline evidence-workflows reference were applied; game-recon/web research/asset-pipeline/native automation were not needed for this supplied-binary label audit.
+
+Ponytail full: reused nmq, its existing Capstone path, `validate.check_fix`, and the original `xreview`/dispatcher completion logic. Stdlib helpers only collect, compile human decisions, submit normal chunks and verify receipts. No new dependency, mapper, alternate acceptance path, pipeline edit, game/client launch, agent, commit or runtime feature was built. Raw pseudocode stays in the lab. Shared code, saves, binaries, Plan/Ledger and unrelated labels were not edited.
+
+### Verdicts and acceptance
+
+| Shard | Agree | Refine | Rename | Downgrade | Reject | Complete fixes | Accepted records | Final confidence C/L/S/U |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| S0215 | 139 | 1 | 1 | 0 | 22 | 24 | 163 | 111/27/25/0 |
+| S0672 | 181 | 1 | 0 | 0 | 0 | 1 | 182 | 41/20/121/0 |
+
+The 22 rejects replace wrong concrete details with complete validated records; they do not retain the rejected text. Every reviewer fix is capped at likely, with four already-speculative corrections kept speculative. Confidence was lowered on 18 S0215 records and one S0672 record under that rule. No separate `downgrade` verdict was needed. S0672's 121 speculative records describe narrow checked-iterator/tree mechanics that the bytes and IDA support; they remain speculative and do not acquire a game-domain identity merely through acceptance. The pipeline's logged `dispute 0%` is the **unfixed-dispute rate** after valid reviewer fixes, not zero raw rejects.
+
+Each shard completed five ordinary 40-record rounds (S0215: 40/40/40/40/3; S0672: 40/40/40/40/22). For every round, the canonical `review[-N].jsonl` was written, `validate.py --fixes` passed, then `xreview.py done` called the dispatcher's `finish_review`; the final round called its own `accept`. `xreview.py claim --sid` reserved only the named shard. No label row was hand-edited. Per-round model markers are `codex-w129-independent-reviewer`, a reviewer identity marker, not a claim about a separately launched model. The artifact helpers did not launch workers.
+
+Acceptance receipts: `lab/native-map/run/shards/{S0215,S0672}/w129-acceptance-receipt.json` and combined `w129-acceptance-receipt.json`. Exact CLI argv, stdout, stderr and exit codes: `w129-accept-commands.json`. Canonical verdicts remain under each shard; complete review copies are `w129-S0215-review.jsonl` and `w129-S0672-review.jsonl`.
+
+### Runnable gates and observed output
+
+From `project/`, `python -I -B ../lab/native-map/run/w129-verify.py` invokes the unchanged validator and ten nmq label queries, and checks canonical full coverage, applied fixes/caps, source rows, mapper hashes and unrelated labels. Exit 0:
+
+```text
+S0215
+valid_records=163 errors=0
+fixes_ok=24 fixes_invalid=0 fixes_missing=0
+accepted_records=163 full_review_records=163 mapper_unchanged=true reused_transcripts_current=true
+IDA start agreement=163/163 (100.0%); size agreement=161/163 (98.8%); pseudocode available=144/163
+S0672
+valid_records=182 errors=0
+fixes_ok=1 fixes_invalid=0 fixes_missing=0
+accepted_records=182 full_review_records=182 mapper_unchanged=true reused_transcripts_current=true
+IDA start agreement=182/182 (100.0%); size agreement=181/182 (99.5%); pseudocode available=177/182
+outside_labels_unchanged=true target_fn_unchanged=true
+security_review: 0 findings; automated AST scan and manual scoped review complete
+```
+
+Every chunk also passed review validation: S0215 fixes_ok=9/8/6/1/0 and S0672=1/0/0/0/0; all ten outputs ended `fixes_invalid=0 fixes_missing=0`. Acceptance stdout:
+
+```text
+S0215 fully reviewed: 163/163 records, 0 disputed (0%); accepting with per-record caps
+S0215 ACCEPTED 163 records, dispute 0%
+S0215 -> accepted (round 6)
+S0672 fully reviewed: 182/182 records, 0 disputed (0%); accepting with per-record caps
+S0672 ACCEPTED 182 records, dispute 0%
+S0672 -> accepted (round 6)
+```
+
+Five accepted-address readbacks per shard, each via `python -I -B scripts/native_map/nmq.py label <address>`:
+
+- `00887f80`: `[accepted:likely] ParticleController::ScalarDeletingDtor`.
+- `00889470`: `[accepted:speculative] CopyXYZAndScalarToFloat4`.
+- `008894b0`: `[accepted:speculative] RandomUnitDirectionFromState`.
+- `0088aee0`: `[accepted:likely] AllocateAlignedRecords16`.
+- `0088ce70`: `[accepted:speculative] MaxFirstThreeExtents`.
+- `012958c0`: `[accepted:likely] Engine::AccountRequestContextMenu::OpenContextMenuDialog`.
+- `01296cd0`: `[accepted:confirmed] Audio::AudioPlaySound::Handle`.
+- `01297bf0`: `[accepted:speculative] CheckedTreeValue7BF0`.
+- `0129ad50`: `[accepted:speculative] FindSignedTreeKeyTag15_AD50`.
+- `0129b030`: `[accepted:likely] EraseTreeNodeTag15`.
+
+The complete readbacks, including behavior text, are in `w129-gates.txt`; `w129-verification.json` also retains each command, final confidence counts and before/after checks.
+
+### Every rejected, renamed or refined record and evidence
+
+Each line below is a recovered static-byte/RTTI observation, not reconstructed server policy. Full before/after records and exact evidence paths are in the corresponding per-address verdict.
+
+- **S0215 `00887f80` - reject (likely):** Binary vslots bind this address to PositionFromShapeController slot 8, not the claimed OffsetCurveController slot 8 (that is 008881b0).
+- **S0215 `008885c0` - reject (likely):** 008885c0 TEST ECX sets flags only; the null path leaves EAX untouched, not a null-test result.
+- **S0215 `008885d0` - refine (likely):** 00888690 calls this body; its OrbitControllerInstance slot-1 binding plus arrays at +0x20/+0x30/+0x40 identifies the owning destructor body.
+- **S0215 `00888f60` - reject (likely):** Constructor stores -1 to twelve WORDs at +8..+0x1e, representing six packed index pairs; it does not initialize six short indices.
+- **S0215 `00889470` - reject (speculative):** 00889481..00889496 copies only source XYZ to +0/+4/+8 and scalar to +0xc; EAX remains destination, ret 8.
+- **S0215 `008894b0` - reject (speculative):** 00889547..00889556 forces W=0 before normalization; EAX is the output pointer. This is a random 3D direction, not a four-random-component quaternion or void return.
+- **S0215 `00889740` - reject (likely):** Callee 008894b0 normalizes XYZ with W=0; describing its output as a quaternion propagates a wrong data format.
+- **S0215 `00889c80` - reject (likely):** 00889c80 builds direction XYZ from spherical angles and copies it to record+0x10; only W is zero. The orientation components are not all zero.
+- **S0215 `00889ee0` - reject (likely):** Stores eight -1 WORDs, not five; writes 0x3f800000 (1.0), not zero, at each endpoint +0xc.
+- **S0215 `0088a0f0` - reject (likely):** Both bounds vectors receive 0x3f800000 at component +0xc; the claimed zero fourth components are wrong.
+- **S0215 `0088a380` - reject (likely):** 0088a38b CALL EDX is followed by RET without writing EAX; nonnull path passes through callee EAX, null path leaves incoming EAX.
+- **S0215 `0088a390` - reject (speculative):** 0088a3bd calls 008785c0 with original receiver in ECX and no pushed argument; stack cookie is SEH bookkeeping, not static initialization data.
+- **S0215 `0088a5c0` - reject (likely):** 0088a5f0 calls 008785c0 with ECX=this and no stack argument; cookie is bookkeeping. The body has scalar deleting destructor shape.
+- **S0215 `0088a730` - reject (likely):** 0088a764 loads output from argument1+0x18; +0x28 is the source record/time field, not velocity output. Scale is min(context+0x20-recordTime, context+0x20-context+0x1c).
+- **S0215 `0088aee0` - reject (likely):** Disassembly pushes alignment 0x10 and count<<4 BEFORE either manager virtual+4 call; the claimed no-stack-argument calls are wrong.
+- **S0215 `0088af50` - reject (likely):** Disassembly pushes alignment 0x10 and count<<4 BEFORE either manager virtual+4 call; the claimed no-stack-argument calls are wrong.
+- **S0215 `0088afc0` - reject (likely):** Disassembly pushes alignment 0x10 and count<<4 BEFORE either manager virtual+4 call; the claimed no-stack-argument calls are wrong.
+- **S0215 `0088ba80` - reject (likely):** 0088ba80 rewrites pointer argument to [arg+0x15c] or global 01be46d8, loads receiver from this+4 and JMPs 00dbe330. It is not a flag or void-return call.
+- **S0215 `0088bae0` - reject (likely):** 0088bae0 loads backend into EAX and never overwrites it after field store; returns backend pointer, not void.
+- **S0215 `0088baf0` - reject (likely):** 00dbf160/00dbf110 operate on global flag word index 0, not per-backend flags; bytecode uses cdecl (0,-1)/(0,mask).
+- **S0215 `0088bc80` - rename (likely):** Derived-then-base vtable writes and field clear match the teardown prefix in 0088c950, not constructor 0088c8a0; no constructor caller exists.
+- **S0215 `0088bcf0` - reject (likely):** 0088bcf0 loads stack value into EAX, stores it at +0x2bc and RET 4 leaves EAX unchanged; return is that value, not void.
+- **S0215 `0088bd10` - reject (likely):** 0088bd16 loads output pointer into EAX and all six stores leave it unchanged; returns output, not void.
+- **S0215 `0088c9c0` - reject (speculative):** 0088c9db loads receiver from [ECX+8]; 0088ca4a returns output EAX and 0088ca57 is RET 4, contradicting caller cleanup.
+- **S0672 `012958c0` - refine (likely):** IDA exposes X/Y tags; bytes at 0176cf0c are 59 00 00 00 58 00 00 00 (Y/X). The supposedly unnamed integers are screen coordinates.
+
+### IDA agreement and limits
+
+All accepted records have matching IDA function starts: **345/345, 100.0%**. The checker's `boundary_match` field tests the start address only (`ida_check.py`). Size/end agreement is **342/345, 99.1%**: S0215 161/163 (98.8%), S0672 181/182 (99.5%). These are mechanical agreement rates, not a semantic-correctness percentage. Three Ghidra source ranges are short: `00889740` 414 vs IDA 423 bytes (+9), `00889c80` 587 vs 594 (+7), `0129b030` 689 vs 695 (+6). Their actual tails were decoded from the start in `w129-supplement.txt`; the last returns are ret 16, ret 16 and ret 12. The source `fn` rows remain unchanged as required by scope. IDA pseudocode exists for 321/345 targets (S0215 144/163, S0672 177/182); the 24 remaining rows still expose IDA boundaries/call graphs/strings, and their native instructions were reviewed. No 99.5% statistic from unrelated previously accepted labels was substituted.
+
+Important second-opinion disagreements were resolved with bytes: IDA's old-count==0 renderings at `0088bf70`, `0088c060`, `0088ca60` lose the arithmetic-result flags from XADD (the immediate JNE tests new-count zero). IDA's C comparisons at `0088c220`, `0088c240`, `0088cce0`, `0088cd40` omit the unordered carry behavior. `0088ce70` really returns an extent in ST0 (`fld` at `0088cecb`), despite IDA's integer-return inference. IDA's SIMD frame/local warnings were not treated as proof of nonexistent arguments. The export also reports 17 caller-graph and five callee-graph disjoint flags in S0215; those do not override direct bytes or RTTI. S0672's one serializer-name flag at `01297360` reflects unlabeled serializer callees, not failure of its observed virtual+0x28 serialization call.
+
+The default pipeline sampled three corrected records into its later independent fixcheck queue: `0088a0f0`, `0088afc0`, `0088baf0`. Those post-acceptance spot-checks remain pending for the lead; this reviewer did not self-check its corrections as another independent reviewer. Broader semantic uncertainty remains in already-speculative helpers, exact source types and historical field names. No native/dynamic behavior was tested or claimed.
+
+### Security review and files written
+
+Applied `secure-code-guardian` and `security-reviewer` to the local file/command helpers. Threat model: wrong-shard writes, shell injection and overwriting another review. Automated AST scan plus manual inspection found **0 findings, 0 security fixes required**: fixed shard allowlist, parameterized read-only SQL, argv-list subprocesses, no shell execution/deletes, exclusive canonical verdict creation, coverage/cap assertions and unchanged unrelated-label digest. No login, credential, remote player input, network listener or Studio surface changed. This is task-scoped review, not a server security audit.
+
+Writes: `w129-review.py`, `w129-supplement.py`, `w129-supplement.txt`, `w129-inputs.json`, `w129-decisions.py`, `w129-{S0215,S0672}-review.jsonl`, `w129-accept.py`, `w129-accept-commands.json`, `w129-acceptance-receipt.json`, `w129-verify.py`, `w129-verification.json`, `w129-gates.txt`; canonical review/sample/model/prompt/round/receipt artifacts inside the two owned shard directories; this appended section. Pipeline-owned side effects are two shard rows and 345 label rows, normal event log/WAL and three fixcheck-queue entries. Original earlier W129 blocker/collection artifacts are preserved.
