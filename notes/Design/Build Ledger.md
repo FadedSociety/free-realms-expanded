@@ -60,7 +60,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 | Field battle 96 "Troll Summoner Madness!" | **Playable** | Full loop in R5 184205: marker, start screen, Go, arena, summons, win, loot wheel, return | Start-screen Switch Jobs is disabled. `required_combat_level` is not enforced. The spawner model 1917 doesn't render. Prizes are (R). |
 | Opening cave 411 | **Playable** | Runs 081219, 114509 | "TOTAL SCORE 0" display. |
 | Encounter instancing for groups | Not built | Each player's `Gameplay` owns its own enemies | Players in the same arena see each other but **fight separate enemy copies**. |
-| Basic attacks per job | Partly | Brawler (43), Medic (11) and Archer (35) attack | **Ninja, Warrior and Wizard have no basic attack** in the runtime content. |
+| Basic attacks per job | Partly | Brawler (43), Medic (11) and Archer (35) attack | **Ninja, Warrior and Wizard have no basic attack** in the runtime content. 2026-10-16: W85 staged Ninja/Warrior/Wizard attacks (bot-proven on scratch gateways), not yet in the play campaign; no weapon check. |
 | Job abilities and level locks | Native-verified (Medic) | `job_abilities.json` (Medic Triage and First Aid); R5 081330 | The other five combat jobs have no abilities. The green heal number hasn't been seen. |
 | Job XP and levels | Wired | `award_job_xp`; battles give 50 XP (R) | A level-up from combat has not been seen natively. |
 | Final-era balance | Wired (R) | `encounter.rs` scaling | Not checked against original numbers. |
@@ -79,7 +79,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 | Completable quests | Native-verified (5) | Through play: 3000021, 3000059, 3000060, 3050011. With a dev offer: 3030007 | 3110002 Ninja "Stolen Away" (kill objective) and 7 talk quests are wired but untried. Carlos Brazenfist doesn't spawn, which blocks the Brawler chain. |
 | Journal sync on relog | Wired | `active_login_packets` | A native relog check is pending. |
 | Inventory, categories, equip | Native-verified | [[Reviews/Native Inventory Repair 173814]]; SB | Only 1,649 item definitions. Search: SB shows "hammer" no longer crashes, but the cause isn't proven for every query. |
-| Item catalogue | Gap | The server only has the 1,703 captured definition rows. Legacy `ClientItemDefinitions` has 58,795. | 16,551 of 18,017 content item references (mostly `stores.json`) can't be granted. Ninja, Wizard and Warrior get **no starter weapon**. |
+| Item catalogue | Gap | The server only has the 1,703 captured definition rows. Legacy `ClientItemDefinitions` has 58,795. | 16,551 of 18,017 content item references (mostly `stores.json`) can't be granted. Ninja, Wizard and Warrior get **no starter weapon**. 2026-10-16: W84 generator covers all 16,551 missing references (private output, rows (R)); not loaded by the server yet. |
 | Coins and rewards | Native-verified | `rewards.rs`; R5 (359→364 from a quest, →384 from a battle) | The turn-in screen shows no reward line. |
 | Crafting (cooking, smelting, forging) | Native-verified, opening tutorial only | 10-08/09 reviews | No world crafting stations. W60's recipe changes haven't been re-checked natively. |
 | Mystery chest | Native-verified (private branch) | Runs 194318, 194943 | Reconstructed chest; no normal way to get one. |
