@@ -11,6 +11,36 @@ use std::time::{Duration, Instant};
 const SERVER: [u8; 32] = [42; 32];
 const HANDLE: &str = "acct_001";
 
+#[test]
+fn credential_failure_lockout_recovery_success_reset_and_unknown_capacity() {
+    use osfr_tools::login_auth::LoginFailures;
+    let now = Instant::now();
+    let hash = login_handle_hash(HANDLE).unwrap();
+    let mut limits = LoginFailures::default();
+    for _ in 0..5 {
+        assert!(limits.allow(hash, now));
+        limits.failed(hash, now);
+    }
+    assert!(!limits.allow(hash, now));
+    assert!(!limits.allow(hash, now + Duration::from_secs(59)));
+    let later = now + Duration::from_secs(60);
+    assert!(limits.allow(hash, later));
+    for _ in 0..4 {
+        limits.failed(hash, later);
+    }
+    limits.succeeded(&hash);
+    assert!(limits.allow(hash, later));
+    limits.failed(hash, later);
+    assert!(limits.allow(hash, later));
+    for n in 1u32..1024 {
+        let mut hash = [0; 32];
+        hash[..4].copy_from_slice(&n.to_le_bytes());
+        assert!(limits.allow(hash, later));
+    }
+    assert!(!limits.allow([255; 32], later));
+    assert!(limits.allow([255; 32], later + Duration::from_secs(600)));
+}
+
 fn setup() -> (AccountStore, u64, SigningKey, LoginAuth, Instant) {
     // Synthetic test key only. Production private keys belong to the launcher.
     let key = SigningKey::from_bytes(&[7; 32]);

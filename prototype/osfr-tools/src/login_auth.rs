@@ -93,6 +93,7 @@ struct PendingToken {
     login_hash: [u8; 32],
     public_key: [u8; 32],
     issued: Instant,
+    handle: String,
 }
 
 /// In-memory one-use grants. Restart discards pending authentication, not accounts.
@@ -109,6 +110,18 @@ impl LoginAuth {
             server_id,
             challenges: BTreeMap::new(),
             tokens: Vec::new(),
+        }
+    }
+
+    /// Server-owned challenge identity for failure accounting, never peer input.
+    pub fn challenge_hash(&self, nonce: &[u8]) -> Option<[u8; 32]> {
+        let nonce: &[u8; 32] = nonce.try_into().ok()?;
+        login_handle_hash(&self.challenges.get(nonce)?.handle).ok()
+    }
+
+    pub fn discard_challenge(&mut self, nonce: &[u8]) {
+        if let Ok(nonce) = <&[u8; 32]>::try_from(nonce) {
+            self.challenges.remove(nonce);
         }
     }
 
@@ -161,11 +174,7 @@ impl LoginAuth {
             .remove(&nonce)
             .ok_or(AuthError::InvalidCredentials)?;
         let key_bytes = validate_public_key(public_key)?;
-        let account_id = challenge.account_id.ok_or(AuthError::InvalidCredentials)?;
         let login_hash = login_handle_hash(&challenge.handle)?;
-        if !binding_is_current(store, account_id, &login_hash, &key_bytes) {
-            return Err(AuthError::InvalidCredentials);
-        }
         let signature =
             Signature::from_slice(signature).map_err(|_| AuthError::InvalidCredentials)?;
         let key =
@@ -175,6 +184,12 @@ impl LoginAuth {
             &signature,
         )
         .map_err(|_| AuthError::InvalidCredentials)?;
+        // (R) Unknown and disabled accounts perform signature verification too.
+        // Fixed replies are non-enumerating; the whole endpoint is not constant-time.
+        let account_id = challenge.account_id.ok_or(AuthError::InvalidCredentials)?;
+        if !binding_is_current(store, account_id, &login_hash, &key_bytes) {
+            return Err(AuthError::InvalidCredentials);
+        }
         if self.tokens.len() >= MAX_TOKENS {
             return Err(AuthError::Capacity);
         }
@@ -203,6 +218,7 @@ impl LoginAuth {
                 login_hash,
                 public_key: key_bytes,
                 issued: now,
+                handle: challenge.handle.clone(),
             });
             return Ok(token);
         }
@@ -217,6 +233,17 @@ impl LoginAuth {
         token: &[u8],
         now: Instant,
     ) -> Result<u64, AuthError> {
+        self.redeem_identity(store, token, now).map(|(id, _)| id)
+    }
+
+    /// (R) The wire adapter needs the verified handle for the legacy service's
+    /// hash-based account lookup. Never take this identity from a native packet.
+    pub fn redeem_identity(
+        &mut self,
+        store: &AccountStore,
+        token: &[u8],
+        now: Instant,
+    ) -> Result<(u64, String), AuthError> {
         self.expire(now);
         if token.len() != 32
             || !token
@@ -245,7 +272,7 @@ impl LoginAuth {
         ) {
             return Err(AuthError::InvalidCredentials);
         }
-        Ok(pending.account_id)
+        Ok((pending.account_id, pending.handle))
     }
 
     /// Also safe to call from the owner's timer when no requests arrive.
@@ -262,6 +289,77 @@ impl LoginAuth {
 fn binding_is_current(store: &AccountStore, id: u64, hash: &[u8; 32], key: &[u8; 32]) -> bool {
     store
         .account(id)
-        .is_some_and(|account| &account.login_name_hash == hash)
-        && store.public_keys(id).is_some_and(|keys| keys.contains(key))
+        .is_some_and(|account| bool::from(account.login_name_hash.ct_eq(hash)))
+        && store.public_keys(id).is_some_and(|keys| {
+            bool::from(
+                keys.iter()
+                    .fold(subtle::Choice::from(0), |found, enrolled| {
+                        found | enrolled.ct_eq(key)
+                    }),
+            )
+        })
+}
+
+struct AccountFailures {
+    bucket: crate::net_policy::Bucket,
+    since: Instant,
+    last: Instant,
+    locked_until: Option<Instant>,
+}
+
+/// (R) Five failures in five minutes lock a handle hash for sixty seconds.
+/// Unknown handles use identical buckets. Success clears only that account.
+/// IP admission uses the existing IpLimiter in the broker before any parsing.
+#[derive(Default)]
+pub struct LoginFailures {
+    accounts: BTreeMap<[u8; 32], AccountFailures>,
+}
+
+impl LoginFailures {
+    pub fn allow(&mut self, hash: [u8; 32], now: Instant) -> bool {
+        self.accounts.retain(|_, failure| {
+            now.saturating_duration_since(failure.last) < Duration::from_secs(600)
+        });
+        if !self.accounts.contains_key(&hash) && self.accounts.len() >= 1024 {
+            return false;
+        }
+        let failure = self
+            .accounts
+            .entry(hash)
+            .or_insert_with(|| AccountFailures {
+                bucket: crate::net_policy::Bucket::full(5.0, now),
+                since: now,
+                last: now,
+                locked_until: None,
+            });
+        // Locked attempts never extend the deadline or the retention timer.
+        if let Some(until) = failure.locked_until {
+            if now < until {
+                return false;
+            }
+            failure.locked_until = None;
+            failure.since = now;
+            failure.bucket = crate::net_policy::Bucket::full(5.0, now);
+        }
+        if now.saturating_duration_since(failure.since) >= Duration::from_secs(300) {
+            failure.since = now;
+            failure.bucket = crate::net_policy::Bucket::full(5.0, now);
+        }
+        failure.last = now;
+        true
+    }
+
+    pub fn failed(&mut self, hash: [u8; 32], now: Instant) {
+        if let Some(failure) = self.accounts.get_mut(&hash) {
+            failure.bucket.take(1.0, 0.0, 5.0, now);
+            let mut probe = failure.bucket;
+            if !probe.take(1.0, 0.0, 5.0, now) {
+                failure.locked_until = Some(now + AUTH_LIFETIME);
+            }
+        }
+    }
+
+    pub fn succeeded(&mut self, hash: &[u8; 32]) {
+        self.accounts.remove(hash);
+    }
 }
