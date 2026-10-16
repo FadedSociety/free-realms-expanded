@@ -2448,7 +2448,14 @@ impl Server {
         mut session: Session,
         reason: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        if session.selected_character {
+        // A duplicate login of a character that another session already owns
+        // must not save its stale copy over the live one (10-15 audit).
+        let another_owns = self
+            .world
+            .active_sessions
+            .get(&session.character_guid)
+            .is_some_and(|owner| *owner != session.id);
+        if session.selected_character && !another_owns {
             save(&session.state_path, &session.gateway.snapshot())?;
         }
         let mut deliveries = self.world.leave_player(session.id);
