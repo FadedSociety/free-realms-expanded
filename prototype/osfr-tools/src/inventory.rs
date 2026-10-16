@@ -94,6 +94,67 @@ pub struct ItemPresentation {
     pub item_type: i32,
 }
 
+/// Equip restrictions read from a definition's wire row. Recovered layout:
+/// gender usage `+0x68`, members-only `+0x74`, minimum profile rank `+0x84`
+/// (Items and Inventory guide, definition table; `00baec20`, `00a142c0`).
+/// Checked against the 58,835-row generated catalogue (W138).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct Requirement {
+    /// 0 any, 1 boys, 2 girls.
+    gender: i32,
+    members_only: bool,
+    min_rank: i32,
+}
+
+impl Requirement {
+    /// Skips the fixed 46-byte prefix and the two length-prefixed strings.
+    /// A row too short to carry the block (test stubs) has no restriction.
+    fn from_wire(bytes: &[u8]) -> Self {
+        let mut at = 46;
+        for _ in 0..2 {
+            let Some(len) = read(bytes, at).ok().and_then(|n| usize::try_from(n).ok()) else {
+                return Self::default();
+            };
+            at = at.saturating_add(4).saturating_add(len);
+        }
+        match (read(bytes, at), bytes.get(at + 12), read(bytes, at + 26)) {
+            (Ok(gender), Some(members), Ok(min_rank)) => Self {
+                gender,
+                members_only: *members != 0,
+                min_rank,
+            },
+            _ => Self::default(),
+        }
+    }
+}
+
+/// Minimum profile rank of an equipment slot: Star rune 10, Moon rune 20
+/// (`EquipmentSlotDefinitions.txt` MIN_PROFILE_RANK; no slot is members-only).
+fn slot_min_rank(slot: i32) -> i32 {
+    match slot {
+        14 => 10,
+        15 => 20,
+        _ => 0,
+    }
+}
+
+/// The player facts equip eligibility needs, owned by the gameplay layer.
+/// (R) Server-side enforcement: the client only greys out and ignores some
+/// requests, and the original server rule was not recovered.
+#[derive(Clone, Debug, Default)]
+pub struct EquipContext {
+    /// Character gender, 1 boy or 2 girl; 0 unknown (no identity yet), not checked.
+    pub gender: i32,
+    /// Membership active now.
+    pub member: bool,
+    /// Rank of every unlocked profile, keyed by profile id. A profile that is
+    /// absent is not owned: equip and unequip on it are refused.
+    pub profile_ranks: BTreeMap<i32, i32>,
+    /// "Now" in the unit of `RentalState::expiration` (R: the unit is not
+    /// proven). `None` skips the rental expiry check.
+    pub rental_now: Option<i64>,
+}
+
 #[derive(Deserialize, PartialEq)]
 struct Definition {
     id: i32,
@@ -110,6 +171,8 @@ struct Definition {
     sha256: String,
     #[serde(skip)]
     bytes: Vec<u8>,
+    #[serde(skip)]
+    requirement: Requirement,
 }
 
 impl Definition {
@@ -126,6 +189,7 @@ impl Definition {
         {
             return Err(invalid("invalid inventory definition content"));
         }
+        self.requirement = Requirement::from_wire(&self.bytes);
         // Keep one wire copy, not its hex and hash as well, for all 58k rows.
         self.serialized_hex = String::new();
         self.sha256 = String::new();
@@ -250,7 +314,11 @@ pub struct Inventory {
 /// or per purchase cost seconds and ~50 MiB each. The key includes each file's
 /// size and modification time, so edited content is parsed again.
 fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
-    type Key = (PathBuf, Option<(u64, SystemTime)>, Option<(u64, SystemTime)>);
+    type Key = (
+        PathBuf,
+        Option<(u64, SystemTime)>,
+        Option<(u64, SystemTime)>,
+    );
     static CACHE: OnceLock<Mutex<HashMap<Key, Arc<Content>>>> = OnceLock::new();
     let stamp = |name: &str| {
         fs::metadata(directory.join(name))
@@ -524,7 +592,7 @@ impl Inventory {
             .iter()
             .find(|i| i.definition_id == definition_id)
             .ok_or_else(|| invalid("starter item is not owned"))?;
-        self.equip(item.id, profile_id, slot)
+        self.equip(item.id, profile_id, slot, None)
     }
 
     pub fn validate_state(state: &InventoryState) -> io::Result<()> {
@@ -864,7 +932,29 @@ impl Inventory {
         Ok(vec![reply])
     }
 
+    /// Equip routing without player facts: ownership, slot and class only.
+    /// Callers that know the player should use `handle_with`.
     pub fn handle(&mut self, inner: &[u8]) -> io::Result<InventoryOutcome> {
+        self.route(inner, None)
+    }
+
+    /// As `handle`, and also refuses equips and unequips the player may not
+    /// make (profile not unlocked, members only, gender, rank, expired rental).
+    /// A refusal leaves state unchanged and replies with a chat line (R: no
+    /// native refusal packet is recovered; the client greys such items out).
+    pub fn handle_with(
+        &mut self,
+        inner: &[u8],
+        player: &EquipContext,
+    ) -> io::Result<InventoryOutcome> {
+        self.route(inner, Some(player))
+    }
+
+    fn route(
+        &mut self,
+        inner: &[u8],
+        player: Option<&EquipContext>,
+    ) -> io::Result<InventoryOutcome> {
         if inner.len() < 4 || inner.len() > 4096 {
             return Err(invalid("invalid inventory message length"));
         }
@@ -885,6 +975,9 @@ impl Inventory {
                     return Err(invalid("invalid unequip request"));
                 }
                 let (slot, profile) = (read(inner, 4)?, read(inner, 8)?);
+                if player.is_some_and(|p| !p.profile_ranks.contains_key(&profile)) {
+                    return Ok(refused("That class is not unlocked."));
+                }
                 let entry = self
                     .state
                     .equipment
@@ -905,7 +998,7 @@ impl Inventory {
                 if inner.len() != 16 {
                     return Err(invalid("invalid equip request"));
                 }
-                self.equip(read(inner, 4)?, read(inner, 8)?, read(inner, 12)?)
+                self.equip(read(inner, 4)?, read(inner, 8)?, read(inner, 12)?, player)
             }
             8 => {
                 if inner.len() != 20 {
@@ -919,7 +1012,7 @@ impl Inventory {
                     .find(|item| item.definition_id == definition && item.tint == tint)
                     .ok_or_else(|| invalid("unowned item record"))?
                     .id;
-                self.equip(id, read(inner, 12)?, read(inner, 16)?)
+                self.equip(id, read(inner, 12)?, read(inner, 16)?, player)
             }
             // Style-card/customization, toolbar and other actions remain outside
             // this layer. They must not silently consume or delete an item.
@@ -927,7 +1020,13 @@ impl Inventory {
         }
     }
 
-    fn equip(&mut self, id: i32, profile_id: i32, slot: i32) -> io::Result<InventoryOutcome> {
+    fn equip(
+        &mut self,
+        id: i32,
+        profile_id: i32,
+        slot: i32,
+        player: Option<&EquipContext>,
+    ) -> io::Result<InventoryOutcome> {
         let item = self
             .state
             .items
@@ -949,6 +1048,10 @@ impl Inventory {
             || !profile.allowed_classes.contains(&definition.class_id)
         {
             return Err(invalid("equipment does not match profile or slot"));
+        }
+        if let Some(reason) = player.and_then(|p| ineligible(p, item, definition, profile_id, slot))
+        {
+            return Ok(refused(&reason));
         }
         let entry = self
             .state
@@ -1046,6 +1149,49 @@ impl Inventory {
     }
 }
 
+/// A system chat line (family 15/3, the form `chat::system` sends) carrying a
+/// fixed, escape-free reason. Built here because `restoration/piece_045.rs`
+/// includes this file without the crate's `chat` module; a test pins equality.
+fn refused(reason: &str) -> InventoryOutcome {
+    let mut line = header(15, 3);
+    line.extend((reason.len() as u32).to_le_bytes());
+    line.extend(reason.as_bytes());
+    line.push(1);
+    InventoryOutcome {
+        replies: vec![line],
+        changed: false,
+    }
+}
+/// Why this player cannot put this item in this slot of this profile, if so.
+fn ineligible(
+    player: &EquipContext,
+    item: &InventoryItem,
+    definition: &Definition,
+    profile_id: i32,
+    slot: i32,
+) -> Option<String> {
+    let need = &definition.requirement;
+    let Some(&rank) = player.profile_ranks.get(&profile_id) else {
+        return Some("That class is not unlocked.".into());
+    };
+    if need.members_only && !player.member {
+        return Some("This item is for members only.".into());
+    }
+    if need.gender != 0 && player.gender != 0 && need.gender != player.gender {
+        let who = if need.gender == 1 { "boys" } else { "girls" };
+        return Some(format!("This item is only for {who}."));
+    }
+    let min_rank = need.min_rank.max(slot_min_rank(slot));
+    if rank < min_rank {
+        return Some(format!("This item needs class rank {min_rank}."));
+    }
+    let expired = item
+        .rental
+        .as_ref()
+        .zip(player.rental_now)
+        .is_some_and(|(rental, now)| rental.expiration <= now);
+    expired.then(|| "This rental has expired.".into())
+}
 fn invalid(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error)
 }

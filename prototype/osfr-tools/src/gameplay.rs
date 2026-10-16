@@ -101,6 +101,8 @@ pub struct Gameplay {
     combat: Combat,
     profiles: Option<Profiles>,
     identity_fingerprint: Option<String>,
+    /// Character gender (1 boy, 2 girl) from `apply_identity`; 0 until then (gender not checked).
+    gender: i32,
     opening: Option<OpeningEngine>,
     encounter: Option<EncounterEngine>,
     world: Option<OpeningWorld>,
@@ -806,6 +808,7 @@ impl Gameplay {
             combat: Combat::load(directory, combat).map_err(invalid)?,
             profiles,
             identity_fingerprint,
+            gender: 0,
             opening,
             encounter,
             world,
@@ -4160,7 +4163,7 @@ impl Gameplay {
         }
         if inner.len() >= 4 && (inner[..2] == [42, 0] || inner[..4] == [35, 0, 34, 0]) {
             let inventory_before = self.inventory.state().clone();
-            let result = self.inventory.handle(inner)?;
+            let result = self.handle_inventory(inner)?;
             out.changed |= result.changed;
             let target_profile = if inner.starts_with(&[42, 0, 3, 0]) && inner.len() == 16 {
                 Some(i32::from_le_bytes(inner[8..12].try_into().unwrap()))
@@ -5300,11 +5303,39 @@ impl Gameplay {
         Ok(())
     }
 
+    /// (R) Player facts for equip eligibility; ranks use `job_level`'s curve.
+    /// `None` without class progression, where the permissive route applies.
+    fn equip_context(&self) -> Option<crate::inventory::EquipContext> {
+        let profiles = self.profiles.as_ref()?;
+        Some(crate::inventory::EquipContext {
+            gender: self.gender,
+            member: self
+                .game_rules
+                .membership
+                .is_active_at(current_unix_seconds()),
+            profile_ranks: profiles
+                .state()
+                .unlocked
+                .iter()
+                .map(|&id| (id, self.job_level(id) as i32))
+                .collect(),
+            rental_now: None, // (R) rental expiry unit unproven
+        })
+    }
+
+    fn handle_inventory(&mut self, inner: &[u8]) -> io::Result<crate::inventory::InventoryOutcome> {
+        match self.equip_context() {
+            Some(player) => self.inventory.handle_with(inner, &player),
+            None => self.inventory.handle(inner),
+        }
+    }
+
     pub fn apply_identity(&mut self, identity: &CharacterIdentity) -> io::Result<bool> {
         if self.profiles.is_none() {
             return Ok(false);
         }
         identity.validate()?;
+        self.gender = identity.gender;
         let fingerprint = format!(
             "{:x}",
             Sha256::digest(serde_json::to_vec(identity).map_err(invalid)?)
@@ -5396,7 +5427,7 @@ impl Gameplay {
         }
         if inner.len() >= 4 && (inner[..2] == [42, 0] || inner[..4] == [35, 0, 34, 0]) {
             let before = self.inventory.state().clone();
-            let inventory = self.inventory.handle(inner)?;
+            let inventory = self.handle_inventory(inner)?;
             out.changed |= inventory.changed;
             out.replies.extend(inventory.replies);
             self.npc_inventory_events(&before, &mut out)?;
