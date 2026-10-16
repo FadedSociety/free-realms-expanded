@@ -411,6 +411,20 @@ class Checker:
 
     # -- walk ---------------------------------------------------------------
     def check_file(self, rel: str, data):
+        if rel == "job_abilities.json" and isinstance(data, dict):
+            # Every skill must opt into its job level. Omission must never
+            # silently turn a later skill into a level-one unlock.
+            for j, job in enumerate(data.get("jobs") or []):
+                if not isinstance(job, dict):
+                    continue
+                for i, ability in enumerate(job.get("slots") or []):
+                    if not isinstance(ability, dict):
+                        continue
+                    level = ability.get("min_level")
+                    if type(level) is not int or not 1 <= level <= 20:
+                        self.add("error", "ability_level_invalid", rel,
+                                 f"jobs[{j}].slots[{i}].min_level", "min_level", level,
+                                 "ability requires an explicit integer job level in 1..20")
         unresolved = "unresolved" in rel
         ev = {"entries": collections.Counter(), "raw_kinds": collections.Counter(), "r_tags": 0,
               "records": 0, "records_by_kind": collections.Counter(), "records_without_evidence": 0}

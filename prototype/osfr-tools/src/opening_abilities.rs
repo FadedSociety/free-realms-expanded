@@ -50,16 +50,12 @@ pub struct JobAbility {
     pub cooldown_ms: u64,
     /// Job level that unlocks it (the owner: every job skill is level-locked;
     /// Medic First Aid 1, Target Vitals 5, Vitamins 10, Shock Paddles 15).
+    /// Required in authored content: omission must not unlock a later skill.
     /// Weapon abilities are level 1.
-    #[serde(default = "first_level")]
     pub min_level: u32,
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
-}
-
-fn first_level() -> u32 {
-    1
 }
 
 #[derive(Deserialize)]
