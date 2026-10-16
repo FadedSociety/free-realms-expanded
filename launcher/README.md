@@ -2,7 +2,8 @@
 
 Standalone Rust launcher. It prepares an existing, writable client copy and
 starts its local `FreeRealms.exe`. Choose that copy and an optional locale pair
-in Settings. It never downloads a client, executes a batch file, or runs Python.
+in Settings. A realm's pinned patch manifest can install or repair files in that
+copy. It never executes a batch file or runs Python.
 
 The current W98 skin follows the owner's direction A: deep-blue glass panels,
 raised bumpy frames, glossy green controls, attached tabs and an imagegen forest
@@ -11,7 +12,7 @@ hashes and slice boxes are listed in `assets/ui/README.md`; review captures and
 the readability audit are in `lab/reports/rust-launcher-w98/`.
 
 Login uses the local compatibility stub when a realm has no profile ID; that
-path accepts literal loopback endpoints only. Enter a stored profile ID beside
+path accepts literal loopback endpoints only. Choose a saved profile beside
 PLAY to use the selected realm's trusted key-pair profile. The launcher loads
 the profile from the current user's `APPDATA` and runs `auth::login` before the
 existing launch handoff. The profile's broker endpoint and server identity are
@@ -29,7 +30,7 @@ Create a key and print its public half with the launcher executable:
 `--new-key` writes an owner-only key under the current user's
 `APPDATA\FreeRealmsExpanded\profiles\<id>` directory and prints only the
 public key. Enroll that public key with the trusted local broker, provision the
-matching pinned profile through `auth::save_profile`, then enter its profile ID
+matching pinned profile through `auth::save_profile`, then select the profile
 for that realm. A profile ID alone does not create a profile or enroll a key.
 Key commands run before UI startup and return their output directly.
 The controller option controls this launcher window. It does not inject game
@@ -86,7 +87,8 @@ W86c adds `--window-size WIDTHxHEIGHT` for bounded layout review, using logical
 egui points (640–3840 by 480–2160); default remains 940 x 790. At this PC's 150%
 display scaling, `--window-size 853x533` captures 1280 x 800 physical pixels;
 `--window-size 1280x800` captures 1920 x 1200. Short windows use a smaller banner
-and tighter spacing, with a visible scrollbar when needed. Captures remain
+and tighter spacing. The standard single-realm Home and Settings fit at
+1280 x 800 physical pixels without scrolling; longer realm lists may scroll. Captures remain
 unable to prepare or launch the game at any size.
 
 The skin bundles Lilita One for titles and captions, keeps Ubuntu body text and
@@ -127,3 +129,69 @@ viewport. PLAY uses the selected realm's stored profile when its profile ID is
 set and passes the resulting session token through the existing launch path.
 The W112 report contains before/after captures, per-gate test output, art
 provenance and remaining limitations.
+
+## W121 pinned patching (2026-10-16)
+
+Settings applies to the selected realm. Set the existing client folder, the
+full HTTPS manifest URL, its trusted SHA-256 pin, and optionally a mirror
+manifest URL. Obtain the pin independently from the realm operator. Never use
+a hash supplied by the same untrusted download as the trust anchor. Pins,
+URLs and realm choices are session-only, like the existing launcher settings.
+There is no default download host or bundled community-client distribution.
+
+Normal patch checks start automatically once the folder, URL and pin are set.
+**Verify and repair** repeats the same check and rehashes existing files;
+same-size tampering is detected. PLAY stays disabled for configured patches
+until that exact folder/realm/URL/pin selection verifies successfully. With no
+patch URL, the existing local-client workflow remains available. File count,
+bytes and current file appear on both pages. Cancel preserves resumable data;
+closing the launcher signals cancellation too.
+
+The version-1 JSON manifest has this shape (the example digest is SHA-256 of
+an empty file):
+
+```json
+{"version":1,"files":[{"path":"data/example.bin","size":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}]}
+```
+
+File URLs are relative to the manifest's directory. A mirror serves the exact
+same manifest and relative file tree. Serve Content-Length on every response;
+resumed responses must have an exact `206 Content-Range`, or return the whole
+file with `200` to restart. Redirects, content compression, URL credentials,
+queries and fragments are rejected. HTTPS uses Windows certificate validation
+and TLS 1.2; plain HTTP is accepted only for literal loopback test servers.
+No cookies, system credentials or login tokens enter patch requests.
+
+Downloads go to `<file>.osfr-part` alongside their destination. A valid complete
+partial can be installed without another download. Interrupted partials resume
+with Range; a bad final hash discards their contents and retries from zero.
+Three attempts use 100/200/400 ms backoff and try the optional mirror. Only a
+size/hash-verified, synced partial replaces the installed file, using a
+same-directory atomic rename. Existing files survive failed verification.
+
+Manifest limits (R): 4 MiB, 50,000 files, 16 GiB per file, 128 GiB total.
+Paths use portable ASCII components, at most 220 bytes, with `/` separators;
+traversal, Windows device names/ADS, duplicate case aliases, overlapping paths,
+launcher-state names, junctions, symlinks and hard-linked targets/partials are
+rejected. Use a private, user-owned client folder: hostile simultaneous local
+filesystem mutation is outside the existing launcher's isolation boundary.
+Do not run two patchers on the same copy. Atomicity is per file, not across
+the whole manifest; a failed update must finish before PLAY unlocks.
+
+Cancellation is checked between hash/I/O blocks and every 20 ms in backoff.
+Synchronous WinHTTP calls have 3-second stage timeouts; cancellation waits for
+an in-flight call to return. Manifest and file body attempts also have 30-second
+and 120-second deadlines. A very large/slow file may require another resume.
+
+W121 uses std, existing serde, Windows WinHTTP and Windows CNG SHA-256. No Cargo
+dependency or lockfile change; `getrandom` stays at 0.2.17. It also centres field
+text, increases panel inner padding, fits both standard compact pages, and
+replaces raw profile IDs with the saved-profile dropdown and Local login.
+
+`--test-patch-progress --screenshot <unused.png>` renders synthetic progress for
+visual review only. It cannot download, prepare or launch anything and is
+rejected without screenshot mode. Actual HTTP transfer/resume and the UI's
+worker/PLAY route are separately tested. Full output, canary, threat model,
+security self-review and before/final captures are in
+`lab/reports/rust-launcher-w121/README.md`. Native game launch, public HTTPS host,
+fresh-PC acceptance and normal-token stored-profile tests remain lead gates.

@@ -22,7 +22,25 @@ exact versions are present in its private Cargo cache.
 
 The client-preparation core uses std and one documented Kernel32 function.
 W100 adds authentication below; there is no direct Windows wrapper crate, regex
-crate, HTTP client, async runtime, Python runtime or game-content dependency.
+crate, HTTP client crate, async runtime, Python runtime or game-content dependency.
+
+## W121 patching (2026-10-16)
+
+No Cargo dependency added or updated; Cargo.toml/Cargo.lock are unchanged.
+`getrandom` remains locked at 0.2.17. The HTTP-client crate allowance was not
+needed: installed Windows WinHTTP handles HTTPS, certificate validation and
+range GETs; Windows CNG (Bcrypt.dll) supplies streaming SHA-256. These are native
+OS APIs, not vendored or redistributed libraries. The pinned llvm-mingw target
+already supplies `libwinhttp.a` and `libbcrypt.a` import libraries. No dlltool,
+hand-written TLS/crypto, external downloader or new tool installation is used.
+
+Primary API references: [WinHTTP option flags](https://learn.microsoft.com/en-us/windows/win32/winhttp/option-flags),
+[WinHttpSendRequest](https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpsendrequest),
+[BCryptCreateHash](https://learn.microsoft.com/en-us/windows/win32/api/bcrypt/nf-bcrypt-bcryptcreatehash).
+Local ABI declarations/constants were checked against the installed pinned
+llvm-mingw `include/winhttp.h` and actual local-server integration tests.
+W121 introduces a Windows-only patch module, consistent with this launcher's
+existing Windows build target; cross-platform patching is not claimed.
 
 Before distribution, retain the full lockfile; collect the licences
 of the actual Windows dependency closure and bundled default fonts (their font

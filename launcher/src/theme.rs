@@ -699,6 +699,7 @@ pub fn text_field(
                 Vec2::new((size.x - 36.0).max(40.0), (size.y - 12.0).max(32.0)),
                 egui::TextEdit::singleline(value)
                     .hint_text(hint)
+                    .vertical_align(egui::Align::Center)
                     .char_limit(max_chars)
                     .frame(false),
             )
@@ -819,7 +820,9 @@ pub fn heading(ui: &mut egui::Ui, title: &str, detail: &str) {
         30.0
     };
     ui.heading(RichText::new(title).font(display(size)).color(INK));
-    ui.label(RichText::new(detail).color(INK));
+    if !detail.is_empty() {
+        ui.label(RichText::new(detail).color(INK));
+    }
     ui.add_space(2.0);
 }
 

@@ -1,6 +1,7 @@
 //! Local client preparation and per-server key-pair authentication.
 
 pub mod auth;
+pub mod patch;
 
 /// Handle enrolment commands before opening the UI. `None` leaves ordinary UI
 /// arguments to the caller. The only successful output is a public key (hex).
