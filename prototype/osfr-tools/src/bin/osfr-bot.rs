@@ -267,8 +267,19 @@ impl Bot {
                 .map_err(|e| format!("send: {e}"))?;
             let deadline = Instant::now() + Duration::from_millis(500);
             while Instant::now() < deadline {
-                if let Ok((length, _)) = socket.recv_from(&mut response) {
-                    if length >= 10 && response[..2] == [0, 2] {
+                if let Ok((length, peer)) = socket.recv_from(&mut response) {
+                    // Native accept handler 010e3dd0 installs the seed only for
+                    // the pending connection id. The core response is 17 bytes;
+                    // the gateway also sends the optional four-byte version.
+                    // Reject encryption: this bot implements no encrypted framing.
+                    if peer == config.gateway
+                        && matches!(length, 17 | 21)
+                        && response[..2] == [0, 2]
+                        && response[2..6] == config.connection_id.to_be_bytes()
+                        && response[10] <= 4
+                        && response[11] <= 1
+                        && response[12] == 0
+                    {
                         handshake = Some(length);
                         break;
                     }
@@ -279,10 +290,10 @@ impl Bot {
             }
         }
         socket.set_nonblocking(true).map_err(|e| e.to_string())?;
-        let length = handshake.ok_or("no SessionResponse from gateway (is it running? only one session without --account-store)")?;
+        handshake.ok_or("no SessionResponse from gateway (is it running? only one session without --account-store)")?;
         let seed = u32::from_be_bytes(response[6..10].try_into().unwrap());
-        let crc_length = if length > 10 { response[10] } else { 3 };
-        let compression = length <= 11 || response[11] != 0;
+        let crc_length = response[10];
+        let compression = response[11] != 0;
         let codec =
             Codec::new(seed, crc_length, compression, MAX_MESSAGE).map_err(|e| e.to_string())?;
         let sender = ReliableSender::new(
@@ -707,5 +718,57 @@ fn main() {
             println!("[{name}] FAIL: {error}");
             std::process::exit(1);
         }
+    }
+}
+
+#[cfg(test)]
+mod handshake_tests {
+    use super::*;
+    use osfr_tools::session::SessionRequest;
+
+    #[test]
+    fn handshake_ignores_foreign_peer_and_connection_id() {
+        let gateway = UdpSocket::bind("127.0.0.1:0").unwrap();
+        gateway
+            .set_read_timeout(Some(Duration::from_secs(2)))
+            .unwrap();
+        let address = gateway.local_addr().unwrap();
+        let server = std::thread::spawn(move || {
+            let mut buffer = [0; 128];
+            let (length, peer) = gateway.recv_from(&mut buffer).unwrap();
+            let request = SessionRequest::parse(&buffer[..length]).unwrap();
+            let foreign = UdpSocket::bind("127.0.0.1:0").unwrap();
+            foreign
+                .send_to(&request.response_with_seed(1), peer)
+                .unwrap();
+            let mut wrong = request.clone();
+            wrong.id ^= 1;
+            gateway.send_to(&wrong.response_with_seed(2), peer).unwrap();
+            gateway
+                .send_to(&request.response_with_seed(3)[..10], peer)
+                .unwrap();
+            gateway
+                .send_to(&request.response_with_seed(4), peer)
+                .unwrap();
+        });
+        let bot = Bot::connect(BotConfig {
+            gateway: address,
+            name: "handshake-check".into(),
+            connection_id: 123,
+            guid: 1,
+            ticket: String::new(),
+            version: DEFAULT_VERSION.into(),
+            expect_timeout_ms: 1000,
+            quiet: true,
+        })
+        .unwrap();
+        server.join().unwrap();
+        assert_eq!(
+            bot.codec.encode(6, &[]).unwrap(),
+            Codec::new(4, 3, true, MAX_MESSAGE)
+                .unwrap()
+                .encode(6, &[])
+                .unwrap()
+        );
     }
 }

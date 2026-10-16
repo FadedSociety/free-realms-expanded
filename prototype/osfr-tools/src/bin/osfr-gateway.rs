@@ -2087,6 +2087,8 @@ pub struct Server {
     refused: u64,
     refusal_logged: Option<Instant>,
     security_flushed: Instant,
+    next_tick_ms: u64,
+    retired_handshakes: BTreeMap<SessionKey, Instant>,
     socket: UdpSocket,
     sessions: SessionMap,
     world: SharedWorld,
@@ -2302,6 +2304,8 @@ impl Server {
             options,
             socket,
             sessions: BTreeMap::new(),
+            next_tick_ms: 0,
+            retired_handshakes: BTreeMap::new(),
             world,
             membership,
             start: Instant::now(),
@@ -2479,6 +2483,8 @@ impl Server {
             self.security_flushed = Instant::now();
         }
         let mut buffer = [0; 65_535];
+        // (R) Bound each receive batch; tick the world after at most 64 packets.
+        for _ in 0..64 {
         match self.socket.recv_from(&mut buffer) {
             Ok((length, peer))
                 if osfr_tools::net_policy::allowed(peer.ip(), self.options.allow_lan) =>
@@ -2558,24 +2564,34 @@ impl Server {
                     io::ErrorKind::WouldBlock
                         | io::ErrorKind::TimedOut
                         | io::ErrorKind::ConnectionReset
-                ) => {}
+                ) => break,
             Err(error) => return Err(error.into()),
         }
-        self.tick_shared_fields(now_ms)?;
+        }
+        let now_ms = self.start.elapsed().as_millis() as u64;
+        // (R) 20 Hz simulation; ACK/retry flushing still runs every step.
+        let tick_due = now_ms >= self.next_tick_ms;
+        if tick_due {
+            self.next_tick_ms = now_ms.saturating_add(50);
+            self.tick_shared_fields(now_ms)?;
+        }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
             let Some(mut current) = self.sessions.remove(&key) else {
                 continue;
             };
-            let result = current
-                .tick(
+            let result = if tick_due {
+                current.tick(
                     &self.options,
                     now_ms,
                     &mut self.world,
                     &mut self.membership,
                     &mut self.sessions,
                 )
-                .and_then(|_| current.flush(&self.socket, now_ms));
+            } else {
+                Ok(())
+            }
+            .and_then(|_| current.flush(&self.socket, now_ms));
             if let Err(error) = result {
                 self.end_session(key, current, &error.to_string())?;
             } else if current.receiver.expire_reassembly(Instant::now()) {
@@ -3104,6 +3120,13 @@ impl Server {
             peer,
             connection_id: request.id,
         };
+        // (R) Retain a bounded 60-second retired-id window. A queued request
+        // must not revive an expired connection with a different CRC seed.
+        let now = Instant::now();
+        self.retired_handshakes.retain(|_, until| *until > now);
+        if self.retired_handshakes.contains_key(&key) {
+            return Ok(());
+        }
         if let Some(existing) = self.sessions.get_mut(&key) {
             let response = existing.response.clone();
             existing.send(&self.socket, &response)?;
@@ -3183,6 +3206,15 @@ impl Server {
         mut session: Session,
         reason: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        if reason == "login_deadline" {
+            if self.retired_handshakes.len() >= MAX_SESSIONS * 4 {
+                if let Some(oldest) = self.retired_handshakes.iter()
+                    .min_by_key(|(_, until)| **until).map(|(key, _)| *key) {
+                    self.retired_handshakes.remove(&oldest);
+                }
+            }
+            self.retired_handshakes.insert(key, Instant::now() + Duration::from_secs(60));
+        }
         // A duplicate login of a character that another session already owns
         // must not save its stale copy over the live one (10-15 audit).
         let another_owns = self

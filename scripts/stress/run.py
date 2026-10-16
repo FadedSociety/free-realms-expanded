@@ -119,7 +119,7 @@ def run_command(args: list[str], cwd: Path, env: dict[str, str] | None = None, t
 
 def stage_head(root: Path, build_dir: Path, commit: str) -> Path:
     source = build_dir / "head-src"
-    if source.parent.resolve() != build_dir.resolve() or source.is_symlink():
+    if source.resolve().parent != build_dir.resolve() or source.is_symlink():
         raise RuntimeError(f"unsafe HEAD staging path: {source}")
     marker = source / ".w107-head"
     if marker.is_file() and marker.read_text(encoding="ascii").strip() == commit:
@@ -139,8 +139,25 @@ def stage_head(root: Path, build_dir: Path, commit: str) -> Path:
     return manifest
 
 
-def build_bins(root: Path, build_dir: Path, run_dir: Path, commit: str) -> Path:
+def build_bins(root: Path, build_dir: Path, run_dir: Path, commit: str, working_tree: bool = False) -> Path:
     manifest = stage_head(root, build_dir, commit)
+    if working_tree:
+        # Freeze current sources so an uncommitted fix is actually exercised.
+        crate = root / "prototype" / "osfr-tools"
+        for name in ("src", "tests", "data"):
+            shutil.copytree(crate / name, manifest.parent / name, dirs_exist_ok=True)
+        for name in ("Cargo.toml", "Cargo.lock"):
+            shutil.copy2(crate / name, manifest.parent / name)
+        (run_dir / "build.diff.patch").write_text(
+            run_command(["git", "diff", "HEAD", "--", "prototype/osfr-tools"], root).stdout,
+            encoding="utf-8",
+        )
+        # Never reuse this overlaid snapshot as a clean HEAD on a later run.
+        (manifest.parents[2] / ".w107-head").unlink(missing_ok=True)
+    (run_dir / "build.sources.json").write_text(json.dumps({
+        str(path.relative_to(manifest.parent)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(manifest.parent.rglob("*")) if path.is_file()
+    }, indent=2) + "\n", encoding="utf-8")
     env = os.environ.copy()
     env["CARGO_TARGET_DIR"] = str(build_dir)
     command = [
@@ -390,13 +407,12 @@ def wait_ready(process: ProcessLogs, path: Path, tokens: tuple[str, ...], timeou
     raise TimeoutError(f"{process.name} did not emit ready markers {tokens}")
 
 
-def gateway_args(bind_port: int, reference: Path, content: Path, state: Path, store: Path, handoff: Path, run_dir: Path, trace_name: str = "gateway.trace.jsonl") -> list[str]:
+def gateway_args(bind_port: int, reference: Path, content: Path, state: Path, store: Path, handoff: Path, run_dir: Path, trace_name: str | None = None) -> list[str]:
     return [
         f"127.0.0.1:{bind_port}", "--reference", str(reference), "--state", str(state),
         "--content", str(content), "--account-store", str(store), "--handoff-key-file", str(handoff),
         "--studio-port", "0", "--security-log", str(run_dir / "security.jsonl"),
-        "--trace", str(run_dir / trace_name),
-    ]
+    ] + (["--trace", str(run_dir / trace_name)] if trace_name else [])
 
 
 def write_raw(lines: list[str], packet: bytes) -> None:
@@ -426,9 +442,8 @@ def make_bot_script(index: int, record: dict, records: list[dict], scenario: dic
 
     def ping() -> None:
         nonlocal cycle
-        if cycle == 0:
-            token = f"stressping_{record['guid']}"
-            lines.extend([f"chat {token}", f"expect-text {token}"])
+        token = f"stressping_{record['guid']}_{cycle}"
+        lines.extend([f"chat {token}", f"expect-text {token}"])
         cycle += 1
 
     if initial:
@@ -547,7 +562,13 @@ def bot_worker(index: int, state: dict, stop: threading.Event, registry: dict, r
                 probe_path.write_text("chat stress_reconnect_probe\nexpect-text stress_reconnect_probe\nquit\n", encoding="utf-8")
                 probe_log = run_dir / "bots" / "duplicate-session-probe.log"
                 probe_args = bot_args(bin_dir / ("osfr-bot.exe" if os.name == "nt" else "osfr-bot"), gateway_port, store, handoff, record, bot_name, probe_path)
-                probe = subprocess.run(probe_args, cwd=run_dir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=15)
+                try:
+                    # Login, ready, and the script expect each have their own deadline.
+                    probe = subprocess.run(probe_args, cwd=run_dir, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=3 * MAX_EXPECT_MS / 1000 + 10)
+                except subprocess.TimeoutExpired as error:
+                    partial = error.stdout or ""
+                    partial = partial.decode("utf-8", errors="replace") if isinstance(partial, bytes) else partial
+                    probe = subprocess.CompletedProcess(probe_args, 124, partial, "reconnect probe timed out\n")
                 probe_log.write_text(probe.stdout + probe.stderr, encoding="utf-8")
                 denied = probe.returncode != 0
                 timeline("immediate_reconnect_probe", {"bot": 1, "returncode": probe.returncode, "refused": denied, "playtest_elapsed_s": round(time.time() - start_time, 1)})
@@ -664,9 +685,9 @@ class ProcessSampler:
 RUN_START = 0.0
 
 
-def sample_save_load(gateway_exe: Path, bin_dir: Path, records: list[dict], verify_port: int, store: Path, handoff: Path, reference: Path, content: Path, state_path: Path, run_dir: Path) -> tuple[ProcessLogs, list[dict]]:
+def sample_save_load(gateway_exe: Path, bin_dir: Path, records: list[dict], verify_port: int, store: Path, handoff: Path, reference: Path, content: Path, state_path: Path, run_dir: Path, trace: bool = False) -> tuple[ProcessLogs, list[dict]]:
     name = "gateway-verify"
-    process = ProcessLogs(name, gateway_exe, gateway_args(verify_port, reference, content, state_path, store, handoff, run_dir, "gateway-verify.trace.jsonl"), run_dir, run_dir)
+    process = ProcessLogs(name, gateway_exe, gateway_args(verify_port, reference, content, state_path, store, handoff, run_dir, "gateway-verify.trace.jsonl" if trace else None), run_dir, run_dir)
     wait_ready(process, run_dir, ('"event":"listening"',))
     results = []
     for record in records:
@@ -825,6 +846,7 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         "",
         f"Run: `{run_dir.name}`  ",
         f"Build commit: `{metadata['commit']}`  ",
+        f"Working-tree overlay: {metadata.get('working_tree', False)}; packet tracing: {metadata.get('trace', True)}.  ",
         f"Requested: {metadata['bots']} bots for {metadata['duration_seconds']} seconds; elapsed {metadata.get('elapsed_seconds', 0):.1f} seconds  ",
         f"Bot handshake/expect timeout: {metadata.get('expect_timeout_ms', MAX_EXPECT_MS)} ms; initial join stagger: 0 to {metadata.get('startup_stagger_max_seconds', 8)} seconds  ",
         f"Scenario: zone 0; quest {scenario.get('quest_id')}; combat targets from quest {scenario.get('combat_quest_id')}; vendor {scenario.get('vendor_id')}; item {scenario.get('item_id')} at {scenario.get('item_price')} coins; {len(scenario.get('enemies', []))} matching field-enemy rows",
@@ -835,7 +857,7 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         f"- Bot sessions started: {bot_sessions}; bot errors: {bot_errors}.",
         f"- Duplicate-session refusals: {duplicate_refusals}; immediate reconnect probe refusals: {immediate_refusals}.",
         f"- Captured refusal/error events across service, bot, trace, and security logs: {len(error_events)}; security-log rows: {len(security_lines)}.",
-        f"- SOE checksum mismatch rejections indexed: {len(checksum_mismatches)}.",
+        f"- SOE checksum mismatch rejections indexed: {len(checksum_mismatches) if metadata.get('trace', True) else 'unavailable (packet tracing disabled; not a zero-rejection claim)'}.",
         f"- Service crash events: {len(crash_events)}; panic markers: {panic_count}.",
         f"- Unique ping round trips: {len(latency)}; p50 `{percentile(latency, .50)}` s, p95 `{percentile(latency, .95)}` s, p99 `{percentile(latency, .99)}` s.",
         f"- End saves present: {sum(row['exists'] for row in saves)}/{len(saves)}; gateway-loader reconnects: {sum(row['loaded'] for row in save_load)}/{len(save_load)}.",
@@ -940,6 +962,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bots", type=int, default=10)
     parser.add_argument("--duration-seconds", type=int, default=3600)
+    parser.add_argument("--trace", action="store_true", help="opt in to synchronous per-packet tracing (affects latency)")
+    parser.add_argument("--working-tree", action="store_true", help="freeze current crate sources over the HEAD snapshot")
     args = parser.parse_args()
     if not 1 <= args.bots <= 10:
         parser.error("--bots must be between 1 and 10")
@@ -949,8 +973,11 @@ def main() -> int:
     script_path = Path(__file__).resolve()
     root = script_path.parents[2]
     lab = root.parent / "lab"
-    build_dir = lab / "build" / "w107"
-    reports = lab / "reports" / "stress-w107"
+    build_dir = Path(os.environ.get("CARGO_TARGET_DIR", str(lab / "build" / "w107"))).resolve()
+    # stage_head may recursively remove only this exact child of the lab build root.
+    if build_dir.parent != (lab / "build").resolve():
+        raise RuntimeError("CARGO_TARGET_DIR must name one directory directly under lab/build")
+    reports = lab / "reports" / "stress-w124"
     run_dir = reports / utc_stamp()
     run_dir.mkdir(parents=True, exist_ok=False)
     build_dir.mkdir(parents=True, exist_ok=True)
@@ -970,7 +997,7 @@ def main() -> int:
         raise RuntimeError("git rev-parse HEAD failed")
     commit = commit_result.stdout.strip()
     (run_dir / "build.commit.txt").write_text(commit + "\n", encoding="ascii")
-    metadata = {"commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds, "expect_timeout_ms": MAX_EXPECT_MS, "startup_stagger_max_seconds": 8}
+    metadata = {"commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds, "expect_timeout_ms": MAX_EXPECT_MS, "startup_stagger_max_seconds": 8, "trace": args.trace, "working_tree": args.working_tree}
     login_process = gateway_process = None
     bot_registry: dict[int, subprocess.Popen] = {}
     registry_lock = threading.Lock()
@@ -985,7 +1012,7 @@ def main() -> int:
 
     try:
         timeline("build_started", {"commit": commit})
-        gateway_exe = build_bins(root, build_dir, run_dir, commit)
+        gateway_exe = build_bins(root, build_dir, run_dir, commit, args.working_tree)
         bin_dir = build_dir / "release"
         account_exe = bin_dir / ("osfr-account.exe" if os.name == "nt" else "osfr-account")
         login_exe = bin_dir / ("osfr-login.exe" if os.name == "nt" else "osfr-login")
@@ -1012,10 +1039,10 @@ def main() -> int:
             "--server-id-file", str(server_id), "--resources", str(run_dir / "login-resources"),
             "--identity", str(run_dir / "identity.json"), "--state", str(run_dir / "login-state.json"),
             "--account-store", str(store), "--key-file", str(login_key), "--handoff-key-file", str(handoff),
-            "--gateway", f"127.0.0.1:{gateway_port}", "--trace", str(run_dir / "login.trace.jsonl"),
-        ], root, run_dir)
+            "--gateway", f"127.0.0.1:{gateway_port}",
+        ] + (["--trace", str(run_dir / "login.trace.jsonl")] if args.trace else []), root, run_dir)
         wait_ready(login_process, run_dir, ('"event":"listening"', '"event":"auth_listening"'))
-        gateway_process = ProcessLogs("gateway", gateway_exe, gateway_args(gateway_port, reference, content, state_path, store, handoff, run_dir), root, run_dir)
+        gateway_process = ProcessLogs("gateway", gateway_exe, gateway_args(gateway_port, reference, content, state_path, store, handoff, run_dir, "gateway.trace.jsonl" if args.trace else None), root, run_dir)
         wait_ready(gateway_process, run_dir, ('"event":"listening"',))
         timeline("services_ready", {"login_port": login_port, "auth_port": auth_port, "gateway_port": gateway_port})
 
@@ -1079,7 +1106,7 @@ def main() -> int:
                 gateway_process.process.wait(timeout=5)
         gateway_process.close_logs()
         if not service_crashed:
-            gateway_process, save_load = sample_save_load(gateway_exe, bin_dir, records, free_port("udp"), store, handoff, reference, content, state_path, run_dir)
+            gateway_process, save_load = sample_save_load(gateway_exe, bin_dir, records, free_port("udp"), store, handoff, reference, content, state_path, run_dir, args.trace)
             if gateway_process.process.poll() is None:
                 gateway_process.process.terminate()
                 try:
