@@ -144,3 +144,119 @@ Project file written: this note. Native-map writes: `map.sqlite`/SQLite journal 
 Security review used secure-code-guardian's local threat boundary and security-reviewer's manual pass. The helpers have no remote input, listeners, credentials, shell execution or process control. SQL values are parameterized; acceptance validates fixed shard/address forms, checks preflight inputs, backs up the database and guards concurrent records. The invalid-callee canary was rejected by the pipeline. A stdlib AST scan plus manual review found no actionable security findings. Bandit was unavailable and was not installed; this was not a production network security audit. Replay/receipt-overwrite guards were added to the one-shot helpers.
 
 **Ponytail:** reused nmq, xreview's no-launch dispatcher, validate/check_fix and Dispatcher.accept. Used stdlib receipts and a cloned rehearsal. Did not build a mapper, parser, new disassembler, dependency, Rust module, worker fleet or global notes regeneration. Caveman applied to chat; persisted evidence remains complete.
+
+## W89 follow-up, 2026-10-16
+
+**Verdict: PARTLY PROVEN; W89 is not complete.** All 57 staged W87 corrections were applied with their prior records and audits preserved. W87's 39-shard mapper check now has **0 errors**, down from 261. Three backlog shards completed full review and acceptance: **S0079, S0182, S0212**. S0215 and S0672 still lack complete mapper output; the expanded 44-shard check reports exactly these two errors. They were not marked accepted or filled with fabricated unknown records.
+
+Ownership stayed within native-map scripts/state and this appended section. No Rust, content, saves, launcher, client, shared Plan/Ledger, commits, agents, external messages or installations were touched. The lead still owns integration and shared plan updates. RTK, Ponytail (full), Caveman, codebase-memory, reverse-engineering, secure-code-guardian and security-reviewer were applied. There was no asset-format or game-client work requiring an asset reader, community search or native run.
+
+### Migration decision and preserved history
+
+The validator was **not changed or weakened**. Old evidence was divided into two cases:
+
+1. **Equivalent anchors:** migrate a vtable slot only when the current export has exactly one matching class/slot, retaining any explicitly supplied table address or object offset. The current export adds subobject offsets such as `+0x30[2]`. Reject ambiguous matches, changed table addresses and changed slot indices. For scalar deleting destructors, migrate the old `== 0` early-return anchor to the current `!= 0` free branch only when the complete current body explicitly calls `_free(param_1)` in that branch and returns the receiver. The existing descriptions already say free-when-set. This rewrote 114 mapper records in 17 shards and reduced 261 errors to 19.
+2. **Changed or ambiguous meaning:** review the current function and native bytes, then write a complete correction through `check_fix`, capped at likely. Seventeen residual mapper records were reviewed. Seven concern renamed pseudocode temporaries; six of those also need the recovered post-free loop reflected in their description. The remaining ten have shortened or obsolete vtable identities. Direct table-entry bytes were checked for every residual vtable correction. All 19 residual errors were resolved. Fifteen records already had accepted labels and were corrected there too; `0101a1f0` and `0101a200` had no accepted label and remain mapper-only corrections, pending their owning shard's normal review.
+
+Original mapper bytes are preserved in `lab/native-map/run/upkeep-W89/mapper-before/` and `review-mapper-before/`. `migration.json` contains original/current file hashes and every before/after record; `review-migration.json` contains each reviewed correction and reason. No existing mapper/reviewer/audit file was deleted. The private helpers refuse completed replay; the reviewed-migration helper also preserves its original backup on interrupted retry.
+
+Whole-shard `Dispatcher.accept` rebuilds records from mapper output and can replace unrelated post-acceptance audit metadata. It remains the path for newly mapped shards, but is unsuitable for revising a small accepted subset. The existing `recheck.py done` now has an explicit `--apply-fixes` mode. It uses the original `check_fix` gate, requires accepted rows to match the claim-time snapshot exactly, and applies the complete batch in one `BEGIN IMMEDIATE` transaction. It retains every old audit plus the complete prior record (apart from the audits already retained separately) inside the new audit entry. Owning shard, status and pass fields are unchanged. Duplicate/missing/extra addresses, invalid fixes, replay, changed records and invalid batch paths are rejected. The default verdict-only recheck behavior is unchanged. Normal independent fix checks still queue after application.
+
+`xreview.py claim --sid` was added to reserve only the assigned shard, preserving the existing prompt, chunking and finish-review gates. It avoids taking a higher-priority unrelated worker's shard. No dispatcher worker/process launch or PID adoption occurred.
+
+### Applied work and native provenance
+
+- **57/57 staged W87 corrections applied; 0 rejected:** 27 upgrades, 29 same-confidence corrections, 1 downgrade. Batch `recheck/B0021`, rehearsed on a cloned database first: `rehearsal_changed=57 unexpected=0 fixes_valid=57`. The W87 byte evidence and `review.jsonl` remain the authority for their recovered facts; W89 did not invent new gameplay rules.
+- **15 accepted-label migration corrections applied; 0 rejected:** batch `B0023`. The earlier `B0022` staging attempt encountered two functions without accepted labels and aborted before any label write; its terminal receipt explicitly records `aborted`, `applied: 0`. The two mapper-only corrections were not promoted. This intermediate failure and retry are preserved.
+- **361 new labels accepted** through the existing full-review gates: S0079 121/121, S0182 123/123, S0212 117/117. W89 supplied 201 remaining verdicts, including 32 valid complete fixes; the preceding 160 verdicts were retained. New reviewer files are S0079/S0182 rounds 3–4 and S0212 rounds 1–3. Every new verdict's current `nmq show` and disassembly receipts are in `upkeep-W89/evidence/`; `provenance.json` indexes all 201 addresses and reasons.
+- Final live state: **99,549 labels**; shards: 828 accepted, 5 failed, 63 pending, 4 queued, 1 review_pending; no mapping/reviewing process was started. `status.json` was refreshed through `Dispatcher.status` with its normal `Spend` helper.
+
+Native source: `lab/working/OSFR.Client/OSFR Client/FreeRealms.exe`, SHA-256 recomputed as `26cc1c522a45e71fb57882da515f65bac45c8c8b8c7e740c0cea81c52a733351`. `fn.c`, `fn.vslots`, the raw executable and the original pipeline validators were used. No Legacy C# was copied. Proposed identifiers are descriptive labels, not recovered original source symbols. No original server rule or numerical balance is established here.
+
+Important recovered corrections, each with full address-specific receipts:
+
+| Addresses | Verified correction | Receipt/provenance |
+|---|---|---|
+| `008cc3d0`, `008cc480`, `008cc530`, `008cc5f0`, `00a3d170`, `00c43390` | These drain the entire linked sequence after free, rather than removing only one node. | `evidence/<addr>.review.txt`; e.g. `008cc455..008cc45c` restores the saved next pointer and loops; `00c43418..00c4341f` does the same. |
+| Ten residual vtable records, listed in `review-migration.json` | Replace obsolete secondary-table notation with the actual current table/slot identity. | `evidence/<addr>.slot.txt` contains the four executable bytes at the table entry, decoded and asserted equal to that function address. |
+| `0057cb63`, `0057cceb`, `0057e14e` | Color and leaf/sentinel bytes differ: `+0x24/+0x25` and `+0x2c/+0x2d`. | Current node constructors `00572027`, `0057205a`, `0055515f`; owning function show/dis receipts and S0079 verdicts. |
+| `007d5850` | Equality walks predecessors to the first equal key, not the last duplicate. | Current body and predecessor `007d4340`; S0182 show/dis receipts and verdict. |
+| `007d6920`, `007d7380` | Cleanup calls the container's callback; array swap delegation does not establish a free operation. | Current receiver expressions and native `007d738b..007d739e`; S0182 verdicts. |
+| `00879230` | Four unrolled groups link sixteen inline nodes, not four. | Native `00879250..0087926d`, step `0x50`, four links per iteration; final count 16. |
+| `0087a5a0`, `0087a690` | One inline-derived array undergoes derived/base destruction; these are not two array subobjects. | Same receiver/fields across native vtable stores; S0212 show/dis receipts. |
+| `0087c390`, `0087c920` | Sum stored node weights at `+0x14` plus 16. The 4096 bound applies to the growth candidate; an explicit larger request can exceed it. | Native field loads/adds and `0087c94d..0087c98f`; S0212 verdicts. |
+| Other corrections and agreements | Exact offsets, receivers, range copies, return conventions and remaining uncertainty are recorded per function. | `S0079.verdicts.jsonl`, `S0182.verdicts.jsonl`, `S0212.verdicts.jsonl`, `provenance.json`; no broader behavior is inferred. |
+
+### Gates, exact remaining errors and files
+
+Commands ran from `project`; private receipts live in `../lab/native-map/run/upkeep-W89/`. Repeatable command/output pairs are retained in `gate-commands.json`, `verify-before.txt`, `regression.txt`, `w87-after.txt`, `w89-after.txt`, and `verification.json`.
+
+```powershell
+python -I '..\lab\native-map\run\upkeep-W87\verify.py' --all-mappers
+# BEFORE, exit 1:
+# mapper_shards=39 valid_records=5515 errors=261 bad_shards=21
+# sqlite_quick_check=ok
+
+python -I scripts/native_map/test_recheck.py --baseline
+# exit 1: AssertionError: validated fix object was not applied
+python -I scripts/native_map/test_recheck.py
+# exit 0:
+# recheck_fixes=ok history=preserved confidence=capped rollback=ok replay=rejected
+# duplicates=rejected concurrent_edit=rejected path_escape=rejected scoped_claim=ok
+
+python -I '..\lab\native-map\run\upkeep-W89\migrate.py'
+# migrated_shards=17 migrated_records=114 errors_before=261 errors_after=19
+python -I '..\lab\native-map\run\upkeep-W89\apply_staged.py'
+# rehearsal_changed=57 unexpected=0 fixes_valid=57
+# APPLIED: applied=57 rejected=0 unexpected=0; upgraded=27 same-confidence=29 downgraded=1
+python -I '..\lab\native-map\run\upkeep-W89\review_migration.py'
+# B0023: applied=15 rejected=0
+# reviewed_migration_records=17 remaining_mapper_errors=0
+python -I '..\lab\native-map\run\upkeep-W89\finish_review.py' S0079
+# ACCEPTED 121 records; all 121 reviewed
+python -I '..\lab\native-map\run\upkeep-W89\finish_review.py' S0182
+# ACCEPTED 123 records; all 123 reviewed
+python -I '..\lab\native-map\run\upkeep-W89\finish_review.py' S0212
+# ACCEPTED 117 records; all 117 reviewed
+```
+
+W87's frozen verifier now reports `mapper_shards=39 valid_records=5646 errors=0 bad_shards=0`, `fixes_ok=80 fixes_invalid=0 fixes_missing=0`, `live_changed_records=23 errors=0`, and `sqlite_quick_check=ok`. Its exit remains 1 because its historical preservation check still expects only W87's original 23 changes: `preservation_changed=456 unexpected=433`. Those 433 subsequent W89 changes are all explained by the current preservation receipt below; W87's verifier and baseline were preserved rather than rewritten to hide the temporal difference.
+
+The W89 verifier compares **every label column**, retains the prior audit sequence and before-image for all 72 existing-label revisions, validates all changed live records, and expands the mapper scope to W87's 39 shards plus all five backlog shards:
+
+```powershell
+python -I '..\lab\native-map\run\upkeep-W89\verify.py' --all-mappers --receipt
+# exit 1, solely the two missing-mapper errors below:
+```
+
+```text
+staged_applied=57 staged_rejected=0 reviewed_migration_applied=15
+preservation_changed=433 existing_changed=72 added=361 unexpected=0
+audit_history_errors=0 live_record_errors=0
+mapper_shards=44 valid_records=6116 errors=2 bad_shards=2
+sqlite_quick_check=ok
+S0079=accepted validated=121/121
+S0182=accepted validated=123/123
+S0212=accepted validated=117/117
+S0215=pending validated=109/163
+S0672=pending validated=0/182
+```
+
+Every remaining mapper error:
+
+| Shard | Error and cause | Unfinished gate |
+|---|---|---|
+| S0215 | `missing records for 54 targets`; the existing mapper file ends before those functions. | Complete and validate the remaining 54 mapper records, then independent full review of all 163. |
+| S0672 | `cannot read output: [Errno 2] No such file or directory: .../shards/S0672/out.jsonl`; all 182 mapper records are absent. | Produce and validate the mapper output, then independent full review of all 182. |
+
+`verification.json` lists **all 236 missing addresses**, without the validator CLI's 40-address truncation. These are input/completeness blockers, not unresolved anchor migrations. This scoped worker did not launch mappers or write and then independently approve its own missing mappings. A zero-error check covering these two shards, and their acceptance, remain unproven. This is why W89 remains partial.
+
+Project files written: `scripts/native_map/recheck.py`, `scripts/native_map/xreview.py`, new `scripts/native_map/test_recheck.py`, and this appended section. Private writes: the receipt helpers and before/rehearsal databases, mapper backups, migrated mapper outputs, evidence/provenance/gate/security receipts, recheck batches B0021–B0023, three shards' new review rounds/prompts/model markers, the map database, normal fixcheck queue additions, dispatch log and status. `before.sqlite` is the W89 baseline. Existing review/audit files and raw executable were preserved. Initial tempfile-based regression runs hit Windows sandbox ACL traversal errors; tests now use ordinary private native-map receipt directories without changing ACLs.
+
+### Security review and limits
+
+Secure-code-guardian and security-reviewer were applied to the local file/SQLite boundary. The manual scoped production-diff review found **0 actionable findings**. The stdlib AST pass found no dynamic SQL, `shell=True`, production dynamic code execution, network creation or process control. Batch path/address/shard guards, exact address sets, stale-snapshot rejection, rollback after a later invalid fix, replay rejection and unrelated-shard reservation were exercised. Bandit, Semgrep and Gitleaks were unavailable; none was installed. Test-only execution of the Git HEAD source is the regression oracle, not execution of mapper input.
+
+SQLite commits the full correction/audit batch atomically. Secondary queue/receipt files are written afterward; an I/O failure then leaves the durable in-row audit authoritative and requires reconciliation of those secondary files. The claim snapshot prevents accidental replay. No such failure occurred in the applied batches. Confidence caps and queued independent fix checks remain distinct from Claude's lead acceptance. No native client or gameplay claim is made.
+
+**Ponytail:** reused `validate`, `check_fix`, recheck batches, the existing independent fix queue, nmq and xreview/Dispatcher full-review gates. Added one opt-in correction path, one scoped reservation filter and a stdlib regression check. Deliberately did not build a second validator, mapper fleet, disassembler, dependency, asset reader, Rust module or global note regeneration.

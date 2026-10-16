@@ -5,13 +5,17 @@
   recheck.py done <run> <batch> <model>                  apply verdicts: same caps as accept() (reject -> unknown/no name,
                                                          rename -> speculative, downgrade -> capped, refine -> refined_name),
                                                          recorded in the owning shard's audit.jsonl and on the label row.
+  recheck.py done <run> <batch> <model> --apply-fixes    atomically apply complete validated fix records to accepted labels
+                                                         matching the claim snapshot; retain prior records and all audits.
+                                                         Each applied fix still queues the normal independent fix check.
 The reviewer prompt is the standard reviewer-prompt.md with this batch's sample and a per-batch out file holding the
 current accepted records, plus a note that the code changed since acceptance.
 """
-import argparse, json, sqlite3, sys
+import argparse, json, re, sqlite3, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import dispatch as D
+from validate import FIX_VERDICTS, check_fix
 
 ORDER = ["unknown", "speculative", "likely", "confirmed"]
 
@@ -63,7 +67,73 @@ def claim(a):
     print("no batches left")
 
 
+def apply_fixes(a):
+    """Opt-in accepted-label corrections; validate each fix, preserve every prior audit.
+
+    records.jsonl is the claim-time snapshot. Replaying or racing another accepted
+    label edit fails closed. Original mapper/reviewer files are never rewritten.
+    Whole-shard accept is for new mappings, not post-acceptance corrections.
+    """
+    if not re.fullmatch(r"B[0-9]{4,}", a.batch) or not a.model.strip():
+        raise ValueError("invalid batch or empty reviewer model")
+    run = Path(a.run).resolve(); b = run / "recheck" / a.batch
+    if b.resolve().parent != (run / "recheck").resolve() or (b / "done").exists():
+        raise ValueError("batch escapes recheck directory or is already done")
+    sample = (b / "sample.txt").read_text().split()
+    if not sample or len(sample) != len(set(sample)) or any(not re.fullmatch(r"[0-9a-f]{8}", x) for x in sample):
+        raise ValueError("sample must contain unique eight-digit addresses")
+    def records(path):
+        rows = [json.loads(x) for x in path.read_text(encoding="utf-8-sig").splitlines() if x.strip()]
+        result = {r["addr"]: r for r in rows}
+        if len(rows) != len(result) or set(result) != set(sample):
+            raise ValueError(f"{path.name}: duplicate, missing or extra address")
+        return result
+    before, verdicts = records(b / "records.jsonl"), records(b / "review.jsonl")
+    db = sqlite3.connect(run / "map.sqlite", timeout=30)
+    fixes = []
+    try:
+        db.execute("BEGIN IMMEDIATE")
+        for addr in sorted(sample):
+            row = db.execute("SELECT shard,record,status,pass FROM label WHERE addr=?", (addr,)).fetchone()
+            if not row or row[2] != "accepted" or json.loads(row[1]) != before[addr]:
+                raise ValueError(f"{addr}: accepted record changed since claim")
+            sid, old = row[0], before[addr]
+            if not re.fullmatch(r"S[0-9]{4}", sid):
+                raise ValueError("invalid owning shard")
+            v = verdicts[addr]
+            if v.get("verdict") not in FIX_VERDICTS:
+                raise ValueError(f"{addr}: correction requires a fix verdict")
+            errors, fix = check_fix(str(run / "map.sqlite"), sid, v)
+            if errors:
+                raise ValueError(f"{addr}: {errors}")
+            audit = dict(v, by=f"recheck {a.batch} ({a.model})",
+                         before={k: value for k, value in old.items() if k != "audits"})
+            fix["audits"] = list(old.get("audits", [])) + [audit]
+            fix["review"] = {k: v[k] for k in ("verdict", "reason", "confidence", "name") if k in v}
+            fix["fixed_by_review"] = {"verdict": v["verdict"], "prior_name": old.get("name"),
+                                      "prior_confidence": old.get("confidence")}
+            db.execute("UPDATE label SET record=? WHERE addr=?", (json.dumps(fix), addr))
+            fixes.append((sid, addr, fix))
+        db.commit()
+    except BaseException:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+    # The full audit and before-image are durable in each label in the same SQLite
+    # transaction. These queue/receipt files are secondary to that atomic history.
+    d = D.Dispatcher.__new__(D.Dispatcher); d.run = run
+    for sid, addr, fix in fixes:
+        d.queue_fixcheck(sid, addr, fix)
+    counts = {"applied": len(fixes), "rejected": 0}
+    (b / "done").write_text(json.dumps(counts), encoding="utf-8")
+    D.log(run, f"recheck {a.batch} fixes applied by {a.model}: {counts}")
+    print(a.batch, counts)
+
+
 def done(a):
+    if getattr(a, "apply_fixes", False):
+        return apply_fixes(a)
     run = Path(a.run).resolve(); b = run / "recheck" / a.batch
     db = sqlite3.connect(run / "map.sqlite", timeout=30)
     sample = set((b / "sample.txt").read_text().split())
@@ -110,5 +180,6 @@ if __name__ == "__main__":
     m.add_argument("--kind", default="code-changed", choices=["code-changed", "fixcheck"])
     c = sub.add_parser("claim"); c.add_argument("run")
     d = sub.add_parser("done"); d.add_argument("run"); d.add_argument("batch"); d.add_argument("model")
+    d.add_argument("--apply-fixes", action="store_true", help="validate and atomically apply fixes to unchanged accepted records, preserving audit history")
     a = ap.parse_args()
     {"make": make, "claim": claim, "done": done}[a.cmd](a)

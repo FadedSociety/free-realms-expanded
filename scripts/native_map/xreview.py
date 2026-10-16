@@ -42,6 +42,8 @@ def claim(a):
     for (sid,) in rows:
         if n >= a.n:
             break
+        if getattr(a, "sid", None) and sid != a.sid:
+            continue
         s = d.run / "shards" / sid
         if a.exclude_mapper and (s / "mapper").exists() and a.exclude_mapper in (s / "mapper").read_text():
             continue
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("claim"); c.add_argument("run"); c.add_argument("n", type=int); c.add_argument("--exclude-mapper")
+    c.add_argument("--sid", help="reserve only this shard for a scoped external review")
     o = sub.add_parser("done"); o.add_argument("run"); o.add_argument("sid"); o.add_argument("model")
     r = sub.add_parser("release"); r.add_argument("run"); r.add_argument("sid")
     a = ap.parse_args()
