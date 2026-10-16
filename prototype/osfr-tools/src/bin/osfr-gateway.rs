@@ -10,6 +10,7 @@ use osfr_tools::game_store::{load_or_create, save};
 use osfr_tools::gameplay::Gameplay;
 use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
+use osfr_tools::net_policy::{Bucket, IpLimiter};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
 use osfr_tools::session::{CRC_SEED, SessionRequest, clock_reflect, decode_controls};
 use osfr_tools::social_chat::{
@@ -346,7 +347,9 @@ impl Options {
             return Err("gateway binds loopback, or a private-network IP with --allow-lan".into());
         }
         if !bind.ip().is_loopback() && (dev_tools || account_store.is_none()) {
-            return Err("a non-loopback gateway needs --account-store and refuses --dev-tools".into());
+            return Err(
+                "a non-loopback gateway needs --account-store and refuses --dev-tools".into(),
+            );
         }
         let handoff_key = handoff_key_file
             .map(fs::read)
@@ -408,6 +411,8 @@ struct Session {
     spam_gate: SpamGate,
     session_start: Instant,
     last_activity: Instant,
+    packets: Bucket,
+    bytes: Bucket,
     sent: u64,
     received: u64,
     trace: Option<trace::Trace>,
@@ -756,6 +761,8 @@ impl Session {
             spam_gate: SpamGate::default(),
             session_start: Instant::now(),
             last_activity: Instant::now(),
+            packets: Bucket::full(PACKET_BUDGET.1, Instant::now()),
+            bytes: Bucket::full(BYTE_BUDGET.1, Instant::now()),
             sent: 0,
             received: 0,
             trace,
@@ -1776,8 +1783,21 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
     Ok(Some(request))
 }
 
+// Admission and budgets (Security Model L6). (R) starting values: the native
+// client peaked at 41 datagrams/s and 4.4 KB/s in run 20261016T045046Z.
+// Loopback (the host's own bots and client) is exempt from the per-IP limits.
+const MAX_SESSIONS: usize = 16;
+const MAX_SESSIONS_PER_IP: usize = 4;
+const HANDSHAKES_PER_IP: (f64, f64) = (5.0, 10.0); // per second, burst
+const LOGIN_DEADLINE: Duration = Duration::from_secs(5);
+const PACKET_BUDGET: (f64, f64) = (200.0, 400.0);
+const BYTE_BUDGET: (f64, f64) = (256.0 * 1024.0, 1024.0 * 1024.0);
+
 pub struct Server {
     options: Options,
+    handshakes: IpLimiter,
+    refused: u64,
+    refusal_logged: Option<Instant>,
     socket: UdpSocket,
     sessions: SessionMap,
     world: SharedWorld,
@@ -1846,11 +1866,28 @@ impl Server {
             trace: None,
             studio,
             studio_assets: BTreeMap::new(),
+            handshakes: IpLimiter::new(HANDSHAKES_PER_IP.0, HANDSHAKES_PER_IP.1, 1024),
+            refused: 0,
+            refusal_logged: None,
         })
     }
 
     pub fn local_addr(&self) -> io::Result<SocketAddr> {
         self.socket.local_addr()
+    }
+
+    /// Count refused traffic and log a summary at most every 10 s, so a flood
+    /// cannot grow the log.
+    fn refuse(&mut self, reason: &'static str) {
+        self.refused += 1;
+        if self
+            .refusal_logged
+            .is_none_or(|at| at.elapsed() >= Duration::from_secs(10))
+        {
+            event(json!({"event":"admission_refused","reason":reason,"count":self.refused}));
+            self.refused = 0;
+            self.refusal_logged = Some(Instant::now());
+        }
     }
 
     pub fn active_session_count(&self) -> usize {
@@ -1867,7 +1904,12 @@ impl Server {
                 if osfr_tools::net_policy::allowed(peer.ip(), self.options.allow_lan) =>
             {
                 let wire = &buffer[..length];
-                if wire.starts_with(&[0, 1]) {
+                if wire.starts_with(&[0, 1])
+                    && !peer.ip().is_loopback()
+                    && !self.handshakes.allow(peer.ip(), Instant::now())
+                {
+                    self.refuse("handshake_rate");
+                } else if wire.starts_with(&[0, 1]) {
                     match SessionRequest::parse(wire) {
                         Ok(request) => {
                             if let Some(trace) = &self.trace {
@@ -1891,20 +1933,37 @@ impl Server {
                     }
                 } else if let Some(key) = self.session_key_for_peer(peer) {
                     if let Some(mut current) = self.sessions.remove(&key) {
-                        let result = current.handle(
-                            &self.socket,
-                            wire,
-                            &self.options,
-                            now_ms,
-                            &mut self.world,
-                            &mut self.sessions,
-                        );
-                        match result {
-                            Ok(false) => {
-                                self.sessions.insert(key, current);
+                        let now = Instant::now();
+                        let over_budget =
+                            !current
+                                .packets
+                                .take(1.0, PACKET_BUDGET.0, PACKET_BUDGET.1, now)
+                                || !current.bytes.take(
+                                    wire.len() as f64,
+                                    BYTE_BUDGET.0,
+                                    BYTE_BUDGET.1,
+                                    now,
+                                );
+                        if over_budget {
+                            // Dropped unread; the session and everyone else keep running.
+                            self.sessions.insert(key, current);
+                            self.refuse("packet_budget");
+                        } else {
+                            let result = current.handle(
+                                &self.socket,
+                                wire,
+                                &self.options,
+                                now_ms,
+                                &mut self.world,
+                                &mut self.sessions,
+                            );
+                            match result {
+                                Ok(false) => {
+                                    self.sessions.insert(key, current);
+                                }
+                                Ok(true) => self.end_session(key, current, "client_disconnect")?,
+                                Err(error) => self.end_session(key, current, &error.to_string())?,
                             }
-                            Ok(true) => self.end_session(key, current, "client_disconnect")?,
-                            Err(error) => self.end_session(key, current, &error.to_string())?,
                         }
                     }
                 }
@@ -1935,6 +1994,11 @@ impl Server {
                 // A fragmented message left incomplete past its fixed deadline
                 // (KeepAlive cannot extend it; Security Model L7).
                 self.end_session(key, current, "reassembly_timeout")?;
+            } else if !current.selected_character
+                && current.session_start.elapsed() > LOGIN_DEADLINE
+            {
+                // Not logged in yet: KeepAlive does not extend this (Security Model L6).
+                self.end_session(key, current, "login_deadline")?;
             } else if current.last_activity.elapsed() > Duration::from_secs(60) {
                 self.end_session(key, current, "idle_timeout")?;
             } else {
@@ -2286,7 +2350,11 @@ impl Server {
             ("GET", p) if p.starts_with("/api/world/") => {
                 // Live-world files (placed NPCs, marks) for the Studio map.
                 let name = &p["/api/world/".len()..];
-                if !name.ends_with(".json") || !name.chars().all(|c| c.is_ascii_lowercase() || c == '_' || c == '.') {
+                if !name.ends_with(".json")
+                    || !name
+                        .chars()
+                        .all(|c| c.is_ascii_lowercase() || c == '_' || c == '.')
+                {
                     return json_reply(400, json!({"error": "bad world file name"}));
                 }
                 let Some(key) = self.studio_session() else {
@@ -2304,7 +2372,11 @@ impl Server {
                     .options
                     .terrain
                     .iter()
-                    .flat_map(|t| t.zone_ids().into_iter().filter_map(|id| Some((id, t.grid(id)?))))
+                    .flat_map(|t| {
+                        t.zone_ids()
+                            .into_iter()
+                            .filter_map(|id| Some((id, t.grid(id)?)))
+                    })
                     .map(|(id, g)| {
                         json!({"zone": id, "min_x": g.min_x, "min_z": g.min_z, "cell": g.cell,
                                "cols": g.cols, "rows": g.rows})
@@ -2433,6 +2505,17 @@ impl Server {
         if let Some(old_key) = self.session_key_for_peer(peer) {
             let old = self.sessions.remove(&old_key).unwrap();
             self.end_session(old_key, old, "connection_replaced")?;
+        }
+        let same_ip = self
+            .sessions
+            .keys()
+            .filter(|k| k.peer.ip() == peer.ip())
+            .count();
+        if self.sessions.len() >= MAX_SESSIONS
+            || (!peer.ip().is_loopback() && same_ip >= MAX_SESSIONS_PER_IP)
+        {
+            self.refuse("session_cap");
+            return Ok(());
         }
         // (R) Without account-store character selection, the configured save is exclusive.
         if self.options.account_store.is_none() && !self.sessions.is_empty() {

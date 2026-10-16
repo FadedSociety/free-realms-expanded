@@ -490,6 +490,41 @@ fn log_in(server: &mut Server, connection_id: u32, guid: u64, store: &Path) -> (
     (client, messages)
 }
 
+/// Security Model L6: the gateway admits at most 16 sessions (pending included).
+#[test]
+fn the_seventeenth_connection_is_refused() {
+    let temp = TempDir::new();
+    let (mut server, _) = start_server(&temp);
+    let admitted: Vec<Client> = (0..16).map(|n| Client::connect(&mut server, 100 + n)).collect();
+    assert_eq!(server.active_session_count(), 16);
+    let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+    socket.set_read_timeout(Some(Duration::from_millis(50))).unwrap();
+    let mut request = vec![0, 1];
+    request.extend_from_slice(&3u32.to_be_bytes());
+    request.extend_from_slice(&999u32.to_be_bytes());
+    request.extend_from_slice(&512u32.to_be_bytes());
+    request.extend_from_slice(b"CGAPI_527 ");
+    socket.send_to(&request, server.local_addr().unwrap()).unwrap();
+    server.step().unwrap();
+    assert!(socket.recv_from(&mut [0; 64]).is_err(), "no handshake reply past the cap");
+    assert_eq!(server.active_session_count(), 16);
+    drop(admitted);
+}
+
+/// A connection that never logs in is dropped after 5 s; KeepAlive or not,
+/// a logged-in player is unaffected.
+#[test]
+fn a_connection_that_never_logs_in_is_dropped() {
+    let temp = TempDir::new();
+    let (mut server, store) = start_server(&temp);
+    let (_player, _) = log_in(&mut server, 71, 2, &store);
+    let _lurker = Client::connect(&mut server, 72);
+    assert_eq!(server.active_session_count(), 2);
+    std::thread::sleep(Duration::from_millis(5_200));
+    server.step().unwrap();
+    assert_eq!(server.active_session_count(), 1);
+}
+
 /// A player whose game exits without a goodbye must not take the server down:
 /// Windows reports the next datagram to their closed port as ConnectionReset.
 #[test]
