@@ -1,6 +1,6 @@
 //! (R) Per-server key-pair login, per notes/Research/Key-pair Login Contract.md.
 //! This is reconstructed authentication, not the historical account service.
-//! Only loopback brokers / authenticated tunnel endpoints are permitted.
+//! Brokers must be loopback or a private-network literal (LAN or VPN); never public.
 
 use crate::SessionToken;
 use ed25519_dalek::{Signer, SigningKey};
@@ -9,7 +9,7 @@ use std::{
     fmt,
     fs::{self, File},
     io::{self, Read, Write},
-    net::{SocketAddr, TcpStream},
+    net::{IpAddr, SocketAddr, TcpStream},
     path::{Path, PathBuf},
     time::{Duration, Instant},
 };
@@ -102,10 +102,23 @@ impl Profile {
             .broker_endpoint
             .parse()
             .map_err(|_| AuthError::InvalidProfile)?;
-        if !address.ip().is_loopback() {
+        if !broker_ip_allowed(address.ip()) {
             return Err(AuthError::InvalidProfile);
         }
         Ok(address)
+    }
+}
+
+/// Security Model decision 2 (2026-10-16): loopback, RFC 1918, the VPN shared
+/// space 100.64.0.0/10, or IPv6 unique-local. Public, wildcard and link-local
+/// addresses stay refused; AUTH2 still pins the server identity on top.
+fn broker_ip_allowed(ip: IpAddr) -> bool {
+    match ip {
+        IpAddr::V4(v4) => {
+            let [a, b, ..] = v4.octets();
+            v4.is_loopback() || v4.is_private() || (a == 100 && (64..128).contains(&b))
+        }
+        IpAddr::V6(v6) => v6.is_loopback() || (v6.segments()[0] & 0xfe00) == 0xfc00,
     }
 }
 

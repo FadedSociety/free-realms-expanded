@@ -26,6 +26,7 @@ use std::{
 };
 
 const AUTH_BROKER_ENDPOINT: &str = "127.0.0.1:20043";
+const AUTH_BROKER_PORT: u16 = 20043;
 
 fn load_banner(ctx: &egui::Context) -> Result<egui::TextureHandle, String> {
     // (R) Fit bundled art to the current limit, including before the first frame.
@@ -129,8 +130,21 @@ pub(crate) fn short_fingerprint(identity: &[u8; 32]) -> String {
         .join("-")
 }
 
+/// The broker listens on the realm host's address at the default broker port;
+/// a host on loopback or a LAN/VPN address shares it (Security Model decision 2).
+pub(crate) fn default_broker(address: &str) -> String {
+    address
+        .trim()
+        .parse::<std::net::SocketAddr>()
+        .map(|realm| {
+            std::net::SocketAddr::new(realm.ip(), AUTH_BROKER_PORT).to_string()
+        })
+        .unwrap_or_else(|_| AUTH_BROKER_ENDPOINT.into())
+}
+
 pub(crate) fn create_join_profile_with(
     address: &str,
+    broker: &str,
     identity_hex: &str,
     account_handle: &str,
     profile_id: &str,
@@ -145,7 +159,7 @@ pub(crate) fn create_join_profile_with(
     let profile = auth::Profile::new(
         profile_id,
         &display_name,
-        AUTH_BROKER_ENDPOINT,
+        broker,
         identity,
         account_handle,
     )
@@ -256,6 +270,7 @@ pub(crate) enum FocusTarget {
     LoginProfile,
     Play,
     JoinAddress,
+    JoinBroker,
     JoinIdentity,
     JoinHandle,
     CreateKey,
@@ -285,6 +300,7 @@ pub(crate) fn focus_order(
     if settings {
         order.extend([
             FocusTarget::JoinAddress,
+            FocusTarget::JoinBroker,
             FocusTarget::JoinIdentity,
             FocusTarget::JoinHandle,
             FocusTarget::CreateKey,
@@ -352,6 +368,8 @@ pub(crate) struct Launcher {
     selected: usize,
     new_address: String,
     join_address: String,
+    join_broker: String,
+    join_broker_edited: bool,
     join_identity: String,
     join_handle: String,
     join_public_key: Option<String>,
@@ -410,6 +428,8 @@ impl Launcher {
             selected: 0,
             new_address: String::new(),
             join_address: String::new(),
+            join_broker: String::new(),
+            join_broker_edited: false,
             join_identity: String::new(),
             join_handle: String::new(),
             join_public_key: None,
@@ -514,6 +534,7 @@ impl Launcher {
         let profile_id = next_profile_id(&self.profiles);
         match create_join_profile_with(
             self.join_address.trim(),
+            self.join_broker.trim(),
             self.join_identity.trim(),
             self.join_handle.trim(),
             &profile_id,
@@ -536,6 +557,8 @@ impl Launcher {
         self.settings_page = true;
         self.join_preview = true;
         self.join_address = "192.0.2.42:20042".into();
+        self.join_broker = default_broker(&self.join_address);
+        self.join_broker_edited = false;
         self.join_identity =
             "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff".into();
         self.join_handle = "your_handle".into();
@@ -921,6 +944,21 @@ impl Launcher {
             261,
         );
         self.record_focus(FocusTarget::JoinAddress, &address);
+        if address.changed() && !self.join_broker_edited {
+            self.join_broker = default_broker(&self.join_address);
+        }
+        let broker = theme::text_field(
+            ui,
+            &self.art,
+            &mut self.join_broker,
+            "Login broker, for example 10.0.0.5:20043",
+            Vec2::new(ui.available_width(), height),
+            261,
+        );
+        self.record_focus(FocusTarget::JoinBroker, &broker);
+        if broker.changed() {
+            self.join_broker_edited = !self.join_broker.trim().is_empty();
+        }
         let identity = theme::text_field(
             ui,
             &self.art,
@@ -930,7 +968,7 @@ impl Launcher {
             64,
         );
         self.record_focus(FocusTarget::JoinIdentity, &identity);
-        if address.changed() || identity.changed() {
+        if address.changed() || broker.changed() || identity.changed() {
             self.join_public_key = None;
         }
         if let Some(identity) = parse_server_identity(&self.join_identity) {
@@ -996,7 +1034,7 @@ impl Launcher {
                 ui.small("Your profile is saved on this PC and appears in the PLAY login list.");
             }
         }
-        ui.small("Login uses the local secure tunnel at 127.0.0.1:20043.");
+        ui.small("Login goes to your host's broker on their LAN or VPN address; public addresses are refused.");
         ui.add_space(4.0);
         ui.separator();
     }
@@ -1724,6 +1762,7 @@ mod tests {
                     FocusTarget::RealmsTab,
                     FocusTarget::SettingsTab,
                     FocusTarget::JoinAddress,
+                    FocusTarget::JoinBroker,
                     FocusTarget::JoinIdentity,
                     FocusTarget::JoinHandle,
                     FocusTarget::CreateKey,
@@ -1750,6 +1789,7 @@ mod tests {
                     FocusTarget::RealmsTab,
                     FocusTarget::SettingsTab,
                     FocusTarget::JoinAddress,
+                    FocusTarget::JoinBroker,
                     FocusTarget::JoinIdentity,
                     FocusTarget::JoinHandle,
                     FocusTarget::CreateKey,
@@ -1827,6 +1867,7 @@ mod tests {
                             let response = match target {
                                 FocusTarget::AddAddress
                                 | FocusTarget::JoinAddress
+                                | FocusTarget::JoinBroker
                                 | FocusTarget::JoinIdentity
                                 | FocusTarget::JoinHandle
                                 | FocusTarget::LoginProfile

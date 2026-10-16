@@ -15,6 +15,7 @@ fn join_flow_saves_profile_lists_it_and_copies_the_public_key() {
     let mut saved_profile = None;
     let joined = app::create_join_profile_with(
         "127.0.0.1:20042",
+        "127.0.0.1:20043",
         SERVER_IDENTITY,
         "acct_test",
         "join-test",
@@ -64,6 +65,7 @@ fn malformed_pin_does_not_generate_or_save_a_key() {
     let mut save_called = false;
     let result = app::create_join_profile_with(
         "127.0.0.1:20042",
+        "127.0.0.1:20043",
         "not-a-pin",
         "acct_test",
         "join-test",
@@ -126,6 +128,7 @@ fn settings_render_fingerprint_copy_button_and_host_instruction() {
         actual,
         [
             app::FocusTarget::JoinAddress,
+            app::FocusTarget::JoinBroker,
             app::FocusTarget::JoinIdentity,
             app::FocusTarget::JoinHandle,
             app::FocusTarget::CreateKey,
@@ -139,6 +142,7 @@ fn new_join_controls_and_conditional_cancel_are_in_focus_order() {
     let ready = app::focus_order(true, 1, false, true);
     for control in [
         app::FocusTarget::JoinAddress,
+        app::FocusTarget::JoinBroker,
         app::FocusTarget::JoinIdentity,
         app::FocusTarget::JoinHandle,
         app::FocusTarget::CreateKey,
@@ -163,4 +167,26 @@ fn key_generation_errors_keep_auth_error_messages() {
         app::auth_error_message(AuthError::RandomUnavailable),
         "The operating system could not generate a secure key."
     );
+}
+
+#[test]
+fn broker_defaults_to_the_realm_host_and_refuses_public_hosts() {
+    assert_eq!(app::default_broker("10.0.0.5:20042"), "10.0.0.5:20043");
+    assert_eq!(app::default_broker("[fd12::7]:20042"), "[fd12::7]:20043");
+    assert_eq!(app::default_broker("not an address"), "127.0.0.1:20043");
+    for (broker, ok) in [("100.64.0.9:20043", true), ("8.8.8.8:20043", false)] {
+        let result = app::create_join_profile_with(
+            "100.64.0.9:20042",
+            broker,
+            SERVER_IDENTITY,
+            "acct_test",
+            "join-test",
+            |_| Ok("ab".repeat(32)),
+            |_| Ok(()),
+        );
+        assert_eq!(result.is_ok(), ok, "{broker}");
+        if let Ok(joined) = result {
+            assert_eq!(joined.profile.broker_endpoint, broker);
+        }
+    }
 }

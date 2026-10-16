@@ -148,14 +148,14 @@ Leave this terminal open. The 14,400-second limit is a planned four-hour clean s
 17. Start login in a second terminal.
 
 ```powershell
-& $loginExe --bind ($vpn + ':20042') --auth-bind 127.0.0.1:20043 --gateway ($vpn + ':20041') --resources (Join-Path $bundle 'login-resources') --identity (Join-Path $runtime 'identity.json') --session $handle --state (Join-Path $runtime 'login-state.json') --account-store (Join-Path $runtime 'accounts.json') --server-id-file (Join-Path $bundle 'server\server-id.bin') --handoff-key-file (Join-Path $runtime 'handoff.key') --key-file $clientKey --allow-lan --seconds 14400
+& $loginExe --bind ($vpn + ':20042') --auth-bind ($vpn + ':20043') --gateway ($vpn + ':20041') --resources (Join-Path $bundle 'login-resources') --identity (Join-Path $runtime 'identity.json') --session $handle --state (Join-Path $runtime 'login-state.json') --account-store (Join-Path $runtime 'accounts.json') --server-id-file (Join-Path $bundle 'server\server-id.bin') --handoff-key-file (Join-Path $runtime 'handoff.key') --key-file $clientKey --allow-lan --seconds 14400
 ```
 
-The login broker is loopback-only. Friends need the W131 authenticated local tunnel to reach 127.0.0.1:20043. Do not bind the broker to the VPN address. The current launcher profile also accepts only a loopback broker endpoint.
+The login broker listens on the VPN address (Security Model decision 2). `--auth-bind` accepts a private address only with `--allow-lan`; a public or wildcard address is refused at startup. Friends' launchers accept loopback, RFC 1918, 100.64.0.0/10 and IPv6 unique-local broker endpoints, and refuse public ones. No tunnel is needed for the VPN playtest. Per-IP connection limits apply to every peer, loopback included. The private bind is tested on this PC's LAN address; a VPN-interface bind has not been run.
 
 18. Restrict network access to the VPN.
 
-Allow UDP 20041 and 20042 on the VPN interface only. Keep public port forwarding closed. The VPN address must be a private address accepted by --allow-lan.
+Allow UDP 20041 and 20042 and TCP 20043 on the VPN interface only. Keep public port forwarding closed. The VPN address must be a private address accepted by --allow-lan.
 
 19. Share the connection details through the trusted playtest channel.
 
@@ -178,7 +178,7 @@ The shared gateway refuses --dev-tools on a non-loopback bind. Studio stays off 
 
 1. Install the client and launcher build designated for this playtest. Do not send the private playtest bundle.
 
-The W131 installer and friend join flow are coming. The intended screen is Settings → Join a realm. The launcher README describes entering the game address, the 64-digit server identity, and an account handle; comparing the host fingerprint; creating a per-server key; then sending only the public key to the owner. It should save the trusted profile and use the local loopback broker tunnel. W131's brief was not present in the checked-in notes, and this path has not passed fresh-PC acceptance.
+The W131 installer and friend join flow are coming. The intended screen is Settings → Join a realm. The launcher README describes entering the game address, the 64-digit server identity, and an account handle; comparing the host fingerprint; creating a per-server key; then sending only the public key to the owner. The join screen also has a login broker field, prefilled with the realm address's IP and port 20043; leave it unless the host says otherwise. W131's brief was not present in the checked-in notes, and this path has not passed fresh-PC acceptance.
 
 2. Find the friend's existing account ID.
 
@@ -260,13 +260,13 @@ These messages come from the current launcher AuthError mapping. They cover brok
 
 | Launcher message | Host or player action |
 |---|---|
-| Server unreachable. Check the broker or secure tunnel. | Check VPN membership, the local authenticated tunnel to 127.0.0.1:20043, and that login is listening. |
+| Server unreachable. Check the broker or secure tunnel. | Check VPN membership, that login is listening on the VPN address port 20043, and the VPN firewall rule for TCP 20043. |
 | Wrong server identity. Check the trusted server profile. | Stop. Compare the 64-digit identity and SHA-256 fingerprint with the owner's out-of-band values. Do not accept a changed identity automatically. |
 | Login refused. Check key enrolment or try again later. | Check the account handle and public-key enrollment. AUTH2 intentionally hides whether an account is unknown, disabled, wrong-key, or locked. Five failures in five minutes lock the handle for 60 seconds; stop retrying and wait. |
 | Server closed the login request. Try again later. | Check that login is running and restart it if it exited. Then try once with a fresh challenge. |
-| Login timed out. Check the broker or try again later. | Check the tunnel, login terminal, and server load. Retry after the route is stable. |
-| Server returned an invalid login reply. | Check the profile endpoint and tunnel target. It must reach the correct AUTH2 broker, not the game UDP port. |
-| Invalid server profile. Check the trusted profile settings. | Correct the saved profile's loopback endpoint, identity, and account handle. |
+| Login timed out. Check the broker or try again later. | Check the VPN route, login terminal, and server load. Retry after the route is stable. |
+| Server returned an invalid login reply. | Check the profile's broker endpoint. It must reach the AUTH2 broker (TCP 20043), not the game UDP port. |
+| Invalid server profile. Check the trusted profile settings. | Correct the saved profile's broker endpoint (loopback or a private/VPN address), identity, and account handle. |
 | Cannot access the private profile files. Check their permissions. | Keep the profile in the signed-in user's APPDATA. Restore its owner-only permissions; never copy the private key to another PC. |
 | The operating system could not generate a secure key. | Restart the launcher and check Windows cryptographic services. Do not substitute a manually chosen key. |
 
@@ -303,7 +303,7 @@ Use lab/reports/playtest-night-YYYYMMDD/bugs/bug-NNN.md. Include UTC time, bundl
 - [ ] Host account is admin before login starts.
 - [ ] VPN and firewall expose only UDP 20041 and 20042 to VPN peers.
 - [ ] Gateway starts with account-store mode, --allow-lan, --security-log, --studio-port 0, and no --dev-tools.
-- [ ] Login starts on the VPN address; AUTH2 broker remains loopback-only behind the authenticated tunnel.
+- [ ] Login and its AUTH2 broker start on the VPN address with --allow-lan.
 - [ ] W131 launcher install/join flow works on a clean second PC.
 - [ ] Private patch URL and trusted manifest pin work without exposing the server bundle.
 - [ ] Two real clients pass login, character select, visibility, movement, and chat over VPN.
@@ -315,7 +315,7 @@ Do not invite players while any item stays unchecked.
 
 ## Night-blocking gaps
 
-- The W131 install/join screen, key creation, and authenticated broker tunnel have not passed a clean-PC test.
+- The W131 install/join screen, key creation, and VPN broker login have not passed a clean-PC test.
 - There is no verified VPN-only patch host or patch URL.
 - Account-store login has no native-client acceptance, and two-client visibility/gameplay over VPN is untested.
 - Developer tools cannot be made host-only on the shared gateway yet.
@@ -329,7 +329,7 @@ Do not invite players while any item stays unchecked.
 - The local source supports private-network binds with --allow-lan. No VPN bind or second-PC session was tested.
 - The account-store login flow has not passed native-client acceptance. No two-real-client VPN run is recorded.
 - Launcher key creation failed in this managed workspace because its owner-only profile directory could not be accessed. W131's friend UI, a clean installation package, and fresh-PC login remain unverified.
-- The AUTH2 broker binds loopback only. A supported authenticated tunnel from a friend's PC is not verified.
+- The AUTH2 broker binds a private address with --allow-lan (tested on a LAN address). Login from a friend's PC over the VPN is not verified.
 - No private patch host or patch URL exists in this runbook's evidence.
 - The gateway rejects --dev-tools for non-loopback binds. There is no supported host-only remote developer console; live scavenger-hunt administration remains blocked.
 - The stress harness's broker-login command was not run because it writes outside W132's owned report path. The full 60-minute broker-login gate remains open.

@@ -102,8 +102,12 @@ impl Options {
             return Err("login binds loopback, or a private-network IP with --allow-lan".into());
         }
         let authenticated = account_store.is_some();
-        if !auth_bind.ip().is_loopback() {
-            return Err("credential broker must bind loopback; use an encrypted tunnel".into());
+        // Security Model decision 2 (2026-10-16): the broker may listen on the
+        // VPN address under the same rule as the UDP binds; public stays closed.
+        if !osfr_tools::net_policy::allowed(auth_bind.ip(), allow_lan) {
+            return Err(
+                "credential broker binds loopback, or a private-network IP with --allow-lan".into(),
+            );
         }
         if !authenticated && (!bind.ip().is_loopback() || server_id_file.is_some()) {
             return Err(
@@ -193,6 +197,7 @@ struct Broker {
     ips: IpLimiter,
     native_ips: IpLimiter,
     global: Bucket,
+    allow_lan: bool,
 }
 
 impl Broker {
@@ -213,6 +218,7 @@ impl Broker {
             ips: IpLimiter::new(20.0 / 60.0, 20.0, 1024),
             native_ips: IpLimiter::new(20.0 / 60.0, 20.0, 1024),
             global: Bucket::full(20.0, Instant::now()),
+            allow_lan: options.allow_lan,
         })
     }
 
@@ -284,7 +290,11 @@ impl Broker {
         for _ in 0..8 {
             match self.listener.accept() {
                 Ok((stream, address)) => {
-                    if !address.ip().is_loopback() || self.peers.len() >= 16 {
+                    // Peers pass the bind rule; the per-IP and global buckets
+                    // below apply to every peer, loopback included.
+                    if !osfr_tools::net_policy::allowed(address.ip(), self.allow_lan)
+                        || self.peers.len() >= 16
+                    {
                         continue;
                     }
                     if stream.set_nonblocking(true).is_err() {

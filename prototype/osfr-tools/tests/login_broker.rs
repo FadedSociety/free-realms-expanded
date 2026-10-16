@@ -34,6 +34,10 @@ struct Server {
 }
 impl Server {
     fn start(secure: bool) -> Self {
+        Self::start_at(secure, "127.0.0.1:0".parse().unwrap(), false)
+    }
+
+    fn start_at(secure: bool, auth_bind: SocketAddr, allow_lan: bool) -> Self {
         let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR"));
         let directory = root.join(format!(
             "test-{}-{}",
@@ -116,9 +120,13 @@ impl Server {
             command
                 .arg("--account-store")
                 .arg(directory.join("accounts.json"))
-                .args(["--auth-bind", "127.0.0.1:0"])
+                .arg("--auth-bind")
+                .arg(auth_bind.to_string())
                 .arg("--server-id-file")
                 .arg(directory.join("server-id"));
+        }
+        if allow_lan {
+            command.arg("--allow-lan");
         }
         let mut child = command
             .stdout(Stdio::piped())
@@ -154,6 +162,66 @@ impl Server {
             _output: output,
         }
     }
+}
+
+#[test]
+fn broker_refuses_public_wildcard_and_private_without_allow_lan() {
+    for (address, allow_lan) in [
+        ("8.8.8.8:20043", true),
+        ("0.0.0.0:20043", true),
+        ("[2001:4860::1]:20043", true),
+        ("[::]:20043", true),
+        ("10.0.0.1:20043", false),
+        ("100.64.0.1:20043", false),
+        ("[fd12::1]:20043", false),
+    ] {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_osfr-login"));
+        command.args(["--auth-bind", address]);
+        if allow_lan {
+            command.arg("--allow-lan");
+        }
+        let result = command.output().unwrap();
+        assert!(!result.status.success(), "{address}");
+        assert!(
+            String::from_utf8_lossy(&result.stderr).contains("credential broker binds loopback"),
+            "{address}: {}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+    }
+}
+
+#[test]
+fn private_broker_bind_admits_private_peers_and_keeps_failure_limits() {
+    // UDP connect selects a local route without sending a packet. Override for
+    // hosts whose default route is not a private interface. Never skip this gate.
+    let ip = std::env::var("OSFR_TEST_PRIVATE_IP")
+        .map(|ip| ip.parse().unwrap())
+        .unwrap_or_else(|_| {
+            let route = UdpSocket::bind("0.0.0.0:0").unwrap();
+            route.connect("192.0.2.1:9").unwrap();
+            route.local_addr().unwrap().ip()
+        });
+    assert!(osfr_tools::net_policy::is_private_network(ip));
+    assert!(!ip.is_loopback());
+    let server = Server::start_at(true, SocketAddr::new(ip, 0), true);
+    assert_eq!(server.auth.ip(), ip);
+    let c = challenge(server.auth, HANDLE);
+    assert_eq!(c[0], 1);
+    assert_eq!(proof(server.auth, HANDLE, &c, &SigningKey::from_bytes(&[7; 32]), &SERVER)[0], 1);
+    for _ in 0..5 {
+        let c = challenge(server.auth, HANDLE);
+        assert_eq!(c[0], 1);
+        assert_eq!(proof(server.auth, HANDLE, &c, &SigningKey::from_bytes(&[10; 32]), &SERVER), [0; 69]);
+    }
+    assert_eq!(challenge(server.auth, HANDLE), [0; 69]);
+    // Thirteen connections spent; seven malformed attempts exhaust the IP burst.
+    for _ in 0..7 {
+        assert_eq!(exchange(server.auth, b"AUTH2\x03xxxx"), [0; 69]);
+    }
+    // Independent account is refused by source-IP admission, not its own lock.
+    assert_eq!(challenge(server.auth, "acct_002"), [0; 69]);
+    std::thread::sleep(Duration::from_millis(3100));
+    assert_eq!(challenge(server.auth, "acct_002")[0], 1);
 }
 impl Drop for Server {
     fn drop(&mut self) {
