@@ -731,14 +731,17 @@ fn load_gateway_from(
     gateway.set_terrain(options.terrain.clone());
     gateway.set_world_dir(options.world.clone())?;
     gateway.set_stock_text(options.stock_text.clone());
-    // (R) Without an account store this is the host's own loopback solo
-    // session (a non-loopback gateway requires a store): it is admin.
-    // Account-store sessions get their stored role at character binding.
-    gateway.set_role(if options.account_store.is_none() {
-        osfr_tools::account_store::AccountRole::Admin
-    } else {
-        osfr_tools::account_store::AccountRole::Player
-    });
+    // (R) Without an account store the gateway can only bind loopback (checked
+    // at startup), so this is the host's own solo dev session: admin only when
+    // --dev-tools is on. Account-store sessions get their stored role at
+    // character binding and default to player.
+    gateway.set_role(
+        if options.account_store.is_none() && options.dev_tools {
+            osfr_tools::account_store::AccountRole::Admin
+        } else {
+            osfr_tools::account_store::AccountRole::Player
+        },
+    );
     Ok(gateway)
 }
 
@@ -911,10 +914,9 @@ impl Session {
             }
         }
         self.gateway = load_gateway_from(options, &path, initial)?;
-        self.gateway.set_role(
-            store
-                .account_role(record.owner_account_id)
-                .unwrap_or(osfr_tools::account_store::AccountRole::Player),
+        self.gateway.bind_account_role(
+            options.account_store.as_ref().unwrap(),
+            record.owner_account_id,
         );
         self.gateway.set_trace_enabled(self.trace.is_some());
         self.gateway.set_game_rules(GameRuleSet::new(
@@ -1314,7 +1316,14 @@ impl Session {
             return Err(error);
         }
         let children = self.gateway.ordered_messages(message)?;
-        if children.len() > 1 {
+        let combat = children.iter().try_fold(false, |seen, child| {
+            self.gateway
+                .is_combat_request(child)
+                .map(|is_combat| seen || is_combat)
+        })?;
+        // (R) Shared combat uses ordered World commits (W116). Other bundles
+        // keep Gateway's staged character/inventory transaction intact.
+        if children.len() > 1 && combat {
             for child in children {
                 self.dispatch_message(
                     &child, options, now_ms, world, membership, sessions, transport,
@@ -1322,7 +1331,7 @@ impl Session {
             }
             return Ok(());
         }
-        if self.gateway.is_combat_request(message)? {
+        if combat {
             let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
             if !security.allow_combat(self.account_guid, Instant::now()) {
                 security.record(
@@ -1332,6 +1341,20 @@ impl Session {
                 );
                 return Ok(());
             }
+        }
+        for _ in 0..self.gateway.denied_dev_commands(message)? {
+            world
+                .security
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .record(
+                    EventKind::DevCommandDenial,
+                    options
+                        .account_store
+                        .as_ref()
+                        .and(self.selected_character.then_some(self.account_guid)),
+                    Some(self.id.0),
+                );
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
@@ -2612,11 +2635,15 @@ impl Server {
             .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
     }
 
-    /// The session a developer is playing (the first character in the world).
+    /// (R) Studio acts only as a verified admin, never the first arbitrary player.
     fn studio_session(&self) -> Option<SessionKey> {
         self.sessions
             .iter()
-            .find(|(_, s)| s.gateway.gameplay().is_some() && s.selected_character)
+            .find(|(_, s)| {
+                s.gateway.gameplay().is_some()
+                    && s.selected_character
+                    && s.gateway.role() == osfr_tools::account_store::AccountRole::Admin
+            })
             .map(|(key, _)| *key)
     }
 
@@ -2628,6 +2655,20 @@ impl Server {
         let json_reply = |status: u16, value: serde_json::Value| {
             (status, "application/json", value.to_string().into_bytes())
         };
+        for session in self.sessions.values_mut() {
+            session.gateway.refresh_role();
+        }
+        if !self.options.dev_tools || self.studio_session().is_none() {
+            self.world
+                .security
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .record(EventKind::DevCommandDenial, None, None);
+            return json_reply(
+                403,
+                json!({"error": "admin account with --dev-tools required"}),
+            );
+        }
         let (path, query) = request
             .path
             .split_once('?')
@@ -3236,6 +3277,153 @@ mod tests {
         app.extend((inner.len() as u32).to_le_bytes());
         app.extend(inner);
         app
+    }
+
+    #[test]
+    fn w120_player_denial_is_logged_and_studio_requires_admin() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+        let scratch = std::env::temp_dir().join(format!("osfr-w120-session-{}", std::process::id()));
+        fs::create_dir_all(&scratch).unwrap();
+        let log_path = scratch.join("security.jsonl");
+        let _ = fs::remove_file(&log_path);
+        let options = Options {
+            bind: "127.0.0.1:0".parse().unwrap(),
+            reference: root.join("references/rust-gateway-reference"),
+            state: scratch.join("character.json"),
+            content: Some(root.join("references/rust-opening-cooking-original-assets")),
+            identity: None,
+            account_store: None,
+            gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
+            handoff_key: Vec::new(),
+            seconds: 1,
+            dev_tools: true,
+            studio_port: 0,
+            client_logs: None,
+            terrain: None,
+            world: Some(scratch.join("world")),
+            stock_text: None,
+            allow_lan: false,
+            security_log: Some(log_path.clone()),
+        };
+        let mut server = Server::new(options).unwrap();
+        let mut session = Session::new(
+            SessionId(120),
+            "127.0.0.1:12345".parse().unwrap(),
+            SessionRequest {
+                id: 120,
+                crc_length: 3,
+                buffer_size: 512,
+            },
+            &server.options,
+            CRC_SEED,
+            None,
+        )
+        .unwrap();
+        // A no-account-store session can only be the host's own loopback dev
+        // session: admin with --dev-tools. Demote it to test a player's denial.
+        assert_eq!(
+            session.gateway.role(),
+            osfr_tools::account_store::AccountRole::Admin
+        );
+        session
+            .gateway
+            .set_role(osfr_tools::account_store::AccountRole::Player);
+        let mut login = 1u16.to_le_bytes().to_vec();
+        for (i, value) in ["w120", "1.910.1.530630", ""].into_iter().enumerate() {
+            login.extend((value.len() as u32).to_le_bytes());
+            login.extend(value.as_bytes());
+            if i == 0 {
+                login.extend(1u64.to_le_bytes());
+            }
+        }
+        session.gateway.handle(&login).unwrap();
+        session.gateway.handle(&wrap(&[13, 0])).unwrap();
+        session.gateway.handle(&wrap(&[10, 0])).unwrap();
+        let before = session.gateway.snapshot();
+        session
+            .dispatch_message(
+                &wrap(&osfr_tools::chat::local_request("realm god")),
+                &server.options,
+                1000,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .unwrap();
+        assert_eq!(session.gateway.snapshot(), before);
+        let mut invalid_equip = vec![42, 0, 3, 0];
+        invalid_equip.extend((-1_i32).to_le_bytes());
+        invalid_equip.extend([0; 8]);
+        let mut bundle = vec![0, 25];
+        for child in [
+            wrap(&osfr_tools::chat::local_request("realm god")),
+            wrap(&invalid_equip),
+        ] {
+            bundle.push(child.len() as u8);
+            bundle.extend(child);
+        }
+        assert!(
+            session
+                .dispatch_message(
+                    &bundle,
+                    &server.options,
+                    1000,
+                    &mut server.world,
+                    &mut server.membership,
+                    &mut server.sessions,
+                    None
+                )
+                .is_err()
+        );
+        assert_eq!(session.gateway.snapshot(), before);
+        server.flush_security();
+        let rows: Vec<serde_json::Value> = fs::read_to_string(&log_path)
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert!(
+            rows.iter()
+                .any(|row| row["kind"] == "dev_command_denial" && row["reason"] == "authorization"),
+            "{rows:?}"
+        );
+        let denied: u64 = rows
+            .iter()
+            .filter(|row| row["kind"] == "dev_command_denial")
+            .map(|row| row["count"].as_u64().unwrap())
+            .sum();
+        assert_eq!(
+            denied, 2,
+            "rollback must not erase an authorization refusal"
+        );
+        let key = SessionKey {
+            peer: session.peer,
+            connection_id: session.request.id,
+        };
+        server.sessions.insert(key, session);
+        let request = studio::Request {
+            method: "GET".into(),
+            path: "/api/state".into(),
+            body: Vec::new(),
+        };
+        assert_eq!(server.studio_route(&request, 1001).0, 403);
+        server
+            .sessions
+            .get_mut(&key)
+            .unwrap()
+            .gateway
+            .set_role(osfr_tools::account_store::AccountRole::Builder);
+        assert_eq!(server.studio_route(&request, 1002).0, 403);
+        server
+            .sessions
+            .get_mut(&key)
+            .unwrap()
+            .gateway
+            .set_role(osfr_tools::account_store::AccountRole::Admin);
+        assert_eq!(server.studio_route(&request, 1003).0, 200);
+        drop(server);
+        fs::remove_dir_all(scratch).unwrap();
     }
     fn direct(app: &[u8], compressed: bool) -> Vec<u8> {
         let mut wire = vec![app[0], u8::from(compressed)];

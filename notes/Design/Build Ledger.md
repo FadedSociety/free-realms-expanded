@@ -43,7 +43,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 | Chat, friends, ignore, groups | Wired | `social_chat.rs`, `social_lists.rs` in the gateway binary | The 10-15 "dropped without `--trace`" claim does not reproduce (W103 test with content and tracing off; two-bot say and tell delivered). Inferred from code, untested. Never tested natively. |
 | Guilds, trade, matchmaking | Built | `guilds.rs`, `trade.rs`, `matchmaking.rs` | Not routed. They wait on multiplayer. |
 | Bot client `osfr-bot` | Wired (gateway-level) | Scripts, re-zoning, battle loop (`bot_zones_into_battle_arena_and_wins`) | It skips the login server and has never run alongside a native client. |
-| Developer authority | Wired | `--dev-tools` | It is one gateway-wide flag, so **every player gets the cheats**. There are no player, builder or admin roles. |
+| Developer authority | Enforced (tests and bot), never run natively | `account_store.rs` roles (W78), gateway/gameplay checks (W120); `tests/role_enforcement.rs` | Every account has a role (player, builder, admin; default player). `--dev-tools` is only a feature switch: each `realm` command, developer quest offer, teleport, cheat and content reload also checks the role from the verified character binding, refusals are logged as `DevCommandDenial`, Studio needs an admin, and `realm role` is admin-only. A loopback gateway without an account store (your own solo dev runs) is admin when `--dev-tools` is on. |
 
 ## World and combat
 

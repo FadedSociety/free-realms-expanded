@@ -153,6 +153,7 @@ pub struct Gameplay {
 
 #[derive(Default)]
 pub struct Outcome {
+    pub dev_command_denied: bool,
     pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
@@ -878,7 +879,10 @@ impl Gameplay {
             .flat_map(|engine| engine.job_profile_ids())
             .filter_map(|(job_id, profile_id)| {
                 let state = profile_state?;
-                if profile_id <= 0 || !state.unlocked.contains(&profile_id) {
+                if profile_id <= 0
+                    || profile_id != state.active
+                    || !state.unlocked.contains(&profile_id)
+                {
                     return None;
                 }
                 // (R) Reuse Profiles' existing local rank curve: one base rank,
@@ -890,9 +894,8 @@ impl Gameplay {
             .collect();
         let limits = &self.game_rules.policy.quest_limits;
         crate::quest_engine::CharacterEligibility {
-            // (R) This save has no separate avatar-level field; retain the
-            // minimum until account/player-level content is routed here.
-            player_level: 1,
+            // (R) No separate avatar level is saved; use the active job's local rank curve.
+            player_level: profile_state.map_or(1, |state| self.job_level(state.active) as u8),
             job_levels,
             member: self.game_rules.membership.is_active_at(now_unix_seconds),
             // (R) The client reads both quest-limit values from self data, but the historical
@@ -2324,6 +2327,9 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
+        if let Some(out) = self.command_refusal(inner, character.guid)? {
+            return Ok(out);
+        }
         if self.kart_entry.is_some() {
             let active = self.kart_entry.as_ref().unwrap().active();
             let command = chat::request(inner, character.guid)?;
@@ -3181,7 +3187,7 @@ impl Gameplay {
 
     /// Developer commands need both `--dev-tools` and a role that may run
     /// this command (`reload` is keyed with its target, e.g. `reload battles`).
-    fn may_run(&self, command: &str) -> bool {
+    pub fn may_run(&self, command: &str) -> bool {
         let mut words = command.split_whitespace();
         let first = words.next().unwrap_or_default();
         let key = if first == "reload" {
@@ -3190,6 +3196,60 @@ impl Gameplay {
             first.to_owned()
         };
         self.dev_tools && crate::account_store::can_run_realm_command(self.role, &key)
+    }
+
+    /// (R) Ordinary play remains available to every role. All other realm routes
+    /// fail closed, including diagnostics and future developer commands.
+    pub(crate) fn developer_command_denied(&self, inner: &[u8], guid: u64) -> io::Result<bool> {
+        let Some(text) = chat::request(inner, guid)? else {
+            return Ok(false);
+        };
+        let lower = text.trim().to_ascii_lowercase();
+        let Some(command) = lower.strip_prefix("realm ") else {
+            return Ok(false);
+        };
+        let first = command.split_whitespace().next().unwrap_or_default();
+        let ordinary = matches!(
+            first,
+            "help"
+                | "status"
+                | "quest"
+                | "quests"
+                | "attack"
+                | "respawn"
+                | "inventory"
+                | "exit"
+                | "retry"
+                | "accept"
+                | "turnin"
+        ) || (first == "race" && self.kart_entry.is_none());
+        Ok(!ordinary && !self.may_run(command))
+    }
+
+    fn command_refusal(&self, inner: &[u8], guid: u64) -> io::Result<Option<Outcome>> {
+        if !self.developer_command_denied(inner, guid)? {
+            return Ok(None);
+        }
+        let mut message = "Cannot do that: developer command requires --dev-tools and an authorized account role.";
+        if !self.dev_tools {
+            // Preserve the existing feature-disabled feedback, while recording
+            // the same refusal as other authorization failures (R).
+            let text = chat::request(inner, guid)?.unwrap_or_default();
+            message = match text.trim().to_ascii_lowercase().as_str() {
+                "realm mine" => {
+                    "Developer mining is disabled; start the gateway with --dev-tools to test it."
+                }
+                "realm harvest" => {
+                    "Developer harvesting is disabled; start the gateway with --dev-tools to test it."
+                }
+                _ => message,
+            };
+        }
+        Ok(Some(Outcome {
+            dev_command_denied: true,
+            replies: vec![chat::system(message)],
+            ..Default::default()
+        }))
     }
 
     /// Stock locale row keys (`--client-locale`) for authored text ids.
@@ -5266,6 +5326,9 @@ impl Gameplay {
         position: [f32; 3],
         now_ms: u64,
     ) -> io::Result<Outcome> {
+        if let Some(out) = self.command_refusal(inner, guid)? {
+            return Ok(out);
+        }
         let mut out = Outcome::default();
         let text = match chat::request(inner, guid) {
             Ok(text) => text,
@@ -6117,6 +6180,87 @@ mod w64_regional_quest_tests {
     const SAMANTHA_ID: u64 = 9_000_000_189;
     const INTRODUCE_YOURSELF_ID: u32 = 3_000_021;
 
+    #[test]
+    fn live_quest_offers_require_real_level_and_the_active_job() {
+        let source = bundled_content();
+        let scratch = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
+            "../../../lab/build/w120/eligibility-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&scratch).unwrap();
+        std::fs::copy(source.join("jobs.json"), scratch.join("jobs.json")).unwrap();
+        for folder in ["quests", "npcs"] {
+            std::fs::create_dir_all(scratch.join(folder)).unwrap();
+            for entry in std::fs::read_dir(source.join(folder)).unwrap() {
+                let path = entry.unwrap().path();
+                std::fs::copy(&path, scratch.join(folder).join(path.file_name().unwrap())).unwrap();
+            }
+        }
+        let path = scratch.join("quests/adventurer.json");
+        let mut file: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        let set_requirement = |file: &mut serde_json::Value, job: Option<i32>| {
+            let quest = file["records"]
+                .as_array_mut()
+                .unwrap()
+                .iter_mut()
+                .find(|q| q["id"] == INTRODUCE_YOURSELF_ID)
+                .unwrap();
+            quest["min_level"] = serde_json::json!(3);
+            quest["job"] = serde_json::json!(job);
+            std::fs::write(&path, serde_json::to_vec(file).unwrap()).unwrap();
+        };
+        set_requirement(&mut file, None);
+        let mut game = Gameplay::load(&reference(), None).unwrap();
+        game.profiles = Some(Profiles::load(&reference(), Some(native_test_profiles())).unwrap());
+        game.bind_npc_quest_catalogue(&scratch, 1).unwrap();
+        assert!(
+            !game
+                .npc_quests
+                .as_ref()
+                .unwrap()
+                .can_offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
+        );
+        game.profiles.as_mut().unwrap().set_experience(200);
+        game.refresh_npc_quest_eligibility(0);
+        assert!(
+            game.npc_quests
+                .as_mut()
+                .unwrap()
+                .offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
+                .changed
+        );
+
+        set_requirement(&mut file, Some(43));
+        let mut profile = game.profiles.as_ref().unwrap().state().clone();
+        assert!(profile.unlocked.contains(&43));
+        assert_ne!(profile.active, 43);
+        profile.experience.insert(43, 200);
+        game.profiles = Some(Profiles::load(&reference(), Some(profile)).unwrap());
+        game.bind_npc_quest_catalogue(&scratch, 1).unwrap();
+        assert!(
+            !game
+                .npc_quests
+                .as_ref()
+                .unwrap()
+                .can_offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
+        );
+        game.profiles
+            .as_mut()
+            .unwrap()
+            .select(43, &game.inventory)
+            .unwrap();
+        game.refresh_npc_quest_eligibility(0);
+        assert!(
+            game.npc_quests
+                .as_mut()
+                .unwrap()
+                .offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
+                .changed
+        );
+        std::fs::remove_dir_all(scratch).unwrap();
+    }
+
     fn reference() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../../lab/references/rust-opening-cooking-original-assets")
@@ -6277,7 +6421,20 @@ mod w64_regional_quest_tests {
         let eligibility = game.npc_quests.as_ref().unwrap().eligibility();
         assert!(eligibility.member);
         assert_eq!(eligibility.member_quest_limit, 100);
-        assert_eq!(eligibility.job_levels.get("adventurer"), Some(&1));
+        let active = game.profiles.as_ref().unwrap().active();
+        let active_job = game
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .job_profile_ids()
+            .find(|(_, profile)| *profile == active)
+            .unwrap()
+            .0;
+        assert_eq!(eligibility.job_levels.len(), 1);
+        assert_eq!(
+            eligibility.job_levels.get(active_job),
+            Some(&eligibility.player_level)
+        );
 
         game.set_game_rules(crate::game_rules::GameRuleSet::new(
             crate::game_rules::MembershipState::new(false, None),

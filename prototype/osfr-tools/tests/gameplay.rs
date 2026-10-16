@@ -121,6 +121,12 @@ fn private_complete_loop_reward_once_atomic_bundle_and_fresh_restore() {
     invalid_equip.extend((-1i32).to_le_bytes());
     invalid_equip.extend([0; 8]);
     let children = [chat("realm respawn"), wrapped(&invalid_equip)];
+    let mut probe = gateway.clone();
+    probe.handle_at(&children[0], clock + 1600).unwrap();
+    assert_ne!(probe.snapshot(), completed); // A real mutation must be rolled back.
+    let unchanged = gateway.snapshot();
+    gateway.handle_at(&children[1], clock + 1600).unwrap();
+    assert_eq!(gateway.snapshot(), unchanged); // Standalone rejection remains a silent drop.
     let mut bundle = vec![0, 25];
     for child in children {
         assert!(child.len() < 255);

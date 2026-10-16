@@ -114,6 +114,8 @@ pub struct Gateway {
     world_dir: Option<std::path::PathBuf>,
     stock_text: Option<std::sync::Arc<std::collections::HashSet<u32>>>,
     role: crate::account_store::AccountRole,
+    // (R) Bound only by the host after verifying the character's owner and ticket.
+    role_account: Option<(std::path::PathBuf, u64)>,
     movement_state: MovementState,
     expected_discontinuity: Option<ExpectedDiscontinuity>,
     last_movement_ms: Option<u64>,
@@ -124,6 +126,7 @@ pub struct Gateway {
 
 #[derive(Debug, Default)]
 pub struct GatewayOutcome {
+    pub dev_command_denials: usize,
     pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
     /// Inner application payloads that passed the gateway parser, in request order.
@@ -386,6 +389,25 @@ enum Event {
     Application(Vec<u8>),
 }
 
+// (R) Account writes cannot participate in a staged character transaction.
+fn reject_bundled_role_changes(events: &[Event], guid: u64) -> io::Result<()> {
+    if events.iter().any(|event| match event {
+        Event::Application(inner) => crate::chat::request(inner, guid)
+            .ok()
+            .flatten()
+            .is_some_and(|text| {
+                let lower = text.trim().to_ascii_lowercase();
+                lower
+                    .strip_prefix("realm ")
+                    .is_some_and(|c| c.split_whitespace().next() == Some("role"))
+            }),
+        _ => false,
+    }) {
+        return Err(invalid("role changes require an unbundled request"));
+    }
+    Ok(())
+}
+
 fn trace_hex_prefix(bytes: &[u8], sensitive: bool) -> Option<String> {
     let head = bytes.iter().take(32).copied().collect::<Vec<_>>();
     let mut letters = 0;
@@ -619,8 +641,12 @@ impl Gateway {
     }
     pub fn ordered_messages(&self, message: &[u8]) -> io::Result<Vec<Vec<u8>>> {
         let messages = application_messages(message)?;
-        for message in &messages {
-            parse_message(message, &self.state, &self.version)?;
+        let events = messages
+            .iter()
+            .map(|message| parse_message(message, &self.state, &self.version))
+            .collect::<io::Result<Vec<_>>>()?;
+        if message.starts_with(&[0, 25]) {
+            reject_bundled_role_changes(&events, self.state.guid)?;
         }
         Ok(messages.into_iter().map(<[u8]>::to_vec).collect())
     }
@@ -818,6 +844,7 @@ impl Gateway {
             world_dir: None,
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
+            role_account: None,
             movement_state,
             expected_discontinuity: None,
             last_movement_ms: None,
@@ -1021,6 +1048,79 @@ impl Gateway {
         self.role = role;
     }
 
+    /// Host-only binding: `account_id` is the verified CharacterRecord owner,
+    /// never an identifier supplied by a gameplay packet.
+    pub fn bind_account_role(&mut self, path: &Path, account_id: u64) {
+        self.role_account = Some((path.to_owned(), account_id));
+        self.refresh_role();
+    }
+
+    /// (R) Re-read on use so online demotion takes effect in every session.
+    /// An unreadable store, missing account or missing role fails closed.
+    pub fn refresh_role(&mut self) {
+        if let Some((path, id)) = &self.role_account {
+            let role = crate::account_store::AccountStore::load(path)
+                .ok()
+                .and_then(|store| store.account_role(*id))
+                .unwrap_or(crate::account_store::AccountRole::Player);
+            self.set_role(role);
+        }
+    }
+
+    pub fn role(&self) -> crate::account_store::AccountRole {
+        self.role
+    }
+
+    /// Authorization audit before staging: a later rejected bundle child must
+    /// not erase a developer refusal from the shared SecurityLog (R).
+    pub fn denied_dev_commands(&mut self, message: &[u8]) -> io::Result<usize> {
+        self.refresh_role();
+        let Some(game) = self.gameplay.as_ref().filter(|_| self.loaded) else {
+            return Ok(0);
+        };
+        let mut count = 0;
+        for child in application_messages(message)? {
+            if let Event::Application(inner) = parse_message(child, &self.state, &self.version)? {
+                count += usize::from(
+                    game.developer_command_denied(&inner, self.state.guid)
+                        .unwrap_or(false),
+                );
+            }
+        }
+        Ok(count)
+    }
+
+    fn change_account_role(&mut self, command: &str) -> &'static str {
+        use crate::account_store::{AccountRole, AccountStore, AccountStoreLock};
+        let words: Vec<_> = command.split_whitespace().collect();
+        let ["role", id, role] = words.as_slice() else {
+            return "Usage: realm role <account-id> <player|builder|admin>";
+        };
+        let (Some(target), Some(role)) = (
+            id.parse::<u64>().ok().filter(|id| *id > 0),
+            AccountRole::parse(role),
+        ) else {
+            return "Usage: realm role <account-id> <player|builder|admin>";
+        };
+        let Some((path, actor)) = &self.role_account else {
+            return "Cannot do that: a verified account binding is required.";
+        };
+        // (R) Cooperate with login/CLI writers; never overwrite a newer key or role.
+        let Ok(_lock) = AccountStoreLock::acquire(path) else {
+            return "Cannot do that: account store is busy or unavailable.";
+        };
+        let result = AccountStore::load(path).and_then(|mut store| {
+            store.set_account_role(*actor, target, role)?;
+            store.save(path)
+        });
+        self.refresh_role();
+        if result.is_ok() {
+            "Account role saved."
+        } else {
+            "Cannot do that: account role was not saved."
+        }
+    }
+
     /// Stock locale row keys for World Builder text ids.
     pub fn set_stock_text(
         &mut self,
@@ -1126,6 +1226,7 @@ impl Gateway {
     }
 
     pub fn handle_at(&mut self, message: &[u8], now_ms: u64) -> io::Result<GatewayOutcome> {
+        self.refresh_role();
         // Decode every child first. Malformed later children cannot partially
         // update a saved character or release half an initialization stream.
         let messages = application_messages(message)?;
@@ -1134,6 +1235,9 @@ impl Gateway {
             .iter()
             .map(|m| parse_message(m, &self.state, &self.version))
             .collect::<io::Result<Vec<_>>>()?;
+        if combined {
+            reject_bundled_role_changes(&events, self.state.guid)?;
+        }
         let mut trace = self.trace_enabled.then(|| {
             messages
                 .iter()
@@ -1355,9 +1459,31 @@ impl Gateway {
                             continue;
                         }
                         let mut staged_game = game.clone();
+                        if let Some(text) = crate::chat::request(&inner, state.guid).ok().flatten()
+                        {
+                            let lower = text.trim().to_ascii_lowercase();
+                            if let Some(command) = lower
+                                .strip_prefix("realm ")
+                                .filter(|c| c.split_whitespace().next() == Some("role"))
+                            {
+                                let allowed = game.may_run("role");
+                                let reply = if allowed {
+                                    self.change_account_role(command)
+                                } else {
+                                    outcome.dev_command_denials += 1;
+                                    "Cannot do that: developer command requires --dev-tools and an authorized account role."
+                                };
+                                game.set_role(self.role);
+                                outcome.replies.push(wrapped(&crate::chat::system(reply)));
+                                continue;
+                            }
+                        }
                         let result = match staged_game.handle_in_world(&inner, &state, now_ms) {
                             Ok(result) => result,
                             Err(error) => {
+                                if combined {
+                                    return Err(error);
+                                }
                                 set_trace(
                                     &mut trace,
                                     event_index,
@@ -1395,6 +1521,7 @@ impl Gateway {
                             }
                         }
                         outcome.shared_field = result.shared_field;
+                        outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());
                         gameplay = Some(staged_game);
                         outcome.state_changed |= result.changed;
