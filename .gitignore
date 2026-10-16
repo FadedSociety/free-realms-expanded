@@ -31,3 +31,6 @@ review_proposed.json.txt
 
 # Generated from the private client (quotes locale text); rebuild with scripts/content_check.py
 prototype/osfr-tools/studio/report.json
+
+# Worker test leftovers
+scripts/launcher/.test-friend-launcher-*/
