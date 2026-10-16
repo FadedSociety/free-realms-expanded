@@ -33,6 +33,9 @@ pub struct KartGatewayContent {
 pub struct ActiveKartEntry {
     pub context: RaceEntryContext,
     pub return_location: CharacterState,
+    /// The job before the race made the player a Kart Driver; restored on exit.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub previous_job: Option<i32>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -329,6 +332,7 @@ impl KartGateway {
         staged.state.active = Some(ActiveKartEntry {
             context,
             return_location: character.clone(),
+            previous_job: None,
         });
         staged.state.next_instance = next;
         staged.rebuild_entry()?;
@@ -527,6 +531,14 @@ impl KartGateway {
             EntryOutcome::Replies(replies) => Ok(replies),
             EntryOutcome::Refused(_) => Ok(Vec::new()),
         }
+    }
+    pub fn set_previous_job(&mut self, job: i32) {
+        if let Some(active) = &mut self.state.active {
+            active.previous_job = Some(job);
+        }
+    }
+    pub fn previous_job(&self) -> Option<i32> {
+        self.state.active.as_ref().and_then(|a| a.previous_job)
     }
     pub fn exit(&mut self) -> Option<CharacterState> {
         if let Some(race) = &mut self.race {

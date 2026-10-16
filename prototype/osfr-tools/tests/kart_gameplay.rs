@@ -603,6 +603,31 @@ fn private_pickup_gateway_grant_use_rollback_and_restore() {
 }
 #[test]
 #[ignore = "requires OSFR_KART_PLAYABLE pointing at the private disposable package"]
+fn private_leaving_a_race_restores_the_previous_job() {
+    let root = PathBuf::from(std::env::var_os("OSFR_KART_PLAYABLE").unwrap());
+    let reference = root.join("../../references/rust-gateway-reference");
+    let doc: serde_json::Value =
+        serde_json::from_slice(&fs::read(root.join("initial-character.json")).unwrap()).unwrap();
+    let character = serde_json::from_value(doc["character"].clone()).unwrap();
+    let saved = serde_json::from_value(doc["gameplay"].clone()).unwrap();
+    let mut g =
+        Gateway::load_gameplay(&reference, character, &root.join("content"), Some(saved)).unwrap();
+    initialize(&mut g);
+    g.set_dev_tools(true);
+    g.set_role(osfr_tools::account_store::AccountRole::Admin);
+    let job = |g: &Gateway| g.snapshot().gameplay.unwrap().profiles.unwrap().active;
+    let before = job(&g);
+    assert_ne!(before, 48);
+    g.handle_at(&wrap(&chat("realm race")), 1000).unwrap();
+    assert_eq!(job(&g), 48); // a race needs Kart Driver
+    g.handle_at(&wrap(&[13, 0]), 1200).unwrap(); // the race scene loads
+    g.handle_at(&wrap(&[10, 0]), 1300).unwrap();
+    g.handle_at(&wrap(&chat("realm exit")), 2000).unwrap();
+    assert_eq!(job(&g), before); // (R) and leaving puts the old job back
+}
+
+#[test]
+#[ignore = "requires OSFR_KART_PLAYABLE pointing at the private disposable package"]
 fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
     let root = PathBuf::from(std::env::var_os("OSFR_KART_PLAYABLE").unwrap());
     let content = root.join("content");
@@ -631,7 +656,9 @@ fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
         .unwrap();
     assert_eq!(scene.scene, "sg_kt_track");
     assert_eq!(scene.rotation[3], 0.);
-    assert_eq!(g.state().zone_id, 48_000_001);
+    // The package save may already have raced; take its next instance.
+    let instance = doc["gameplay"]["kart_entry"]["next_instance"].as_u64().unwrap_or(48_000_001) as u32;
+    assert_eq!(g.state().zone_id, instance);
     let gameplay = g.snapshot().gameplay.unwrap();
     assert_eq!(gameplay.profiles.as_ref().unwrap().active, 48);
     assert_eq!(
@@ -727,7 +754,7 @@ fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
     let waiting = g.snapshot();
     assert!(g.tick_at(90_001).unwrap().replies.is_empty());
     assert_eq!(g.snapshot(), waiting);
-    for request in [race_start(48_000_002, 1), race_start(48_000_001, 999)] {
+    for request in [race_start(instance + 1, 1), race_start(instance, 999)] {
         assert!(
             g.handle_at(&wrap(&request), 90_000)
                 .unwrap()
@@ -738,7 +765,7 @@ fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
     }
     assert!(g.handle_at(&wrap(&[41, 0, 108, 0]), 90_000).is_err());
     assert_eq!(g.snapshot(), waiting);
-    g.handle_at(&wrap(&race_start(48_000_001, 1)), 90_000)
+    g.handle_at(&wrap(&race_start(instance, 1)), 90_000)
         .unwrap();
     let started = g.snapshot();
     assert_eq!(
@@ -755,7 +782,7 @@ fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
             .phase,
         osfr_tools::kart_service::RacePhase::Countdown
     );
-    g.handle_at(&wrap(&race_start(48_000_001, 1)), 90_100)
+    g.handle_at(&wrap(&race_start(instance, 1)), 90_100)
         .unwrap();
     assert_eq!(g.snapshot(), started);
     let snapshot = g.snapshot();
@@ -778,6 +805,11 @@ fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
     assert!(stop.gameplay_changed);
     assert_eq!(g.state(), &before.character);
     let after = g.snapshot();
+    // Leaving the race restores the job the player had before it.
+    assert_eq!(
+        after.gameplay.as_ref().unwrap().profiles.as_ref().unwrap().active,
+        before.gameplay.as_ref().unwrap().profiles.as_ref().unwrap().active
+    );
     assert_eq!(
         after.gameplay.as_ref().unwrap().inventory,
         before.gameplay.as_ref().unwrap().inventory

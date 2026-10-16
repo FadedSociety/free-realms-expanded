@@ -1589,7 +1589,32 @@ impl Gameplay {
     /// Race clocks belong to one connection. A reconnect returns to the saved
     /// world pose rather than resuming a race against a restarted clock.
     pub fn abandon_kart_for_reconnect(&mut self) -> Option<CharacterState> {
-        self.kart_entry.as_mut().and_then(|kart| kart.exit())
+        let kart = self.kart_entry.as_mut()?;
+        let previous = kart.previous_job();
+        let location = kart.exit();
+        if let (Some(job), Some(profiles)) = (previous, self.profiles.as_mut()) {
+            // Self data at login carries the job, so the activation reply is not needed.
+            let _ = profiles.select(job, &self.inventory);
+        }
+        location
+    }
+
+    /// (R) Leaving a race puts the player back in the job they had before it;
+    /// Kart Driver stays only when chosen or required (the owner, 2026-10-15).
+    fn restore_job(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
+        let profiles = self.profiles.as_mut().unwrap();
+        if profiles.active() == job {
+            return Ok(());
+        }
+        out.replies.push(profiles.select(job, &self.inventory)?);
+        out.replies.extend(
+            self.abilities
+                .as_ref()
+                .unwrap()
+                .activation(job, self.job_level(job))?,
+        );
+        self.sync_player_level(out);
+        Ok(())
     }
 
     /// A save taken inside a battle arena loads with the battle dropped (the
@@ -2078,9 +2103,12 @@ impl Gameplay {
                 .as_mut()
                 .ok_or_else(|| invalid("kart entry requires class content"))?;
             // Reconstructed local starter unlock, confined to the opt-in test campaign.
+            let previous_job = profiles.active();
             profiles.unlock(48)?;
             out.replies.push(profiles.select(48, &self.inventory)?);
-            let (replies, scene) = self.kart_entry.as_mut().unwrap().begin(character)?;
+            let kart = self.kart_entry.as_mut().unwrap();
+            let (replies, scene) = kart.begin(character)?;
+            kart.set_previous_job(previous_job);
             out.replies.extend(replies);
             out.scene_zoning = Some(scene);
             out.changed = true;
@@ -2090,7 +2118,11 @@ impl Gameplay {
             || inner == [26, 0, 42, 0]
             || self.kart_entry.as_ref().unwrap().accepts_close(inner)?;
         if exit {
+            let previous_job = self.kart_entry.as_ref().unwrap().previous_job();
             let return_location = self.kart_entry.as_mut().unwrap().exit().unwrap();
+            if let Some(job) = previous_job {
+                self.restore_job(job, &mut out)?;
+            }
             // Captured return frame44446 clears racing bit10 (0x401 ->1).
             out.replies
                 .push(crate::kart_gateway::player_status(return_location.guid, 1));

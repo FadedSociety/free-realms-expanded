@@ -39,7 +39,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 | Self data (opcode 12) | Native-verified | `startup_selfdata.rs`; SD | It is still seeded from captured template #7. The action-bar rows are the captured ones. |
 | Saves | Native-verified | `game_store.rs` (atomic replace), `characters/{guid}.json`; R5 runs 143737, 144157, 182347 | Each save rewrites the whole JSON file. A rejected duplicate login may save a stale snapshot (inferred, untested). No database. |
 | Movement validation | Native-verified | `movement.rs` via `gateway.rs:957-1061`; R5 050310 | Limits are loose (R). Mount speed ×1 would snap a mounted player back. No collision. |
-| Player registry and other-player visibility | Built and tested, never seen with two native clients | `players.rs`; `osfr-gateway.rs:450-530,1222-1249`; `tests/multiplayer.rs` 1 | **No native run has ever had two players.** Since 2026-10-15 AddPc carries the real name, look, active job and outfit (`Gateway::player_presentation`), the facing is a direction, and position relays carry the two movement bytes. Still (R): name ids, speed, wield type. Account ids and character GUIDs share one key space, so they can collide. |
+| Player registry and other-player visibility | Native-verified 2026-10-15 (bot + the owner) | `players.rs`; `Gateway::player_presentation`; `tests/multiplayer.rs` | Run 20261016T045046Z: the owner saw the bot spawn with its name, Capo's look and its chat, stand still, and despawn on timeout. Frida `add_pc` hooks: the client parses our AddPc and creates the actor. Fixed tonight: only GUID 1 could enter the world or basic-attack; one player's game exiting crashed the gateway (Windows 10054). Open: name ids, speed, wield type still (R); an earlier spawn/vanish was not seen (likely out of range); no two-real-client run yet. |
 | Chat, friends, ignore, groups | Wired | `social_chat.rs`, `social_lists.rs` in the gateway binary | **Probable bug:** with `--content`, social packets are dropped unless `--trace` is on (`gateway.rs:887,1128-1156`). Inferred from code, untested. Never tested natively. |
 | Guilds, trade, matchmaking | Built | `guilds.rs`, `trade.rs`, `matchmaking.rs` | Not routed. They wait on multiplayer. |
 | Bot client `osfr-bot` | Wired (gateway-level) | Scripts, re-zoning, battle loop (`bot_zones_into_battle_arena_and_wins`) | It skips the login server and has never run alongside a native client. |
@@ -89,7 +89,7 @@ The plan for what comes next is [[Build Plan]]. **Update this ledger whenever a 
 
 | System | Status | Entry today | Open gaps |
 |---|---|---|---|
-| Kart | Native-verified (3 laps, 50 coins and 25 XP paid once, reload) | `realm race` (dev only) | No NPC or menu entry. Solo only. Weapon effects partly done. |
+| Kart | Native-verified (3 laps, 50 coins and 25 XP paid once, reload) | `realm race` (dev only) | No NPC or menu entry. Solo only. Weapon effects partly done. Entering a race switches the job to Kart Driver (48); since 2026-10-15 leaving restores the previous job (R). Kart Driver's native default outfit (4 items) is not in our starter content, so a Kart Driver shows no clothes. |
 | Mining | Wired | `realm mine` (dev) | No native win so far (runs 151307, 200750 lost). Dead board. W38's lifecycle adapter isn't called. |
 | Harvesting | Wired | `realm harvest` (dev) | Goal names show placeholders. Leave/Quit fails. No payout. |
 | Minigame framework (`minigame.rs`) | Built | — | Unrouted modules use it. The combat encounter path is the proven one. |
