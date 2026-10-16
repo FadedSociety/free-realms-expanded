@@ -15,7 +15,9 @@ recognises fields by name:
   list ids   (id, npc_id, key)               -> duplicates within a list / across quest files
   quest/npc refs (prerequisite_quest_ids, quest_ids, giver_npc_id) -> authored quests/npcs
 
-It also counts source evidence ({kind, evidence} entries, source tags) by kind
+The report's item_coverage section (W166) applies Inventory::load's own rules to inventory.json + the
+catalogue and lists, per consumer file/field, how many referenced item ids load (rides included, candidate
+keys too). It also counts source evidence ({kind, evidence} entries, source tags) by kind
 and "(R)" tags per file. Findings in *_unresolved.json files are warnings, not
 errors: those files hold candidates by design. Nothing is modified.
 
@@ -23,6 +25,7 @@ Usage: python -I project/scripts/content_check.py [--client DIR] [--item-catalog
 """
 import argparse
 import collections
+import hashlib
 import json
 import re
 import sys
@@ -160,6 +163,324 @@ def items_from_catalogue(path: Path) -> dict:
         name_id = definition.get("name_id")
         out[item_id] = name_id if isinstance(name_id, int) and not isinstance(name_id, bool) else None
     return out
+
+
+# ---------------------------------------------------------------------------
+# Item coverage (W166): which ids Inventory::load accepts, and who references them.
+#
+# The runtime accepts the union of <content>/inventory.json and
+# <content>/item-catalogue.json (src/inventory.rs parse_content / load_catalogue).
+# W162 counted inventory.json alone (1,649 ids) and concluded that only 24 of
+# the 54 rides could be owned; with the catalogue beside it the union is 58,835
+# ids and all 54 can. This section keeps both views in the report, applies the
+# loader's own rules to the files, and walks the references the loader's callers
+# use (stores, vendors, recipes, rides, rewards, ...), including the
+# "candidate" keys the per-value checks deliberately skip.
+
+# Mirrors the caps in src/inventory.rs: MAX_ITEMS, MAX_CONTENT, MAX_CATALOGUE_*,
+# Definition::decode and decode_hex. Keep them in step with that file.
+LOADER_LIMITS = {
+    "inventory_rows": 4096,
+    "inventory_file_bytes": 4 * 1024 * 1024,
+    "catalogue_file_bytes": 128 * 1024 * 1024,
+    "catalogue_rows": 65_536,
+    "catalogue_row_bytes": 32 * 1024 * 1024,
+}
+ROW_BYTES_MAX = 65_536        # one serialized definition
+ROW_TEXT_MAX = 4096           # model / texture / tint_alias
+LIMIT_WARN = 0.85             # report a limit as near once a file is this full
+ITEM_CANDIDATE_KEYS = {"item_definition_id_candidates", "candidate_item_ids",
+                       "candidate_recipe_item_definition_id", "candidate_output_definition_id"}
+DEFINITION_FILES = ("inventory.json", "item-catalogue.json")
+# Runtime-package files that hold saved states, proofs or definition rows, not consumers.
+NOT_CONSUMERS = re.compile(r"(prior|before-default|quest-inventory|proof|report|repairs|item-definitions)")
+_ROW_INTS = ("id", "slot", "class_id", "default_tint", "max_stack", "effect", "wield_type")
+_ROW_STRS = ("model", "texture", "tint_alias", "serialized_hex", "sha256")
+_LOWER_HEX = re.compile(r"[0-9a-f]*")
+
+
+def definition_problem(row):
+    """First reason Inventory's Definition::decode refuses this row, or None."""
+    if not isinstance(row, dict):
+        return "row is not an object"
+    for key in _ROW_INTS:
+        value = row.get(key)
+        if type(value) is not int or not -2**31 <= value < 2**31:
+            return f"{key} is not an i32"
+    for key in _ROW_STRS:
+        if not isinstance(row.get(key), str):
+            return f"{key} is not a string"
+    text = row["serialized_hex"]
+    if len(text) % 2 or len(text) > 131_072 or not _LOWER_HEX.fullmatch(text):
+        return "serialized_hex is not lowercase even-length hex of at most 64 KiB"
+    raw = bytes.fromhex(text)
+    if len(raw) < 4 or len(raw) > ROW_BYTES_MAX:
+        return "row bytes are shorter than 4 or longer than 64 KiB"
+    if row["id"] <= 0:
+        return "id is not positive"
+    if raw[:4] != row["id"].to_bytes(4, "little", signed=True):
+        return "row bytes do not start with the id"
+    if hashlib.sha256(raw).hexdigest() != row["sha256"]:
+        return "sha256 does not match the row bytes"
+    if any(len(row[key].encode("utf-8")) > ROW_TEXT_MAX for key in ("model", "texture", "tint_alias")):
+        return "model, texture or tint_alias is longer than 4096 bytes"
+    return None
+
+
+def _row_key(row):
+    return tuple(row.get(k) for k in _ROW_INTS + ("model", "texture", "tint_alias", "serialized_hex"))
+
+
+def inventory_problems(document, size):
+    """(problems, ids, bytes) for an inventory.json document, as parse_content judges it."""
+    problems = []
+    if size > LOADER_LIMITS["inventory_file_bytes"]:
+        problems.append("inventory.json exceeds 4 MiB")
+    rows = document.get("definitions") if isinstance(document, dict) else None
+    if not isinstance(rows, list):
+        return problems + ["inventory.json has no definitions array"], set(), 0
+    if len(rows) > LOADER_LIMITS["inventory_rows"]:
+        problems.append(f"inventory.json has {len(rows)} definitions (limit {LOADER_LIMITS['inventory_rows']})")
+    seen, total = {}, 0
+    for index, row in enumerate(rows):
+        reason = definition_problem(row)
+        if reason:
+            problems.append(f"inventory.json row {index}: {reason}")
+        elif seen.setdefault(row["id"], _row_key(row)) != _row_key(row):
+            problems.append(f"inventory.json row {index}: conflicting definition for id {row['id']}")
+        else:
+            total += len(row["serialized_hex"]) // 2
+    return problems[:20], set(seen), total
+
+
+def catalogue_problems(document, size):
+    """(problems, ids, bytes) for an item-catalogue.json document, as load_catalogue judges it."""
+    problems = []
+    if size > LOADER_LIMITS["catalogue_file_bytes"]:
+        problems.append("item-catalogue.json exceeds 128 MiB")
+    if not isinstance(document, dict) or set(document) != {"schema_version", "definitions"} \
+            or document["schema_version"] != 1 or not isinstance(document["definitions"], list):
+        return problems + ["item-catalogue.json needs exactly schema_version 1 and a definitions array"], set(), 0
+    rows = document["definitions"]
+    if len(rows) > LOADER_LIMITS["catalogue_rows"]:
+        problems.append(f"item-catalogue.json has {len(rows)} rows (limit {LOADER_LIMITS['catalogue_rows']})")
+    ids, total = set(), 0
+    for index, row in enumerate(rows):
+        reason = definition_problem(row)
+        if reason:
+            problems.append(f"item-catalogue.json row {index}: {reason}")
+        elif row["id"] in ids:
+            problems.append(f"item-catalogue.json row {index}: duplicate id {row['id']}")
+        else:
+            ids.add(row["id"])
+            total += len(row["serialized_hex"]) // 2
+    if total > LOADER_LIMITS["catalogue_row_bytes"]:
+        problems.append(f"item-catalogue.json rows total {total} bytes (limit {LOADER_LIMITS['catalogue_row_bytes']})")
+    return problems[:20], ids, total
+
+
+def limit_report(inventory_size, inventory_rows, catalogue_size, catalogue_rows, catalogue_bytes):
+    """value / limit / fraction for each loader cap, so growth shows before it breaks the load."""
+    values = {"inventory_rows": inventory_rows, "inventory_file_bytes": inventory_size,
+              "catalogue_file_bytes": catalogue_size, "catalogue_rows": catalogue_rows,
+              "catalogue_row_bytes": catalogue_bytes}
+    return {k: {"value": v, "limit": LOADER_LIMITS[k], "fraction": round(v / LOADER_LIMITS[k], 4)}
+            for k, v in values.items()}
+
+
+def load_item_definitions(inventory_path, catalogue_path):
+    """What Inventory::load would accept from these two files (either may be None).
+
+    Returns problems (any one aborts the real load), the id sets, the saved default
+    state's undefined owned ids, and the limit report. Reads files; changes nothing.
+    """
+    out = {"problems": [], "inventory_ids": set(), "catalogue_ids": set(),
+           "default_state_undefined": [], "limits": None}
+    inv_size = inv_total = cat_size = cat_total = 0
+    document = None
+    if inventory_path is not None and Path(inventory_path).is_file():
+        raw = Path(inventory_path).read_bytes()
+        inv_size = len(raw)
+        try:
+            document = json.loads(raw)
+        except ValueError as exc:
+            out["problems"].append(f"inventory.json is not JSON: {exc}")
+        else:
+            problems, out["inventory_ids"], inv_total = inventory_problems(document, inv_size)
+            out["problems"] += problems
+    elif inventory_path is not None:
+        out["problems"].append("inventory.json is missing (Inventory::load needs it)")
+    if catalogue_path is not None and Path(catalogue_path).is_file():
+        raw = Path(catalogue_path).read_bytes()
+        cat_size = len(raw)
+        try:
+            problems, out["catalogue_ids"], cat_total = catalogue_problems(json.loads(raw), cat_size)
+        except ValueError as exc:
+            problems = [f"item-catalogue.json is not JSON: {exc}"]
+        out["problems"] += problems
+    defined = out["inventory_ids"] | out["catalogue_ids"]
+    state = document.get("default_state") if isinstance(document, dict) else None
+    if isinstance(state, dict):
+        out["default_state_undefined"] = sorted({i.get("definition_id") for i in state.get("items") or []
+                                                 if isinstance(i, dict)} - defined - {None})
+    out["limits"] = limit_report(inv_size, len(out["inventory_ids"]), cat_size,
+                                 len(out["catalogue_ids"]), cat_total)
+    return out
+
+
+def item_references(content_dir):
+    """Every item-id reference in a content folder, as the loader's callers use them.
+
+    Same key rules as Checker (ITEM_KEYS, `definition_id` under an item-like path) plus
+    ITEM_CANDIDATE_KEYS. Definition and saved-state files are skipped. Each reference is
+    {file, field, id, candidate, unresolved}.
+    """
+    refs = []
+    for path in sorted(Path(content_dir).rglob("*.json")):
+        rel = path.relative_to(content_dir).as_posix()
+        if rel in DEFINITION_FILES or NOT_CONSUMERS.search(rel):
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, ValueError):
+            continue  # content files that do not parse are reported by the main checks
+
+        def take(key, value, holder):
+            lk = key.lower()
+            if isinstance(value, dict) and "value" in value:
+                value = value["value"]
+            for x in value if isinstance(value, list) else [value]:
+                if not isinstance(x, int) or isinstance(x, bool) or x <= 0:
+                    continue
+                candidate = lk in ITEM_CANDIDATE_KEYS
+                if candidate or lk in ITEM_KEYS or (lk == "definition_id" and ITEM_CONTEXT.search(holder)
+                                                    and not NON_ITEM_CONTEXT.search(holder)):
+                    refs.append({"file": rel, "field": key, "id": x, "candidate": candidate,
+                                 "unresolved": "unresolved" in rel})
+
+        def walk(node, where):
+            if isinstance(node, dict):
+                for key, value in node.items():
+                    take(key, value, where)
+                    walk(value, f"{where}.{key}" if where else key)
+            elif isinstance(node, list):
+                for i, value in enumerate(node):
+                    walk(value, f"{where}[{i}]")
+
+        walk(data, "")
+    return refs
+
+
+def item_coverage(content_dir, definitions):
+    """Per-consumer coverage of a content folder against load_item_definitions' result."""
+    inventory_ids, defined = definitions["inventory_ids"], definitions["inventory_ids"] | definitions["catalogue_ids"]
+    groups = {}
+    for ref in item_references(content_dir):
+        g = groups.setdefault((ref["file"], ref["field"]),
+                              {"file": ref["file"], "field": ref["field"], "candidate": ref["candidate"],
+                               "unresolved": ref["unresolved"], "refs": 0, "ids": set()})
+        g["refs"] += 1
+        g["ids"].add(ref["id"])
+    consumers = []
+    for g in sorted(groups.values(), key=lambda g: (g["file"], g["field"])):
+        ids = g.pop("ids")
+        g.update(unique_ids=len(ids), in_inventory_json=len(ids & inventory_ids), defined=len(ids & defined),
+                 undefined=len(ids - defined), undefined_examples=sorted(ids - defined)[:6])
+        consumers.append(g)
+    rides = {"total": 0, "ownable_inventory_json_only": 0, "ownable_with_catalogue": 0, "without_item": []}
+    mounts = Path(content_dir) / "mounts.json"
+    if mounts.is_file():
+        try:
+            records = json.loads(mounts.read_text(encoding="utf-8-sig")).get("mounts") or []
+        except (OSError, ValueError, AttributeError):
+            records = []
+        for ride in records:
+            candidates = {c for c in ride.get("item_definition_id_candidates") or [] if isinstance(c, int)}
+            rides["total"] += 1
+            rides["ownable_inventory_json_only"] += bool(candidates & inventory_ids)
+            if candidates & defined:
+                rides["ownable_with_catalogue"] += 1
+            else:
+                rides["without_item"].append({"id": ride.get("id"), "name": ride.get("name")})
+    return {
+        "definitions": {"inventory_json": len(inventory_ids), "catalogue": len(definitions["catalogue_ids"]),
+                        "loadable": len(defined), "load_problems": definitions["problems"],
+                        "default_state_undefined": definitions["default_state_undefined"],
+                        "limits": definitions["limits"]},
+        "consumers": consumers,
+        "rides": rides,
+    }
+
+
+def item_coverage_errors(coverage):
+    """Reasons a content folder cannot be played as shipped (empty list when it can)."""
+    errors = list(coverage["definitions"]["load_problems"])
+    for c in coverage["consumers"]:
+        if c["undefined"] and not c["candidate"] and not c["unresolved"]:
+            errors.append(f"{c['file']} {c['field']}: {c['undefined']} of {c['unique_ids']} item ids have no "
+                          f"definition (e.g. {c['undefined_examples']})")
+    if coverage["rides"]["without_item"]:
+        errors.append(f"{len(coverage['rides']['without_item'])} rides have no loadable item definition "
+                      f"(e.g. {coverage['rides']['without_item'][:3]})")
+    for name, limit in (coverage["definitions"]["limits"] or {}).items():
+        if limit["value"] > limit["limit"]:
+            errors.append(f"{name} {limit['value']} exceeds the loader limit {limit['limit']}")
+    return errors
+
+
+# Client tables that name item definitions. The server must be able to answer a 35/34 for these.
+CLIENT_ITEM_TABLES = {
+    "ItemGroupMappings.txt": ("ITEM_DEFINITION_ID",),
+    "CharacterCreate/CharacterCreateItemMappings.txt": ("ITEM_ID",),
+    "CharacterCreate/CharacterCreateItemClothingSets.txt": ("FEET_ITEM_ID", "LEGS_ITEM_ID", "CHEST_ITEM_ID"),
+    "CharacterCreate/ItemDefinitions.txt": ("ID",),
+}
+
+
+def client_named_items(client_dir, defined):
+    """{table: {ids, undefined, examples}} for the item ids the client's own tables name."""
+    out = {}
+    for table, columns in CLIENT_ITEM_TABLES.items():
+        path = Path(client_dir) / "Resources" / table
+        if not path.is_file():
+            continue
+        lines = [l.rstrip("\r\n").split("^") for l in path.read_text(encoding="utf-8", errors="replace").splitlines()
+                 if l.strip()]
+        header = [h.lstrip("#") for h in lines[0]]
+        ids = set()
+        for column in columns:
+            index = header.index(column)
+            for row in lines[1:]:
+                if index < len(row) and row[index].lstrip("-").isdigit() and int(row[index]) > 0:
+                    ids.add(int(row[index]))
+        out[table] = {"ids": len(ids), "undefined": len(ids - defined), "examples": sorted(ids - defined)[:6]}
+    return out
+
+
+def item_coverage_findings(checker, coverage, with_catalogue):
+    """Findings for the report: unloadable files, rides without items, near or over limits."""
+    defs = coverage["definitions"]
+    for problem in defs["load_problems"]:
+        checker.add("error", "item_definitions_unloadable", "item-catalogue.json", "", "", None, problem)
+    if with_catalogue:
+        for ride in coverage["rides"]["without_item"]:
+            checker.add("error", "ride_item_undefined", "mounts.json", "", "item_definition_id_candidates",
+                        ride["id"], f"ride '{ride['name']}' has no candidate item with a loadable definition")
+    for name, limit in (defs["limits"] or {}).items():
+        if limit["value"] > limit["limit"]:
+            checker.add("error", "item_loader_limit", "item-catalogue.json", "", name, limit["value"],
+                        f"over the loader limit {limit['limit']}: Inventory::load fails for every login")
+        elif limit["fraction"] >= LIMIT_WARN:
+            checker.add("warning", "item_loader_limit_near", "item-catalogue.json", "", name, limit["value"],
+                        f"{limit['fraction']:.0%} of the loader limit {limit['limit']}")
+    for item_id in defs["default_state_undefined"]:
+        checker.add("warning", "item_default_undefined", "inventory.json", "default_state.items", "definition_id",
+                    item_id, "owned in the default inventory but defined by no source; withheld from the client")
+    for table, row in (coverage.get("client_named") or {}).items():
+        if row["undefined"]:
+            checker.add("warning", "client_item_undefined", table, "", "", row["examples"][0],
+                        f"{row['undefined']} of {row['ids']} item ids this client table names have no definition "
+                        f"(e.g. {row['examples']})")
 
 
 # ---------------------------------------------------------------------------
@@ -879,6 +1200,10 @@ def main():
     for rel, data in files:
         checker.check_file(rel, data)
     checker.finish()
+    definitions = load_item_definitions(INVENTORY if INVENTORY.is_file() else None, item_catalogue)
+    coverage = item_coverage(CONTENT, definitions)
+    coverage["client_named"] = client_named_items(args.client, definitions["inventory_ids"] | definitions["catalogue_ids"])
+    item_coverage_findings(checker, coverage, item_catalogue is not None)
 
     # evidence summary
     overall = {"files": len(checker.evidence), "entries": collections.Counter(),
@@ -922,6 +1247,7 @@ def main():
             "by_code": {f"{s}:{c}": v for (s, c), v in sorted(totals.items())},
         },
         "checks": {"errors": checks["error"], "warnings": checks["warning"], "suppressed": suppressed},
+        "item_coverage": coverage,
         "text_previews": dict(sorted(checker.text_previews.items(), key=lambda kv: int(kv[0]))),
         "evidence": {"overall": overall_out, "by_file": by_file, "files_without_evidence": no_evidence},
     }
@@ -950,6 +1276,13 @@ def main():
         print("\nFirst errors:", file=out)
         for f in errs[:15]:
             print(f"  {f['file']} {f['path']} = {f['value']}: {f['problem']}", file=out)
+    d, r = coverage["definitions"], coverage["rides"]
+    print(f"\nItem coverage: {d['loadable']} ids load ({d['inventory_json']} in inventory.json + "
+          f"{d['catalogue']} in the catalogue); rides ownable {r['ownable_with_catalogue']}/{r['total']} "
+          f"(inventory.json alone: {r['ownable_inventory_json_only']})", file=out)
+    for c in coverage["consumers"]:
+        if c["undefined"]:
+            print(f"  {c['file']} {c['field']}: {c['undefined']} of {c['unique_ids']} ids undefined", file=out)
     o = overall_out
     print("\nEvidence (entries / records with kind):", file=out)
     for k in CANON + ("other",):

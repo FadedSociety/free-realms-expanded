@@ -26,6 +26,7 @@ from bundle_common import (  # noqa: E402
     scan_bundle_sources,
     verify_manifest,
 )
+from item_content import check_item_content  # noqa: E402
 
 
 @contextmanager
@@ -509,6 +510,7 @@ def main() -> int:
     protected_count, _ = scan_bundle_sources(bundle, manifest)
     print(f"Manifest: PASS ({file_count} payload files, SHA-256 and sizes match)")
     print(f"Runtime content: PASS (optional files present and valid: {check_runtime_content(bundle) or 'none'})")
+    print(f"Item content: PASS ({check_item_content(bundle)})")
     print(
         "Security scan: PASS (empty accounts=0, characters=0, public keys=0; "
         f"protected source files checked={protected_count}, matches=0)"

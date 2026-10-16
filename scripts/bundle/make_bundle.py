@@ -38,6 +38,7 @@ from bundle_common import (  # noqa: E402
     scan_bundle_sources,
     verify_manifest,
 )
+from item_content import check_item_content  # noqa: E402
 
 
 def copy_file(source: Path, source_root: Path, target: Path) -> None:
@@ -371,6 +372,7 @@ def main() -> int:
         (target / "README.md").write_text(readme(bundle_id, revision), encoding="utf-8")
 
         present = check_runtime_content(target)
+        item_content = check_item_content(target)  # a bundle whose items cannot load is not built
         manifest = make_manifest(target)
         (target / "manifest.json").write_text(
             json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
@@ -394,6 +396,7 @@ def main() -> int:
             "absent optional="
             f"{[n for n in OPTIONAL_REPOSITORY_CONTENT if n not in present] or 'none'}"
         )
+        print(f"Item content: PASS ({item_content})")
         pending = uncommitted_content()
         if pending:
             print(

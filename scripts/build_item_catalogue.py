@@ -176,18 +176,6 @@ def content_row(row, wield_types, provenance, reconstructed):
     return value
 
 
-class ItemReferences(checker.Checker):
-    """Reuse the content checker's walk and classification, without its reports."""
-    def load_tables(self, client):
-        self.locale = self.images = self.image_sets = self.anims = self.models = None
-        self.items_runtime = {1: 0}  # enables check_item calls; no external tables needed
-        self.items_legacy = {}
-
-    def check_item(self, sev, file, path, field, value):
-        if isinstance(value, int) and not isinstance(value, bool) and value > 0:
-            self.references.append({"file": file, "path": path, "id": value})
-
-
 def self_check():
     source = {"Id": 1, "NameId": 2, "Icon": {"Id": 3, "TintId": 4}, "ModelName": "a"}
     row = legacy_row(source)
@@ -210,7 +198,20 @@ def self_check():
             pass
         else:
             raise AssertionError("malformed definition accepted")
-    print("self-check: roundtrip, mutation canary and 5 malformed rows passed")
+    # W166: the loader-rule check must refuse what Inventory::load refuses.
+    good = {"id": 1, "slot": 0, "class_id": 0, "default_tint": 0, "max_stack": 1, "model": "", "texture": "",
+            "tint_alias": "", "effect": 0, "wield_type": 0, "serialized_hex": raw.hex(),
+            "sha256": hashlib.sha256(raw).hexdigest()}
+    one = {"schema_version": 1, "definitions": [good]}
+    assert checker.catalogue_problems(one, 100)[0] == []
+    broken = ({**good, "sha256": "0" * 64}, {**good, "id": 2}, {**good, "serialized_hex": raw.hex()[:-1] + "G"},
+              {**good, "model": "x" * 4097}, {**good, "slot": True})
+    for row in broken:
+        assert checker.catalogue_problems({"schema_version": 1, "definitions": [row]}, 100)[0], row
+    assert checker.catalogue_problems({"schema_version": 1, "definitions": [good, good]}, 100)[0]
+    assert checker.catalogue_problems({"schema_version": 2, "definitions": [good]}, 100)[0]
+    assert checker.catalogue_problems(one, 129 * 1024 * 1024)[0]
+    print("self-check: roundtrip, mutation canary, 5 malformed rows and 8 loader-rule refusals passed")
 
 
 def main():
@@ -219,6 +220,7 @@ def main():
     parser.add_argument("--legacy", type=Path, default=LAB / "references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json")
     parser.add_argument("--client-items", type=Path, default=LAB / "working/OSFR.Client/OSFR Client/Resources/CharacterCreate/ItemDefinitions.txt")
     parser.add_argument("--self-check", action="store_true")
+    parser.add_argument("--out", type=Path, default=OUTPUT, help="private report folder (default: the W84 folder)")
     args = parser.parse_args()
     if args.self_check:
         self_check()
@@ -305,11 +307,10 @@ def main():
         else:
             row, reconstructed = candidates[item_id]
             definitions.append(content_row(row, wield_types, "legacy+client-if-present", reconstructed))
-    references = ItemReferences(Path())
-    references.references = []
     for path in sorted(checker.CONTENT.rglob("*.json")):
-        raw = read_input(path, inputs, "content/" + path.relative_to(checker.CONTENT).as_posix())
-        references.check_file(path.relative_to(checker.CONTENT).as_posix(), json.loads(raw))
+        read_input(path, inputs, "content/" + path.relative_to(checker.CONTENT).as_posix())
+    # Non-candidate item references of the same content, by the checker's own key rules.
+    references = [r for r in checker.item_references(checker.CONTENT) if not r["candidate"]]
     generated_ids = {row["id"] for row in definitions}
     starter_crosscheck = None
     starter_path = LAB / "reports/job-outfits-20261015/starter_items.json"
@@ -320,7 +321,7 @@ def main():
                               "missing_before": sorted(starter_ids - baseline.keys()),
                               "still_missing": sorted(starter_ids - generated_ids)}
     coverage = {}
-    for ref in references.references:
+    for ref in references:
         counts = coverage.setdefault(ref["file"], Counter())
         counts["references"] += 1
         if ref["id"] not in baseline:
@@ -337,19 +338,28 @@ def main():
               "generated_unique_ids": len(definitions),
               "generated_record_bytes": sum(len(d["serialized_hex"]) // 2 for d in definitions),
               "new_unique_ids": len(generated_ids - baseline.keys()), "coverage_totals": dict(total),
-              "coverage_by_file": coverage, "uncovered_ids": sorted({ref["id"] for ref in references.references} - generated_ids)}
+              "coverage_by_file": coverage, "uncovered_ids": sorted({ref["id"] for ref in references} - generated_ids)}
     report["w82_starter_crosscheck"] = starter_crosscheck
-    if OUTPUT.resolve() != OUTPUT.absolute() or not OUTPUT.resolve().is_relative_to(LAB.resolve()):
+    output = args.out
+    if output.resolve() != output.absolute() or not output.resolve().is_relative_to(LAB.resolve()):
         raise ValueError("private output must not escape the assigned report directory")
-    OUTPUT.mkdir(parents=True, exist_ok=True)
+    output.mkdir(parents=True, exist_ok=True)
     documents = {"report.json": report, "roundtrip.json": roundtrip,
                  "catalogue.json": {"schema_version": 1, "definitions": definitions},
                  "source-mismatches.json": mismatches, "client-corrections.json": client_changes}
-    for name, document in documents.items():
-        path = OUTPUT / name
-        if path.is_symlink() or path.resolve().parent != OUTPUT.resolve():
+    texts = {name: json.dumps(document, separators=(",", ":"), sort_keys=True) + "\n" for name, document in documents.items()}
+    # W166: refuse a catalogue the server's loader would reject (a bad row, a duplicate id, or growth past
+    # the row / byte caps makes Inventory::load fail for every login, not just for the new items).
+    problems, _, row_bytes = checker.catalogue_problems(documents["catalogue.json"], len(texts["catalogue.json"].encode()))
+    if problems:
+        raise ValueError("generated catalogue breaks the inventory loader's rules: " + "; ".join(problems[:5]))
+    for name, text in texts.items():
+        path = output / name
+        if path.is_symlink() or path.resolve().parent != output.resolve():
             raise ValueError("unsafe output path")
-        path.write_text(json.dumps(document, separators=(",", ":"), sort_keys=True) + "\n", encoding="utf-8")
+        path.write_text(text, encoding="utf-8")
+    print("loader limits:", json.dumps(checker.limit_report(0, 0, len(texts["catalogue.json"].encode()),
+                                                           len(definitions), row_bytes)["catalogue_rows"]))
     print(json.dumps({k: report[k] for k in ("stored_rows", "captured_unique_ids", "roundtrip_matches",
                      "independent_source_matches", "independent_source_mismatch_classes", "generated_unique_ids",
                      "coverage_totals", "uncovered_ids")}, indent=2))
