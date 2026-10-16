@@ -147,14 +147,26 @@ impl fmt::Display for RegistryError {
 
 impl std::error::Error for RegistryError {}
 
+#[derive(Clone, Debug, Default)]
+struct VisibleView {
+    members: BTreeSet<SessionId>,
+    // Exact worst selected (distance squared, session id), including ties (R).
+    cutoff: Option<(f64, SessionId)>,
+}
+
 #[derive(Clone, Debug)]
 pub struct PlayerRegistry {
     policy: InterestPolicy,
     sessions: BTreeMap<SessionId, PlayerSession>,
-    // (R) At most one live session may own either its account or character GUID.
-    guid_owners: BTreeMap<u64, SessionId>,
+    // (R) At most one live session may own its account or its character. Account
+    // ids and character GUIDs are separate counters that both start at 1, so they
+    // need separate maps (W103: one map let account 2 block character 2).
+    account_owners: BTreeMap<u64, SessionId>,
+    character_owners: BTreeMap<u64, SessionId>,
     // (R) Uniform 3D broad phase; exact distance and directed caps are unchanged.
     cells: BTreeMap<(ZoneInstance, [i64; 3]), BTreeSet<SessionId>>,
+    // Cached directed nearest sets; bounded by the existing per-viewer cap (R).
+    views: BTreeMap<SessionId, VisibleView>,
 }
 
 impl PlayerRegistry {
@@ -162,8 +174,10 @@ impl PlayerRegistry {
         Self {
             policy,
             sessions: BTreeMap::new(),
-            guid_owners: BTreeMap::new(),
+            account_owners: BTreeMap::new(),
+            character_owners: BTreeMap::new(),
             cells: BTreeMap::new(),
+            views: BTreeMap::new(),
         }
     }
 
@@ -212,19 +226,17 @@ impl PlayerRegistry {
         if self.sessions.contains_key(&session_id) {
             return Err(RegistryError::SessionAlreadyActive);
         }
-        for guid in [account_guid, character_guid] {
-            if self
-                .guid_owners
-                .get(&guid)
-                .is_some_and(|owner| *owner != session_id)
-            {
+        for (owners, guid) in [
+            (&self.account_owners, account_guid),
+            (&self.character_owners, character_guid),
+        ] {
+            if owners.get(&guid).is_some_and(|owner| *owner != session_id) {
                 return Err(RegistryError::GuidAlreadyBound);
             }
         }
 
         let mut affected = self.nearby(zone, position);
         affected.insert(session_id);
-        let before_views = self.visible_sets(&affected);
         self.insert_cell(session_id, zone, position);
         self.sessions.insert(
             session_id,
@@ -240,10 +252,9 @@ impl PlayerRegistry {
                 movement_unknown: 0, // (R) no accepted movement report yet.
             },
         );
-        self.guid_owners.insert(account_guid, session_id);
-        self.guid_owners.insert(character_guid, session_id);
-        let after_views = self.visible_sets(&affected);
-        Ok(self.diff_messages(None, &before_views, &after_views, None))
+        self.account_owners.insert(account_guid, session_id);
+        self.character_owners.insert(character_guid, session_id);
+        Ok(self.refresh_views(session_id, &affected, None, false))
     }
 
     pub fn leave(&mut self, session_id: SessionId) -> Vec<OutboundMessage> {
@@ -252,16 +263,18 @@ impl PlayerRegistry {
             return Vec::new();
         };
         let affected = self.nearby(removed.zone, removed.position);
-        let before_views = self.visible_sets(&affected);
         self.remove_cell(session_id, removed.zone, removed.position);
         self.sessions.remove(&session_id);
-        for guid in [removed.account_guid, removed.character_guid] {
-            if self.guid_owners.get(&guid) == Some(&session_id) {
-                self.guid_owners.remove(&guid);
+        self.views.remove(&session_id);
+        for (owners, guid) in [
+            (&mut self.account_owners, removed.account_guid),
+            (&mut self.character_owners, removed.character_guid),
+        ] {
+            if owners.get(&guid) == Some(&session_id) {
+                owners.remove(&guid);
             }
         }
-        let after_views = self.visible_sets(&affected);
-        self.diff_messages(Some(&removed), &before_views, &after_views, None)
+        self.refresh_views(session_id, &affected, Some(&removed), false)
     }
 
     /// Change pose and/or zone while preserving accepted relay bytes. Interest
@@ -308,7 +321,6 @@ impl PlayerRegistry {
         let mut affected = self.nearby(current.zone, current.position);
         affected.extend(self.nearby(zone, position));
         affected.insert(session_id);
-        let before_views = self.visible_sets(&affected);
         let old_cell = (current.zone, self.cell(current.position));
         let new_cell = (zone, self.cell(position));
         if old_cell != new_cell {
@@ -322,8 +334,7 @@ impl PlayerRegistry {
         changed.heading = heading;
         changed.movement_state = state;
         changed.movement_unknown = unknown;
-        let after_views = self.visible_sets(&affected);
-        Ok(self.diff_messages(None, &before_views, &after_views, Some(session_id)))
+        Ok(self.refresh_views(session_id, &affected, None, true))
     }
 
     fn cell(&self, position: [f32; 3]) -> [i64; 3] {
@@ -385,88 +396,169 @@ impl PlayerRegistry {
         nearby
     }
 
-    fn visible_sets(
-        &self,
-        affected: &BTreeSet<SessionId>,
-    ) -> BTreeMap<SessionId, BTreeSet<SessionId>> {
-        let mut visible = BTreeMap::new();
-        let radius_squared = f64::from(self.policy.radius).powi(2);
+    fn visible_set(&self, viewer: &PlayerSession) -> VisibleView {
         // (R) Visibility is directed under a per-viewer cap. Distance ties use
         // session id, and the radius boundary is included.
-        // ponytail: dense crowds still scan/sort local candidates per affected
-        // viewer; incremental ranked views are a separate measured upgrade.
-        for viewer in affected.iter().filter_map(|id| self.sessions.get(id)) {
-            let mut candidates: Vec<(f64, SessionId)> = self
-                .nearby(viewer.zone, viewer.position)
-                .into_iter()
-                .filter(|id| *id != viewer.session_id)
-                .filter_map(|id| {
-                    let candidate = &self.sessions[&id];
-                    let distance_squared = distance_squared(viewer.position, candidate.position);
-                    (distance_squared <= radius_squared).then_some((distance_squared, id))
-                })
-                .collect();
-            candidates.sort_by(|left, right| {
-                left.0
-                    .total_cmp(&right.0)
-                    .then_with(|| left.1.cmp(&right.1))
-            });
-            let set = candidates
-                .into_iter()
-                .take(self.policy.max_visible_count)
-                .map(|(_, session)| session)
-                .collect();
-            visible.insert(viewer.session_id, set);
+        let cap = self.policy.max_visible_count;
+        if cap == 0 {
+            return VisibleView::default();
         }
-        visible
+        let mut candidates: Vec<_> = self
+            .nearby(viewer.zone, viewer.position)
+            .into_iter()
+            .filter(|id| *id != viewer.session_id)
+            .map(|id| {
+                (
+                    distance_squared(viewer.position, self.sessions[&id].position),
+                    id,
+                )
+            })
+            .collect();
+        if candidates.len() > cap {
+            candidates.select_nth_unstable_by(cap, rank_cmp);
+            candidates.truncate(cap);
+        }
+        VisibleView {
+            cutoff: candidates.iter().copied().max_by(rank_cmp),
+            members: candidates.into_iter().map(|(_, id)| id).collect(),
+        }
     }
 
-    fn diff_messages(
-        &self,
+    fn refresh_views(
+        &mut self,
+        subject: SessionId,
+        affected: &BTreeSet<SessionId>,
         removed: Option<&PlayerSession>,
-        before_views: &BTreeMap<SessionId, BTreeSet<SessionId>>,
-        after_views: &BTreeMap<SessionId, BTreeSet<SessionId>>,
-        updated_session: Option<SessionId>,
+        updated: bool,
     ) -> Vec<OutboundMessage> {
         let mut messages = Vec::new();
-        for (viewer, current_view) in after_views {
-            let old_view = before_views.get(viewer).cloned().unwrap_or_default();
-            for subject in old_view.difference(current_view) {
-                if let Some(player) = self
-                    .sessions
-                    .get(subject)
-                    .or_else(|| removed.filter(|player| player.session_id == *subject))
+        let cap = self.policy.max_visible_count;
+        for &id in affected {
+            let Some(viewer) = self.sessions.get(&id) else {
+                continue;
+            };
+            let mut old = self.views.remove(&id).unwrap_or_default();
+            let selected = old.members.contains(&subject);
+            let rank = self
+                .sessions
+                .get(&subject)
+                .filter(|p| p.zone == viewer.zone && p.session_id != id)
+                .map(|p| (distance_squared(viewer.position, p.position), subject))
+                .filter(|(distance, _)| *distance <= f64::from(self.policy.radius).powi(2));
+            // Only this subject changed. Invisible subjects outside the cutoff,
+            // and selected subjects staying inside it, cannot change membership.
+            // ponytail: an outward selected move rebuilds local candidates; no
+            // quadratic all-neighbour rank cache. Cost depends on cap crossings.
+            let rerank = id == subject
+                || if selected {
+                    rank.is_none_or(|rank| {
+                        old.members.len() >= cap
+                            && old
+                                .cutoff
+                                .is_some_and(|cutoff| rank_cmp(&rank, &cutoff).is_gt())
+                    })
+                } else {
+                    cap > 0
+                        && rank.is_some_and(|rank| {
+                            old.members.len() < cap
+                                || old
+                                    .cutoff
+                                    .is_some_and(|cutoff| rank_cmp(&rank, &cutoff).is_lt())
+                        })
+                };
+            if rerank {
+                let current = self.visible_set(viewer);
+                self.diff_messages(
+                    &mut messages,
+                    id,
+                    removed,
+                    &old.members,
+                    &current.members,
+                    updated.then_some(subject),
+                );
+                self.views.insert(id, current);
+            } else {
+                // A retained cutoff subject can move inward. Refresh its exact
+                // cutoff, or a later entrant could displace the wrong subject.
+                if selected
+                    && old.cutoff.is_some_and(|cutoff| {
+                        cutoff.1 == subject
+                            || rank.is_some_and(|rank| rank_cmp(&rank, &cutoff).is_gt())
+                    })
                 {
+                    old.cutoff = old
+                        .members
+                        .iter()
+                        .map(|&id| {
+                            (
+                                distance_squared(viewer.position, self.sessions[&id].position),
+                                id,
+                            )
+                        })
+                        .max_by(rank_cmp);
+                }
+                if updated && selected {
                     messages.push(OutboundMessage {
-                        recipient: *viewer,
-                        kind: MessageKind::Despawn,
-                        bytes: build_remove_player(player.character_guid),
+                        recipient: id,
+                        kind: MessageKind::Position,
+                        bytes: build_position_update(&self.sessions[&subject]),
                     });
                 }
-            }
-            for subject in current_view.difference(&old_view) {
-                if let Some(player) = self.sessions.get(subject) {
-                    messages.push(OutboundMessage {
-                        recipient: *viewer,
-                        kind: MessageKind::Spawn,
-                        bytes: build_add_pc(player),
-                    });
-                }
-            }
-            if let Some(updated) = updated_session {
-                if current_view.contains(&updated) && old_view.contains(&updated) {
-                    if let Some(player) = self.sessions.get(&updated) {
-                        messages.push(OutboundMessage {
-                            recipient: *viewer,
-                            kind: MessageKind::Position,
-                            bytes: build_position_update(player),
-                        });
-                    }
-                }
+                self.views.insert(id, old);
             }
         }
         messages
     }
+
+    fn diff_messages(
+        &self,
+        messages: &mut Vec<OutboundMessage>,
+        viewer: SessionId,
+        removed: Option<&PlayerSession>,
+        old_view: &BTreeSet<SessionId>,
+        current_view: &BTreeSet<SessionId>,
+        updated_session: Option<SessionId>,
+    ) {
+        for subject in old_view.difference(current_view) {
+            if let Some(player) = self
+                .sessions
+                .get(subject)
+                .or_else(|| removed.filter(|player| player.session_id == *subject))
+            {
+                messages.push(OutboundMessage {
+                    recipient: viewer,
+                    kind: MessageKind::Despawn,
+                    bytes: build_remove_player(player.character_guid),
+                });
+            }
+        }
+        for subject in current_view.difference(old_view) {
+            if let Some(player) = self.sessions.get(subject) {
+                messages.push(OutboundMessage {
+                    recipient: viewer,
+                    kind: MessageKind::Spawn,
+                    bytes: build_add_pc(player),
+                });
+            }
+        }
+        if let Some(updated) = updated_session {
+            if current_view.contains(&updated) && old_view.contains(&updated) {
+                if let Some(player) = self.sessions.get(&updated) {
+                    messages.push(OutboundMessage {
+                        recipient: viewer,
+                        kind: MessageKind::Position,
+                        bytes: build_position_update(player),
+                    });
+                }
+            }
+        }
+    }
+}
+
+fn rank_cmp(left: &(f64, SessionId), right: &(f64, SessionId)) -> std::cmp::Ordering {
+    left.0
+        .total_cmp(&right.0)
+        .then_with(|| left.1.cmp(&right.1))
 }
 
 fn validate_identity(account_guid: u64, character_guid: u64) -> Result<(), RegistryError> {

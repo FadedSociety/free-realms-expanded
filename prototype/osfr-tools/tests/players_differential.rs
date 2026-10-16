@@ -205,3 +205,96 @@ fn rejected_poses_and_identities_do_not_poison_the_grid() {
     );
     assert_eq!(grid.leave(SessionId(1)), old.leave(SessionId(1)));
 }
+
+#[test]
+fn dense_randomized_ordered_messages_match_reference() {
+    let zone = ZoneInstance {
+        zone_id: 0,
+        instance_id: 0,
+    };
+    for cap in [0, 1, 64, 128] {
+        // Zero seed keeps every random coordinate/id at zero: a fully
+        // coincident crowd, with the lowest-id subject moving in and out.
+        for seed in [0, 106, 0x106_1234_5678] {
+            let mut rng = Rng(seed);
+            let mut grid = PlayerRegistry::new(InterestPolicy::new(100.0, cap).unwrap());
+            let mut old = old::PlayerRegistry::new(old::InterestPolicy::new(100.0, cap).unwrap());
+            // All 96 viewers share one cell and are in range, including ties.
+            for id in 0..96 {
+                let p = std::array::from_fn(|_| (rng.next() % 12) as f32);
+                assert_eq!(
+                    grid.join(SessionId(id), 1000 + id, 2000 + id, zone, p, 0.0),
+                    old.join(SessionId(id), 1000 + id, 2000 + id, zone, p, 0.0)
+                );
+            }
+            for step in 0..240 {
+                let id = SessionId(rng.next() % 96);
+                let mut p = std::array::from_fn(|_| (rng.next() % 12) as f32);
+                let mut target_zone = zone;
+                // Mix tiny moves, radius crossings, zone changes, flags, and rejoin.
+                match step % 8 {
+                    0 => {
+                        assert_eq!(grid.leave(id), old.leave(id));
+                        assert_eq!(
+                            grid.join(id, 1000 + id.0, 2000 + id.0, zone, p, 0.0),
+                            old.join(id, 1000 + id.0, 2000 + id.0, zone, p, 0.0)
+                        );
+                    }
+                    1 => p = grid.get(id).unwrap().position.map(|x| x + 0.25),
+                    2 => p = [100.0, 0.0, 0.0],
+                    3 => p = [100.000_01, 0.0, 0.0],
+                    4 => target_zone.instance_id = 1,
+                    5 => p = grid.get(id).unwrap().position,
+                    6 => p = [0.0; 3],
+                    _ => {}
+                }
+                assert_eq!(
+                    grid.update_pose_with_state(id, target_zone, p, 0.5, step as u8, 255),
+                    old.update_pose_with_state(id, target_zone, p, 0.5, step as u8, 255),
+                    "dense seed={seed} step={step} cap={cap}"
+                );
+                assert_eq!(grid.get(id), old.get(id));
+                if step % 40 == 0 {
+                    assert_eq!(grid.clone().leave(id), old.clone().leave(id));
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn cutoff_crossing_and_tie_canary_matches_reference() {
+    let zone = ZoneInstance {
+        zone_id: 0,
+        instance_id: 0,
+    };
+    let mut grid = PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap());
+    let mut old = old::PlayerRegistry::new(old::InterestPolicy::new(100.0, 64).unwrap());
+    for id in 0..80 {
+        let p = [id as f32, 0.0, 0.0];
+        assert_eq!(
+            grid.join(SessionId(id), 1000 + id, 2000 + id, zone, p, 0.0),
+            old.join(SessionId(id), 1000 + id, 2000 + id, zone, p, 0.0)
+        );
+    }
+    // Viewer 0 starts with ids 1..=64. Exercise invisible entry, cutoff
+    // retreat/advance, equal-distance session-id ties, and radius exit/entry.
+    for (id, x) in [
+        (79, 0.5),
+        (79, 90.0),
+        (64, 0.25),
+        (65, 63.5),
+        (64, 64.0),
+        (65, 64.0),
+        (63, 64.0),
+        (1, 100.0),
+        (1, 100.000_01),
+        (1, 1.0),
+    ] {
+        assert_eq!(
+            grid.update_pose(SessionId(id), zone, [x, 0.0, 0.0], 0.0),
+            old.update_pose(SessionId(id), zone, [x, 0.0, 0.0], 0.0),
+            "cutoff id={id} x={x}"
+        );
+    }
+}

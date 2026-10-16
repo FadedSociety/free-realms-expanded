@@ -1,4 +1,4 @@
-//! W96 opt-in, bounded measurements; no timing thresholds on shared hardware.
+//! W96/W106 opt-in measurements; no timing thresholds on shared hardware.
 //! Run with --release --test load_players -- --ignored --nocapture --test-threads=1.
 //!
 //! Receipt 2026-10-16, Windows GNU release, shared host with concurrent builds.
@@ -15,7 +15,7 @@
 //! UDP gateway step: median 1172.000 us, max 1945.700 us (10 samples), exact
 //! peer relay asserted; excludes drain/read timeouts, content/history and save I/O.
 //!
-//! Recommendation (R): keep 16 total / 4 per-IP admission and 100 m / 64 interest
+//! W96 recommendation (historical, R): keep 16 / 4 per-IP and 100 m / 64 interest
 //! defaults. The cap bounds fanout, not dense-cell CPU: local work remains O(k^2)
 //! and this crowded run regressed. A grid is not 1000-player gateway acceptance.
 //! At 16, preserve transactional staging; clone cost was about 1% of the step.
@@ -24,6 +24,37 @@
 //! and shared security budgets. Bound dense-cell work and run a content/saves
 //! load test before raising admission. No new native facts were recovered;
 //! players_reference.rs freezes this project's pre-W96 Rust algorithm.
+//!
+//! W106 threat model: an authenticated hostile mover can supply malformed poses,
+//! churn radius/cutoff boundaries, or disconnect/rejoin. Pose, identity and
+//! presentation validation still precede all index/cache changes. Cached views
+//! hold only registry-owned ids and at most the existing interest cap per viewer;
+//! leave removes the viewer's cache and repairs affected directed views.
+//! Security-reviewer pass: scoped added-line scan plus manual validation/cache
+//! lifetime review found no new unsafe/FFI, panic/unwrap, credentials or external
+//! APIs. Semgrep/Gitleaks were unavailable. Residual CPU risk: coincident crowds
+//! or many cutoff crossings can still force local rescans; admission is unchanged.
+//! The differential canary fails when selected-mover cutoff re-ranking is disabled
+//! (id 79, x=0.5); the source was restored byte-for-byte before the clean gates.
+//!
+//! W106 receipt 2026-10-16, same release layout/sweep and shared-host caveat:
+//! N       spread W96/W106 us       crowded W96/W106 us
+//! 16         18.113 / 9.194           85.831 / 7.231
+//! 64         32.062 / 9.833         1445.120 / 46.386
+//! 256        63.108 / 22.634       19191.554 / 244.430
+//! 1000      174.502 / 20.910      196971.673 / 898.865
+//! Historical W96 values are the receipt above, not simultaneous measurements.
+//! Rerun pre-grid reference: crowded N=1000 61082.144 us/update. Every ordered
+//! output matched. Crowded N=1000 registry clone+drop: 619.456 us (100 samples).
+//! Logs: lab/build/w106/{registry-scaling,focused-tests,cutoff-canary-caught}.log
+//! Clean release gates: players 11/0, multiplayer 11/0 (4 existing ignores),
+//! differential 5/0 (including 96-player dense/coincident crowds), load 1/0.
+//!
+//! W106 recommendation (R): retain 16 total / 4 per-IP and 100 m / 64 interest.
+//! Cached views and partial selection remove the measured dense-cell regression,
+//! but cutoff churn retains quadratic worst cases. Full gateway queueing, saves,
+//! content, transactional SharedWorld clones and long-running bot load were not
+//! measured here. These registry-only results do not justify raising admission.
 #![allow(unexpected_cfgs)] // w96_gateway_probe is used only by the isolated source probe below.
 
 #[path = "players_reference.rs"]
@@ -45,9 +76,17 @@ fn position(id: usize, crowded: bool) -> [f32; 3] {
 #[test]
 #[ignore = "bounded scaling measurement; run in release mode on an idle machine"]
 fn registry_scaling() {
-    println!("layout,N,updates,old_us_per_update,grid_us_per_update,speedup,registry_clone_us");
+    println!(
+        "layout,N,updates,old_us_per_update,w96_grid_us_per_update,w106_us_per_update,w96_speedup,registry_clone_us"
+    );
     for crowded in [false, true] {
-        for count in [16, 64, 256, 1000] {
+        for (index, count) in [16, 64, 256, 1000].into_iter().enumerate() {
+            // Historical W96 receipt above, not a second live timing on this host.
+            let w96_us = if crowded {
+                [85.831, 1445.120, 19191.554, 196971.673][index]
+            } else {
+                [18.113, 32.062, 63.108, 174.502][index]
+            };
             let mut grid = PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap());
             for id in 0..count {
                 grid.join(
@@ -96,9 +135,9 @@ fn registry_scaling() {
             }
             let clone_us = start.elapsed().as_secs_f64() * 1e6 / 100.0;
             println!(
-                "{},{count},{count},{old_us:.3},{grid_us:.3},{:.2},{clone_us:.3}",
+                "{},{count},{count},{old_us:.3},{w96_us:.3},{grid_us:.3},{:.2},{clone_us:.3}",
                 if crowded { "crowded" } else { "spread" },
-                old_us / grid_us
+                w96_us / grid_us
             );
         }
     }

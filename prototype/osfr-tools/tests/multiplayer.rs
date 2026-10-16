@@ -537,7 +537,6 @@ fn move_player(client: &mut Client, server: &mut Server, guid: u64, x: f32) {
 
 /// W103: reproduce the crossed numeric domains without renumbering existing saves.
 #[test]
-#[ignore = "W103 confirmed failure: players.rs mixes ID namespaces; lead-owned fix required"]
 fn audit_crossed_account_and_character_ids_can_join_together() {
     let temp = TempDir::new();
     let (mut server, store_path) = start_server(&temp);
