@@ -30,8 +30,8 @@ You and about 10 friends log into our server from your own PCs and play together
 
 - [x] Audit the true state and rewrite the [[Build Ledger]] (2026-10-15).
 - [x] Write this plan.
-- [ ] **Version control.** The project repo has no commits. Commit locally at every milestone, never push. *Needs the owner's yes.*
-- [ ] **Code memory.** Install `codebase-memory-mcp` (MIT, local SQLite, supports Rust and Windows) for Claude and Codex. It answers "what calls X / is X routed / what changed" from the code. *Needs the owner's yes; review its hooks first.*
+- [x] **Version control** (2026-10-15). First commit `ffef740` (5,458 files). Commit at every milestone and integration. The GitHub remote is pending: the repo must be **private**, because the content carries client-derived text and Legacy-derived data.
+- [x] **Code memory** (2026-10-15). `codebase-memory-mcp` 0.12.0 is installed for Claude Code, Codex and VS Code, with project `cartoonmmo` indexed (57,693 nodes, 168,877 edges). Use `trace_path` (inbound callers) to check whether a module is wired before planning work. Re-index after big changes with `codebase-memory-mcp cli index_repository --repo-path <project> --name cartoonmmo`.
 - [x] **Worker preamble** (2026-10-15, `lab/runs/luna/prompts/preamble.md`). Add the current toolkit (Studio API, bot client, terrain, behaviours, content checker, asset graph, World Builder, `realm` commands), the gate rule, and "read Build Plan and Build Ledger first, not older notes".
 - [x] **Brought stale notes up to date** (2026-10-15; originals in `lab/snapshots/notes-20261015/`): AGENTS.md (the captured-init and search-crash lines), Tasks.md, Current Progress top section, and MODLOG entries for 10-13 and 10-14.
 
@@ -82,5 +82,7 @@ Run it, collect bug reports and field notes, and feed them back into this plan.
 The remaining dungeons, housing (missing scene assets), pets, mounts (including the community "Mounts and Pets" update, licence check first), fishing, soccer, chess, derby, the card game, the guild, trade and matchmaking routes, a native Rust 3D editor (whose renderer becomes the Rust client), a database for saves, public hosting, and restarting the native map (6 stuck shards to reset).
 
 ## Update log
+
+- **2026-10-15 (later):** Git baseline committed. codebase-memory-mcp installed and indexed; its first query confirmed that nothing calls `FishingService`, matching the audit.
 
 - **2026-10-15:** Plan created from a five-part audit (network, world/combat, quests/economy, minigames, worker history). The ledger was rewritten. Found and recorded: loopback-only servers, a one-session login, the AddPc stub, social packets dropped without trace, the coin-store overwrite bug, hollow quests, missing starter weapons and attacks, and no git history. Earlier today, built and verified: World Builder text and literal NPC names (run 20261016T011257Z), live world layer, enemy reach made tunable, suite at 2065 passed.
