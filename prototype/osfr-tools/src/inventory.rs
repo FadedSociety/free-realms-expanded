@@ -481,6 +481,14 @@ impl Inventory {
         self.content.definitions.contains_key(&definition_id)
     }
 
+    /// The serialized `ClientItemDefinition` row, the same bytes a 35/37 batch carries.
+    pub fn definition_record(&self, definition_id: i32) -> Option<&[u8]> {
+        self.content
+            .definitions
+            .get(&definition_id)
+            .map(|definition| definition.bytes.as_slice())
+    }
+
     pub fn presentation(&self, definition_id: i32) -> io::Result<ItemPresentation> {
         let definition = self
             .content

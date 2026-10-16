@@ -57,6 +57,7 @@ pub mod opening_abilities;
 pub mod opening_journal;
 pub mod opening_world;
 pub mod pets;
+pub mod player_radial;
 pub mod players;
 pub mod profiles;
 pub mod progression_extras;

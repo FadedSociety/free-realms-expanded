@@ -1833,6 +1833,42 @@ impl Gameplay {
         self.profiles.as_ref().map(|p| p.state().active)
     }
 
+    /// What other players may see on Inspect (W143): unlocked jobs with their
+    /// ranks and the active job's worn items. Coins, quests, stats and titles
+    /// are never included (R).
+    pub fn public_look(&self) -> Option<crate::player_radial::PublicLook> {
+        let profiles = self.profiles.as_ref()?;
+        let active = profiles.state().active;
+        let state = self.inventory.state();
+        let items = state
+            .equipment
+            .iter()
+            .filter(|worn| worn.profile_id == active && worn.item_id != 0)
+            .filter_map(|worn| {
+                let item = state.items.iter().find(|item| item.id == worn.item_id)?;
+                Some(crate::player_radial::PublicItem {
+                    slot: worn.slot,
+                    definition_id: item.definition_id,
+                    tint: item.tint,
+                    definition_record: self
+                        .inventory
+                        .definition_record(item.definition_id)?
+                        .to_vec(),
+                })
+            })
+            .collect();
+        Some(crate::player_radial::PublicLook {
+            profiles: profiles
+                .state()
+                .unlocked
+                .iter()
+                .map(|&id| (id, self.job_level(id) as i32))
+                .collect(),
+            active_profile: active,
+            items,
+        })
+    }
+
     /// One profile's outfit as the native attachment list (count + rows).
     pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
         self.inventory.profile_attachments(profile_id)
@@ -2183,7 +2219,10 @@ impl Gameplay {
         // (R) Same rule for the Type8 movies: a reconnecting client has no board or tile queue,
         // so an unfinished Mining/Harvesting run (even a paid Won run waiting for results Close)
         // is released here instead of blocking jobs, equipment and interaction forever.
-        for engine in [&mut self.mining, &mut self.harvesting].into_iter().flatten() {
+        for engine in [&mut self.mining, &mut self.harvesting]
+            .into_iter()
+            .flatten()
+        {
             let cancelled = engine.cancel();
             out.changed |= cancelled.changed;
             out.replies.extend(cancelled.replies);
@@ -4713,7 +4752,8 @@ impl Gameplay {
                     }
                 } else {
                     // Empty or level-locked slot: explicit failure, no state change. (R)
-                    out.replies.push(crate::abilities::unsupported_cast_failure());
+                    out.replies
+                        .push(crate::abilities::unsupported_cast_failure());
                 }
                 return Ok(out);
             }
@@ -4726,7 +4766,8 @@ impl Gameplay {
                     .supports_basic(active_profile)
             {
                 // Slot 0 on a non-combat job: explicit failure. (R)
-                out.replies.push(crate::abilities::unsupported_cast_failure());
+                out.replies
+                    .push(crate::abilities::unsupported_cast_failure());
                 return Ok(out);
             }
         }
@@ -4892,9 +4933,7 @@ impl Gameplay {
             // (R) A recipe-book run has no tutorial objective; the profile and
             // station checks still bind the completion.
             if self.profiles.as_ref().unwrap().active() != 14 || !near_furnace {
-                return Err(invalid(
-                    "smelting completion is outside a Miner station",
-                ));
+                return Err(invalid("smelting completion is outside a Miner station"));
             }
             if transaction
                 .consumes
@@ -5059,9 +5098,7 @@ impl Gameplay {
             // (R) A recipe-book run has no tutorial objective; the profile and
             // station checks still bind the completion.
             if self.profiles.as_ref().unwrap().active() != 45 || !near_station {
-                return Err(invalid(
-                    "cooking completion is outside a Chef station",
-                ));
+                return Err(invalid("cooking completion is outside a Chef station"));
             }
             if transaction
                 .consumes
@@ -6285,10 +6322,19 @@ mod developer_teleport {
         assert!(denied && text.contains("account role"), "{text}");
         assert!(!world.join("marks.json").exists());
         game.set_role(AccountRole::Builder);
-        assert!(try_cmd(&mut game, "realm mark spot").0.contains("Marked spot"));
+        assert!(
+            try_cmd(&mut game, "realm mark spot")
+                .0
+                .contains("Marked spot")
+        );
         assert!(try_cmd(&mut game, "realm god").1, "builder gets no cheats");
         game.set_role(AccountRole::Admin);
-        assert!(try_cmd(&mut game, "realm god").0.to_lowercase().contains("god"));
+        assert!(
+            try_cmd(&mut game, "realm god")
+                .0
+                .to_lowercase()
+                .contains("god")
+        );
         // Wire experiments stay behind --dev-tools for every role.
         assert!(try_cmd(&mut game, "realm mine").0.contains("--dev-tools"));
         std::fs::remove_dir_all(&world).unwrap();
@@ -6765,12 +6811,23 @@ mod w64_regional_quest_tests {
         let out = game.handle_in_world(&forged, &character, 1_007).unwrap();
         assert!(!out.changed && out.replies.is_empty());
         assert_eq!(state(&game), before);
-        assert!(game.handle_in_world(&[47, 0, 12, 1, 0, 0], &character, 1_008).is_err());
+        assert!(
+            game.handle_in_world(&[47, 0, 12, 1, 0, 0], &character, 1_008)
+                .is_err()
+        );
 
         // 47/13: wire 0 = unlocked = client auto-switch set; wire 1 = locked.
-        assert!(game.handle_in_world(&[47, 0, 13, 0], &character, 1_009).unwrap().changed);
+        assert!(
+            game.handle_in_world(&[47, 0, 13, 0], &character, 1_009)
+                .unwrap()
+                .changed
+        );
         assert!(state(&game).auto_switch_selected);
-        assert!(game.handle_in_world(&[47, 0, 13, 1], &character, 1_010).unwrap().changed);
+        assert!(
+            game.handle_in_world(&[47, 0, 13, 1], &character, 1_010)
+                .unwrap()
+                .changed
+        );
         assert!(!state(&game).auto_switch_selected);
 
         // 49/15 for an id the server never registered offers nothing.
@@ -7611,6 +7668,31 @@ mod w64_regional_quest_tests {
         std::fs::remove_dir_all(dir).ok();
     }
 
+    /// W143: Inspect shows only unlocked jobs with ranks and the active job's
+    /// worn items, each with its definition row; nothing for an unworn slot.
+    #[test]
+    fn public_look_holds_only_jobs_and_active_worn_items() {
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        let look = game.public_look().expect("profiles are loaded");
+        let profiles = game.profiles.as_ref().unwrap().state().clone();
+        assert_eq!(look.active_profile, profiles.active);
+        assert_eq!(look.profiles.len(), profiles.unlocked.len());
+        let state = game.inventory.state().clone();
+        let worn = state
+            .equipment
+            .iter()
+            .filter(|e| e.profile_id == profiles.active && e.item_id != 0)
+            .count();
+        assert_eq!(look.items.len(), worn);
+        assert!(look.items.iter().all(|i| !i.definition_record.is_empty()));
+        // Another profile's outfit never leaks into the active look.
+        game.profiles.as_mut().unwrap().unlock(11).unwrap();
+        let after = game.public_look().unwrap();
+        assert_eq!(after.items, look.items);
+        assert!(after.profiles.iter().any(|&(id, _)| id == 11));
+    }
+
     /// W141: 36/12 resolves only this job's own toolbar definitions; a miss is
     /// silent; unsupported 36/10 modes, other bars and empty or level-locked
     /// slots get the client failure string. None of it touches game state.
@@ -7659,7 +7741,10 @@ mod w64_regional_quest_tests {
             let out = game.handle_in_world(&ask, &who, 5_000).unwrap();
             assert!(out.replies.is_empty(), "locked, other-job or unknown {id}");
         }
-        assert!(game.handle_in_world(&[36, 0, 12, 0, 1, 2], &who, 5_000).is_err());
+        assert!(
+            game.handle_in_world(&[36, 0, 12, 0, 1, 2], &who, 5_000)
+                .is_err()
+        );
         let cast = |bar: i32, slot: i32, tail: &[u8], mode: i32| {
             let mut p = vec![36, 0, 10, 0];
             for v in [bar, slot, mode] {

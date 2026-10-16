@@ -11,6 +11,7 @@ use osfr_tools::gameplay::Gameplay;
 use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
 use osfr_tools::net_policy::{Bucket, IpLimiter};
+use osfr_tools::player_radial::{PlayerRadial, PublicLook};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
 use osfr_tools::security_log::{EventKind, SecurityEvent, SecurityLog};
 use osfr_tools::session::{CRC_SEED, SessionRequest, clock_reflect, decode_controls};
@@ -421,6 +422,8 @@ struct Session {
     quick_chat: QuickChatCatalog,
     /// (R) Emote actor state, refreshed from the committed gateway before routing.
     emote: social_chat::piece_093::EmoteContext,
+    /// Open player radial menu / inspect for this session (W143).
+    radial: PlayerRadial,
     selected_character: bool,
     spam_gate: SpamGate,
     session_start: Instant,
@@ -440,6 +443,9 @@ struct Session {
 #[derive(Clone, Debug)]
 struct SharedWorld {
     players: PlayerRegistry,
+    /// What a stranger may see of each joined character, keyed by character guid (W143).
+    /// Filled at join and on profile/equipment change; empty means no Inspect entry (R).
+    public_looks: BTreeMap<u64, PublicLook>,
     social: SocialService,
     identities: BTreeMap<u64, SocialIdentity>,
     social_paths: BTreeMap<u64, PathBuf>,
@@ -502,6 +508,7 @@ impl SharedWorld {
         // (R) Local runner defaults; native visibility radius and group cap are unknown.
         Self {
             players: PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap()),
+            public_looks: BTreeMap::new(),
             social: SocialService::new(17).unwrap(),
             identities: BTreeMap::new(),
             social_paths: BTreeMap::new(),
@@ -601,6 +608,9 @@ impl SharedWorld {
     }
 
     fn leave_player(&mut self, session_id: SessionId) -> Vec<Delivery> {
+        if let Some(player) = self.players.get(session_id) {
+            self.public_looks.remove(&player.character_guid);
+        }
         self.joined.remove(&session_id);
         self.chat_sessions.remove(&session_id);
         self.players
@@ -859,6 +869,7 @@ impl Session {
             is_member,
             quick_chat,
             emote: social_chat::piece_093::EmoteContext::standing(),
+            radial: PlayerRadial::default(),
             selected_character,
             spam_gate: SpamGate::default(),
             session_start: Instant::now(),
@@ -1511,12 +1522,18 @@ impl Session {
             let moved = previous.position != current.position
                 || previous.rotation != current.rotation
                 || (state, unknown) != self.gateway.movement_bytes();
+            // W143: what strangers may see on Inspect. Refreshed on any gameplay
+            // change (equipment, job) and published at join; removed on leave.
+            if outcome.gameplay_changed && staged_world.joined.contains(&self.id) {
+                refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
+            }
             if outcome.entered_world
                 && staged_gateway.is_world_loaded()
                 && !staged_world.joined.contains(&self.id)
             {
                 let look = staged_gateway.player_presentation(self.is_member)?;
                 deliveries.extend(staged_world.join_player(self, &current, look, instance)?);
+                refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
             } else if moved && staged_world.joined.contains(&self.id) {
                 let messages = staged_world
                     .players
@@ -1590,6 +1607,7 @@ impl Session {
             self.npc_visibility_revision = None;
             self.npc_view_position = None;
             self.npc_view_fields.clear();
+            self.radial.reset();
         }
         self.gateway = staged_gateway;
         *world = staged_world;
@@ -1661,6 +1679,34 @@ impl Session {
         Ok(true)
     }
 
+    /// 26/19 select, 26/10 choice on an open player menu, 149/2 close (W143).
+    /// A refusal is a silent drop (R): nothing is sent, so ids cannot be probed.
+    fn route_player_radial(&mut self, inner: &[u8], world: &mut SharedWorld) -> Vec<Delivery> {
+        let looks = &world.public_looks;
+        let replies = if inner == [149, 0, 2] {
+            self.radial.stop_inspect(inner).map(|()| Vec::new())
+        } else if inner.starts_with(&[26, 0, 19, 0]) {
+            self.radial
+                .select_player(&world.players, self.id, inner, |guid| {
+                    looks.contains_key(&guid)
+                })
+        } else {
+            self.radial
+                .choose(&world.players, self.id, inner, |guid| {
+                    looks.get(&guid).cloned()
+                })
+                .map(Option::unwrap_or_default)
+        };
+        replies
+            .unwrap_or_default()
+            .iter()
+            .map(|reply| Delivery {
+                recipient: self.id,
+                bytes: wrap_application(reply),
+            })
+            .collect()
+    }
+
     fn route_application(&mut self, inner: &[u8], world: &mut SharedWorld) -> Vec<Delivery> {
         // One social action budget per account (W91); a refusal is a silent drop (R).
         let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
@@ -1676,6 +1722,12 @@ impl Session {
             return Vec::new();
         }
         drop(security);
+        if inner.starts_with(&[26, 0, 19, 0])
+            || inner == [149, 0, 2]
+            || (inner.starts_with(&[26, 0, 10, 0]) && self.radial.menu_target().is_some())
+        {
+            return self.route_player_radial(inner, world);
+        }
         if inner.starts_with(&[15, 0, 1, 0]) {
             return self.route_typed_chat(inner, world);
         }
@@ -1923,6 +1975,19 @@ impl Session {
 
 /// (R) Longest a pose-only change waits before it is written (crash loss bound).
 const POSITION_SAVE_MS: u64 = 5_000;
+
+/// (R) Inspect shows only unlocked jobs with ranks and the active job's worn
+/// items; no look (no profiles loaded) means no Inspect entry.
+fn refresh_public_look(world: &mut SharedWorld, guid: u64, gateway: &Gateway) {
+    match gateway.public_look() {
+        Some(look) => {
+            world.public_looks.insert(guid, look);
+        }
+        None => {
+            world.public_looks.remove(&guid);
+        }
+    }
+}
 
 fn persist_social_changes(before: &SharedWorld, after: &SharedWorld) -> io::Result<()> {
     for (guid, path) in &after.social_paths {

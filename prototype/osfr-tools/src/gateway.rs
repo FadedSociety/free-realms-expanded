@@ -476,6 +476,10 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
 /// The handler that owns an application message body, by family/subtype.
 /// Routing uses it as well as tracing, so behaviour never depends on --trace.
 fn application_handler(body: &[u8]) -> &'static str {
+    // StopInspect is u16 149 + u8 2 (three bytes), so it cannot use the u16 sub below.
+    if body == [149, 0, 2] {
+        return "player_radial";
+    }
     let word = |at: usize| {
         body.get(at..at + 2)
             .map(|b| u16::from_le_bytes([b[0], b[1]]))
@@ -484,6 +488,7 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(15), Some(1)) => "social_chat",
         (Some(67), Some(2 | 3)) => "quick_chat",
         (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
+        (Some(26), Some(19)) => "player_radial",
         (Some(26), Some(14 | 15 | 17 | 30)) | (Some(40), Some(1 | 3 | 4 | 6)) => "social_router",
         (Some(49), Some(2 | 14 | 15)) => "quest_engine",
         // Family 47 carries a one-byte subtype; word(2) would swallow the first body byte.
@@ -976,6 +981,11 @@ impl Gateway {
     /// same identity, profile and inventory inputs as `build_self_message`.
     /// (R) Name ids stay zero (literal-name mode); speed and wield type keep
     /// the players.rs defaults until those are server-owned.
+    /// See `Gameplay::public_look` (W143 Inspect).
+    pub fn public_look(&self) -> Option<crate::player_radial::PublicLook> {
+        self.gameplay.as_ref()?.public_look()
+    }
+
     pub fn player_presentation(&self, member: bool) -> io::Result<PlayerPresentation> {
         let mut look = PlayerPresentation {
             character_guid: self.state.guid,
@@ -1937,5 +1947,25 @@ fn template_fallback_enabled() -> io::Result<bool> {
         Err(std::env::VarError::NotUnicode(_)) => Err(invalid(
             "OSFR_GATEWAY_STARTUP_TEMPLATE_FALLBACK is not Unicode",
         )),
+    }
+}
+
+#[cfg(test)]
+mod radial_routing {
+    use super::application_handler;
+
+    #[test]
+    fn player_radial_requests_have_a_known_handler() {
+        let mut select = vec![26, 0, 19, 0];
+        select.extend([0u8; 16]);
+        assert_eq!(application_handler(&select), "player_radial");
+        // StopInspect is u16 149 + u8 2: three bytes, no u16 sub-opcode.
+        assert_eq!(application_handler(&[149, 0, 2]), "player_radial");
+        // Neighbouring traffic keeps its handler.
+        assert_eq!(application_handler(&[26, 0, 10, 0]), "npc_interaction");
+        assert_eq!(
+            application_handler(&[149, 0, 3]),
+            "gameplay.handle_in_world"
+        );
     }
 }

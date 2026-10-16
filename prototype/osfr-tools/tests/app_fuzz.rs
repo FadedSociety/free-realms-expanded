@@ -466,6 +466,8 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     for sub in [1, 3, 4, 6] {
         result.push(("social_router", words(40, sub, &[u32::MAX; 4])));
     }
+    // 26/19 select-player: own guid then target guid (W143); unknown target.
+    result.push(("player_radial", words(26, 19, &[0, 0, u32::MAX, u32::MAX])));
     for sub in [2, 14, 15] {
         let mut p = vec![49, 0, sub, 0, 0, 0];
         p.extend(u32::MAX.to_le_bytes());
