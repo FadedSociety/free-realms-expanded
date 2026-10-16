@@ -311,6 +311,7 @@ fn options(root: &Path, reference: PathBuf, account_store: Option<PathBuf>) -> O
         terrain: None,
         world: None,
         stock_text: None,
+        allow_lan: false,
     }
 }
 

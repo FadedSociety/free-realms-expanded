@@ -37,6 +37,8 @@ struct Options {
     open_chat: bool,
     seconds: u64,
     trace_file: Option<PathBuf>,
+    /// Accept a private-network bind and peers (Security Model L1).
+    allow_lan: bool,
 }
 impl Options {
     fn parse() -> Result<Self, Box<dyn std::error::Error>> {
@@ -58,7 +60,12 @@ impl Options {
             None,
         );
         let (mut max_characters, mut underage, mut open_chat) = (6, false, true);
+        let mut allow_lan = false;
         while let Some(flag) = args.next() {
+            if flag == "--allow-lan" {
+                allow_lan = true;
+                continue;
+            }
             let value = args.next().ok_or("missing login option value")?;
             match flag.as_str() {
                 "--bind" => bind = value.parse()?,
@@ -79,8 +86,8 @@ impl Options {
                 _ => return Err(format!("unknown login option {flag}").into()),
             }
         }
-        if !bind.ip().is_loopback() {
-            return Err("login only binds loopback".into());
+        if !osfr_tools::net_policy::allowed(bind.ip(), allow_lan) {
+            return Err("login binds loopback, or a private-network IP with --allow-lan".into());
         }
         let key_path = key_file.ok_or("--key-file required")?;
         let key = fs::read(&key_path)?;
@@ -107,6 +114,7 @@ impl Options {
             open_chat,
             seconds,
             trace_file,
+            allow_lan,
         })
     }
     fn service(&self) -> io::Result<LoginService> {
@@ -465,7 +473,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             break;
         }
         match socket.recv_from(&mut buffer) {
-            Ok((n, peer)) if peer.ip().is_loopback() => {
+            Ok((n, peer)) if osfr_tools::net_policy::allowed(peer.ip(), options.allow_lan) => {
                 let wire = &buffer[..n];
                 if wire.starts_with(&[0, 1]) {
                     if let Some(request) = Request::parse(wire) {

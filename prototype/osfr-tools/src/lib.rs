@@ -47,6 +47,7 @@ pub mod minigame;
 pub mod mining;
 pub mod mounts;
 pub mod movement;
+pub mod net_policy;
 pub mod mystery_chest;
 pub mod mystery_chest_loot;
 pub mod npc_interaction;

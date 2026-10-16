@@ -283,6 +283,8 @@ pub struct Options {
     pub world: Option<PathBuf>,
     /// Row keys of the stock client locale, so authored text ids avoid them.
     pub stock_text: Option<Arc<std::collections::HashSet<u32>>>,
+    /// Accept a private-network bind and peers (Security Model L1).
+    pub allow_lan: bool,
 }
 
 impl Options {
@@ -292,14 +294,12 @@ impl Options {
             .next()
             .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--dev-tools]")?
             .parse()?;
-        if !bind.ip().is_loopback() {
-            return Err("gateway only binds loopback".into());
-        }
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
         let (mut gateway_ticket, mut handoff_key_file) =
             (login::DEFAULT_GATEWAY_TICKET.to_owned(), None);
         let mut dev_tools = false;
+        let mut allow_lan = false;
         let mut studio_port = 47_800;
         let mut client_logs = None;
         let mut terrain = None;
@@ -308,6 +308,10 @@ impl Options {
         while let Some(key) = args.next() {
             if key == "--dev-tools" {
                 dev_tools = true;
+                continue;
+            }
+            if key == "--allow-lan" {
+                allow_lan = true;
                 continue;
             }
             let value = args.next().ok_or("missing option value")?;
@@ -336,6 +340,14 @@ impl Options {
                 _ => return Err(format!("unknown option {key}").into()),
             }
         }
+        // Security Model L1/L5: loopback by default; a private-network bind only
+        // with --allow-lan, in account-store mode, and never with dev tools.
+        if !osfr_tools::net_policy::allowed(bind.ip(), allow_lan) {
+            return Err("gateway binds loopback, or a private-network IP with --allow-lan".into());
+        }
+        if !bind.ip().is_loopback() && (dev_tools || account_store.is_none()) {
+            return Err("a non-loopback gateway needs --account-store and refuses --dev-tools".into());
+        }
         let handoff_key = handoff_key_file
             .map(fs::read)
             .transpose()?
@@ -359,6 +371,7 @@ impl Options {
             terrain,
             world,
             stock_text,
+            allow_lan,
         })
     }
 }
@@ -1756,8 +1769,8 @@ pub struct Server {
 
 impl Server {
     pub fn new(options: Options) -> Result<Self, Box<dyn std::error::Error>> {
-        if !options.bind.ip().is_loopback() {
-            return Err("gateway only binds loopback".into());
+        if !osfr_tools::net_policy::allowed(options.bind.ip(), options.allow_lan) {
+            return Err("gateway binds loopback, or a private-network IP with --allow-lan".into());
         }
         if let Some(parent) = options
             .state
@@ -1828,7 +1841,9 @@ impl Server {
         self.poll_studio(now_ms);
         let mut buffer = [0; 65_535];
         match self.socket.recv_from(&mut buffer) {
-            Ok((length, peer)) if peer.ip().is_loopback() => {
+            Ok((length, peer))
+                if osfr_tools::net_policy::allowed(peer.ip(), self.options.allow_lan) =>
+            {
                 let wire = &buffer[..length];
                 if wire.starts_with(&[0, 1]) {
                     match SessionRequest::parse(wire) {
@@ -2587,6 +2602,7 @@ mod tests {
             terrain: None,
             world: None,
             stock_text: None,
+            allow_lan: false,
         };
         let mut session = Session::new(
             SessionId(17),

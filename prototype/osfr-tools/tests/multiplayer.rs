@@ -478,6 +478,7 @@ fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
         terrain: None,
         world: None,
         stock_text: None,
+        allow_lan: false,
     })
     .unwrap();
 
