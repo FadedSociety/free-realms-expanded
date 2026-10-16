@@ -457,12 +457,10 @@ fn is_opcode(message: &[u8], opcode: u16) -> bool {
         && u16::from_le_bytes(message[7..9].try_into().unwrap()) == opcode
 }
 
-#[test]
-fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
-    let temp = TempDir::new();
+fn start_server(temp: &TempDir) -> (Server, PathBuf) {
     let reference = create_reference(&temp.0);
     let account_store = create_account_store(&temp.0);
-    let mut server = Server::new(Options {
+    let server = Server::new(Options {
         bind: "127.0.0.1:0".parse().unwrap(),
         reference,
         state: temp.0.join("gateway-state.json"),
@@ -481,6 +479,41 @@ fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
         allow_lan: false,
     })
     .unwrap();
+    (server, account_store)
+}
+
+fn log_in(server: &mut Server, connection_id: u32, guid: u64, store: &Path) -> (Client, Vec<Vec<u8>>) {
+    let mut client = Client::connect(server, connection_id);
+    let mut messages = client.send(server, &login(guid, store));
+    messages.extend(client.send(server, &packet(13, &[])));
+    messages.extend(client.send(server, &packet(10, &[])));
+    (client, messages)
+}
+
+/// A player whose game exits without a goodbye must not take the server down:
+/// Windows reports the next datagram to their closed port as ConnectionReset.
+#[test]
+fn a_vanished_client_does_not_stop_the_server() {
+    let temp = TempDir::new();
+    let (mut server, store) = start_server(&temp);
+    let (mut first, _) = log_in(&mut server, 61, 2, &store);
+    let (second, _) = log_in(&mut server, 62, 3, &store);
+    drop(second);
+    let mut fields = 2u64.to_le_bytes().to_vec();
+    for value in [4.0f32, 2.0, 3.0, 0.0, 0.0, 1.0] {
+        fields.extend_from_slice(&value.to_le_bytes());
+    }
+    fields.extend_from_slice(&[0, 0]);
+    first.send(&mut server, &packet(125, &fields)); // relayed to the closed port
+    // Every step() here unwraps: the reset must not end the server loop.
+    first.send(&mut server, &application(6, &chat_request(0, "still here", None)));
+    assert_eq!(server.active_session_count(), 2); // the quiet one times out later
+}
+
+#[test]
+fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
+    let temp = TempDir::new();
+    let (mut server, account_store) = start_server(&temp);
 
     let mut first = Client::connect(&mut server, 51);
     let mut first_login = first.send(&mut server, &login(2, &account_store));

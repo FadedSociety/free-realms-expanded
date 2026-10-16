@@ -534,7 +534,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             Err(e)
                 if matches!(
                     e.kind(),
-                    io::ErrorKind::TimedOut | io::ErrorKind::WouldBlock
+                    io::ErrorKind::TimedOut
+                        | io::ErrorKind::WouldBlock
+                        | io::ErrorKind::ConnectionReset // a closed peer port on Windows
                 ) => {}
             Err(e) => return Err(e.into()),
         }

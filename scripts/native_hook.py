@@ -26,6 +26,13 @@ IMAGE_BASE = 0x400000
 # "insn" logs registers at an instruction. `read` lists extra values to log:
 #   "reg:eax", "u8:eax", "mem32:ebx+0x1c", "mem32:esp+0x70", "arg:0", "bytes:arg0:arg1:16", "bytes:arg0:64"
 HOOK_SETS = {
+    # Other-player spawn (35/1 AddPc) in the player-update dispatcher 0092f460.
+    "add_pc": [
+        {"addr": 0x0092FECF, "kind": "insn", "label": "addpc.case1_reached", "read": []},
+        {"addr": 0x0092FEE8, "kind": "insn", "label": "addpc.parse_result", "read": ["u8:eax"]},
+        {"addr": 0x0092FF22, "kind": "insn", "label": "addpc.lookup_result", "read": ["reg:eax"]},
+        {"addr": 0x00930058, "kind": "insn", "label": "addpc.actor_created", "read": []},
+    ],
     "quest_offer": [
         {"addr": 0x00A107F0, "kind": "enter", "label": "quest.dispatch.thunk",
          "read": ["arg:0", "arg:1", "bytes:arg0:arg1:16"]},

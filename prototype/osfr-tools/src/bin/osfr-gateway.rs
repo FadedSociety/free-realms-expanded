@@ -1910,10 +1910,14 @@ impl Server {
                 }
             }
             Ok(_) => {}
+            // ConnectionReset is Windows reporting that an earlier datagram hit
+            // a closed port (a player whose game exited); it is not fatal.
             Err(error)
                 if matches!(
                     error.kind(),
-                    io::ErrorKind::WouldBlock | io::ErrorKind::TimedOut
+                    io::ErrorKind::WouldBlock
+                        | io::ErrorKind::TimedOut
+                        | io::ErrorKind::ConnectionReset
                 ) => {}
             Err(error) => return Err(error.into()),
         }
