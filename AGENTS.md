@@ -39,7 +39,14 @@ Delegated workers follow [[notes/Design/MMO Worker Contract.md]] and the scoped 
 
 the owner's Codex weekly limit was reached; Claude Code is now the lead. DeepSeek V4.1 Flash workers (max effort) run as separate `codex exec` processes through the local Codex Router, dispatched by `scripts/native_map/dispatch.py`. the owner raised the target to up to 100 concurrent workers; actual concurrency is bounded by free RAM (~650 MB per worker with all MCP tools kept on). Workers still never spawn workers. The native function map pipeline and its quality gates are described in [[notes/Native Map/Native Map]] and `scripts/native_map/`.
 
+## Lead and worker change, October 16
+
+Codex hit its usage limit (resets October 22). Workers now run as Claude subagents on **Sonnet** (scoped builds and research) or **Haiku** (mechanical work), never Opus. Each worker reads `lab/runs/claude/subagent-rules.md` and then its brief in `lab/runs/luna/prompts/`. The rules cover exclusive file ownership, no git stash/reset/commit, preserving line endings, a private build dir, and disk cleanup. Workers write patches for shared files instead of editing them. **The lead does all security work personally** (auth, login broker, transport, roles, admission, inspect privacy), and reviews every worker with the full suite in a clean worktree before committing. At most five workers at once.
+
 ## Current state and plan (read first)
+
+Start with `notes/Project Map.md`, which maps where every module, binary, test gate, script and lab folder lives.
+
 
 The verified state of every system is `notes/Design/Build Ledger.md` (rebuilt from code and native reviews 2026-10-15). The living plan is `notes/Design/Build Plan.md`. Read both before choosing work. Older notes, including some below, can be stale: verify against the code (what is routed in `gameplay.rs`/`gateway.rs`/`bin/osfr-gateway.rs`) and the newest `notes/Reviews/Native *.md` before claiming a gap. Update the Plan and Ledger after any milestone, integration or native run. Developer tools: `notes/Design/Studio Toolkit.md` and `notes/Design/World Builder.md`.
 

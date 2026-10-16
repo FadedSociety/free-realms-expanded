@@ -10,6 +10,8 @@ Restore **Free Realms**, with Rust as the preferred implementation language. Car
 
 **Current step:** the actual client now completes a reconstructed enemy quest, earns coin/item rewards, equips native gear and finishes a checkpoint activity against Rust. Restart restores 35 coins, reward quantity 10, equipped pants and the 18.456-second activity record. Original full quest/minigame restoration remains ahead; inventory text search needs diagnosis. Preserved inputs and community research remain available.
 
+- [[Project Map]] — **where everything lives**: binaries, modules by system, tests and gates, scripts, lab and notes (agents start here)
+- [[Design/Build Ledger|Build Ledger]] and [[Design/Build Plan|Build Plan]] — verified state per system, and the living plan with its update log
 - [[Design/Project Brief|Project brief]] — direction and open decisions
 - [[Tasks]] — current work and next actions
 - [[Build Guides]] — one guide per feature (Kart Racing, Housing, TCG, UI, network...) with every mapped function and how it works; the build reference

@@ -119,3 +119,13 @@ Observations the owner gathers from original-game videos and screenshots. They a
 - **Animated title:** the original Free Realms launcher's "Free Realms" wordmark was animated, with vines flowing out of it.
 - **Frames with raised edges:** UI parts were "3D but not completely 3D": frames wrapping text had a raised, bumpy rim ("braille bump style") around their edges.
 - Not in the client files: the client's own `Free_Realms_Logo.dds` is the plain orange wordmark with a glow, and the launcher (SOE LaunchPad) was a separate download. No screenshot found online yet (2026-10-16 search), so this note is the evidence. Lead's reading of "braille bump" is (R) until the owner confirms it.
+
+### Combat power-ups (the owner, 2026-10-16)
+- **Enemies drop power-ups during combat**, by chance per kill. the owner's screenshot of the official in-game help (via the wiki): you use one with the **number 3 key** and can **hold only one at a time**, so you use it to make room for the next.
+- The five kinds:
+  - **Health:** the big heart heals everyone in your group; the little heart restores a small amount of your own health.
+  - **Energy:** restores energy.
+  - **Flame Wave:** instantly damages all enemies around you.
+  - **Earth Shard:** damages all enemies in your area and stuns them briefly.
+  - **Super Shield:** raises your speed and makes you invulnerable for a short time.
+- Client evidence so far (lead, 2026-10-16): the locale has "Flame Wave Power Up", "earth shards power up buff - tier 4" and "spawn healt powerup npc", which suggests a power-up spawns as a pickup actor that grants a buff. Drop chances were not found yet. If they are server-side only, we reconstruct a chance per kind and mark it (R).
