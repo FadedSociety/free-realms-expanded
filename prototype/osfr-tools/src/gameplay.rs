@@ -1300,6 +1300,9 @@ impl Gameplay {
                 if let Some(key) = visibility.content_key(merchant) {
                     request[4..12].copy_from_slice(&key.to_le_bytes());
                 }
+                // The shop was built with the login-time inventory; without this
+                // a purchase overwrote everything earned since (10-15 audit).
+                shop.sync_inventory(self.inventory.clone());
                 let outcome = interaction.handle_coin_store(
                     &mut shop,
                     &request,

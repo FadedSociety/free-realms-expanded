@@ -232,3 +232,15 @@ fn marketplace_handshake_replies_and_keeps_payment_sources_off() {
         assert!(!response.changed);
     }
 }
+
+/// Regression (2026-10-15 audit): the shop is created at login, but purchases
+/// must use the live inventory, or coins/items earned since login are lost.
+#[test]
+fn purchase_uses_the_synced_live_inventory() {
+    let directory = inventory_content();
+    let mut shop = shop(&directory, inventory_with_coins(&directory, 5), usize::MAX);
+    shop.sync_inventory(inventory_with_coins(&directory, 100));
+    let result = shop.buy(71001, 8, 1).unwrap();
+    assert_eq!(result.result_code, coin_shop::RESULT_SUCCESS);
+    assert_eq!(shop.inventory().state().coins, 85);
+}

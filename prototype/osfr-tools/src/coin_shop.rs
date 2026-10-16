@@ -169,6 +169,12 @@ impl CoinShop {
         &self.inventory
     }
 
+    /// Trade against the player's live inventory: coins and items earned
+    /// since the shop was created must not be lost or ignored on a purchase.
+    pub fn sync_inventory(&mut self, inventory: Inventory) {
+        self.inventory = inventory;
+    }
+
     pub fn set_member_status(&mut self, is_member: bool) {
         self.is_member = is_member;
     }
