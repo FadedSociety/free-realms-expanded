@@ -548,3 +548,110 @@ The default pipeline sampled three corrected records into its later independent 
 Applied `secure-code-guardian` and `security-reviewer` to the local file/command helpers. Threat model: wrong-shard writes, shell injection and overwriting another review. Automated AST scan plus manual inspection found **0 findings, 0 security fixes required**: fixed shard allowlist, parameterized read-only SQL, argv-list subprocesses, no shell execution/deletes, exclusive canonical verdict creation, coverage/cap assertions and unchanged unrelated-label digest. No login, credential, remote player input, network listener or Studio surface changed. This is task-scoped review, not a server security audit.
 
 Writes: `w129-review.py`, `w129-supplement.py`, `w129-supplement.txt`, `w129-inputs.json`, `w129-decisions.py`, `w129-{S0215,S0672}-review.jsonl`, `w129-accept.py`, `w129-accept-commands.json`, `w129-acceptance-receipt.json`, `w129-verify.py`, `w129-verification.json`, `w129-gates.txt`; canonical review/sample/model/prompt/round/receipt artifacts inside the two owned shard directories; this appended section. Pipeline-owned side effects are two shard rows and 345 label rows, normal event log/WAL and three fixcheck-queue entries. Original earlier W129 blocker/collection artifacts are preserved.
+
+
+## W133 independent fix checks of B0024/B0025/B0026, 2026-10-16
+
+**Complete through the normal pipeline:** 130 address verdicts in B0027-B0030: **106 confirm (`agree`), 0 refine, 24 reject/cap**. This includes every one of the 128 unique queued fixes selected from B0024/B0025 and two explicit supplemental checks. Both semantic corrections (`006b9730`, `016c2365`) and the retirement of `006ca9c3` hold. All 93 sampled chunk associations hold; the rejected chunk records retain misleading earlier semantic text, not disproved boundary corrections. Confirm does not promote the pipeline confidence.
+
+### Scope and provenance
+
+The unchanged source client is `lab/working/OSFR.Client/OSFR Client/FreeRealms.exe`, SHA-256 `26cc1c522a45e71fb57882da515f65bac45c8c8b8c7e740c0cea81c52a733351`. The supplied IDA export is `lab/native-map/run/ida-check/full-20261016/labels.jsonl`, SHA-256 `0d84d3da6df5ee1e31e578ccab3ae8f151485f9eb49b41211ec914d2822c3130`. Every verdict records its exact IDA line and its own `w133-evidence/<address>.txt` nmq show/callers/dis transcript. Complete fn/label/IDA rows and available owner pseudocode are in the paired JSON dossier. These are recovered static-client facts; map names remain annotations, not original symbols. No original server rule or native gameplay claim is made.
+
+Applied Ponytail full, Caveman, reverse-engineering and the reviewer evidence-workflows reference. Secure-code-guardian and security-reviewer covered the scoped local file/subprocess helpers. No community source, fresh game inputs, IDA process, native client, descendant worker, Rust change, dependency, commit or publication was used. Game-recon, web research, asset conversion and native automation were unnecessary for this supplied-artifact check.
+
+`queue_fixcheck` selects every hot gameplay/network/minigame/world/script record and a stable 20% of other subsystems. Recomputed that rule and matched the selected addresses to the append-only queue. Historical duplicate queue lines were deduplicated by address. B0026 and the descriptor-array correction do not meet that deterministic selection; they were explicitly added as supplemental fixcheck targets, not silently reported as queued. No queue line was deleted.
+
+| Source batch | Applied fixes | Unique queued | Claimed | Done |
+|---|---:|---:|---:|---:|
+| B0024 | 248 | 93 | 93 | 93 |
+| B0025 | 104 | 35 | 35 | 35 |
+| B0026 | 1 | 0 | 0 | 0 |
+| Supplemental 006b9730 / 006ca9c3 (checks only) | 0 | 0 | 2 | 2 |
+
+### Independent evidence and outcomes
+
+An independent scan of every initialized executable section found **zero raw E8 rel32 candidates** targeting any of the 93 sampled chunks. A scan of all initialized sections found **zero absolute pointer candidates** to them. All **174** recorded incoming branches were decoded and verified against their exact target. This supports the chunk associations and falsifies none of their no-direct-call/no-vtable claims. IDA mismatch rows intentionally omit pseudocode/xrefs; their empty fields were not used as negative evidence. `chunk_of` remains an association, not exclusive source-language ownership, and shared/noncontiguous tails remain separate annotations. Arbitrarily computed runtime targets are not disproved by this static scan.
+
+An independent operand/stored-pointer byte check proved all **50 literal citations**, including permitted prefix citations. It follows actual instruction operands and, where needed, one stored pointer; it does not accept nearby numerical data or a symbol spelling as literal use. Receipts: `w133-evidence/independent-entry-scan.json` and `independent-literals.json`.
+
+- `006b9730` (IDA line 1085): `006b977b` loads `[esi+8]`, `006b977e` adds 8 to ESI, and `006b9789` returns `[esi+4]`. Both null guards and string comparisons agree with IDA. `006df3f0`/`006e8bd0` push static tables `017e0cd8`/`017e2444`; no next-link traversal was restored.
+- `016c2365` (IDA line 66636): `016c2371` stores `0176ab48`, whose bytes contain exactly `GFC_Drivers_Draw_FontDeviceWin32`. Getter `004c886d` returns `01ccbe58`; descriptor/link/head stores agree with both decompilers. No question mark was restored.
+- `006ca9c3` (IDA line 38474): decoding from `006ca9b0` yields `006ca9c1:8a68fc` and next instruction `006ca9c4`. The labelled byte is the `fc` displacement. The existing retirement stays `name=null`, `kind=unknown`, `confidence=unknown`; function-row repair remains separate.
+
+Every non-confirm below is a `reject` under the standard fixcheck prompt: a false concrete behavior, argument, return or flag claim. No replacement `fix` objects were written. Chunk boundary metadata is retained.
+
+| Address | One-line evidence for rejection |
+|---|---|
+| `0051eb29` | Chunk boundary holds, but 0051eb29 pushes 0,0 then calls nonreturning 00d83c46 at 0051eb2d. Normal capacity branch enters 0051eb32; it does not resume insertion after rethrow as the preserved description says. |
+| `0058221b` | Chunk boundary holds, but 0058221f calls nonreturning 00d83c46 after two zero pushes. Normal 00582148 branch enters 00582224; the claimed throw-then-shift flow is false, not unresolved. |
+| `005fcc1c` | Chunk boundary holds; 005fcc20 calls nonreturning 00d83c46. Normal branch 005fcb49 reaches 005fcc25. This entry rethrows; it does not perform the claimed recovery fill assignment. |
+| `005ff354` | Chunk boundary holds; 005ff358 calls nonreturning 00d83c46. Normal branch 005ff281 enters 005ff35d. The described cleanup/continuation is not reachable by falling through this rethrow entry. |
+| `0062b94e` | Chunk boundary holds; 0062b952 calls nonreturning 00d83c46. Normal branch 0062b872 enters 0062b957. Iterator initialization and range insertion are not exception recovery after this entry. |
+| `0062e627` | Chunk boundary holds; 0062e62b calls nonreturning 00d83c46. Normal branch 0062e554 enters 0062e630. The claimed catch insertion/cleanup path conflates rethrow with the separate normal block. |
+| `007adf80` | Chunk boundary and setup hold, but 007adfd0 calls AIL_sample_playback_rate, then only pops EDI/ESI and ret 4 at 007adfd8. EAX playback rate is returned, not discarded; failure preserves zero. |
+| `008dec2f` | Chunk boundary holds, but 008dec3d:f6824201000008 tests byte [character+0x142] with mask 0x08, bit index 3. Preserved prose says bit 8, a wrong concrete flag index. |
+| `00a720f0` | Citation correction holds, but prose still names BBaseClient.SocialShare. 00a72118 loads pointer 01b50144=01815d04; bytes there spell BaseClient.SocialShare. The preceding B at 01815d03 is not passed. |
+| `00ac7f40` | String correction holds, but exact-cursor claim is false: 00ac801b subtracts cursor from end; 00ac8021:7e1d accepts signed end-cursor<=0, including cursor past end. Existing-record branch also reuses it and continues model lookup, rather than ending processing. |
+| `00f0f0a0` | Literal correction holds, but this is an ESI-register helper, not MSVC thiscall: 00f0f0a0 reads [esi] without ECX transfer, caller 00f0fe20 supplies ESI, and EAX returns the taken old slot while cursor advances. Hooking it as thiscall would use the wrong receiver. |
+| `01409070` | Chunk boundary holds, but 013ce130 is a no-argument getter; key/factory pushed at 01409070/75 remain for 013ce230. The explicit 013ce130(0x222e2,01409000) claim is false. |
+| `01442d70` | Registration sequence holds, but 01442d81 calls 013ce230 and 01442d86 immediately returns, preserving EAX (the written map slot). The explicit no-return-value claim is false. |
+| `01446960` | Chunk boundary holds, but 013ce130 consumes no key/factory arguments. Pushes at 01446960/65 survive until 013ce230 ret 8; the explicit getter-with-pair claim is false. |
+| `01446df0` | Chunk boundary holds, but 013ce130 consumes no key/factory arguments. Pushes at 01446df0/f5 survive until 013ce230 ret 8; the explicit getter-with-pair claim is false. |
+| `0144bde0` | Registration sequence holds, but 0144bdf1 calls 013ce230 then 0144bdf6 returns with unchanged EAX (the written map slot); explicit returns-nothing claim is false. The previously pushed pair is consumed by 013ce230. |
+| `0145a670` | Chunk boundary holds, but the pair pushed at 0145a670/75 is still on the stack for 013ce230 at 0145a681; that helper reads both arguments and ret 8. Claim that it has no stack arguments is false. |
+| `0145b4e0` | Chunk boundary holds, but the pair pushed at 0145b4e0/e5 is still on the stack for 013ce230 at 0145b4f1; that helper reads both arguments and ret 8. Claim that it has no stack arguments is false. |
+| `014880f0` | Chunk boundary holds, but 013ce130 is a no-argument getter; pushed key 0x17c/factory 01488090 belong only to 013ce230. Explicit getter(classID,factory) claim is false. |
+| `014ac9f0` | Chunk boundary holds, but 013ce130 is a no-argument getter; pushed key 0x23e/factory 014ac990 belong only to 013ce230. Explicit getter-with-pair claim is false. |
+| `014d0a80` | Chunk boundary holds, but 013ce130 takes no arguments; 013ce230 alone consumes key 0x1a5/factory 014d0a20 and ret 8. Explicit both-take-id-and-factory claim is false. |
+| `014f9960` | Registration sequence holds, but 014f9971 calls 013ce230 then 014f9976 immediately returns with unchanged EAX (the written map slot). Explicit returns-void claim is false. |
+| `014fa0e0` | Registration sequence holds, but 014fa0f1 calls 013ce230 then 014fa0f6 immediately returns with unchanged EAX (the written map slot). Explicit returns-void claim is false. |
+| `0151ab90` | Chunk boundary holds, but 013ce130 takes no arguments; key 0x230/factory 0151ab30 remain pushed for 013ce230. Explicit getter(0x230,factory) claim is false. |
+
+### Pipeline and gates
+
+From `project/`, ran `python -I -B scripts/native_map/recheck.py make ../lab/native-map/run ../lab/native-map/run/w133-addresses.txt --kind fixcheck --size 40` (4 batches), then the existing `claim` CLI four times (B0027-B0030). After writing verdicts, completed each with `python -I -B scripts/native_map/recheck.py done ../lab/native-map/run <batch> codex-w133-independent-fixcheck`. All four exited 0; no `--apply-fixes` was used by this independent checker. Exact done argv/stdout/stderr/exit receipts: `w133-completion-commands.json`.
+
+| Fixcheck batch | Claimed | Done | Confirm | Refine | Reject |
+|---|---:|---:|---:|---:|---:|
+| B0027 | 40 | 40 | 32 | 0 | 8 |
+| B0028 | 40 | 40 | 37 | 0 | 3 |
+| B0029 | 40 | 40 | 29 | 0 | 11 |
+| B0030 | 10 | 10 | 8 | 0 | 2 |
+
+`python -I -B ../lab/native-map/run/w133-verify.py post` exited 0. It reuses the original `validate.check_fix` with each actual owning shard and an in-memory copy of the current record, checks verdict coverage/shape, normal completion receipts and applied audit/cap behavior. This is record validation, not an alternative label writer. The ordinary `validate.py --fixes` CLI expects replacement fix objects for rejects, while the special fixcheck prompt explicitly forbids them; it was not incorrectly used to validate verdict-only fixchecks.
+
+```text
+pipeline_check_fix: valid_records=130 errors=0
+B0027 claimed=40 done=40 {"agree": 32, "reject": 8}
+B0028 claimed=40 done=40 {"agree": 37, "reject": 3}
+B0029 claimed=40 done=40 {"agree": 29, "reject": 11}
+B0030 claimed=10 done=10 {"agree": 8, "reject": 2}
+fixcheck_format: reviews=130 missing=0 duplicate=0 extra=0 fix_fields=0
+independent_chunks: targets=93 raw_E8_candidates=0 absolute_pointer_candidates=0 incoming_branches=174
+independent_literals: citations=50 operand_or_pointer_proven=50
+outside_labels_unchanged=99764/99764
+input_hashes_unchanged=2/2
+security_AST_and_manual_scope_review: actionable_findings=0 fixes_required=0
+verdicts: confirmed=106 refined=0 rejected=24
+```
+
+All five required readbacks ran through the unchanged `nmq.py label` CLI with exit 0; full text is in `w133-gates.txt` and `w133-receipt.json`:
+
+```text
+006b9730 [accepted:likely] LookupStringEntryByKey
+016c2365 [accepted:likely] Register_GFC_Drivers_Draw_FontDeviceWin32
+006ca9c3 [accepted:unknown] -
+007cf79f [accepted:likely] DelayLoad_ResolveImport_Chunk
+00ac7f40 [accepted:unknown] -
+```
+
+### Files, security and limits
+
+Writes: pipeline-created `recheck/B0027` through `B0030` (sample/kind/prompt/records/claimed/review/done); `w133-addresses.txt`, `w133-collect.py`, `w133-scan.py`, `w133-decisions.py`, `w133-verify.py`, `w133-evidence/` (130 paired dossiers/transcripts, snapshots, manifest, independent scans and note before-images), `w133-supplement.txt`, `w133-verdicts.jsonl`, `w133-completion-commands.json`, `w133-receipt.json`, `w133-gates.txt`, and this appended section. Normal pipeline-owned side effects are the 130 label audit/cap updates, owning shard audit appends and dispatch log/WAL. No pipeline source or unrelated label was hand-edited.
+
+Security scope: fixed local paths and numeric target addresses, read-only parameterized analysis SQL, argv subprocesses with bounded verification timeouts, no evaluation of mapper text, no shell execution, listener, credential access, delete or process control. Stdlib AST checks and manual review found **0 actionable findings, 0 fixes required**. This is not a production-server security audit.
+
+The fixcheck completion path caps the 24 rejected labels to unknown and clears their names. It preserves their prior prose and adds the rejection evidence; it does not rewrite the descriptions, restore prior mapper names, remove invalid fn rows or repair graph/ranges. Those retained semantic descriptions and boundary/graph repair are lead follow-up items. The 223 fixes outside the queue and explicit supplements were not semantically re-reviewed here. No dynamic or fresh IDA acceptance is claimed.
+
+**Ponytail:** reused nmq, the supplied IDA export, existing Capstone environment, `queue_fixcheck`, `recheck make/claim/done` and `validate.check_fix`. Deliberately did not build a new pipeline, disassembler, validator, dependency, gameplay module or native test harness.
