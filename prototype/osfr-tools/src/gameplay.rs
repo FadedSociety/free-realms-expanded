@@ -119,6 +119,9 @@ pub struct Gameplay {
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
     // World Builder live layer (`--world`); None keeps building in content_dir.
     world_dir: Option<PathBuf>,
+    // Who may run developer `realm` commands (Build Plan 1.5). Player until
+    // the gateway sets it from the account store (or admin for local solo).
+    role: crate::account_store::AccountRole,
     // Stock locale row keys, so authored text ids never collide with them.
     stock_text: Option<Arc<HashSet<u32>>>,
     /// Optional native five-table test catalogue. Not character progression.
@@ -645,6 +648,7 @@ impl Gameplay {
             terrain: None,
             world_dir: None,
             stock_text: None,
+            role: crate::account_store::AccountRole::Player,
             kart_lobby_reply,
             kart_entry,
             content_dir: npc_content.to_path_buf(),
@@ -2738,6 +2742,23 @@ impl Gameplay {
         self.world_dir.clone().unwrap_or_else(|| self.content_dir.clone())
     }
 
+    pub fn set_role(&mut self, role: crate::account_store::AccountRole) {
+        self.role = role;
+    }
+
+    /// Developer commands need both `--dev-tools` and a role that may run
+    /// this command (`reload` is keyed with its target, e.g. `reload battles`).
+    fn may_run(&self, command: &str) -> bool {
+        let mut words = command.split_whitespace();
+        let first = words.next().unwrap_or_default();
+        let key = if first == "reload" {
+            format!("reload {}", words.next().unwrap_or("all"))
+        } else {
+            first.to_owned()
+        };
+        self.dev_tools && crate::account_store::can_run_realm_command(self.role, &key)
+    }
+
     /// Stock locale row keys (`--client-locale`) for authored text ids.
     pub fn set_stock_text(&mut self, hashes: Option<Arc<HashSet<u32>>>) {
         self.stock_text = hashes;
@@ -3505,16 +3526,17 @@ impl Gameplay {
         }
         if let Some(text) = chat::request(inner, character.guid)? {
             if let Some(command) = text.trim().to_ascii_lowercase().strip_prefix("realm ") {
-                if self.developer_npx_off(command, &mut out) {
+                let tool = self.may_run(command);
+                if tool && self.developer_npx_off(command, &mut out) {
                     return Ok(out);
                 }
-                if self.developer_quest_offer(command, character, &mut out)? {
+                if tool && self.developer_quest_offer(command, character, &mut out)? {
                     return Ok(out);
                 }
-                if self.dev_tools && self.developer_teleport(command, character, &mut out)? {
+                if tool && self.developer_teleport(command, character, &mut out)? {
                     return Ok(out);
                 }
-                if self.dev_tools && command == "here" {
+                if tool && command == "here" {
                     out.replies
                         .push(chat::system(&self.developer_here(character)));
                     return Ok(out);
@@ -3522,9 +3544,7 @@ impl Gameplay {
                 // Same byte offsets as `command` (ASCII lowercasing keeps lengths):
                 // literal names keep their case.
                 let raw = &text.trim()["realm ".len()..];
-                if self.dev_tools
-                    && self.developer_cheat(command, raw, character, now_ms, &mut out)?
-                {
+                if tool && self.developer_cheat(command, raw, character, now_ms, &mut out)? {
                     return Ok(out);
                 }
                 match command {
@@ -4979,6 +4999,7 @@ mod developer_teleport {
         assert!(content.join("cooking-campaign.json").is_file());
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         game.cooking.as_mut().unwrap().begin(45).unwrap();
         let before = game.state();
         let out = game
@@ -5023,6 +5044,7 @@ mod developer_teleport {
         let content = content_directory();
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         let start = character();
         let (x, z) = (start.position[0] + 20.0, start.position[2] - 15.0);
         // Without terrain data a ground teleport needs an explicit height.
@@ -5059,6 +5081,7 @@ mod developer_teleport {
         let content = content_directory();
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         let dir = std::env::temp_dir().join(format!("osfr-placements-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let _ = std::fs::remove_file(dir.join("npc_placements.json"));
@@ -5146,6 +5169,7 @@ mod developer_teleport {
         {
             let mut game = Gameplay::load(&content, None).unwrap();
             game.set_dev_tools(true);
+            game.set_role(crate::account_store::AccountRole::Admin);
             game.set_world_dir(Some(world.clone())).unwrap();
             game.update_npc_visibility(&start).unwrap();
             let out = game
@@ -5172,6 +5196,7 @@ mod developer_teleport {
         // A restart loads the live world again and shows the placed NPC.
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         game.set_world_dir(Some(world.clone())).unwrap();
         let spawned = game.update_npc_visibility(&start).unwrap();
         assert!(
@@ -5192,6 +5217,7 @@ mod developer_teleport {
         let _ = std::fs::remove_dir_all(&world);
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         game.set_world_dir(Some(world.clone())).unwrap();
         let first = crate::world_text::FIRST_WORLD_TEXT_ID;
         game.set_stock_text(Some(Arc::new(HashSet::from([crate::world_text::locale_hash(first)]))));
@@ -5212,10 +5238,46 @@ mod developer_teleport {
     }
 
     #[test]
+    fn developer_commands_follow_the_account_role() {
+        use crate::account_store::AccountRole;
+        let content = content_directory();
+        let world = std::env::temp_dir().join(format!("osfr-roles-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&world);
+        let mut game = Gameplay::load(&content, None).unwrap();
+        game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
+        game.set_world_dir(Some(world.clone())).unwrap();
+        let start = character();
+        let try_cmd = |game: &mut Gameplay, text: &str| {
+            let out = game.handle_in_world(&chat(text), &start, 1_000).unwrap();
+            reply_text(&out)
+        };
+        // Player: no developer command runs.
+        game.set_role(AccountRole::Player);
+        assert!(!try_cmd(&mut game, "realm mark spot").contains("Marked"));
+        assert!(!try_cmd(&mut game, "realm here").contains("Zone 0 at"));
+        assert!(!world.join("marks.json").exists());
+        // Builder: building commands yes, cheats no.
+        game.set_role(AccountRole::Builder);
+        assert!(try_cmd(&mut game, "realm mark spot").contains("Marked spot"));
+        assert!(try_cmd(&mut game, "realm here").contains("Zone 0 at"));
+        assert!(!try_cmd(&mut game, "realm god").contains("God mode"));
+        // Admin: everything.
+        game.set_role(AccountRole::Admin);
+        let god = try_cmd(&mut game, "realm god");
+        assert!(god.to_lowercase().contains("god"), "{god}");
+        // No --dev-tools: nothing, whatever the role.
+        game.set_dev_tools(false);
+        assert!(!try_cmd(&mut game, "realm mark other").contains("Marked"));
+        std::fs::remove_dir_all(&world).unwrap();
+    }
+
+    #[test]
     fn realm_marks_save_list_return_and_remove() {
         let content = content_directory();
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         let dir = std::env::temp_dir().join(format!("osfr-marks-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let _ = std::fs::remove_file(dir.join("marks.json"));
@@ -5253,6 +5315,7 @@ mod developer_teleport {
         let content = content_directory();
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         let start = character();
         let moved = game
             .handle_in_world(&chat("realm goto Roosey"), &start, 1_000)
@@ -5284,6 +5347,7 @@ mod developer_teleport {
         let content = content_directory();
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         let out = game
             .handle_in_world(&chat("realm npx off"), &character(), 1_000)
             .unwrap();
@@ -5512,6 +5576,7 @@ mod w64_regional_quest_tests {
         game.profiles = Some(Profiles::load(&reference, Some(native_test_profiles())).unwrap());
         game.bind_npc_quest_catalogue(&content, 1).unwrap();
         game.set_dev_tools(dev_tools);
+        game.set_role(crate::account_store::AccountRole::Admin);
 
         let npc_file: serde_json::Value = serde_json::from_slice(
             &std::fs::read(content.join("npcs/cobblestone_village.json")).unwrap(),
@@ -6461,6 +6526,7 @@ mod w64_regional_quest_tests {
         let reference = reference();
         let mut game = Gameplay::load(&reference, None).unwrap();
         game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
         let inventory = game.inventory.clone();
         game.profiles
             .as_mut()

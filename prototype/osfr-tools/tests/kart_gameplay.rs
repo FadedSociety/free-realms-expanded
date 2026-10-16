@@ -24,6 +24,7 @@ fn private_early_grid_claim_is_refused_and_native_refill_ctrl_still_work() {
     .unwrap();
     initialize(&mut gateway);
     gateway.set_dev_tools(true);
+    gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
     let before = gateway.snapshot().gameplay.unwrap();
     gateway.handle_at(&wrap(&chat("realm race")), 1100).unwrap();
     gateway.handle_at(&wrap(&[13, 0]), 1200).unwrap();
@@ -179,6 +180,7 @@ fn private_actual_native_route_pays_registered_reward_once() {
     .unwrap();
     initialize(&mut g);
     g.set_dev_tools(true);
+    g.set_role(osfr_tools::account_store::AccountRole::Admin);
     let before = g.snapshot().gameplay.unwrap();
     g.handle_at(&wrap(&chat("realm race")), 1100).unwrap();
     g.handle_at(&wrap(&[13, 0]), 1200).unwrap();
@@ -271,6 +273,7 @@ fn private_v15_shield_respawn_preserves_paid_economy() {
     .unwrap();
     initialize(&mut g);
     g.set_dev_tools(true);
+    g.set_role(osfr_tools::account_store::AccountRole::Admin);
     let before = g.snapshot().gameplay.unwrap();
     g.handle_at(&wrap(&chat("realm race")), 1100).unwrap();
     g.handle_at(&wrap(&[13, 0]), 1200).unwrap();
@@ -419,6 +422,7 @@ fn private_pickup_gateway_grant_use_rollback_and_restore() {
     let mut g = Gateway::load_gameplay(&reference, character, &content, Some(saved)).unwrap();
     initialize(&mut g);
     g.set_dev_tools(true);
+    g.set_role(osfr_tools::account_store::AccountRole::Admin);
     g.handle_at(&wrap(&chat("realm race")), 1100).unwrap();
     g.handle_at(&wrap(&[13, 0]), 1200).unwrap();
     let mut register = vec![33, 0, 9, 0];
@@ -617,6 +621,7 @@ fn private_gateway_entry_save_restore_spoof_job_guard_and_abort() {
     );
     assert_eq!(g.snapshot(), before);
     g.set_dev_tools(true);
+    g.set_role(osfr_tools::account_store::AccountRole::Admin);
     let start = g.handle_at(&wrap(&chat("realm race")), 1100).unwrap();
     assert!(start.gameplay_changed && start.state_changed);
     let scene = start
@@ -816,6 +821,7 @@ fn private_timed_out_race_returns_to_world_without_rewards() {
     .unwrap();
     initialize(&mut gateway);
     gateway.set_dev_tools(true);
+    gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
     let before = gateway.snapshot();
     gateway.handle_at(&wrap(&chat("realm race")), 1100).unwrap();
     gateway.handle_at(&wrap(&[13, 0]), 1200).unwrap();
@@ -946,6 +952,7 @@ fn complete_private_race(different_lane: bool) {
     let mut g = Gateway::load_gameplay(&reference, character, &content, Some(saved)).unwrap();
     initialize(&mut g);
     g.set_dev_tools(true);
+    g.set_role(osfr_tools::account_store::AccountRole::Admin);
     let before = g.snapshot();
     let before_game = before.gameplay.as_ref().unwrap();
     let coins = before_game.inventory.coins;

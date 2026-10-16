@@ -643,6 +643,14 @@ fn load_gateway_from(
     gateway.set_terrain(options.terrain.clone());
     gateway.set_world_dir(options.world.clone())?;
     gateway.set_stock_text(options.stock_text.clone());
+    // (R) Without an account store this is the host's own loopback solo
+    // session (a non-loopback gateway requires a store): it is admin.
+    // Account-store sessions get their stored role at character binding.
+    gateway.set_role(if options.account_store.is_none() {
+        osfr_tools::account_store::AccountRole::Admin
+    } else {
+        osfr_tools::account_store::AccountRole::Player
+    });
     Ok(gateway)
 }
 
@@ -800,6 +808,11 @@ impl Session {
             }
         }
         self.gateway = load_gateway_from(options, &path, initial)?;
+        self.gateway.set_role(
+            store
+                .account_role(record.owner_account_id)
+                .unwrap_or(osfr_tools::account_store::AccountRole::Player),
+        );
         self.gateway.set_trace_enabled(self.trace.is_some());
         self.gateway.set_game_rules(GameRuleSet::new(
             MembershipState::new(account.flags.membership, None),

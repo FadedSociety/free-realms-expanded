@@ -175,6 +175,7 @@ fn fixture(dev_tools: bool) -> (Gateway, PathBuf, PathBuf) {
     let mut gateway = Gateway::load_gameplay(&reference, character, &content, Some(state)).unwrap();
     enter_world(&mut gateway);
     gateway.set_dev_tools(dev_tools);
+    gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
     (gateway, content, reference)
 }
 
@@ -465,6 +466,7 @@ fn private_dev_teleport_refuses_live_encounter_and_knockout() {
         let state: GameplayState = serde_json::from_value(value).unwrap();
         let mut game = Gameplay::load(&content, Some(state)).unwrap();
         game.set_dev_tools(true);
+        game.set_role(osfr_tools::account_store::AccountRole::Admin);
         let before = game.state();
 
         let outcome = game
@@ -526,6 +528,7 @@ fn private_dev_teleport_bundle_is_atomic_and_restart_keeps_the_position() {
     // spot; the developer command itself must still work after the restart.
     enter_world(&mut fresh);
     fresh.set_dev_tools(true);
+    fresh.set_role(osfr_tools::account_store::AccountRole::Admin);
     let after_restart = say(&mut fresh, "realm goto mae farnum");
     assert!(chat_text(&after_restart.replies).contains("Developer teleport"));
     assert_position_close(fresh.state().position, loaded.character.position);

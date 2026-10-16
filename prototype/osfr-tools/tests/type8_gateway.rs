@@ -183,6 +183,7 @@ impl Fixture {
             Gateway::load_gameplay(&self.reference, character, &self.directory, Some(state))
                 .unwrap();
         gateway.set_dev_tools(dev_tools);
+        gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
         login(&mut gateway);
         gateway
     }
@@ -554,6 +555,7 @@ fn save_reconnect_and_cancel_paths_release_the_run() {
     )
     .unwrap();
     restored.set_dev_tools(true);
+    restored.set_role(osfr_tools::account_store::AccountRole::Admin);
     login(&mut restored);
     assert_eq!(active_instance(&restored), Some(instance));
 

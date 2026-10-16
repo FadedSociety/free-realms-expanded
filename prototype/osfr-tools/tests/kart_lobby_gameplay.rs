@@ -75,6 +75,7 @@ fn private_lobby_opt_in_exact_request_full_reply_and_no_save_changes() {
     let before = game.state();
     // No catalogue remains inert, including with developer tools enabled.
     game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
     assert!(
         game.handle_in_world(&[102, 0, 1, 0], &character(), 0)
             .unwrap()
@@ -94,6 +95,7 @@ fn private_lobby_opt_in_exact_request_full_reply_and_no_save_changes() {
             .is_empty()
     );
     game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
     for time in [1, 2] {
         let reply = game
             .handle_in_world(&[102, 0, 1, 0], &character(), time)
@@ -161,6 +163,7 @@ fn private_gateway_wraps_catalogue_once_and_preserves_whole_snapshot() {
     let character = Gateway::reference_state(&reference).unwrap();
     let mut gateway = Gateway::load_gameplay(&reference, character, &fixture.0, None).unwrap();
     gateway.set_dev_tools(true);
+    gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
     let mut login = 1u16.to_le_bytes().to_vec();
     for (index, text) in ["local-private-test", "1.910.1.530630", ""]
         .iter()

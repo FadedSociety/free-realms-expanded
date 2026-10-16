@@ -112,6 +112,7 @@ pub struct Gateway {
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
     world_dir: Option<std::path::PathBuf>,
     stock_text: Option<std::sync::Arc<std::collections::HashSet<u32>>>,
+    role: crate::account_store::AccountRole,
     movement_state: MovementState,
     expected_discontinuity: Option<ExpectedDiscontinuity>,
     last_movement_ms: Option<u64>,
@@ -734,6 +735,7 @@ impl Gateway {
             terrain: None,
             world_dir: None,
             stock_text: None,
+            role: crate::account_store::AccountRole::Player,
             movement_state,
             expected_discontinuity: None,
             last_movement_ms: None,
@@ -770,8 +772,17 @@ impl Gateway {
         gameplay.set_terrain(self.terrain.clone());
         gameplay.set_world_dir(self.world_dir.clone())?;
         gameplay.set_stock_text(self.stock_text.clone());
+        gameplay.set_role(self.role);
         self.gameplay = Some(gameplay);
         Ok(())
+    }
+
+    /// The session's authority for developer commands (Build Plan 1.5).
+    pub fn set_role(&mut self, role: crate::account_store::AccountRole) {
+        if let Some(gameplay) = self.gameplay.as_mut() {
+            gameplay.set_role(role);
+        }
+        self.role = role;
     }
 
     /// Stock locale row keys for World Builder text ids.

@@ -253,6 +253,7 @@ impl Fixture {
             Gateway::load_gameplay(&self.reference, character, &self.directory, Some(state))
                 .unwrap();
         gateway.set_dev_tools(dev_tools);
+        gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
         login(&mut gateway);
         gateway
     }
@@ -678,6 +679,7 @@ fn save_reconnect_cancel_and_restart_rebind_the_run() {
     )
     .unwrap();
     restored.set_dev_tools(true);
+    restored.set_role(osfr_tools::account_store::AccountRole::Admin);
     login(&mut restored);
     assert_eq!(active_instance(&restored), Some(instance));
 
@@ -882,6 +884,7 @@ fn full_bag_rolls_back_the_win_and_retry_grants_after_space() {
     )
     .unwrap();
     reopened.set_dev_tools(true);
+    reopened.set_role(osfr_tools::account_store::AccountRole::Admin);
     login(&mut reopened);
     let win = send(&mut reopened, &payload(instance, "OnNextLevelMsg"), 2_900);
     assert!(has_text(&win, "OnGameWonMsg"));
