@@ -7491,11 +7491,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1632; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2889 (ModelId=962, ModelFileName=human_f_raina_rush.agr, NameId=103723)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.104100, JenkinsLookup2 hash 4114067529, line 108689. Raina's autograph greeting follows the named Introduce Yourself objective and precedes her named autograph-pen quest. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.072566,
       "model_id": 962,
-      "model_file_name": "human_f_raina_rush.agr"
+      "model_file_name": "human_f_raina_rush.agr",
+      "greeting_string_id": 104100
     },
     {
       "npc_id": 9500000335,

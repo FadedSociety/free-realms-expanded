@@ -3076,11 +3076,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1692; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2949 (ModelId=965, ModelFileName=human_m_francis_panic.agr, NameId=116518)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.116463, JenkinsLookup2 hash 1178693629, line 31211. Francis's out-of-power greeting follows his named introduction and precedes his named power-crystal quest. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.826596,
       "model_id": 965,
-      "model_file_name": "human_m_francis_panic.agr"
+      "model_file_name": "human_m_francis_panic.agr",
+      "greeting_string_id": 116463
     },
     {
       "npc_id": 9000000096,

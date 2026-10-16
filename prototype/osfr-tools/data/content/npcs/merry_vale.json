@@ -31192,11 +31192,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:961; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2209 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=41267)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.41268, JenkinsLookup2 hash 637514910, line 16881. Speaker explicitly identifies herself as Tyra, the fairy performer; matches the Merry Vale NPC role, not Counselor Tyra. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.5711,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 41268
     },
     {
       "npc_id": 9500000431,

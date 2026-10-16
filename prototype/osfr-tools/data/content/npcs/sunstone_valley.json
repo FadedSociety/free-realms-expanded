@@ -11322,11 +11322,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2695; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4028 (ModelId=4759, ModelFileName=horse_f_nosaddle.adr, NameId=413059)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.413082, JenkinsLookup2 hash 1537492881, line 40741. Speaker explicitly identifies herself as Honeydew and welcomes the visitor; matches the Sunstone Valley horse-tending NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.489035,
       "model_id": 4759,
-      "model_file_name": "horse_f_nosaddle.adr"
+      "model_file_name": "horse_f_nosaddle.adr",
+      "greeting_string_id": 413082
     },
     {
       "npc_id": 9500000825,

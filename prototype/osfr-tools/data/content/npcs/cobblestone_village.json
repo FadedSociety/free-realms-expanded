@@ -1271,11 +1271,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:843; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2087 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=20942)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.4420092, JenkinsLookup2 hash 4076013363, line 107700. Bartle's first response to Pappy's referral; the objective explicitly names Bartle. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.109688,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_string_id": 4420092
     },
     {
       "npc_id": 9000000042,
@@ -3778,11 +3789,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2762; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4096 (ModelId=40, ModelFileName=human_f_courier.agr, NameId=77444)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.94293, JenkinsLookup2 hash 814379686, line 21474. Jonelle's standalone distress greeting; named referral precedes it, and her named package quest corroborates the speaker. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.434931,
       "model_id": 40,
-      "model_file_name": "human_f_courier.agr"
+      "model_file_name": "human_f_courier.agr",
+      "greeting_string_id": 94293
     },
     {
       "npc_id": 9000000121,
@@ -4381,11 +4403,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:812; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2056 (ModelId=510, ModelFileName=human_m_sirwellington.agr, NameId=46335)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.94297, JenkinsLookup2 hash 2693224871, line 70925. Jones's standalone greeting immediately follows the named referral; his next quest names his stolen artifacts. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -3.017878,
       "model_id": 510,
-      "model_file_name": "human_m_sirwellington.agr"
+      "model_file_name": "human_m_sirwellington.agr",
+      "greeting_string_id": 94297
     },
     {
       "npc_id": 9500000248,

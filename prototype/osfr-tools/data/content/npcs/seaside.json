@@ -8031,8 +8031,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.441432, JenkinsLookup2 hash 519720762, line 13817. Speaker explicitly identifies himself as Burglz, Robgoblin Banker; matches the Seaside NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 441432
     },
     {
       "npc_id": 9500000564,
@@ -45661,11 +45672,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:496; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1734 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=440997)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.441037, JenkinsLookup2 hash 4133027090, line 109227. Speaker explicitly identifies himself as Troy Ridewrangler, ride trainer; this generic referral does not assume the player owns a training saddle. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.527334,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_string_id": 441037
     },
     {
       "npc_id": 9500000640,

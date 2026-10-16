@@ -5884,11 +5884,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1954; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3211 (ModelId=430, ModelFileName=human_m_pappy_farnum.agr, NameId=19091)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.4420036, JenkinsLookup2 hash 2879821891, line 75946. Pappy's first welcome to the hero; the same block explicitly says Talk to Pappy Farnum. Farnum Farmstead guide row 37 also identifies this greeting. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.618079,
       "model_id": 430,
-      "model_file_name": "human_m_pappy_farnum.agr"
+      "model_file_name": "human_m_pappy_farnum.agr",
+      "greeting_string_id": 4420036
     },
     {
       "npc_id": 9500000274,

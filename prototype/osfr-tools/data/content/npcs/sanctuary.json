@@ -6703,8 +6703,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.441420, JenkinsLookup2 hash 3530882578, line 93501. Speaker explicitly identifies himself as Bezzle, Robgoblin Banker; matches the Sanctuary NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 441420
     },
     {
       "npc_id": 9500000451,
@@ -23206,11 +23217,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1119; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2376 (ModelId=411, ModelFileName=fairy_f_courier_flitter_01.agr, NameId=7595)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.24842, JenkinsLookup2 hash 2666346165, line 70210. Speaker explicitly identifies herself as Flitter at the Sanctuary Post Office; matches the NPC's postman trainer role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.192378,
       "model_id": 411,
-      "model_file_name": "fairy_f_courier_flitter_01.agr"
+      "model_file_name": "fairy_f_courier_flitter_01.agr",
+      "greeting_string_id": 24842
     },
     {
       "npc_id": 9500000481,
@@ -27783,11 +27805,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1205; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2462 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=37963)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.37872, JenkinsLookup2 hash 901196118, line 23873. Speaker explicitly identifies himself as Grayfoot, the Memorial Caverns mural guide; matches the NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -2.392737,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_string_id": 37872
     },
     {
       "npc_id": 9500000488,
@@ -56258,11 +56291,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1105; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2361 (ModelId=398, ModelFileName=fairy_sanctuary_m_01.adr, NameId=10074)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.46166, JenkinsLookup2 hash 1840944402, line 48565. Speaker explicitly identifies himself as Steelbloom, Royal Blacksmith; matches the Sanctuary NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": -2.424114,
       "model_id": 398,
-      "model_file_name": "fairy_sanctuary_m_01.adr"
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_string_id": 46166
     },
     {
       "npc_id": 9500000536,
@@ -59007,11 +59051,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1192; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2449 (ModelId=440, ModelFileName=fairy_f_tori.agr, NameId=21433)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.21602, JenkinsLookup2 hash 747530949, line 19674. Speaker explicitly identifies herself as Tori at Memorial Caverns; matches the NPC's tour-guide role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
       },
       "heading": 2.275693,
       "model_id": 440,
-      "model_file_name": "fairy_f_tori.agr"
+      "model_file_name": "fairy_f_tori.agr",
+      "greeting_string_id": 21602
     },
     {
       "npc_id": 9500000542,

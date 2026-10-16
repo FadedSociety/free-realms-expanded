@@ -17592,8 +17592,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.430860, JenkinsLookup2 hash 2601991504, line 68505. Speaker explicitly identifies herself as Frostpetal, Snowhill Village town greeter; matches the NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 430860
     },
     {
       "npc_id": 9000000094,
@@ -28610,8 +28621,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "W126: en_us_data.dat Global.Text.5696, JenkinsLookup2 hash 3674181662, line 97342. Speaker explicitly identifies himself as Murphy, hot springs resort manager; matches the Snowhill NPC role. See lab/reports/npc-greetings-w126/greetings.json for the exact locale line and named anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 5696
     },
     {
       "npc_id": 9500000759,
