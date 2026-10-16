@@ -82,6 +82,20 @@ fn difficulty_level(difficulty: i32) -> u32 {
 /// Energy for job abilities (R): the HUD shows 100/100; regeneration of
 /// 2 per 0.5 s follows the community reference's 4 per second.
 const ENERGY_MAX: i32 = 100;
+/// (R) Overworld knockout window, in ms: the ten-second recovery of the wiki
+/// Combat page (research piece 058). The client counts it down only when it
+/// does not show the two-button dialog, and then sends the free revive itself.
+const REVIVE_TIMER_MS: i32 = 10_000;
+/// (R) Price sent in 41/125. No payment policy exists, so it is unaffordable:
+/// the original window greys "Revive here" while wallet < cost (revive_window
+/// gfx `showTwoButtons_lua`, piece 037). Paid 41/122 is also refused below.
+const PAID_REVIVE_COST: i32 = i32::MAX;
+/// (R) Field enemies ignore a freshly revived or recovered player this long.
+const FIELD_GRACE_MS: u64 = 8_000;
+/// (R) Server fallback: an overworld knockout with no 41/122 by then is revived
+/// at the safe location anyway, so a client that never shows the window (its
+/// 41/125 field order is inferred, not captured) cannot leave a player down.
+const AUTO_REVIVE_MS: u64 = 15_000;
 const BATTLE_JOB_XP: u32 = 50;
 /// Job type of combat jobs in the profile definitions (field 3).
 const COMBAT_PROFILE_TYPE: i32 = 2;
@@ -664,6 +678,8 @@ pub struct EncounterEngine {
     field_combat: bool,
     // After an overworld knockout, field enemies ignore the player until then.
     field_grace_until: u64,
+    /// When the current overworld knockout was first seen by `tick` (session-only).
+    knocked_out_at: Option<u64>,
     battles: Vec<FieldBattle>,
     /// Start screen shown for (battle id, instance id); Go (41/108) starts it.
     pending_battle: Option<(u32, i32)>,
@@ -1273,21 +1289,18 @@ impl EncounterEngine {
     pub(crate) fn receive_field_damage(
         &mut self,
         damage: u32,
-        now_ms: u64,
+        _now_ms: u64,
         engaged: bool,
     ) -> EncounterOutcome {
         let mut out = EncounterOutcome::default();
-        if damage > 0 {
+        if damage > 0 && self.state.player_health > 0 {
             self.state.player_health = self.state.player_health.saturating_sub(damage);
             out.changed = true;
             out.replies
                 .push(player_hp(self.state.player_health, self.max_health));
             if self.state.player_health == 0 {
-                // (R) Keep the existing recover-in-place policy and grace.
-                self.state.player_health = self.max_health;
-                self.field_grace_until = now_ms.saturating_add(8_000);
-                out.replies
-                    .push(player_hp(self.max_health, self.max_health));
+                // (R) Hold the knockout; 41/122 chooses the way back up.
+                out.replies.push(respawn_window());
             }
         }
         if self.field_combat != engaged && !self.world_stage_fighting() {
@@ -1396,7 +1409,7 @@ impl EncounterEngine {
             // the login.
             state.rewarded.retain(|id| ids.contains(id));
         }
-        let state = state.unwrap_or_else(|| EncounterState {
+        let mut state = state.unwrap_or_else(|| EncounterState {
             version: 1,
             content_sha256: content_hash.clone(),
             active: None,
@@ -1406,10 +1419,14 @@ impl EncounterEngine {
             rewarded: BTreeSet::new(),
             next_instance_id: 1,
         });
+        // (R) A world knockout is held in memory and saved as zero health; the
+        // respawn window is not persisted, so a reload wakes the character.
+        if state.active.is_none() && state.player_health == 0 {
+            state.player_health = PLAYER_MAX;
+        }
         if state.version != 1
             || state.content_sha256 != content_hash
             || state.player_health > PLAYER_HEALTH_CAP
-            || (state.active.is_none() && state.player_health == 0)
             || state.next_instance_id <= 0
             || state.rewarded.iter().any(|id| !ids.contains(id))
         {
@@ -1488,6 +1505,7 @@ impl EncounterEngine {
             shared_sender: None,
             field_combat: false,
             field_grace_until: 0,
+            knocked_out_at: None,
             battles: Vec::new(),
             pending_battle: None,
             terrain: None,
@@ -2252,12 +2270,17 @@ impl EncounterEngine {
 
     /// Developer: full health and energy.
     pub fn heal_full(&mut self) -> Vec<Vec<u8>> {
+        let was_down = self.state.player_health == 0;
         self.state.player_health = self.max_health;
         self.energy = ENERGY_MAX;
-        vec![
+        let mut out = vec![
             player_hp(self.max_health, self.max_health),
             crate::abilities::build_energy(ENERGY_MAX, ENERGY_MAX),
-        ]
+        ];
+        if was_down {
+            out.push(respawn_hide());
+        }
+        out
     }
 
     /// Standing enemies of the active encounter: (guid, position, shielded).
@@ -2593,6 +2616,9 @@ impl EncounterEngine {
         if self.active() {
             return Err(invalid("encounter already active"));
         }
+        if self.state.player_health == 0 {
+            return Err(invalid("cannot begin an encounter while knocked out"));
+        }
         if return_location.zone_id != self.content.world.zone_id {
             return Err(invalid("encounter return must be the local world"));
         }
@@ -2691,6 +2717,10 @@ impl EncounterEngine {
         if !self.active() {
             let mut replies = self.world_initialization();
             replies.extend(self.field_initialization());
+            if self.state.player_health == 0 {
+                // (R) A knocked-out player whose scene reloads gets the window back.
+                replies.push(respawn_window());
+            }
             return Ok(EncounterOutcome {
                 replies,
                 ..Default::default()
@@ -2824,6 +2854,7 @@ impl EncounterEngine {
                 }
             }
 
+            (41, 122) => self.resume(inner, now_ms),
             (41, 109) => {
                 if inner.len() != 12 {
                     return Err(invalid("malformed encounter exit"));
@@ -2950,6 +2981,62 @@ impl EncounterEngine {
                 self.attack(guid, position, profile_id, slot, now_ms)
             }
             _ => Ok(EncounterOutcome::default()),
+        }
+    }
+
+    /// 41/122 ParticipantResume: header, then a bool, 1 for the paid revive
+    /// (`0093be30`, Lua `OnPaidRevive`) and 0 for the free one (`0093bd80`,
+    /// `RevivePlayer`, and the safe-location button). Only the session's own
+    /// knocked-out state is revived; the client sends no place or price (R).
+    fn resume(&mut self, inner: &[u8], now_ms: u64) -> io::Result<EncounterOutcome> {
+        if inner.len() != 13 || inner[12] > 1 {
+            return Err(invalid("malformed encounter resume"));
+        }
+        if self.state.player_health != 0 {
+            return Ok(EncounterOutcome::default());
+        }
+        let in_world = self.state.active.is_none();
+        if inner[12] == 1 {
+            // (R) No payment policy yet. The window hid itself on the click,
+            // so show it again or the knocked-out player has no buttons.
+            return Ok(EncounterOutcome {
+                replies: if in_world {
+                    vec![respawn_window()]
+                } else {
+                    Vec::new()
+                },
+                feedback: Some("Paying to revive is not available. Choose the free revive.".into()),
+                ..Default::default()
+            });
+        }
+        if let Some(a) = &self.state.active {
+            // A lost instance revives through its existing exit (return
+            // location, full health). A header naming another instance is a
+            // replay from an earlier one.
+            let encounter = i32::from_le_bytes(inner[4..8].try_into().unwrap());
+            let instance = i32::from_le_bytes(inner[8..12].try_into().unwrap());
+            if a.phase == EncounterPhase::Lost
+                && (encounter == 0 || encounter == a.encounter_id as i32)
+                && (instance == 0 || instance == a.instance_id)
+            {
+                return self.exit();
+            }
+            return Ok(EncounterOutcome::default());
+        }
+        Ok(self.revive_at_safe_location(now_ms))
+    }
+
+    /// (R) Safe location: the world checkpoint the opening already uses.
+    fn revive_at_safe_location(&mut self, now_ms: u64) -> EncounterOutcome {
+        self.state.player_health = self.max_health;
+        self.field_grace_until = now_ms.saturating_add(FIELD_GRACE_MS);
+        self.knocked_out_at = None;
+        EncounterOutcome {
+            changed: true,
+            zoning: Some(self.content.world.clone()),
+            replies: vec![player_hp(self.max_health, self.max_health), respawn_hide()],
+            feedback: Some("You revive at the safe location.".into()),
+            ..Default::default()
         }
     }
 
@@ -3327,6 +3414,14 @@ impl EncounterEngine {
         if !valid_position(position) {
             return Err(invalid("invalid encounter player position"));
         }
+        if self.state.player_health > 0 {
+            self.knocked_out_at = None;
+        } else if self.state.active.is_none() {
+            let at = *self.knocked_out_at.get_or_insert(now_ms);
+            if now_ms >= at.saturating_add(AUTO_REVIVE_MS) {
+                return Ok(self.revive_at_safe_location(now_ms));
+            }
+        }
         if self
             .state
             .active
@@ -3524,14 +3619,10 @@ impl EncounterEngine {
                     out.feedback =
                         Some("Knocked out; returning to the local opening checkpoint.".into());
                 } else {
-                    // (R) Overworld knockout: recover in place; the original
-                    // knockout and respawn flow is not recovered.
-                    self.state.player_health = self.max_health;
-                    out.replies
-                        .push(player_hp(self.max_health, self.max_health));
-                    // (R) Field enemies disengage and walk home for a short grace.
-                    self.field_grace_until = now_ms.saturating_add(8_000);
-                    out.feedback = Some("Knocked out. You shake it off and recover.".into());
+                    // (R) Overworld knockout: stay down and show the recovered
+                    // respawn window; 41/122 (`resume`) revives the player.
+                    out.replies.push(respawn_window());
+                    out.feedback = Some("Knocked out.".into());
                 }
             }
         }
@@ -4291,6 +4382,21 @@ fn encounter_state(id: u32, instance: i32, state: i32) -> Vec<u8> {
     let mut b = encounter_header(106, id, instance);
     b.extend(state.to_le_bytes());
     b
+}
+/// 41/125 EncounterShowRespawnWindowPacket: dispatcher `0090d830`, ctor
+/// `008a33b0`, reader `008d6730`. Family header (ids zero: the overworld has no
+/// instance) then two i32 handed to `DisplayRespawnWindow` `00904300`, which
+/// takes (timer ms, revive cost). The field order is inferred from that
+/// handler, not captured.
+fn respawn_window() -> Vec<u8> {
+    let mut b = encounter_header(125, 0, 0);
+    b.extend(REVIVE_TIMER_MS.to_le_bytes());
+    b.extend(PAID_REVIVE_COST.to_le_bytes());
+    b
+}
+/// 41/126: the dispatcher runs `RespawnWindow:Hide` (family header only).
+fn respawn_hide() -> Vec<u8> {
+    encounter_header(126, 0, 0)
 }
 fn combat_flag(sub: u16, id: u32, instance: i32, on: bool) -> Vec<u8> {
     let mut b = encounter_header(sub, id, instance);
