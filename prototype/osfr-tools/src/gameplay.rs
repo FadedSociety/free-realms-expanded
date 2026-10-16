@@ -37,6 +37,11 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+/// Warpstone definitions, attunement and validated travel (W142).
+#[path = "restoration/piece_077.rs"]
+#[allow(dead_code)]
+mod piece_077;
+
 #[derive(Clone)]
 struct DisappearingActor {
     guid: u64,
@@ -87,6 +92,9 @@ pub struct GameplayState {
     pub harvesting: Option<Type8State>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kart_entry: Option<crate::kart_gateway::KartGatewayState>,
+    /// Attuned warpstones (W142). Absent until the first attunement.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warpstones: Option<piece_077::WarpState>,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -154,6 +162,8 @@ pub struct Gameplay {
     profile_content_directory: Option<PathBuf>,
     recipe_catalog: crate::recipes::RecipeCatalog,
     learned_recipes: BTreeSet<u32>,
+    /// Warpstone attunement and travel cooldowns (W142).
+    warp: piece_077::WarpRegistry,
 }
 
 #[derive(Default)]
@@ -380,6 +390,10 @@ impl Gameplay {
     }
 
     pub fn load(directory: &Path, state: Option<GameplayState>) -> io::Result<Self> {
+        let mut warp = piece_077::WarpRegistry::curated();
+        if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
+            warp.restore(saved);
+        }
         let (
             inventory,
             quests,
@@ -802,6 +816,7 @@ impl Gameplay {
                 .then(|| directory.to_path_buf()),
             recipe_catalog,
             learned_recipes,
+            warp,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -1807,6 +1822,7 @@ impl Gameplay {
             mining: self.mining.as_ref().map(|m| m.state().clone()),
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
+            warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
         }
     }
 
@@ -2105,6 +2121,7 @@ impl Gameplay {
         if self.opening.is_none() {
             let mut out = self.initialization(character.position)?;
             self.append_npc_quest_login_sync(&mut out)?;
+            self.append_warp_definitions(character, &mut out);
             return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
@@ -2178,6 +2195,7 @@ impl Gameplay {
         self.apply_encounter(result, &mut out)?;
         self.append_journal_updates(&before, &mut out)?;
         self.append_npc_quest_login_sync(&mut out)?;
+        self.append_warp_definitions(character, &mut out);
         Ok(out)
     }
 
@@ -2186,6 +2204,11 @@ impl Gameplay {
             return Ok(Outcome::default());
         }
         let mut out = Outcome::default();
+        let visited = self.warp.visit(&self.warp_context(character));
+        out.changed |= visited.changed;
+        out.replies.extend(visited.replies);
+        out.replies
+            .extend(visited.notices.iter().map(|text| chat::system(text)));
         // gateway.rs calls this only after movement validation accepted/clamped
         // the pose. Engine checks active objectives indexed by current zone.
         self.npc_quest_event(
@@ -2399,6 +2422,9 @@ impl Gameplay {
                     });
                 }
             }
+        }
+        if let Some(outcome) = self.handle_warp(inner, character, now_ms)? {
+            return Ok(outcome);
         }
         let inventory_before = self.inventory.state().clone();
         if let Some(mut outcome) = self.handle_npc_packet(inner, character)? {
@@ -3145,17 +3171,114 @@ impl Gameplay {
             out.replies.push(chat::system(&reason));
             return Ok(());
         }
-        self.opening
-            .as_mut()
-            .unwrap()
-            .set_location_without_events(character.zone_id, relocation.position)?;
+        self.apply_relocation(relocation, character, out)?;
+        out.replies.push(chat::system(&reply));
+        Ok(())
+    }
+
+    /// Moves the staged character inside the zone. The gateway owns the 38/12
+    /// packet and the saved position, so bytes and save cannot diverge.
+    fn apply_relocation(
+        &mut self,
+        relocation: dev_teleport::Relocation,
+        character: &CharacterState,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if let Some(opening) = self.opening.as_mut() {
+            opening.set_location_without_events(character.zone_id, relocation.position)?;
+        }
         if let Some(visibility) = &mut self.npc_visibility {
             out.replies
                 .extend(visibility.update(character.zone_id, relocation.position)?);
         }
         out.relocation = Some(relocation);
-        out.replies.push(chat::system(&reply));
         Ok(())
+    }
+
+    fn warp_context(&self, character: &CharacterState) -> piece_077::TravelContext {
+        piece_077::TravelContext {
+            guid: character.guid,
+            zone_id: character.zone_id,
+            position: character.position,
+            rotation: character.rotation,
+            blocked: self.warp_blocker(),
+        }
+    }
+
+    /// (R) Warpstones never interrupt a fight, a knockout or a running
+    /// crafting/gathering movie; those states own the character.
+    fn warp_blocker(&self) -> Option<piece_077::Blocker> {
+        if self
+            .encounter
+            .as_ref()
+            .is_some_and(|e| e.state().player_health == 0)
+        {
+            return Some(piece_077::Blocker::KnockedOut);
+        }
+        if self.encounter.as_ref().is_some_and(EncounterEngine::active) {
+            return Some(piece_077::Blocker::Encounter);
+        }
+        let busy = self.forging.as_ref().is_some_and(Forging::active)
+            || self.smelting.as_ref().is_some_and(Smelting::active)
+            || self.cooking.as_ref().is_some_and(Cooking::active)
+            || self.mining.as_ref().is_some_and(Type8Engine::active)
+            || self.harvesting.as_ref().is_some_and(Type8Engine::active)
+            || self.kart_entry.as_ref().is_some_and(|k| k.active());
+        busy.then_some(piece_077::Blocker::Busy)
+    }
+
+    /// The client replaces its whole destination table with each 57.
+    fn append_warp_definitions(&self, character: &CharacterState, out: &mut Outcome) {
+        if character.zone_id == piece_077::OPEN_WORLD_ZONE {
+            out.replies.push(self.warp.definitions_message());
+        }
+    }
+
+    /// 56 destination list, 90 warpstone, 122 safe teleport, 58 friend teleport.
+    /// Every request is validated against server state; no position or path
+    /// comes from the client. `friend` stays empty until the player registry
+    /// supplies an online-friend view, so 58 is refused (R).
+    fn handle_warp(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let context = self.warp_context(character);
+        let terrain = self.terrain.clone();
+        let zone = character.zone_id;
+        let ground = move |x: f32, z: f32| terrain.as_ref()?.height_at(zone, x, z);
+        let world = piece_077::WarpWorld {
+            ground: &ground,
+            friend: &|_| None,
+        };
+        let Some(reply) = self.warp.handle(inner, &context, now_ms, &world) else {
+            return Ok(None);
+        };
+        if matches!(
+            reply.rejection,
+            Some(piece_077::WarpRejection::MalformedRequest(_))
+        ) {
+            return Err(invalid("invalid warpstone request"));
+        }
+        let mut out = Outcome {
+            changed: reply.changed,
+            replies: reply.replies,
+            ..Outcome::default()
+        };
+        if let Some(target) = reply.relocation {
+            self.apply_relocation(
+                dev_teleport::Relocation {
+                    position: target.position,
+                    rotation: target.rotation,
+                },
+                character,
+                &mut out,
+            )?;
+        }
+        out.replies
+            .extend(reply.notices.iter().map(|text| chat::system(text)));
+        Ok(Some(out))
     }
 
     /// `goto x z` (onto the ground), `goto x y z` or `goto mark <name>`;

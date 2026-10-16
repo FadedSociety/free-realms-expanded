@@ -1,5 +1,5 @@
 //! Piece 077 - warpstones and travel: recovered warpstone request/destination
-//! wire layouts plus the reconstructed locked-destination gate.
+//! wire layouts, the curated destination set and the reconstructed travel rules.
 //!
 //! Provenance and the full boundary live in
 //! `notes/Research/Pieces/077 Warpstones and travel.md` and in the header of
@@ -10,16 +10,30 @@
 //!   carries exactly one 32-bit payload and `ClientUpdatePacketUpdateLocation`
 //!   writes sub-opcode `0xc`. The client's point-of-interest data source column
 //!   order is recovered by `FUN_00b97c40`.
+//! * ORIGINAL (native map, W142): the client's `57` handler `00b98b70` reads
+//!   `u16` opcode, then an `i32` blob length (`ReadBoundedLengthBlob`
+//!   `008bfc00`), clears its table (`00b98160`) and reads the flag-framed stream
+//!   (`00b98990`: flag byte, record, flag byte ...) with `00b98290` (13 dwords,
+//!   a length-prefixed string, one dword). So the length prefix is real, a `57`
+//!   replaces the whole table, and the client builds an op-90 request only for
+//!   an id already in that table (`00b991d0`, reached from Lua through
+//!   `00c17bb0`). The client sends `122` itself when its character falls below
+//!   a world floor (`00bf9430`).
 //! * ORIGINAL (preserved live captures): [`CAPTURED_TELEPORT_SAMPLES`] are the
 //!   eight real request frames and their `38/12` replies.
-//! * RECONSTRUCTED: [`WarpRegistry`]'s attunement gate. The shipped locale
-//!   (41300, "You are now attuned to the Solace Warpstone.") and the community
-//!   wiki describe activation; no captured frame proves a server rejection, so
-//!   the gate is policy this restoration owns, not recovered behavior.
+//! * ORIGINAL (supplied emulator data, equal to the captured gateway `57`):
+//!   the zone-hub rows (notification type 7, sub name "Press to Teleport...")
+//!   in [`CURATED`].
+//! * RECONSTRUCTED (R): everything in [`WarpRules`] and [`WarpRegistry`] that
+//!   decides whether a request moves the character. No captured frame proves
+//!   the original server ever refused a request.
 //!
-//! Nothing here grants items, currency or zone changes on its own: the caller
-//! decides what to do with a resolved destination.
+//! The registry never moves anyone itself: it returns a [`WarpReply`] whose
+//! relocation the gateway applies (the same `Outcome.relocation` path as
+//! `realm goto`), so server position, saved position and movement validation
+//! stay in agreement. Nothing grants items, currency or experience.
 
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
 /// `PacketPointOfInterestDefinitionRequest` (client asks for the destination list).
@@ -36,6 +50,9 @@ pub const ZONE_SAFE_TELEPORT_REQUEST_OPCODE: u16 = 122;
 pub const CLIENT_UPDATE_PACKET_OPCODE: u16 = 38;
 /// `ClientUpdatePacketUpdateLocation` sub-opcode inside the family above.
 pub const UPDATE_LOCATION_SUB_OPCODE: u16 = 12;
+/// The seamless open world. Warpstones only work here (R); cave, arena and kart
+/// scenes are other zones. Mirrors `world::OPEN_WORLD_ZONE`.
+pub const OPEN_WORLD_ZONE: u32 = 0;
 
 /// Length-prefixed ASCII string, as written by both recovered serializers
 /// (`SOEWriter.AddASCIIString`, `PacketWriter.Write(string)`).
@@ -101,12 +118,31 @@ fn read_f32(body: &[u8], offset: &mut usize) -> Result<f32, WarpCodecError> {
 /// so a short body and a body with trailing bytes are both malformed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WarpCodecError {
-    Truncated { expected: usize, got: usize },
-    TrailingBytes { expected: usize, got: usize },
+    Truncated {
+        expected: usize,
+        got: usize,
+    },
+    TrailingBytes {
+        expected: usize,
+        got: usize,
+    },
     MissingTerminator,
-    NegativeLength { offset: usize, length: i32 },
-    InvalidAsciiString { offset: usize },
-    UnexpectedSubOpcode { expected: u16, got: u16 },
+    NegativeLength {
+        offset: usize,
+        length: i32,
+    },
+    /// The `57` length prefix does not match the bytes that follow it.
+    LengthMismatch {
+        declared: i32,
+        actual: usize,
+    },
+    InvalidAsciiString {
+        offset: usize,
+    },
+    UnexpectedSubOpcode {
+        expected: u16,
+        got: u16,
+    },
 }
 
 fn expect_exact(body: &[u8], expected: usize) -> Result<(), WarpCodecError> {
@@ -304,6 +340,64 @@ pub fn encode_point_of_interest_reply(records: &[PointOfInterestDefinition]) -> 
     body
 }
 
+/// The whole `57` inner message: `u16` opcode, `i32` length of the flag-framed
+/// stream, then the stream (terminator included). Native reader `00b98b70`.
+pub fn point_of_interest_reply_message(records: &[PointOfInterestDefinition]) -> Vec<u8> {
+    let stream = encode_point_of_interest_reply(records);
+    let mut message = Vec::with_capacity(6 + stream.len());
+    message.extend_from_slice(&POINT_OF_INTEREST_DEFINITION_REPLY_OPCODE.to_le_bytes());
+    message.extend_from_slice(&(stream.len() as i32).to_le_bytes());
+    message.extend_from_slice(&stream);
+    message
+}
+
+/// Strict inverse of [`point_of_interest_reply_message`]: the length must be
+/// exactly what follows, as the native bounded reader requires.
+pub fn decode_point_of_interest_message(
+    message: &[u8],
+) -> Result<Vec<PointOfInterestDefinition>, WarpCodecError> {
+    if message.len() < 6 {
+        return Err(WarpCodecError::Truncated {
+            expected: 6,
+            got: message.len(),
+        });
+    }
+    let sub = u16::from_le_bytes([message[0], message[1]]);
+    if sub != POINT_OF_INTEREST_DEFINITION_REPLY_OPCODE {
+        return Err(WarpCodecError::UnexpectedSubOpcode {
+            expected: POINT_OF_INTEREST_DEFINITION_REPLY_OPCODE,
+            got: sub,
+        });
+    }
+    let declared = i32::from_le_bytes(message[2..6].try_into().unwrap());
+    if declared < 0 || declared as usize != message.len() - 6 {
+        return Err(WarpCodecError::LengthMismatch {
+            declared,
+            actual: message.len() - 6,
+        });
+    }
+    let stream = &message[6..];
+    let mut offset = 0;
+    let mut records = Vec::new();
+    loop {
+        let more = *stream
+            .get(offset)
+            .ok_or(WarpCodecError::MissingTerminator)?;
+        offset += 1;
+        if more == 0 {
+            return if offset == stream.len() {
+                Ok(records)
+            } else {
+                Err(WarpCodecError::TrailingBytes {
+                    expected: offset,
+                    got: stream.len(),
+                })
+            };
+        }
+        records.push(decode_point_of_interest_record(stream, &mut offset)?);
+    }
+}
+
 pub fn decode_point_of_interest_reply(
     body: &[u8],
 ) -> Result<Vec<PointOfInterestDefinition>, WarpCodecError> {
@@ -363,11 +457,16 @@ fn decode_point_of_interest_record(
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WarpDestination {
     pub id: i32,
+    /// Shown in the attunement notice (client locale text of the row's name id).
+    pub name: &'static str,
     /// Recovered rows for non-warpstone points of interest are legitimately in
     /// the client's destination list; only warpstones travel.
     pub is_warpstone: bool,
     pub position: [f32; 4],
     pub rotation: [f32; 4],
+    /// `rotation` is a captured original spawn facing. When false the arrival
+    /// keeps the character's current facing: no facing convention is invented.
+    pub facing_known: bool,
 }
 
 /// One captured request and the reply the original server sent for it.
@@ -520,40 +619,419 @@ pub fn captured_destinations() -> Vec<WarpDestination> {
     .into_iter()
     .map(|(id, position, rotation)| WarpDestination {
         id,
+        name: "captured",
         is_warpstone: true,
         position,
         rotation,
+        facing_known: true,
     })
     .collect()
 }
 
-/// Why a teleport request produced no reply. Every variant is a rejection the
-/// caller must surface; none of them moves the character.
+/// One curated zone hub. ORIGINAL data: the supplied emulator's
+/// `PointOfInterestDefinitions.json`, which `piece_073` proved equal, field for
+/// field, to the `57` message the original client accepted. Every hub shares
+/// the fields in the `HUB_*` constants below.
+struct CuratedRow {
+    id: i32,
+    /// Client locale text of `name_id`.
+    name: &'static str,
+    name_id: i32,
+    location_id: i32,
+    position: [f32; 3],
+    heading: f32,
+    unknown_11: i32,
+    teleport_location_id: i32,
+    unknown_15: i32,
+}
+
+/// Notification type 7 ("ZoneHub"), the rows whose sub name is the client text
+/// "Press to Teleport..." (locale 382845): the warpstone towns.
+const HUB_NOTIFICATION_TYPE: i32 = 7;
+const HUB_ICON_ID: i32 = 1345;
+const HUB_SUB_NAME_ID: i32 = 382845;
+const HUB_ATLAS_NAME: &str = "sacredgrove";
+
+const fn hub(
+    id: i32,
+    name: &'static str,
+    name_id: i32,
+    location_id: i32,
+    position: [f32; 3],
+    heading: f32,
+    unknown_11: i32,
+    teleport_location_id: i32,
+    unknown_15: i32,
+) -> CuratedRow {
+    CuratedRow {
+        id,
+        name,
+        name_id,
+        location_id,
+        position,
+        heading,
+        unknown_11,
+        teleport_location_id,
+        unknown_15,
+    }
+}
+
+/// (R) The curated set: the eight original zone hubs (ids 3-10, the range the
+/// client treats as zone changes in `ScriptsBase.lua`) plus Lavender Coast
+/// Pass. All lie on the zone-0 terrain grid, within 0.2 m of its height.
+const CURATED: [CuratedRow; 9] = [
+    hub(
+        3,
+        "Snowhill",
+        3961,
+        281,
+        [51.391, 30.987, 363.156],
+        1.487,
+        651,
+        210020,
+        60,
+    ),
+    hub(
+        4,
+        "Briarwood",
+        18140,
+        282,
+        [-808.386, -21.029, 1631.789],
+        0.14,
+        651,
+        210021,
+        90,
+    ),
+    hub(
+        5,
+        "Sanctuary",
+        3499,
+        283,
+        [-1414.636, -27.631, 351.567],
+        2.247,
+        651,
+        210022,
+        20,
+    ),
+    hub(
+        6,
+        "Greenwood Forest",
+        428995,
+        221686,
+        [-1583.1395, -45.37643, -547.8314],
+        -0.21685,
+        651,
+        581,
+        30,
+    ),
+    hub(
+        7,
+        "Cobblestone Village",
+        18142,
+        285,
+        [-1904.46, -39.79, 413.316],
+        0.596,
+        0,
+        210023,
+        10,
+    ),
+    hub(
+        8,
+        "Shrouded Glade",
+        3502,
+        11292,
+        [1.167, 41.038, 1114.959],
+        2.477,
+        651,
+        210024,
+        85,
+    ),
+    hub(
+        9,
+        "Lakeshore",
+        18899,
+        11293,
+        [-733.952, 9.09, 945.973],
+        -2.673,
+        651,
+        210025,
+        60,
+    ),
+    hub(
+        10,
+        "Briarheart",
+        4029,
+        11294,
+        [44.487, -30.922, 2804.612],
+        -0.876,
+        651,
+        210026,
+        95,
+    ),
+    hub(
+        15,
+        "Lavender Coast Pass",
+        41393,
+        11299,
+        [-2124.768, -23.903, -292.377],
+        1.694,
+        651,
+        210030,
+        30,
+    ),
+];
+
+fn curated_definition(row: &CuratedRow) -> PointOfInterestDefinition {
+    PointOfInterestDefinition {
+        id: row.id,
+        name_id: row.name_id,
+        location_id: row.location_id,
+        x: row.position[0],
+        y: row.position[1],
+        z: row.position[2],
+        heading: row.heading,
+        icon_id: HUB_ICON_ID,
+        notification_type: HUB_NOTIFICATION_TYPE,
+        sub_name_id: HUB_SUB_NAME_ID,
+        unknown_11: row.unknown_11,
+        breadcrumb_quest_id: 0,
+        teleport_location_id: row.teleport_location_id,
+        atlas_name: HUB_ATLAS_NAME.to_string(),
+        unknown_15: row.unknown_15,
+    }
+}
+
+/// The curated hubs as wire rows, every one (the registry lists only attuned
+/// ones). Exposed so a private gate can compare them with the captured `57`.
+pub fn curated_definitions() -> Vec<PointOfInterestDefinition> {
+    CURATED.iter().map(curated_definition).collect()
+}
+
+/// Spawn for a curated hub. ORIGINAL where the captures hold the original
+/// server's spawn for that id (Lakeshore, Lavender Coast Pass); otherwise the
+/// hub's own row position with the character's facing kept (R). The arrival
+/// height is finished by the server's terrain in [`WarpRegistry`].
+fn curated_destination(row: &CuratedRow) -> WarpDestination {
+    if let Some(captured) = captured_destinations()
+        .into_iter()
+        .find(|captured| captured.id == row.id)
+    {
+        return WarpDestination {
+            name: row.name,
+            ..captured
+        };
+    }
+    WarpDestination {
+        id: row.id,
+        name: row.name,
+        is_warpstone: true,
+        position: [row.position[0], row.position[1], row.position[2], 1.0],
+        rotation: [0.0; 4],
+        facing_known: false,
+    }
+}
+
+/// (R) Travel tunables. Defaults are guesses nobody recovered; the sanity
+/// bounds in [`WarpRules::checked`] only keep a bad data file from disabling
+/// the gates or locking everyone out.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WarpRules {
+    /// A warpstone attunes when the character is this close (planar metres).
+    /// The server's existing interaction radius is 12 m.
+    pub attune_radius_m: f32,
+    /// Minimum gap between two successful teleports of one character.
+    pub cooldown_ms: u64,
+    /// Minimum gap between two "I am stuck" safe teleports (`122`) that the
+    /// server cannot verify as a fall below the world.
+    pub stuck_cooldown_ms: u64,
+    /// A character this far under the terrain counts as fallen out of the world.
+    pub below_world_m: f32,
+}
+
+impl Default for WarpRules {
+    fn default() -> Self {
+        Self {
+            attune_radius_m: 12.0,
+            cooldown_ms: 5_000,
+            stuck_cooldown_ms: 300_000,
+            below_world_m: 3.0,
+        }
+    }
+}
+
+impl WarpRules {
+    pub fn checked(self) -> Result<Self, &'static str> {
+        if !(1.0..=100.0).contains(&self.attune_radius_m) {
+            return Err("attune radius must be 1-100 m");
+        }
+        if self.cooldown_ms > 3_600_000 || self.stuck_cooldown_ms > 3_600_000 {
+            return Err("cooldowns must be at most one hour");
+        }
+        if !(0.5..=100.0).contains(&self.below_world_m) {
+            return Err("below-world margin must be 0.5-100 m");
+        }
+        Ok(self)
+    }
+}
+
+/// (R) Arrival is lifted this far above the terrain; the client grounds a
+/// character from above, never from below. Same value as `realm goto`.
+const ARRIVAL_LIFT_M: f32 = 0.5;
+
+/// Why the character may not teleport right now. The caller derives it from
+/// live state it owns (encounters, crafting/minigame movies, knockout).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Blocker {
+    KnockedOut,
+    Encounter,
+    Busy,
+}
+
+/// What the registry may know about the requester: all of it server state.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TravelContext {
+    pub guid: u64,
+    pub zone_id: u32,
+    pub position: [f32; 3],
+    pub rotation: [f32; 3],
+    pub blocked: Option<Blocker>,
+}
+
+/// A teleport target the caller already verified is an online friend of the
+/// requester. The registry still checks zone and the target's own state.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FriendView {
+    pub zone_id: u32,
+    pub position: [f32; 3],
+    pub blocked: bool,
+}
+
+/// Server-owned lookups the registry needs: terrain height at (x, z) in the
+/// open world, and the friend view for a guid (`None` when the guid is not an
+/// online friend of the requester).
+pub struct WarpWorld<'a> {
+    pub ground: &'a dyn Fn(f32, f32) -> Option<f32>,
+    pub friend: &'a dyn Fn(u64) -> Option<FriendView>,
+}
+
+/// Where to put the character. The gateway turns this into the same
+/// `38/12` update and saved position as a developer teleport.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WarpRelocation {
+    pub position: [f32; 3],
+    pub rotation: [f32; 3],
+}
+
+/// Why a request produced no relocation. Every variant is a refusal the caller
+/// must surface; none of them moves the character.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WarpRejection {
     MalformedRequest(WarpCodecError),
     UnknownDestination(i32),
     LockedDestination(i32),
     NotAWarpstone(i32),
+    WrongZone(u32),
+    Blocked(Blocker),
+    Cooldown,
+    SelfTarget,
+    TargetUnavailable,
 }
 
-/// Destination table plus the character's attunement set.
+impl WarpRejection {
+    /// Player-facing text. Unknown, locked and non-warpstone ids share one
+    /// message, and every friend refusal shares another, so a probing client
+    /// learns nothing about ids or other players. Malformed bodies get none.
+    pub fn notice(&self) -> Option<&'static str> {
+        Some(match self {
+            WarpRejection::MalformedRequest(_) => return None,
+            WarpRejection::UnknownDestination(_)
+            | WarpRejection::LockedDestination(_)
+            | WarpRejection::NotAWarpstone(_) => "You have not attuned to that warpstone yet.",
+            WarpRejection::WrongZone(_) => "Warpstones only work in the open world.",
+            WarpRejection::Blocked(Blocker::KnockedOut) => {
+                "You cannot use a warpstone while knocked out."
+            }
+            WarpRejection::Blocked(_) => "Finish what you are doing before using a warpstone.",
+            WarpRejection::Cooldown => "The warpstone needs a moment to recharge.",
+            WarpRejection::SelfTarget | WarpRejection::TargetUnavailable => {
+                "You cannot teleport to that player."
+            }
+        })
+    }
+}
+
+/// Everything a handled request produces. `replies` are inner packets (the
+/// gateway wraps them), `notices` are system chat lines.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct WarpReply {
+    pub replies: Vec<Vec<u8>>,
+    pub notices: Vec<String>,
+    pub relocation: Option<WarpRelocation>,
+    /// Persisted state changed (a new attunement): the caller must save.
+    pub changed: bool,
+    pub rejection: Option<WarpRejection>,
+}
+
+impl WarpReply {
+    fn refused(rejection: WarpRejection) -> Self {
+        Self {
+            notices: rejection.notice().map(str::to_owned).into_iter().collect(),
+            rejection: Some(rejection),
+            ..Self::default()
+        }
+    }
+}
+
+/// The part of the registry that survives relog (inside the character's
+/// gameplay save). Cooldowns are session-only (R).
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WarpState {
+    #[serde(default)]
+    pub attuned: BTreeSet<i32>,
+}
+
+impl WarpState {
+    pub fn is_empty(&self) -> bool {
+        self.attuned.is_empty()
+    }
+}
+
+/// Destination table plus one character's attunement and cooldowns.
 ///
-/// The gate is RECONSTRUCTED policy: a warpstone must be attuned before travel
-/// (shipped locale 41300; community wiki "Warpstones"). The request layout and
-/// the reply bytes it emits are the recovered ones.
+/// The gates are RECONSTRUCTED policy (see [`WarpRules`]): a warpstone must be
+/// attuned (visited) before travel (shipped locale 41300; community wiki
+/// "Warpstones"). The request layouts and the destination rows are recovered.
 #[derive(Clone, Debug, Default)]
 pub struct WarpRegistry {
     destinations: Vec<WarpDestination>,
+    definitions: Vec<PointOfInterestDefinition>,
     attuned: BTreeSet<i32>,
+    rules: WarpRules,
+    last_travel_ms: Option<u64>,
+    last_stuck_ms: Option<u64>,
 }
 
 impl WarpRegistry {
     pub fn new(destinations: Vec<WarpDestination>) -> Self {
         Self {
             destinations,
-            attuned: BTreeSet::new(),
+            ..Self::default()
         }
+    }
+
+    /// The curated warpstone set with its client-visible rows.
+    pub fn curated() -> Self {
+        Self {
+            destinations: CURATED.iter().map(curated_destination).collect(),
+            definitions: curated_definitions(),
+            ..Self::default()
+        }
+    }
+
+    pub fn set_rules(&mut self, rules: WarpRules) -> Result<(), &'static str> {
+        self.rules = rules.checked()?;
+        Ok(())
     }
 
     /// Marks a destination attuned. Returns whether the set changed, mirroring
@@ -572,26 +1050,243 @@ impl WarpRegistry {
             .find(|entry| entry.id == destination_id)
     }
 
-    /// Validates a `90` request body and answers with the `38/12` message body.
-    /// `trailer` is the caller-supplied byte the captured replies carry; this
-    /// module does not invent its meaning.
-    pub fn handle_zone_teleport(&self, body: &[u8], trailer: u8) -> Result<Vec<u8>, WarpRejection> {
+    pub fn state(&self) -> WarpState {
+        WarpState {
+            attuned: self.attuned.clone(),
+        }
+    }
+
+    /// Loads a saved set, keeping only ids that are warpstones here (a save
+    /// from an older table or a hand-edited file cannot unlock anything else).
+    pub fn restore(&mut self, state: &WarpState) {
+        self.attuned = state
+            .attuned
+            .iter()
+            .copied()
+            .filter(|id| self.destination(*id).is_some_and(|d| d.is_warpstone))
+            .collect();
+    }
+
+    /// The full `57` message listing the attuned warpstones. The client replaces
+    /// its whole table with it (`00b98b70` clears, then reads), so this is also
+    /// the update after a new attunement.
+    pub fn definitions_message(&self) -> Vec<u8> {
+        let rows: Vec<_> = self
+            .definitions
+            .iter()
+            .filter(|row| self.attuned.contains(&row.id))
+            .cloned()
+            .collect();
+        point_of_interest_reply_message(&rows)
+    }
+
+    /// Position-driven attunement: standing within the radius of a warpstone in
+    /// the open world attunes it. The server's own position, never a client
+    /// claim; call it after a movement update was accepted.
+    pub fn visit(&mut self, ctx: &TravelContext) -> WarpReply {
+        if ctx.zone_id != OPEN_WORLD_ZONE || !ctx.position.iter().all(|v| v.is_finite()) {
+            return WarpReply::default();
+        }
+        let radius_squared = self.rules.attune_radius_m * self.rules.attune_radius_m;
+        let fresh: Vec<(i32, &'static str)> = self
+            .destinations
+            .iter()
+            .filter(|d| d.is_warpstone && !self.attuned.contains(&d.id))
+            .filter(|d| {
+                let dx = d.position[0] - ctx.position[0];
+                let dz = d.position[2] - ctx.position[2];
+                dx * dx + dz * dz <= radius_squared
+            })
+            .map(|d| (d.id, d.name))
+            .collect();
+        if fresh.is_empty() {
+            return WarpReply::default();
+        }
+        self.attuned.extend(fresh.iter().map(|(id, _)| *id));
+        WarpReply {
+            replies: vec![self.definitions_message()],
+            notices: fresh
+                .iter()
+                .map(|(_, name)| format!("You are now attuned to the {name} Warpstone."))
+                .collect(),
+            changed: true,
+            ..WarpReply::default()
+        }
+    }
+
+    /// Routes one client request. `None` means the opcode is not a warpstone
+    /// opcode; every handled request returns `Some`, refused or not.
+    pub fn handle(
+        &mut self,
+        inner: &[u8],
+        ctx: &TravelContext,
+        now_ms: u64,
+        world: &WarpWorld,
+    ) -> Option<WarpReply> {
+        let opcode = u16::from_le_bytes(inner.get(..2)?.try_into().ok()?);
+        let body = &inner[2..];
+        let result = match opcode {
+            POINT_OF_INTEREST_DEFINITION_REQUEST_OPCODE => self.definition_request(body),
+            ZONE_TELEPORT_REQUEST_OPCODE => self.zone_teleport(body, ctx, now_ms, world),
+            ZONE_SAFE_TELEPORT_REQUEST_OPCODE => self.safe_teleport(body, ctx, now_ms, world),
+            WORLD_TELEPORT_REQUEST_OPCODE => self.friend_teleport(body, ctx, now_ms, world),
+            _ => return None,
+        };
+        Some(result.unwrap_or_else(WarpReply::refused))
+    }
+
+    fn definition_request(&self, body: &[u8]) -> Result<WarpReply, WarpRejection> {
+        expect_exact(body, 0).map_err(WarpRejection::MalformedRequest)?;
+        Ok(WarpReply {
+            replies: vec![self.definitions_message()],
+            ..WarpReply::default()
+        })
+    }
+
+    /// `90`: travel to an attuned warpstone from anywhere in the open world.
+    fn zone_teleport(
+        &mut self,
+        body: &[u8],
+        ctx: &TravelContext,
+        now_ms: u64,
+        world: &WarpWorld,
+    ) -> Result<WarpReply, WarpRejection> {
         let request = ZoneTeleportRequest::decode(body).map_err(WarpRejection::MalformedRequest)?;
-        let destination = self
-            .destination(request.destination_id)
-            .ok_or(WarpRejection::UnknownDestination(request.destination_id))?;
+        let id = request.destination_id;
+        let destination = *self
+            .destination(id)
+            .ok_or(WarpRejection::UnknownDestination(id))?;
         if !destination.is_warpstone {
-            return Err(WarpRejection::NotAWarpstone(request.destination_id));
+            return Err(WarpRejection::NotAWarpstone(id));
         }
-        if !self.is_attuned(request.destination_id) {
-            return Err(WarpRejection::LockedDestination(request.destination_id));
+        if !self.is_attuned(id) {
+            return Err(WarpRejection::LockedDestination(id));
         }
-        Ok(UpdateLocation {
-            position: destination.position,
-            rotation: destination.rotation,
-            teleport: true,
-            trailer,
+        self.check_context(ctx)?;
+        self.check_cooldown(self.last_travel_ms, self.rules.cooldown_ms, now_ms)?;
+        self.last_travel_ms = Some(now_ms);
+        Ok(relocate(arrive_at_destination(&destination, ctx, world)))
+    }
+
+    /// `122`: the client sends it when it falls below the world floor, and a
+    /// stuck button may send it too. The destination is always the nearest
+    /// warpstone to the server's own position (R); the request carries no
+    /// position. A fall the server can verify against the terrain only shares
+    /// the ordinary cooldown; otherwise the long stuck cooldown applies.
+    fn safe_teleport(
+        &mut self,
+        body: &[u8],
+        ctx: &TravelContext,
+        now_ms: u64,
+        world: &WarpWorld,
+    ) -> Result<WarpReply, WarpRejection> {
+        ZoneSafeTeleportRequest::decode(body).map_err(WarpRejection::MalformedRequest)?;
+        self.check_context(ctx)?;
+        let fallen = (world.ground)(ctx.position[0], ctx.position[2])
+            .is_some_and(|ground| ctx.position[1] < ground - self.rules.below_world_m);
+        self.check_cooldown(self.last_travel_ms, self.rules.cooldown_ms, now_ms)?;
+        if !fallen {
+            self.check_cooldown(self.last_stuck_ms, self.rules.stuck_cooldown_ms, now_ms)?;
         }
-        .encode_message())
+        let distance = |d: &WarpDestination| {
+            (d.position[0] - ctx.position[0]).powi(2) + (d.position[2] - ctx.position[2]).powi(2)
+        };
+        let nearest = *self
+            .destinations
+            .iter()
+            .filter(|d| d.is_warpstone)
+            .min_by(|a, b| distance(a).total_cmp(&distance(b)))
+            .ok_or(WarpRejection::TargetUnavailable)?;
+        if !fallen {
+            self.last_stuck_ms = Some(now_ms);
+        }
+        self.last_travel_ms = Some(now_ms);
+        Ok(relocate(arrive_at_destination(&nearest, ctx, world)))
+    }
+
+    /// `58`: go to an online friend in the same open world (R). The request
+    /// names a guid and nothing else; the arrival is the friend's server-side
+    /// position.
+    fn friend_teleport(
+        &mut self,
+        body: &[u8],
+        ctx: &TravelContext,
+        now_ms: u64,
+        world: &WarpWorld,
+    ) -> Result<WarpReply, WarpRejection> {
+        let request =
+            WorldTeleportRequest::decode(body).map_err(WarpRejection::MalformedRequest)?;
+        if request.player_guid == ctx.guid {
+            return Err(WarpRejection::SelfTarget);
+        }
+        self.check_context(ctx)?;
+        let friend = (world.friend)(request.player_guid).ok_or(WarpRejection::TargetUnavailable)?;
+        if friend.zone_id != OPEN_WORLD_ZONE || friend.blocked {
+            return Err(WarpRejection::TargetUnavailable);
+        }
+        self.check_cooldown(self.last_travel_ms, self.rules.cooldown_ms, now_ms)?;
+        self.last_travel_ms = Some(now_ms);
+        Ok(relocate(arrival(friend.position, None, ctx, world)))
+    }
+
+    fn check_context(&self, ctx: &TravelContext) -> Result<(), WarpRejection> {
+        if ctx.zone_id != OPEN_WORLD_ZONE {
+            return Err(WarpRejection::WrongZone(ctx.zone_id));
+        }
+        match ctx.blocked {
+            Some(blocker) => Err(WarpRejection::Blocked(blocker)),
+            None => Ok(()),
+        }
+    }
+
+    fn check_cooldown(
+        &self,
+        last: Option<u64>,
+        window_ms: u64,
+        now_ms: u64,
+    ) -> Result<(), WarpRejection> {
+        match last {
+            Some(last) if now_ms.saturating_sub(last) < window_ms => Err(WarpRejection::Cooldown),
+            _ => Ok(()),
+        }
+    }
+}
+
+fn relocate(relocation: WarpRelocation) -> WarpReply {
+    WarpReply {
+        relocation: Some(relocation),
+        ..WarpReply::default()
+    }
+}
+
+fn arrive_at_destination(
+    destination: &WarpDestination,
+    ctx: &TravelContext,
+    world: &WarpWorld,
+) -> WarpRelocation {
+    let [x, y, z, _] = destination.position;
+    let [fx, fy, fz, _] = destination.rotation;
+    arrival(
+        [x, y, z],
+        destination.facing_known.then_some([fx, fy, fz]),
+        ctx,
+        world,
+    )
+}
+
+/// Arrival point: the stored height, raised to the server's terrain plus a
+/// small lift when the terrain is higher; facing kept unless one is known.
+fn arrival(
+    mut position: [f32; 3],
+    facing: Option<[f32; 3]>,
+    ctx: &TravelContext,
+    world: &WarpWorld,
+) -> WarpRelocation {
+    if let Some(ground) = (world.ground)(position[0], position[2]).filter(|g| g.is_finite()) {
+        position[1] = position[1].max(ground + ARRIVAL_LIFT_M);
+    }
+    WarpRelocation {
+        position,
+        rotation: facing.unwrap_or(ctx.rotation),
     }
 }

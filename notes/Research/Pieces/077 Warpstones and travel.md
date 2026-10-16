@@ -124,12 +124,18 @@ the original server ever rejected a locked destination.
 
 ## Gaps and remaining gates
 
-* No `56`, `57`, `58` or `122` frame exists anywhere in the fourteen preserved
-  captures (`scripts/pieces/piece_077.py` re-checks this). The destination-list
-  layout is therefore community-reconstructed on both sides, and whether the
-  real `57` body carries the legacy server's length prefix before the record
-  stream is unresolved. The Rust decoder tolerates both; the encoder writes the
-  bare framed stream.
+* **Settled 2026-10-16 (W142, lead-checked):** the `57` body carries an `i32`
+  blob length before the flag-framed record stream. Native evidence: the
+  client reader `ClientPointOfInterestManager_OnDefinitionReply 00b98b70`
+  reads the opcode, the `i32` length (`008bfc00`), clears the table
+  (`00b98160`) and then reads the flag-framed records (`00b98990`/`00b98290`).
+  So each `57` replaces the whole table. One `57` does exist in a capture,
+  `lab/captures/legacy-gateway-20261008T014620082859Z/messages/0009-ready.bin`
+  (inner `39 00`, length 10,631 = exactly the remaining bytes). That capture
+  is of the community Legacy server, not SOE, so it proves Legacy's framing
+  and row data, not the original server's rows. The original 56/58/122 frames
+  remain uncaptured. W142's curated nine warpstone rows are bit-equal to that
+  capture's rows.
 * No attunement or discovery packet was recovered. How the server learns a
   character attuned a warpstone is unknown; an incremental `57` record is a
   plausible mechanism but is not evidenced.

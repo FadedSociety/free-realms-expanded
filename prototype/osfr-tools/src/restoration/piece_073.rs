@@ -14,6 +14,11 @@
 //!   trailing int, then a `false` list terminator. The supplied server's writer produces exactly
 //!   that byte stream; the original client is the consumer of that message id in the recorded
 //!   gateway milestone, though this piece did not re-inspect the native map/POI panel.
+//! * the native client reader agrees (W142, native map): `00b98b70` reads `u16` opcode, an `i32`
+//!   blob length (`008bfc00`), clears its table and reads the flag-framed stream with `00b98990`
+//!   (flag byte, record, flag byte, ... until a zero flag); `00b98290` reads 13 dwords (NaN-checked
+//!   floats), a length-prefixed string and one dword. [`decode_poi_definitions`] takes the stream
+//!   after that length; `piece_077` writes the length-prefixed whole message, curated warpstone rows.
 //! * `CollectionCategories.txt` row `1^93636^9535`: category id 1 is the exploration category;
 //!   the shipped locale resolves name id 93636 to `Exploration`.
 //!

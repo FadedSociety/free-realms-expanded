@@ -45,13 +45,13 @@
 mod piece_077;
 
 use piece_077::{
-    CAPTURED_TELEPORT_SAMPLES, CLIENT_UPDATE_PACKET_OPCODE,
+    CAPTURED_TELEPORT_SAMPLES, CLIENT_UPDATE_PACKET_OPCODE, OPEN_WORLD_ZONE,
     POINT_OF_INTEREST_DEFINITION_REPLY_OPCODE, POINT_OF_INTEREST_DEFINITION_REQUEST_OPCODE,
-    PointOfInterestDefinition, UPDATE_LOCATION_SUB_OPCODE, UpdateLocation,
+    PointOfInterestDefinition, TravelContext, UPDATE_LOCATION_SUB_OPCODE, UpdateLocation,
     WORLD_TELEPORT_REQUEST_OPCODE, WarpCodecError, WarpDestination, WarpRegistry, WarpRejection,
-    WorldTeleportRequest, ZONE_SAFE_TELEPORT_REQUEST_OPCODE, ZONE_TELEPORT_REQUEST_OPCODE,
-    ZoneSafeTeleportRequest, ZoneTeleportRequest, captured_destinations,
-    decode_point_of_interest_reply, encode_point_of_interest_reply,
+    WarpWorld, WorldTeleportRequest, ZONE_SAFE_TELEPORT_REQUEST_OPCODE,
+    ZONE_TELEPORT_REQUEST_OPCODE, ZoneSafeTeleportRequest, ZoneTeleportRequest,
+    captured_destinations, decode_point_of_interest_reply, encode_point_of_interest_reply,
 };
 
 fn unhex(hex: &str) -> Vec<u8> {
@@ -225,51 +225,85 @@ fn safe_and_world_teleport_requests_validate_their_own_lengths() {
     );
 }
 
+/// Ground and friend lookups that know nothing: arrival keeps the stored height.
+fn no_world() -> WarpWorld<'static> {
+    WarpWorld {
+        ground: &|_, _| None,
+        friend: &|_| None,
+    }
+}
+
+fn context() -> TravelContext {
+    TravelContext {
+        guid: 1,
+        zone_id: OPEN_WORLD_ZONE,
+        position: [0.0, 0.0, 0.0],
+        rotation: [0.0, 0.0, 1.0],
+        blocked: None,
+    }
+}
+
+fn teleport(id: i32) -> Vec<u8> {
+    let mut inner = ZONE_TELEPORT_REQUEST_OPCODE.to_le_bytes().to_vec();
+    inner.extend(ZoneTeleportRequest { destination_id: id }.encode());
+    inner
+}
+
 #[test]
 fn unknown_destination_is_rejected() {
-    let registry = WarpRegistry::new(captured_destinations());
-    let body = ZoneTeleportRequest {
-        destination_id: 99_999,
-    }
-    .encode();
+    let mut registry = WarpRegistry::new(captured_destinations());
+    let reply = registry
+        .handle(&teleport(99_999), &context(), 0, &no_world())
+        .expect("a warpstone opcode");
     assert_eq!(
-        registry.handle_zone_teleport(&body, 0).unwrap_err(),
-        WarpRejection::UnknownDestination(99_999)
+        reply.rejection,
+        Some(WarpRejection::UnknownDestination(99_999))
     );
+    assert!(reply.relocation.is_none());
 }
 
 #[test]
 fn locked_destination_is_rejected_until_attuned() {
     let mut registry = WarpRegistry::new(captured_destinations());
-    let body = ZoneTeleportRequest { destination_id: 9 }.encode();
     assert!(!registry.is_attuned(9));
-    assert_eq!(
-        registry.handle_zone_teleport(&body, 1).unwrap_err(),
-        WarpRejection::LockedDestination(9)
-    );
+    let locked = registry
+        .handle(&teleport(9), &context(), 0, &no_world())
+        .unwrap();
+    assert_eq!(locked.rejection, Some(WarpRejection::LockedDestination(9)));
+    assert!(locked.relocation.is_none());
     assert!(registry.attune(9), "first attunement reports the change");
     assert!(!registry.attune(9), "repeat attunement is a no-op");
 
     let reply = registry
-        .handle_zone_teleport(&body, 1)
+        .handle(&teleport(9), &context(), 0, &no_world())
         .expect("attuned warpstone");
+    // The relocation is the original server's spawn for id 9, byte for byte
+    // once re-encoded as the captured `38/12` body.
     let captured = CAPTURED_TELEPORT_SAMPLES
         .iter()
         .find(|sample| sample.capture == "p2.pcap" && sample.destination_id == 9)
         .expect("captured id 9 sample");
-    assert_eq!(reply, unhex(captured.reply_message_hex));
+    let sent = UpdateLocation::decode_message(&unhex(captured.reply_message_hex)).unwrap();
+    let relocation = reply.relocation.expect("relocation");
+    assert_eq!(relocation.position, sent.position[..3]);
+    assert_eq!(relocation.rotation, sent.rotation[..3]);
 }
 
 #[test]
 fn malformed_bodies_reach_the_policy_without_a_reply() {
-    let registry = WarpRegistry::new(captured_destinations());
+    let mut registry = WarpRegistry::new(captured_destinations());
+    let reply = registry
+        .handle(&[90, 0, 9, 0, 0], &context(), 0, &no_world())
+        .unwrap();
     assert_eq!(
-        registry.handle_zone_teleport(&[9, 0, 0], 0).unwrap_err(),
-        WarpRejection::MalformedRequest(WarpCodecError::Truncated {
+        reply.rejection,
+        Some(WarpRejection::MalformedRequest(WarpCodecError::Truncated {
             expected: 4,
             got: 3
-        })
+        }))
     );
+    assert!(reply.notices.is_empty(), "malformed bodies get no feedback");
+    assert!(reply.relocation.is_none() && reply.replies.is_empty());
 }
 
 #[test]
@@ -332,18 +366,18 @@ fn point_of_interest_reply_round_trips_and_rejects_a_truncated_record() {
 
 #[test]
 fn registry_rejects_a_destination_that_is_not_a_warpstone() {
-    let registry = WarpRegistry::new(vec![WarpDestination {
+    let mut registry = WarpRegistry::new(vec![WarpDestination {
         id: 131,
+        name: "not a warpstone",
         is_warpstone: false,
         position: [128.81799, 22.525, 390.70901, 1.0],
         rotation: [-0.19572824, 0.0, 0.9806582, 0.0],
+        facing_known: true,
     }]);
-    let body = ZoneTeleportRequest {
-        destination_id: 131,
-    }
-    .encode();
-    assert_eq!(
-        registry.handle_zone_teleport(&body, 0).unwrap_err(),
-        WarpRejection::NotAWarpstone(131)
-    );
+    registry.attune(131);
+    let reply = registry
+        .handle(&teleport(131), &context(), 0, &no_world())
+        .unwrap();
+    assert_eq!(reply.rejection, Some(WarpRejection::NotAWarpstone(131)));
+    assert!(reply.relocation.is_none());
 }
