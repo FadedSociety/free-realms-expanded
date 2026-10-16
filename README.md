@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/banner-collage.png" alt="Free Realms Expanded" width="100%">
+  <img src="docs/images/banner.png" alt="Free Realms Expanded" width="100%">
 </p>
 
 <h3 align="center">An open-source revival of Free Realms, with tools to build new content in the running game.</h3>
@@ -54,8 +54,6 @@ Building an MMO's worth of content takes good tools. The server includes a devel
 - **Behaviour presets:** enemy AI (speed, reach, attack rate, run-and-rest) is data you can tune while the game runs.
 
 **World Builder** (in progress) lets trusted builders place NPCs, write quests and text, link quests together, and send an event such as a scavenger hunt to everyone online. Builds persist in a live-world layer, and finished content goes through review before it becomes part of the main world. Design: [World Builder](notes/Design/World%20Builder.md).
-
-<p align="center"><img src="docs/images/banner-clean.png" alt="" width="100%"></p>
 
 ## Roadmap
 

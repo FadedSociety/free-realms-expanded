@@ -47,6 +47,7 @@ Gate: two real clients on two PCs see each other move with real appearances, cha
 | 1.4 | Fix bugs the 10-15 audit found: social packets dropped without `--trace`; account-id/GUID collision; stale save on duplicate login | Lead | Regression tests plus a bot chat test with content loaded |
 | 1.5 | Roles: player, builder and admin per account; `realm` cheats only for builders and admins | Luna (to a spec) → lead | A player account can't run `realm god`; the admin can |
 | 1.6 | Native two-player run: client plus bot, then two clients | Lead | Review note with run ids |
+| 1.7 | **Minimal friend launcher** (moved up from M3, 2026-10-15). Set up a client copy, apply our overlay (world text locale, settings, server address), then launch. There is no launcher today: `run-local-baseline.py` is a dev harness that needs the private `lab/`. | Luna → lead | A clean second PC goes from launcher to character select |
 
 ## M2: A real hour of play
 
@@ -70,7 +71,11 @@ Gate: two real clients on two PCs see each other move with real appearances, cha
 | 3.2 | Minigames without dev commands: kart from its NPC or menu; mining and harvesting win and pay out (wire the lifecycle adapters); world crafting stations | Luna → lead | Native win and payout per activity |
 | 3.3 | World Builder for admins: quest authoring, broadcast, scavenger-hunt event ([[World Builder]] steps 4–6) | Lead | Native: an admin's hunt quest offered to a second player |
 | 3.4 | Shippable content: freeze activity content from `lab` packages into a playtest bundle | Lead | A clean checkout plus the bundle starts the full game |
-| 3.5 | Friend launcher: client copy, locale overlay and server address | Luna → lead | A friend's PC connects with one command |
+| 3.5 | **Full launcher (Rust).** Lessons from Free Realms Legacy's launcher, whose patching visibly fails with "Failed to download 22 files":
+- **Patching:** a SHA-256 manifest, resumable downloads with retries and a mirror, and a "verify and repair" button.
+- **Client:** fetch the community client release (licence check first) rather than hosting it ourselves, then apply our small overlay.
+- **In the window:** live server status and player count from the gateway; a "What's New" panel fed by World Builder events; login handoff; window-size settings (today's client opened larger than the screen).
+- **Art:** generated in Free Realms promo style, matching the client's own green UI buttons. | Sol design → Luna → lead | A fresh PC installs, patches, survives a killed download, and plays |
 | 3.6 | Stress test: 10 bots playing scripted loops for an hour | Lead | No crashes, saves intact, tick time logged |
 
 ## M4: Playtest night
@@ -82,6 +87,8 @@ Run it, collect bug reports and field notes, and feed them back into this plan.
 The remaining dungeons, housing (missing scene assets), pets, mounts (including the community "Mounts and Pets" update, licence check first), fishing, soccer, chess, derby, the card game, the guild, trade and matchmaking routes, a native Rust 3D editor (whose renderer becomes the Rust client), a database for saves, public hosting, and restarting the native map (6 stuck shards to reset).
 
 ## Update log
+
+- **2026-10-15 (later):** Confirmed there is no player-facing launcher. Added 1.7 (minimal launcher in M1) and expanded 3.5 (full launcher). README rewritten; the banner art is being redone in real Free Realms promo style using client art as references.
 
 - **2026-10-15 (later):** Git baseline committed. codebase-memory-mcp installed and indexed; its first query confirmed that nothing calls `FishingService`, matching the audit.
 
