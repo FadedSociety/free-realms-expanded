@@ -13,7 +13,8 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
     inventory::{Inventory, InventoryItem, InventoryState},
     npc_interaction::{
-        NpcAction, NpcInteraction, NpcInteractionError, NpcSelection, decode_merchant_list_66_42,
+        MerchantBuyRequestV2, NpcAction, NpcInteraction, NpcInteractionError, NpcSelection,
+        decode_merchant_list_66_42, encode_merchant_buy_66_43,
     },
 };
 use serde_json::{Value, json};
@@ -64,6 +65,32 @@ fn buy_packet(merchant: u64, transaction: u32, item: i32, quantity: u32) -> Vec<
     packet.extend(quantity.to_le_bytes());
     packet.extend(0u32.to_le_bytes());
     packet
+}
+
+fn vendor_buy_packet(transaction: u32, item: i32, quantity: u32) -> Vec<u8> {
+    encode_merchant_buy_66_43(&MerchantBuyRequestV2 {
+        initial_dwords: [item as u32, 0],
+        context_dwords: [0; 3],
+        context_bytes: Vec::new(),
+        trailing_dwords: [quantity, 0, transaction],
+    })
+    .expect("66/43 request encodes")
+}
+
+fn merchant_status(packet: &[u8]) -> u32 {
+    assert_eq!(packet.len(), 56);
+    assert_eq!(&packet[..4], &[66, 0, 44, 0]);
+    u32::from_le_bytes(packet[48..52].try_into().unwrap())
+}
+
+fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for child in children {
+        assert!(child.len() < 255);
+        bytes.push(child.len() as u8);
+        bytes.extend(child);
+    }
+    bytes
 }
 
 /// The 165/6 record as `00c74ef0`/`00c71f30` read it. Field names beyond the result are (R).
@@ -729,9 +756,8 @@ impl Fixture {
         gateway
     }
 
-    /// A fresh player standing at the vendor with the shop window open.
-    fn at_open_shop(&self) -> (Gateway, Vec<Vec<u8>>) {
-        let mut gateway = self.connect(self.state());
+    fn at_open_shop_with(&self, state: GameplayState) -> (Gateway, Vec<Vec<u8>>) {
+        let mut gateway = self.connect(state);
         gateway
             .handle_at(&wrap(&npc_request(8, None)), NOW)
             .unwrap();
@@ -744,6 +770,11 @@ impl Fixture {
             "the shop did not open"
         );
         (gateway, inner)
+    }
+
+    /// A fresh player standing at the vendor with the shop window open.
+    fn at_open_shop(&self) -> (Gateway, Vec<Vec<u8>>) {
+        self.at_open_shop_with(self.state())
     }
 }
 
@@ -909,4 +940,153 @@ fn gateway_buy_then_sell_round_trip_from_the_native_window() {
     let sold = inventory_of(&gateway);
     assert_eq!(sold.coins, bought.coins + 7);
     assert_eq!(count_definition(&sold, 8), count_definition(&before, 8));
+}
+
+#[test]
+fn gateway_vendor_buy_debits_grants_and_replies() {
+    let fixture = Fixture::new();
+    let (mut gateway, _) = fixture.at_open_shop();
+    let before = inventory_of(&gateway);
+
+    let replies = send(&mut gateway, &vendor_buy_packet(91_001, 8, 1));
+    let status = merchant_status(replies.last().expect("vendor buy reply"));
+    assert_eq!(status, 1);
+    let after = inventory_of(&gateway);
+    assert_eq!(after.coins, before.coins - 15);
+    assert_eq!(
+        count_definition(&after, 8),
+        count_definition(&before, 8) + 1
+    );
+}
+
+#[test]
+fn gateway_vendor_buy_insufficient_coins_replies_and_changes_nothing() {
+    let fixture = Fixture::new();
+    let mut state = fixture.state();
+    state.inventory.coins = 5;
+    let (mut gateway, _) = fixture.at_open_shop_with(state);
+    let before = gateway.snapshot();
+
+    let replies = send(&mut gateway, &vendor_buy_packet(91_002, 8, 1));
+    assert_eq!(replies.len(), 1, "refusal has one client-visible reply");
+    assert_eq!(merchant_status(&replies[0]), 0);
+    assert_eq!(gateway.snapshot(), before);
+}
+
+#[test]
+fn gateway_vendor_buy_full_bag_replies_and_changes_nothing() {
+    let fixture = Fixture::new();
+    let mut state = fixture.state();
+    state.inventory.items.clear();
+    for entry in &mut state.inventory.equipment {
+        entry.item_id = 0;
+    }
+    for id in 100_000..100_100 {
+        state.inventory.items.push(InventoryItem {
+            definition_id: 75060,
+            tint: 0,
+            id,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+    }
+    state.inventory.next_instance_id = Some(100_100);
+    let (mut gateway, _) = fixture.at_open_shop_with(state);
+    let before = gateway.snapshot();
+
+    let replies = send(&mut gateway, &vendor_buy_packet(91_003, 8, 1));
+    assert_eq!(replies.len(), 1, "full bag has one client-visible reply");
+    assert_eq!(merchant_status(&replies[0]), 0);
+    assert_eq!(gateway.snapshot(), before);
+}
+
+#[test]
+fn gateway_vendor_buy_refusals_always_answer_with_66_44() {
+    let fixture = Fixture::new();
+    let (mut gateway, _) = fixture.at_open_shop();
+    let before = gateway.snapshot();
+    let cases = [
+        ("malformed", vec![66, 0, 43, 0]),
+        ("unknown item", vendor_buy_packet(91_010, i32::MAX, 1)),
+        ("zero quantity", vendor_buy_packet(91_011, 8, 0)),
+        ("unbounded quantity", vendor_buy_packet(91_012, 8, u32::MAX)),
+    ];
+    for (label, request) in cases {
+        let replies = send(&mut gateway, &request);
+        assert_eq!(replies.len(), 1, "{label}: one client-visible reply");
+        assert_eq!(merchant_status(&replies[0]), 0, "{label}: refused");
+        assert_eq!(gateway.snapshot(), before, "{label}: state changed");
+    }
+
+    let mut closed = fixture.connect(fixture.state());
+    let before = closed.snapshot();
+    let replies = send(&mut closed, &vendor_buy_packet(91_013, 8, 1));
+    assert_eq!(replies.len(), 1, "closed shop: one client-visible reply");
+    assert_eq!(merchant_status(&replies[0]), 0, "closed shop: refused");
+    assert_eq!(closed.snapshot(), before, "closed shop: state changed");
+}
+
+#[test]
+fn gateway_vendor_buy_reads_the_live_inventory_after_a_reward() {
+    let fixture = Fixture::new();
+    let (mut gateway, _) = fixture.at_open_shop();
+    let mut live = inventory_of(&gateway);
+    live.coins += 100;
+    live.items.push(InventoryItem {
+        definition_id: 75060,
+        tint: 0,
+        id: 900_010,
+        count: 1,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    });
+    live.next_instance_id = Some(900_011);
+    gateway.adopt_trade_inventory(live).unwrap();
+    let before = inventory_of(&gateway);
+
+    let replies = send(&mut gateway, &vendor_buy_packet(91_004, 8, 1));
+    assert_eq!(
+        merchant_status(replies.last().expect("vendor buy reply")),
+        1
+    );
+    let after = inventory_of(&gateway);
+    assert_eq!(after.coins, before.coins - 15);
+    assert_eq!(
+        count_definition(&after, 75060),
+        count_definition(&before, 75060)
+    );
+}
+
+#[test]
+fn gateway_bundle_failure_does_not_commit_a_vendor_buy() {
+    let fixture = Fixture::new();
+    let (mut gateway, _) = fixture.at_open_shop();
+    let before = gateway.snapshot();
+    let request = vendor_buy_packet(91_005, 8, 1);
+
+    let failed = gateway.handle_at(&bundle(&[request.clone(), vec![26, 0, 8, 0]]), NOW);
+    assert!(
+        failed.is_err(),
+        "the malformed child must reject the bundle"
+    );
+    assert_eq!(gateway.snapshot(), before, "failed bundle changed gameplay");
+
+    let replies = send(&mut gateway, &request);
+    assert_eq!(
+        merchant_status(replies.last().expect("vendor buy reply")),
+        1
+    );
+    assert_eq!(
+        inventory_of(&gateway).coins,
+        before.gameplay.unwrap().inventory.coins - 15
+    );
 }

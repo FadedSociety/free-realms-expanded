@@ -22,6 +22,7 @@ use std::{
     collections::{BTreeMap, BTreeSet, VecDeque},
     io::{self, Read},
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
 const COIN_FAMILY: u16 = 0xa5;
@@ -150,10 +151,11 @@ struct SaleRecord {
     available: bool,
 }
 
+#[derive(Clone)]
 pub struct CoinShop {
     inventory_content: PathBuf,
     inventory: Inventory,
-    catalogue: StoreCatalogue,
+    catalogue: Arc<StoreCatalogue>,
     bag_capacity: usize,
     is_member: bool,
     client_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
@@ -172,7 +174,7 @@ impl CoinShop {
         Ok(Self {
             inventory_content: inventory_content.to_path_buf(),
             inventory,
-            catalogue,
+            catalogue: Arc::new(catalogue),
             bag_capacity,
             // (R) The caller must set the verified account flag after construction.
             is_member: false,

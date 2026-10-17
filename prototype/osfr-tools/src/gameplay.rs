@@ -171,7 +171,8 @@ pub struct Gameplay {
     /// Packets sent when the pending quest row is chosen. Empty means "send the
     /// 49/1 offer"; a turn-in holds its 49/13 end screen here.
     pending_choice_packets: Vec<Vec<u8>>,
-    npc_coin_shop: Option<Arc<Mutex<crate::coin_shop::CoinShop>>>,
+    /// Inline rather than shared: purchases follow the gateway's staged Gameplay commit.
+    npc_coin_shop: Option<crate::coin_shop::CoinShop>,
     npc_quests: Option<crate::quest_engine::QuestEngine>,
     saved_npc_quests: Option<crate::quest_engine::QuestState>,
     /// Quests a player may start remotely with 49/15 (R), each with its giver NPC.
@@ -789,12 +790,12 @@ impl Gameplay {
             let catalogue =
                 crate::coin_shop::StoreCatalogue::load(&npc_content.join("stores.json"))?;
             // (R) Local bag capacity is 100 occupied stacks until an account capacity is wired.
-            Some(Arc::new(Mutex::new(crate::coin_shop::CoinShop::new(
+            Some(crate::coin_shop::CoinShop::new(
                 directory,
                 inventory.clone(),
                 catalogue,
                 100,
-            )?)))
+            )?)
         } else {
             None
         };
@@ -1738,16 +1739,13 @@ impl Gameplay {
         // 165/4 buy and 165/5 sell, plus the siblings (W172): 2 definitions, 8 list update,
         // 12 buy-back, 14 gift (always refused).
         if matches!(inner, [0xa5, 0, 2 | 4 | 5 | 8 | 12 | 14, 0, ..]) {
-            if let Some(shop) = &self.npc_coin_shop {
+            if let Some(shop) = &mut self.npc_coin_shop {
                 let Some(interaction) = &self.npc_interaction else {
                     return Ok(None);
                 };
                 let mut interaction = interaction
                     .lock()
                     .map_err(|_| invalid("NPC interaction state is unavailable"))?;
-                let mut shop = shop
-                    .lock()
-                    .map_err(|_| invalid("NPC Coin Store state is unavailable"))?;
                 let Some(visibility) = &self.npc_visibility else {
                     return Ok(None);
                 };
@@ -1769,7 +1767,7 @@ impl Gameplay {
                 // a purchase overwrote everything earned since (10-15 audit).
                 shop.sync_inventory(self.inventory.clone());
                 let outcome = interaction.handle_coin_store(
-                    &mut shop,
+                    shop,
                     &request,
                     character.zone_id,
                     character.position,
@@ -1817,12 +1815,9 @@ impl Gameplay {
                 ..
             ]
         ) {
-            let Some(shop) = &self.npc_coin_shop else {
+            let Some(shop) = &mut self.npc_coin_shop else {
                 return Ok(None);
             };
-            let mut shop = shop
-                .lock()
-                .map_err(|_| invalid("NPC Coin Store state is unavailable"))?;
             let outcome = shop.handle_marketplace(inner)?;
             return Ok(Some(Outcome {
                 replies: outcome.replies,
@@ -1865,13 +1860,7 @@ impl Gameplay {
                         crate::coin_shop::RESULT_INVALID_MERCHANT
                     }
                 });
-            let Some(shop) = &self.npc_coin_shop else {
-                return Ok(Some(Outcome {
-                    replies: vec![crate::coin_shop::merchant_buy_result_packet(false)],
-                    ..Outcome::default()
-                }));
-            };
-            let Ok(mut shop) = shop.lock() else {
+            let Some(shop) = &mut self.npc_coin_shop else {
                 return Ok(Some(Outcome {
                     replies: vec![crate::coin_shop::merchant_buy_result_packet(false)],
                     ..Outcome::default()
