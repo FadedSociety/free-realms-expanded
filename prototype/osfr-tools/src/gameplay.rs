@@ -916,6 +916,18 @@ impl Gameplay {
         {
             apply_node_changes(visibility, nodes.sync(0, false));
         }
+        if let (Some(profiles), Some(interaction)) = (&profiles, &npc_interaction) {
+            let trainers = profiles.load_trainers(directory)?;
+            let unknown = interaction
+                .lock()
+                .map_err(|_| invalid("NPC interaction state is unavailable"))?
+                .set_job_trainers(trainers);
+            for npc in unknown {
+                npc_event(
+                    serde_json::json!({"event": "job_trainer_unknown_npc", "content_key": npc}),
+                );
+            }
+        }
         Ok(Self {
             mystery_chests,
             pending_chest: None,
@@ -1392,6 +1404,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::Shop => "shop",
                         npc_interaction::NpcAction::Race => "race",
                         npc_interaction::NpcAction::Fish => "fish",
+                        npc_interaction::NpcAction::Learn { .. } => "learn",
                     };
                     serde_json::json!({
                         "id": option.id,
@@ -1458,6 +1471,7 @@ impl Gameplay {
             let mut out = Outcome::default();
             let mut race_gate = None;
             let mut fish_gate = None;
+            let mut learn_trainer = None;
             match selected {
                 Ok(NpcSelection::Talk(mut context)) => {
                     if let Some(engine) = &mut self.npc_quests {
@@ -1623,6 +1637,16 @@ impl Gameplay {
                         "outcome": "fish"
                     }));
                 }
+                Ok(NpcSelection::Learn(trainer)) => {
+                    learn_trainer = Some(trainer);
+                    npc_event(serde_json::json!({
+                        "event": "npc_select",
+                        "guid": runtime_guid,
+                        "content_key": key,
+                        "option": option_id,
+                        "outcome": "learn"
+                    }));
+                }
                 Ok(NpcSelection::Quest(quest)) => {
                     let has_offer = quest.outbound.iter().any(|message| {
                         matches!(
@@ -1682,6 +1706,17 @@ impl Gameplay {
                     None => out.replies.push(chat::system(
                         crate::kart_gateway::EntryDenied::NoRace.message(),
                     )),
+                }
+            }
+            if let Some(trainer) = learn_trainer {
+                // (R) Ordinary unlock: the NPC service proved range and that this exact option
+                // was offered; `learn_job` decides the rest.
+                let mut staged = self.clone();
+                out = staged.learn_job(&trainer)?;
+                // Leave the NPC dialog camera first (see the fishing choice).
+                out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                if out.changed {
+                    *self = staged;
                 }
             }
             if let Some(gate) = fish_gate {
@@ -3147,8 +3182,9 @@ impl Gameplay {
             .profiles
             .as_mut()
             .ok_or_else(|| invalid("kart entry requires class content"))?;
-        // (R) Reconstructed starter unlock: the first race unlocks Kart Driver (no trainer
-        // unlock exists yet). The prior job is restored on exit.
+        // (R) First use still unlocks Kart Driver for saves that predate trainers; the
+        // option is idempotent. W176 also offers the job from a trainer. The prior job is
+        // restored on exit.
         let previous_job = profiles.active();
         let first_time = profiles.unlock(48)?;
         out.replies.push(profiles.select(48, &self.inventory)?);
@@ -3176,6 +3212,33 @@ impl Gameplay {
                 unlocked: BTreeSet::from([1]),
                 experience: Default::default(),
             })
+    }
+
+    /// W176 (R): teach the job the chosen trainer offers. The caller stages `self`, so a refusal
+    /// (a chat line, `changed` false) leaves the player exactly as they were.
+    fn learn_job(&mut self, trainer: &crate::profiles::Trainer) -> io::Result<Outcome> {
+        use crate::profiles::LearnDenied;
+        let mut out = Outcome::default();
+        let denied = if self.activity_busy() {
+            Some(LearnDenied::Busy)
+        } else {
+            match self.profiles.as_mut() {
+                Some(profiles) => profiles.learn(trainer).err(),
+                None => Some(LearnDenied::Unavailable),
+            }
+        };
+        if let Some(denied) = denied {
+            out.replies.push(chat::system(&denied.message()));
+            return Ok(out);
+        }
+        // The job is not made active; the player picks it in the job list (R).
+        self.give_starter_outfit(trainer.profile, false, &mut out)?;
+        out.changed = true;
+        out.replies.push(chat::system(&format!(
+            "You learned the {} job. Pick it in your job list to switch.",
+            trainer.job
+        )));
+        Ok(out)
     }
 
     /// W160 (R): start the fishing round the chosen guide offers. The caller stages `self`, so a

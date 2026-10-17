@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "trainers": [
+    {
+      "npc": 9000000405,
+      "profile": 14,
+      "job": "Miner",
+      "label_string_id": 139748,
+      "source": "client: 139748/442237/119068/139749/413026 (Therin at the Singing Crystal Mines); wiki: Miner.md:41,46; reconstructed: Therin is only a poi_anchor, so Mili Ironcall, a spawned Miner trainer at Southvale, is the reachable menu trainer"
+    },
+    {
+      "npc": 9000000467,
+      "profile": 45,
+      "job": "Chef",
+      "label_string_id": 413021,
+      "source": "client: 413021/140471/413022/431102 (Simone, Auguste Frydaze or Helena); wiki: Chef.md:36; reconstructed: Simone is spawned at Cobblestone Village and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000181,
+      "profile": 137,
+      "job": "Fisherman",
+      "label_string_id": 412490,
+      "source": "client: 412490/412491/442234/1498860325 (Reed Stillwater); wiki: Fisherman.md:23,32; reconstructed: Reed is spawned at Stillwater Crossing and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000039,
+      "profile": 48,
+      "job": "Kart Driver",
+      "label_string_id": 407752,
+      "source": "client: 407752/407751 (any Kart Driver trainer at a speedway); wiki: Kart Driver.md:22,34; reconstructed: Cale Yardbird is spawned at Tangletrack and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000391,
+      "profile": 49,
+      "job": "Demo Derby Driver",
+      "label_string_id": 412342,
+      "source": "client: 412342/379927456/1574840783 (speak with Mad Jack at Wildwood Speedway); wiki: Demolition Derby Driver.md:39; reconstructed: Mad Jack is spawned and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000206,
+      "profile": 16,
+      "job": "Blacksmith",
+      "label_string_id": 412314,
+      "source": "client: 412314/412315/442224/119057/2618187357 (Smitty at the Snowhill forge); wiki: Blacksmith.md:28,46; reconstructed: Smitty is spawned and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000387,
+      "profile": 35,
+      "job": "Archer",
+      "label_string_id": 412187,
+      "source": "client: 412187/412188/442223/119056 (Lugabow at Greenwood Camp); wiki: Archer.md:27,46; reconstructed: Lugabow is spawned and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000161,
+      "profile": 11,
+      "job": "Medic",
+      "label_string_id": 412422,
+      "source": "client: 412422/412423/442228/119067 (Nurse Naia in Sanctuary); wiki: Medic.md:44; reconstructed: Naia is spawned and the menu choice grants the job"
+    },
+    {
+      "npc": 9000000223,
+      "profile": 2,
+      "job": "Ninja",
+      "label_string_id": 412437,
+      "requires": {
+        "profile": 35,
+        "job": "Archer",
+        "rank": 20
+      },
+      "source": "client: 412437/412438/442229/119069 (Ty in Lakeshore) and 5100368/5100390 (level 20 Archer); wiki: Ninja.md:41; reconstructed: Ty is spawned and the menu choice grants the job after the prerequisite"
+    },
+    {
+      "npc": 9000000324,
+      "profile": 12,
+      "job": "Wizard",
+      "label_string_id": 412481,
+      "requires": {
+        "profile": 11,
+        "job": "Medic",
+        "rank": 20
+      },
+      "source": "client: 412481/412482/442233/119076 (Fizzlesticks at Robgoblin Camp) and 5100378/5100392 (level 20 Medic); wiki: Wizard.md:46; reconstructed: Fizzlesticks is spawned and the menu choice grants the job after the prerequisite"
+    }
+  ]
+}

@@ -12,6 +12,7 @@ use osfr_tools::{
         RESULT_SERVICE_UNAVAILABLE,
     },
     content::NpcRole,
+    profiles::Trainer,
     quest_engine::{QuestEngine, QuestOutcome, QuestStatus},
 };
 use serde::Deserialize;
@@ -72,6 +73,10 @@ pub enum NpcAction {
     Race,
     /// (R) Go fishing (W160). Offered only by NPCs named in `fishing_spots.json`.
     Fish,
+    /// (R) Learn a job from its trainer (W176). Offered only by NPCs named in `job_trainers.json`.
+    Learn {
+        profile: i32,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -136,6 +141,8 @@ pub enum NpcSelection {
     Race,
     /// The caller decides whether the trip may start (`FishingService::enter`).
     Fish,
+    /// The caller decides whether the job is taught (`Profiles::learn`).
+    Learn(Trainer),
 }
 
 #[derive(Deserialize)]
@@ -225,6 +232,8 @@ pub struct NpcInteraction {
     /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
     fish_gates: BTreeSet<u64>,
     fish_string_id: u32,
+    /// (R) Jobs each NPC teaches (W176).
+    job_trainers: BTreeMap<u64, Vec<Trainer>>,
     active: Option<ActiveInteraction>,
 }
 
@@ -331,6 +340,7 @@ impl NpcInteraction {
             race_string_id: 0,
             fish_gates: BTreeSet::new(),
             fish_string_id: 0,
+            job_trainers: BTreeMap::new(),
             active: None,
         })
     }
@@ -352,6 +362,24 @@ impl NpcInteraction {
             npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
         self.fish_gates = known.into_iter().collect();
         self.fish_string_id = string_id;
+        unknown
+    }
+
+    /// (R) List "Learn <job>" in these trainers' menus (W176). Returns the NPC ids that are not NPC
+    /// content, like [`Self::set_race_gates`].
+    pub fn set_job_trainers(&mut self, trainers: Vec<Trainer>) -> Vec<u64> {
+        self.job_trainers.clear();
+        let mut unknown = Vec::new();
+        for trainer in trainers {
+            if self.npcs.contains_key(&trainer.npc) {
+                self.job_trainers
+                    .entry(trainer.npc)
+                    .or_default()
+                    .push(trainer);
+            } else {
+                unknown.push(trainer.npc);
+            }
+        }
         unknown
     }
 
@@ -461,6 +489,16 @@ impl NpcInteraction {
             NpcAction::Fish => {
                 self.active = None;
                 Ok(NpcSelection::Fish)
+            }
+            NpcAction::Learn { profile } => {
+                let trainer = self
+                    .job_trainers
+                    .get(&npc_id)
+                    .and_then(|list| list.iter().find(|t| t.profile == profile))
+                    .cloned()
+                    .ok_or(NpcInteractionError::InvalidOption)?;
+                self.active = None;
+                Ok(NpcSelection::Learn(trainer))
             }
             NpcAction::TurnInQuest { quest_id } => {
                 let engine = quests
@@ -735,6 +773,14 @@ impl NpcInteraction {
         }
         if self.fish_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Fish, self.fish_string_id));
+        }
+        for trainer in self.job_trainers.get(&npc.npc_id).into_iter().flatten() {
+            options.push((
+                NpcAction::Learn {
+                    profile: trainer.profile,
+                },
+                trainer.label_string_id,
+            ));
         }
         if options.len() > MAX_MENU_OPTIONS {
             return Err(NpcInteractionError::InvalidOption);

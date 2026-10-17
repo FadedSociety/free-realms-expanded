@@ -47,6 +47,63 @@ pub struct Profiles {
     state: ProfileState,
 }
 
+/// W176: one job a trainer NPC teaches (`job_trainers.json`). The job, trainer pointer and
+/// "Become a <job>" locale label are documented per row. That a menu choice immediately grants
+/// the job, without the original quest, is reconstructed policy (R).
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Trainer {
+    pub npc: u64,
+    pub profile: i32,
+    /// Human name, used in chat lines only.
+    pub job: String,
+    /// Client locale id of the menu label ("Become a Miner").
+    pub label_string_id: u32,
+    /// A recovered prerequisite: another job at this rank first (client text, e.g. the Ninja
+    /// trainer wants a level 20 Archer). The rank curve itself is the local (R) one.
+    #[serde(default)]
+    pub requires: Option<Requirement>,
+    /// Evidence for the row; not read by the server.
+    pub source: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Requirement {
+    pub profile: i32,
+    pub job: String,
+    pub rank: u32,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TrainerFile {
+    schema_version: u32,
+    trainers: Vec<Trainer>,
+}
+
+/// Why a trainer would not teach a job. Nothing changes on any of these.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum LearnDenied {
+    Busy,
+    Unavailable,
+    AlreadyKnown,
+    NeedsRank { job: String, rank: u32 },
+}
+
+impl LearnDenied {
+    pub fn message(&self) -> String {
+        match self {
+            Self::Busy => "Finish what you are doing first.".into(),
+            Self::Unavailable => "Job training is not available here.".into(),
+            Self::AlreadyKnown => "You already know that job.".into(),
+            Self::NeedsRank { job, rank } => {
+                format!("Come back when you are a level {rank} {job}.")
+            }
+        }
+    }
+}
+
 fn invalid(message: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
 }
@@ -127,11 +184,82 @@ impl Profiles {
             .unwrap_or_default()
     }
     pub fn unlock(&mut self, profile: i32) -> io::Result<bool> {
-        if !self.content.profiles.iter().any(|p| p.id == profile) {
+        if !self.has_profile(profile) {
             return Err(invalid("unknown class unlock"));
         }
         Ok(self.state.unlocked.insert(profile))
     }
+    fn has_profile(&self, profile: i32) -> bool {
+        self.content.profiles.iter().any(|p| p.id == profile)
+    }
+
+    /// The job's level on the local (R) 100-XP curve, 1 to 20.
+    pub fn rank(&self, profile: i32) -> u32 {
+        (1 + self.state.experience.get(&profile).copied().unwrap_or(0) / 100).min(20)
+    }
+
+    /// W176: read the optional `job_trainers.json`. Absent means no trainers. A row naming a job
+    /// the profile content lacks is a content error, so a typo cannot silently offer nothing.
+    pub fn load_trainers(&self, directory: &Path) -> io::Result<Vec<Trainer>> {
+        let path = directory.join("job_trainers.json");
+        let bytes = match fs::read(&path) {
+            Ok(bytes) => bytes,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(error) => return Err(error),
+        };
+        if bytes.len() > 65_536 {
+            return Err(invalid("job trainer content exceeds bounds"));
+        }
+        let file: TrainerFile = serde_json::from_slice(&bytes).map_err(invalid)?;
+        if file.schema_version != 1 || file.trainers.len() > 128 {
+            return Err(invalid("unsupported job trainer content"));
+        }
+        let mut seen = BTreeSet::new();
+        for trainer in &file.trainers {
+            let required = trainer.requires.as_ref();
+            if trainer.npc == 0
+                || trainer.label_string_id == 0
+                || trainer.job.trim().is_empty()
+                || trainer.job.len() > 40
+                || !self.has_profile(trainer.profile)
+                || trainer.source.trim().is_empty()
+                || trainer.source.len() > 1024
+                || required.is_some_and(|r| {
+                    r.job.trim().is_empty()
+                        || r.job.len() > 40
+                        || !(1..=20).contains(&r.rank)
+                        || r.profile == trainer.profile
+                        || !self.has_profile(r.profile)
+                })
+                || !seen.insert((trainer.npc, trainer.profile))
+            {
+                return Err(invalid("invalid job trainer row"));
+            }
+        }
+        Ok(file.trainers)
+    }
+
+    /// W176 (R): a trainer teaches a job the player lacks, once. The caller has already proved
+    /// the menu choice was offered, the range, and that the player is not busy.
+    pub fn learn(&mut self, trainer: &Trainer) -> Result<(), LearnDenied> {
+        if !self.has_profile(trainer.profile) {
+            return Err(LearnDenied::Unavailable);
+        }
+        if self.state.unlocked.contains(&trainer.profile) {
+            return Err(LearnDenied::AlreadyKnown);
+        }
+        if let Some(need) = &trainer.requires
+            && (!self.state.unlocked.contains(&need.profile) || self.rank(need.profile) < need.rank)
+        {
+            return Err(LearnDenied::NeedsRank {
+                job: need.job.clone(),
+                rank: need.rank,
+            });
+        }
+        self.state.unlocked.insert(trainer.profile);
+        Ok(())
+    }
+
     /// Developer: set the active job's experience outright.
     pub fn set_experience(&mut self, xp: u32) -> bool {
         let previous = self.state.experience.insert(self.state.active, xp);
