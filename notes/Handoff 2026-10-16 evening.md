@@ -29,8 +29,17 @@ Contents:
 
 The files are applied in `project/` and copied into the review worktree `CartoonMMO/review`. Its full suite was running when work stopped; the log is `lab/build/review-b9-full.txt`.
 
-To finish:
-1. If the summary line shows 0 failed, stage the review copies of these files and commit:
+**Result: 2745 passed, 2 failed: a real regression, so the batch is NOT committed.** Both failures are in `tests/mount_bots.rs`:
+- `riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_dropped` (line 604): "C: no ride actor".
+- `the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail` (line 697): "C: no AddPc of A".
+
+A late-joining bot receives 35/2 and 35/3 but never the rider's AddPc or the ride actor. Both tests passed in batch 8 (`b3dcbc9`), so a batch 9 change broke late-joiner visibility. Suspects, in order:
+- W171's gameplay patch, which adds and removes node actors through the visibility calls.
+- W174's change that commits a labelled request's staged gameplay even when it sends no reply.
+- W173's join-time chat settings load in `osfr-gateway.rs` (`join_player`).
+
+Bisect by applying them one at a time on HEAD in the review worktree. Then:
+1. Once both tests pass, stage the review copies of these files and commit: stage the review copies of these files and commit:
    - `src/bin/osfr-gateway.rs`, `src/gameplay.rs`, `src/gateway.rs`, `src/harvest_nodes.rs`, `src/social_chat.rs`
    - `tests/app_fuzz.rs`, `tests/bot_acceptance_1016.rs`, `tests/chat_settings.rs`, `tests/gathering_nodes.rs`, `tests/telemetry_labels.rs`
    - `data/content/mining_nodes.json`
