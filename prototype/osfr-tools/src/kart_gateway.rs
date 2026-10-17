@@ -113,6 +113,14 @@ pub struct KartGatewayState {
     pub last_paid_unix: Option<u64>,
 }
 
+/// A paid finish and the stable race identity a quest may credit.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct KartRewardClaim {
+    pub replies: Vec<Vec<u8>>,
+    /// (R) The speedway id is the stable, content-authored race identity.
+    pub minigame_id: Option<u32>,
+}
+
 #[derive(Clone)]
 pub struct KartGateway {
     content: Arc<KartGatewayContent>,
@@ -643,8 +651,16 @@ impl KartGateway {
         inventory: &mut crate::inventory::Inventory,
         profiles: &mut crate::profiles::Profiles,
     ) -> io::Result<Vec<Vec<u8>>> {
+        Ok(self.claim_reward_with_event(inventory, profiles)?.replies)
+    }
+    /// Claim a finished race once and report the race id for quest events.
+    pub fn claim_reward_with_event(
+        &mut self,
+        inventory: &mut crate::inventory::Inventory,
+        profiles: &mut crate::profiles::Profiles,
+    ) -> io::Result<KartRewardClaim> {
         if !self.race.as_ref().is_some_and(|race| race.finish_flag()) {
-            return Ok(Vec::new());
+            return Ok(KartRewardClaim::default());
         }
         // Claiming consumes the finish offer. Stage that flag with both banks so
         // an overflow or refused price leaves a retryable, unpaid finish.
@@ -653,7 +669,7 @@ impl KartGateway {
         let mut staged_profiles = profiles.clone();
         let race = staged.race.as_mut().unwrap();
         if !race.reward_priced() {
-            return Ok(Vec::new());
+            return Ok(KartRewardClaim::default());
         }
         let guid = race.player_guid().unwrap();
         let finished = race.take_finished_session().unwrap();
@@ -668,14 +684,17 @@ impl KartGateway {
             Ok(payout) => payout,
             // A bank/XP limit is a refused payout, not a transport failure.
             // Keep the unpaid finish intact and release its progress frame.
-            Err(_) => return Ok(Vec::new()),
+            Err(_) => return Ok(KartRewardClaim::default()),
         };
         staged.state.last_paid_unix = Some(now_unix());
         staged.sync_race();
         *self = staged;
         *inventory = staged_inventory;
         *profiles = staged_profiles;
-        Ok(payout.replies)
+        Ok(KartRewardClaim {
+            replies: payout.replies,
+            minigame_id: Some(u32::from(payout.speedway)),
+        })
     }
     pub fn race_ready(&mut self) -> io::Result<Vec<Vec<u8>>> {
         let entry = self

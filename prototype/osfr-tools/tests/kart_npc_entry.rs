@@ -651,10 +651,17 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
     assert_eq!((coins(&inventory), xp(&profiles)), (0, 0));
 
     let end = drive(&mut g, green);
-    let paid = g.claim_reward(&mut inventory, &mut profiles).unwrap();
+    let paid = g
+        .claim_reward_with_event(&mut inventory, &mut profiles)
+        .unwrap();
     assert!(
-        !paid.is_empty(),
+        !paid.replies.is_empty(),
         "a finished race must send its reward frames"
+    );
+    assert_eq!(
+        paid.minigame_id,
+        Some(31),
+        "the stable speedway id is the quest completion identity"
     );
     assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
 
@@ -666,6 +673,12 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
                 .is_empty()
         );
     }
+    assert_eq!(
+        g.claim_reward_with_event(&mut inventory, &mut profiles)
+            .unwrap()
+            .minigame_id,
+        None
+    );
     g.handle(&gate_hit(PLAYER, 1.0), end + 1_000).unwrap();
     assert!(
         g.claim_reward(&mut inventory, &mut profiles)

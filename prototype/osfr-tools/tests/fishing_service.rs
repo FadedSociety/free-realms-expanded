@@ -242,10 +242,13 @@ fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
     assert_eq!(reward.inventory.state().items[0].count, 1);
     assert_eq!(
         caught.quest_events,
-        vec![QuestEvent::CollectItem {
-            item_id: 100,
-            quantity: 1
-        }]
+        vec![
+            QuestEvent::CollectItem {
+                item_id: 100,
+                quantity: 1
+            },
+            QuestEvent::FinishMinigame { minigame_id: 595 }
+        ]
     );
 }
 

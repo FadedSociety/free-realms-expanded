@@ -85,6 +85,8 @@ pub struct Change {
 struct Tracked {
     runs: MinigameRuns,
     instance_id: i32,
+    /// Stable minigame catalogue id used by quest completion events.
+    game_id: i32,
     area_key: String,
     fisherman_level: u32,
     anchor: Vec4,
@@ -238,6 +240,7 @@ impl FishingService {
             });
         }
         let id = self.next_instance_id.max(1);
+        let game_id = spec.game_id;
         let mut runs = MinigameRuns::new(id).map_err(|_| Error::InvalidValue)?;
         let offered = runs.offer(spec).map_err(|_| Error::InvalidValue)?;
         if !offered.accepted {
@@ -249,6 +252,7 @@ impl FishingService {
             Tracked {
                 runs,
                 instance_id: id,
+                game_id,
                 area_key: area_key.to_owned(),
                 fisherman_level,
                 anchor,
@@ -887,6 +891,10 @@ fn settle_catch(
     change.quest_events.push(QuestEvent::CollectItem {
         item_id: definition_id,
         quantity: 1,
+    });
+    // (R) One paid catch is one quest-visible minigame completion.
+    change.quest_events.push(QuestEvent::FinishMinigame {
+        minigame_id: tracked.game_id as u32,
     });
     change.changed = true;
     change.paid = true;

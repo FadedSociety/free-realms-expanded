@@ -2585,6 +2585,15 @@ impl Gameplay {
         self.apply_encounter(result, &mut out)?;
         self.append_journal_updates(&before, &mut out)?;
         self.append_npc_quest_login_sync(&mut out)?;
+        // Scene entry is an authoritative location event. Area and reach
+        // objectives must advance without waiting for the first movement packet.
+        self.npc_quest_event(
+            crate::quest_engine::QuestEvent::VisitPosition {
+                zone_id: character.zone_id,
+                position: character.position,
+            },
+            &mut out,
+        )?;
         self.sync_tracked_target(character, &mut out);
         self.append_warp_definitions(character, &mut out);
         self.append_activity_list(&mut out);
@@ -2687,17 +2696,27 @@ impl Gameplay {
                 *self = staged;
                 return Ok(returned);
             }
-            if let Some(profiles) = &mut staged.profiles {
-                replies.extend(kart.claim_reward(&mut staged.inventory, profiles)?);
-            }
+            let claim = if let Some(profiles) = &mut staged.profiles {
+                kart.claim_reward_with_event(&mut staged.inventory, profiles)?
+            } else {
+                crate::kart_gateway::KartRewardClaim::default()
+            };
+            replies.extend(claim.replies);
             let changed = before != *kart.state();
             staged.refresh_npc_quest_eligibility(current_unix_seconds());
-            *self = staged;
-            return Ok(Outcome {
+            let mut out = Outcome {
                 replies,
                 changed,
                 ..Default::default()
-            });
+            };
+            if let Some(minigame_id) = claim.minigame_id {
+                staged.npc_quest_event(
+                    crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+                    &mut out,
+                )?;
+            }
+            *self = staged;
+            return Ok(out);
         }
         let mut out = Outcome::default();
         if self.forging.as_ref().is_some_and(Forging::active) {
@@ -3310,6 +3329,24 @@ impl Gameplay {
                     return Ok(Some(Outcome::default()));
                 }
             };
+        // Collect is derived from the adopted inventory diff below. The
+        // service's own CollectItem is intentionally skipped to avoid counting
+        // the catch twice; its minigame completion has no other source.
+        let minigame_events: Vec<_> = if change.paid {
+            change
+                .quest_events
+                .iter()
+                .filter(|event| {
+                    matches!(
+                        event,
+                        crate::quest_engine::QuestEvent::FinishMinigame { .. }
+                    )
+                })
+                .cloned()
+                .collect()
+        } else {
+            Vec::new()
+        };
         let mut out = Outcome {
             replies: change.replies,
             ..Outcome::default()
@@ -3318,8 +3355,7 @@ impl Gameplay {
             .extend(change.notices.iter().map(|line| chat::system(line)));
         if change.paid {
             // The service paid on its staged copy of the player's inventory and profiles;
-            // adopt it, then let the inventory diff raise the quest events (the change's own
-            // `quest_events` are not forwarded, or a catch would count twice).
+            // adopt it, then let the inventory diff raise the collect event.
             if let Some(next) = self.fishing.reward_state(character.guid).cloned() {
                 let before = self.inventory.state().clone();
                 if self
@@ -3342,6 +3378,9 @@ impl Gameplay {
                     out.replies.extend(update.replies);
                 }
             }
+        }
+        for event in minigame_events {
+            self.npc_quest_event(event, &mut out)?;
         }
         Ok(Some(out))
     }
@@ -3411,12 +3450,20 @@ impl Gameplay {
             let kart = self.kart_entry.as_mut().unwrap();
             let before = kart.state().clone();
             out.replies = kart.handle(inner, now_ms)?;
+            let mut minigame_id = None;
             if let Some(profiles) = &mut self.profiles {
-                out.replies
-                    .extend(kart.claim_reward(&mut self.inventory, profiles)?);
+                let claim = kart.claim_reward_with_event(&mut self.inventory, profiles)?;
+                minigame_id = claim.minigame_id;
+                out.replies.extend(claim.replies);
             }
             out.changed = before != *kart.state();
             self.refresh_npc_quest_eligibility(current_unix_seconds());
+            if let Some(minigame_id) = minigame_id {
+                self.npc_quest_event(
+                    crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+                    &mut out,
+                )?;
+            }
             return Ok(out);
         }
         if inner == [102, 0, 1, 0] {
@@ -10060,5 +10107,546 @@ mod w104_quest_tests {
             game.on_location(&character, 1_001).unwrap();
             count(&game, 1);
         }
+    }
+}
+
+#[cfg(test)]
+mod t013_objective_events {
+    use super::*;
+    use crate::quest_engine::{
+        CharacterEligibility, ObjectiveKind, QuestDefinition, QuestEngine, QuestObjective,
+        QuestRequirements,
+    };
+    use crate::rewards::{RewardDisplay, RewardGrant};
+    use serde_json::json;
+    use std::{
+        fs,
+        path::PathBuf,
+        sync::atomic::{AtomicU64, Ordering},
+    };
+
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    const FISHING_T0: u64 = 1_000_000;
+    const FISHING_ACTOR: crate::fishing::Handle = crate::fishing::Handle {
+        id: 0x1122_3344,
+        seq: 0x5566_7788,
+    };
+
+    fn reference() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets")
+    }
+
+    fn game() -> Gameplay {
+        let path = reference();
+        assert!(
+            path.join("opening.json").is_file(),
+            "T013 requires the private opening reference at {}",
+            path.display()
+        );
+        Gameplay::load(&path, None).expect("opening reference loads")
+    }
+
+    fn eligibility() -> CharacterEligibility {
+        CharacterEligibility {
+            member: true,
+            member_quest_limit: 30,
+            ..CharacterEligibility::default()
+        }
+    }
+
+    fn definition(id: u32, kind: ObjectiveKind, required: u32) -> QuestDefinition {
+        QuestDefinition {
+            id,
+            title: "Synthetic T013 objective (R)".into(),
+            description: String::new(),
+            giver_npc_id: 1,
+            turnin_npc_id: 1,
+            prerequisite_quest_ids: vec![],
+            requirements: QuestRequirements::default(),
+            ordered: true,
+            objectives: vec![QuestObjective {
+                id: 1,
+                required,
+                description: "Synthetic T013 step (R)".into(),
+                kind,
+            }],
+            reward: RewardGrant {
+                coins: 0,
+                items: vec![],
+                job_xp: Default::default(),
+                display: RewardDisplay {
+                    source_guid: 1,
+                    player_guid: 1,
+                    reward_kind: 0,
+                    icon_id: 0,
+                    name_id: 0,
+                    rows: vec![],
+                },
+            },
+        }
+    }
+
+    fn install(game: &mut Gameplay, kind: ObjectiveKind, required: u32) {
+        let mut engine =
+            QuestEngine::new(1, vec![definition(1, kind, required)], eligibility(), None)
+                .expect("synthetic quest engine");
+        assert!(engine.offer(1, 1).changed);
+        assert!(engine.accept(1).changed);
+        game.npc_quests = Some(engine);
+    }
+
+    fn count(game: &Gameplay, expected: u32) {
+        count_id(game, 1, expected);
+    }
+
+    fn count_id(game: &Gameplay, quest_id: u32, expected: u32) {
+        let progress = game
+            .npc_quests
+            .as_ref()
+            .expect("quest engine installed")
+            .progress(quest_id)
+            .expect("active quest exists");
+        assert_eq!(progress.counts, vec![expected]);
+    }
+
+    fn select(game: &mut Gameplay, profile: i32) {
+        let profiles = game.profiles.as_mut().expect("reference profiles");
+        profiles.unlock(profile).expect("profile exists");
+        profiles
+            .select(profile, &game.inventory)
+            .expect("profile can be selected");
+    }
+
+    fn station(game: &Gameplay, recipe_id: u32) -> CharacterState {
+        let actor = game
+            .opening
+            .as_ref()
+            .expect("reference opening")
+            .actors()
+            .iter()
+            .find(|actor| {
+                matches!(
+                    actor.action,
+                    Some(crate::opening::OpeningTrigger::Craft { recipe_id: id })
+                        if id == recipe_id
+                )
+            })
+            .expect("reference crafting station")
+            .clone();
+        CharacterState {
+            guid: 1,
+            zone_id: actor.zone_id,
+            position: actor.position,
+            rotation: [0., 0., 1.],
+        }
+    }
+
+    fn fishing_request(sub: u16, body: &[u8]) -> Vec<u8> {
+        let mut packet = vec![138, 0];
+        packet.extend(sub.to_le_bytes());
+        packet.extend(body);
+        packet
+    }
+
+    fn fishing_actor_bytes() -> Vec<u8> {
+        [
+            FISHING_ACTOR.id.to_le_bytes(),
+            FISHING_ACTOR.seq.to_le_bytes(),
+        ]
+        .concat()
+    }
+
+    fn fishing_register() -> Vec<u8> {
+        let mut body = fishing_actor_bytes();
+        body.push(0);
+        fishing_request(2, &body)
+    }
+
+    fn fishing_cast() -> Vec<u8> {
+        let mut body = fishing_actor_bytes();
+        for coordinate in [10.0f32, 0.0, 0.0, 1.0] {
+            body.extend(coordinate.to_le_bytes());
+        }
+        body.push(0);
+        fishing_request(6, &body)
+    }
+
+    fn fishing_reel() -> Vec<u8> {
+        let mut body = fishing_actor_bytes();
+        body.push(1);
+        fishing_request(7, &body)
+    }
+
+    fn reach_engine(position: [f32; 3], radius: f32) -> QuestEngine {
+        let directory = std::env::temp_dir().join(format!(
+            "osfr-t013-reach-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(directory.join("quests")).unwrap();
+        fs::create_dir_all(directory.join("npcs")).unwrap();
+        let source = json!([
+            {"kind": "reconstructed", "evidence": "(R) T013 synthetic reach objective"}
+        ]);
+        fs::write(
+            directory.join("quests/synthetic.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "records": [{
+                    "id": 7001,
+                    "title_string_id": 1,
+                    "giver_npc_id": 700,
+                    "prerequisite_quest_ids": [],
+                    "objectives": [{
+                        "kind": "reach_poi",
+                        "id": 1,
+                        "poi_id": 9,
+                        "zone_id": 0,
+                        "position": position,
+                        "radius": radius,
+                        "source": source.clone()
+                    }],
+                    "rewards": [],
+                    "source": source.clone()
+                }]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            directory.join("jobs.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "records": [{
+                    "id": "synthetic",
+                    "name": "Synthetic",
+                    "profile_id": null,
+                    "category": "freestyle",
+                    "max_level": 20,
+                    "members_only": false,
+                    "trainer_npc_ids": [],
+                    "quest_ids": [7001],
+                    "abilities": [],
+                    "source": source
+                }]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            directory.join("npcs/synthetic.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "records": [{
+                    "npc_id": 700,
+                    "quest_ids_given": [7001],
+                    "quests_given": [],
+                    "quests_accepted": [{"quest_id": 7001}]
+                }]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let mut engine = QuestEngine::from_split_content(&directory, 1, eligibility(), None)
+            .expect("reach quest");
+        assert!(engine.offer(7001, 700).changed);
+        assert!(engine.accept(7001).changed);
+        let _ = fs::remove_dir_all(directory);
+        engine
+    }
+
+    #[test]
+    fn collect_reward_grant_advances_the_active_collect_objective() {
+        let mut game = game();
+        install(&mut game, ObjectiveKind::CollectItem { item_id: 1195 }, 2);
+        let mut out = Outcome::default();
+        game.grant_reward(0, &[(1195, 1)], &mut out).unwrap();
+        count(&game, 1);
+        game.grant_reward(0, &[(1195, 5)], &mut out).unwrap();
+        count(&game, 2);
+
+        let before = game.npc_quests.as_ref().unwrap().state().clone();
+        assert!(game.grant_reward(0, &[(i32::MAX, 1)], &mut out).is_err());
+        assert_eq!(game.npc_quests.as_ref().unwrap().state(), &before);
+    }
+
+    #[test]
+    fn harvest_payout_advances_the_active_gather_objective() {
+        let mut game = game();
+        install(
+            &mut game,
+            ObjectiveKind::GatherResource { resource_id: 2884 },
+            2,
+        );
+        select(&mut game, 45);
+        let mut out = Outcome::default();
+        game.apply_harvesting(
+            Type8Outcome {
+                transaction: Some(crate::mining::Type8Transaction {
+                    consumes: vec![],
+                    grants: vec![(2884, 2)],
+                }),
+                completed: true,
+                ..Default::default()
+            },
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 2);
+
+        let mut refused = game_without_job(ObjectiveKind::GatherResource { resource_id: 2884 });
+        let before = refused.state();
+        assert!(
+            refused
+                .apply_harvesting(
+                    Type8Outcome {
+                        transaction: Some(crate::mining::Type8Transaction {
+                            consumes: vec![],
+                            grants: vec![(2884, 1)],
+                        }),
+                        completed: true,
+                        ..Default::default()
+                    },
+                    &mut out,
+                )
+                .is_err()
+        );
+        assert_eq!(refused.state(), before);
+        count(&refused, 0);
+    }
+
+    #[test]
+    fn cooking_completion_advances_the_active_craft_objective() {
+        let mut game = game();
+        let recipe_id = game
+            .recipe_catalog
+            .by_key(game.cooking.as_ref().unwrap().recipe_key())
+            .and_then(|recipe| recipe.recipe_id)
+            .expect("cooking recipe has a numeric id");
+        install(&mut game, ObjectiveKind::CraftRecipe { recipe_id }, 1);
+        select(&mut game, 45);
+        let character = station(&game, 2001);
+        let mut out = Outcome::default();
+        game.apply_cooking(
+            CookingOutcome {
+                transaction: Some(crate::cooking::CookingTransaction {
+                    consumes: vec![],
+                    grants: vec![(2884, 1)],
+                    experience_points: 0,
+                }),
+                completed: true,
+                ..Default::default()
+            },
+            &character,
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 1);
+
+        let mut refused = game_without_job(ObjectiveKind::CraftRecipe { recipe_id });
+        let character = station(&refused, 2001);
+        let before = refused.state();
+        assert!(
+            refused
+                .apply_cooking(
+                    CookingOutcome {
+                        transaction: Some(crate::cooking::CookingTransaction {
+                            consumes: vec![],
+                            grants: vec![(2884, 1)],
+                            experience_points: 0,
+                        }),
+                        completed: true,
+                        ..Default::default()
+                    },
+                    &character,
+                    &mut out,
+                )
+                .is_err()
+        );
+        assert_eq!(refused.state(), before);
+        count(&refused, 0);
+    }
+
+    #[test]
+    fn mining_win_advances_the_active_minigame_objective() {
+        let mut game = game();
+        install(
+            &mut game,
+            ObjectiveKind::FinishMinigame { minigame_id: 18 },
+            1,
+        );
+        select(&mut game, 14);
+        let mut win = crate::mining::payload_packet(111_000_001, "OnGameWonMsg").unwrap();
+        win[11..15].copy_from_slice(&18i32.to_le_bytes());
+        let mut out = Outcome::default();
+        game.apply_mining(
+            Type8Outcome {
+                transaction: Some(crate::mining::Type8Transaction {
+                    consumes: vec![],
+                    grants: vec![(2739, 1)],
+                }),
+                completed: true,
+                replies: vec![win.clone()],
+                ..Default::default()
+            },
+            &mut out,
+        )
+        .unwrap();
+        count(&game, 1);
+
+        let mut refused = game_without_job(ObjectiveKind::FinishMinigame { minigame_id: 18 });
+        let before = refused.state();
+        refused
+            .apply_mining(
+                Type8Outcome {
+                    replies: vec![win],
+                    ..Default::default()
+                },
+                &mut out,
+            )
+            .unwrap();
+        assert_eq!(refused.state(), before);
+        count(&refused, 0);
+    }
+
+    #[test]
+    fn fishing_catch_forwards_collect_and_minigame_through_gameplay() {
+        let mut game = game();
+        install(
+            &mut game,
+            ObjectiveKind::FinishMinigame { minigame_id: 595 },
+            1,
+        );
+        let content: serde_json::Value =
+            serde_json::from_str(crate::fishing_service::FishingService::content_json()).unwrap();
+        for fish in content["species"].as_array().unwrap() {
+            let key = fish["key"].as_str().unwrap();
+            for grade in 1..=4 {
+                game.fishing.bind_item_definition(key, grade, 2884).unwrap();
+            }
+        }
+        let rewards = crate::rewards::RewardState::new(
+            game.inventory.clone(),
+            game.profiles.as_ref().unwrap().state().clone(),
+            100,
+        );
+        game.fishing
+            .begin(
+                1,
+                595,
+                9001,
+                "sacred_grove_shallows",
+                1,
+                crate::fishing::Vec4 {
+                    x: 0.0,
+                    y: 0.0,
+                    z: 0.0,
+                    w: 1.0,
+                },
+                rewards,
+            )
+            .unwrap();
+        let instance = game.fishing.instance_id(1).unwrap();
+        let mut start = vec![39, 0, 5];
+        start.extend(instance.to_le_bytes());
+        start.extend((-1i32).to_le_bytes());
+        start.extend((-1i32).to_le_bytes());
+        game.fishing.handle_minigame_lifecycle(1, &start).unwrap();
+        assert!(game.fishing.mark_started(1));
+
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [0.; 3],
+            rotation: [0., 0., 1.],
+        };
+        assert!(
+            game.handle_fishing(&fishing_register(), &character, FISHING_T0)
+                .unwrap()
+                .is_some()
+        );
+        assert!(
+            game.handle_fishing(&fishing_cast(), &character, FISHING_T0 + 10)
+                .unwrap()
+                .is_some()
+        );
+        game.fishing.tick(1, FISHING_T0 + 1_510).unwrap();
+        game.fishing.tick(1, FISHING_T0 + 2_410).unwrap();
+        let caught = game
+            .handle_fishing(&fishing_reel(), &character, FISHING_T0 + 2_420)
+            .unwrap()
+            .expect("catch routes");
+        assert!(!caught.replies.is_empty());
+        count(&game, 1);
+
+        let before = game.npc_quests.as_ref().unwrap().state().clone();
+        game.handle_fishing(&fishing_reel(), &character, FISHING_T0 + 2_430)
+            .unwrap();
+        assert_eq!(game.npc_quests.as_ref().unwrap().state(), &before);
+        count(&game, 1);
+    }
+
+    #[test]
+    fn scene_entry_advances_the_active_area_objective() {
+        let mut game = game();
+        install(&mut game, ObjectiveKind::EnterArea { area_id: 0 }, 1);
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [0.; 3],
+            rotation: [0., 0., 1.],
+        };
+        game.initialize_world(&character, 1_000).unwrap();
+        count(&game, 1);
+
+        let mut refused = game_without_job(ObjectiveKind::EnterArea { area_id: 0 });
+        let before = refused.npc_quests.as_ref().unwrap().state().clone();
+        refused
+            .on_location(
+                &CharacterState {
+                    zone_id: 1,
+                    ..character
+                },
+                2_000,
+            )
+            .unwrap();
+        assert_eq!(refused.npc_quests.as_ref().unwrap().state(), &before);
+        count(&refused, 0);
+    }
+
+    #[test]
+    fn scene_entry_advances_the_active_reach_objective() {
+        let mut game = game();
+        game.npc_quests = Some(reach_engine([0.; 3], 2.0));
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [1.; 3],
+            rotation: [0., 0., 1.],
+        };
+        game.initialize_world(&character, 1_000).unwrap();
+        count_id(&game, 7001, 1);
+
+        let mut refused = game_without_job(ObjectiveKind::EnterArea { area_id: 0 });
+        refused.npc_quests = Some(reach_engine([0.; 3], 2.0));
+        let before = refused.npc_quests.as_ref().unwrap().state().clone();
+        refused
+            .on_location(
+                &CharacterState {
+                    position: [10.; 3],
+                    ..character
+                },
+                2_000,
+            )
+            .unwrap();
+        assert_eq!(refused.npc_quests.as_ref().unwrap().state(), &before);
+        count_id(&refused, 7001, 0);
+    }
+
+    fn game_without_job(kind: ObjectiveKind) -> Gameplay {
+        let mut game = game();
+        install(&mut game, kind, 1);
+        game
     }
 }
