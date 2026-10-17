@@ -901,6 +901,47 @@
             "unavailable": "(R) Shadow Minion refused explicitly: friendly summon actor lifecycle not implemented; other entries executable"
           },
           "weapon_class": 71
+        },
+        {
+          "slot": 4,
+          "definition_id": 62024,
+          "min_level": 5,
+          "name_id": 15916,
+          "description_id": 3255,
+          "icon_id": 2617,
+          "animation_id": 1099,
+          "effect_id": 15414,
+          "damage_multiplier": 1.4,
+          "heal": 0,
+          "energy_cost": 15,
+          "cooldown_ms": 6000,
+          "effects": [
+            {
+              "kind": "stun",
+              "duration_ms": 2000
+            }
+          ],
+          "range": 18,
+          "unavailable": false,
+          "source": {
+            "tag": "client + guide + reconstructed (R)",
+            "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
+            "slot": "(R) T011: Brawler slot 4, appended after the preserved W125 slots; original toolbar order is unrecovered",
+            "min_level": "W125/B2009: Pamela Blalock, Brushing Up on the Brawler, MMORPG.com, 2009-07-29, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/brushing-up-on-the-brawler-2000117137; Rock Toss 5; (R) applying this historical level to the current hybrid skill content",
+            "name_id": "Client locale Global.Text.15916; Jenkins lookup2 1570714033",
+            "description_id": "Client locale Global.Text.3255; Jenkins lookup2 4248561680; 'Hurls a small rock at an opponent doing damage and briefly stunning them.'",
+            "icon_id": "Client Resources/Images/Images.txt:2180 icon_abil_brawler_rockthrow_32.dds",
+            "animation_id": "(R) same-job basic swing fallback; client Resources/WieldTypeAnimationMappings.txt:11-16 maps all six job wield types to 1099; per-skill animation unrecovered",
+            "effect_id": "Client Resources/ActorCompositeEffectDefinitions.xml:10476 PFX_rocks_brown_cog_projectile-land-1; (R) name-based binding, native visual acceptance pending",
+            "damage_multiplier": "(R) ranged opener, 1.4x the existing final-era tier-scaled basic damage; no recovered retail magnitude",
+            "heal": "(R) no heal",
+            "energy_cost": "(R) 100-energy economy, existing 4/s regeneration",
+            "cooldown_ms": "(R) 6 s per-slot monotonic deadline",
+            "range": "Client tutorial Global.Text.37458 calls Rock Toss a ranged attack; (R) 18 m and one target",
+            "effects": "(R) 2 s stun follows the client description 'briefly stunning'; no original server table",
+            "unavailable": "(R) executable; targeting and effect timing need native acceptance"
+          },
+          "weapon_class": 71
         }
       ]
     },

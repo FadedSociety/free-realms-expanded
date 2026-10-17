@@ -238,15 +238,30 @@ impl OpeningAbilities {
         Ok(())
     }
 
+    /// One entry per toolbar slot 1..=7 for the job at `level`. A locked or
+    /// absent ability leaves its slot empty instead of shifting later skills;
+    /// the client's variable-length toolbar encoding expects that position.
+    pub fn job_bar(&self, profile_id: i32, level: u32) -> [Option<&JobAbility>; 7] {
+        let mut bar = [None; 7];
+        if let Some(slots) = self.jobs.get(&profile_id) {
+            for ability in slots {
+                if ability.min_level <= level {
+                    bar[(ability.slot - 1) as usize] = Some(ability);
+                }
+            }
+        }
+        bar
+    }
+
     /// The job ability on toolbar `slot` (1..) for this profile, if the job
     /// level has unlocked it.
     pub fn job_slot(&self, profile_id: i32, slot: i32, level: u32) -> Option<&JobAbility> {
         self.basics.get(&profile_id)?;
-        self.jobs.get(&profile_id).and_then(|slots| {
-            slots
-                .iter()
-                .find(|a| a.slot == slot && a.min_level <= level)
-        })
+        let index = usize::try_from(slot).ok()?.checked_sub(1)?;
+        self.job_bar(profile_id, level)
+            .get(index)
+            .copied()
+            .flatten()
     }
 
     /// Resolve server-owned requirements against CURRENT inventory at cast
@@ -315,16 +330,12 @@ impl OpeningAbilities {
                 put(&mut toolbar, value);
             }
             toolbar.push(1); // ForceDismount, as in the pinned CreateToolbarSlot.
-            let extra = self
-                .jobs
-                .get(&profile_id)
-                .map_or(&[][..], |slots| slots.as_slice());
-            for ability in extra {
-                if ability.min_level > level {
+            for ability in self.job_bar(profile_id, level) {
+                let Some(ability) = ability else {
                     // Not learned yet: the slot stays empty (keys keep their order).
                     put(&mut toolbar, 0);
                     continue;
-                }
+                };
                 // 36/13 layout: id 4, name 10, description 14, icon 18, energy cost 50.
                 let mut definition = vec![0; 160];
                 definition[..4].copy_from_slice(&[36, 0, 13, 0]);
@@ -354,8 +365,6 @@ impl OpeningAbilities {
                 }
                 toolbar.push(1);
             }
-            // The remaining slots have Type=0.
-            toolbar.extend(vec![0; 4 * (7 - extra.len())]);
         } else {
             toolbar.extend([0; 32]);
         }

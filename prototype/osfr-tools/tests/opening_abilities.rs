@@ -77,9 +77,7 @@ fn scratch_warrior_level_five_bot_reads_kick_and_spinning_blade_bar() {
     bot.disconnect();
 }
 
-// Independent expected levels: changing a content lock alone must fail this test.
-#[test]
-fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
+fn shipped_roster() -> OpeningAbilities {
     let mut fixture = Fixture::new();
     fixture.content["basics"] = json!([11, 32, 12, 2, 43, 35].map(
         |profile| json!({"profile_id":profile,"definition_id":4895,"name_id":1,
@@ -88,13 +86,140 @@ fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
     fixture.write();
     let jobs: Value =
         serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
-    let abilities = load_jobs(&fixture, &jobs).unwrap();
+    load_jobs(&fixture, &jobs).unwrap()
+}
+
+// (slot, client name id, unlock level). The name ids come from the client
+// locale, not from job_abilities.json, so a swapped skill fails here.
+const COMBAT_LADDERS: [(i32, &[(i32, i32, u32)]); 6] = [
+    (
+        11,
+        &[
+            (1, 442456, 1),
+            (2, 3784, 1),
+            (3, 3810, 5),
+            (4, 24061, 10),
+            (5, 3800, 15),
+        ],
+    ),
+    (
+        32,
+        &[(1, 24540, 1), (2, 4908, 5), (3, 24694, 10), (4, 24706, 15)],
+    ),
+    (
+        12,
+        &[(1, 17071, 1), (2, 35492, 5), (3, 23679, 10), (4, 38016, 15)],
+    ),
+    (
+        2,
+        &[(1, 3085, 1), (2, 3086, 5), (3, 24516, 10), (4, 3855, 15)],
+    ),
+    (
+        43,
+        &[(1, 24097, 10), (2, 21374, 15), (3, 24133, 1), (4, 15916, 5)],
+    ),
+    (
+        35,
+        &[
+            (1, 4830, 5),
+            (2, 24364, 1),
+            (3, 20015, 15),
+            (4, 24397, 10),
+            (5, 24398, 20),
+        ],
+    ),
+];
+
+#[test]
+fn every_job_bar_has_exactly_the_unlocked_ladder_at_every_level() {
+    let abilities = shipped_roster();
+    for (profile, ladder) in COMBAT_LADDERS {
+        for level in 1..=20 {
+            let bar = abilities.job_bar(profile, level);
+            for slot in 1..=7 {
+                let expected = ladder.iter().find(|(s, _, _)| *s == slot);
+                match (bar[slot as usize - 1], expected) {
+                    (Some(ability), Some((_, name, minimum))) => {
+                        assert_eq!(ability.slot, slot, "profile {profile}, level {level}");
+                        assert_eq!(ability.name_id, *name, "profile {profile}, level {level}");
+                        assert!(
+                            level >= *minimum,
+                            "profile {profile}, slot {slot} showed early at level {level}"
+                        );
+                    }
+                    (None, Some((_, _, minimum))) => assert!(
+                        level < *minimum,
+                        "profile {profile}, slot {slot} missing at level {level}"
+                    ),
+                    (Some(ability), None) => {
+                        panic!(
+                            "profile {profile}, unexpected slot {} at level {level}",
+                            ability.slot
+                        )
+                    }
+                    (None, None) => {}
+                }
+            }
+
+            // The wire bar must match the model: one basic, seven job slots,
+            // a definition for every unlocked skill and an empty locked slot.
+            let packets = abilities.activation(profile, level).unwrap();
+            let mut expected_definitions = vec![4895];
+            expected_definitions.extend(bar.iter().flatten().map(|a| a.definition_id));
+            let definitions: Vec<i32> = packets[..packets.len() - 1]
+                .iter()
+                .map(|p| i32::from_le_bytes(p[4..8].try_into().unwrap()))
+                .collect();
+            assert_eq!(definitions, expected_definitions);
+
+            let toolbar = packets.last().unwrap();
+            assert_eq!(
+                i32::from_le_bytes(toolbar[4..8].try_into().unwrap()),
+                profile
+            );
+            assert_eq!(i32::from_le_bytes(toolbar[8..12].try_into().unwrap()), 8);
+            let mut at = 12;
+            assert_eq!(
+                i32::from_le_bytes(toolbar[at..at + 4].try_into().unwrap()),
+                3
+            );
+            assert_eq!(
+                i32::from_le_bytes(toolbar[at + 4..at + 8].try_into().unwrap()),
+                4895
+            );
+            at += 41;
+            for (entry, expected) in bar.iter().enumerate() {
+                let kind = i32::from_le_bytes(toolbar[at..at + 4].try_into().unwrap());
+                match expected {
+                    Some(ability) => {
+                        assert_eq!(kind, 3, "profile {profile}, level {level}, slot {entry}");
+                        assert_eq!(
+                            i32::from_le_bytes(toolbar[at + 4..at + 8].try_into().unwrap()),
+                            ability.definition_id
+                        );
+                        at += 41;
+                    }
+                    None => {
+                        assert_eq!(kind, 0, "profile {profile}, level {level}, slot {entry}");
+                        at += 4;
+                    }
+                }
+            }
+            assert_eq!(at, toolbar.len());
+        }
+    }
+}
+
+// Independent expected levels: changing a content lock alone must fail this test.
+#[test]
+fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
+    let abilities = shipped_roster();
     for (profile, expected) in [
         (11, vec![(1, 1), (2, 1), (3, 5), (4, 10), (5, 15)]),
         (32, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
         (12, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
         (2, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
-        (43, vec![(1, 10), (2, 15), (3, 1)]), // W125: 2009 Brawler guide
+        (43, vec![(1, 10), (2, 15), (3, 1), (4, 5)]), // W125: 2009 Brawler guide
         (35, vec![(1, 5), (2, 1), (3, 15), (4, 10), (5, 20)]), // W125: 2009 Archer guide
     ] {
         for (slot, minimum) in expected {
@@ -135,6 +260,8 @@ fn full_roster_preserves_campaigns_with_only_some_basic_attacks() {
         serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
     let abilities = load_jobs(&fixture, &jobs).unwrap();
     assert!(abilities.job_slot(43, 3, 1).is_some()); // Leg Sweep, the level-1 Brawler skill (W125)
+    assert!(abilities.job_slot(43, 4, 4).is_none()); // Rock Toss is a level-5 skill
+    assert!(abilities.job_slot(43, 4, 5).is_some());
     assert!(abilities.job_slot(32, 1, 20).is_none());
     let bar = abilities.activation(32, 20).unwrap();
     assert_eq!(bar.len(), 1);
