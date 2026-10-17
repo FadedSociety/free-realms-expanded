@@ -6,13 +6,15 @@ status: unrun
 
 # Native Checklist 2026-10-16
 
-One play session in the real 2014 client that checks everything the Claude workers landed on 2026-10-16 (W138 to W151, W155, W158, W161). Nothing below has been seen on a native client yet. Every behaviour is proven only by unit tests, gateway-level tests and, for six features, bots (`tests/bot_acceptance_1016.rs`, W154). Treat each "what should happen" line as a hypothesis from static analysis, and every field order marked (R) as a guess to confirm.
+One play session in the real 2014 client that checks everything the Claude workers landed on 2026-10-16 (W138 to W151, W155, W158, W160 to W164). Nothing below has been seen on a native client yet. Every behaviour is proven only by unit tests, gateway-level tests and, for six features, bots (`tests/bot_acceptance_1016.rs`, W154). Treat each "what should happen" line as a hypothesis from static analysis, and every field order marked (R) as a guess to confirm.
 
 Sections follow the order a session naturally flows: login, town, shops, crafting, fights, travel, then relog. Each has Setup, Steps, Expect, Capture and the Open question the run answers. Fill the **Result** line as you go.
 
+W170 update (HEAD `5d522cf`): sections 11 and 15 to 18 were placeholders when W165 wrote this note and now describe the real behaviour from the W158, W160, W162, W163 and W164 reports; section 5 carries the W161 and W164 detail. Sections 15 (fishing), 16 (mounts) and 18 (path trail) are wired in the working tree but only **staged, not committed**; section 17's real trade is **not wired at all** and its commit fails closed. Re-check the gates in 0.1 before you rely on this.
+
 ## 0. Before you start
 
-### 0.1 What is live at HEAD `5f06115`
+### 0.1 What is live (HEAD `5d522cf`, checked 2026-10-16)
 
 | Feature | Worker | Commit | Live in the gateway? |
 |---|---|---|---|
@@ -27,20 +29,27 @@ Sections follow the order a session naturally flows: login, town, shops, craftin
 | Free revive (41/122) with 15 s server fallback | W147 | `f24c3ba` | Yes |
 | Item bar and Small Health Potion; friend positions; group job and map ping | W146, W151 | `86b1b0e` | Yes |
 | Kart race from an NPC menu; activity portal list and Play | W149, W150 | `5f06115` | Yes (kart needs `kart_gates.json`, see 0.3) |
-| **Take Me There pin (47/14)** | W161 | not committed | **No.** The builder and tests exist; the `gameplay.rs` hook is a pending shared patch. |
-| **Power-up drops** | W155, W158 | data committed; engine uncommitted | **No.** `power_ups.json` is in `data/content` but `gameplay.rs` does not load it and no enemy rolls it until the lead wires it. |
-| **Trade unavailable answer (59/x)** | W156 | not committed | **No.** The adapter exists; the route patch is pending. |
-| **Fishing entry** | W160 | in flight | No |
-| **Mounts** | W162 | in flight | No |
-| **Real player trade** | W163 | in flight | No |
-| **98/1 path answer (breadcrumb trail)** | W164 | in flight | No |
+| **Take Me There pin (47/14)** | W161 | `dc27270` | Yes |
+| **Power-up drops, killer's own pickup** | W155, W158 | `dc27270` (data, engine, `gameplay.rs` load, `realm reload power_ups`) | Yes |
+| **Trade unavailable answer (59/x)** | W156 | `dc27270` | Yes. This is the only trade behaviour that is live. |
+| Power-up per-participant drops and big-heart group heal (slice 2b) | W158 | not committed | **No.** `encounter.rs`, `power_ups.rs` and the `participation` block in `power_ups.json` are edited in the tree, but `apply_slice2b.py` (gameplay, gateway, world, `osfr-gateway.rs`) has not been applied. Today only the killer gets a pickup and a big heart heals only its owner. |
+| **Fishing entry from six guide NPCs** | W160 | staged, **not committed** | Wired in the tree (`handle_fishing`, `begin_fishing`, `fishing_spots.json`, bundle line). Needs the package to carry `fishing_spots.json` (0.3). |
+| **Mounts (168)** | W162 | staged, **not committed** | Wired in the tree (`is_mounted`, `settle_mounts`, `mounts.json`). |
+| **98/1 path answer (breadcrumb trail)** | W164 | staged, **not committed** | Wired in the tree (`pathing.rs`, `gameplay.rs`, label in `gateway.rs`). |
+| **Real player trade** | W163 | not committed | **No.** `trade.rs` and `player_radial.rs` are edited and `tests/player_trade.rs` exists, but `lab/runs/claude/W163/patch/shared-files.diff` is not applied (no `route_trade`, no Trade radial entry in `osfr-gateway.rs`), and its `commit_trade` is a fail-closed stub even after it is applied. |
 
 Run the gate for each "No" row just before the session and skip a section if its gate fails:
 
 ```
 git -C project log --oneline -30
-rg -n "power_up|PowerUps" project/prototype/osfr-tools/src/gameplay.rs
-rg -n "Tracker|tracked_target" project/prototype/osfr-tools/src/gameplay.rs
+rg -n "load_power_ups" project/prototype/osfr-tools/src/gameplay.rs      # drops (live at dc27270)
+rg -n "tracked_pin" project/prototype/osfr-tools/src/gameplay.rs          # pin (live at dc27270)
+rg -n "group_heal|claim_group_heal" project/prototype/osfr-tools/src/gameplay.rs   # slice 2b (empty = not wired)
+rg -n "handle_fishing" project/prototype/osfr-tools/src/gameplay.rs       # fishing
+rg -n "settle_mounts" project/prototype/osfr-tools/src/gameplay.rs        # mounts
+rg -n "pathing" project/prototype/osfr-tools/src/gameplay.rs              # 98/1 answer
+rg -n "route_trade|commit_trade" project/prototype/osfr-tools/src/bin/osfr-gateway.rs   # real trade (empty = not wired)
+git -C project status --short                                             # staged (A/M in column 1) means not committed
 ```
 
 A section whose gate fails stays in this note for the day it lands. Do not count it as a native failure.
@@ -59,14 +68,17 @@ A section whose gate fails stays in this note for the day it lands. Do not count
 | 8 Recipe book | No |
 | 9 Item bar | No |
 | 10 Free revive | No |
-| 11 Power-up drops | No (a second client is optional for the group heal, which is not built) |
+| 11 Power-up drops | No for the killer's own pickup. **Yes** for the per-participant drop and the big-heart group heal (slice 2b), once wired |
 | 12 Activity portal | No |
 | 13 Warpstones and Atlas | No (58 friend teleport is refused, so a friend is not needed) |
 | 14 Kart from an NPC | No |
-| 15 to 18 (once wired) | 17 real trade needs two clients; the rest do not |
+| 15 Fishing | No |
+| 16 Mounts | **Yes** to see the rider and the ride from outside (one client checks everything else) |
+| 17 Trade | The shim runs on one client; **real trade needs two clients** (and, today, only reaches the fail-closed commit) |
+| 18 Path trail | No |
 | 19 Relog | No |
 
-`run-local-baseline.py` starts one client. For a second real client use a second PC over the LAN or VPN with its own account and enrolled key (see [[Playtest Host Runbook]]); this is the main blocker for sections 2, 4 and 17. Until it exists, run those sections with a bot as the second player and mark the receiving-side checks as not done. A bot (`osfr-bot`) stands in as a visible second player for sections 2 (server side) and 3.
+`run-local-baseline.py` starts one client. For a second real client use a second PC over the LAN or VPN with its own account and enrolled key (see [[Playtest Host Runbook]]); this is the main blocker for sections 2, 4, 11b, 16 and 17. Until it exists, run those sections with a bot as the second player and mark the receiving-side checks as not done. A bot (`osfr-bot`) stands in as a visible second player for sections 2 (server side) and 3.
 
 ### 0.3 Build the play package
 
@@ -82,8 +94,9 @@ The old `round70` package holds only the campaign overlay. It has no `stores.jso
    {"schema_version": 1, "npcs": [9000000039], "reward_cooldown_s": 60}
    ```
    9000000039 is Cale Yardbird (Briarwood, -276.7, 1964.8). Chase Wheeler is 9000000273. Both are (R) picks. A short cooldown lets you see the cooldown refusal without waiting.
+   `fishing_spots.json` (section 15) and `mounts.json` (section 16) are in `data\content`, so the copy in step 2 brings them. Check that both are in the scratch `content\`: `fishing_spots.json` is a bundle-optional file and nothing else loads it, and without it no guide offers fishing.
 4. Optional, to make the power-up check take minutes instead of hours (section 11): in the scratch `content\power_ups.json` set both `chance` values of the `standard` table to `1.0`. The shipped chances are 12% and 10% (R).
-5. Wallet: `realm coins 5000` after login. Capo has 309 coins; the cheapest checks below cost 75 to 750.
+5. Wallet: `realm coins 5000` after login. Section 16 needs a ride item (`realm give 14289`, the Wolf) and section 17 needs a few `realm give` items on both characters. Capo has 309 coins; the cheapest checks below cost 75 to 750.
 
 This merged package has not been run through `run-local-baseline.py` yet. Step 1.1 is the first proof it starts.
 
@@ -129,7 +142,8 @@ Take a screenshot at each **Expect** point. Name them `<section>-<step>.png` in 
 | `realm level <1-20>` | set the active job's level |
 | `realm heal` / `realm god` | restore health and energy / toggle god mode |
 | `realm battle <id>` / `realm win` | start a field battle / dev-win it |
-| `realm reload all` | reload battles, enemies, abilities (does not reload `power_ups.json` unless the lead has added that, check) |
+| `realm reload all` | reload battles, enemies, abilities and power-ups |
+| `realm reload power_ups` | reload `power_ups.json` alone (a bad file keeps the old tables and answers an error); use it after changing `chance` in the scratch package instead of restarting |
 
 Landmarks used below (zone 0, the one continent; the regional `zone_id`s in content are labels):
 
@@ -251,7 +265,7 @@ Landmarks used below (zone 0, the one continent; the regional `zone_id`s in cont
 
 ## 5. Quest select, lock and the Take Me There pin
 
-**Result:** ____ (pin part runs only if W161 is wired; see 0.1)
+**Result:** ____ (pin: committed `dc27270`, runs now. Trail in step 7b: W164, staged only, see 0.1 and section 18)
 
 **Setup:** Cobblestone Village. Two quests available without prerequisites: 3000021 (Samantha, objective: talk to Ricky Danger) and 3000060 (Ricky Danger, objective: talk to Samantha), both in the Adventurer set. Take both so two are active. Others with objectives: 3030007 Jones (Brawler, defeat).
 
@@ -266,6 +280,8 @@ Landmarks used below (zone 0, the one continent; the regional `zone_id`s in cont
 7. (Pin) Walk to Ricky Danger, finish the objective, and check the pin clears. Select the other quest and check the pin moves.
 8. (Pin) Leave the area through a warpstone (section 13) and back; check the pin clears and returns.
 9. Breadcrumb: if the journal has a "Start" or breadcrumb button for a not-yet-taken quest (49/15), try it on one.
+10. (Pin, kill objective) `realm goto Jones`, accept 3030007 (Brawler, defeat), select it. The pin should point at a Hooligan near (-1971, 540).
+11. (Pin, no place) Pick a quest whose current objective is an item, gather, craft or minigame step (any of the later Adventurer or Brawler quests). Select it. Also finish every objective of 3000021 but do not turn it in.
 
 **Expect**
 
@@ -275,10 +291,13 @@ Landmarks used below (zone 0, the one continent; the regional `zone_id`s in cont
 - Step 6: a pin to Ricky Danger at (-1909.5, 462.8) on the minimap and a "Take Me There" button that walks or points toward him. The NPC name is not sent, so the label reads "Objective Destination".
 - Step 7: the pin clears when the objective is done and moves with the selection.
 - Step 9: for an unregistered quest nothing happens (no crosswalk yet; breadcrumb starts are inert except for an owned active quest).
+- Step 10: a pin on the lowest-guid Hooligan of that kind. That is the quest-gated Hooligan at about (-1971, 540), which may not be the one nearest you (R, known weak pick).
+- Step 11: no pin and no "Take Me There" button for an objective with no single place, and none once all objectives are done and only the turn-in is left (the pin clears; a turn-in pin is not built). The server sends a 1-byte clear only when a pin was showing; it sends nothing when there was none.
+- A pin is sent only when the quest's zone equals the character's zone. The pin is not saved: relog resends it.
 
-**Capture:** inbound 47/12, 47/13, 49/15; outbound 47/14 (`app_out`, 45 bytes with a pin, 1 byte to clear). Also the inbound 98/1 rows after Take Me There: the client sends them whenever the target is within 300 m and waits for a reply the server does not send yet (W164 is building one). Save diff: `selected_quest_id` in the quest state.
+**Capture:** inbound 47/12, 47/13, 49/15; outbound 47/14 (`app_out`; the body after the 3-byte header is 1 byte inactive, or 1 + 44 bytes active: three u32 `a`, `b`, `c`, a u64 guid, a u32 name id, four floats, a u32 zone id; the earlier "45 bytes" counted the body, 48 with the header). Also the inbound 98/1 rows after Take Me There: the client sends one (55 bytes) whenever the target is within 300 m. With W164 staged the server answers with 98/2 (section 18). Without it, per W164's recovery of `009cd410`, the client waits 10 s and then **drops the Take Me There target** (it does not just show an empty trail), so a pin that vanishes after 10 s means the 98/1 reply is missing. Save diff: `selected_quest_id` in the quest state. Client log: `Breadcrumb.log` ("Kynapse path attempt success - path nodes: N").
 
-**Open questions:** (a) polarity of 47/13 (the wire byte is the inverse of the client's auto-switch flag, from `00c7c5d0`): lock once, unlock once, relog, and confirm the checkbox state matches; (b) the meaning of the pin's `a`/`b`/`c` fields (W161 sets a = quest id, b = 0, c = objective id, name 0, w 1.0): does the pin land on the right spot, and does the minimap marker and button both work; (c) with no 98/1 reply, does the client draw no breadcrumb trail, log "no path", or retry in a loop (watch the trace row count for 98/1); (d) does the login self-data read `selected_quest_id` back, so the relog shows the same selection.
+**Open questions:** (a) polarity of 47/13 (the wire byte is the inverse of the client's auto-switch flag, from `00c7c5d0`): lock once, unlock once, relog, and confirm the checkbox state matches; (b) the meaning of the pin's `a`/`b`/`c` fields (W161 sets a = quest id, b = 0, c = objective id, name 0, w 1.0): does the pin land on the right spot, and does the minimap marker and button both work; (c) whether the pin and button survive more than 10 s (they should only if a 98/2 reply arrives; if W164 is not in the build, expect the target to clear at about 10 s, which is the proof that the reply matters); (d) does the login self-data read `selected_quest_id` back, so the relog shows the same selection.
 
 ## 6. Vendor buy and sell
 
@@ -422,37 +441,64 @@ Landmarks used below (zone 0, the one continent; the regional `zone_id`s in cont
 
 **Open questions:** (a) **the 41/125 field order**: the server sends `timer ms` then `cost`, inferred from the arguments at `00904300`. If the screen shows a countdown of thousands of seconds or a cost of 10000, the order is reversed; (b) does the window appear for an overworld knockout (the client-side "overworld" predicate has an unrecovered writer at client `+0x80`); (c) does it show two buttons or only the countdown; (d) the avatar has no knocked-out pose (the 35/20 bit is not sent); does the character just stand with 0 health; (e) is the zoning to the checkpoint smooth or a visible pop; (f) 41/125 built by `abilities.rs` (`build_respawn_window`) is 12 bytes and would be misparsed (needs the 20-byte layout); it is not on the world route but check no other knockout path shows a garbled window (battle knockouts).
 
-## 11. Power-up drops (only once wired)
+## 11. Power-up drops
 
-**Result:** ____ (skip until the gate in 0.1 passes)
+**Result:** ____ (11a, the killer's own pickup, is committed `dc27270` and runs now. 11b, per-participant drops and the big-heart group heal, needs two clients and is not wired, see 0.1)
 
-**Setup:** the scratch `power_ups.json` with chance 1.0 (see 0.3 step 4), tables `standard`. The Hooligans (field_enemies) and the 3 field battles (96, 12301, 12302) carry `power_up_table: "standard"` in the uncommitted data. Kinds: health_small (15% heal), health_big (50%, group heal not built), energy, flame_wave, earth_shard, super_shield. Models 736, 737, 1949, 1950, 1951.
+**Setup**
 
-**Steps**
+- Package from 0.3, `power_ups.json` with both `standard` `chance` values at `1.0` (0.3 step 4). If you edit it mid-session, run `realm reload power_ups`.
+- Solo, god mode off, `realm level 5` so the Hooligans do not end the test. Stand near the Hooligan group at about (-1970, 540). All 16 field enemies and the Bixie Soldier (12301) and Robgoblin (12302) battles carry `power_up_table: "standard"`; battle 96 is deliberately untagged and the tutorial cave drops nothing.
+- To see health pickups work, get hurt first. To see energy work, spend some energy first.
+- Kinds: `health_small` 15% heal, `health_big` 50% heal and a heart for the group (model 736, scale 1.5), `energy` +100 (clamped to the bar, model 737), and the held kinds `flame_wave` (1949), `earth_shard` (1950), `super_shield` (1951). Pickup radius 1.5 m, lifetime 30 s, at most 16 alive per instance.
+- One client for 11a. 11b needs two clients in a group in the same zone (or a client plus `osfr-bot`; a bot stands in for the damage side but not for what the second player sees).
+
+**Steps (11a, one client)**
 
 1. Kill a Hooligan. Look where it fell.
-2. Walk onto a pickup (do not click).
+2. Walk onto the pickup. Do not click.
 3. Collect a health pickup while hurt, and one at full health.
 4. Collect an energy pickup.
-5. Collect a stored kind (flame wave, earth shard or super shield). Then try a second stored kind.
-6. Leave a pickup for 30 s.
-7. Kill several at once to see the 16-per-instance cap.
-8. Try a click on the pickup actor.
+5. Collect a stored kind (flame wave, earth shard or super shield), then try to collect a second stored kind while holding the first.
+6. Leave a pickup alone for 30 s.
+7. Kill several enemies in a row without collecting to see the 16 cap.
+8. Click the pickup actor.
+9. Zone away (warpstone, section 13) with a pickup on the ground, then come back.
+10. Log out holding a stored kind and log back in.
 
-**Expect**
+**Expect (11a)**
 
-- Step 1: a bobbing, spinning pickup actor spawns where the enemy died (and a "com_spawn" effect), disposition neutral so it is not Tab-targetable.
-- Step 2: walking within 1.5 m collects it (proximity only; no packet is sent by the client in the design).
-- Step 3: health heals by 15% and a +N number appears; collected even at full health.
-- Step 4: energy fills, 38/13.
-- Step 5: the first stored kind is held; the second stays on the ground and the client line "You can have one power up active at a time." appears once.
-- Step 6: the pickup disappears at 30 s.
-- Step 8: probably nothing.
-- The held power-up is **not** shown on the bar yet (slice 3 is blocked on your key-3 slot decision).
+- Step 1: a bobbing, spinning pickup actor appears where the enemy died, with the "com_spawn" effect. Neutral disposition, so it cannot be Tab-targeted. Several drops from one kill sit 0.8 m apart.
+- Step 2: walking within 1.5 m collects it (horizontal distance, from the server position; the client sends nothing). The pickup sound (composite 15509) plays.
+- Step 3: a heal of 15% (small) or 50% (big) of max health and a "+N" number. It is consumed even at full health (R).
+- Step 4: energy rises, clamped at 100, and the energy bar updates.
+- Step 5: the first stored kind is held (invisible: it is **not** on the bar yet). The second stays on the ground, the client line "You can have one power up active at a time." appears **once** per pickup, and the pickup still despawns on its 30 s lifetime. Hearts and energy are still collected while holding a stored kind.
+- Step 6: the pickup disappears at 30 s. At exactly the deadline despawn wins.
+- Step 7: pickups beyond 16 alive are simply not created.
+- Step 8: probably nothing (the pickup has no click route).
+- Step 9: pickups are cleared on the zone change, with no removal packets. Pickups never outlive the 30 s lifetime anyway.
+- Step 10: the held kind is lost (session only, by design).
+- The pickup is personal to the killer for now; a second player standing next to you sees nothing at all (the pickup and its removal go only to you).
 
-**Capture:** outbound AddNpc/RemoveNpc rows (families 36/39 as usual for actors, check the trace), 35/35, 38/13, 15/3; the pickup sound (composite 15509). Screenshot each pickup type.
+**Steps and expect (11b, two clients A and B, in a group, wired only after `apply_slice2b.py`)**
 
-**Open questions:** (a) does a pickup actor with `name_id` 0 show an empty nameplate or the kind id string; (b) template field 133 and disposition 1 behaviour; (c) does the client send anything when you stand on or click a pickup (then the proximity-only design needs a click route); (d) does composite 15509 play; (e) the Super Shield mesh and icon are missing from the extracted packs, so that kind may render as nothing; (f) at 12% and 10% real chances, how many kills until you see one (a tuning data point, not a pass/fail); (g) not testable yet: whether the client accepts a whole-bar 36/5 mid-fight, which slice 3 (the held power-up in toolbar slot index 2, key 3) needs; slice 3 also waits for your slot-layout decision. Group heal for the big heart needs cross-player routing and is not built.
+1. A and B both hit the same Hooligan; A lands the last hit.
+2. A and B each stand off and wait 10 s, then A and B each kill another where only A hits it.
+3. B stands in the group but never hits or gets targeted; A kills.
+4. A picks up a big heart while B is hurt and in range. Then get a second big heart from the same kill if you can.
+5. A picks up a big heart while B is in another zone.
+
+- Step 1: **each of A and B gets their own pickup**, and neither sees the other's. A's appears immediately, B's on B's next server tick. Rolls are independent, so with chance 1.0 both see one.
+- Step 2: a player who hit the enemy in the last 30 s or was its target at death takes part; a credit not claimed within 10 s lapses.
+- Step 3: B (a bystander) gets nothing.
+- Step 4: A heals 50% and B (same group, same zone and instance, alive) heals 50% of B's own max health once. A second big heart from the same kill adds no second group heal. It never revives a knocked-out member.
+- Step 5: no heal for B (and the kill's group claim is spent).
+
+**Capture:** AddNpc and RemoveNpc rows for the pickup (families 35/2 and 35/3), 35/35 (the "+N" number), 38/1 and 38/13 (health and energy), 15/3 (the held-kind line), and the pickup sound. For 11b: B's own AddNpc/35/3 rows, and a 38/1 on B at the moment A collects. Screenshot each pickup type, plus both players' screens in 11b.
+
+**Open questions (native):** (a) does a pickup actor with `name_id` 0 show an empty nameplate or the kind id string; (b) does disposition 1 and template field 133 behave as non-targetable and non-attackable; (c) does the client send anything when you stand on or click a pickup (if so, the proximity-only design needs a click route); (d) does composite 15509 play, and from the right spot (W158 plays it on guid 1 in the personal tick); (e) the Super Shield mesh and icon are missing from the extracted packs, so that kind may render as nothing; (f) tuning data point, not pass/fail: at the shipped 12% and 10% chances, how many kills until you see one; (g) not testable yet: whether the client accepts a whole-bar 36/5 mid-fight, which slice 3 (the held power-up in toolbar slot index 2, key 3) needs, and slice 3 also waits for the owner's slot-layout decision; (h) 11b: does the group heal land on the right player and number, and does A's big heart heal the others in a group the client treats as the same group as the social service.
+
+**Known gaps for this run:** participants are credited only for players in instance 0 with the world loaded; the engaged-target rule uses the target at death only; `Session::heal_group` has no automated test (only a socket test with two bots in a group would cover it), so 11b is the first proof.
 
 ## 12. Activity portal
 
@@ -545,32 +591,187 @@ Landmarks used below (zone 0, the one continent; the regional `zone_id`s in cont
 
 **Open questions:** (a) whether a kart race can be entered from the ordinary menu path and loads (the earlier native kart runs entered via `realm race`); (b) the menu label; (c) the Kart Driver outfit (the native default outfit of 4 items is not in our starter content, so the jersey may be missing: W88 catalogue adds 13419); (d) is the race sound and HUD intact when entered through the NPC; (e) the reward cooldown message and whether the lead wants "Kart Driver job must be unlocked" instead of auto-unlock on first entry.
 
-## 15. Fishing entry (only once wired, W160)
+## 15. Fishing from a guide NPC (W160, staged, not committed)
 
-**Result:** ____ (skip until the gate passes)
+**Result:** ____ (skip until `rg -n "handle_fishing" ...gameplay.rs` finds it in the build you launch; see 0.1)
 
-W160 recovers how a player starts fishing (a spot, a pole, or a listed NPC (R)) and builds admission and glue; the entry has not been seen natively. Setup comes from the W160 report: `fishing_spots.json` if it adds one. Steps will follow W149's pattern: reach the entry, start, cast, catch, quit and reconnect. **Expect** exactly one server-owned payout per catch and nothing for a quit or a forged catch. **Capture:** fishing family 138 and minigame type 21 traffic, and the save diff for items and coins. **Open question:** which ordinary entry the client actually supports.
+**Setup**
 
-## 16. Mounts (only once wired, W162)
+- `fishing_spots.json` must be in the package's `content\` (0.3). Without it no guide offers fishing, and that is the first thing to check if the menu has no fishing entry.
+- No job is required (a quest video shows an Archer fishing), and no rod or item needs to be given. The first trip unlocks Fisherman (R) and does **not** change the active job. Any role; `realm goto <name>` works with a name prefix.
+- Six guides stand in for the original boat, which is a world object our server does not route (R). All six are NPC content:
 
-**Result:** ____ (skip until the gate passes)
+| Guide | NPC id | Area (minigame row) | Notes |
+|---|---|---|---|
+| Reed Stillwater (Stillwater Crossing) | 9000000181 | Sacred Grove Shallows (599) | strongest evidence: client text says use the boat behind him |
+| Selvi Slowreel (Lakeshore docks) | 9000000194 | Rainbow Lake (598) | client text names her |
+| Lila Darklure (Briarwood) | 9000000377 | Darklit Lagoon (596) | client text names her |
+| Gunther (Briarwood) | 9000000339 | Brambleback's Bayou (597) | weak (R) pick, the real guide is unnamed |
+| Big J (Snowhill) | 9000000024 | Wintery Basin (600) | weak (R) pick |
+| Chip Numbwing (Snowhill) | 9500000736 | Frostbitten Banks (601) | client text names him |
 
-W162 routes summon and dismount, auto-dismount on zoning, combat start, knockout and minigame entry, and supplies `is_mounted()` to the emote rules. **Setup:** an owned mount (`mounts.json`), `realm give` the mount item. **Steps:** summon, ride, have a second client watch (2 clients for the visibility check), dismount by each trigger, then try an emote while mounted (section 2 step 6) and expect the silent refusal. **Capture:** mount family 168 traffic, the AddPc or attachment the other player sees, the mounted speed. **Open questions:** what the client sends to summon (item use, a mount bar, a 168 request), what the rider looks like to others, and whether movement validation accepts the mounted speed (R: validation is unchanged).
+- Menu label: locale 73552, "Go fish!" (R). The "Learn to Fish!" tutorial row 595 has no entry.
+- The server anchors the fishing spot at the position where you clicked the menu entry and accepts casts 2 to 35 m from it, so stand next to real water when you click. A round ends for free if you walk more than 50 m from the anchor or change zone.
+- One client. Optional: a second client watches for the cast visuals.
 
-## 17. Trade
+**Steps**
+
+1. `realm goto Reed`. Talk to him and read the menu.
+2. Talk to a non-guide NPC. Check no fishing entry.
+3. Choose "Go fish!". Then click the Go or start button on the minigame dialog the client shows.
+4. Cast at the water. Wait for the bite, reel in.
+5. Repeat for three catches. Check the inventory and the Fisherman job (it appears unlocked, with XP; the active job is unchanged).
+6. Reel too early, and let a bite pass without reeling.
+7. Quit from the fishing menu.
+8. Choose "Go fish!" again and, in the middle of a cast, close the game. Log back in.
+9. Choose "Go fish!" and leave the dialog open without pressing Go. Walk 60 m away.
+10. Start a round and, while fishing, try to start a kart race, an activity from the portal and a second guide's trip.
+11. Visit the other five guides (`realm goto Selvi`, `Lila`, `Gunther`, `Big J`, `Chip`) and start a round at each. Note which ones put you at a place with water.
+
+**Expect**
+
+- Step 1: the ordinary menu plus one extra row "Go fish!". Only the six guides have it.
+- Step 3: the dialog camera ends (26/4), a type-21 minigame offer appears (39/16) with the area's name and icon; pressing Go makes the client send 39/5 and the server answer 41/2 and a player-status update (35/20) with **bit 22 set** (0x400001). That bit is what turns the client's fishing processor on, so the cast UI should appear.
+- Step 4: a catch pays exactly one fish item and 10 Fisherman XP, once. Fish are small to large per species; sizes without an item are never caught. The bag floor is raised so a full inventory does not block a catch.
+- Step 5: three casts, three payments. Every hooked reel pays (catch chance 1.0, no cooldown, about one catch every 2.4 s), so this is a farm until tuned in `fishing.json`.
+- Step 6: early or late reels pay nothing. A fish gets away only for a late reel, an unbound size or an unstorable catch.
+- Step 7: nothing paid, the status bit is cleared (back to 1), and a new trip can start.
+- Step 8: the earlier catches are kept, the cast in flight is lost, and a new trip offers fresh. Nothing is paid for the abandoned cast.
+- Step 9: the round stays "offered" (busy) until 26/42, 50 m of walking, a zone change or a reconnect. Walking away ends it without a payout.
+- Step 10: all three refused (fishing counts as busy and blocks warps).
+- Step 11: each guide opens its own game row 596 to 601.
+
+**Capture:** 26/8, 26/9 (menu with the extra row), 26/10 (choice), 26/4, 39/16, 39/5, 41/2, 35/20 (read the status dword), the family-138 traffic (subs 3, 4, 8, 10, 11 and 14, all (R) reconstructions), 39/19 on a server-initiated end, 41/109 and 39/6 on quit, 26/42 on dialog cancel, and 38/x inventory updates. Save diff: fish items, Fisherman unlock and XP, active job unchanged. Screenshots: the menu, the cast UI, the catch.
+
+**Open question from the report:** is the entry the client really supports a guide NPC rather than only the boat object? Native unknowns: (a) does the 35/20 bit really start the client's fishing processor on our 39/16 plus 41/2 sequence (static analysis of `0092f460` says yes); (b) do the guides stand where a ray probe finds water within cast reach; (c) what the client shows on a server-initiated end (39/19), since type 21 has no score screen; (d) does the "Go fish!" label render; (e) do the cast, bite and reel subs behave as reconstructed; (f) the rod and lure choice from the Fish Finder is not routed (the client message is unknown), so a lure choice would do nothing.
+
+## 16. Mounts (W162, staged, not committed)
+
+**Result:** ____ (skip until `rg -n "settle_mounts" ...gameplay.rs` finds it; see 0.1)
+
+**Setup**
+
+- `mounts.json` in `content\` (it is in `data\content`). Mount state is session only: it is not saved and is gone after a relog.
+- The cheapest ride to own: `realm give 14289` (Wolf, ride id 993, top speed 12.5 against a base of 10). Only **24 of the 54** catalogued rides can be owned today because 30 of them have no item definition in the captured catalogue. Ownable: Scaled Dragon, Poison Dragon, Gold-Tipped Dragon, Bat, Fire Pegasus, Tiger, Lava Tiger, Stone Saber-Tooth Tiger, Wolf, Nightmare, Armored T-Rex, Striped T-Rex, Air T-Rex, Hydra, Fire Hawk, Bicycle, Robgoblin Mech, Tractor, five Hoverboards (Molten Precursor, Precursor, Clockwork, Fiery, Stormy) and Surfboard. A ride you were not given must be refused.
+- **Two clients** for the visibility rows (a second player in range, and a third who logs in afterwards); everything else runs on one.
+- Near the Hooligans (about -1970, 540) for the combat trigger.
+
+**Steps**
+
+1. `realm give 14289`. Open the Rides panel (the dock stable icon) and look for the Wolf.
+2. Summon it from the panel. Then dismount, and summon it again from the inventory item instead.
+3. Run, jump and stop while mounted. Watch both your own view and, if you have B, B's view.
+4. B stands within range from the start. A third client C logs in nearby while A is already mounted.
+5. Dismount from the UI.
+6. Try to summon a ride you do not own (from the panel if it lists others).
+7. Summon twice within a second.
+8. Mounted, trigger each server dismount: walk through a warpstone zone change (section 13), start a field fight (let a Hooligan chase you), get knocked out (`realm level 1`, god off), start the cooking minigame (section 8), start the kart (section 14).
+9. Mounted, use an ability.
+10. Mounted, send an emote (section 2 step 6), then dismount and send it again.
+11. Try to summon while a Hooligan is chasing you, and while knocked out.
+12. Mounted, log out. A and B and C: watch what each sees. Log back in.
+
+**Expect**
+
+- Step 1: the Wolf is listed; the unowned rides are not usable.
+- Step 2: every summon makes the client send a dismount (168/3) first, then 168/6 (panel) or 168/8 (item). The server answers with the ride as a world actor (AddNpc), a roster refresh (168/5), and the board (168/2). When the ride actor appears, the client itself sends 168/1 (automount), which also boards. You end up seated on the ride.
+- Step 3: the rider moves normally; no rubber-banding (movement validation is unchanged, the Wolf is 1.25x base and the limit is 40x). **Open gap 1:** the server moves only the rider and never moves the ride actor, so B may see the ride stay where it spawned.
+- Step 4: B sees the ride and the rider seated. C, who logs in later, sees an AddNpc and a 168/2 after A's AddPc (this is a replay, not the original AddPc mount tail).
+- Step 5: one step: 168/4, the ride is removed and the roster is refreshed. W25 used to need a second request.
+- Step 6: refused with "You do not own that ride." and a roster refresh. Nothing changes.
+- Step 7: the second summon inside 1 s is ignored.
+- Step 8: each trigger ends the ride: zoning, a chasing field enemy (at the next tick after the engage flag), an instance battle, a knockout, a minigame start, and a kart race. The rider is dismounted (168/4) and the ride removed.
+- Step 9: the client sends 168/3 before an ability, so it dismounts.
+- Step 10: the emote is dropped silently while mounted (no animation, no text for anyone), and plays after dismounting.
+- Step 11: refused with "You cannot use a ride here right now." and a roster refresh.
+- Step 12: the ride disappears for B and C when A disconnects. After relog A is not mounted.
+
+**Capture:** inbound 168/1, 168/3, 168/6 and 168/8 (check the real byte lengths; the report allowed 8 to 24 body bytes for 168/1 and 0 to 16 for 168/3), outbound 168/5, 168/2, 168/4 and the AddNpc/35/3 for the ride, the 15/3 notices, and 67/3 on the emote. A screenshot of A mounted from A's and B's view. Save diff: the inventory only (nothing else is saved).
+
+**Open question from the report:** what does the real client send to summon (the Rides panel's 168/6, the item's 168/8, or its own automount 168/1), and does the rider draw attached to the ride? Also: (a) does B see the ride follow the rider (open gap 1; if not, an NPC move packet per rider pose is needed and is not built); (b) the 168/1 and 168/3 serializers and the refusal bytes are unrecovered (R); (c) the ride GUID is the owner's id XOR `0xc000000000000000` (R); (d) the 168/2 trailing fields, seat and queue values are (R); (e) any zone allows a ride (R), with no dungeon, duel, member or trial rule; (f) the late-join route differs from the native AddPc mount tail (W162 gap 5).
+
+## 17. Trade (W156 shim live, W163 real trade not wired)
 
 **Result:** ____
 
-Two states, depending on what has landed:
+Two states, depending on which build you launch. Check them with the gates in 0.1.
 
-- **Unavailable shim (W156, when routed):** one client. Open the radial on another player (section 3); Trade is not offered. If the client reaches trade some other way, every family-59 request gets the native close: accept gets 59/5, cancel gets 59/5, offer or lock gets 59/15 status 1 then 59/5. **Expect:** the trade window never opens, or closes at once, with no crash. **Capture:** inbound 59/x and the two replies. **Open question:** how the real client renders status 1 followed by sub 5.
-- **Real trade (W163, when landed):** **two clients required.** Invite, accept, offer an item and coins, lock, accept, complete, then cancel variants (walk away, zone, disconnect). **Expect:** a changed offer resets both accepts; the settlement commits atomically (the lead's own work); nothing duplicates. **Capture:** the whole family-59 lifecycle and both saves. **Open questions:** the radial's Trade entry id and label, and what the client sends after choosing it.
+### 17a. Unavailable shim (W156, committed `dc27270`, one client)
 
-## 18. Take Me There path trail (only once W164 lands)
+**Setup:** any other player in range (a bot is enough). Radial menu from section 3.
 
-**Result:** ____ (skip until the gate passes)
+**Steps:** open the radial on the other player; look for Trade. If the client can reach trade some other way, send each of accept, cancel, offer and lock.
 
-With the pin from section 5 set, the client sends 98/1 when the target is within 300 m. W164 answers with a straight sampled line, or the client's failure reply when terrain is missing. **Steps:** select 3000021 within 300 m of Ricky Danger and click Take Me There, then again from over 300 m. **Expect:** breadcrumb dots along the ground toward the NPC; nothing past 300 m. **Capture:** inbound 98/1 and the reply. **Open question:** what the client draws from a straight-line reply (a trail, a walk, or a rejection), and whether it retries.
+**Expect:** the radial offers Inspect only; Trade is not offered. Every family-59 request that gets through is answered with the native close: accept 59/3 gets 59/5, cancel 59/7 gets 59/5, offer 59/9 or 59/10, lock 59/8 or accept 59/6 gets 59/15 status 1 then 59/5. The trade window never opens or closes at once, with no crash.
+
+**Capture:** inbound 59/x and the two replies.
+
+**Open question:** how does the real client render status 1 followed by sub 5? (W163 recovered that status 1 alone does not close the window; only 59/5 does.)
+
+### 17b. Real player trade (W163, **two clients**, not wired)
+
+Run this only when the gates `route_trade` and a real `commit_trade` pass (0.1). `lab/runs/claude/W163/patch/shared-files.diff` replaces W156's hunks, and `tests/trade_unavailable_gateway.rs` must be deleted when it is applied. Until the lead replaces the fail-closed commit, the happy path ends in a cancel by design, so only steps 1 to 9 are meaningful.
+
+**Setup:** characters A and B in the same zone and instance, within 40 m, both online and registered, each having been sent the other's AddPc (stand in view of each other first), neither marked away (not in a battle or dungeon), B not ignoring A, no pending invite or trade. `realm give` A a stackable item (for example `realm give 11002 5`, five Small Health Potions), a piece of gear to equip and keep equipped, an item to leave in the bag, and `realm coins 500`. Give B a stack of the same potion and some coins so a merge and a max-stack case exist. Add a no-trade item and a rental if you can find one. The radial's Trade row is entry id **1002** (R), label locale 3299 "Trade", icon 43188 (not checked against client assets), listed before Inspect.
+
+**Steps**
+
+1. A clicks B's character. Read the radial: Trade and Inspect.
+2. A chooses Trade. Look at B.
+3. B declines. A re-invites; B accepts.
+4. A offers 3 potions and then raises it to 4. A offers 100 coins.
+5. B watches the window. B offers coins and an item.
+6. A tries to offer the equipped item, the no-trade item, the rental, more coins than A has, and more items than A owns.
+7. A locks. B locks (note the order). A then changes an offer while both are locked.
+8. Lock both again. Wait for the 10-second timer. Click Accept on both.
+9. Cancel variants, each on a fresh session: A cancels; A walks more than 40 m away; A changes zone; A disconnects; B disconnects; A starts a battle; leave an invite unanswered for 60 s; leave an open session for 300 s.
+10. After the commit lands: complete a trade and check both inventories; trade into a nearly full stack of the same item; trade a coin total that would overflow.
+
+**Expect**
+
+- Step 1: a two-row radial.
+- Step 2: B gets an invite toast (59/2). A gets nothing yet.
+- Step 3: B's decline gives A the "rejected" text (59/16) and frees both. An accept opens the window on both (59/4).
+- Step 4: B sees A's offer rows update (59/11, 59/12, 59/13, side 0 for B). A's own window updates optimistically.
+- Step 6: each refusal changes nothing; a refused item offer answers A with the real row so A's optimistic row snaps back. An over-balance coin offer is not corrected on the client (the client ignores a side-1 coin update).
+- Step 7: a lock with a stale counter is refused and answered with an unlock; any change to an offer resets both locks and both accepts and tells both sides. With both locked the "other accepted" marker appears (59/17).
+- Step 8: after both locks the confirm timer runs 10 s (59/18), then Accept enables. After both accept the server builds a settlement and calls `commit_trade`. **Today the commit fails closed**: both players see the cancelled status and 59/5, and the save diff shows **nothing moved**. When the lead's commit is wired: coins and items move atomically, both see status 6 and 59/5, per-definition totals are conserved, and the receiver gets fresh instance ids.
+- Step 9: a client cancel, distance, zone change, a battle or an expiry gives status 1 then 59/5 to both; either side leaving gives the other status 2 and 59/5; entering an instanced zone gives 7 or 8. A withdrawn pending invite uses status 2, whose text reads as if the other left the game (the only status that removes the toast).
+- Step 10: a blocked max stack cancels with status 9 or 10, a coin overflow with 3 or 4.
+
+**Capture:** the whole family-59 lifecycle on both sides (59/2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18), the radial 26/9 and the 26/10 choice (check that the Trade choice really arrives as a 26/10 with the entry id), `app_out` for each reply, and both save diffs. Screenshots: the radial, the window on both sides, the timer, the cancel.
+
+**Open questions:** (a) the radial's Trade entry id, label, icon and order, and what the client sends after choosing it (static analysis says a 26/10 with the menu guid and the entry id); (b) the counter semantics beyond "running maximum" (the original server's reply to a stale counter is unknown); (c) is the client's own optimistic coin box ever corrected; (d) the account gates (members only, trade-banned, "already trading" lines) are not traced and silent refusals give the clicker no message; (e) the missing trade-completed hook for quests; (f) the commit itself is the lead's: it must refuse unless each saved state still equals `before`, write both `after` states in one step, and then call `settled`.
+
+## 18. Take Me There path trail (W164, staged, not committed)
+
+**Result:** ____ (skip until `rg -n "pathing" ...gameplay.rs` finds it; see 0.1)
+
+**Setup:** the pin from section 5, with quest 3000021 selected. Ricky Danger is at (-1909.5, 462.8) and Samantha at (-1879, 443), about 36 m apart, so stand within 300 m of him for the near case. The far case needs a spot more than 300 m away, for example the Sanctuary warpstone area (-1414.6, 351.6), about 500 m off. One client, any role. Open the client log for `Breadcrumb.log`.
+
+**Steps**
+
+1. Stand 100 m from Ricky Danger (use `realm goto` to a point away from him). Select 3000021 and click Take Me There.
+2. Walk toward him and stay still for 10 s.
+3. Walk more than 10 m away from where you started, then wait 5 s.
+4. Go to the far spot (`realm goto -1414 352`) and click Take Me There again.
+5. Walk back inside 300 m.
+6. (Optional) `realm goto` to a zone the server has no terrain for and try again.
+7. Click the button many times in a second.
+
+**Expect**
+
+- Step 1: the client sends one 98/1 (55 bytes, kind 1) and the server answers with a 98/2 whose points follow the terrain from you to Ricky, 5 m apart (61 points at 300 m, never more than 80). The client plays a moving breadcrumb effect along the ground and `Breadcrumb.log` reads "Kynapse path attempt success - path nodes: N".
+- Step 2: the target and the trail are **still there** after 10 s. Without a reply the client drops the Take Me There target at 10 s.
+- Step 3: the client re-requests (one request per 5 s while you walk and are more than 10 m from the last start) and the trail follows.
+- Step 4: nothing is sent past 300 m. The client logs "Kynapse path attempt ... is too long. Not attempting". The server sees no 98/1.
+- Step 5: the trail comes back.
+- Step 6: a 15-byte 98/2 with a count of 0. The client logs "no path generated (tried fallback N)", makes one immediate retry and then holds, and the target survives.
+- Step 7: at most 4 answered requests per second. Refused requests (non-finite numbers, a start more than 300 m from your server position, a point outside the zone grid, a wrong length) get silence, no error and no disconnect.
+
+**Capture:** inbound 98/1 and outbound 98/2 (header 15 bytes plus 16 per point, `kind` and `aux` echoed), the row count per second, `Breadcrumb.log`. Screenshot the trail. Kind 2 requests (the point-of-interest teleport) and click-to-move kinds 3 and 4 are **not** answered and still show as `rejected: unknown application message`; that is expected and not a finding unless the client needs them.
+
+**Open question from the report:** what the client draws from a straight-line reply (a trail, a walk, or a rejection), and whether it retries. Confirm the three assumptions W164 could not test: (a) `from` is the start and `to` the goal and nodes run start to goal; (b) echoing `kind` and `aux` is harmless; (c) `w` is interpolated between the request's two values. Expect the line to cut through walls, cliffs and water (no obstacle avoidance); the client prepends its own nav-graph nodes, which mitigates short hops. If you see false out-of-zone refusals after a teleport, the player-near check (it relies on a fresh `character.position`) is the cause.
 
 ## 19. Relog and persistence pass
 
@@ -578,7 +779,7 @@ With the pin from section 5 set, the client sends 98/1 when the target is within
 
 Run last. Exit the game normally (menu exit), wait 6 s for the pose save, then start again from the same package.
 
-**Check** each of these survived: warpstone attunements (13), quest selection and lock (5), item-bar slots and counts (9), coins and items after the sell (6), equipment (7), Kart Driver XP and previous job (14), the last position (the pose-only save coalesces to every 5 s and flushes on logout). Also from W140: start a Mining or Harvesting run (dev tools: `realm mine` or `realm harvest`), disconnect mid-run, log back in, and check jobs, equipment and interaction all work with no "Close the mining game" refusal and no payout for the abandoned run.
+**Check** each of these survived: warpstone attunements (13), quest selection and lock (5), item-bar slots and counts (9), coins and items after the sell (6), equipment (7), Kart Driver XP and previous job (14), the last position (the pose-only save coalesces to every 5 s and flushes on logout). Features that are **session only by design** and must be gone after the relog: the mount (16), a held power-up and uncollected pickups (11), a fishing round in flight (15; earlier catches, the Fisherman unlock and its XP persist), and a trade session (17). The Take Me There pin is not saved but is resent (5). Also from W140: start a Mining or Harvesting run (dev tools: `realm mine` or `realm harvest`), disconnect mid-run, log back in, and check jobs, equipment and interaction all work with no "Close the mining game" refusal and no payout for the abandoned run.
 
 **Expect:** everything above present; no run left half-open; no duplicate reward.
 
@@ -596,4 +797,4 @@ These need no setup of their own; note them as you pass.
 
 ## What to record afterwards
 
-In a new review note named `Native Run <stamp>.md` (or by feature) record: the run id and release SHA, the package folder, pass or fail per section, the answers to each **Open question** (especially: the 41/125 order, whether a failed sell shows anything, whether the client accepts a 36/5 or 36/13 mid-fight, the vendor window opening, the Atlas with only type-7 hubs), the screenshot names, and any new `rejected` family/subtype from the trace. Then update [[Build Plan]] and [[Build Ledger]] with a verdict per feature (PROVEN, PARTLY PROVEN or NOT PROVEN) and mark every (R) rule that the run confirmed or contradicted.
+In a new review note named `Native Run <stamp>.md` (or by feature) record: the run id and release SHA, the package folder, pass or fail per section, the answers to each **Open question** (especially: the 41/125 order, whether a failed sell shows anything, whether the client accepts a 36/5 or 36/13 mid-fight, the vendor window opening, the Atlas with only type-7 hubs, whether the 35/20 bit starts fishing, whether the client sends a 98/1 and keeps the target for more than 10 s, what the client sends to summon a mount and whether the ride follows the rider, the radial's Trade entry and the 26/10 it sends, and whether a pickup actor shows a nameplate), the screenshot names, and any new `rejected` family/subtype from the trace. Then update [[Build Plan]] and [[Build Ledger]] with a verdict per feature (PROVEN, PARTLY PROVEN or NOT PROVEN) and mark every (R) rule that the run confirmed or contradicted.
