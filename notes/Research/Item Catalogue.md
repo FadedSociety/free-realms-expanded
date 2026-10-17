@@ -1,13 +1,15 @@
 ---
 type: research
-updated: 2026-10-15
+updated: 2026-10-17
 task: W84
 verdict: PARTLY PROVEN
 ---
 
 # Item Catalogue
 
-W84 supplies an offline catalogue generator and a byte oracle. **1,703/1,703 stored rows round-trip exactly**, representing **1,649 unique IDs** and 54 duplicate occurrences. Generated definitions cover **16,551/16,551 previously missing content reference occurrences**, including all seven definitions identified by W82. No runtime content, saves, routing or shared modules were changed. Lead review, integration and a native grant/display gate remain open.
+W84 supplies an offline catalogue generator and a byte oracle. **1,703/1,703 stored rows round-trip exactly**, representing **1,649 unique IDs** and 54 duplicate occurrences. Generated definitions cover **16,551/16,551 previously missing content reference occurrences**, including all seven definitions identified by W82. W84 itself changed no runtime content, saves, routing or shared modules; W166 later integrated the generated catalogue into the packaged runtime. A native grant/display gate remains open.
+
+**Runtime correction (W166, `5d522cf`, 2026-10-16).** The packaged runtime loads the union of `inventory.json` and `item-catalogue.json`: **58,835 ids**, not the 1,649 in `inventory.json` alone. `Inventory::load` inserts the catalogue under the captured rows; `content_check.py` checks consumer references and ride coverage against that union; and `scripts/bundle/item_content.py` refuses a bundle whose catalogue is missing or fails the loader's rules. Every 1,649 figure below describes W84's stored-row fixture (1,703 rows with 54 duplicates), not the runtime catalogue.
 
 These are separate claims: decoding and re-encoding the stored rows proves the wire layout; it does not prove that Legacy reproduces the captured values. Independent regeneration from Legacy plus shipped client starter data matches **419/1,703** stored rows. The other **1,284** rows have the mismatch classes below. Known rows retain their existing bytes and metadata; unknown IDs use the corrected source data. This is not a historically complete catalogue.
 
@@ -15,7 +17,7 @@ These are separate claims: decoding and re-encoding the stored rows proves the w
 
 - `scripts/build_item_catalogue.py`: Python stdlib only, run with `python -I`. Imports the existing `prepare-opening-base.py::legacy_definition` and `content_definition`, which use `prepare-gameplay-inventory.py::definition_bytes`. There is no second row encoder.
 - `prototype/osfr-tools/tests/item_catalogue_roundtrip.rs`: ignored private oracle using `OSFR_ITEM_CATALOGUE`. Calls the existing `inventory_v2_fixes::encode_definition_batch_v2`; no duplicate batch encoder.
-- Private output: `lab/reports/item-catalogue-20261015/`. `catalogue.json` contains 58,835 unique definitions (57,186 additions), serialized bytes, hashes, source tags and `reconstructed_fields`. It is a catalogue fragment, not a complete `Inventory::load` manifest.
+- Private output: `lab/reports/item-catalogue-20261015/`. `catalogue.json` contains 58,835 unique definitions (57,186 additions), serialized bytes, hashes, source tags and `reconstructed_fields`. It is the payload installed as `CONTENT/item-catalogue.json`; merged under `inventory.json` it gives the runtime's 58,835 loadable ids. The 1,703-row fixture behind the 1,649 batch ids is separate, not the runtime total.
 - `roundtrip.json`: 1,703 independently decoded/re-encoded rows in original order. The Rust oracle reads the original input independently, verifies its SHA-256 and every row hash, then compares every row byte.
 - `report.json`: input paths, hashes and lengths, coverage by source file, source mismatch counts, W82 cross-check. `source-mismatches.json` records every differing field for every stored row occurrence. `client-corrections.json` records all 302 starter-resource overlays.
 - Native evidence stays in `native-*.txt` under that private directory. No client bytes, source tables or decompiled code are embedded in the repository files.
@@ -74,7 +76,7 @@ Two Legacy rows, 18092 and 78397, encode stats as flattened `Stats.<id>.Id` / `.
 
 ## Round-trip and independent-source mismatches
 
-`decode -> existing definition_bytes`: **1,703 matches, 0 mismatches**. The batch encoder reduces the 54 equal duplicates to **1,649** IDs in sorted order. That is expected `Inventory::definitions_packet` behavior, not parity with the original ordered startup stream. The original 1,383-row startup stream is a different fixture, documented in [[Startup Catalogues]].
+`decode -> existing definition_bytes`: **1,703 matches, 0 mismatches**. The batch encoder reduces the 54 equal duplicates to **1,649** IDs in sorted order. That is expected `Inventory::definitions_packet` behavior, not parity with the original ordered startup stream. It is also the stored-row fixture only; the runtime union with `item-catalogue.json` is **58,835** ids. The original 1,383-row startup stream is a different fixture, documented in [[Startup Catalogues]].
 
 `Legacy + client starter overlay -> existing definition_bytes`: **419 exact matches, 1,284 differing row occurrences**. Every mismatch class and its count follows. A row may contribute to several classes, so counts do not sum to 1,284. Full per-occurrence field differences are in `source-mismatches.json`.
 
@@ -142,10 +144,10 @@ $env:OSFR_ITEM_CATALOGUE='%USERPROFILE%\Documents\Projects\CartoonMMO\lab\report
 ./scripts/cargo.ps1 -CargoArgs @('test','--manifest-path','prototype/osfr-tools/Cargo.toml','--test','item_catalogue_roundtrip','--','--ignored','--nocapture')
 ```
 
-The self-check reports roundtrip, a mutation canary and five malformed rows passing. The content checker reports **0 errors, 17,276 warnings** across 134 files. Its existing 16,551 `item_not_runtime` warnings remain expected: W84 does not alter runtime content. The private Rust oracle passes 1 test; without the explicit ignored-test selection it remains ignored. A separate output copy with one name-ID byte flipped fails the oracle (exit 101), proving it detects a real row change; the unmodified output passes. No crate-wide formatting was run; only the owned Rust file was formatted.
+The self-check reports roundtrip, a mutation canary and five malformed rows passing. At W84, the content checker reported **0 errors, 17,276 warnings** across 134 files. Its 16,551 `item_not_runtime` warnings were expected then: W84 did not alter runtime content. W166 later added the catalogue checks and reported **0 errors**. The bundle gate applies the merged 58,835-id set to the consumers and ride rows that a particular bundle ships; the current repository content covers **54/54 rides with 0 item-coverage errors**. The private Rust oracle passes 1 test; without the explicit ignored-test selection it remains ignored. A separate output copy with one name-ID byte flipped fails the oracle (exit 101), proving it detects a real row change; the unmodified output passes. No crate-wide formatting was run; only the owned Rust file was formatted.
 
 Initial Cargo verification was blocked by an uncached concurrent `ed25519-dalek` dependency. A private-toolchain direct-rustc run against cached existing serde_json/sha2 libraries passed the isolated test and mutation canary. After that dependency appeared in the shared cache, the normal `scripts/cargo.ps1` retry also passed: **1 passed, 0 failed**, in the owned target directory. No dependency was added or manifest edited by W84.
 
-Open gates: lead review; runtime loader/catalogue integration; real 35/34 reply for a formerly missing definition; native inventory display and starter grants; production correctness of omitted Legacy stats/abilities and all reconstructed defaults. The 419 independent matches must not be reported as 1,703 source-derived matches. Build Plan/Ledger and shared progress notes remain lead-owned.
+Open gates: a native 35/34 request and reply for a formerly missing definition; native inventory display; starter grants; production correctness of omitted Legacy stats/abilities and all reconstructed defaults. The runtime loader/catalogue integration and bundle item gate are present (W166, `5d522cf`), so the old "only 1,649 definitions at runtime" reading is closed. The 419 independent matches must not be reported as 1,703 source-derived matches. Build Plan/Ledger and shared progress notes remain lead-owned.
 
 Ponytail: reused the existing serializers, data adapter, content traversal and batch encoder. Deliberately omitted a second encoder, a new dependency, a general schema framework, gateway wiring and startup expansion.

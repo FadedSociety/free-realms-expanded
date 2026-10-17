@@ -1,5 +1,5 @@
 ---
-updated: 2026-10-16
+updated: 2026-10-17
 ---
 
 # Project Map
@@ -39,18 +39,18 @@ The request path runs packet → `gateway.rs` (per-character application gateway
 | Transport and session | `soe.rs`, `soe_send.rs` (SOE framing and reliable channel), `session.rs`, `net_policy.rs` (bind and peer rules, token buckets), `trace.rs` |
 | Login, accounts and security | `login.rs`, `login_auth.rs` (AUTH2 key-pair), `account.rs`, `account_store.rs` (roles, public keys), `character_store.rs`, `identity.rs`, `security_log.rs` |
 | World entry | `startup_snapshot.rs`, `startup_world.rs`, `startup_selfdata.rs`, `startup_catalogues.rs`, `startup_messages.rs`, `zone_transition.rs` |
-| Shared world | `players.rs` (sessions, interest grid, nearest-64 fanout), `world.rs` (zone instances, membership, transfers), `movement.rs` (pose validation), `terrain.rs` |
+| Shared world | `players.rs` (sessions, interest grid, nearest-64 fanout, AddPc mount tail), `world.rs` (zone instances, membership, transfers, group-heal claims), `movement.rs` (pose validation), `terrain.rs` |
 | Gameplay core | `gameplay.rs`, `game_store.rs` (save envelope), `game_rules.rs` (membership policy), `rewards.rs` |
-| Combat and enemies | `encounter.rs` (encounters, shared field fights, HP, revive), `enemies.rs`, `combat.rs`, `abilities.rs` (36/10 casts, 36/12–13 definitions), `opening_abilities.rs` (job bars), `power_ups.rs` (drop tables, roll; pickups live in `encounter.rs`) |
+| Combat and enemies | `encounter.rs` (encounters, shared field fights, HP, revive, kill credits, pickups, group-heal outcome), `enemies.rs`, `combat.rs`, `abilities.rs` (36/10 casts, 36/12–13 definitions), `opening_abilities.rs` (job bars), `power_ups.rs` (drop tables and participation roll) |
 | Quests and story | `quest_engine.rs` (definition-driven quests), `quest_journal.rs` (47/12, 47/13, 49/15, 47/14 tracked-target pin), `quests.rs`, `opening.rs`, `opening_journal.rs`, `opening_world.rs`, `profiles.rs` (jobs/classes) |
 | NPCs and vendors | `npc_interaction.rs` (menus, quest offers, merchant 66/42), `coin_shop.rs` (165/4 buy, 165/5 sell, 165/6 result) |
-| Items | `inventory.rs` (state, equip with eligibility), `inventory_v2_fixes.rs`, `item_categories.rs`, `item_bar.rs` (four-slot bar, potion), `mystery_chest.rs`, `mystery_chest_loot.rs` |
-| Crafting and gathering | `recipes.rs`, `recipe_book.rs` (26/24 at a station), `cooking.rs`, `smelting.rs`, `forging.rs`, `mining.rs`, `harvesting.rs`, `minigame.rs` (shared run lifecycle), `mining_lifecycle.rs`, `harvesting_lifecycle.rs`, `harvest_nodes.rs` |
-| Social | `chat.rs`, `social_chat.rs` (chat policy, quick chat and emotes, per-account action budget), `social_lists.rs` (friends, ignore, groups), `guilds.rs`, `trade.rs` (59: trade-unavailable close today; real trading in progress), `player_radial.rs` (click menu, Inspect) |
-| Travel | `restoration/piece_077.rs` (warpstones: 56/57/90/122/58), `dev_teleport.rs`, `pathing.rs` (98/1 Take Me There path answer; landing) |
-| Minigames and activities | `kart_*.rs` (8 files: entry, lobby, racing, service, pickups, weapons, rewards, progress; NPC gates and reward cooldown in `kart_gateway.rs` + `kart_gates.json`), `soccer*.rs`, `derby.rs`, `chess.rs`, `fishing*.rs`, `matchmaking.rs`, `activity_portal.rs` (167) |
-| Housing, pets, mounts, progression | `housing*.rs`, `pets.rs`, `mounts.rs` (not routed yet), `progression_extras.rs` |
-| Content loading | `content.rs` (content JSON schema and cross-checks), `world_text.rs` |
+| Items | `inventory.rs` (state, equip with eligibility, `adopt_state` for trade commits), `inventory_v2_fixes.rs`, `item_categories.rs`, `item_bar.rs` (four-slot bar, potion), `mystery_chest.rs`, `mystery_chest_loot.rs` |
+| Crafting and gathering | `recipes.rs`, `recipe_book.rs` (26/24 at a station), `cooking.rs`, `smelting.rs`, `forging.rs`, `mining.rs`, `harvesting.rs`, `minigame.rs` (shared run lifecycle), `mining_lifecycle.rs`, `harvesting_lifecycle.rs`, `harvest_nodes.rs` (W171 per-player ore and mushroom node actors; 26/8 starts the matching Type8 run; placements in `mining_nodes.json` and `harvest_nodes.json`) |
+| Social | `chat.rs`, `social_chat.rs` (chat policy, quick chat and emotes, per-account action budget, W173 persisted channel switches and bubble colour), `social_lists.rs` (friends, ignore, groups), `guilds.rs`, `trade.rs` (radial invite; 59/3 and 59/6–10 lifecycle; validated settlement), `player_radial.rs` (click menu, Inspect, Trade). The commit in `bin/osfr-gateway.rs` writes `trade-<session>-<ns>.trade-journal` beside character saves and recovers it before accepting logins. |
+| Travel | `restoration/piece_077.rs` (warpstones: 56/57/90/122/58), `dev_teleport.rs`, `pathing.rs` (98/1 Take Me There request to 98/2 terrain-sampled path) |
+| Minigames and activities | `kart_*.rs` (8 files: entry, lobby, racing, service, pickups, weapons, rewards, progress; NPC gates and reward cooldown in `kart_gateway.rs` + `kart_gates.json`), `soccer*.rs`, `derby.rs`, `chess.rs`, `fishing.rs` + `fishing_service.rs` (guide entry from `fishing_spots.json`; minigame 21 and opcode 138), `matchmaking.rs`, `activity_portal.rs` (167) |
+| Housing, pets, mounts, progression | `housing*.rs`, `pets.rs`, `mounts.rs` (168 spawn/board/put-away, ride actor and rider attachment; fanout in `bin/osfr-gateway.rs`; ride catalogue and shop rows in `mounts.json`, `stores.json`, `vendors.json`), `progression_extras.rs` |
+| Content loading | `content.rs` (content JSON schema and cross-checks), `world_text.rs`; item definitions are the union of `inventory.json` and `item-catalogue.json` (58,835 ids in the shipped packages) |
 | Developer tools | `studio.rs` (loopback HTTP), World Builder layer (`--world`), `realm` commands (by role on account-store servers) |
 | Restoration pieces | `src/restoration/piece_NNN.rs`: recovered native codecs and rules, one per work item (`notes/WorkItems/NNN.md`). Some are included by a host module via `#[path]` instead of `lib.rs`. |
 
@@ -67,7 +67,7 @@ The request path runs packet → `gateway.rs` (per-character application gateway
 |---|---|
 | Native function map | `native_map/` (`nmq.py` query, `validate.py`, `recheck.py`, `xreview.py`, `ida_check.py`, `build_guides.py`, `dispatch.py`) |
 | Content | `content_check.py`, `build_item_catalogue.py`, `quest_audit.py`, `prepare-*.py`, `wiki-research.py`, `world_objects.py` |
-| Bundles and playtest | `bundle/`, `stress/run.py` (bots, `--broker-login`), `run-local-baseline.py`, `drive-local-game.py` |
+| Bundles and playtest | `bundle/` (including `item_content.py`: loader-rule item, ride and consumer-coverage gate; refuses a missing or broken `item-catalogue.json`), `stress/run.py` (bots, `--broker-login`), `run-local-baseline.py`, `drive-local-game.py` |
 | Assets | `build_asset_graph.py`, `build_asset_index.py`, `asset_delivery.py`, `build_terrain.py`, `locale_id_map.py` |
 | Launcher | `launcher/` |
 
