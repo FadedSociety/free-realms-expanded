@@ -102,6 +102,13 @@ pub const SUB_PAYLOAD: u8 = 14;
 pub const GAME_ID: i32 = 20;
 pub const GAME_TYPE: i32 = 6;
 pub const ROW_IDS: [u32; 12] = [20, 65, 66, 67, 543, 544, 545, 546, 547, 548, 549, 550];
+/// Client `MiniGameData` row facts shared by every type-6 row: NAME_ID 950,
+/// DESCRIPTION_ID 951, ICON_ID 917. The movie's own `GAME_ID` constant is 20.
+pub const NAME_ID: i32 = 950;
+pub const DESCRIPTION_ID: i32 = 951;
+pub const ICON_ID: i32 = 917;
+/// Flash movie loaded by `26/12` for the chess start screen (pack manifest).
+pub const MOVIE: &str = "game_chess.gfx";
 
 pub const EVENT_INIT: u8 = 0;
 pub const EVENT_TURN_START: u8 = 1;
@@ -932,6 +939,7 @@ enum TableMode {
     TwoPlayer,
 }
 
+#[derive(Clone)]
 pub struct ChessTable {
     table_id: u64,
     row_id: u32,
@@ -958,6 +966,20 @@ impl ChessTable {
         let Some(Mode::Single { skill }) = Mode::for_row(row_id) else {
             return Err(invalid("row is not a single-player chess row"));
         };
+        ChessTable::single_with_skill(table_id, row_id, player, human_side, skill)
+    }
+
+    /// Same table with a content-supplied client-engine skill (0 to 100).
+    fn single_with_skill(
+        table_id: u64,
+        row_id: u32,
+        player: ChessParticipant,
+        human_side: Side,
+        skill: u8,
+    ) -> io::Result<ChessTable> {
+        if !matches!(Mode::for_row(row_id), Some(Mode::Single { .. })) || skill > 100 {
+            return Err(invalid("invalid single-player chess row or skill"));
+        }
         validate_participant(player)?;
         let computer_side = human_side.opponent();
         let (white, black) = if human_side == Side::White {
@@ -1290,6 +1312,12 @@ impl ChessTable {
         };
         let bytes: [u8; 4] = bytes.try_into().unwrap();
         if bytes == [0; 4] {
+            // A no-move claim is never trusted: the server has the rules. With a
+            // legal move on the board the reply is a silent refusal that changes
+            // nothing; a real no-move position would already have finished above.
+            if !self.position.legal_moves().is_empty() {
+                return Ok(ChessOutcome::default());
+            }
             let mut out = ChessOutcome {
                 accepted: true,
                 changed: true,
@@ -1628,7 +1656,7 @@ impl Activity for ChessFinishActivity {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct ChessTables {
     tables: HashMap<u64, ChessTable>,
 }
@@ -1647,6 +1675,26 @@ impl ChessTables {
         self.tables.insert(
             table_id,
             ChessTable::single(table_id, row_id, player, human_side)?,
+        );
+        Ok(())
+    }
+
+    /// Open a single-player table with the content row's `skill` instead of
+    /// the default for that row id.
+    pub fn open_single_with_skill(
+        &mut self,
+        table_id: u64,
+        row_id: u32,
+        player: ChessParticipant,
+        human_side: Side,
+        skill: u8,
+    ) -> io::Result<()> {
+        if self.tables.contains_key(&table_id) {
+            return Err(invalid("chess table already exists"));
+        }
+        self.tables.insert(
+            table_id,
+            ChessTable::single_with_skill(table_id, row_id, player, human_side, skill)?,
         );
         Ok(())
     }

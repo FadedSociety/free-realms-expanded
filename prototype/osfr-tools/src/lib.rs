@@ -7,6 +7,7 @@ pub mod activity_portal;
 pub mod character_store;
 pub mod chat;
 pub mod chess;
+pub mod chess_service;
 pub mod coin_shop;
 pub mod combat;
 pub mod content;

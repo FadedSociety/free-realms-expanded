@@ -3,6 +3,7 @@
 use crate::{
     character_store::CharacterState,
     chat,
+    chess_service::{ChessActivityOutcome, ChessService},
     combat::{Combat, CombatOutcome, CombatState},
     cooking::{Cooking, CookingOutcome, CookingState},
     dev_teleport,
@@ -151,6 +152,9 @@ pub struct Gameplay {
     kart_lobby_reply: Option<Arc<[u8]>>,
     /// W150 (R): battles published in the activity portal (167/1/1). Not persisted.
     activities: crate::activity_portal::Catalogue,
+    /// T022 (R): single-player chess rows and this session's table. Not persisted;
+    /// a reconnect starts with no run, so no stale result can be replayed.
+    chess: Option<ChessService>,
     /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
     portal_refreshed_ms: Option<u64>,
@@ -790,11 +794,23 @@ impl Gameplay {
             }
         }
         let battle_file = npc_content.join("field_battles.json");
-        let activities = if battle_file.is_file() {
+        // T022: optional chess rows; an absent file publishes none.
+        let chess_path = npc_content.join(crate::chess_service::CONTENT_FILE);
+        let chess = if chess_path.is_file() {
+            Some(ChessService::new(
+                crate::chess_service::ChessContent::load(&chess_path)?,
+            )?)
+        } else {
+            None
+        };
+        let mut activities = if battle_file.is_file() {
             crate::activity_portal::Catalogue::load(&battle_file)?
         } else {
             Default::default()
         };
+        if let Some(chess) = &chess {
+            activities = activities.with_chess_rows(chess.activities())?;
+        }
         let npc_interaction = if npc_content.join("npcs").is_dir()
             && npc_content.join("stores.json").is_file()
             && npc_content.join("vendors.json").is_file()
@@ -1016,6 +1032,7 @@ impl Gameplay {
             role_commands: false,
             kart_lobby_reply,
             activities,
+            chess,
             portal_refreshed_ms: None,
             kart_entry,
             derby,
@@ -3103,6 +3120,9 @@ impl Gameplay {
         if let Some(out) = self.command_refusal(inner, character.guid)? {
             return Ok(out);
         }
+        if let Some(out) = self.handle_chess(inner, character, now_ms)? {
+            return Ok(out);
+        }
         if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
             return Ok(out);
         }
@@ -3369,6 +3389,7 @@ impl Gameplay {
             || self.cooking.as_ref().is_some_and(Cooking::active)
             || self.mining.as_ref().is_some_and(Type8Engine::active)
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
+            || self.chess.as_ref().is_some_and(ChessService::is_active)
             || self.encounter.as_ref().is_some_and(EncounterEngine::active)
             || self
                 .derby
@@ -4071,6 +4092,12 @@ impl Gameplay {
                 if let Some(encounter) = self.encounter.as_mut() {
                     encounter.reload_field_battles(&path)?;
                     self.activities = crate::activity_portal::Catalogue::load(&path)?;
+                    if let Some(chess) = &self.chess {
+                        self.activities = self
+                            .activities
+                            .clone()
+                            .with_chess_rows(chess.activities())?;
+                    }
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         for (guid, name, name_id, model_id, position, icon) in
                             encounter.battle_spawners()
@@ -4359,6 +4386,7 @@ impl Gameplay {
             || self.cooking.as_ref().is_some_and(Cooking::active)
             || self.mining.as_ref().is_some_and(Type8Engine::active)
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
+            || self.chess.as_ref().is_some_and(ChessService::is_active)
             || self.kart_entry.as_ref().is_some_and(|k| k.active())
             || !self.fishing.is_empty();
         busy.then_some(piece_077::Blocker::Busy)
@@ -4409,10 +4437,23 @@ impl Gameplay {
                 }
             }
             Request::Play { activity } => {
-                let busy = self.warp_blocker().is_some() || self.encounter.is_none();
-                match self.activities.admit(activity, viewer, busy).map(|a| a.id) {
+                // A missing battle engine keeps the old Busy answer for battle
+                // rows; chess rows never need it.
+                let missing_battle = matches!(
+                    self.activities.kind(activity),
+                    Some(crate::activity_portal::Kind::Battle)
+                ) && self.encounter.is_none();
+                let busy = self.warp_blocker().is_some() || missing_battle;
+                match self
+                    .activities
+                    .admit(activity, viewer, busy)
+                    .map(|a| (a.id, a.kind))
+                {
                     Err(refusal) => out.replies.push(chat::system(&refusal.message())),
-                    Ok(battle) => {
+                    Ok((_, crate::activity_portal::Kind::Chess { row_id })) => {
+                        self.begin_chess(row_id, character.guid, &mut out)?;
+                    }
+                    Ok((battle, crate::activity_portal::Kind::Battle)) => {
                         let profile = self.profiles.as_ref().map_or(0, Profiles::active);
                         let begun = self
                             .encounter
@@ -4429,6 +4470,91 @@ impl Gameplay {
             }
         }
         Ok(Some(out))
+    }
+
+    /// T022: chess movie and lifecycle packets while this character's chess run exists.
+    /// The packet is staged on a clone; a refusal or a structural error leaves the table
+    /// (and the wallet) unchanged. `None` leaves the packet to the other handlers.
+    fn handle_chess(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        if !self.chess.as_ref().is_some_and(ChessService::is_active) {
+            return Ok(None);
+        }
+        let mut staged = self.clone();
+        let rewards = RewardState::new(
+            staged.inventory.clone(),
+            staged.reward_profiles(),
+            staged.inventory.state().items.len().max(100),
+        );
+        let Some(change) =
+            staged
+                .chess
+                .as_mut()
+                .unwrap()
+                .route(character.guid, inner, now_ms, &rewards)?
+        else {
+            return Ok(None);
+        };
+        let mut out = Outcome::default();
+        staged.apply_chess(change, &mut out)?;
+        *self = staged;
+        Ok(Some(out))
+    }
+
+    /// T022: a portal Play of a published chess row publishes the 39/16 offer.
+    fn begin_chess(&mut self, row_id: u32, player_id: u64, out: &mut Outcome) -> io::Result<()> {
+        let Some(chess) = self.chess.as_mut() else {
+            out.replies.push(chat::system(
+                crate::chess_service::EntryDenied::Unavailable.message(),
+            ));
+            return Ok(());
+        };
+        match chess.begin(row_id, player_id) {
+            Ok(change) => self.apply_chess(change, out),
+            Err(denied) => {
+                out.replies.push(chat::system(denied.message()));
+                Ok(())
+            }
+        }
+    }
+
+    /// T022: stage a routed chess change. Payout packets follow the result packets,
+    /// and the wallet/profile snapshot is adopted before anything is sent.
+    fn apply_chess(&mut self, change: ChessActivityOutcome, out: &mut Outcome) -> io::Result<()> {
+        let lifecycle = change.replies.clone();
+        out.changed |= change.changed;
+        out.replies.extend(change.replies);
+        if let Some(next) = change.reward_state {
+            let before = self.inventory.state().clone();
+            if self
+                .profiles
+                .as_ref()
+                .is_some_and(|profiles| *profiles.state() != next.profiles)
+            {
+                let directory = self
+                    .profile_content_directory
+                    .as_deref()
+                    .ok_or_else(|| invalid("chess reward XP needs profile content"))?;
+                self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
+            }
+            self.inventory = next.inventory;
+            out.changed = true;
+            self.npc_inventory_events(&before, out)?;
+        }
+        out.replies.extend(change.reward_packets);
+        // Only the lifecycle result (39/18) advances quests. A checkmate movie
+        // message alone is not a payout: the client still has to acknowledge it.
+        if lifecycle
+            .iter()
+            .any(|packet| packet.starts_with(&[39, 0, 18]))
+        {
+            self.npc_minigame_win(&lifecycle, out)?;
+        }
+        Ok(())
     }
 
     /// The client replaces its whole destination table with each 57.

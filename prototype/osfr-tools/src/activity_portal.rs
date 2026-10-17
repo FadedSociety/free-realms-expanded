@@ -43,6 +43,7 @@
 
 use serde::Deserialize;
 use std::{
+    collections::BTreeSet,
     fs,
     io::{self, Read},
     path::Path,
@@ -56,9 +57,22 @@ const SUB_REFRESH: u8 = 4;
 const ENTRY_WORLD_TUNNEL: u32 = 1;
 const COMBAT_CATEGORY: u32 = 18;
 const ART: &str = "hacknslash_detail.dds";
+/// (R) The type-6 row in `MiniGameTypeData.txt` carries CATEGORY_ID 0; the
+/// portal categories table has no board-game row, so chess rows use it as-is.
+const CHESS_CATEGORY: u32 = 0;
+const CHESS_DETAIL: &str = "chess_detail.dds";
+const CHESS_THUMBNAIL: &str = "chess_thumb.dds";
 const MAX_ACTIVITIES: usize = 64;
 const MAX_FILE: u64 = 1 << 20;
 const PLAY_LEN: usize = 12;
+
+/// What a published row starts. Battles use the encounter engine; chess rows
+/// name the client minigame row the chess table service understands.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Kind {
+    Battle,
+    Chess { row_id: u32 },
+}
 
 /// One published activity: a battle of the frozen package.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -70,6 +84,18 @@ pub struct Activity {
     pub icon_id: u32,
     pub difficulty: u32,
     pub required_level: u32,
+    pub kind: Kind,
+}
+
+/// One published chess row. Ids, names, icon and difficulty come from the
+/// client `MiniGameData` type-6 rows; only the portal id is server policy.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ChessActivity {
+    pub row_id: u32,
+    pub name_id: u32,
+    pub description_id: u32,
+    pub icon_id: u32,
+    pub difficulty: u32,
 }
 
 #[derive(Deserialize)]
@@ -165,6 +191,7 @@ impl Catalogue {
                     icon_id: u32::try_from(b.icon_id).unwrap_or(0),
                     difficulty: b.difficulty,
                     required_level: b.required_combat_level,
+                    kind: Kind::Battle,
                 })
                 .collect(),
         )
@@ -174,17 +201,52 @@ impl Catalogue {
         &self.0
     }
 
+    /// The kind behind an id, without admitting the player. Unknown ids are `None`.
+    pub fn kind(&self, id: u32) -> Option<Kind> {
+        self.0.iter().find(|a| a.id == id).map(|a| a.kind)
+    }
+
+    /// Publish chess rows after the battle rows. A chess row is one
+    /// single-player minigame row; the encounter engine never sees it.
+    pub fn with_chess_rows(mut self, rows: Vec<ChessActivity>) -> io::Result<Self> {
+        let mut ids: BTreeSet<u32> = self.0.iter().map(|a| a.id).collect();
+        for row in rows {
+            if row.row_id == 0 || !ids.insert(row.row_id) {
+                return Err(invalid("chess activity ids must be unique and nonzero"));
+            }
+            self.0.push(Activity {
+                id: row.row_id,
+                name_id: row.name_id,
+                description_id: row.description_id,
+                icon_id: row.icon_id,
+                difficulty: row.difficulty,
+                required_level: 0,
+                kind: Kind::Chess { row_id: row.row_id },
+            });
+        }
+        if self.0.len() > MAX_ACTIVITIES {
+            return Err(invalid("too many activities"));
+        }
+        Ok(self)
+    }
+
     /// Admission for a Play. Order matters: an unknown id reveals nothing about the player.
     pub fn admit(&self, id: u32, viewer: Viewer, busy: bool) -> Result<&Activity, Refusal> {
         let activity = self.0.iter().find(|a| a.id == id).ok_or(Refusal::Unknown)?;
         if busy {
             return Err(Refusal::Busy);
         }
-        if !viewer.combat_job {
-            return Err(Refusal::NotCombatJob);
-        }
-        if viewer.level < activity.required_level {
-            return Err(Refusal::LevelTooLow(activity.required_level));
+        match activity.kind {
+            Kind::Battle => {
+                if !viewer.combat_job {
+                    return Err(Refusal::NotCombatJob);
+                }
+                if viewer.level < activity.required_level {
+                    return Err(Refusal::LevelTooLow(activity.required_level));
+                }
+            }
+            // (R) Chess needs no job or level; the table is open to every player.
+            Kind::Chess { .. } => {}
         }
         Ok(activity)
     }
@@ -195,11 +257,19 @@ impl Catalogue {
         out.extend(ENTRY_WORLD_TUNNEL.to_le_bytes());
         out.extend((self.0.len() as i32).to_le_bytes());
         for (position, a) in self.0.iter().enumerate() {
-            let can_join = viewer.combat_job && viewer.level >= a.required_level;
+            let (category, detail, thumbnail, can_join) = match a.kind {
+                Kind::Battle => (
+                    COMBAT_CATEGORY,
+                    ART,
+                    ART,
+                    viewer.combat_job && viewer.level >= a.required_level,
+                ),
+                Kind::Chess { .. } => (CHESS_CATEGORY, CHESS_DETAIL, CHESS_THUMBNAIL, true),
+            };
             for dword in [
                 a.id,
                 0, // AppSystemId
-                COMBAT_CATEGORY,
+                category,
                 a.icon_id,
                 position as u32 + 1, // ActivityPositionId
                 a.name_id,
@@ -215,7 +285,7 @@ impl Catalogue {
             out.extend(0u32.to_le_bytes()); // featured windows
             out.extend(0u32.to_le_bytes()); // TutorialActivityId
             out.push(0); // MembersOnly
-            for name in [ART, ART] {
+            for name in [detail, thumbnail] {
                 out.extend((name.len() as i32).to_le_bytes());
                 out.extend(name.as_bytes());
             }

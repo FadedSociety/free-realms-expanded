@@ -3,7 +3,9 @@
 //! The list reader below is written from the client reader chain (`00be79d0` -> `00be75c0` ->
 //! `00be6fa0` -> `00be63e0`), not from the writer under test, and fails on any trailing or missing
 //! byte exactly as the client does. All content is synthetic; no player names or chat appear.
-use osfr_tools::activity_portal::{Activity, Catalogue, Refusal, Request, Viewer, parse};
+use osfr_tools::activity_portal::{
+    Activity, Catalogue, ChessActivity, Kind, Refusal, Request, Viewer, parse,
+};
 use std::{
     fs,
     path::PathBuf,
@@ -43,6 +45,7 @@ fn row(id: u32, level: u32) -> Activity {
         icon_id: 4_500 + id,
         difficulty: 2,
         required_level: level,
+        kind: Kind::Battle,
     }
 }
 
@@ -335,7 +338,8 @@ fn loads_the_battle_file_shape() {
                 description_id: 42059,
                 icon_id: 4543,
                 difficulty: 1,
-                required_level: 0
+                required_level: 0,
+                kind: Kind::Battle
             },
             Activity {
                 id: 12302,
@@ -343,7 +347,8 @@ fn loads_the_battle_file_shape() {
                 description_id: 42068,
                 icon_id: 0,
                 difficulty: 3,
-                required_level: 5
+                required_level: 5,
+                kind: Kind::Battle
             },
         ]
     );
@@ -373,5 +378,67 @@ fn shipped_battle_content_publishes_every_battle() {
     assert_eq!(
         decode_list(&catalogue.list_packet(FIGHTER)).rows.len(),
         ids.len()
+    );
+}
+
+fn chess_row(row_id: u32) -> ChessActivity {
+    ChessActivity {
+        row_id,
+        name_id: 950,
+        description_id: 951,
+        icon_id: 917,
+        difficulty: 1,
+    }
+}
+
+#[test]
+fn chess_rows_follow_battles_and_open_without_a_combat_job() {
+    let catalogue = Catalogue::new(vec![row(96, 0)])
+        .unwrap()
+        .with_chess_rows(vec![chess_row(20), chess_row(66)])
+        .unwrap();
+    let civilian = Viewer {
+        combat_job: false,
+        level: 0,
+    };
+    let list = decode_list(&catalogue.list_packet(civilian));
+    assert_eq!(list.rows.len(), 3);
+    // Battles first, then chess in content order; ids are the client minigame rows.
+    assert_eq!(list.rows[0][0], 96);
+    assert_eq!(list.rows[1][0], 20);
+    assert_eq!(list.rows[2][0], 66);
+    // Category 0 (the type-6 CATEGORY_ID), icon 917, positions follow the list.
+    assert_eq!(
+        list.rows[1][..10],
+        [20, 0, 0, 917, 2, 950, 951, 950, 951, 1]
+    );
+    assert_eq!(list.rows[2][4], 3);
+    assert_eq!(
+        list.strings[1],
+        ("chess_detail.dds".to_owned(), "chess_thumb.dds".to_owned())
+    );
+    assert_eq!(list.flags[1].0, 1, "a non-combat job can join chess");
+    assert_eq!(list.flags[1].1, 0, "chess rows are not members-only");
+
+    // Admission: no job or level gate, but a busy player is refused.
+    assert_eq!(catalogue.admit(20, civilian, false).unwrap().id, 20);
+    assert_eq!(catalogue.admit(20, civilian, true), Err(Refusal::Busy));
+    assert_eq!(catalogue.admit(21, civilian, false), Err(Refusal::Unknown));
+    assert_eq!(catalogue.kind(20), Some(Kind::Chess { row_id: 20 }));
+    assert_eq!(catalogue.kind(96), Some(Kind::Battle));
+    assert_eq!(catalogue.kind(21), None);
+
+    // A battle id cannot be republished as chess, and a zero id is refused.
+    assert!(
+        Catalogue::new(vec![row(96, 0)])
+            .unwrap()
+            .with_chess_rows(vec![chess_row(96)])
+            .is_err()
+    );
+    assert!(
+        Catalogue::new(vec![row(96, 0)])
+            .unwrap()
+            .with_chess_rows(vec![chess_row(0)])
+            .is_err()
     );
 }

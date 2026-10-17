@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source": "client MiniGameData.txt type-6 rows 20/66/67 (NAME_ID 950, DESCRIPTION_ID 951, ICON_ID 917, difficulty 1/3/5) and the pack manifest's game_chess.gfx; the portal row ids, human colour and coin awards are reconstructed (R)",
+  "human_side": "white",
+  "rows": [
+    {
+      "row_id": 20,
+      "difficulty": 1,
+      "skill": 20,
+      "success_coins": 10
+    },
+    {
+      "row_id": 66,
+      "difficulty": 3,
+      "skill": 60,
+      "success_coins": 25
+    },
+    {
+      "row_id": 67,
+      "difficulty": 5,
+      "skill": 100,
+      "success_coins": 50
+    }
+  ]
+}

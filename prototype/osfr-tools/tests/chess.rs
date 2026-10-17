@@ -594,6 +594,57 @@ fn payload_header_and_difficulty_mapping_are_bounded_and_stable() {
 }
 
 #[test]
+fn content_skill_overrides_the_row_default_in_move_request() {
+    let mut tables = ChessTables::default();
+    tables
+        .open_single_with_skill(
+            9,
+            20,
+            ChessParticipant {
+                player_id: 41,
+                instance_id: 901,
+            },
+            Side::White,
+            77,
+        )
+        .unwrap();
+    send(&mut tables, 9, 41, 901, "OnConnectMsg");
+    send(&mut tables, 9, 41, 901, "OnStartGameMsg\t0");
+    let moved = send(
+        &mut tables,
+        9,
+        41,
+        901,
+        &format!("OnMoveMsg\t{}\t{}", sq(4, 1), sq(4, 3)),
+    );
+    assert!(text(&moved.messages, 41).contains(&"OnChessEventMsg\t30\t1\t77".into()));
+
+    // The default opener keeps the row's own skill.
+    let mut defaults = ChessTables::default();
+    defaults
+        .open_single(
+            10,
+            20,
+            ChessParticipant {
+                player_id: 42,
+                instance_id: 902,
+            },
+            Side::White,
+        )
+        .unwrap();
+    send(&mut defaults, 10, 42, 902, "OnConnectMsg");
+    send(&mut defaults, 10, 42, 902, "OnStartGameMsg\t0");
+    let default_move = send(
+        &mut defaults,
+        10,
+        42,
+        902,
+        &format!("OnMoveMsg\t{}\t{}", sq(4, 1), sq(4, 3)),
+    );
+    assert!(text(&default_move.messages, 42).contains(&"OnChessEventMsg\t30\t1\t20".into()));
+}
+
+#[test]
 fn chess_mode_and_move_encoding_cover_client_castling_events() {
     assert!(matches!(Mode::for_row(65).unwrap(), Mode::TwoPlayer));
     let mut position = chess::Position::from_fen("5k2/8/8/8/8/8/8/R3K2R w KQ - 0 1").unwrap();
