@@ -436,13 +436,22 @@ fn payload_bytes(packet: &SoccerPacket) -> Vec<u8> {
 
 /// Encode a message in the Soccer family-76 gateway envelope.
 pub fn encode(message: &Message) -> Vec<u8> {
-    let payload = payload_bytes(&message.packet);
-    let mut out = Vec::with_capacity(payload.len() + 11);
+    let inner = encode_inner(&message.packet);
+    let mut out = Vec::with_capacity(inner.len() + 7);
     out.extend(message.outer.to_le_bytes());
     out.push(u8::from(message.flag));
-    out.extend(((payload.len() + 4) as u32).to_le_bytes());
+    out.extend((inner.len() as u32).to_le_bytes());
+    out.extend(inner);
+    out
+}
+
+/// Encode the application body the gateway carries inside a tunnel:
+/// `u16 76 | u16 sub | payload`. This is what `Outcome::replies` expects.
+pub fn encode_inner(packet: &SoccerPacket) -> Vec<u8> {
+    let payload = payload_bytes(packet);
+    let mut out = Vec::with_capacity(payload.len() + 4);
     out.extend(TUNNEL_OPCODE.to_le_bytes());
-    out.extend(soccer_sub(&message.packet).to_le_bytes());
+    out.extend(soccer_sub(packet).to_le_bytes());
     out.extend(payload);
     out
 }

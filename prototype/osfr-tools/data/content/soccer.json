@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "source": "MiniGameData rows 42/43/44 (type 12) and client Resources/ActivityCategories.txt row 22 (Soccer_Briarwood.dds); match, roster, reward and adapter values are reconstructed (R) and remain tunable.",
+  "games": [
+    {
+      "id": 42,
+      "name_id": 37944,
+      "description_id": 37947,
+      "icon_id": 15,
+      "difficulty": 1,
+      "required_level": 0,
+      "encounter_id": 1
+    },
+    {
+      "id": 43,
+      "name_id": 37945,
+      "description_id": 37948,
+      "icon_id": 20992,
+      "difficulty": 1,
+      "required_level": 0,
+      "encounter_id": 2
+    },
+    {
+      "id": 44,
+      "name_id": 37946,
+      "description_id": 37949,
+      "icon_id": 20992,
+      "difficulty": 1,
+      "required_level": 0,
+      "encounter_id": 3
+    }
+  ],
+  "match_config": {
+    "bounds": {
+      "half_x": 50.0,
+      "half_z": 30.0,
+      "goal_half_width": 8.0,
+      "goal_height": 5.0
+    },
+    "physics": {
+      "gravity": 9.81,
+      "max_position_step": 10.0,
+      "max_speed": 40.0,
+      "control_radius": 2.0,
+      "max_kick_power": 30.0,
+      "pass_radius": 40.0,
+      "max_tick": 0.25
+    },
+    "half_seconds": 180.0,
+    "kickoff_spawn": [0.0, 0.0, 0.0],
+    "half_policy": "switch_sides",
+    "adapter": {
+      "max_power": 30.0,
+      "charge_floor": 0.01,
+      "min_direction_norm": 0.001
+    },
+    "entry_position": [0.0, 0.0, 0.0, 1.0],
+    "entry_rotation": [0.0, 0.0, 1.0, 0.0]
+  },
+  "reward": {
+    "coins": 10,
+    "job_xp": {}
+  }
+}

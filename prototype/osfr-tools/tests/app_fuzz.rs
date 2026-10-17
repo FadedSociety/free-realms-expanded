@@ -620,6 +620,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         [vec![167, 0, 1, 2], vec![0xff; 8]].concat(),
     ));
     result.push(("activity_portal", vec![167, 0, 0xff, 0xff]));
+    // Family 76 is the native Soccer family; inactive sessions refuse every
+    // subtype without a snapshot change. The wildcard covers the family route.
+    result.push(("soccer", words(76, 14, &[u32::MAX; 15])));
+    result.push(("soccer", vec![76, 0, 0xff, 0xff]));
     result.push(("free_interaction", words(26, 20, &[])));
     result.push(("profile_notice", words(26, 26, &[0x30, 0x30])));
     result.push(("profile_notice", words(26, 37, &[0; 3])));

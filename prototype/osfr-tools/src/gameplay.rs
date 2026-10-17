@@ -156,6 +156,10 @@ pub struct Gameplay {
     kart_lobby_reply: Option<Arc<[u8]>>,
     /// W150 (R): battles published in the activity portal (167/1/1). Not persisted.
     activities: crate::activity_portal::Catalogue,
+    /// Soccer content and one live session-only match. Neither is persisted;
+    /// a reconnect drops the match without a grant.
+    soccer_content: Option<Arc<crate::soccer_entry::Content>>,
+    soccer: Option<crate::soccer_entry::Session>,
     /// T022 (R): single-player chess rows and this session's table. Not persisted;
     /// a reconnect starts with no run, so no stale result can be replayed.
     chess: Option<ChessService>,
@@ -822,6 +826,17 @@ impl Gameplay {
         if let Some(chess) = &chess {
             activities = activities.with_chess_rows(chess.activities())?;
         }
+        let soccer_path = [directory, bundled_npc_content.as_path()]
+            .into_iter()
+            .map(|base| base.join(crate::soccer_entry::CONTENT_FILE))
+            .find(|path| path.is_file());
+        let soccer_content = match soccer_path {
+            Some(path) => Some(Arc::new(crate::soccer_entry::Content::load(&path)?)),
+            None => None,
+        };
+        if let Some(content) = &soccer_content {
+            activities.add_soccer_rows(content.portal_rows())?;
+        }
         let npc_interaction = if npc_content.join("npcs").is_dir()
             && npc_content.join("stores.json").is_file()
             && npc_content.join("vendors.json").is_file()
@@ -1060,6 +1075,8 @@ impl Gameplay {
             role_commands: false,
             kart_lobby_reply,
             activities,
+            soccer_content,
+            soccer: None,
             chess,
             portal_refreshed_ms: None,
             kart_entry,
@@ -2577,6 +2594,23 @@ impl Gameplay {
         self.opening.is_some()
     }
 
+    /// True while a session-local soccer match owns the character.
+    pub fn is_soccer_active(&self) -> bool {
+        self.soccer.is_some()
+    }
+
+    pub fn soccer_score(&self) -> Option<[u32; 2]> {
+        self.soccer
+            .as_ref()
+            .map(crate::soccer_entry::Session::score)
+    }
+
+    pub fn soccer_phase(&self) -> Option<crate::soccer_match::MatchPhase> {
+        self.soccer
+            .as_ref()
+            .map(crate::soccer_entry::Session::phase)
+    }
+
     /// True while a demolition derby match or its results screen belongs to this session.
     pub fn derby_active(&self) -> bool {
         self.derby
@@ -2598,6 +2632,9 @@ impl Gameplay {
     }
 
     pub fn supports_location(&self, character: &CharacterState) -> bool {
+        if self.soccer.is_some() {
+            return true;
+        }
         if let Some(kart) = self.kart_entry.as_ref().filter(|k| k.active()) {
             return kart.supports_location(character);
         }
@@ -2633,6 +2670,12 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
+        if let Some(soccer) = self.soccer.as_mut() {
+            return Ok(Outcome {
+                replies: soccer.loaded_replies(),
+                ..Outcome::default()
+            });
+        }
         if let Some(kart) = self.kart_entry.as_ref().filter(|k| k.active()) {
             return Ok(Outcome {
                 replies: kart.loaded()?,
@@ -2751,6 +2794,9 @@ impl Gameplay {
     }
 
     pub fn on_location(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
+        if self.soccer.is_some() {
+            return Ok(Outcome::default());
+        }
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             return Ok(Outcome::default());
         }
@@ -2833,6 +2879,25 @@ impl Gameplay {
     }
 
     fn tick_world(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
+        if self.soccer.is_some() {
+            let mut staged = self.clone();
+            let result = staged
+                .soccer
+                .as_mut()
+                .unwrap()
+                .tick(character.guid, now_ms)?;
+            // The match is session-local; periodic clock ticks must not force
+            // a character save. Only an adopted reward marks a persisted change.
+            let mut out = Outcome {
+                replies: result.replies,
+                ..Outcome::default()
+            };
+            if let Some(rewards) = result.reward_state {
+                staged.adopt_reward_state(rewards, &mut out)?;
+            }
+            *self = staged;
+            return Ok(out);
+        }
         if self
             .derby
             .as_ref()
@@ -2976,6 +3041,7 @@ impl Gameplay {
             in_minigame: self.encounter.as_ref().is_some_and(EncounterEngine::active)
                 || self.field_engaged
                 || self.kart_entry.as_ref().is_some_and(|k| k.active())
+                || self.soccer.is_some()
                 || self
                     .derby
                     .as_ref()
@@ -3183,6 +3249,9 @@ impl Gameplay {
             return Ok(out);
         }
         if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_soccer(inner, character, now_ms)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_pets(inner, character, now_ms)? {
@@ -3502,6 +3571,7 @@ impl Gameplay {
                 .as_ref()
                 .is_some_and(crate::derby_gateway::DerbyGateway::active)
             || !self.fishing.is_empty()
+            || self.soccer.is_some()
     }
 
     /// Switches to Kart Driver and enters the track. Shared by the developer `realm race` command
@@ -3573,6 +3643,28 @@ impl Gameplay {
                 unlocked: BTreeSet::from([1]),
                 experience: Default::default(),
             })
+    }
+
+    /// Adopt a staged minigame reward transaction. The caller has already
+    /// committed the activity/run ledger on a clone; a profile reload failure
+    /// therefore discards the whole staged gameplay state.
+    fn adopt_reward_state(&mut self, next: RewardState, out: &mut Outcome) -> io::Result<()> {
+        let before = self.inventory.state().clone();
+        if self
+            .profiles
+            .as_ref()
+            .is_some_and(|profiles| *profiles.state() != next.profiles)
+        {
+            let directory = self
+                .profile_content_directory
+                .as_deref()
+                .ok_or_else(|| invalid("minigame XP needs profile content"))?;
+            self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
+        }
+        self.inventory = next.inventory;
+        out.changed = true;
+        self.npc_inventory_events(&before, out)?;
+        Ok(())
     }
 
     /// W176 (R): teach the job the chosen trainer offers. The caller stages `self`, so a refusal
@@ -4494,7 +4586,8 @@ impl Gameplay {
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
             || self.chess.as_ref().is_some_and(ChessService::is_active)
             || self.kart_entry.as_ref().is_some_and(|k| k.active())
-            || !self.fishing.is_empty();
+            || !self.fishing.is_empty()
+            || self.soccer.is_some();
         busy.then_some(piece_077::Blocker::Busy)
     }
 
@@ -4513,6 +4606,135 @@ impl Gameplay {
                 .is_some_and(|a| a.supports_basic(profile)),
             level: self.job_level(profile),
         }
+    }
+
+    /// (R) Begin a portal soccer row: join the authenticated player, fill the
+    /// solo roster with passive bots, and offer the shared type-12 run. The
+    /// client sees the captured scene entry first; roster and the 39/16 offer
+    /// follow after Loaded. Any failure leaves the player untouched.
+    fn begin_soccer(
+        &mut self,
+        activity: u32,
+        character: &CharacterState,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(content) = self.soccer_content.clone() else {
+            out.replies
+                .push(chat::system("Soccer is not available right now."));
+            return Ok(());
+        };
+        let scene = match content.entry_scene() {
+            Ok(scene) => scene,
+            Err(_) => {
+                out.replies
+                    .push(chat::system("Soccer is not available right now."));
+                return Ok(());
+            }
+        };
+        let rewards = RewardState::new(
+            self.inventory.clone(),
+            self.reward_profiles(),
+            self.inventory.state().items.len().max(100),
+        );
+        match crate::soccer_entry::Session::begin(&content, activity, character, rewards) {
+            Ok(session) => {
+                self.soccer = Some(session);
+                out.scene_zoning = Some(scene);
+                out.changed = true;
+            }
+            Err(_) => out
+                .replies
+                .push(chat::system("You cannot start that activity here.")),
+        }
+        Ok(())
+    }
+
+    /// While a soccer match owns the character, family-76 input and the shared
+    /// lifecycle controls are consumed here. Unknown families still pass
+    /// through; job/equipment changes are refused with a chat line.
+    fn handle_soccer(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        if self.soccer.is_none() {
+            return Ok(None);
+        }
+        if inner.starts_with(&[76, 0]) {
+            let replies =
+                self.soccer
+                    .as_mut()
+                    .unwrap()
+                    .handle_client(character.guid, inner, now_ms)?;
+            return Ok(Some(Outcome {
+                replies,
+                ..Outcome::default()
+            }));
+        }
+        if inner.starts_with(&[39, 0])
+            || inner.starts_with(&[41, 0, 109, 0])
+            || inner.starts_with(&[26, 0, 42, 0])
+        {
+            let result =
+                self.soccer
+                    .as_mut()
+                    .unwrap()
+                    .handle_lifecycle(character.guid, inner, now_ms)?;
+            let mut out = Outcome {
+                replies: result.replies,
+                ..Outcome::default()
+            };
+            if matches!(
+                result.state,
+                Some(crate::minigame::RunState::Cancelled)
+                    | Some(crate::minigame::RunState::Closed)
+            ) {
+                self.exit_soccer(&mut out)?;
+            }
+            return Ok(Some(out));
+        }
+        if inner.starts_with(&[26, 0, 13, 0])
+            || inner.starts_with(&[42, 0])
+            || inner.starts_with(&[36, 0, 10, 0])
+        {
+            return Ok(Some(Outcome {
+                replies: vec![chat::system(
+                    "Finish the soccer match before changing jobs or using equipment.",
+                )],
+                ..Outcome::default()
+            }));
+        }
+        Ok(None)
+    }
+
+    /// Return to the pre-match world after a leave or results Close. The world
+    /// scene comes from the loaded encounter, so the saved position and the
+    /// op31 frame always agree.
+    fn exit_soccer(&mut self, out: &mut Outcome) -> io::Result<()> {
+        let Some(session) = self.soccer.take() else {
+            return Ok(());
+        };
+        let Some(encounter) = &self.encounter else {
+            return Ok(());
+        };
+        let (zone, position, rotation) = session.return_location();
+        let world = encounter.world();
+        out.scene_zoning = Some(crate::zone_transition::ZoneTransition {
+            envelope_flag: 1,
+            scene: world.name.clone(),
+            type_id: 2,
+            position: [position[0], position[1], position[2], 1.0],
+            rotation: [rotation[0], rotation[1], rotation[2], 1.0],
+            sky: world.sky.clone(),
+            id: i32::try_from(zone).unwrap_or(0),
+            geometry_id: world.geometry_id,
+            override_update_radius: true,
+            unknown: 1,
+            ..Default::default()
+        });
+        out.changed = true;
+        Ok(())
     }
 
     /// W150 (R): 167/1/4 re-sends the list; 167/1/2 Play starts the published battle through the
@@ -4558,6 +4780,9 @@ impl Gameplay {
                     Err(refusal) => out.replies.push(chat::system(&refusal.message())),
                     Ok((_, crate::activity_portal::Kind::Chess { row_id })) => {
                         self.begin_chess(row_id, character.guid, &mut out)?;
+                    }
+                    Ok((soccer, crate::activity_portal::Kind::Soccer)) => {
+                        self.begin_soccer(soccer, character, &mut out)?;
                     }
                     Ok((battle, crate::activity_portal::Kind::Battle)) => {
                         let profile = self.profiles.as_ref().map_or(0, Profiles::active);

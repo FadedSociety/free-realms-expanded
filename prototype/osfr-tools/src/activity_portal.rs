@@ -30,16 +30,18 @@
 //!
 //! # Reconstructed policy (R)
 //!
-//! * Only activities backed by a running battle in the frozen content package are published: one row
-//!   per `field_battles.json` battle, activity id = battle id, category 18 (the combat category
-//!   row of `ActivityCategories.txt`), entry type 1. Every other activity (races, mining, card
-//!   game ...) is simply not listed, so the client cannot ask for it.
-//! * `CanPlayerJoin` is per player: a combat job must be active and its level must reach the
-//!   battle's `required_combat_level`. A refused Play says why in chat (the 147/2 join-error body
-//!   is not recovered). Nothing but the battle itself ever awards.
+//! * Only activities backed by a running battle or a configured native soccer match are published:
+//!   one row per `field_battles.json` battle (category 18) and one per `soccer.json` game (category
+//!   22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt` row 22),
+//!   entry type 1. Every other activity (races, mining, card game ...) is simply not listed, so the
+//!   client cannot ask for it.
+//! * `CanPlayerJoin` is per player: battle rows require a combat job at the configured level;
+//!   chess is open, and soccer uses its own configured level floor without a job gate. A
+//!   refused Play says why in chat (the 147/2 join-error body is not recovered). The owning
+//!   activity, never the portal request, awards.
 //! * The preferred/featured/tutorial/AppSystem/chest fields and the two unknown dwords are 0.
-//!   The image names are the category's art (`hacknslash_detail.dds`), the only art name known to
-//!   exist for the category.
+//!   Image names come from each row's client category (`hacknslash_detail.dds` for combat and
+//!   `Soccer_Briarwood.dds` for soccer).
 
 use serde::Deserialize;
 use std::{
@@ -56,6 +58,10 @@ const SUB_PLAY: u8 = 2;
 const SUB_REFRESH: u8 = 4;
 const ENTRY_WORLD_TUNNEL: u32 = 1;
 const COMBAT_CATEGORY: u32 = 18;
+/// Recovered soccer category row 22 in the client `Resources/ActivityCategories.txt`.
+pub const SOCCER_CATEGORY: u32 = 22;
+/// Recovered category-22 art name in the same client table.
+pub const SOCCER_ART: &str = "Soccer_Briarwood.dds";
 const ART: &str = "hacknslash_detail.dds";
 /// (R) The type-6 row in `MiniGameTypeData.txt` carries CATEGORY_ID 0; the
 /// portal categories table has no board-game row, so chess rows use it as-is.
@@ -67,11 +73,13 @@ const MAX_FILE: u64 = 1 << 20;
 const PLAY_LEN: usize = 12;
 
 /// What a published row starts. Battles use the encounter engine; chess rows
-/// name the client minigame row the chess table service understands.
+/// name the client minigame row the chess table service understands; soccer
+/// rows begin the session-local native match service.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
     Battle,
     Chess { row_id: u32 },
+    Soccer,
 }
 
 /// One published activity: a battle of the frozen package.
@@ -140,7 +148,7 @@ impl Refusal {
             Self::Unknown => "That activity is not available.".into(),
             Self::Busy => "Finish what you are doing before starting an activity.".into(),
             Self::NotCombatJob => "Switch to a combat job before starting a battle.".into(),
-            Self::LevelTooLow(level) => format!("This activity needs a level {level} combat job."),
+            Self::LevelTooLow(level) => format!("This activity needs level {level}."),
         }
     }
 }
@@ -152,21 +160,45 @@ pub enum Request {
 }
 
 /// The published activities. Empty by default, which publishes an empty list.
+///
+/// Soccer rows live in the same list so the client can ask for them with the
+/// portal Play request. The wire row shape is identical; `Kind` selects the
+/// admission and category rules.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct Catalogue(Vec<Activity>);
+pub struct Catalogue {
+    rows: Vec<Activity>,
+}
 
 impl Catalogue {
     /// Build from rows; ids must be unique and nonzero (they are the client's hash keys).
     pub fn new(rows: Vec<Activity>) -> io::Result<Self> {
-        if rows.len() > MAX_ACTIVITIES {
+        validate_rows(&rows)?;
+        Ok(Self { rows })
+    }
+
+    /// Append soccer rows loaded from the soccer content file. Their ids share
+    /// the portal namespace with battles, so a collision is refused.
+    pub fn add_soccer_rows(&mut self, rows: Vec<Activity>) -> io::Result<()> {
+        validate_rows(&rows)?;
+        if self.rows.len() + rows.len() > MAX_ACTIVITIES {
             return Err(invalid("too many activities"));
         }
-        for (i, row) in rows.iter().enumerate() {
-            if row.id == 0 || rows[..i].iter().any(|other| other.id == row.id) {
-                return Err(invalid("activity ids must be unique and nonzero"));
-            }
+        if rows
+            .iter()
+            .any(|row| self.rows.iter().any(|other| other.id == row.id))
+        {
+            return Err(invalid("activity ids must be unique and nonzero"));
         }
-        Ok(Self(rows))
+        if rows.iter().any(|row| row.kind != Kind::Soccer) {
+            return Err(invalid("soccer catalogue rows have the wrong kind"));
+        }
+        self.rows.extend(rows);
+        Ok(())
+    }
+
+    /// True when `id` is a published soccer row (never a battle).
+    pub fn is_soccer(&self, id: u32) -> bool {
+        self.kind(id) == Some(Kind::Soccer)
     }
 
     /// Read `field_battles.json` (the same file the battle engine loads, so every row here is a
@@ -198,23 +230,23 @@ impl Catalogue {
     }
 
     pub fn activities(&self) -> &[Activity] {
-        &self.0
+        &self.rows
     }
 
     /// The kind behind an id, without admitting the player. Unknown ids are `None`.
     pub fn kind(&self, id: u32) -> Option<Kind> {
-        self.0.iter().find(|a| a.id == id).map(|a| a.kind)
+        self.rows.iter().find(|a| a.id == id).map(|a| a.kind)
     }
 
     /// Publish chess rows after the battle rows. A chess row is one
     /// single-player minigame row; the encounter engine never sees it.
     pub fn with_chess_rows(mut self, rows: Vec<ChessActivity>) -> io::Result<Self> {
-        let mut ids: BTreeSet<u32> = self.0.iter().map(|a| a.id).collect();
+        let mut ids: BTreeSet<u32> = self.rows.iter().map(|a| a.id).collect();
         for row in rows {
             if row.row_id == 0 || !ids.insert(row.row_id) {
                 return Err(invalid("chess activity ids must be unique and nonzero"));
             }
-            self.0.push(Activity {
+            self.rows.push(Activity {
                 id: row.row_id,
                 name_id: row.name_id,
                 description_id: row.description_id,
@@ -224,7 +256,7 @@ impl Catalogue {
                 kind: Kind::Chess { row_id: row.row_id },
             });
         }
-        if self.0.len() > MAX_ACTIVITIES {
+        if self.rows.len() > MAX_ACTIVITIES {
             return Err(invalid("too many activities"));
         }
         Ok(self)
@@ -232,7 +264,11 @@ impl Catalogue {
 
     /// Admission for a Play. Order matters: an unknown id reveals nothing about the player.
     pub fn admit(&self, id: u32, viewer: Viewer, busy: bool) -> Result<&Activity, Refusal> {
-        let activity = self.0.iter().find(|a| a.id == id).ok_or(Refusal::Unknown)?;
+        let activity = self
+            .rows
+            .iter()
+            .find(|a| a.id == id)
+            .ok_or(Refusal::Unknown)?;
         if busy {
             return Err(Refusal::Busy);
         }
@@ -247,6 +283,13 @@ impl Catalogue {
             }
             // (R) Chess needs no job or level; the table is open to every player.
             Kind::Chess { .. } => {}
+            // (R) Soccer is a world activity, not a combat-job gate. Its row
+            // still honors the configured level floor; the original gate is unknown.
+            Kind::Soccer => {
+                if viewer.level < activity.required_level {
+                    return Err(Refusal::LevelTooLow(activity.required_level));
+                }
+            }
         }
         Ok(activity)
     }
@@ -255,8 +298,8 @@ impl Catalogue {
     pub fn list_packet(&self, viewer: Viewer) -> Vec<u8> {
         let mut out = header(SUB_LIST);
         out.extend(ENTRY_WORLD_TUNNEL.to_le_bytes());
-        out.extend((self.0.len() as i32).to_le_bytes());
-        for (position, a) in self.0.iter().enumerate() {
+        out.extend((self.rows.len() as i32).to_le_bytes());
+        for (position, a) in self.rows.iter().enumerate() {
             let (category, detail, thumbnail, can_join) = match a.kind {
                 Kind::Battle => (
                     COMBAT_CATEGORY,
@@ -265,6 +308,12 @@ impl Catalogue {
                     viewer.combat_job && viewer.level >= a.required_level,
                 ),
                 Kind::Chess { .. } => (CHESS_CATEGORY, CHESS_DETAIL, CHESS_THUMBNAIL, true),
+                Kind::Soccer => (
+                    SOCCER_CATEGORY,
+                    SOCCER_ART,
+                    SOCCER_ART,
+                    viewer.level >= a.required_level,
+                ),
             };
             for dword in [
                 a.id,
@@ -318,6 +367,18 @@ fn header(sub_op: u8) -> Vec<u8> {
     let mut out = FAMILY.to_le_bytes().to_vec();
     out.extend([SERVICE_ACTIVITY, sub_op]);
     out
+}
+
+fn validate_rows(rows: &[Activity]) -> io::Result<()> {
+    if rows.len() > MAX_ACTIVITIES {
+        return Err(invalid("too many activities"));
+    }
+    for (i, row) in rows.iter().enumerate() {
+        if row.id == 0 || rows[..i].iter().any(|other| other.id == row.id) {
+            return Err(invalid("activity ids must be unique and nonzero"));
+        }
+    }
+    Ok(())
 }
 
 fn invalid(message: &str) -> io::Error {

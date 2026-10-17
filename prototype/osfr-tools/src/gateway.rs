@@ -524,6 +524,10 @@ fn application_handler(body: &[u8]) -> &'static str {
         // Family 34 is the demolition derby processor. Its client records are routed through the
         // active derby service; unknown subtypes stay inert there.
         (Some(34), _) => "derby",
+        // Family 76 is the native Soccer family. Gameplay consumes it only while
+        // a soccer session is active; naming it keeps understood refusals out of
+        // the unknown-application log.
+        (Some(76), _) => "soccer",
         // Family 168 carries a one-byte sub-opcode, so only the family is matched.
         (Some(168), _) => "mounts",
         // Family 53 likewise has a one-byte subtype. Only the implemented pet requests
@@ -1856,6 +1860,7 @@ impl Gateway {
         if !game.is_opening()
             && !game.accepts_kart_loading_application(&[33, 0])
             && !game.derby_active()
+            && !game.is_soccer_active()
         {
             return Ok(GatewayOutcome::default());
         }

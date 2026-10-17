@@ -390,6 +390,12 @@ impl ServiceEvent {
     pub fn wire(&self) -> Vec<u8> {
         wrap(self.packet())
     }
+
+    /// The inner family-76 body for `Outcome::replies` (the gateway adds the
+    /// tunnel envelope itself).
+    pub fn inner(&self) -> Vec<u8> {
+        soccer::encode_inner(&self.packet())
+    }
 }
 
 /// Codec gate for the service's bounded R output set. It refuses variants with
@@ -1001,8 +1007,8 @@ fn unit(value: [f32; 3]) -> io::Result<[f32; 3]> {
 
 /// Encode a candidate opcode-31 `ClientBeginZoning` frame. The native layout
 /// is shared; scene/config values below are R candidates, not client facts.
-pub fn entry_frame(position: [f32; 4], rotation: [f32; 4]) -> io::Result<Vec<u8>> {
-    zone_transition::encode(&ZoneTransition {
+pub fn entry_scene(position: [f32; 4], rotation: [f32; 4]) -> io::Result<ZoneTransition> {
+    let scene = ZoneTransition {
         envelope_flag: ENTRY_FLAG,
         scene: ZONE.to_string(),
         type_id: ENTRY_TYPE,
@@ -1016,7 +1022,37 @@ pub fn entry_frame(position: [f32; 4], rotation: [f32; 4]) -> io::Result<Vec<u8>
         geometry_id: ENTRY_GEOMETRY_ID,
         override_update_radius: true,
         wait_for_zone_ready: false,
-    })
+    };
+    // Validate through the registered native codec before the caller stages a
+    // zone change: bounds, finite floats and string limits.
+    zone_transition::encode(&scene)?;
+    Ok(scene)
+}
+
+/// Encode a candidate opcode-31 `ClientBeginZoning` frame. The native layout
+/// is shared; scene/config values below are R candidates, not client facts.
+pub fn entry_frame(position: [f32; 4], rotation: [f32; 4]) -> io::Result<Vec<u8>> {
+    zone_transition::encode(&entry_scene(position, rotation)?)
+}
+
+/// Rebuild the family-76 gateway envelope around an application body that the
+/// gateway already stripped (`u16 76 | u16 sub | payload`). The soccer codec's
+/// own `decode` keeps its captured-envelope contract; this is the live route's
+/// adapter to it.
+pub fn wire_from_inner(inner: &[u8]) -> io::Result<Vec<u8>> {
+    if inner.len() < 4 || u16::from_le_bytes([inner[0], inner[1]]) != soccer::TUNNEL_OPCODE {
+        return Err(invalid("not a soccer application body"));
+    }
+    let mut bytes = Vec::with_capacity(inner.len() + 7);
+    bytes.extend(5u16.to_le_bytes());
+    bytes.push(1);
+    bytes.extend(
+        u32::try_from(inner.len())
+            .map_err(|_| invalid("soccer application body too large"))?
+            .to_le_bytes(),
+    );
+    bytes.extend(inner);
+    Ok(bytes)
 }
 
 /// Result packet and reward semantics remain open native evidence.
