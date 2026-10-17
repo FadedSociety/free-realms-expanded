@@ -57,9 +57,12 @@ impl Fixture {
         if race {
             content.race = Some(race_content());
         }
+        self.write(&content);
+    }
+    fn write(&self, content: &KartGatewayContent) {
         fs::write(
             self.0.join("kart_entry.json"),
-            serde_json::to_vec(&content).unwrap(),
+            serde_json::to_vec(content).unwrap(),
         )
         .unwrap();
     }
@@ -329,6 +332,7 @@ fn refusals_carry_distinct_player_readable_messages() {
         EntryDenied::NoRace,
         EntryDenied::AlreadyRacing,
         EntryDenied::Busy,
+        EntryDenied::Cooldown,
     ];
     let texts: BTreeSet<_> = all.iter().map(|d| d.message()).collect();
     assert_eq!(texts.len(), all.len());
@@ -395,6 +399,22 @@ fn malformed_gate_files_are_refused_at_load() {
     fs::remove_dir(&path).unwrap();
     // Canary: removing the bad file restores a loadable, closed gate.
     assert!(f.load().gate_npcs().is_empty());
+}
+
+#[test]
+fn race_content_that_never_reaches_countdown_zero_is_refused() {
+    let f = Fixture::new(true);
+    let mut content = content();
+    let mut race = race_content();
+    race.schedule
+        .retain(|step| step.frame != ScheduledFrame::Countdown(0));
+    content.race = Some(race);
+    f.write(&content);
+    assert!(KartGateway::load(&f.0, None).is_err());
+
+    // Canary for the fixture itself: the valid generated content loads.
+    f.write_content(true);
+    assert!(KartGateway::load(&f.0, None).unwrap().is_some());
 }
 
 #[test]
@@ -609,9 +629,15 @@ fn gate_cooldown_after_a_paid_race_blocks_entry_until_it_passes() {
             .unwrap()
     );
     g.exit();
+    let before_refusal = g.state().clone();
     assert_eq!(
         g.admit_at(GATE_NPC, false, paid + 10),
         Err(EntryDenied::Cooldown)
+    );
+    assert_eq!(
+        g.state(),
+        &before_refusal,
+        "a cooldown refusal must not consume the saved allowance"
     );
     assert_eq!(g.admit_at(GATE_NPC, false, paid + 600), Ok(()));
     // The cooldown survives a reload from the saved state.

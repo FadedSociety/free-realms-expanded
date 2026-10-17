@@ -605,7 +605,11 @@ impl RaceSession {
     }
 
     pub fn abandon(&mut self) {
-        self.phase = Phase::Abandoned;
+        // A validated finish is a result, not a run in progress. Service callers already guard this,
+        // but the session API must also keep a late teardown from destroying a payable outcome.
+        if self.phase != Phase::Finished {
+            self.phase = Phase::Abandoned;
+        }
     }
 
     pub fn snapshot(&self) -> SessionSnapshot {

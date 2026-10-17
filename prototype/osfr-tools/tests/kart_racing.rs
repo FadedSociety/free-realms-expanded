@@ -6,13 +6,13 @@
 //! `lab/reports/original-minigame-packets/racing-*.bin` and the recovered schema is recorded in
 //! `lab/reports/kart-racing-20261009T0158Z/kart-racing-wire-schema.json`.
 use osfr_tools::kart_racing::{
-    self, decode_racing_frame, vehicle_body_asset, CheckpointOutcome, FrameError, KartRacingError,
-    LobbyGameDefinition, LobbyGameEntry, ObservationOutcome, Phase, RaceSession, RewardProposal,
-    RewardSchedule, TrackLayout, KART_DRIVER_JOB_GUID, KART_DRIVER_JOB_NAME_ID,
-    KART_RACE_GAME_TYPE, KART_RACE_LOBBY_NAME_ID, RACER_STATE_BODY_LEN, RACE_PROGRESS_BODY_LEN,
-    SPEEDWAYS,
+    self, CheckpointOutcome, FrameError, KART_DRIVER_JOB_GUID, KART_DRIVER_JOB_NAME_ID,
+    KART_RACE_GAME_TYPE, KART_RACE_LOBBY_NAME_ID, KartRacingError, LobbyGameDefinition,
+    LobbyGameEntry, ObservationOutcome, Phase, RACE_PROGRESS_BODY_LEN, RACER_STATE_BODY_LEN,
+    RaceSession, RewardProposal, RewardSchedule, SPEEDWAYS, TrackLayout, decode_racing_frame,
+    vehicle_body_asset,
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
 fn bytes(hex: &str) -> Vec<u8> {
@@ -494,6 +494,31 @@ fn reward_stays_unpriced_without_evidence_and_is_granted_only_once() {
         abandoned.claim_reward(),
         Err(KartRacingError::NotFinished),
         "an abandoned run never grants"
+    );
+}
+
+#[test]
+fn abandoning_after_finish_keeps_the_result_and_reward() {
+    let mut session = RaceSession::open(
+        34,
+        TrackLayout::new(31, 1, vec![11], Some(RewardSchedule { coins: 10, xp: 25 })).unwrap(),
+        0,
+    )
+    .unwrap();
+    session.begin(0).unwrap();
+    session.start(0).unwrap();
+    session.on_checkpoint(10, 11);
+    assert_eq!(session.phase(), Phase::Finished);
+
+    session.abandon();
+    assert_eq!(
+        session.phase(),
+        Phase::Finished,
+        "a finished result must survive late teardown"
+    );
+    assert_eq!(
+        session.claim_reward(),
+        Ok(RewardProposal::Granted { coins: 10, xp: 25 })
     );
 }
 

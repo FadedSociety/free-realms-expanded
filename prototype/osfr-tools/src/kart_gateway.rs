@@ -212,6 +212,14 @@ impl KartGateway {
         if content.schema_version != 1 {
             return Err(invalid("unsupported kart entry content"));
         }
+        if content.race.as_ref().is_some_and(|race| {
+            !race
+                .schedule
+                .iter()
+                .any(|step| step.frame == crate::kart_service::ScheduledFrame::Countdown(0))
+        }) {
+            return Err(invalid("kart race schedule never reaches countdown zero"));
+        }
         KartEntryHandler::new(content.entry.clone()).map_err(invalid)?;
         // This starter binding owns one kart. AI racers need separate progress,
         // transforms and identities before they can be included here.

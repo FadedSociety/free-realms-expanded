@@ -2454,6 +2454,11 @@ impl KartService {
             }));
         }
         self.attempts += 1;
+        // The packet path must enforce the same whole-race window as `tick`: a claim arriving just
+        // after the limit but before the next 20 Hz tick must not reach the finish line.
+        if let Err(refusal) = self.race_elapsed(now_ms) {
+            return Ok(ServiceOutcome::Refused(refusal));
+        }
         let charge = match self.check_movement(position, now_ms) {
             Ok(charge) => charge,
             Err(refusal) => return Ok(ServiceOutcome::Refused(refusal)),

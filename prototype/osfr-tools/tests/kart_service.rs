@@ -2518,6 +2518,44 @@ fn timeout_aborts_without_a_reward() {
 }
 
 #[test]
+fn gate_claim_after_the_race_window_is_refused_before_the_tick_aborts() {
+    let mut content = synthetic_content();
+    content.laps = 1;
+    content.progress_template.lap_limit = 1;
+    content.gates.truncate(1);
+    content.bounds.max_race_ms = 60_000;
+    // Keep the movement guard out of the way: only the whole-race window may refuse this claim.
+    content.bounds.max_step_ms = 120_000;
+    let (mut service, context) = racing(content);
+    let before = service.snapshot().expect("snapshot before the timed claim");
+
+    let timed = gate_claim(&mut service, &context, 1.0, at(13_241 + 60_001));
+    assert_eq!(
+        refusal(&timed),
+        &ServiceRefusal::RaceTimeout {
+            elapsed_ms: 60_001,
+            limit_ms: 60_000,
+        }
+    );
+    let mut expected = before.clone();
+    expected.attempts += 1;
+    assert_eq!(
+        service.snapshot().expect("snapshot after the timed claim"),
+        expected,
+        "the timed claim must not finish, pay or move the race"
+    );
+    assert_eq!(service.phase(), RacePhase::Racing);
+    assert!(!service.finish_flag());
+
+    let aborted = service.tick(at(13_241 + 60_001)).unwrap();
+    assert!(matches!(
+        aborted,
+        ServiceOutcome::Handled { abort: true, .. }
+    ));
+    assert_eq!(service.phase(), RacePhase::Aborted);
+}
+
+#[test]
 fn bulk_observations_are_bounded_and_inert() {
     let (mut service, context) = started();
     let before = service.phase();
