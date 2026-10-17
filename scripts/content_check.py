@@ -822,6 +822,11 @@ class Checker:
                 if not (isinstance(r, dict) and num(r.get("chance"), 0, .5) and isinstance(pool, dict) and 0 < len(pool) <= 64
                         and all(n in kinds and num(w, 0, 1000, True) for n, w in pool.items()) and any(w > 0 for w in pool.values())):
                     bad(f"{where}.{roll}", r, "roll needs chance 0..0.5 and a pool of existing kinds, weights 0..1000, one non-zero")
+        s = data.get("participation")
+        if s is not None and not (isinstance(s, dict) and num(s.get("window_ms"), 1000, 300000, True)
+                                  and num(s.get("group_chance_multiplier"), .05, 1)
+                                  and isinstance(s.get("source"), str) and s["source"].strip()):
+            bad("participation", s, "participation needs window_ms 1000..300000, group_chance_multiplier 0.05..1 and a source note")
         p = data.get("pickup")
         if not (isinstance(p, dict) and num(p.get("ttl_ms"), 5000, 120000, True) and num(p.get("radius"), .5, 5)
                 and num(p.get("max_alive_per_instance"), 1, 32, True)):

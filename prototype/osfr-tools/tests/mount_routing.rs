@@ -9,8 +9,8 @@
 use osfr_tools::{
     inventory::{InventoryItem, InventoryState},
     mounts::{
-        MountCatalog, MountEffectKind, MountRequest, MountService, RideContext, RidePose,
-        RideRestrictions, RideWire, decode_request,
+        MountCatalog, MountEffectKind, MountRequest, MountService, MountTail, RideContext,
+        RidePose, RideRestrictions, RideWire, decode_request,
     },
     players::{PlayerRegistry, SessionId, ZoneInstance},
     social_chat::{
@@ -376,6 +376,72 @@ fn a_second_player_in_range_sees_the_ride_and_its_removal() {
     // Putting the ride away removes it for everyone in range.
     let away = handle(&mut service, &DISMOUNT_REQUEST, &owned, 20);
     assert_eq!(away.shared[1][6..14], view.removal_packet()[6..14]);
+}
+
+/// A rider's 125 position update as `players.rs` writes it (36 bytes of inner packet).
+fn position_update(guid: u64) -> Vec<u8> {
+    let mut bytes = 125u16.to_le_bytes().to_vec();
+    bytes.extend(guid.to_le_bytes());
+    for value in [10.0_f32, 2.0, 30.0, 0.25, 0.0, 0.97] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.extend([3, 0]); // movement state, unknown
+    bytes
+}
+
+/// W167: a viewer who meets a seated rider later gets the native AddPc mount block, and the
+/// ride copies the rider's position updates (only while the rider sits on it).
+#[test]
+fn a_seated_rider_carries_the_mount_tail_and_the_ride_copies_its_moves() {
+    let owned = inventory(&[DRAGON_ITEM]);
+    let actor = MountService::ride_guid(OWNER);
+    let mut service = MountService::new(catalog());
+    let update = position_update(OWNER);
+
+    // Summoned, not boarded: no seat to carry, and the ride stays where it stands.
+    handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+    let idle = service.view(OWNER).unwrap();
+    assert_eq!(idle.tail(), MountTail::NONE);
+    assert_eq!(idle.follow(&update), None);
+
+    let boarded = handle(&mut service, &mount_request(actor), &owned, 10);
+    let view = service.view(OWNER).unwrap();
+    let tail = view.tail();
+    assert_eq!(
+        tail,
+        MountTail {
+            ride_guid: actor,
+            seat: 0,
+            queue: 1,
+            lift: 0.0
+        }
+    );
+    // 168/2 feeds `Mount` the same seat, queue slot and last argument as the tail does.
+    let response = &boarded.shared[0];
+    let field = |at: usize| i32::from_le_bytes(response[at..at + 4].try_into().unwrap());
+    assert_eq!(field(19), tail.seat);
+    assert_eq!(field(23), 1, "queue position: the client mounts on 1");
+    assert_eq!(field(27), tail.queue);
+    assert_eq!(
+        f32::from_le_bytes(response[35..39].try_into().unwrap()),
+        tail.lift
+    );
+
+    // The copy differs from the rider's update in the GUID only.
+    let copy = view.follow(&update).unwrap();
+    assert_eq!(copy.len(), update.len());
+    assert_eq!(copy[..2], update[..2]);
+    assert_eq!(copy[2..10], actor.to_le_bytes());
+    assert_eq!(copy[10..], update[10..]);
+    // Another player's move, another family, and a cut-short packet are not copied.
+    assert_eq!(view.follow(&position_update(OTHER)), None);
+    assert_eq!(view.follow(&[42, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), None);
+    assert_eq!(view.follow(&update[..9]), None);
+    assert_eq!(view.follow(&[]), None);
+
+    // Dismounted: the view is gone, so nothing is copied or carried.
+    handle(&mut service, &DISMOUNT_REQUEST, &owned, 20);
+    assert!(service.view(OWNER).is_none());
 }
 
 #[test]

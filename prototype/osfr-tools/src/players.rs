@@ -5,6 +5,7 @@
 //! layouts follow mapped client readers. Interest limits and fallback AddPc
 //! presentation values are reconstructed policy (R).
 
+use crate::mounts::MountTail;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
@@ -186,6 +187,9 @@ pub struct PlayerRegistry {
     cells: BTreeMap<(ZoneInstance, [i64; 3]), BTreeSet<SessionId>>,
     // Cached directed nearest sets; bounded by the existing per-viewer cap (R).
     views: BTreeMap<SessionId, VisibleView>,
+    // W167: the ride a seated player shows in later AddPc frames (the native pending-mount
+    // block). Absent means `MountTail::NONE`.
+    mounts: BTreeMap<SessionId, MountTail>,
 }
 
 impl PlayerRegistry {
@@ -197,6 +201,7 @@ impl PlayerRegistry {
             character_owners: BTreeMap::new(),
             cells: BTreeMap::new(),
             views: BTreeMap::new(),
+            mounts: BTreeMap::new(),
         }
     }
 
@@ -302,6 +307,7 @@ impl PlayerRegistry {
         self.remove_cell(session_id, removed.zone, removed.position);
         self.sessions.remove(&session_id);
         self.views.remove(&session_id);
+        self.mounts.remove(&session_id);
         for (owners, guid) in [
             (&mut self.account_owners, removed.account_guid),
             (&mut self.character_owners, removed.character_guid),
@@ -311,6 +317,19 @@ impl PlayerRegistry {
             }
         }
         self.refresh_views(session_id, &affected, Some(&removed), false)
+    }
+
+    /// W167: set or clear the ride shown in this player's future AddPc frames. Nobody is messaged:
+    /// players who already see the rider got the ride actor and 168/2 when it was boarded.
+    pub fn set_mount(&mut self, session_id: SessionId, mount: MountTail) {
+        if !self.sessions.contains_key(&session_id) {
+            return;
+        }
+        if mount == MountTail::NONE {
+            self.mounts.remove(&session_id);
+        } else {
+            self.mounts.insert(session_id, mount);
+        }
     }
 
     /// Change pose and/or zone while preserving accepted relay bytes. Interest
@@ -573,7 +592,10 @@ impl PlayerRegistry {
                 messages.push(OutboundMessage {
                     recipient: viewer,
                     kind: MessageKind::Spawn,
-                    bytes: build_add_pc(player),
+                    bytes: build_add_pc(
+                        player,
+                        self.mounts.get(subject).copied().unwrap_or(MountTail::NONE),
+                    ),
                 });
             }
         }
@@ -705,7 +727,7 @@ fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {
     dx * dx + dy * dy + dz * dz
 }
 
-fn build_add_pc(player: &PlayerSession) -> Vec<u8> {
+fn build_add_pc(player: &PlayerSession, mount: MountTail) -> Vec<u8> {
     let mut inner = Vec::with_capacity(195);
     put_u16(&mut inner, 35);
     put_u16(&mut inner, 1);
@@ -755,10 +777,12 @@ fn build_add_pc(player: &PlayerSession) -> Vec<u8> {
         put_i32(&mut inner, 0); // (R) title fields are not routed.
     }
     put_i32(&mut inner, 0); // (R) no public persistent-effect snapshot.
-    put_u64(&mut inner, 0); // (R) mounts are not routed.
-    put_i32(&mut inner, -1); // (R) unmounted seat sentinel.
-    put_i32(&mut inner, -1); // (R) unmounted queue sentinel.
-    put_f32(&mut inner, 0.0); // (R) no mount/nameplate lift.
+    // Native 0092f460 case 1 feeds these five values to SetPendingMountInfo (0095ad80); the client
+    // calls Mount (00972d30) once the ride actor exists. NONE is the unmounted sentinel.
+    put_u64(&mut inner, mount.ride_guid);
+    put_i32(&mut inner, mount.seat);
+    put_i32(&mut inner, mount.queue);
+    put_f32(&mut inner, mount.lift);
     put_i32(&mut inner, presentation.wield_type);
     put_f32(&mut inner, 0.0); // (R) no VIP progression source.
     for _ in 0..3 {

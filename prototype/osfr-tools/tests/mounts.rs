@@ -112,10 +112,10 @@ fn expected_mount_response() -> Vec<u8> {
     bytes.extend_from_slice(&OWNER.to_le_bytes());
     bytes.extend_from_slice(&MOUNT_ACTOR.to_le_bytes());
     bytes.extend_from_slice(&0_i32.to_le_bytes()); // seat
-    bytes.extend_from_slice(&1_i32.to_le_bytes()); // (R) accept
-    bytes.extend_from_slice(&0_i32.to_le_bytes()); // (R) queue position
-    bytes.extend_from_slice(&0_i32.to_le_bytes()); // (R) unknown field
-    bytes.extend_from_slice(&0.0_f32.to_le_bytes()); // (R) unknown field
+    bytes.extend_from_slice(&1_i32.to_le_bytes()); // queue position: the client mounts on 1
+    bytes.extend_from_slice(&1_i32.to_le_bytes()); // (R) Mount's fourth argument, as in the AddPc tail
+    bytes.extend_from_slice(&0_i32.to_le_bytes()); // (R) stored on the rider (+0x17bc)
+    bytes.extend_from_slice(&0.0_f32.to_le_bytes()); // (R) Mount's last argument
     bytes
 }
 

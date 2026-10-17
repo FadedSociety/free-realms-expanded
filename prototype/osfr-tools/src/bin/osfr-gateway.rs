@@ -10,7 +10,7 @@ use osfr_tools::game_store::{load_or_create, save};
 use osfr_tools::gameplay::Gameplay;
 use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
-use osfr_tools::mounts::{RidePose, RideView};
+use osfr_tools::mounts::{MountTail, RidePose, RideView};
 use osfr_tools::net_policy::{Bucket, IpLimiter};
 use osfr_tools::player_radial::{Chosen, MenuOffer, PlayerRadial, PublicLook};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
@@ -689,6 +689,8 @@ impl SharedWorld {
                     heading: player.heading,
                 }))
             });
+            // W167 (R): a seated rider's 125 is followed by the ride's copy (see `RideView::follow`).
+            let extra = extra.or_else(|| self.ride_follow(&delivery.bytes));
             out.push(delivery);
             out.extend(extra.into_iter().flatten().map(|packet| Delivery {
                 recipient,
@@ -696,6 +698,14 @@ impl SharedWorld {
             }));
         }
         out
+    }
+
+    /// W167: the ride's copy of a seated rider's 125 position update (tunnel frame in, inner
+    /// packets out); `None` for every other frame.
+    fn ride_follow(&self, frame: &[u8]) -> Option<Vec<Vec<u8>>> {
+        let inner = frame.get(7..)?;
+        let rider = u64::from_le_bytes(inner.get(2..10)?.try_into().ok()?);
+        Some(vec![self.rides.get(&rider)?.follow(inner)?])
     }
 
     fn social_delivery(&self, message: SocialMessage) -> Option<Delivery> {
@@ -1679,9 +1689,11 @@ impl Session {
                 self.emote = staged_gateway.emote_context(now_ms);
                 match staged_gateway.ride_view() {
                     Some(view) => {
+                        staged_world.players.set_mount(self.id, view.tail());
                         staged_world.rides.insert(current.guid, view);
                     }
                     None => {
+                        staged_world.players.set_mount(self.id, MountTail::NONE);
                         staged_world.rides.remove(&current.guid);
                     }
                 }
@@ -1817,6 +1829,9 @@ impl Session {
                 }))?;
             }
             event(json!({"event":"world_ready","state":self.gateway.state()}));
+        }
+        if let Some(heal) = outcome.group_heal {
+            self.heal_group(heal, world, membership, sessions)?;
         }
         Ok(true)
     }
@@ -2149,6 +2164,58 @@ impl Session {
             self.note_packet("out", message);
         }
         self.sender.queue_message(message)?;
+        Ok(())
+    }
+
+    /// W158: a big heart heals the rest of the picker's group, once per kill (R).
+    /// Members must be in the same zone and instance and not knocked out (the
+    /// engine never revives). Each member's state is saved before the heal shows.
+    fn heal_group(
+        &self,
+        heal: osfr_tools::encounter::GroupHeal,
+        world: &SharedWorld,
+        membership: &mut World,
+        sessions: &mut SessionMap,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let Some(group) = world.social.group_of(self.character_guid) else {
+            return Ok(());
+        };
+        if !membership.claim_group_heal(heal.kill) {
+            return Ok(());
+        }
+        let members = world
+            .social
+            .group_members(group)
+            .map(<[u64]>::to_vec)
+            .unwrap_or_default();
+        let zone = self.gateway.state().zone_id;
+        let instance = membership
+            .player_location(self.character_guid)
+            .map(|l| l.instance_id);
+        for guid in members.into_iter().filter(|g| *g != self.character_guid) {
+            let Some(session) = world
+                .active_sessions
+                .get(&guid)
+                .and_then(|id| world.session_keys.get(id))
+                .and_then(|key| sessions.get_mut(key))
+            else {
+                continue;
+            };
+            let same_place = session.gateway.state().zone_id == zone
+                && membership.player_location(guid).map(|l| l.instance_id) == instance;
+            if !same_place {
+                continue;
+            }
+            let mut staged = session.gateway.clone();
+            let healed = staged.receive_group_heal(heal.percent)?;
+            if healed.changed {
+                save(&session.state_path, &staged.snapshot())?;
+                session.gateway = staged;
+            }
+            for reply in healed.replies {
+                session.queue_shared_message(&wrap_application(&reply))?;
+            }
+        }
         Ok(())
     }
 

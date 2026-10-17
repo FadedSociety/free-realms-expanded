@@ -51,22 +51,22 @@
   },
   "coverage": {
     "vendor_keys_total": 192,
-    "vendors_with_item_ids": 96,
-    "vendors_without_item_ids": 96,
+    "vendors_with_item_ids": 98,
+    "vendors_without_item_ids": 94,
     "wiki_npc_pages_with_sells_lists": 94,
     "unique_wiki_stock_names": 1133,
     "named_video_stock_claims_without_item_id": 1,
     "named_content_stock_claims": 5,
     "item_names_considered": 1139,
-    "items_resolved": 1026,
+    "items_resolved": 1083,
     "items_ambiguous": 31,
     "items_unmatched": 82,
     "unique_name_id_matches_missing_from_startup": 0,
     "no_exact_name_id_match": 81,
     "member_only_flags_recovered": 0,
-    "items_with_stores_price": 1024,
+    "items_with_stores_price": 1081,
     "mapped_items_without_stores_price": 2,
-    "vendors_with_runtime_item_ids": 94
+    "vendors_with_runtime_item_ids": 96
   },
   "vendors": [
     {
@@ -45878,6 +45878,2350 @@
         75924
       ],
       "stock_completeness": "all_named_evidence_items_mapped"
+    },
+    {
+      "npc_id": 9500000572,
+      "npc_name": "Delvin",
+      "npc_content_file": "seaside.json",
+      "vendor_stock_description": "Rides: the Seaside surfboard seller doubles as the reconstructed ride stable stock (W169, R). Wiki Rides page; Station Cash prices converted to coins.",
+      "stock_completeness": "reconstructed_ride_stock_w169",
+      "item_ids": [
+        10530,
+        76856,
+        76905,
+        76855,
+        38799,
+        14288,
+        76768,
+        78069,
+        76870,
+        76871,
+        76863,
+        76875,
+        76864,
+        76873,
+        14289,
+        76872,
+        76869,
+        76868,
+        76866,
+        76867,
+        76865,
+        76859,
+        76854,
+        76853,
+        17180,
+        11317,
+        17197,
+        10499,
+        76759,
+        78394,
+        78395,
+        78396,
+        78397,
+        78332,
+        76903,
+        17598,
+        78036,
+        7976,
+        10382,
+        7975,
+        76858,
+        76857,
+        79410,
+        79454,
+        10381,
+        10393,
+        79438,
+        79439,
+        79447,
+        79458,
+        15733,
+        15740,
+        16920,
+        79460
+      ],
+      "items": [
+        {
+          "item_id": 10530,
+          "item_name": "Skeletal Dragon",
+          "source_stock_name": "Skeletal Dragon",
+          "item_name_id": 6638,
+          "purchase_price_coins": 13000,
+          "member_price_coins": 11700,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Skeletal Dragon",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6638,
+            "english_text": "Skeletal Dragon",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 10530,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 10530,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76856,
+          "item_name": "Scaled Dragon",
+          "source_stock_name": "Scaled Dragon",
+          "item_name_id": 4897,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Scaled Dragon",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 4897,
+            "english_text": "Scaled Dragon",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76856,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76856,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76905,
+          "item_name": "Poison Dragon",
+          "source_stock_name": "Poison Dragon",
+          "item_name_id": 434170,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Poison Dragon",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 434170,
+            "english_text": "Poison Dragon",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76905,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76905,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76855,
+          "item_name": "Gold-Tipped Dragon",
+          "source_stock_name": "Gold-Tipped Dragon",
+          "item_name_id": 4893,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Gold-Tipped Dragon",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 4893,
+            "english_text": "Gold-Tipped Dragon",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76855,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76855,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 38799,
+          "item_name": "Feathered Drake",
+          "source_stock_name": "Feathered Drake",
+          "item_name_id": 33906,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Feathered Drake",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 33906,
+            "english_text": "Feathered Drake",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 38799,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 38799,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 14288,
+          "item_name": "Bat",
+          "source_stock_name": "Bat",
+          "item_name_id": 372,
+          "purchase_price_coins": 7000,
+          "member_price_coins": 6300,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Bat",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 372,
+            "english_text": "Bat",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 14288,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 14288,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76768,
+          "item_name": "Pegasus",
+          "source_stock_name": "Pegasus",
+          "item_name_id": 5656,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Pegasus",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5656,
+            "english_text": "Pegasus",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76768,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76768,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78069,
+          "item_name": "Fire Pegasus",
+          "source_stock_name": "Fire Pegasus",
+          "item_name_id": 435560,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Fire Pegasus",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 435560,
+            "english_text": "Fire Pegasus",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78069,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78069,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76870,
+          "item_name": "Hearts Pegasus",
+          "source_stock_name": "Hearts Pegasus",
+          "item_name_id": 10108,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Hearts Pegasus",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 10108,
+            "english_text": "Hearts Pegasus",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76870,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76870,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76871,
+          "item_name": "Pegasus Unicorn",
+          "source_stock_name": "Pegasus Unicorn",
+          "item_name_id": 10110,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Pegasus Unicorn",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 10110,
+            "english_text": "Pegasus Unicorn",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76871,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76871,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76863,
+          "item_name": "Tiger",
+          "source_stock_name": "Tiger",
+          "item_name_id": 6182,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Tiger",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6182,
+            "english_text": "Tiger",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76863,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76863,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76875,
+          "item_name": "Lava Tiger",
+          "source_stock_name": "Lava Tiger",
+          "item_name_id": 6369,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Lava Tiger",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6369,
+            "english_text": "Lava Tiger",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76875,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76875,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76864,
+          "item_name": "Saber-Tooth Tiger",
+          "source_stock_name": "Saber-Tooth Tiger",
+          "item_name_id": 6221,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Saber-Tooth Tiger",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6221,
+            "english_text": "Saber-Tooth Tiger",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76864,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76864,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76873,
+          "item_name": "Stone Saber-Tooth Tiger",
+          "source_stock_name": "Stone Saber-Tooth Tiger",
+          "item_name_id": 6305,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Stone Saber-Tooth Tiger",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6305,
+            "english_text": "Stone Saber-Tooth Tiger",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76873,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76873,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 14289,
+          "item_name": "Wolf",
+          "source_stock_name": "Wolf",
+          "item_name_id": 374,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Wolf",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 374,
+            "english_text": "Wolf",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 14289,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 14289,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76872,
+          "item_name": "Unicorn",
+          "source_stock_name": "Unicorn",
+          "item_name_id": 4905,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Unicorn",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 4905,
+            "english_text": "Unicorn",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76872,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76872,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76869,
+          "item_name": "Nightmare",
+          "source_stock_name": "Nightmare",
+          "item_name_id": 4831,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Nightmare",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 4831,
+            "english_text": "Nightmare",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76869,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76869,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76868,
+          "item_name": "White-Nosed Stallion",
+          "source_stock_name": "White-Nosed Stallion",
+          "item_name_id": 15014,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "White-Nosed Stallion",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 15014,
+            "english_text": "White-Nosed Stallion",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76868,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76868,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76866,
+          "item_name": "Black-Nosed Stallion",
+          "source_stock_name": "Black-Nosed Stallion",
+          "item_name_id": 15012,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Black-Nosed Stallion",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 15012,
+            "english_text": "Black-Nosed Stallion",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76866,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76866,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76867,
+          "item_name": "Stallion",
+          "source_stock_name": "Stallion",
+          "item_name_id": 10106,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Stallion",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 10106,
+            "english_text": "Stallion",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76867,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76867,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76865,
+          "item_name": "White-Nosed Mare",
+          "source_stock_name": "White-Nosed Mare",
+          "item_name_id": 15011,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "White-Nosed Mare",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 15011,
+            "english_text": "White-Nosed Mare",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76865,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76865,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76859,
+          "item_name": "Armored T-Rex",
+          "source_stock_name": "Armored T-Rex",
+          "item_name_id": 6403,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Armored T-Rex",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6403,
+            "english_text": "Armored T-Rex",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76859,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76859,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76854,
+          "item_name": "Spotted T-Rex",
+          "source_stock_name": "Spotted T-Rex",
+          "item_name_id": 5571,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Spotted T-Rex",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5571,
+            "english_text": "Spotted T-Rex",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76854,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76854,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76853,
+          "item_name": "Striped T-Rex",
+          "source_stock_name": "Striped T-Rex",
+          "item_name_id": 5570,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Striped T-Rex",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5570,
+            "english_text": "Striped T-Rex",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76853,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76853,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 17180,
+          "item_name": "Sun",
+          "source_stock_name": "Sun",
+          "item_name_id": 22960,
+          "purchase_price_coins": 7000,
+          "member_price_coins": 6300,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Sun",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 22960,
+            "english_text": "Sun",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 17180,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 17180,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 11317,
+          "item_name": "Air T-Rex",
+          "source_stock_name": "Air T-Rex",
+          "item_name_id": 6806,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Air T-Rex",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6806,
+            "english_text": "Air T-Rex",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 11317,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 11317,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 17197,
+          "item_name": "Bowling Ball",
+          "source_stock_name": "Bowling Ball",
+          "item_name_id": 7376,
+          "purchase_price_coins": 7000,
+          "member_price_coins": 6300,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Bowling Ball",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 7376,
+            "english_text": "Bowling Ball",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 17197,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 17197,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 10499,
+          "item_name": "Eight Ball",
+          "source_stock_name": "Eight Ball",
+          "item_name_id": 6697,
+          "purchase_price_coins": 7000,
+          "member_price_coins": 6300,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Eight Ball",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6697,
+            "english_text": "Eight Ball",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 10499,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 10499,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76759,
+          "item_name": "Hydra Ride",
+          "source_stock_name": "Hydra Ride",
+          "item_name_id": 6764,
+          "purchase_price_coins": 14000,
+          "member_price_coins": 12600,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Hydra Ride",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6764,
+            "english_text": "Hydra Ride",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76759,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76759,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78394,
+          "item_name": "The Hero Copter",
+          "source_stock_name": "The Hero Copter",
+          "item_name_id": 442671,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "The Hero Copter",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442671,
+            "english_text": "The Hero Copter",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78394,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78394,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78395,
+          "item_name": "The Cyber Cycle",
+          "source_stock_name": "The Cyber Cycle",
+          "item_name_id": 442672,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "The Cyber Cycle",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442672,
+            "english_text": "The Cyber Cycle",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78395,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78395,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78396,
+          "item_name": "The Blast Rover",
+          "source_stock_name": "The Blast Rover",
+          "item_name_id": 442673,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "The Blast Rover",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442673,
+            "english_text": "The Blast Rover",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78396,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78396,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78397,
+          "item_name": "The Fire Hawk",
+          "source_stock_name": "The Fire Hawk",
+          "item_name_id": 442674,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "The Fire Hawk",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442674,
+            "english_text": "The Fire Hawk",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78397,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78397,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78332,
+          "item_name": "The Hover Ring",
+          "source_stock_name": "The Hover Ring",
+          "item_name_id": 442479,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "The Hover Ring",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442479,
+            "english_text": "The Hover Ring",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78332,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78332,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76903,
+          "item_name": "Bicycle",
+          "source_stock_name": "Bicycle",
+          "item_name_id": 6966,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Bicycle",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6966,
+            "english_text": "Bicycle",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76903,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76903,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 17598,
+          "item_name": "Robgoblin Mech",
+          "source_stock_name": "Robgoblin Mech",
+          "item_name_id": 852,
+          "purchase_price_coins": 19000,
+          "member_price_coins": 17100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Robgoblin Mech",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 852,
+            "english_text": "Robgoblin Mech",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 17598,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 17598,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 78036,
+          "item_name": "Tractor",
+          "source_stock_name": "Tractor",
+          "item_name_id": 435431,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Tractor",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 435431,
+            "english_text": "Tractor",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 78036,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 78036,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 7976,
+          "item_name": "Molten Precursor Hoverboard",
+          "source_stock_name": "Molten Precursor Hoverboard",
+          "item_name_id": 5219,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Molten Precursor Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5219,
+            "english_text": "Molten Precursor Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 7976,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 7976,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 10382,
+          "item_name": "Fiery Hoverboard",
+          "source_stock_name": "Fiery Hoverboard",
+          "item_name_id": 6231,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Fiery Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6231,
+            "english_text": "Fiery Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 10382,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 10382,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 7975,
+          "item_name": "Precursor Hoverboard",
+          "source_stock_name": "Precursor Hoverboard",
+          "item_name_id": 5218,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Precursor Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5218,
+            "english_text": "Precursor Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 7975,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 7975,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76858,
+          "item_name": "Clockwork Hoverboard",
+          "source_stock_name": "Clockwork Hoverboard",
+          "item_name_id": 6847,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Clockwork Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6847,
+            "english_text": "Clockwork Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76858,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76858,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 76857,
+          "item_name": "Dwarftech Hoverboard",
+          "source_stock_name": "Dwarftech Hoverboard",
+          "item_name_id": 4945,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Dwarftech Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 4945,
+            "english_text": "Dwarftech Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 76857,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76857,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79410,
+          "item_name": "Lawn Chair",
+          "source_stock_name": "Lawn Chair",
+          "item_name_id": 442689,
+          "purchase_price_coins": 8000,
+          "member_price_coins": 7200,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Lawn Chair",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442689,
+            "english_text": "Lawn Chair",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79410,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79410,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79454,
+          "item_name": "Chrome Drake",
+          "source_stock_name": "Chrome Drake",
+          "item_name_id": 442331,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Chrome Drake",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 442331,
+            "english_text": "Chrome Drake",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79454,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79454,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 10381,
+          "item_name": "Stormy Hoverboard",
+          "source_stock_name": "Stormy Hoverboard",
+          "item_name_id": 6230,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Stormy Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6230,
+            "english_text": "Stormy Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 10381,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 10381,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 10393,
+          "item_name": "Fairweather Hoverboard",
+          "source_stock_name": "Fairweather Hoverboard",
+          "item_name_id": 6447,
+          "purchase_price_coins": 11000,
+          "member_price_coins": 9900,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Fairweather Hoverboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 6447,
+            "english_text": "Fairweather Hoverboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 10393,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 10393,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79438,
+          "item_name": "Pogo Stick",
+          "source_stock_name": "Pogo Stick",
+          "item_name_id": 14105,
+          "purchase_price_coins": 15000,
+          "member_price_coins": 13500,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Pogo Stick",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 14105,
+            "english_text": "Pogo Stick",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79438,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79438,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79439,
+          "item_name": "Eyeball",
+          "source_stock_name": "Eyeball",
+          "item_name_id": 5102489,
+          "purchase_price_coins": 3000,
+          "member_price_coins": 2700,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Eyeball",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5102489,
+            "english_text": "Eyeball",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79439,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79439,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79447,
+          "item_name": "Polar Bear",
+          "source_stock_name": "Polar Bear",
+          "item_name_id": 441220,
+          "purchase_price_coins": 10000,
+          "member_price_coins": 9000,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Polar Bear",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 441220,
+            "english_text": "Polar Bear",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79447,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79447,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79458,
+          "item_name": "Dwarftech Chopper",
+          "source_stock_name": "Dwarftech Chopper",
+          "item_name_id": 854,
+          "purchase_price_coins": 15000,
+          "member_price_coins": 13500,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Dwarftech Chopper",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 854,
+            "english_text": "Dwarftech Chopper",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79458,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79458,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 15733,
+          "item_name": "Surfboard",
+          "source_stock_name": "Surfboard",
+          "item_name_id": 5635,
+          "purchase_price_coins": 8000,
+          "member_price_coins": 7200,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Surfboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5635,
+            "english_text": "Surfboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 15733,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 15733,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 15740,
+          "item_name": "Wooden Surfboard",
+          "source_stock_name": "Wooden Surfboard",
+          "item_name_id": 5636,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Wooden Surfboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 5636,
+            "english_text": "Wooden Surfboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 15740,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 15740,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 16920,
+          "item_name": "Basalt Surfboard",
+          "source_stock_name": "Basalt Surfboard",
+          "item_name_id": 7257,
+          "purchase_price_coins": 9000,
+          "member_price_coins": 8100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Basalt Surfboard",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 7257,
+            "english_text": "Basalt Surfboard",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 16920,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 16920,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79460,
+          "item_name": "Holiday Tree Board",
+          "source_stock_name": "Holiday Tree Board",
+          "item_name_id": 7503,
+          "purchase_price_coins": 7000,
+          "member_price_coins": 6300,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Rides",
+            "url": "https://freerealms.fandom.com/wiki/Rides",
+            "section": "List of Rides",
+            "listed_as": "Holiday Tree Board",
+            "license": "CC BY-SA",
+            "note": "(R) The original sold rides in the Station Cash Marketplace; this vendor is a reconstructed coin equivalent."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 7503,
+            "english_text": "Holiday Tree Board",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79460,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79460,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        }
+      ]
+    },
+    {
+      "npc_id": 9500000569,
+      "npc_name": "Cragara",
+      "npc_content_file": "seaside.json",
+      "vendor_stock_description": "Mysterious Merchant: Dwarftech Chopper, Pogo Stick and Robgoblin Mech (Legacy merchant-only bundles 50044, 50053, 50057).",
+      "stock_completeness": "reconstructed_ride_stock_w169",
+      "item_ids": [
+        17598,
+        79438,
+        79458
+      ],
+      "items": [
+        {
+          "item_id": 17598,
+          "item_name": "Robgoblin Mech",
+          "source_stock_name": "Robgoblin Mech",
+          "item_name_id": 852,
+          "purchase_price_coins": 19000,
+          "member_price_coins": 17100,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "reference",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "reference",
+            "evidence": "Legacy StoreBundles.json merchant-only bundle (category group 'Mysterious Merchant'), 2012-12-03"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 852,
+            "english_text": "Robgoblin Mech",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 17598,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 17598,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79438,
+          "item_name": "Pogo Stick",
+          "source_stock_name": "Pogo Stick",
+          "item_name_id": 14105,
+          "purchase_price_coins": 15000,
+          "member_price_coins": 13500,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "reference",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "reference",
+            "evidence": "Legacy StoreBundles.json merchant-only bundle (category group 'Mysterious Merchant'), 2012-12-03"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 14105,
+            "english_text": "Pogo Stick",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79438,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79438,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 79458,
+          "item_name": "Dwarftech Chopper",
+          "source_stock_name": "Dwarftech Chopper",
+          "item_name_id": 854,
+          "purchase_price_coins": 15000,
+          "member_price_coins": 13500,
+          "sell_price_coins": null,
+          "member_only": null,
+          "price_basis": "(R) W169 ride price, see stores.json ride_price_policy.",
+          "source_tags": [
+            "client",
+            "reference",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "reference",
+            "evidence": "Legacy StoreBundles.json merchant-only bundle (category group 'Mysterious Merchant'), 2012-12-03"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "name_id": 854,
+            "english_text": "Dwarftech Chopper",
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "reference_definition_id": 79458,
+            "mapping_policy": "(R) the ride item whose Param1 equals the mount id (W169)."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 79458,
+            "scope": "(R) W169 ride price"
+          },
+          "runtime_eligible": true
+        }
+      ]
     }
   ]
 }

@@ -738,6 +738,8 @@ pub struct World {
     next_instance_id: InstanceId,
     // (R) Empty private instances use a local grace interval.
     empty_instance_grace_ms: u64,
+    // (R) Kills whose big-heart group heal was already given (W158); bounded.
+    group_heals: std::collections::VecDeque<(u64, u64)>,
 }
 
 /// (R) Only touched membership data is staged. No packets or world-wide clone.
@@ -762,6 +764,19 @@ impl World {
             .entry(instance)
             .or_default()
             .extend(packets);
+    }
+    /// True the first time a kill's big-heart group heal is claimed (R: one
+    /// group heal per kill, however many participants picked up a heart). The
+    /// last 256 kills are remembered.
+    pub fn claim_group_heal(&mut self, kill: (u64, u64)) -> bool {
+        if self.group_heals.contains(&kill) {
+            return false;
+        }
+        if self.group_heals.len() >= 256 {
+            self.group_heals.pop_front();
+        }
+        self.group_heals.push_back(kill);
+        true
     }
     pub fn take_field_packets(&mut self, instance: InstanceId) -> Vec<Vec<u8>> {
         self.field_packets.remove(&instance).unwrap_or_default()
@@ -960,6 +975,7 @@ impl World {
             players: BTreeMap::new(),
             next_instance_id,
             empty_instance_grace_ms,
+            group_heals: std::collections::VecDeque::new(),
         }
     }
 

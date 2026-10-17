@@ -140,6 +140,8 @@ pub struct GatewayOutcome {
     pub gameplay_changed: bool,
     /// (R) Also true for same-scene transfers, which must reset interest membership.
     pub began_zoning: bool,
+    /// W158: a big heart was picked up; the server heals the rest of the group.
+    pub group_heal: Option<crate::encounter::GroupHeal>,
     /// Populated only when the owning local server explicitly enables tracing.
     pub trace: Vec<GatewayTraceEvent>,
 }
@@ -723,6 +725,13 @@ impl Gateway {
             .as_mut()
             .ok_or_else(|| invalid("shared damage requires gameplay"))?
             .receive_field_damage(damage, now_ms, engaged)
+    }
+    /// W158: heal this player for another member's big heart.
+    pub fn receive_group_heal(&mut self, percent: u32) -> io::Result<crate::gameplay::Outcome> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("group heal requires gameplay"))?
+            .receive_group_heal(percent)
     }
 
     pub fn reference_state(directory: &Path) -> io::Result<CharacterState> {
@@ -1724,6 +1733,7 @@ impl Gateway {
         let mut gameplay = game.clone();
         let result = gameplay.tick(&self.state, now_ms)?;
         let mut outcome = GatewayOutcome {
+            group_heal: result.group_heal,
             state_changed: result.changed,
             gameplay_changed: result.changed,
             replies: result.replies.iter().map(|r| wrapped(r)).collect(),

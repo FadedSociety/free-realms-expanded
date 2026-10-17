@@ -20,6 +20,11 @@ const RIDE_GUID_TAG: u64 = 0xc000_0000_0000_0000;
 const MAX_CONTENT_BYTES: usize = 4 * 1024 * 1024;
 // (R) Server-side duplicate guard mirrors the client's 00a2e540 request window.
 const SPAWN_DEBOUNCE_MS: u64 = 1_000;
+// (R) The seated rider's "queue position" for the Mount call. The client tests 168/2 field 4 for 1
+// (success, `00b06100` case 2) and passes field 5 on as `Mount`'s fourth argument (unused once the
+// rider is seated), and the AddPc tail feeds the same slot (`0095ad80`); FreeRealms-Legacy, which
+// this client accepts, sends 1 in all three places. Used for both so the two routes agree.
+const SEATED_QUEUE: i32 = 1;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(tag = "kind", content = "evidence", rename_all = "snake_case")]
@@ -617,6 +622,26 @@ pub struct RideWire {
     pub notice: Option<&'static str>,
 }
 
+/// The mount block at the end of a player's AddPc (35/1): the ride's GUID, seat, queue position and
+/// a lift (the client also reads it as `Mount`'s last argument, so keep it 0). `NONE` is what an
+/// unmounted player always carried: no GUID and -1 for seat and queue.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct MountTail {
+    pub ride_guid: u64,
+    pub seat: i32,
+    pub queue: i32,
+    pub lift: f32,
+}
+
+impl MountTail {
+    pub const NONE: Self = Self {
+        ride_guid: 0,
+        seat: -1,
+        queue: -1,
+        lift: 0.0,
+    };
+}
+
 /// A spawned ride as other players must see it. A player who enters interest range later gets
 /// `packets` (ride actor, then the rider's attachment) so the late joiner draws the same scene.
 #[derive(Clone, Debug, PartialEq)]
@@ -631,6 +656,40 @@ impl RideView {
     /// Remove-actor packet for a viewer that loses sight of the rider or the ride.
     pub fn removal_packet(&self) -> Vec<u8> {
         remove_actor(self.actor_guid)
+    }
+
+    /// The mount block of this rider's AddPc (35/1), for a viewer who meets the rider later.
+    /// Natively (`0092f460` case 1 -> `SetPendingMountInfo` `0095ad80`) the client keeps these
+    /// values and calls `Mount` (`00972d30`) from `ProxiedCharacter::Process` as soon as the ride
+    /// actor exists, so the order of AddPc and the ride's AddNpc does not matter. A ride that is
+    /// summoned but not boarded has no seat to carry.
+    pub fn tail(&self) -> MountTail {
+        self.seat.map_or(MountTail::NONE, |seat| MountTail {
+            ride_guid: self.actor_guid,
+            seat: seat as i32,
+            queue: SEATED_QUEUE,
+            lift: 0.0,
+        })
+    }
+
+    /// The ride's copy of the rider's 125 position update (`rider_update` is the inner packet).
+    ///
+    /// (R) Hedge. Natively the client carries a ridden actor with its rider: the world's frame loop
+    /// (`00984010`) skips `ProxiedCharacter::Process` for an actor whose rider GUID (+0x17a0, set
+    /// by `Mount`) is set, and the 125 handler (`0090de90`) ignores such an actor, so these copies
+    /// are most likely dropped by the client. They cost one small packet per rider move and keep
+    /// the ride moving if that reading is wrong (FreeRealms-Legacy sends them too). Remove this
+    /// relay once a native capture shows the ride follows without it.
+    pub fn follow(&self, rider_update: &[u8]) -> Option<Vec<u8>> {
+        self.seat?;
+        if rider_update.get(..2)? != [125, 0]
+            || rider_update.get(2..10)? != self.rider_guid.to_le_bytes()
+        {
+            return None;
+        }
+        let mut copy = rider_update.to_vec();
+        copy[2..10].copy_from_slice(&self.actor_guid.to_le_bytes());
+        Some(copy)
     }
 
     pub fn packets(&self, pose: RidePose) -> Vec<Vec<u8>> {
@@ -822,10 +881,10 @@ fn encode_mount_response(rider_guid: u64, mount_guid: u64, seat_index: u32) -> V
     put_u64(&mut out, rider_guid);
     put_u64(&mut out, mount_guid);
     put_i32(&mut out, seat_index as i32);
-    put_i32(&mut out, 1); // (R) accepted result
-    put_i32(&mut out, 0); // (R) queue position
-    put_i32(&mut out, 0); // (R) unresolved response field
-    put_f32(&mut out, 0.0); // (R) unresolved response field
+    put_i32(&mut out, SEATED_QUEUE); // queue position; the client mounts when it is 1 (00b06100)
+    put_i32(&mut out, SEATED_QUEUE); // (R) Mount's fourth argument, as in the AddPc tail
+    put_i32(&mut out, 0); // (R) stored on the rider (+0x17bc); Legacy puts an effect id here
+    put_f32(&mut out, 0.0); // (R) Mount's last argument; keep 0
     out
 }
 

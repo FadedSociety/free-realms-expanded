@@ -206,6 +206,8 @@ pub struct Outcome {
     /// A developer relocation to apply to the staged character state. The
     /// gateway owns the packet so bytes and saved position cannot diverge.
     pub relocation: Option<dev_teleport::Relocation>,
+    /// W158: a big heart was picked up; the gateway heals the rest of the group.
+    pub group_heal: Option<crate::encounter::GroupHeal>,
     /// W162: inner packets (already inside `replies`) that nearby players must also receive: the
     /// ride actor, the rider's attachment and their removal. The gateway fans them out through
     /// the player registry's interest set.
@@ -416,6 +418,15 @@ impl Gameplay {
         self.field_engaged = engaged;
         if let Some(engine) = &mut self.encounter {
             let result = engine.receive_field_damage(damage, now_ms, engaged);
+            self.apply_encounter(result, &mut out)?;
+        }
+        Ok(out)
+    }
+    /// W158: another group member picked up a big heart; heal this player too.
+    pub fn receive_group_heal(&mut self, percent: u32) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if let Some(engine) = &mut self.encounter {
+            let result = engine.receive_group_heal(percent);
             self.apply_encounter(result, &mut out)?;
         }
         Ok(out)
@@ -2647,6 +2658,8 @@ impl Gameplay {
         }
         self.sync_field_quests(&mut out)?;
         if let Some(encounter) = &mut self.encounter {
+            // W158: pickups left in another zone are already gone from the client.
+            encounter.enter_zone(character.zone_id);
             let result = encounter.tick(
                 character.position,
                 self.profiles.as_ref().unwrap().active(),
@@ -5873,6 +5886,7 @@ impl Gameplay {
 
     fn apply_encounter(&mut self, result: EncounterOutcome, out: &mut Outcome) -> io::Result<()> {
         out.changed |= result.changed;
+        out.group_heal = result.group_heal.or(out.group_heal);
         out.replies.extend(result.replies);
         if let Some(feedback) = result.feedback {
             out.replies.push(chat::system(&feedback));
@@ -8505,6 +8519,38 @@ mod w64_regional_quest_tests {
         std::fs::write(dir.join("power_ups.json"), b"{ not json").unwrap();
         assert!(game.reload_content("power_ups", &mut out).is_err());
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    /// W158 slice 2b: a big heart's group heal leaves the engine, reaches the
+    /// gameplay outcome through `apply_encounter`, and heals a hurt member.
+    #[test]
+    fn group_heal_reaches_the_outcome_and_heals_a_hurt_member() {
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        let heal = crate::encounter::GroupHeal {
+            percent: 50,
+            kill: (7, 9),
+        };
+        let mut out = Outcome::default();
+        game.apply_encounter(
+            EncounterOutcome {
+                group_heal: Some(heal),
+                ..Default::default()
+            },
+            &mut out,
+        )
+        .unwrap();
+        assert_eq!(out.group_heal, Some(heal));
+        game.receive_field_damage(400, 1_000, false).unwrap();
+        let before = game.encounter.as_ref().unwrap().player_health().0;
+        let healed = game.receive_group_heal(50).unwrap();
+        let (now, max) = game.encounter.as_ref().unwrap().player_health();
+        assert!(now > before && now <= max, "{before} -> {now} of {max}");
+        assert!(healed.changed && !healed.replies.is_empty());
+        // At full health a group heal says nothing and changes nothing.
+        game.encounter.as_mut().unwrap().heal_full();
+        let quiet = game.receive_group_heal(50).unwrap();
+        assert!(!quiet.changed && quiet.replies.is_empty());
     }
 
     /// Lead: a 4-byte 167/1/4 refresh returns the whole activity list, so it is

@@ -75,6 +75,11 @@
       "source": "(R) Bosses always drop a big heart (locale 'garunteed to drop a power up'); the choice of kind is reconstructed."
     }
   },
+  "participation": {
+    "window_ms": 30000,
+    "group_chance_multiplier": 1.0,
+    "source": "(R) the owner 2026-10-16: every player who took part in a kill rolls and gets their own pickup. Took part = dealt damage within window_ms, or was the enemy's target. Lower group_chance_multiplier (0.05..1) to thin the roll chances when two or more share a kill."
+  },
   "pickup": {
     "ttl_ms": 30000,
     "radius": 1.5,

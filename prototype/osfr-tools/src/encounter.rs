@@ -109,6 +109,11 @@ const PICKUP_GUID_BASE: u64 = 0x5057_5550_0000_0000;
 /// SFX_PowerUp_Pickup composite (ActorCompositeEffectDefinitions.xml 15509,
 /// Combat Power-ups note 1.1); played at the pickup when it is collected.
 const POWER_UP_PICKUP_EFFECT: i32 = 15509;
+/// (R) An unclaimed shared-kill drop lapses after this long (the claim happens
+/// on the participant's next shared tick, a fraction of a second away).
+const CREDIT_TTL_MS: u64 = 10_000;
+/// (R) At most this many unclaimed drops wait per player.
+const MAX_CREDITS: usize = 16;
 /// The client's own tutorial line, shown when a second stored kind is refused.
 const ONE_POWER_UP_TEXT: &str = "You can have one power up active at a time.";
 /// Local reconstructed objective award. The original encounter scoring table
@@ -637,10 +642,17 @@ pub struct EncounterOutcome {
     pub completed: Option<u32>,
     pub defeated: Vec<i32>,
     pub feedback: Option<String>,
-    /// A group heal power-up was picked up: percent of max health for the other
-    /// group members (the engine heals only its own player; the gateway routes
-    /// this to the rest of the group).
-    pub group_heal_percent: Option<u32>,
+    /// A group heal power-up was picked up (the engine heals only its own
+    /// player; the gateway heals the rest of the group, once per kill).
+    pub group_heal: Option<GroupHeal>,
+}
+
+/// Percent of max health for the rest of the picker's group, and the kill whose
+/// drop it was: the gateway applies at most one group heal per kill (R).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct GroupHeal {
+    pub percent: u32,
+    pub kill: (u64, u64),
 }
 
 #[derive(Clone)]
@@ -717,6 +729,32 @@ pub struct EncounterEngine {
     /// The single stored power-up (kind id in `power_ups.json`). Slice 3 shows
     /// it in the key-3 slot and takes it on use; nothing else reads it.
     held_power_up: Option<String>,
+    /// Who hit which shared-field enemy, and the drops other participants have
+    /// yet to claim. Owned by the shared field; swapped in with it (empty for a
+    /// solo engine).
+    ledger: KillLedger,
+    /// Zone the pickups were dropped in; a different zone clears them.
+    pickup_zone: Option<u32>,
+}
+
+/// (R) Shared-field kill bookkeeping for power-up drops (W158 slice 2b).
+#[derive(Clone, Default)]
+struct KillLedger {
+    /// enemy guid -> player guid -> time of that player's last damage.
+    hits: BTreeMap<u64, BTreeMap<u64, u64>>,
+    /// player guid -> drops earned by a kill another player landed.
+    credits: BTreeMap<u64, Vec<KillCredit>>,
+}
+
+/// A participant's unclaimed roll for one kill; the player's own engine rolls
+/// it, so every player has independent luck and their own pickups.
+#[derive(Clone)]
+struct KillCredit {
+    kill: (u64, u64),
+    table: String,
+    at: [f32; 3],
+    participants: usize,
+    expires_ms: u64,
 }
 
 /// A pickup actor on the ground, owned by the player whose kill dropped it.
@@ -724,6 +762,7 @@ pub struct EncounterEngine {
 struct PowerUpDrop {
     guid: u64,
     kind: String,
+    kill: (u64, u64),
     position: [f32; 3],
     expires_ms: u64,
     /// The one-at-a-time refusal was already shown for this pickup.
@@ -800,6 +839,7 @@ pub struct SharedFieldState {
     last_tick: Option<u64>,
     template: Arc<Content>,
     battles: Arc<Vec<FieldBattle>>,
+    kills: KillLedger,
 }
 
 #[derive(Clone, Debug)]
@@ -879,6 +919,14 @@ impl SharedFieldState {
     pub fn retain_casters(&mut self, ready: &BTreeSet<u64>) {
         self.dots
             .retain(|caster, dots| ready.contains(caster) && !dots.is_empty());
+        // Players who left the field neither share future kills nor keep drops.
+        self.kills
+            .credits
+            .retain(|player, _| ready.contains(player));
+        for hitters in self.kills.hits.values_mut() {
+            hitters.retain(|player, _| ready.contains(player));
+        }
+        self.kills.hits.retain(|_, hitters| !hitters.is_empty());
     }
     pub fn due(&mut self, now_ms: u64) -> Option<u64> {
         let elapsed = self
@@ -1071,6 +1119,7 @@ impl EncounterEngine {
             last_tick: None,
             template: self.content.clone(),
             battles: Arc::new(self.battles.clone()),
+            kills: KillLedger::default(),
         })
     }
     pub fn shared_field_guids(&self) -> impl Iterator<Item = u64> + '_ {
@@ -1208,6 +1257,7 @@ impl EncounterEngine {
         std::mem::swap(&mut self.wander, &mut runtime.wander);
         std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
         std::mem::swap(&mut self.moving, &mut runtime.moving);
+        std::mem::swap(&mut self.ledger, &mut runtime.kills);
         let personal_dots = std::mem::replace(
             &mut self.skill_dots,
             runtime.dots.remove(&sender).unwrap_or_default(),
@@ -1240,6 +1290,7 @@ impl EncounterEngine {
         std::mem::swap(&mut self.wander, &mut runtime.wander);
         std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
         std::mem::swap(&mut self.moving, &mut runtime.moving);
+        std::mem::swap(&mut self.ledger, &mut runtime.kills);
         self.shared_sender = old_sender;
         // Evade/defeat invalidates every caster's effects on that incarnation.
         for f in &runtime.enemies {
@@ -1296,6 +1347,7 @@ impl EncounterEngine {
         self.with_shared_fields(runtime, sender, |engine| {
             let mut out = EncounterOutcome::default();
             engine.tick_job_effects(now_ms, &mut out)?;
+            engine.claim_kill_credits(sender, now_ms, &mut out);
             Ok(out)
         })
     }
@@ -1554,6 +1606,8 @@ impl EncounterEngine {
             pickups: Vec::new(),
             next_pickup: 0,
             held_power_up: None,
+            ledger: KillLedger::default(),
+            pickup_zone: None,
         };
         engine.rebuild_behaviours()?;
         Ok(engine)
@@ -3291,6 +3345,13 @@ impl EncounterEngine {
         };
         let dealt = damage.min(health);
         let hp = health - dealt;
+        if let (Some(sender), true) = (self.shared_sender, dealt > 0) {
+            self.ledger
+                .hits
+                .entry(guid)
+                .or_default()
+                .insert(sender, now_ms);
+        }
         if self.active() {
             if !self.armed {
                 self.last_tick = Some(now_ms);
@@ -3437,29 +3498,132 @@ impl EncounterEngine {
                 ]);
             }
         }
-        // A won encounter is over: its zone is about to close, nothing to pick up.
-        if hp == 0
-            && self
+        if hp == 0 {
+            let hitters = self.ledger.hits.remove(&guid).unwrap_or_default();
+            // A won encounter is over: its zone is about to close, nothing to pick up.
+            if self
                 .state
                 .active
                 .as_ref()
                 .is_none_or(|a| a.phase == EncounterPhase::Fighting)
-        {
-            if let Some(table) = drop_table {
-                self.drop_power_ups(&table, killed_at, now_ms, &mut out);
+            {
+                if let Some(table) = drop_table {
+                    let engaged = field_index.and_then(|i| self.field[i].target);
+                    self.drop_for_participants(
+                        &table, guid, killed_at, now_ms, hitters, engaged, &mut out,
+                    );
+                }
             }
         }
         self.present_results(&mut out);
         Ok(out)
     }
 
-    /// Roll `table` for a kill at `at` and spawn each drop as a pickup actor.
-    /// An unknown table, no loaded file or a full ground drops nothing.
+    /// A kill's drops: this engine's player rolls at once; in a shared field
+    /// every other player who took part (dealt damage within the window, or was
+    /// the enemy's target) is credited and rolls on their own engine at their
+    /// next shared tick. Bystanders get nothing.
+    #[allow(clippy::too_many_arguments)]
+    fn drop_for_participants(
+        &mut self,
+        table: &str,
+        enemy: u64,
+        at: [f32; 3],
+        now_ms: u64,
+        hitters: BTreeMap<u64, u64>,
+        engaged: Option<u64>,
+        out: &mut EncounterOutcome,
+    ) {
+        let kill = (enemy, now_ms);
+        let Some(killer) = self.shared_sender else {
+            self.drop_power_ups(table, kill, at, now_ms, 1, out);
+            return;
+        };
+        let window = self
+            .power_ups
+            .as_ref()
+            .map_or(30_000, |p| p.participation_window_ms());
+        let mut who: BTreeSet<u64> = hitters
+            .into_iter()
+            .filter(|&(_, last)| now_ms.saturating_sub(last) <= window)
+            .map(|(player, _)| player)
+            .collect();
+        who.extend(engaged.filter(|&g| g != 0));
+        who.insert(killer);
+        let participants = who.len();
+        self.drop_power_ups(table, kill, at, now_ms, participants, out);
+        for player in who.into_iter().filter(|&p| p != killer) {
+            let waiting = self.ledger.credits.entry(player).or_default();
+            if waiting.len() >= MAX_CREDITS {
+                waiting.remove(0);
+            }
+            waiting.push(KillCredit {
+                kill,
+                table: table.to_owned(),
+                at,
+                participants,
+                expires_ms: now_ms.saturating_add(CREDIT_TTL_MS),
+            });
+        }
+    }
+
+    /// Roll the drops other players earned for this engine's player.
+    fn claim_kill_credits(&mut self, player: u64, now_ms: u64, out: &mut EncounterOutcome) {
+        for credit in self.ledger.credits.remove(&player).unwrap_or_default() {
+            if now_ms < credit.expires_ms {
+                self.drop_power_ups(
+                    &credit.table,
+                    credit.kill,
+                    credit.at,
+                    now_ms,
+                    credit.participants,
+                    out,
+                );
+            }
+        }
+    }
+
+    /// Heal `percent` of max health and show the "+N" number. Says nothing when
+    /// nothing was healed (full health, or knocked out: healing never revives).
+    fn heal_with_number(&mut self, percent: u32, out: &mut EncounterOutcome) {
+        let before = self.state.player_health;
+        let replies = self.heal_player_percent(percent);
+        let healed = (self.state.player_health - before) as i32;
+        if healed > 0 {
+            out.replies.extend(replies);
+            out.replies
+                .push(crate::abilities::build_hitpoint_delta(1, 1, healed));
+            out.changed = true;
+        }
+    }
+
+    /// Another player's big heart: heal this player by the same percent.
+    pub fn receive_group_heal(&mut self, percent: u32) -> EncounterOutcome {
+        let mut out = EncounterOutcome::default();
+        self.heal_with_number(percent.min(100), &mut out);
+        out
+    }
+
+    /// The player is in `zone` now. Pickups left in another zone are gone from
+    /// the client already, so forget them (no removal packets).
+    pub fn enter_zone(&mut self, zone: u32) {
+        if self.pickup_zone.is_some_and(|previous| previous != zone) {
+            self.pickups.clear();
+        }
+        self.pickup_zone = Some(zone);
+    }
+
+    /// Roll `table` for one participant of the kill and spawn each drop as a
+    /// pickup actor. An unknown table, no loaded file or a full ground drops
+    /// nothing. With several participants every chance is scaled by the file's
+    /// group multiplier.
     fn drop_power_ups(
         &mut self,
         table: &str,
+        kill: (u64, u64),
         at: [f32; 3],
         now_ms: u64,
+        participants: usize,
         out: &mut EncounterOutcome,
     ) {
         let ground = self.ground();
@@ -3469,7 +3633,12 @@ impl EncounterEngine {
         let (Some(table), Some(rng)) = (power_ups.table(table), self.power_up_rng.as_mut()) else {
             return;
         };
-        let kinds = power_ups::roll(table, rng);
+        let scale = if participants > 1 {
+            power_ups.group_chance_multiplier()
+        } else {
+            1.0
+        };
+        let kinds = power_ups::roll_scaled(table, rng, scale);
         for (i, kind_id) in kinds.into_iter().enumerate() {
             let Some(kind) = power_ups.kind(kind_id) else {
                 continue;
@@ -3505,6 +3674,7 @@ impl EncounterEngine {
             self.pickups.push(PowerUpDrop {
                 guid,
                 kind: kind_id.to_owned(),
+                kill,
                 position,
                 expires_ms: now_ms.saturating_add(u64::from(power_ups.pickup.ttl_ms)),
                 told: false,
@@ -3555,16 +3725,12 @@ impl EncounterEngine {
             self.held_power_up = Some(drop.kind.clone());
         }
         if let Some(percent) = kind.heal_pct_max {
-            let before = self.state.player_health;
-            out.replies.extend(self.heal_player_percent(percent));
-            let healed = (self.state.player_health - before) as i32;
-            if healed > 0 {
-                out.replies
-                    .push(crate::abilities::build_hitpoint_delta(1, 1, healed));
-                out.changed = true;
-            }
+            self.heal_with_number(percent, out);
             if kind.group {
-                out.group_heal_percent = Some(percent.min(100));
+                out.group_heal = Some(GroupHeal {
+                    percent: percent.min(100),
+                    kill: drop.kill,
+                });
             }
         }
         if let Some(energy) = kind.energy {

@@ -91,6 +91,22 @@ pub struct Pickup {
     pub source: String,
 }
 
+/// Who shares a kill (R, W158 slice 2b): every player who dealt damage to the
+/// enemy within `window_ms` (or was its target) gets their own roll. When more
+/// than one player took part, each roll's chances are multiplied by
+/// `group_chance_multiplier` (1.0 = a full roll each) so a crowd does not flood
+/// the ground. Guaranteed drops are not scaled.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Participation {
+    pub window_ms: u32,
+    pub group_chance_multiplier: f64,
+    pub source: String,
+}
+
+/// Used when `power_ups.json` has no `participation` block.
+const DEFAULT_WINDOW_MS: u32 = 30_000;
+
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct PowerUps {
@@ -98,6 +114,8 @@ pub struct PowerUps {
     pub kinds: BTreeMap<String, Kind>,
     pub tables: BTreeMap<String, Table>,
     pub pickup: Pickup,
+    #[serde(default)]
+    pub participation: Option<Participation>,
 }
 
 impl PowerUps {
@@ -128,6 +146,22 @@ impl PowerUps {
         self.kinds.get(id)
     }
 
+    /// How long after its last hit a player still shares a kill.
+    pub fn participation_window_ms(&self) -> u64 {
+        u64::from(
+            self.participation
+                .as_ref()
+                .map_or(DEFAULT_WINDOW_MS, |p| p.window_ms),
+        )
+    }
+
+    /// Roll-chance factor when several players share a kill.
+    pub fn group_chance_multiplier(&self) -> f64 {
+        self.participation
+            .as_ref()
+            .map_or(1.0, |p| p.group_chance_multiplier)
+    }
+
     fn validate(&self) -> io::Result<()> {
         if self.schema_version != 1
             || self.kinds.len() > MAX_KINDS
@@ -142,6 +176,14 @@ impl PowerUps {
             || !sourced(&p.source)
         {
             return Err(invalid("pickup settings out of bounds"));
+        }
+        if let Some(share) = &self.participation {
+            if !(1_000..=300_000).contains(&share.window_ms)
+                || !in_range(share.group_chance_multiplier, 0.05, 1.0)
+                || !sourced(&share.source)
+            {
+                return Err(invalid("participation settings out of bounds"));
+            }
         }
         for (id, kind) in &self.kinds {
             if id.trim().is_empty() || !kind.valid() {
@@ -244,12 +286,17 @@ impl Rng {
 /// then the other roll (R: two independent rolls, mirroring the two original
 /// reactive procs). Pure: the same table and RNG state give the same drops.
 pub fn roll<'a>(table: &'a Table, rng: &mut Rng) -> Vec<&'a str> {
+    roll_scaled(table, rng, 1.0)
+}
+
+/// `roll` with every roll chance multiplied by `chance_scale` (shared kills).
+pub fn roll_scaled<'a>(table: &'a Table, rng: &mut Rng, chance_scale: f64) -> Vec<&'a str> {
     let mut drops: Vec<&str> = table.guaranteed.iter().map(String::as_str).collect();
     for r in [&table.health_roll, &table.other_roll]
         .into_iter()
         .flatten()
     {
-        if rng.next_f64() < r.chance {
+        if rng.next_f64() < r.chance * chance_scale {
             drops.extend(pick(&r.pool, rng));
         }
     }

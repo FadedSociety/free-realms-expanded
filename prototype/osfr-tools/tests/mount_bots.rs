@@ -628,3 +628,99 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     disconnect(b);
     disconnect(c);
 }
+
+// ------------------------------------------------------------------ W167 scenario
+
+fn is_move_of(m: &[u8], guid: u64) -> bool {
+    m.starts_with(&[125, 0]) && m.get(2..10) == Some(&guid.to_le_bytes()[..])
+}
+
+fn is_add_pc_of(m: &[u8], guid: u64) -> bool {
+    m.starts_with(&[35, 0, 1, 0]) && m.get(4..12) == Some(&guid.to_le_bytes()[..])
+}
+
+/// `bot` walks to `from` shifted by each `dx`; each step is one 125 to the server.
+fn walk(bot: &mut bot::Bot, guid: u64, from: [f32; 3], steps: &[f32]) {
+    for dx in steps {
+        let to = [from[0] + dx, from[1], from[2]];
+        raw(bot, &bot::move_request(guid, to, [0.0, 0.0, 1.0]));
+        bot.pump(Duration::from_millis(300)).unwrap();
+    }
+}
+
+#[test]
+fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail() {
+    let _serial = serial();
+    let rig = Rig::start(&[AccountRole::Player; 3], false);
+    disconnect(rig.connect(0, "followA0"));
+    std::thread::sleep(Duration::from_millis(1500));
+    seed_items(&rig, 0, &[(900_001, WOLF_ITEM)]);
+
+    let ga = rig.accounts[0].guid;
+    let ride = ride_of(ga);
+    let start = rig.start_position;
+    let mut a = rig.connect(0, "followA");
+    let mut b = rig.connect(1, "followB");
+    a.pump(Duration::from_millis(500)).unwrap();
+    b.pump(Duration::from_millis(500)).unwrap();
+
+    // Summoned but not boarded: the ride stands where it appeared, so B gets A's move only.
+    raw(&mut a, &spawn_request(WOLF));
+    b.wait_for(T, |m| is_ride_actor(m, ride))
+        .expect("B: ride actor");
+    walk(&mut a, ga, start, &[0.5]);
+    b.wait_for(T, |m| is_move_of(m, ga))
+        .unwrap_or_else(|e| panic!("B: no move of A ({e}); got {}", tail(&b)));
+    assert!(
+        b.wait_for(Duration::from_secs(1), |m| is_move_of(m, ride))
+            .is_err(),
+        "an unboarded ride followed"
+    );
+
+    // Boarded: every move of A reaches B followed by the ride's copy, same pose.
+    raw(&mut a, &board_request(ride));
+    b.wait_for(T, |m| is_mount_reply(m, 2, ga))
+        .expect("B: sees A board");
+    walk(&mut a, ga, start, &[1.0]);
+    let rider_move = b
+        .wait_for(T, |m| is_move_of(m, ga))
+        .unwrap_or_else(|e| panic!("B: no move of A ({e}); got {}", tail(&b)));
+    let ride_move = b
+        .wait_for(T, |m| is_move_of(m, ride))
+        .unwrap_or_else(|e| panic!("B: the ride did not follow ({e}); got {}", tail(&b)));
+    assert_eq!(ride_move[10..], rider_move[10..], "same pose and state");
+
+    // C arrives later: A's AddPc carries the native mount block, then the ride actor and 168/2.
+    let mut c = rig.connect(2, "followC");
+    let add_pc = c
+        .wait_for(T, |m| is_add_pc_of(m, ga))
+        .unwrap_or_else(|e| panic!("C: no AddPc of A ({e}); got {}", tail(&c)));
+    let block = &add_pc[add_pc.len() - 40..add_pc.len() - 20];
+    assert_eq!(block[..8], ride.to_le_bytes(), "mount guid");
+    assert_eq!(block[8..12], 0_i32.to_le_bytes(), "seat");
+    assert_eq!(block[12..16], 1_i32.to_le_bytes(), "queue position");
+    assert_eq!(block[16..], 0.0_f32.to_le_bytes(), "lift");
+    c.wait_for(T, |m| is_ride_actor(m, ride))
+        .expect("C: ride actor");
+    c.wait_for(T, |m| is_mount_reply(m, 2, ga))
+        .expect("C: sees A mounted");
+    walk(&mut a, ga, start, &[1.5]);
+    c.wait_for(T, |m| is_move_of(m, ride))
+        .unwrap_or_else(|e| panic!("C: the ride did not follow ({e}); got {}", tail(&c)));
+
+    // Put away: the ride is gone and A's next move is A's alone.
+    raw(&mut a, &[168, 0, 3]);
+    b.wait_for(T, |m| is_ride_removal(m, ride))
+        .expect("B: ride removed");
+    walk(&mut a, ga, start, &[2.0]);
+    b.wait_for(T, |m| is_move_of(m, ga))
+        .unwrap_or_else(|e| panic!("B: no move of A ({e}); got {}", tail(&b)));
+    assert!(
+        b.wait_for(Duration::from_secs(1), |m| is_move_of(m, ride))
+            .is_err(),
+        "a put-away ride kept following"
+    );
+    disconnect(a);
+    disconnect(b);
+    disconnect(c);
+}
