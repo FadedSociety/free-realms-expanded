@@ -678,6 +678,11 @@ impl SocialService {
         let Some(target_profile) = self.profiles.get(&target.character_guid) else {
             return Ok(vec![message(inviter_guid, encode_group_result(2, 1))]);
         };
+        if target.character_guid == inviter_guid {
+            // (R) A self-invite would reserve the inviter's own slot; report the
+            // client's already-grouped result before any group is created.
+            return Ok(vec![message(inviter_guid, encode_group_result(2, 3))]);
+        }
         if target_profile.ignored.contains_key(&inviter_guid) {
             // (R) Ignore blocks group invites. Result 2 has no client notice.
             return Ok(vec![message(inviter_guid, encode_group_result(2, 2))]);
@@ -691,31 +696,40 @@ impl SocialService {
             return Ok(vec![message(inviter_guid, encode_group_result(2, 1))]);
         }
 
-        let (group_id, created) =
-            if let Some(group_id) = self.member_group.get(&inviter_guid).copied() {
-                if self.groups[&group_id].leader_guid != inviter_guid {
-                    return Ok(vec![message(inviter_guid, encode_group_result(2, 5))]);
-                }
-                (group_id, false)
-            } else {
-                (self.create_group(inviter_guid)?, true)
-            };
-
+        let current_group = self.member_group.get(&inviter_guid).copied();
+        if let Some(group_id) = current_group {
+            if self.groups[&group_id].leader_guid != inviter_guid {
+                return Ok(vec![message(inviter_guid, encode_group_result(2, 5))]);
+            }
+        }
         if let Some(existing) = self.group_invites.get(&target.character_guid) {
             // (R) Distinguish a repeated invite from this group (6) from another group's invite (4).
-            let code = if existing.group_id == group_id { 6 } else { 4 };
+            let code = if Some(existing.group_id) == current_group {
+                6
+            } else {
+                4
+            };
             return Ok(vec![message(inviter_guid, encode_group_result(2, code))]);
         }
-        let group = &self.groups[&group_id];
-        let open = self
-            .group_invites
-            .values()
-            .filter(|invite| invite.group_id == group_id)
-            .count();
+        let members = current_group
+            .map(|group_id| self.groups[&group_id].members.len())
+            .unwrap_or(1);
+        let open = current_group
+            .map(|group_id| {
+                self.group_invites
+                    .values()
+                    .filter(|invite| invite.group_id == group_id)
+                    .count()
+            })
+            .unwrap_or(0);
         // (R) Pending invites reserve room so later accepts cannot exceed the configured cap.
-        if group.members.len() + open >= self.max_group_members {
+        if members + open >= self.max_group_members {
             return Ok(vec![message(inviter_guid, encode_group_result(2, 7))]);
         }
+        let (group_id, created) = match current_group {
+            Some(group_id) => (group_id, false),
+            None => (self.create_group(inviter_guid)?, true),
+        };
         self.group_invites.insert(
             target.character_guid,
             PendingGroupInvite {

@@ -729,6 +729,19 @@ impl SharedWorld {
         })
     }
 
+    /// Drop a disconnected character's volatile group state and refresh every survivor's chat
+    /// scope. Without the refresh, the last member of a dissolved group would keep its old party
+    /// channel and could still address itself on channel 4.
+    fn social_disconnect(&mut self, guid: u64) -> io::Result<Vec<Delivery>> {
+        let messages = self.social.disconnect(guid).map_err(invalid_io)?;
+        let deliveries = messages
+            .into_iter()
+            .filter_map(|message| self.social_delivery(message))
+            .collect();
+        self.refresh_group_ids();
+        Ok(deliveries)
+    }
+
     /// (R) Where each joined character stands, read from the authenticated player registry.
     /// `in_battle` stays false until the world tracks it; battles run in their own instance.
     fn map_spots(&self) -> BTreeMap<u64, MapSpot> {
@@ -4154,16 +4167,7 @@ impl Server {
         let owns_active =
             self.world.active_sessions.get(&session.character_guid) == Some(&session.id);
         if owns_active && self.world.social.profile(session.character_guid).is_some() {
-            for message in self
-                .world
-                .social
-                .disconnect(session.character_guid)
-                .map_err(invalid_io)?
-            {
-                if let Some(delivery) = self.world.social_delivery(message) {
-                    deliveries.push(delivery);
-                }
-            }
+            deliveries.extend(self.world.social_disconnect(session.character_guid)?);
         }
         if owns_active {
             self.membership.leave(
@@ -5061,6 +5065,415 @@ mod w173_chat_settings_routing {
         };
         assert_eq!(style(GUIDS[1]), chosen);
         assert_eq!(style(GUIDS[0]), BubbleStyle::default());
+    }
+}
+
+/// T020: family-40 grouping and group chat through `Session::route_application` with three
+/// sessions and no sockets. The two clients that form the party are the gate; the third session
+/// proves that group chat and roster events stay inside the authenticated group.
+#[cfg(test)]
+mod t020_group_routing {
+    use super::*;
+    use osfr_tools::players::PlayerPresentation;
+    use osfr_tools::social_chat::{ChatChannel, PacketChat};
+
+    const GUIDS: [u64; 3] = [301, 302, 303];
+    const NAMES: [&str; 3] = ["P301", "P302", "P303"];
+
+    struct Rig {
+        sessions: [Session; 3],
+        world: SharedWorld,
+        scratch: PathBuf,
+    }
+
+    impl Drop for Rig {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.scratch);
+        }
+    }
+
+    fn rig(name: &str) -> Rig {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+        let scratch = std::env::temp_dir().join(format!("osfr-t020-{name}-{}", std::process::id()));
+        fs::create_dir_all(&scratch).unwrap();
+        let options = Options {
+            bind: "127.0.0.1:0".parse().unwrap(),
+            reference: root.join("references/rust-gateway-reference"),
+            state: scratch.join("character.json"),
+            content: Some(root.join("references/rust-opening-cooking-original-assets")),
+            identity: None,
+            account_store: None,
+            gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
+            handoff_key: Vec::new(),
+            seconds: 1,
+            dev_tools: false,
+            studio_port: 0,
+            client_logs: None,
+            terrain: None,
+            world: Some(scratch.join("world")),
+            stock_text: None,
+            allow_lan: false,
+            security_log: None,
+        };
+        let session = |index: usize| {
+            let id = 17 + index as u64;
+            let mut session = Session::new(
+                SessionId(id),
+                "127.0.0.1:12345".parse().unwrap(),
+                SessionRequest {
+                    id: id as u32,
+                    crc_length: 3,
+                    buffer_size: 512,
+                },
+                &options,
+                CRC_SEED,
+                None,
+                None,
+            )
+            .unwrap();
+            session.character_guid = GUIDS[index];
+            session.account_guid = GUIDS[index] + 10_000;
+            session
+        };
+        let sessions = [session(0), session(1), session(2)];
+        let mut world = SharedWorld::new();
+        for (index, session) in sessions.iter().enumerate() {
+            let guid = GUIDS[index];
+            let first = NAMES[index];
+            world
+                .players
+                .join_with_presentation(
+                    session.id,
+                    guid + 10_000,
+                    guid,
+                    ZoneInstance {
+                        zone_id: 1,
+                        instance_id: 1,
+                    },
+                    [index as f32 * 5.0, 0.0, 0.0],
+                    0.0,
+                    PlayerPresentation {
+                        character_guid: guid,
+                        first_name: first.to_owned(),
+                        ..PlayerPresentation::default()
+                    },
+                )
+                .unwrap();
+            let identity = SocialIdentity {
+                account_id: guid + 10_000,
+                character_guid: guid,
+                name: SocialName::new(first, "").unwrap(),
+            };
+            world.identities.insert(guid, identity.clone());
+            world
+                .social
+                .register(SocialLists::new(identity).unwrap())
+                .unwrap();
+            world.social.login(guid).unwrap();
+            world.active_sessions.insert(guid, session.id);
+            world.chat_sessions.insert(
+                session.id,
+                ChatSession {
+                    session_id: session.id.0,
+                    character_guid: guid,
+                    name: NameData {
+                        fields: [0; 3],
+                        first: first.to_owned(),
+                        last: String::new(),
+                    },
+                    zone_id: 1,
+                    position: [index as f32 * 5.0, 0.0, 0.0],
+                    chat_area_id: None,
+                    group_id: None,
+                    guild_id: None,
+                    is_member: true,
+                },
+            );
+            world.chat_settings.join(guid, None);
+            world.joined.insert(session.id);
+        }
+        Rig {
+            sessions,
+            world,
+            scratch,
+        }
+    }
+
+    fn send(rig: &mut Rig, index: usize, packet: &[u8]) -> Vec<Delivery> {
+        let deliveries = rig.sessions[index].route_application(packet, &mut rig.world, 1_000);
+        // Production calls this after every routed application message; group chat reads the
+        // same canonical membership from the chat session.
+        rig.world.refresh_group_ids();
+        deliveries
+    }
+
+    fn inner(delivery: &Delivery) -> &[u8] {
+        assert_eq!(&delivery.bytes[..3], &[5, 0, 1]);
+        &delivery.bytes[7..]
+    }
+
+    fn put_string(out: &mut Vec<u8>, value: &str) {
+        out.extend_from_slice(&(value.len() as i32).to_le_bytes());
+        out.extend_from_slice(value.as_bytes());
+    }
+
+    fn put_name(out: &mut Vec<u8>, index: usize) {
+        for _ in 0..3 {
+            out.extend_from_slice(&0i32.to_le_bytes());
+        }
+        put_string(out, NAMES[index]);
+        put_string(out, "");
+    }
+
+    fn group_header(sub: u16) -> Vec<u8> {
+        let mut out = 40u16.to_le_bytes().to_vec();
+        out.extend_from_slice(&sub.to_le_bytes());
+        out
+    }
+
+    fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
+        let mut out = group_header(1);
+        out.extend_from_slice(&0i16.to_le_bytes());
+        out.extend_from_slice(&0i16.to_le_bytes());
+        out.extend_from_slice(&GUIDS[from].to_le_bytes());
+        put_name(&mut out, from);
+        out.extend_from_slice(&GUIDS[to].to_le_bytes());
+        put_name(&mut out, to);
+        out.extend_from_slice(&group_id.to_le_bytes());
+        out.extend_from_slice(
+            &[0u32; 5]
+                .into_iter()
+                .flat_map(u32::to_le_bytes)
+                .collect::<Vec<_>>(),
+        );
+        out
+    }
+
+    fn response(from: usize, to: usize, group_id: u32, accepted: bool) -> Vec<u8> {
+        let mut out = group_header(4);
+        out.extend_from_slice(&0i16.to_le_bytes());
+        out.extend_from_slice(&0i16.to_le_bytes());
+        out.extend_from_slice(&GUIDS[from].to_le_bytes());
+        put_name(&mut out, from);
+        out.extend_from_slice(&GUIDS[to].to_le_bytes());
+        put_name(&mut out, to);
+        out.extend_from_slice(&group_id.to_le_bytes());
+        out.push(u8::from(accepted));
+        out.extend_from_slice(
+            &[0u32; 5]
+                .into_iter()
+                .flat_map(u32::to_le_bytes)
+                .collect::<Vec<_>>(),
+        );
+        out
+    }
+
+    fn leave(index: usize) -> Vec<u8> {
+        let mut out = group_header(3);
+        out.extend_from_slice(&GUIDS[index].to_le_bytes());
+        put_name(&mut out, index);
+        out
+    }
+
+    fn kick(index: usize) -> Vec<u8> {
+        let mut out = group_header(6);
+        out.extend_from_slice(&GUIDS[index].to_le_bytes());
+        put_name(&mut out, index);
+        out
+    }
+
+    fn chat(channel: ChatChannel) -> Vec<u8> {
+        social_chat::encode_packet_chat(&PacketChat {
+            channel,
+            sender_guid: 0,
+            target_guid: 0,
+            sender_name: NameData::default(),
+            target_name: NameData::default(),
+            message: "synthetic line".to_owned(),
+            position: [0.0; 4],
+            guild_guid: 0,
+            language: 0,
+            area_id: None,
+        })
+        .unwrap()
+    }
+
+    fn family_sub(delivery: &Delivery) -> (u16, u16) {
+        let bytes = inner(delivery);
+        (
+            u16::from_le_bytes([bytes[0], bytes[1]]),
+            u16::from_le_bytes([bytes[2], bytes[3]]),
+        )
+    }
+
+    fn has(deliveries: &[Delivery], index: usize, family: u16, sub: u16) -> bool {
+        deliveries.iter().any(|delivery| {
+            delivery.recipient == SessionId(17 + index as u64)
+                && family_sub(delivery) == (family, sub)
+        })
+    }
+
+    fn result_for(deliveries: &[Delivery], index: usize, sub: u16) -> Option<u32> {
+        deliveries
+            .iter()
+            .find(|delivery| {
+                delivery.recipient == SessionId(17 + index as u64)
+                    && family_sub(delivery) == (40, sub)
+            })
+            .map(|delivery| u32::from_le_bytes(inner(delivery)[4..8].try_into().unwrap()))
+    }
+
+    fn recipients(deliveries: &[Delivery]) -> Vec<u64> {
+        let mut ids: Vec<u64> = deliveries.iter().map(|d| d.recipient.0).collect();
+        ids.sort();
+        ids
+    }
+
+    #[test]
+    fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
+        let mut rig = rig("party");
+        let a = 0;
+        let b = 1;
+        let c = 2;
+
+        // A singleton cannot invite itself: no solo group and no pending invite may appear.
+        let refused = send(&mut rig, c, &invite(c, c, 0));
+        assert_eq!(result_for(&refused, c, 2), Some(3));
+        assert_eq!(rig.world.social.group_of(GUIDS[c]), None);
+        assert_eq!(rig.world.social.group_invitee(GUIDS[c]), None);
+
+        // 40/1 creates the transient leader row (40/8), invites the target, and answers 40/2=0.
+        let invited = send(&mut rig, a, &invite(a, b, 0));
+        assert!(has(&invited, a, 40, 8));
+        assert_eq!(result_for(&invited, a, 2), Some(0));
+        assert!(has(&invited, b, 40, 1));
+        let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
+        let pending = rig.world.social.group_invitee(GUIDS[b]);
+        assert_eq!(pending, Some((group_id, GUIDS[a])));
+
+        // Repeats and cross-groups refuse against unchanged membership.
+        let repeated = send(&mut rig, a, &invite(a, b, group_id));
+        assert_eq!(result_for(&repeated, a, 2), Some(6));
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a]].as_slice())
+        );
+        assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending);
+
+        let cross = send(&mut rig, c, &invite(c, b, 0));
+        assert_eq!(result_for(&cross, c, 2), Some(4));
+        assert_eq!(rig.world.social.group_of(GUIDS[c]), None);
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a]].as_slice())
+        );
+        assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending);
+
+        let self_while_grouped = send(&mut rig, a, &invite(a, a, group_id));
+        assert_eq!(result_for(&self_while_grouped, a, 2), Some(3));
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a]].as_slice())
+        );
+        assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending);
+
+        // 40/4 accept fans out the invitation notice, member row and full roster.
+        let accepted = send(&mut rig, b, &response(a, b, group_id, true));
+        assert!(has(&accepted, a, 40, 4));
+        assert!(has(&accepted, a, 40, 9));
+        assert!(has(&accepted, a, 40, 8));
+        assert!(has(&accepted, b, 40, 4));
+        assert!(has(&accepted, b, 40, 9));
+        assert!(has(&accepted, b, 40, 8));
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a], GUIDS[b]].as_slice())
+        );
+
+        // B's channel-4 chat reaches A and echoes to B; C is not a member and hears nothing.
+        let party_chat = send(&mut rig, b, &chat(ChatChannel::Group));
+        assert_eq!(
+            recipients(&party_chat),
+            vec![rig.sessions[a].id.0, rig.sessions[b].id.0]
+        );
+        let line = social_chat::decode_packet_chat(inner(
+            party_chat
+                .iter()
+                .find(|delivery| delivery.recipient == rig.sessions[a].id)
+                .unwrap(),
+        ))
+        .unwrap();
+        assert_eq!(line.sender_guid, GUIDS[b]);
+        assert_eq!(line.sender_name.first, NAMES[b]);
+        assert_eq!(line.channel, ChatChannel::Group);
+        assert!(send(&mut rig, c, &chat(ChatChannel::Group)).is_empty());
+
+        // Add C, then prove a non-leader cannot kick and the leader can.
+        send(&mut rig, a, &invite(a, c, group_id));
+        let accepted_c = send(&mut rig, c, &response(a, c, group_id, true));
+        assert!(has(&accepted_c, a, 40, 8));
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a], GUIDS[b], GUIDS[c]].as_slice())
+        );
+
+        let refused_kick = send(&mut rig, b, &kick(a));
+        assert_eq!(result_for(&refused_kick, b, 7), Some(2));
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a], GUIDS[b], GUIDS[c]].as_slice())
+        );
+
+        let kicked = send(&mut rig, a, &kick(c));
+        assert!(has(&kicked, a, 40, 6));
+        assert!(has(&kicked, b, 40, 6));
+        assert!(has(&kicked, c, 40, 6));
+        assert!(has(&kicked, a, 40, 8));
+        assert_eq!(rig.world.social.group_of(GUIDS[c]), None);
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[a], GUIDS[b]].as_slice())
+        );
+        assert!(send(&mut rig, c, &chat(ChatChannel::Group)).is_empty());
+
+        // 40/3 leaves; with one member left the volatile party dissolves for both players.
+        let left = send(&mut rig, b, &leave(b));
+        assert!(has(&left, a, 40, 3));
+        assert!(has(&left, b, 40, 3));
+        assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
+        assert_eq!(rig.world.social.group_of(GUIDS[b]), None);
+        assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
+    }
+
+    #[test]
+    fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
+        let mut rig = rig("disconnect");
+        let (a, b) = (0, 1);
+        send(&mut rig, a, &invite(a, b, 0));
+        let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
+        send(&mut rig, b, &response(a, b, group_id, true));
+        assert_eq!(
+            rig.world.chat_sessions[&rig.sessions[a].id].group_id,
+            Some(u64::from(group_id))
+        );
+        assert_eq!(
+            rig.world.chat_sessions[&rig.sessions[b].id].group_id,
+            Some(u64::from(group_id))
+        );
+
+        // This is the same order as `Server::end_session`: remove the player/chat row, then
+        // disconnect the social state. The survivor must lose the dissolved channel too.
+        rig.world.leave_player(rig.sessions[b].id);
+        let delivered = rig.world.social_disconnect(GUIDS[b]).unwrap();
+        assert!(
+            delivered
+                .iter()
+                .any(|delivery| delivery.recipient == rig.sessions[a].id
+                    && family_sub(delivery) == (40, 3))
+        );
+        assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
+        assert_eq!(rig.world.chat_sessions[&rig.sessions[a].id].group_id, None);
+        assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
     }
 }
 

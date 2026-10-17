@@ -70,6 +70,10 @@ fn family(message: &social_lists::SocialMessage) -> u16 {
     u16::from_le_bytes([message.bytes[0], message.bytes[1]])
 }
 
+fn result(message: &social_lists::SocialMessage) -> u32 {
+    u32::from_le_bytes(message.bytes[4..8].try_into().unwrap())
+}
+
 #[test]
 fn friend_request_accept_remove_and_all_client_result_codes() {
     let (mut social, directory) = service(5);
@@ -431,6 +435,59 @@ fn offline_group_invite_uses_not_found_result_without_creating_a_group() {
         1
     );
     assert_eq!(social.group_of(101), None);
+}
+
+#[test]
+fn refused_group_invites_leave_membership_and_pending_invites_unchanged() {
+    let (mut social, directory) = service(3);
+    for guid in [101, 202, 303] {
+        social.login(guid).unwrap();
+    }
+    let a_name = identity(10, 101, "FixtureA").name;
+    let b_name = identity(20, 202, "FixtureB").name;
+    let c_name = identity(30, 303, "FixtureC").name;
+
+    // (R) Self-invite is refused before a solo group can be created.
+    let self_without_group = social.invite_to_group(303, &c_name, &directory).unwrap();
+    assert_eq!(
+        (family(&self_without_group[0]), sub(&self_without_group[0])),
+        (40, 2)
+    );
+    assert_eq!(result(&self_without_group[0]), 3);
+    assert_eq!(social.group_of(303), None);
+    assert_eq!(social.group_invitee(303), None);
+
+    social.invite_to_group(101, &b_name, &directory).unwrap();
+    let group_id = social.group_of(101).unwrap();
+    let membership = [101, 202, 303].map(|guid| social.group_of(guid));
+    let pending = social.group_invitee(202);
+
+    let repeated = social.invite_to_group(101, &b_name, &directory).unwrap();
+    assert_eq!((family(&repeated[0]), sub(&repeated[0])), (40, 2));
+    assert_eq!(result(&repeated[0]), 6);
+    assert_eq!(social.group_of(101), Some(group_id));
+    assert_eq!(social.group_members(group_id), Some([101].as_slice()));
+    assert_eq!(social.group_invitee(202), pending);
+
+    // A failed invite from an ungrouped player must not leave that player in a phantom group.
+    let cross_invite = social.invite_to_group(303, &b_name, &directory).unwrap();
+    assert_eq!((family(&cross_invite[0]), sub(&cross_invite[0])), (40, 2));
+    assert_eq!(result(&cross_invite[0]), 4);
+    assert_eq!(social.group_of(303), None);
+    assert_eq!(
+        [101, 202, 303].map(|guid| social.group_of(guid)),
+        membership
+    );
+    assert_eq!(social.group_invitee(202), pending);
+
+    let self_while_grouped = social.invite_to_group(101, &a_name, &directory).unwrap();
+    assert_eq!(
+        (family(&self_while_grouped[0]), sub(&self_while_grouped[0])),
+        (40, 2)
+    );
+    assert_eq!(result(&self_while_grouped[0]), 3);
+    assert_eq!(social.group_members(group_id), Some([101].as_slice()));
+    assert_eq!(social.group_invitee(202), pending);
 }
 
 #[test]
