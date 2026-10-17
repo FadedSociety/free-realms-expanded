@@ -232,7 +232,12 @@ fn marketplace_handshake_replies_and_keeps_payment_sources_off() {
         (22, 23),
         (25, 26),
     ] {
-        let request = [66u16.to_le_bytes(), request_opcode.to_le_bytes()].concat();
+        let mut request = [66u16.to_le_bytes(), request_opcode.to_le_bytes()].concat();
+        if matches!(request_opcode, 16 | 20 | 25) {
+            // The client appends its locale as an i32 length and text (62 native traces).
+            request.extend(5i32.to_le_bytes());
+            request.extend(b"en_US");
+        }
         let response = shop.handle(&request).unwrap();
         let packet = response.replies.first().expect("handshake response exists");
         assert_eq!(u16::from_le_bytes(packet[0..2].try_into().unwrap()), 66);

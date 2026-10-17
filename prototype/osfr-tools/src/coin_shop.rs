@@ -4,11 +4,22 @@
 //! Numeric result-code meanings, buy idempotency's caller field, resale pricing, buy-back window,
 //! merchant authorization and Marketplace defaults are reconstructed policy (R). No persistence
 //! or packet transport is performed here; callers save the returned state before sending replies.
+//!
+//! Sibling requests (W172). Recovered from the client: 165/2 is `i32 count` then `count x u32`
+//! item ids (sender `00c76b10`, writers `00c75580`/`00c75620`) and is answered by 165/3, which the
+//! client reads (`00c74e40`, `008e8230`) as `u8 complete` then `i32 count` then `count x u32` ids;
+//! it carries no definition records, the client already holds them from 35/37. 165/12 is
+//! `u32 transaction id` then `u32 caller value` (`00c76600`, `00c759c0`), where the id is the
+//! dword after the first u64 of the sale's 165/6 record (`00c71f30`, record +0x10). The Marketplace
+//! list replies 66/17, 19, 21 and 23 all start `u32 status` and, on status 1, carry a counted
+//! list (readers `00b416c0`, `00b41800`, `00b41760`, `00b41620`); 17, 21 and 23 put a text
+//! between the status and the list. Station Cash, wallet funding and membership stay refused or
+//! empty (R).
 
 use crate::inventory::Inventory;
 use serde::Deserialize;
 use std::{
-    collections::{BTreeMap, VecDeque},
+    collections::{BTreeMap, BTreeSet, VecDeque},
     io::{self, Read},
     path::{Path, PathBuf},
 };
@@ -19,7 +30,12 @@ const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
 const MAX_PACKET_BYTES: usize = 64 * 1024;
 const MAX_GIFT_ITEMS: usize = 256;
 const MAX_CLIENT_TRANSACTIONS: usize = 4096;
-const BUY_BACK_WINDOW: usize = 20;
+/// (R) Only the ten most recent sales can be bought back; the client keeps its own longer list.
+const BUY_BACK_WINDOW: usize = 10;
+/// (R) The client's static item map has 4096 buckets (`00c75fc0`); a longer id list is refused.
+const MAX_DEFINITION_IDS: usize = 4096;
+/// (R) Marketplace requests are tiny (4 bytes, or a 13-byte locale string); anything longer is refused.
+const MAX_MARKETPLACE_REQUEST: usize = 64;
 
 // The client dispatches codes 1..=11 through one virtual call. The names appear in the same order
 // in the native result function, but the numeric-to-name association is not proven; mapping is (R).
@@ -264,6 +280,8 @@ impl CoinShop {
                 read_u32(inner, 16)?,
                 read_u64(inner, 4)?,
             ),
+            2 => Ok(self.item_definitions(inner)),
+            // (R) The dynamic list is always empty; the client clears and refills it from 165/9.
             8 if inner.len() == 4 => Ok(CoinShopOutcome {
                 replies: vec![counted_empty(COIN_FAMILY, 9)],
                 ..CoinShopOutcome::default()
@@ -271,6 +289,7 @@ impl CoinShop {
             12 if inner.len() == 12 => {
                 self.buy_back_with_context(read_u32(inner, 4)?, read_u32(inner, 8)?)
             }
+            8 | 12 => Err(invalid("malformed Coin Store request")),
             14 => self.refuse_gift(inner),
             _ => Ok(CoinShopOutcome::default()),
         }
@@ -462,6 +481,54 @@ impl CoinShop {
         };
         let transaction_id = self.allocate_transaction_id();
         self.failure(2, result_code, transaction_id, item, quantity, 0, merchant)
+    }
+
+    /// 165/2: answer with the requested ids the item catalogue defines, in request order and
+    /// without duplicates, and a complete flag that is true when every id was known. A malformed
+    /// or oversized list gets an empty incomplete answer, because the client waits for one reply
+    /// per request (its search stays pending otherwise, `00c76e70`). Read-only (R).
+    fn item_definitions(&self, inner: &[u8]) -> CoinShopOutcome {
+        let requested = read_i32(inner, 4)
+            .ok()
+            .and_then(|count| usize::try_from(count).ok())
+            .filter(|count| *count <= MAX_DEFINITION_IDS && inner.len() == 8 + 4 * count)
+            .map(|_| inner[8..].chunks_exact(4));
+        let (mut known, mut seen) = (Vec::new(), BTreeSet::new());
+        let mut complete = requested.is_some();
+        for chunk in requested.into_iter().flatten() {
+            let id = u32::from_le_bytes(chunk.try_into().unwrap());
+            let defined = i32::try_from(id).is_ok_and(|id| self.inventory.has_definition(id));
+            complete &= defined;
+            if defined && seen.insert(id) {
+                known.push(id);
+            }
+        }
+        let mut reply = header(COIN_FAMILY, 3);
+        reply.push(u8::from(complete));
+        put_i32(&mut reply, known.len() as i32);
+        known.into_iter().for_each(|id| put_u32(&mut reply, id));
+        CoinShopOutcome {
+            result_code: if complete {
+                RESULT_SUCCESS
+            } else {
+                RESULT_FAILURE
+            },
+            replies: vec![reply],
+            ..CoinShopOutcome::default()
+        }
+    }
+
+    /// Client-readable 165/13 refusal for a 165/12 the NPC layer rejected before the shop saw it
+    /// (closed shop, range). Echoes the request's id and caller value; changes nothing (R).
+    pub fn refuse_buy_back(&self, inner: &[u8], result_code: u32) -> CoinShopOutcome {
+        let (transaction, context) = match inner {
+            [0xa5, 0, 12, 0, rest @ ..] if rest.len() == 8 => (
+                u32::from_le_bytes(rest[..4].try_into().unwrap()),
+                u32::from_le_bytes(rest[4..].try_into().unwrap()),
+            ),
+            _ => (0, 0),
+        };
+        buy_back_result(transaction, result_code, context)
     }
 
     pub fn sell(&mut self, item_instance_id: i32, quantity: u32) -> io::Result<CoinShopOutcome> {
@@ -803,6 +870,9 @@ impl CoinShop {
             return Err(invalid("not a Marketplace packet"));
         }
         let opcode = read_u16(inner, 2)?;
+        if !marketplace_request_is_well_formed(opcode, inner) {
+            return Err(invalid("malformed Marketplace request"));
+        }
         let (result_code, response) = match opcode {
             1 => (MARKETPLACE_RESULT_DISABLED, preview_disabled_packet()),
             3 => (
@@ -810,16 +880,28 @@ impl CoinShop {
                 order_disabled_packet(&self.catalogue.marketplace.not_available_message),
             ),
             10 => (1, wallet_packet()),
-            12 => (1, marketplace_bool_packet(13, true)),
+            12 => (
+                1,
+                marketplace_bool_packet(13, self.catalogue.marketplace.enabled_on_handshake),
+            ),
             14 => (1, empty_product_list(15)),
-            // The native currency reader accepts an empty response and logs "no data available".
-            16 => (1, header(MARKETPLACE_FAMILY, 17)),
-            18 => (1, counted_empty(MARKETPLACE_FAMILY, 19)),
-            20 => (1, counted_empty(MARKETPLACE_FAMILY, 21)),
-            22 => (1, empty_product_list(23)),
+            // Status 1 with an empty list is the client's own "no data was available" path
+            // (`00b460c0`, `00b46a50`, `00b46200`, `00b45ba0`). A header-only reply read as an
+            // overrun and logged a serialize failure instead.
+            16 => (1, empty_list_with_text(17)),
+            18 => (1, empty_product_list(19)),
+            20 => (1, empty_list_with_text(21)),
+            22 => (1, empty_list_with_text(23)),
             25 => (1, account_info_packet()),
+            // Bundle content (27) and item requirements (38): the Station Cash catalogue is empty
+            // (R), so the client has no bundle to ask about; the layouts of both requests are
+            // unrecovered. Refused with no reply and no state change.
+            27 | 38 => return Ok(CoinShopOutcome::default()),
             // NpcMerchantV2 buy reply: every result other than 1 is a client-visible refusal.
-            43 => (MARKETPLACE_RESULT_DISABLED, merchant_buy_result_packet(false)),
+            43 => (
+                MARKETPLACE_RESULT_DISABLED,
+                merchant_buy_result_packet(false),
+            ),
             _ => return Ok(CoinShopOutcome::default()),
         };
         Ok(CoinShopOutcome {
@@ -921,11 +1003,38 @@ fn wallet_packet() -> Vec<u8> {
     bytes
 }
 
+/// Status 1 and an empty counted list: Station Cash SKUs (15, `00b415c0`) and state codes (19,
+/// `00b41800`).
 fn empty_product_list(opcode: u16) -> Vec<u8> {
     let mut bytes = header(MARKETPLACE_FAMILY, opcode);
     put_u32(&mut bytes, 1);
     put_i32(&mut bytes, 0);
     bytes
+}
+
+/// Status 1, an empty text and an empty counted list: currency codes (17, `00b416c0`), country
+/// codes (21, `00b41760`) and membership SKUs (23, `00b41620`).
+fn empty_list_with_text(opcode: u16) -> Vec<u8> {
+    let mut bytes = header(MARKETPLACE_FAMILY, opcode);
+    put_u32(&mut bytes, 1);
+    put_i32(&mut bytes, 0);
+    put_i32(&mut bytes, 0);
+    bytes
+}
+
+/// Observed client requests (62 native traces): 66/10 and 66/18 are the bare header; 66/16, 20
+/// and 25 add an `i32` length and that many locale bytes (`en_US`). Rows with no observed sender
+/// are only length-bounded (R).
+fn marketplace_request_is_well_formed(opcode: u16, inner: &[u8]) -> bool {
+    match (opcode, inner.get(4..8)) {
+        (10 | 18, _) => inner.len() == 4,
+        (16 | 20 | 25, Some(length)) => {
+            let length = i32::from_le_bytes(length.try_into().unwrap());
+            usize::try_from(length).is_ok_and(|n| n <= 32 && inner.len() == 8 + n)
+        }
+        (16 | 20 | 25, None) => false,
+        _ => inner.len() <= MAX_MARKETPLACE_REQUEST,
+    }
 }
 
 fn marketplace_bool_packet(opcode: u16, enabled: bool) -> Vec<u8> {

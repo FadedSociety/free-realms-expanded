@@ -543,7 +543,10 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(194), _) => "ui_telemetry",
         (Some(36), Some(10 | 12)) => "combat",
         (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
-        (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
+        // W172: Coin Store siblings and the Marketplace shell are understood merchant
+        // traffic even when a particular row is intentionally answered with nothing.
+        (Some(66), Some(1 | 3 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 25 | 27 | 38 | 43))
+        | (Some(165), Some(2 | 4 | 5 | 8 | 12 | 14)) => "merchant",
         _ => "gameplay.handle_in_world",
     }
 }
@@ -2194,6 +2197,27 @@ mod radial_routing {
         assert_eq!(application_handler(&head(26, 20)), "free_interaction");
         assert_eq!(application_handler(&head(26, 26)), "profile_notice");
         assert_eq!(application_handler(&head(26, 37)), "profile_notice");
+    }
+
+    #[test]
+    fn coin_store_and_marketplace_siblings_are_merchant_traffic() {
+        // W172: the five login-time Marketplace requests and the Coin Store siblings are
+        // understood requests, so a silent refusal must not log as an unknown message.
+        for sub in [1u8, 3, 10, 12, 14, 16, 18, 20, 22, 25, 27, 38, 43] {
+            assert_eq!(application_handler(&[66, 0, sub, 0]), "merchant");
+        }
+        for sub in [2u8, 4, 5, 8, 12, 14] {
+            assert_eq!(application_handler(&[165, 0, sub, 0]), "merchant");
+        }
+        // Unrelated neighbours stay unknown (6 is the server-to-client completion).
+        assert_eq!(
+            application_handler(&[165, 0, 6, 0]),
+            "gameplay.handle_in_world"
+        );
+        assert_eq!(
+            application_handler(&[66, 0, 11, 0]),
+            "gameplay.handle_in_world"
+        );
     }
 
     #[test]

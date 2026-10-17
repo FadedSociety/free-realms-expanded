@@ -1700,7 +1700,9 @@ impl Gameplay {
             return Ok(Some(out));
         }
 
-        if inner.starts_with(&[0xa5, 0, 4, 0]) || inner.starts_with(&[0xa5, 0, 5, 0]) {
+        // 165/4 buy and 165/5 sell, plus the siblings (W172): 2 definitions, 8 list update,
+        // 12 buy-back, 14 gift (always refused).
+        if matches!(inner, [0xa5, 0, 2 | 4 | 5 | 8 | 12 | 14, 0, ..]) {
             if let Some(shop) = &self.npc_coin_shop {
                 let Some(interaction) = &self.npc_interaction else {
                     return Ok(None);
@@ -1714,17 +1716,20 @@ impl Gameplay {
                 let Some(visibility) = &self.npc_visibility else {
                     return Ok(None);
                 };
-                let merchant = u64::from_le_bytes(
-                    inner
-                        .get(4..12)
-                        .ok_or_else(|| invalid("truncated Coin Store request"))?
-                        .try_into()
-                        .unwrap(),
-                );
+                // Only buys and sells name a merchant; 165/8 is 4 bytes and 165/2 and 165/12
+                // carry other fields at 4..12, so those are never rewritten (W172).
+                let merchant = inner
+                    .get(4..12)
+                    .map_or(0, |bytes| u64::from_le_bytes(bytes.try_into().unwrap()));
                 let mut request = inner.to_vec();
-                if let Some(key) = visibility.content_key(merchant) {
-                    request[4..12].copy_from_slice(&key.to_le_bytes());
+                if matches!(inner[2], 4 | 5) {
+                    if let Some(key) = visibility.content_key(merchant) {
+                        request[4..12].copy_from_slice(&key.to_le_bytes());
+                    }
                 }
+                let content_key = request
+                    .get(4..12)
+                    .map_or(0, |bytes| u64::from_le_bytes(bytes.try_into().unwrap()));
                 // The shop was built with the login-time inventory; without this
                 // a purchase overwrote everything earned since (10-15 audit).
                 shop.sync_inventory(self.inventory.clone());
@@ -1739,7 +1744,7 @@ impl Gameplay {
                         npc_event(serde_json::json!({
                             "event": "shop_txn",
                             "guid": merchant,
-                            "content_key": u64::from_le_bytes(request[4..12].try_into().unwrap()),
+                            "content_key": content_key,
                             "subtype": u16::from_le_bytes(inner[2..4].try_into().unwrap()),
                             "outcome": "accepted"
                         }));
@@ -1754,7 +1759,7 @@ impl Gameplay {
                         npc_event(serde_json::json!({
                             "event": "shop_txn",
                             "guid": merchant,
-                            "content_key": u64::from_le_bytes(request[4..12].try_into().unwrap()),
+                            "content_key": content_key,
                             "subtype": u16::from_le_bytes(inner[2..4].try_into().unwrap()),
                             "outcome": "rejected",
                             "reason": format!("{error:?}")
@@ -1763,6 +1768,31 @@ impl Gameplay {
                     }
                 }
             }
+        }
+
+        // Marketplace siblings (W172): wallet, status, SKU and code lists, account info, and the
+        // refused order rows. Stateless and payment-free; `handle_marketplace` replies or errors.
+        if matches!(
+            inner,
+            [
+                66,
+                0,
+                1 | 3 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 25 | 27 | 38,
+                0,
+                ..
+            ]
+        ) {
+            let Some(shop) = &self.npc_coin_shop else {
+                return Ok(None);
+            };
+            let mut shop = shop
+                .lock()
+                .map_err(|_| invalid("NPC Coin Store state is unavailable"))?;
+            let outcome = shop.handle_marketplace(inner)?;
+            return Ok(Some(Outcome {
+                replies: outcome.replies,
+                ..Outcome::default()
+            }));
         }
 
         if inner.starts_with(&[66, 0, 43, 0]) {

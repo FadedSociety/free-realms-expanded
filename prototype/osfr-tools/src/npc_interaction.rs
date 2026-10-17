@@ -39,6 +39,7 @@ const QUEST_OFFER: i32 = 1;
 const COIN_STORE_FAMILY: u16 = 165;
 const COIN_STORE_BUY: u16 = 4;
 const COIN_STORE_SELL: u16 = 5;
+const COIN_STORE_BUY_BACK: u16 = 12;
 const TALK_STRING_ID: u32 = 3300;
 // Supplied locale-id-to-text export: locale row 8075 is exactly "Goodbye".
 const GOODBYE_STRING_ID: u32 = 8075;
@@ -470,11 +471,13 @@ impl NpcInteraction {
         }
     }
 
-    /// Route only active-NPC Coin Store buys/sells through the existing idempotent validator.
+    /// Route Coin Store requests. Buys, sells and buy-backs (165/4, 5, 12) need the open shop and
+    /// range; the rest (165/2 definitions, 165/8 list, 165/14 gift) are session-free and stateless.
     ///
     /// A rejected sell (165/5) is answered with a client-readable 165/6 failure completion
-    /// instead of an error, so the native window is told the sale did not happen (W148). Buys keep
-    /// returning the error; their refusals are answered by the 66/43 route.
+    /// instead of an error, so the native window is told the sale did not happen (W148). A rejected
+    /// buy-back gets a 165/13 failure the same way (W172, R). Buys keep returning the error; their
+    /// refusals are answered by the 66/43 route.
     pub fn handle_coin_store(
         &mut self,
         shop: &mut CoinShop,
@@ -482,20 +485,30 @@ impl NpcInteraction {
         zone_id: u32,
         position: [f32; 3],
     ) -> Result<CoinShopOutcome, NpcInteractionError> {
-        let is_sell = packet.starts_with(&[COIN_STORE_FAMILY as u8, 0, COIN_STORE_SELL as u8, 0]);
-        let result = self
-            .check_coin_store(packet, zone_id, position)
-            .and_then(|()| {
-                shop.handle(packet)
-                    .map_err(|error| NpcInteractionError::CoinShop(error.kind()))
-            });
+        let is = |subtype: u16| packet.starts_with(&[COIN_STORE_FAMILY as u8, 0, subtype as u8, 0]);
+        let (is_sell, is_buy_back) = (is(COIN_STORE_SELL), is(COIN_STORE_BUY_BACK));
+        // 2 definitions, 8 list update and 14 gift need no session; anything else (including an
+        // unknown subtype) must pass the checks, which refuse what they do not know.
+        let session_free = [2, 8, 14].into_iter().any(is);
+        let result = (if session_free {
+            Ok(())
+        } else {
+            self.check_coin_store(packet, zone_id, position)
+        })
+        .and_then(|()| {
+            shop.handle(packet)
+                .map_err(|error| NpcInteractionError::CoinShop(error.kind()))
+        });
         match result {
             Err(error) if is_sell => Ok(shop.refuse_sell(packet, sell_refusal_code(&error))),
+            Err(error) if is_buy_back => {
+                Ok(shop.refuse_buy_back(packet, sell_refusal_code(&error)))
+            }
             other => other,
         }
     }
 
-    /// Session, range, length and merchant checks shared by Coin Store buys and sells.
+    /// Session, range, length and merchant checks shared by Coin Store buys, sells and buy-backs.
     fn check_coin_store(
         &self,
         packet: &[u8],
@@ -523,10 +536,16 @@ impl NpcInteraction {
         let expected_len = match subtype {
             COIN_STORE_BUY => 28,
             COIN_STORE_SELL => 20,
+            COIN_STORE_BUY_BACK => 12,
             _ => return Err(NpcInteractionError::InvalidPacket),
         };
         if packet.len() != expected_len {
             return Err(NpcInteractionError::InvalidPacket);
+        }
+        // A buy-back names a sale transaction, not a merchant (client sender `00c76600`): the open
+        // shop and range checks above are its whole authorization (R).
+        if subtype == COIN_STORE_BUY_BACK {
+            return Ok(());
         }
         let merchant_id = u64::from_le_bytes(packet[4..12].try_into().unwrap());
         // (R) Content NPC keys are used as the Coin Store merchant ID until an original binding
