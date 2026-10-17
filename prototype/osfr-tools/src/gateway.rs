@@ -551,6 +551,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(194), _) => "ui_telemetry",
         (Some(36), Some(10 | 12)) => "combat",
         (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
+        // W178: title select/refresh and the claim window are answered by Gameplay.
+        (Some(152), Some(4 | 5)) => "titles",
+        (Some(108), Some(1 | 3 | 5)) => "claims",
         // W172: Coin Store siblings and the Marketplace shell are understood merchant
         // traffic even when a particular row is intentionally answered with nothing.
         (Some(66), Some(1 | 3 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 25 | 27 | 38 | 43))
@@ -1317,6 +1320,31 @@ impl Gateway {
 
     pub fn gameplay_summary(&self) -> Option<serde_json::Value> {
         self.gameplay.as_ref().map(Gameplay::summary)
+    }
+
+    /// W178: trusted server/store hook for one queued claim; not a network route.
+    pub fn issue_claim(
+        &mut self,
+        claim_id: u64,
+        grant: crate::rewards::RewardGrant,
+        client_record: Vec<u8>,
+    ) -> io::Result<()> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("claims require gameplay"))?
+            .issue_claim(claim_id, grant, client_record)
+    }
+
+    /// W178: trusted achievement-completion hook; clients cannot grant a title.
+    pub fn award_achievement_titles(
+        &mut self,
+        newly_completed: &[String],
+        bindings: &[crate::progression_extras::AchievementTitleBinding],
+    ) -> io::Result<Vec<Vec<u8>>> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("titles require gameplay"))?
+            .award_achievement_titles(newly_completed, bindings)
     }
 
     /// Phrase IDs are sourced from the same typed startup data sent to this client.

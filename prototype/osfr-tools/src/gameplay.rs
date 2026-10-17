@@ -102,6 +102,10 @@ pub struct GameplayState {
     /// The four-slot item bar (W146). Absent until something is bound.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub item_bar: Option<crate::item_bar::ItemBar>,
+    /// W178 title ownership and durable claim history. Pending claims and
+    /// in-flight definition trackers are session-only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub progression_extras: Option<crate::progression_extras::ProgressionExtrasState>,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -208,6 +212,8 @@ pub struct Gameplay {
     /// W177: the saved pet roster and session-only active actor. The roster stays in the
     /// canonical save's top-level `pets` payload; only the actor is reset on reconnect.
     pets: crate::pets::PetService,
+    /// W178 titles and claim history, staged with the rest of this character.
+    progression_extras: crate::progression_extras::ProgressionExtras,
 }
 
 #[derive(Default)]
@@ -484,6 +490,9 @@ impl Gameplay {
         let item_bar = crate::item_bar::ItemBar::load(
             directory,
             state.as_ref().and_then(|s| s.item_bar.clone()),
+        )?;
+        let progression_extras = crate::progression_extras::ProgressionExtras::load(
+            state.as_ref().and_then(|s| s.progression_extras.clone()),
         )?;
         let (
             inventory,
@@ -1021,6 +1030,7 @@ impl Gameplay {
             mounts,
             field_engaged: false,
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
+            progression_extras,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -2256,6 +2266,8 @@ impl Gameplay {
     }
 
     pub fn state(&self) -> GameplayState {
+        let progression_extras =
+            (!self.progression_extras.is_empty()).then(|| self.progression_extras.state());
         GameplayState {
             inventory: self.inventory.state().clone(),
             quests: self.quests.state().clone(),
@@ -2282,7 +2294,31 @@ impl Gameplay {
                 .and_then(crate::derby_gateway::DerbyGateway::snapshot),
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
             item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
+            progression_extras,
         }
+    }
+
+    /// W178: trusted store/event code queues a server-owned claim. No client
+    /// request reaches this method or supplies its reward payload.
+    pub fn issue_claim(
+        &mut self,
+        claim_id: u64,
+        grant: crate::rewards::RewardGrant,
+        client_record: Vec<u8>,
+    ) -> io::Result<()> {
+        self.progression_extras
+            .issue_server_grant(claim_id, grant, client_record)
+    }
+
+    /// W178: award titles only for achievements completed by the existing
+    /// achievement engine during this transition.
+    pub fn award_achievement_titles(
+        &mut self,
+        newly_completed: &[String],
+        bindings: &[crate::progression_extras::AchievementTitleBinding],
+    ) -> io::Result<Vec<Vec<u8>>> {
+        self.progression_extras
+            .award_completed_achievement_titles(newly_completed, bindings)
     }
 
     fn recipe_replace_all_packet(&self) -> io::Result<Vec<u8>> {
@@ -3140,6 +3176,9 @@ impl Gameplay {
         if let Some(out) = self.command_refusal(inner, character.guid)? {
             return Ok(out);
         }
+        if let Some(out) = self.handle_progression_extras(inner)? {
+            return Ok(out);
+        }
         if let Some(out) = self.handle_chess(inner, character, now_ms)? {
             return Ok(out);
         }
@@ -3314,6 +3353,53 @@ impl Gameplay {
         staged.append_journal_updates(&before, &mut out)?;
         *self = staged;
         Ok(out)
+    }
+
+    /// W178: title list/select and claim list/apply/definition requests. Claim
+    /// rewards are server-owned; request ids only choose queued rows.
+    fn handle_progression_extras(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
+        if !inner.starts_with(&[108, 0]) && !inner.starts_with(&[152, 0]) {
+            return Ok(None);
+        }
+        let rewards = RewardState::new(
+            self.inventory.clone(),
+            self.reward_profiles(),
+            self.inventory.state().items.len().max(100),
+        );
+        let mut staged = self.progression_extras.clone();
+        let change = staged.handle(inner, &rewards)?;
+        if !change.handled {
+            return Ok(None);
+        }
+        let mut out = Outcome {
+            replies: change.replies,
+            changed: change.changed,
+            ..Outcome::default()
+        };
+        if let Some(next) = change.reward_state {
+            let before = self.inventory.state().clone();
+            let next_profiles = if self.profiles.is_some()
+                && next.profiles != *self.profiles.as_ref().unwrap().state()
+            {
+                let directory = self
+                    .profile_content_directory
+                    .as_deref()
+                    .ok_or_else(|| invalid("claim XP needs profile content"))?;
+                Some(Profiles::load(directory, Some(next.profiles))?)
+            } else {
+                None
+            };
+            // Commit the claim ledger before adopting the bag/wallet snapshot.
+            self.progression_extras = staged;
+            self.inventory = next.inventory;
+            if let Some(profiles) = next_profiles {
+                self.profiles = Some(profiles);
+            }
+            self.npc_inventory_events(&before, &mut out)?;
+        } else {
+            self.progression_extras = staged;
+        }
+        Ok(Some(out))
     }
 
     /// W171: hide paid nodes once their run closed, bring back grown-back ones. A change marks

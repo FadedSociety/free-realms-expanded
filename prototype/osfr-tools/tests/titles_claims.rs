@@ -1,0 +1,379 @@
+//! W178: title selection and the server-owned claim window.
+//!
+//! Recovered client facts: 108/2 is `bool + counted claim rows`; 108/4 is
+//! `tracker u32 + bool + counted rows`; 152/3 is a length blob containing a
+//! count, four dwords per title and the selected title id. Synthetic rewards
+//! and ids below are test policy (R), never client-selected payouts.
+
+use osfr_tools::{
+    account_store::AccountRole,
+    game_store,
+    gameplay::{Gameplay, GameplayState},
+    gateway::{Gateway, GatewayOutcome},
+    inventory::Inventory,
+    profiles::ProfileState,
+    progression_extras::{
+        self, AchievementProgression, AchievementRule, AchievementTitleBinding, ClaimWindow,
+        definitions_request,
+    },
+    rewards::{ItemGrant, RewardBundleRow, RewardDisplay, RewardGrant, RewardState},
+};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs,
+    path::PathBuf,
+    sync::atomic::{AtomicU64, Ordering},
+};
+
+const NOW: u64 = 20_000;
+const CLAIM: u64 = 0x0102_0304_0506_0708;
+static SERIAL: AtomicU64 = AtomicU64::new(0);
+
+fn lab() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab")
+}
+
+struct Fixture {
+    content: PathBuf,
+    reference: PathBuf,
+}
+
+impl Drop for Fixture {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.content);
+    }
+}
+
+impl Fixture {
+    fn new() -> Self {
+        let source = std::env::var_os("OSFR_APP_FUZZ_CONTENT")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| lab().join("reports/round59-native-20261015T124443Z/content"));
+        let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| lab().join("references/rust-gateway-reference"));
+        assert!(
+            source.join("inventory.json").is_file(),
+            "prepared content fixture missing: {}",
+            source.display()
+        );
+        let content = lab().join("build/w178-fixtures").join(format!(
+            "titles-claims-{}-{}",
+            std::process::id(),
+            SERIAL.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(&content).unwrap();
+        for entry in fs::read_dir(&source).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_file()
+                && matches!(
+                    path.extension().and_then(|s| s.to_str()),
+                    Some("json" | "bin")
+                )
+            {
+                fs::copy(&path, content.join(path.file_name().unwrap())).unwrap();
+            }
+        }
+        Self { content, reference }
+    }
+
+    fn state(&self) -> GameplayState {
+        Gameplay::load(&self.content, None).unwrap().state()
+    }
+
+    fn gateway(&self, saved: Option<GameplayState>) -> Gateway {
+        let mut character = Gateway::reference_state(&self.reference).unwrap();
+        character.position = [0.; 3];
+        let state = saved.unwrap_or_else(|| self.state());
+        let mut gateway =
+            Gateway::load_gameplay(&self.reference, character, &self.content, Some(state)).unwrap();
+        gateway.set_dev_tools(false);
+        gateway.set_role(AccountRole::Player);
+        gateway.set_trace_enabled(true);
+        for packet in [login(), wrap(&[13, 0]), wrap(&[10, 0])] {
+            gateway.handle_at(&packet, NOW).unwrap();
+        }
+        gateway
+    }
+}
+
+fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut bytes = vec![5, 0, 1];
+    bytes.extend((inner.len() as u32).to_le_bytes());
+    bytes.extend(inner);
+    bytes
+}
+
+fn login() -> Vec<u8> {
+    let mut bytes = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["w178-synthetic-ticket", "1.910.1.530630", ""]
+        .iter()
+        .enumerate()
+    {
+        bytes.extend((text.len() as u32).to_le_bytes());
+        bytes.extend(text.as_bytes());
+        if index == 0 {
+            bytes.extend(1u64.to_le_bytes());
+        }
+    }
+    bytes
+}
+
+fn send(gateway: &mut Gateway, inner: &[u8]) -> GatewayOutcome {
+    gateway.handle_at(&wrap(inner), NOW).unwrap()
+}
+
+fn inner_packets(out: &GatewayOutcome) -> Vec<Vec<u8>> {
+    out.replies
+        .iter()
+        .map(|packet| packet[7..].to_vec())
+        .collect()
+}
+
+fn item_grant() -> RewardGrant {
+    let mut body = vec![0; 34];
+    body[17..21].copy_from_slice(&8u32.to_le_bytes());
+    body.extend(0u32.to_le_bytes());
+    RewardGrant {
+        coins: 0,
+        items: vec![ItemGrant {
+            definition_id: 8,
+            count: 1,
+        }],
+        job_xp: BTreeMap::new(),
+        display: RewardDisplay {
+            source_guid: 700,
+            player_guid: 1,
+            reward_kind: 0,
+            icon_id: 0,
+            name_id: 0,
+            rows: vec![RewardBundleRow { type_id: 1, body }],
+        },
+    }
+}
+
+fn empty_grant() -> RewardGrant {
+    RewardGrant {
+        coins: 0,
+        items: Vec::new(),
+        job_xp: BTreeMap::new(),
+        display: RewardDisplay {
+            source_guid: 700,
+            player_guid: 1,
+            reward_kind: 0,
+            icon_id: 0,
+            name_id: 0,
+            rows: Vec::new(),
+        },
+    }
+}
+
+fn item_count(snapshot: &game_store::Snapshot, definition_id: i32) -> u32 {
+    snapshot
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .inventory
+        .items
+        .iter()
+        .filter(|item| item.definition_id == definition_id)
+        .map(|item| item.count)
+        .sum()
+}
+
+fn assert_snapshot_canary(gateway: &Gateway) {
+    let before = gateway.snapshot();
+    let mut changed = before.clone();
+    changed.gameplay.as_mut().unwrap().inventory.coins ^= 1;
+    assert_ne!(changed, before, "snapshot equality canary went stale");
+}
+
+#[test]
+fn achievement_title_selects_and_persists_while_forged_id_changes_nothing() {
+    let fixture = Fixture::new();
+    let inventory = Inventory::load(&fixture.content, None).unwrap();
+    let rewards = RewardState::new(
+        inventory,
+        ProfileState {
+            version: 1,
+            active: 1,
+            unlocked: BTreeSet::from([1]),
+            experience: BTreeMap::new(),
+        },
+        100,
+    );
+    let mut achievements = AchievementProgression::new(
+        vec![AchievementRule {
+            key: "test:title".into(),
+            client_id: Some(9001),
+            counter_key: "title_count".into(),
+            objective_id: 1,
+            threshold: 1,
+            trophy_id: None,
+            reward: empty_grant(),
+        }],
+        Default::default(),
+    )
+    .unwrap();
+    let transition = achievements.on_event("title_count", 1, &rewards).unwrap();
+    assert_eq!(transition.newly_completed, ["test:title"]);
+
+    let mut gateway = fixture.gateway(None);
+    let added = gateway
+        .award_achievement_titles(
+            &transition.newly_completed,
+            &[AchievementTitleBinding {
+                achievement_key: "test:title".into(),
+                title: [77, 2, 100, 9],
+            }],
+        )
+        .unwrap();
+    assert_eq!(added.len(), 1);
+    assert_eq!(&added[0][..6], &[152, 0, 1, 0, 0, 0]);
+
+    let selected = send(&mut gateway, &progression_extras::title_select_request(77));
+    assert_eq!(selected.trace[0].handler, "titles");
+    let replies = inner_packets(&selected);
+    assert_eq!(&replies[0][..6], &[152, 0, 3, 0, 0, 0]);
+    assert_eq!(
+        i32::from_le_bytes(replies[0][6..10].try_into().unwrap()),
+        24
+    );
+    assert_eq!(
+        u32::from_le_bytes(replies[0][30..34].try_into().unwrap()),
+        77
+    );
+
+    assert_snapshot_canary(&gateway);
+    let before = gateway.snapshot();
+    let forged = send(&mut gateway, &progression_extras::title_select_request(78));
+    assert!(inner_packets(&forged).is_empty());
+    assert_eq!(gateway.snapshot(), before);
+
+    let path = fixture.content.join("title-save.json");
+    game_store::save(&path, &before).unwrap();
+    let reloaded = game_store::load_or_create(&path, before.character.clone()).unwrap();
+    let metadata = reloaded
+        .gameplay
+        .as_ref()
+        .and_then(|state| state.progression_extras.as_ref())
+        .unwrap();
+    assert_eq!(metadata.titles.active(), Some(77));
+
+    let mut fresh = fixture.gateway(reloaded.gameplay.clone());
+    let refresh = send(&mut fresh, &progression_extras::title_refresh_request());
+    let replies = inner_packets(&refresh);
+    assert_eq!(
+        u32::from_le_bytes(replies[0][30..34].try_into().unwrap()),
+        77
+    );
+    let before = fresh.snapshot();
+    let forged = send(&mut fresh, &progression_extras::title_select_request(78));
+    assert!(inner_packets(&forged).is_empty());
+    assert_eq!(fresh.snapshot(), before);
+}
+
+#[test]
+fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(None);
+    let before = gateway.snapshot();
+    assert_eq!(item_count(&before, 8), 0);
+
+    gateway
+        .issue_claim(CLAIM, item_grant(), CLAIM.to_le_bytes().to_vec())
+        .unwrap();
+    let listed = send(&mut gateway, &ClaimWindow::list_request());
+    assert_eq!(listed.trace[0].handler, "claims");
+    let list = inner_packets(&listed).pop().unwrap();
+    assert_eq!(&list[..5], &[108, 0, 2, 0, 1]);
+    assert_eq!(u32::from_le_bytes(list[5..9].try_into().unwrap()), 1);
+    assert_eq!(&list[9..17], &CLAIM.to_le_bytes());
+
+    assert_snapshot_canary(&gateway);
+    let before_forged = gateway.snapshot();
+    let forged_id = CLAIM.wrapping_add(1);
+    let forged = send(
+        &mut gateway,
+        &progression_extras::claim_request(0xDEAD, &[forged_id]).unwrap(),
+    );
+    let forged_reply = inner_packets(&forged).pop().unwrap();
+    assert_eq!(&forged_reply[..9], &[108, 0, 4, 0, 0xad, 0xde, 0, 0, 0]);
+    assert_eq!(gateway.snapshot(), before_forged);
+
+    let request = progression_extras::claim_request(0xBEEF, &[CLAIM]).unwrap();
+    let claimed = send(&mut gateway, &request);
+    let replies = inner_packets(&claimed);
+    assert!(
+        replies
+            .iter()
+            .any(|packet| { packet.starts_with(&[108, 0, 4, 0, 0xef, 0xbe, 0, 0, 1]) })
+    );
+    let paid = gateway.snapshot();
+    assert_eq!(item_count(&paid, 8), 1);
+    assert!(
+        paid.gameplay
+            .as_ref()
+            .unwrap()
+            .progression_extras
+            .as_ref()
+            .unwrap()
+            .claimed_ids
+            .contains(&CLAIM)
+    );
+
+    let definitions = definitions_request(0xBEEF, &[8]).unwrap();
+    let definitions = send(&mut gateway, &definitions);
+    let response = inner_packets(&definitions).pop().unwrap();
+    assert_eq!(&response[..9], &[108, 0, 6, 0, 0xef, 0xbe, 0, 0, 1]);
+    let blob_len = i32::from_le_bytes(response[9..13].try_into().unwrap());
+    assert_eq!(blob_len as usize, response.len() - 13);
+    assert_eq!(u32::from_le_bytes(response[13..17].try_into().unwrap()), 1);
+    assert_eq!(i32::from_le_bytes(response[17..21].try_into().unwrap()), 8);
+
+    let before_replay = gateway.snapshot();
+    let replay = send(&mut gateway, &request);
+    let replay_reply = inner_packets(&replay).pop().unwrap();
+    assert_eq!(&replay_reply[..9], &[108, 0, 4, 0, 0xef, 0xbe, 0, 0, 0]);
+    assert_eq!(gateway.snapshot(), before_replay);
+
+    let path = fixture.content.join("claim-save.json");
+    game_store::save(&path, &paid).unwrap();
+    let saved: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    assert_eq!(
+        saved["gameplay"]["progression_extras"]["claimed_ids"]
+            .as_array()
+            .map(Vec::len),
+        Some(1)
+    );
+    let reloaded = game_store::load_or_create(&path, paid.character.clone()).unwrap();
+    assert!(
+        gateway_claim_history_contains(&reloaded, CLAIM),
+        "claim history did not survive the save"
+    );
+    let mut fresh = fixture.gateway(reloaded.gameplay.clone());
+    assert!(
+        fresh
+            .issue_claim(CLAIM, item_grant(), CLAIM.to_le_bytes().to_vec())
+            .is_err(),
+        "a claimed reward row was reissued"
+    );
+    let before = fresh.snapshot();
+    let replay = send(&mut fresh, &request);
+    assert_eq!(
+        &inner_packets(&replay).pop().unwrap()[..9],
+        &[108, 0, 4, 0, 0xef, 0xbe, 0, 0, 0]
+    );
+    assert_eq!(fresh.snapshot(), before);
+}
+
+fn gateway_claim_history_contains(
+    snapshot: &osfr_tools::game_store::Snapshot,
+    claim_id: u64,
+) -> bool {
+    snapshot
+        .gameplay
+        .as_ref()
+        .and_then(|state| state.progression_extras.as_ref())
+        .is_some_and(|state| state.claimed_ids.contains(&claim_id))
+}

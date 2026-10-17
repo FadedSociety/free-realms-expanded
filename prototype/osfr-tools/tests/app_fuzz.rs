@@ -556,6 +556,11 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("merchant", words(66, 43, &[u32::MAX; 4])));
     result.push(("merchant", words(165, 4, &[u32::MAX; 6])));
     result.push(("merchant", words(165, 5, &[u32::MAX; 4])));
+    result.push(("titles", words(152, 4, &[u32::MAX])));
+    result.push(("titles", words(152, 5, &[])));
+    result.push(("claims", words(108, 1, &[])));
+    result.push(("claims", words(108, 3, &[u32::MAX; 3])));
+    result.push(("claims", words(108, 5, &[u32::MAX; 3])));
     // W172: Coin Store siblings (definitions, list update, buy-back, gift) and the
     // Marketplace rows (bare header, locale string, unrecovered layouts).
     result.push(("merchant", words(165, 2, &[2, 8, u32::MAX])));

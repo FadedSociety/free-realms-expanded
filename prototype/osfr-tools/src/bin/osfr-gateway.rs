@@ -2025,6 +2025,11 @@ impl Session {
             let _ = world.chat_settings.handle(self.character_guid, inner);
             return Vec::new();
         }
+        // W178: the per-character Gameplay stage owns titles and the claim window;
+        // no shared-world delivery is composed here.
+        if matches!(inner, [108, 0, 1 | 3 | 5, 0, ..]) || matches!(inner, [152, 0, 4 | 5, 0, ..]) {
+            return Vec::new();
+        }
         if inner.starts_with(&[15, 0, 1, 0]) {
             return self.route_typed_chat(inner, world);
         }

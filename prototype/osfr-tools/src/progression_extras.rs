@@ -6,7 +6,10 @@
 //! server-sent and have no client table, local IDs use the documented (R)
 //! namespaces in the content files; they are not recovered historical IDs.
 
-use crate::rewards::{self, RewardBundleRow, RewardGrant, RewardState};
+use crate::{
+    inventory::Inventory,
+    rewards::{self, RewardBundleRow, RewardGrant, RewardState},
+};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -18,9 +21,12 @@ pub use collection_ledger::{
     CollectOutcome, CollectionCatalogue, CollectionDefinition, CollectionLedger, CollectionProgress,
 };
 
+// Local safety bounds, not recovered historical limits (R).
 const MAX_COUNTER: u32 = 1_000_000;
 const MAX_PACKET_BYTES: usize = 1024 * 1024;
 const MAX_CLAIM_ITEMS: usize = 256;
+const MAX_CLAIM_HISTORY: usize = 4096;
+const MAX_TITLES: usize = 256;
 const FORBIDDEN_BUNDLE_ENTRY_TYPES: [u32; 6] = [2, 4, 5, 9, 16, 21];
 const SUPPORTED_BUNDLE_ENTRY_TYPES: [u32; 17] = [
     1, 3, 6, 7, 8, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 22, 23,
@@ -524,17 +530,29 @@ impl TitleState {
         self.active
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.owned.is_empty()
+    }
+
     pub fn contains(&self, title_id: u32) -> bool {
         self.owned.contains_key(&title_id)
     }
 
+    pub fn validate(&self) -> io::Result<()> {
+        if self.owned.len() > MAX_TITLES
+            || self.owned.keys().any(|id| *id == 0)
+            || self.active.is_some_and(|id| !self.owned.contains_key(&id))
+        {
+            return Err(invalid("invalid title state"));
+        }
+        Ok(())
+    }
+
     pub fn add(&mut self, fields: [u32; 4]) -> io::Result<Vec<u8>> {
         let id = fields[0];
-        if id == 0 || self.owned.contains_key(&id) {
+        if id == 0 || self.owned.contains_key(&id) || self.owned.len() >= MAX_TITLES {
             return Err(invalid("invalid or duplicate owned title"));
         }
-        let mut fields = fields;
-        fields[3] = 0;
         self.owned.insert(id, fields);
         let mut packet = packet_u16_u32(152, 1);
         for field in fields {
@@ -573,15 +591,25 @@ impl TitleState {
     pub fn update_all_packet(&self) -> io::Result<Vec<u8>> {
         let count =
             u32::try_from(self.owned.len()).map_err(|_| invalid("too many owned titles"))?;
-        let mut packet = packet_u16_u32(152, 3);
-        put_u32(&mut packet, count); // R: list count width; row width is client evidence.
-        for (&id, fields) in &self.owned {
-            let mut row = *fields;
-            row[0] = id;
-            row[3] = if self.active == Some(id) { 1 } else { 0 };
-            for field in row {
-                put_u32(&mut packet, field);
+        let mut blob = Vec::with_capacity(8 + self.owned.len() * 16);
+        put_u32(&mut blob, count);
+        for fields in self.owned.values() {
+            for field in fields {
+                put_u32(&mut blob, *field);
             }
+        }
+        // The last dword is the selected title id (ClientPcData PlayerTitleStruct
+        // and native reader 0090a890); selection is not a per-row flag.
+        put_u32(&mut blob, self.active.unwrap_or(0));
+        let mut packet = packet_u16_u32(152, 3);
+        packet.extend(
+            i32::try_from(blob.len())
+                .map_err(|_| invalid("title list exceeds wire length"))?
+                .to_le_bytes(),
+        );
+        packet.extend(blob);
+        if packet.len() > MAX_PACKET_BYTES {
+            return Err(invalid("title list exceeds packet bound"));
         }
         Ok(packet)
     }
@@ -595,6 +623,14 @@ pub fn title_select_request(title_id: u32) -> Vec<u8> {
 
 pub fn title_refresh_request() -> Vec<u8> {
     packet_u16_u32(152, 5)
+}
+
+/// One achievement-to-title binding. The caller supplies only titles emitted by
+/// `AchievementTransition::newly_completed`; title ids are not client-authoritative.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AchievementTitleBinding {
+    pub achievement_key: String,
+    pub title: [u32; 4],
 }
 
 // Claim records are supplied as opaque client-reader bytes. The client row
@@ -632,12 +668,22 @@ impl ClaimWindow {
         client_record: Vec<u8>,
     ) -> io::Result<()> {
         validate_reward_rows(&grant.display.rows)?;
+        let pending_bytes = self
+            .pending
+            .values()
+            .try_fold(0usize, |total, item| {
+                total.checked_add(item.client_record.len())
+            })
+            .ok_or_else(|| invalid("claim record total overflow"))?;
         if claim_id == 0
             || self.pending.contains_key(&claim_id)
             || self.claimed.contains(&claim_id)
             || client_record.is_empty()
             || client_record.len() > MAX_PACKET_BYTES
             || self.pending.len() >= MAX_CLAIM_ITEMS
+            || pending_bytes
+                .checked_add(client_record.len())
+                .is_none_or(|total| total > MAX_PACKET_BYTES - 13)
         {
             return Err(invalid("invalid or duplicate pending claim"));
         }
@@ -706,6 +752,8 @@ impl ClaimWindow {
         if ids.is_empty()
             || ids.len() > MAX_CLAIM_ITEMS
             || self.trackers.contains_key(&tracker_id)
+            || self.trackers.len() >= MAX_CLAIM_ITEMS
+            || self.claimed.len().saturating_add(ids.len()) > MAX_CLAIM_HISTORY
             || ids.iter().copied().collect::<BTreeSet<_>>().len() != ids.len()
             || ids.iter().any(|id| !self.pending.contains_key(id))
         {
@@ -713,9 +761,15 @@ impl ClaimWindow {
         }
 
         let grants: Vec<_> = ids.iter().map(|id| &self.pending[id].grant).collect();
-        let grant = merge_grants(&grants)?;
+        let grant = match merge_grants(&grants) {
+            Ok(grant) => grant,
+            Err(_) => return Ok(reject()),
+        };
         let grant_key = claim_grant_key(&ids);
-        let (next_rewards, reward_packets) = apply_award(reward_state, &grant, &grant_key)?;
+        let (next_rewards, reward_packets) = match apply_award(reward_state, &grant, &grant_key) {
+            Ok(result) => result,
+            Err(_) => return Ok(reject()),
+        };
         let records: Vec<_> = ids
             .iter()
             .map(|id| self.pending[id].client_record.as_slice())
@@ -730,6 +784,8 @@ impl ClaimWindow {
             .iter()
             .filter_map(|item| u32::try_from(item.definition_id).ok())
             .collect();
+        // Mark the ledger before the caller adopts the reward state. The caller
+        // saves both snapshots together before sending a reply.
         for id in &ids {
             self.pending.remove(id);
             self.claimed.insert(*id);
@@ -770,6 +826,217 @@ impl ClaimWindow {
         response.extend_from_slice(definitions_blob);
         self.trackers.remove(&tracker_id);
         Ok(response)
+    }
+
+    fn definition_blob(
+        &self,
+        tracker_id: u32,
+        ids: &[u32],
+        inventory: &Inventory,
+    ) -> io::Result<Vec<u8>> {
+        let expected = self
+            .trackers
+            .get(&tracker_id)
+            .ok_or_else(|| invalid("unknown claim tracker"))?;
+        if ids.is_empty() || ids.iter().any(|id| !expected.contains(id)) {
+            return Err(invalid("claim tracker does not own requested definitions"));
+        }
+        let count = u32::try_from(ids.len()).map_err(|_| invalid("too many claim definitions"))?;
+        let mut blob = Vec::new();
+        put_u32(&mut blob, count);
+        for &id in ids {
+            let definition_id =
+                i32::try_from(id).map_err(|_| invalid("claim definition id exceeds i32"))?;
+            let record = inventory
+                .definition_record(definition_id)
+                .ok_or_else(|| invalid("claim definition is missing from inventory"))?;
+            if blob
+                .len()
+                .checked_add(record.len())
+                .is_none_or(|total| total > MAX_PACKET_BYTES - 13)
+            {
+                return Err(invalid("claim definitions exceed packet bound"));
+            }
+            blob.extend_from_slice(record);
+        }
+        Ok(blob)
+    }
+}
+
+/// Persisted title and claim history. Pending claim payloads and in-flight
+/// definition trackers remain session state.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ProgressionExtrasState {
+    #[serde(default)]
+    pub titles: TitleState,
+    #[serde(default)]
+    pub claimed_ids: BTreeSet<u64>,
+}
+
+#[derive(Clone, Default)]
+pub struct ProgressionOutcome {
+    /// False when another gameplay route owns the request.
+    pub handled: bool,
+    pub replies: Vec<Vec<u8>>,
+    pub changed: bool,
+    pub reward_state: Option<RewardState>,
+}
+
+/// Character-owned title and claim state. Only trusted server methods can add
+/// titles or queue claim grants.
+#[derive(Clone, Debug, Default)]
+pub struct ProgressionExtras {
+    titles: TitleState,
+    claims: ClaimWindow,
+}
+
+impl ProgressionExtras {
+    pub fn load(saved: Option<ProgressionExtrasState>) -> io::Result<Self> {
+        let Some(saved) = saved else {
+            return Ok(Self::default());
+        };
+        saved.titles.validate()?;
+        if saved.claimed_ids.len() > MAX_CLAIM_HISTORY || saved.claimed_ids.contains(&0) {
+            return Err(invalid("invalid claim history"));
+        }
+        Ok(Self {
+            titles: saved.titles,
+            claims: ClaimWindow::with_claimed_ids(saved.claimed_ids),
+        })
+    }
+
+    pub fn state(&self) -> ProgressionExtrasState {
+        ProgressionExtrasState {
+            titles: self.titles.clone(),
+            claimed_ids: self.claims.claimed_ids().clone(),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.titles.is_empty() && self.claims.claimed_ids().is_empty()
+    }
+
+    pub fn titles(&self) -> &TitleState {
+        &self.titles
+    }
+
+    pub fn pending_count(&self) -> usize {
+        self.claims.pending_count()
+    }
+
+    /// Trusted server/store code queues a claim. No client request can name or
+    /// synthesize the reward.
+    pub fn issue_server_grant(
+        &mut self,
+        claim_id: u64,
+        grant: RewardGrant,
+        client_record: Vec<u8>,
+    ) -> io::Result<()> {
+        if self
+            .claims
+            .claimed_ids()
+            .len()
+            .saturating_add(self.claims.pending_count())
+            >= MAX_CLAIM_HISTORY
+        {
+            return Err(invalid("claim history is full"));
+        }
+        self.claims
+            .issue_server_grant(claim_id, grant, client_record)
+    }
+
+    /// Award only the titles bound to achievements completed by the existing
+    /// achievement engine during this transition.
+    pub fn award_completed_achievement_titles(
+        &mut self,
+        newly_completed: &[String],
+        bindings: &[AchievementTitleBinding],
+    ) -> io::Result<Vec<Vec<u8>>> {
+        let completed: BTreeSet<&str> = newly_completed.iter().map(String::as_str).collect();
+        let mut staged = self.titles.clone();
+        let mut packets = Vec::new();
+        for binding in bindings {
+            if !completed.contains(binding.achievement_key.as_str())
+                || staged.contains(binding.title[0])
+            {
+                continue;
+            }
+            packets.push(staged.add(binding.title)?);
+        }
+        self.titles = staged;
+        Ok(packets)
+    }
+
+    /// Route the client's title and claim requests. Forged ids are silent
+    /// refusals; claim failures with a valid request receive 108/4 result 0.
+    pub fn handle(
+        &mut self,
+        request: &[u8],
+        reward_state: &RewardState,
+    ) -> io::Result<ProgressionOutcome> {
+        let mut outcome = ProgressionOutcome {
+            handled: true,
+            ..ProgressionOutcome::default()
+        };
+        if request == ClaimWindow::list_request() {
+            outcome.replies.push(self.claims.list_response()?);
+            return Ok(outcome);
+        }
+        if request == title_refresh_request() {
+            outcome.replies.push(self.titles.update_all_packet()?);
+            return Ok(outcome);
+        }
+        if request.len() == 10
+            && request[..2] == 152u16.to_le_bytes()
+            && request[2..6] == 4u32.to_le_bytes()
+        {
+            let mut staged = self.titles.clone();
+            let reply = match staged.handle_select_request(request) {
+                Ok(reply) => reply,
+                Err(_) => return Ok(outcome),
+            };
+            outcome.changed = staged != self.titles;
+            self.titles = staged;
+            outcome.replies.push(reply);
+            return Ok(outcome);
+        }
+        if request.len() >= 4 && request[..4] == [108, 0, 3, 0] {
+            let mut staged = self.claims.clone();
+            let transition = match staged.handle_claim_request(request, reward_state) {
+                Ok(transition) => transition,
+                Err(_) => return Ok(outcome),
+            };
+            if transition.accepted {
+                self.claims = staged;
+                outcome.changed = true;
+                outcome.reward_state = Some(transition.reward_state);
+            }
+            outcome.replies.push(transition.response_packet);
+            outcome.replies.extend(transition.reward_packets);
+            return Ok(outcome);
+        }
+        if request.len() >= 4 && request[..4] == [108, 0, 5, 0] {
+            let (tracker_id, ids) = match parse_definitions_request(request) {
+                Ok(parsed) => parsed,
+                Err(_) => return Ok(outcome),
+            };
+            let blob = match self
+                .claims
+                .definition_blob(tracker_id, &ids, &reward_state.inventory)
+            {
+                Ok(blob) => blob,
+                Err(_) => return Ok(outcome),
+            };
+            let reply = match self.claims.handle_definitions_request(request, &blob) {
+                Ok(reply) => reply,
+                Err(_) => return Ok(outcome),
+            };
+            outcome.replies.push(reply);
+            return Ok(outcome);
+        }
+        outcome.handled = false;
+        Ok(outcome)
     }
 }
 

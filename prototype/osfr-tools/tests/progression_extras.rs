@@ -327,8 +327,15 @@ fn achievement_threshold_awards_once_and_emits_150_messages() {
 #[test]
 fn owned_title_selection_updates_state_and_uses_152() {
     let mut titles = TitleState::default();
-    let added = titles.add([77, 0, 0, 0]).unwrap();
+    let added = titles.add([77, 2, 100, 9]).unwrap();
     assert_eq!(&added[..6], &[152, 0, 1, 0, 0, 0]);
+    assert_eq!(
+        added[6..]
+            .chunks_exact(4)
+            .map(|word| { u32::from_le_bytes(word.try_into().unwrap()) })
+            .collect::<Vec<_>>(),
+        [77, 2, 100, 9]
+    );
     assert!(titles.contains(77));
 
     let update_all = titles
@@ -337,8 +344,24 @@ fn owned_title_selection_updates_state_and_uses_152() {
     assert_eq!(titles.active(), Some(77));
     assert_eq!(&update_all[..6], &[152, 0, 3, 0, 0, 0]);
     assert_eq!(
-        u32::from_le_bytes(update_all[22..26].try_into().unwrap()),
+        i32::from_le_bytes(update_all[6..10].try_into().unwrap()),
+        24
+    );
+    assert_eq!(
+        u32::from_le_bytes(update_all[10..14].try_into().unwrap()),
         1
+    );
+    assert_eq!(
+        u32::from_le_bytes(update_all[22..26].try_into().unwrap()),
+        100
+    );
+    assert_eq!(
+        u32::from_le_bytes(update_all[26..30].try_into().unwrap()),
+        9
+    );
+    assert_eq!(
+        u32::from_le_bytes(update_all[30..34].try_into().unwrap()),
+        77
     );
     assert!(
         titles
@@ -397,6 +420,28 @@ fn claim_tracker_grants_only_queued_server_reward_once() {
     assert!(replay.reward_packets.is_empty());
     let restored_claims = ClaimWindow::with_claimed_ids(claims.claimed_ids().clone());
     assert!(restored_claims.claimed_ids().contains(&claim_id));
+}
+
+#[test]
+fn claim_batch_cannot_grow_saved_history_past_its_load_bound() {
+    let fixture = InventoryFixture::new();
+    let rewards = fixture.state();
+    let mut claims = ClaimWindow::with_claimed_ids((1..=4095).collect());
+    claims
+        .issue_server_grant(9001, coin_grant(1), vec![1])
+        .unwrap();
+    claims
+        .issue_server_grant(9002, coin_grant(1), vec![2])
+        .unwrap();
+
+    let request = claim_request(0xCAFE, &[9001, 9002]).unwrap();
+    let rejected = claims.handle_claim_request(&request, &rewards).unwrap();
+    assert!(!rejected.accepted);
+    assert_eq!(rejected.response_packet[8], 0);
+    assert!(rejected.reward_packets.is_empty());
+    assert_eq!(rejected.reward_state.inventory.state().coins, 0);
+    assert_eq!(claims.claimed_ids().len(), 4095);
+    assert_eq!(claims.pending_count(), 2);
 }
 
 #[test]
