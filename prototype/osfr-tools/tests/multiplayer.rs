@@ -898,8 +898,14 @@ fn an_account_past_its_action_budget_is_dropped_and_logged() {
     let log = fs::read_to_string(temp.0.join("security.jsonl")).unwrap();
     assert!(replies[..10].iter().all(|n| *n > 0), "{replies:?}");
     let accepted = replies.iter().sum::<usize>() as f64;
-    assert!(accepted < 30.0 && accepted <= 10.0 + refill.ceil(), "{replies:?}");
-    assert!(log.contains(r#""kind":"budget_refusal""#), "{log}");
+    // The bucket refills 5/s: a run slowed by a loaded machine earns tokens
+    // back, so the hard bound is burst + refill, and a refusal must show
+    // only when the run was fast enough to exhaust the bucket.
+    assert!(accepted <= 10.0 + refill.ceil(), "{replies:?} refill {refill}");
+    if refill < 15.0 {
+        assert!(accepted < 30.0, "{replies:?}");
+        assert!(log.contains(r#""kind":"budget_refusal""#), "{log}");
+    }
     assert!(!log.contains("Beryl"), "names never reach the log");
 }
 

@@ -130,6 +130,9 @@ pub struct GatewayOutcome {
     pub dev_command_denials: usize,
     pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
+    /// W162: inner packets (also in `replies`, wrapped) that players near this one must receive
+    /// too: a ride actor, its rider's attachment and their removal.
+    pub nearby: Vec<Vec<u8>>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
     pub state_changed: bool,
@@ -494,11 +497,15 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(49), Some(2 | 14 | 15)) => "quest_engine",
         // Family 47 carries a one-byte subtype; word(2) would swallow the first body byte.
         (Some(47), _) if matches!(body.get(2), Some(12 | 13)) => "quest_engine",
+        // Family 98 also has a one-byte subtype: 98/1 is the client's path request (W164).
+        (Some(98), _) if body.get(2) == Some(&1) => "pathing",
         // Family 59 also has a one-byte subtype: trade requests, answered as unavailable (W156, R).
         (Some(59), _) if matches!(body.get(2), Some(3 | 6..=10)) => "trade_unavailable",
         (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
             "kart"
         }
+        // Family 168 carries a one-byte sub-opcode, so only the family is matched.
+        (Some(168), _) => "mounts",
         (Some(36), Some(10 | 12)) => "combat",
         (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
         (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
@@ -1236,10 +1243,28 @@ impl Gateway {
         )
     }
 
-    /// (R) Actor state for emote validation. `mounted` stays false until the
-    /// mount service is routed into gameplay (mounts.rs is not wired yet).
+    /// (R) Actor state for emote validation. `mounted` comes from the mount service in
+    /// gameplay (W162); `moving` from the last accepted position update.
     pub fn emote_context(&self, now_ms: u64) -> crate::social_chat::piece_093::EmoteContext {
-        crate::social_chat::emote_context(false, self.last_movement_ms, now_ms)
+        let mounted = self.gameplay.as_ref().is_some_and(Gameplay::is_mounted);
+        crate::social_chat::emote_context(mounted, self.last_movement_ms, now_ms)
+    }
+
+    /// W162: the summoned ride as other players must see it; `None` without one.
+    pub fn ride_view(&self) -> Option<crate::mounts::RideView> {
+        self.gameplay.as_ref()?.ride_view(self.state.guid)
+    }
+
+    /// W162: end the ride after a message or tick when the player zoned, entered a fight or
+    /// minigame, or was knocked out. Replies are wrapped like every gateway reply.
+    pub fn settle_rides(&mut self, zoned: bool) -> GatewayOutcome {
+        let mut outcome = GatewayOutcome::default();
+        if let Some(game) = self.gameplay.as_mut() {
+            let ended = game.settle_mounts(&self.state, zoned);
+            outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();
+            outcome.nearby = ended.nearby;
+        }
+        outcome
     }
 
     /// Begin a new local session while retaining the latest character snapshot.
@@ -1559,6 +1584,7 @@ impl Gateway {
                             }
                         }
                         outcome.shared_field = result.shared_field;
+                        outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());
                         gameplay = Some(staged_game);
@@ -1675,6 +1701,7 @@ impl Gateway {
             state_changed: result.changed,
             gameplay_changed: result.changed,
             replies: result.replies.iter().map(|r| wrapped(r)).collect(),
+            nearby: result.nearby.clone(),
             ..Default::default()
         };
         if let Some(zone) = result.zoning {

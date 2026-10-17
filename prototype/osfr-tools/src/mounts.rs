@@ -3,15 +3,20 @@
 //! Mount packets are synthetic inner messages based on the client readers in
 //! `notes/Build Guides/Gameplay/Mounts.md`; datagram byte order is unverified.
 
-use crate::inventory::InventoryState;
+use crate::{inventory::InventoryState, startup_world, world};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs, io,
     path::Path,
+    sync::Arc,
 };
 
 const FAMILY: u16 = 168;
+const LIST: u8 = 5;
+// (R) The ride is its own world actor. Its GUID is the owner's XOR a fixed tag: unique per owner,
+// never equal to the owner, and outside the other actor GUID spaces (derby 0xd0.., housing 0x0f..).
+const RIDE_GUID_TAG: u64 = 0xc000_0000_0000_0000;
 const MAX_CONTENT_BYTES: usize = 4 * 1024 * 1024;
 // (R) Server-side duplicate guard mirrors the client's 00a2e540 request window.
 const SPAWN_DEBOUNCE_MS: u64 = 1_000;
@@ -67,7 +72,7 @@ struct MountsDocument {
 #[derive(Clone, Debug)]
 pub struct MountCatalog {
     types: BTreeMap<u32, MountType>,
-    mounts: BTreeMap<i32, MountDefinition>,
+    mounts: BTreeMap<i32, Arc<MountDefinition>>,
     item_to_mount: BTreeMap<i32, i32>,
 }
 
@@ -163,7 +168,7 @@ impl MountCatalog {
                     return Err(MountError::InvalidCatalog);
                 }
             }
-            records.insert(mount_id, mount);
+            records.insert(mount_id, Arc::new(mount));
         }
         Ok(Self {
             types,
@@ -177,17 +182,21 @@ impl MountCatalog {
     }
 
     pub fn mounts(&self) -> impl Iterator<Item = &MountDefinition> {
-        self.mounts.values()
+        self.mounts.values().map(|mount| &**mount)
     }
 
     pub fn mount(&self, mount_id: i32) -> Option<&MountDefinition> {
-        self.mounts.get(&mount_id)
+        self.mounts.get(&mount_id).map(|mount| &**mount)
+    }
+
+    fn mount_arc(&self, mount_id: i32) -> Option<Arc<MountDefinition>> {
+        self.mounts.get(&mount_id).cloned()
     }
 
     pub fn mount_for_item(&self, item_definition_id: i32) -> Option<&MountDefinition> {
         self.item_to_mount
             .get(&item_definition_id)
-            .and_then(|mount_id| self.mounts.get(mount_id))
+            .and_then(|mount_id| self.mount(*mount_id))
     }
 
     /// Ownership is derived from positive-count inventory instances. Item-to-
@@ -199,8 +208,7 @@ impl MountCatalog {
             .filter(|item| item.count > 0)
             .map(|item| item.definition_id)
             .collect();
-        self.mounts
-            .values()
+        self.mounts()
             .filter(|mount| {
                 mount
                     .item_definition_id_candidates
@@ -217,11 +225,13 @@ pub struct RideRestrictions {
     pub zone_allows_riding: bool,
     pub in_minigame: bool,
     pub ability_active: bool,
+    /// A knocked-out player cannot summon or board a ride (R).
+    pub knocked_out: bool,
 }
 
 impl RideRestrictions {
     fn allows(self) -> bool {
-        self.zone_allows_riding && !self.in_minigame && !self.ability_active
+        self.zone_allows_riding && !self.in_minigame && !self.ability_active && !self.knocked_out
     }
 }
 
@@ -275,6 +285,15 @@ pub struct MountEffect {
     pub kind: MountEffectKind,
 }
 
+impl MountEffect {
+    /// Everything but the owner's roster list is public: nearby players need the ride actor, the
+    /// rider's attachment and its removal to draw the rider on the ride (client 00b06100 handles
+    /// 168/2 and 168/4 for any rider it knows, not only the local player).
+    pub fn nearby(&self) -> bool {
+        !matches!(&self.kind, MountEffectKind::Packet(bytes) if bytes.get(2) == Some(&LIST))
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct MountOutcome {
     pub effects: Vec<MountEffect>,
@@ -284,7 +303,7 @@ pub struct MountOutcome {
 
 #[derive(Clone, Debug)]
 pub struct MountService {
-    catalog: MountCatalog,
+    catalog: Arc<MountCatalog>,
     state: MountState,
     last_spawn_ms: Option<u64>,
 }
@@ -292,7 +311,7 @@ pub struct MountService {
 impl MountService {
     pub fn new(catalog: MountCatalog) -> Self {
         Self {
-            catalog,
+            catalog: Arc::new(catalog),
             state: MountState::Empty,
             last_spawn_ms: None,
         }
@@ -304,6 +323,18 @@ impl MountService {
 
     pub fn catalog(&self) -> &MountCatalog {
         &self.catalog
+    }
+
+    /// True while the rider sits on the ride. This is the `mounted` input of the emote rules
+    /// (`social_chat::emote_context`).
+    pub fn is_mounted(&self) -> bool {
+        matches!(self.state, MountState::Mounted { .. })
+    }
+
+    /// A new network session starts with no ride out (the actor does not survive a disconnect).
+    pub fn reset(&mut self) {
+        self.state = MountState::Empty;
+        self.last_spawn_ms = None;
     }
 
     pub fn list_packet(&self, inventory: &InventoryState) -> Vec<u8> {
@@ -463,9 +494,11 @@ impl MountService {
         })
     }
 
-    /// 168/3 is shared by Lua `Dismount` and `Despawn`; state is the only
-    /// available discriminator. First detach a rider, then a later request
-    /// removes the now-unridden summoned actor (R).
+    /// 168/3 is shared by Lua `Dismount` and `Despawn` and the client cannot say which one ran, so
+    /// the server treats every request as "put the ride away": a rider is dismounted and the ride
+    /// actor removed in one step (R; W25 kept the actor standing until a second request). The
+    /// client always sends 168/3 before a new 168/6 spawn (00bff6f0), so a re-summon starts clean.
+    /// Server-side triggers (zoning, combat, knockout, minigame) call this too.
     pub fn dismount_request(
         &mut self,
         owner_guid: u64,
@@ -473,35 +506,32 @@ impl MountService {
         observers: &[u64],
     ) -> MountOutcome {
         let all_recipients = recipients(owner_guid, observers);
-        match self.state.clone() {
+        let mut effects = Vec::new();
+        let ride = match std::mem::replace(&mut self.state, MountState::Empty) {
             // (R) Empty dismount requests are idempotent no-ops.
-            MountState::Empty => MountOutcome::default(),
+            MountState::Empty => return MountOutcome::default(),
+            MountState::Spawned(ride) => ride,
             MountState::Mounted {
                 ride, rider_guid, ..
             } => {
-                self.state = MountState::Spawned(ride);
-                MountOutcome {
-                    changed: true,
-                    effects: vec![packet(all_recipients, encode_dismount_response(rider_guid))],
-                    debounced: false,
-                }
+                effects.push(packet(
+                    all_recipients.clone(),
+                    encode_dismount_response(rider_guid),
+                ));
+                ride
             }
-            MountState::Spawned(ride) => {
-                self.state = MountState::Empty;
-                MountOutcome {
-                    changed: true,
-                    effects: vec![
-                        MountEffect {
-                            recipients: all_recipients,
-                            kind: MountEffectKind::DespawnRide {
-                                actor_guid: ride.actor_guid,
-                            },
-                        },
-                        packet(vec![owner_guid], self.list_packet(inventory)),
-                    ],
-                    debounced: false,
-                }
-            }
+        };
+        effects.push(MountEffect {
+            recipients: all_recipients,
+            kind: MountEffectKind::DespawnRide {
+                actor_guid: ride.actor_guid,
+            },
+        });
+        effects.push(packet(vec![owner_guid], self.list_packet(inventory)));
+        MountOutcome {
+            changed: true,
+            effects,
+            debounced: false,
         }
     }
 
@@ -524,6 +554,233 @@ impl MountService {
     }
 }
 
+/// Client-to-server mount requests (family 168). Bodies follow the client constructors:
+/// 168/1 `PacketMountRequest` (`008b3730`: target GUID plus further fields), 168/3
+/// `PacketDismountRequest` (`009aa410`, no fields), 168/6 spawn (`00b038c0`, one i32 ride id,
+/// writer `00b05a80`) and 168/8 spawn by item (`00b03970`, i32 item definition and a flag byte
+/// that is always 1, writer `00b05ae0`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MountRequest {
+    Mount { target: u64 },
+    Dismount,
+    Spawn { mount_id: i32 },
+    SpawnByItem { item_definition_id: i32 },
+}
+
+/// `Ok(None)` when the message is not a mount request this server answers; `Err` when it is one
+/// with a malformed body. The 168/1 and 168/3 serializers were not recovered, so those two accept
+/// a bounded tail (R) and read only the leading target GUID.
+pub fn decode_request(inner: &[u8]) -> io::Result<Option<MountRequest>> {
+    if inner.len() < 3 || inner[..2] != FAMILY.to_le_bytes() {
+        return Ok(None);
+    }
+    let body = &inner[3..];
+    let word = |at: usize| i32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+    Ok(Some(match (inner[2], body.len()) {
+        (1, 8..=24) => MountRequest::Mount {
+            target: u64::from_le_bytes(body[..8].try_into().unwrap()),
+        },
+        (3, 0..=16) => MountRequest::Dismount,
+        (6, 4) => MountRequest::Spawn { mount_id: word(0) },
+        (8, 5) => MountRequest::SpawnByItem {
+            item_definition_id: word(0),
+        },
+        (1 | 3 | 6 | 8, _) => return Err(invalid_data("malformed mount request")),
+        _ => return Ok(None),
+    }))
+}
+
+/// Where the ride actor stands when it appears: the owner's pose. Heading is radians, the
+/// convention of `players.rs` (`atan2(x, z)` of the character rotation).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RidePose {
+    pub position: [f32; 3],
+    pub heading: f32,
+}
+
+/// What the gateway layer knows when a request arrives.
+pub struct RideContext<'a> {
+    pub guid: u64,
+    pub inventory: &'a InventoryState,
+    pub restrictions: RideRestrictions,
+    pub pose: RidePose,
+    pub now_ms: u64,
+}
+
+/// Inner application packets for one handled event. `private` goes to the owner only; `shared`
+/// goes to the owner and every player in interest range of the owner (the gateway fans it out
+/// through `PlayerRegistry::nearby_sessions`). `notice` is a refusal for a system chat line.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct RideWire {
+    pub private: Vec<Vec<u8>>,
+    pub shared: Vec<Vec<u8>>,
+    pub notice: Option<&'static str>,
+}
+
+/// A spawned ride as other players must see it. A player who enters interest range later gets
+/// `packets` (ride actor, then the rider's attachment) so the late joiner draws the same scene.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RideView {
+    pub rider_guid: u64,
+    pub actor_guid: u64,
+    pub seat: Option<u32>,
+    mount: Arc<MountDefinition>,
+}
+
+impl RideView {
+    /// Remove-actor packet for a viewer that loses sight of the rider or the ride.
+    pub fn removal_packet(&self) -> Vec<u8> {
+        remove_actor(self.actor_guid)
+    }
+
+    pub fn packets(&self, pose: RidePose) -> Vec<Vec<u8>> {
+        let mut out = Vec::new();
+        out.extend(add_ride_npc(&self.mount, self.actor_guid, pose));
+        if let Some(seat) = self.seat {
+            out.push(encode_mount_response(
+                self.rider_guid,
+                self.actor_guid,
+                seat,
+            ));
+        }
+        out
+    }
+}
+
+impl MountService {
+    /// (R) The ride's world GUID for an owner.
+    pub fn ride_guid(owner_guid: u64) -> u64 {
+        owner_guid ^ RIDE_GUID_TAG
+    }
+
+    pub fn view(&self, owner_guid: u64) -> Option<RideView> {
+        let ride = self.state.active_ride()?;
+        Some(RideView {
+            rider_guid: owner_guid,
+            actor_guid: ride.actor_guid,
+            seat: match self.state {
+                MountState::Mounted { seat_index, .. } => Some(seat_index),
+                _ => None,
+            },
+            mount: self.catalog.mount_arc(ride.mount_id)?,
+        })
+    }
+
+    /// Answer one client request. A refusal changes nothing and sends the owner a roster refresh,
+    /// which makes the client rebuild its mount UI, plus a short notice (R: no refusal packet was
+    /// recovered).
+    pub fn handle(&mut self, inner: &[u8], ctx: &RideContext) -> io::Result<Option<RideWire>> {
+        let Some(request) = decode_request(inner)? else {
+            return Ok(None);
+        };
+        let owner = ctx.guid;
+        let actor = Self::ride_guid(owner);
+        let result = match request {
+            MountRequest::Spawn { mount_id } => self.spawn(
+                owner,
+                ctx.inventory,
+                mount_id,
+                actor,
+                ctx.restrictions,
+                ctx.now_ms,
+                &[],
+            ),
+            MountRequest::SpawnByItem { item_definition_id } => self.spawn_by_item_definition(
+                owner,
+                ctx.inventory,
+                item_definition_id,
+                actor,
+                ctx.restrictions,
+                ctx.now_ms,
+                &[],
+            ),
+            // (R) The request names no seat; every shipped-slice ride has one seat.
+            MountRequest::Mount { target } => self.mount(
+                owner,
+                owner,
+                ctx.inventory,
+                target,
+                0,
+                ctx.restrictions,
+                &[],
+            ),
+            MountRequest::Dismount => Ok(self.dismount_request(owner, ctx.inventory, &[])),
+        };
+        Ok(Some(match result {
+            Ok(outcome) => self.wire(&outcome, ctx.pose),
+            Err(error) => RideWire {
+                private: vec![self.list_packet(ctx.inventory)],
+                notice: Some(refusal_text(error)),
+                ..RideWire::default()
+            },
+        }))
+    }
+
+    /// Turn an outcome into inner packets. Ride actors are AddNpc / remove-actor packets.
+    pub fn wire(&self, outcome: &MountOutcome, pose: RidePose) -> RideWire {
+        let mut wire = RideWire::default();
+        for effect in &outcome.effects {
+            let target = if effect.nearby() {
+                &mut wire.shared
+            } else {
+                &mut wire.private
+            };
+            match &effect.kind {
+                MountEffectKind::Packet(bytes) => target.push(bytes.clone()),
+                MountEffectKind::SpawnRide {
+                    mount_id,
+                    actor_guid,
+                    ..
+                } => {
+                    if let Some(mount) = self.catalog.mount_arc(*mount_id) {
+                        target.extend(add_ride_npc(&mount, *actor_guid, pose));
+                    }
+                }
+                MountEffectKind::DespawnRide { actor_guid } => {
+                    target.push(remove_actor(*actor_guid))
+                }
+            }
+        }
+        wire
+    }
+}
+
+fn refusal_text(error: MountError) -> &'static str {
+    match error {
+        MountError::NotOwned => "You do not own that ride.",
+        MountError::Restricted => "You cannot use a ride here right now.",
+        _ => "That ride is not available.",
+    }
+}
+
+/// AddNpc for a ride. Field values come from the captured content template (`world.rs`), made
+/// non-interactable; the model, name and tint come from the ride record. The animation and seat
+/// definitions live in the client's actor definition, not in this packet (R for everything else).
+fn add_ride_npc(mount: &MountDefinition, actor_guid: u64, pose: RidePose) -> Option<Vec<u8>> {
+    let npc = startup_world::NpcSpawn {
+        actor_id: actor_guid,
+        name_string_id: mount.name_string_id,
+        model_id: mount.model_id?,
+        tint_alias: mount.tint_alias.clone(),
+        tint_id: mount.tint_id,
+        speed: mount.max_movement_speed,
+        is_interactable: 0,
+        interact_range: 0,
+        position: [pose.position[0], pose.position[1], pose.position[2], 1.0],
+        rotation: [pose.heading.sin(), 0.0, pose.heading.cos(), 0.0],
+        ..world::content_spawn_template()
+    };
+    world::unframe_tunnel(&startup_world::build_add_npc(&npc)).ok()
+}
+
+/// Remove-actor packet, the 35/3 shape the opening encounter and field enemies use (R).
+fn remove_actor(guid: u64) -> Vec<u8> {
+    let mut out = vec![35, 0, 3, 0, 1, 0];
+    out.extend_from_slice(&guid.to_le_bytes());
+    out.extend_from_slice(&[0; 17]);
+    out
+}
+
 fn is_owned(mount: &MountDefinition, inventory: &InventoryState) -> bool {
     inventory.items.iter().any(|item| {
         item.count > 0
@@ -539,7 +796,7 @@ fn encode_mount_list(
     active: Option<&ActiveRide>,
 ) -> Vec<u8> {
     let mounts = catalog.owned_mounts(inventory);
-    let mut out = header(5);
+    let mut out = header(LIST);
     put_i32(&mut out, mounts.len() as i32);
     for mount in mounts {
         put_i32(&mut out, mount.id);

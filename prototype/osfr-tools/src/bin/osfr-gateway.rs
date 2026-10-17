@@ -10,6 +10,7 @@ use osfr_tools::game_store::{load_or_create, save};
 use osfr_tools::gameplay::Gameplay;
 use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
+use osfr_tools::mounts::{RidePose, RideView};
 use osfr_tools::net_policy::{Bucket, IpLimiter};
 use osfr_tools::player_radial::{PlayerRadial, PublicLook};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
@@ -446,6 +447,8 @@ struct SharedWorld {
     /// What a stranger may see of each joined character, keyed by character guid (W143).
     /// Filled at join and on profile/equipment change; empty means no Inspect entry (R).
     public_looks: BTreeMap<u64, PublicLook>,
+    /// W162: each mounted or ride-summoning character's ride, keyed by character guid.
+    rides: BTreeMap<u64, RideView>,
     social: SocialService,
     identities: BTreeMap<u64, SocialIdentity>,
     social_paths: BTreeMap<u64, PathBuf>,
@@ -509,6 +512,7 @@ impl SharedWorld {
         Self {
             players: PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap()),
             public_looks: BTreeMap::new(),
+            rides: BTreeMap::new(),
             social: SocialService::new(17).unwrap(),
             identities: BTreeMap::new(),
             social_paths: BTreeMap::new(),
@@ -608,19 +612,77 @@ impl SharedWorld {
     }
 
     fn leave_player(&mut self, session_id: SessionId) -> Vec<Delivery> {
+        let mut deliveries = Vec::new();
         if let Some(player) = self.players.get(session_id) {
             self.public_looks.remove(&player.character_guid);
+            if let Some(view) = self.rides.remove(&player.character_guid) {
+                deliveries = self.ride_fanout(session_id, &[view.removal_packet()]);
+            }
         }
         self.joined.remove(&session_id);
         self.chat_sessions.remove(&session_id);
+        deliveries.extend(
+            self.players
+                .leave(session_id)
+                .into_iter()
+                .map(|message| Delivery {
+                    recipient: message.recipient,
+                    bytes: message.bytes,
+                }),
+        );
+        deliveries
+    }
+
+    /// W162: `packets` for every other player within interest range of `session`, found from the
+    /// registry's current position (so call it before a zone transfer removes the player).
+    fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
+        let Some(player) = self
+            .players
+            .get(session)
+            .filter(|_| self.joined.contains(&session))
+        else {
+            return Vec::new();
+        };
         self.players
-            .leave(session_id)
+            .nearby_sessions(player.zone, player.position)
             .into_iter()
-            .map(|message| Delivery {
-                recipient: message.recipient,
-                bytes: message.bytes,
+            .filter(|other| *other != session)
+            .flat_map(|other| {
+                packets.iter().map(move |packet| Delivery {
+                    recipient: other,
+                    bytes: wrap_application(packet),
+                })
             })
             .collect()
+    }
+
+    /// W162: whoever is told about a mounted player (AddPc, 35/1) also gets the ride actor and
+    /// the rider's attachment, and whoever loses the player (RemovePlayer, 35/3) loses the ride.
+    fn with_rides(&self, deliveries: Vec<Delivery>) -> Vec<Delivery> {
+        if self.rides.is_empty() {
+            return deliveries;
+        }
+        let mut out = Vec::with_capacity(deliveries.len());
+        for delivery in deliveries {
+            let recipient = delivery.recipient;
+            let extra = rider_event(&delivery.bytes).and_then(|(guid, added)| {
+                let view = self.rides.get(&guid)?;
+                if !added {
+                    return Some(vec![view.removal_packet()]);
+                }
+                let player = self.players.get(*self.active_sessions.get(&guid)?)?;
+                Some(view.packets(RidePose {
+                    position: player.position,
+                    heading: player.heading,
+                }))
+            });
+            out.push(delivery);
+            out.extend(extra.into_iter().flatten().map(|packet| Delivery {
+                recipient,
+                bytes: wrap_application(&packet),
+            }));
+        }
+        out
     }
 
     fn social_delivery(&self, message: SocialMessage) -> Option<Delivery> {
@@ -816,12 +878,20 @@ impl Session {
         options: &Options,
         seed: u32,
         trace: Option<trace::Trace>,
+        template: Option<&Gateway>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         if request.crc_length == 0 {
             return Err("gateway requires a nonzero CRC trailer".into());
         }
+        // An account-store session is a placeholder until login binds the
+        // character (which loads current content then). Cloning the startup
+        // template keeps an unauthenticated handshake from re-parsing all game
+        // content on the event loop (Security Model S05).
         let mut gateway = if options.account_store.is_some() {
-            load_gateway_template(options)?
+            match template {
+                Some(template) => template.clone(),
+                None => load_gateway_template(options)?,
+            }
         } else {
             load_gateway(options)?
         };
@@ -1483,6 +1553,11 @@ impl Session {
                 }
             }
         }
+        // W162: rides end with zoning, a fight or minigame, or a knockout (R).
+        let zoned = outcome.began_zoning || previous.zone_id != staged_gateway.state().zone_id;
+        let ended = staged_gateway.settle_rides(zoned);
+        outcome.replies.extend(ended.replies);
+        outcome.nearby.extend(ended.nearby);
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
         let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
@@ -1534,7 +1609,7 @@ impl Session {
             let bound = staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
             outcome.state_changed |= bound;
             let mut staged_world = world.clone();
-            let mut deliveries = Vec::new();
+            let mut deliveries = staged_world.ride_fanout(self.id, &outcome.nearby);
             if transfer && staged_world.joined.contains(&self.id) {
                 deliveries.extend(staged_world.leave_player(self.id));
             }
@@ -1579,6 +1654,14 @@ impl Session {
 
             if staged_world.joined.contains(&self.id) {
                 self.emote = staged_gateway.emote_context(now_ms);
+                match staged_gateway.ride_view() {
+                    Some(view) => {
+                        staged_world.rides.insert(current.guid, view);
+                    }
+                    None => {
+                        staged_world.rides.remove(&current.guid);
+                    }
+                }
                 for application in &outcome.applications {
                     if osfr_tools::chat::request(application, self.character_guid)
                         .ok()
@@ -1607,6 +1690,7 @@ impl Session {
                 save(&self.state_path, &staged_gateway.snapshot())?;
             }
             persist_social_changes(world, &staged_world)?;
+            let deliveries = staged_world.with_rides(deliveries);
             Ok((staged_world, deliveries, change, deferred))
         })();
         let (staged_world, deliveries, change, deferred) = match prepared {
@@ -2089,6 +2173,21 @@ fn chat_error_delivery(error: social_chat::ChatError, recipient: SessionId) -> V
         .unwrap_or_default()
 }
 
+/// The character and whether it was added (true) or removed (false), for the registry's AddPc
+/// (35/1) and RemovePlayer (35/3) tunnel frames; `None` for every other delivery.
+fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
+    let inner = frame.get(7..)?;
+    match inner.get(..4)? {
+        [35, 0, 1, 0] => Some((u64::from_le_bytes(inner.get(4..12)?.try_into().ok()?), true)),
+        // 35/3 carries a u16 submode before the GUID.
+        [35, 0, 3, 0] => Some((
+            u64::from_le_bytes(inner.get(6..14)?.try_into().ok()?),
+            false,
+        )),
+        _ => None,
+    }
+}
+
 fn wrap_application(inner: &[u8]) -> Vec<u8> {
     let mut out = vec![5, 0, 1];
     out.extend_from_slice(&(inner.len() as u32).to_le_bytes());
@@ -2277,6 +2376,8 @@ const BYTE_BUDGET: (f64, f64) = (256.0 * 1024.0, 1024.0 * 1024.0);
 
 pub struct Server {
     options: Options,
+    /// Account-store mode: the pre-login gateway each handshake clones (S05).
+    template: Option<Gateway>,
     handshakes: IpLimiter,
     refused: u64,
     refusal_logged: Option<Instant>,
@@ -2625,7 +2726,9 @@ impl Server {
         if let Some(fields) = seed.take_shared_fields() {
             membership.install_field(0, fields);
         }
+        let template = options.account_store.is_some().then_some(seed);
         Ok(Self {
+            template,
             options,
             socket,
             sessions: BTreeMap::new(),
@@ -3571,6 +3674,7 @@ impl Server {
             &self.options,
             seed,
             self.trace.clone(),
+            self.template.as_ref(),
         ) {
             Ok(mut session) => {
                 self.world.session_keys.insert(id, key);
@@ -3756,6 +3860,7 @@ mod tests {
             &server.options,
             CRC_SEED,
             None,
+            None,
         )
         .unwrap();
         // A no-account-store session can only be the host's own loopback dev
@@ -3901,6 +4006,7 @@ mod tests {
             &server.options,
             CRC_SEED,
             None,
+            None,
         )
         .unwrap();
         let mut login = 1u16.to_le_bytes().to_vec();
@@ -4033,6 +4139,7 @@ mod tests {
             },
             &options,
             CRC_SEED,
+            None,
             None,
         )
         .unwrap();

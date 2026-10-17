@@ -69,6 +69,8 @@ pub enum NpcAction {
     Shop,
     /// (R) Start the solo kart race (W149). Offered only by NPCs named in `kart_gates.json`.
     Race,
+    /// (R) Go fishing (W160). Offered only by NPCs named in `fishing_spots.json`.
+    Fish,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -131,6 +133,8 @@ pub enum NpcSelection {
     Shop(MerchantWindow),
     /// The caller decides whether the race may start (`KartGateway::admit`).
     Race,
+    /// The caller decides whether the trip may start (`FishingService::enter`).
+    Fish,
 }
 
 #[derive(Deserialize)]
@@ -217,6 +221,9 @@ pub struct NpcInteraction {
     /// (R) NPCs whose menu lists the kart race, and the label's locale id.
     race_gates: BTreeSet<u64>,
     race_string_id: u32,
+    /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
+    fish_gates: BTreeSet<u64>,
+    fish_string_id: u32,
     active: Option<ActiveInteraction>,
 }
 
@@ -321,6 +328,8 @@ impl NpcInteraction {
             vendor_items,
             race_gates: BTreeSet::new(),
             race_string_id: 0,
+            fish_gates: BTreeSet::new(),
+            fish_string_id: 0,
             active: None,
         })
     }
@@ -332,6 +341,16 @@ impl NpcInteraction {
             npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
         self.race_gates = known.into_iter().collect();
         self.race_string_id = string_id;
+        unknown
+    }
+
+    /// (R) List a fishing trip in these NPCs' menus (W160). Returns the ids that are not NPC
+    /// content, like [`Self::set_race_gates`].
+    pub fn set_fish_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
+        let (known, unknown): (Vec<u64>, Vec<u64>) =
+            npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
+        self.fish_gates = known.into_iter().collect();
+        self.fish_string_id = string_id;
         unknown
     }
 
@@ -437,6 +456,10 @@ impl NpcInteraction {
                 // Choosing a race is not a conversation: drop the open menu.
                 self.active = None;
                 Ok(NpcSelection::Race)
+            }
+            NpcAction::Fish => {
+                self.active = None;
+                Ok(NpcSelection::Fish)
             }
             NpcAction::TurnInQuest { quest_id } => {
                 let engine = quests
@@ -690,6 +713,9 @@ impl NpcInteraction {
         }
         if self.race_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Race, self.race_string_id));
+        }
+        if self.fish_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Fish, self.fish_string_id));
         }
         if options.len() > MAX_MENU_OPTIONS {
             return Err(NpcInteractionError::InvalidOption);

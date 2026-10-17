@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "menu_string_id": 73552,
+  "catch_xp": 10,
+  "spots": [
+    {
+      "npc": 9000000181,
+      "area": "sacred_grove_shallows",
+      "game_id": 599,
+      "name_id": 408591,
+      "description_id": 5235,
+      "icon_id": 9870,
+      "source": "Reed Stillwater (Stillwater Crossing). Client text 408571: 'When you're ready to head out, just use the boat behind me' and 'Interact with the boat behind Reed Stillwater to enter Sacred Grove Shallows'. The boat object is not a routed interaction, so the guide's menu stands in for it (R)."
+    },
+    {
+      "npc": 9000000194,
+      "area": "rainbow_lake",
+      "game_id": 598,
+      "name_id": 93710,
+      "description_id": 5235,
+      "icon_id": 9870,
+      "source": "Selvi Slowreel (Lakeshore docks). Client text: 'Selvi Slowreel on the docks in Lakeshore can show you the way to Rainbow Lake' (3685316205); guide line 408566 'Rainbow Lake ... Are you ready to head out?'."
+    },
+    {
+      "npc": 9000000377,
+      "area": "darklit_lagoon",
+      "game_id": 596,
+      "name_id": 408604,
+      "description_id": 5235,
+      "icon_id": 9870,
+      "source": "Lila Darklure (Briarwood, beside a boat). Client text 'Only Lila Darklure knows the way' (1194232508); guide line 408605 'Darklit Lagoon ... Are you ready to head out?'."
+    },
+    {
+      "npc": 9000000339,
+      "area": "bramblebacks_bayou",
+      "game_id": 597,
+      "name_id": 408599,
+      "description_id": 5235,
+      "icon_id": 9870,
+      "source": "Gunther (Briarwood). R: the Bayou guide line 408596 has no named speaker; Gunther is the Fisherman quest giver at Brambleback's Bayou."
+    },
+    {
+      "npc": 9000000024,
+      "area": "wintery_basin",
+      "game_id": 600,
+      "name_id": 408622,
+      "description_id": 5235,
+      "icon_id": 9870,
+      "source": "Big J (Snowhill). Client text 379035497: 'Head to the Wintery Basin for further instructions' (Big J's ice fishing crew). R: the Wintery Basin guide line has no named speaker."
+    },
+    {
+      "npc": 9500000736,
+      "area": "frostbitten_banks",
+      "game_id": 601,
+      "name_id": 408640,
+      "description_id": 5235,
+      "icon_id": 9870,
+      "source": "Chip Numbwing (Snowhill). Client text 216811999 / 4011916228: 'Chip Numbwing can show you the way' to Lenore's cabin at Frostbitten Banks; guide line 408641 'Frostbitten Banks ... Are you ready to head out?'."
+    }
+  ],
+  "items": {
+    "flutterfish": [
+      68041,
+      68042,
+      68043,
+      68044
+    ],
+    "slugmud_skipper": [
+      68048,
+      68049,
+      0,
+      0
+    ],
+    "butter_flyfish": [
+      0,
+      68053,
+      68054,
+      68055
+    ],
+    "tickled_trout": [
+      68001,
+      68001,
+      68001,
+      68001
+    ],
+    "tangletooth_shark": [
+      68113,
+      68113,
+      68113,
+      68113
+    ],
+    "feral_catfish": [
+      0,
+      0,
+      68056,
+      68057
+    ],
+    "cheery_salmon": [
+      68062,
+      68063,
+      68064,
+      0
+    ],
+    "chipsen_fish": [
+      0,
+      68067,
+      68068,
+      0
+    ],
+    "baconfish": [
+      0,
+      68069,
+      68070,
+      68071
+    ],
+    "creeping_cod": [
+      0,
+      68081,
+      68082,
+      0
+    ],
+    "bitter_betta": [
+      68096,
+      68097,
+      0,
+      0
+    ],
+    "golden_scaled_nettler": [
+      68009,
+      68009,
+      68009,
+      68009
+    ],
+    "globfish": [
+      0,
+      68078,
+      68079,
+      68080
+    ],
+    "blind_swurglefish": [
+      68083,
+      68084,
+      68085,
+      0
+    ],
+    "fanged_grouper": [
+      0,
+      68091,
+      68092,
+      68093
+    ],
+    "changed_salmon": [
+      0,
+      68094,
+      68095,
+      0
+    ],
+    "briar_nibbler": [
+      0,
+      0,
+      68101,
+      68102
+    ],
+    "ink_cod": [
+      68072,
+      68073,
+      68074,
+      0
+    ],
+    "purplenosed_shark": [
+      0,
+      68075,
+      68076,
+      68077
+    ],
+    "old_sole": [
+      68086,
+      68087,
+      68088,
+      0
+    ],
+    "thorny_trout": [
+      68089,
+      68090,
+      0,
+      0
+    ],
+    "roach_loach": [
+      68098,
+      68099,
+      68100,
+      0
+    ],
+    "finless_fish": [
+      68045,
+      68046,
+      68047,
+      0
+    ],
+    "peachy_perch": [
+      68050,
+      68051,
+      68052,
+      0
+    ],
+    "calico_catfish": [
+      0,
+      68058,
+      68059,
+      0
+    ],
+    "lady_tetra": [
+      68060,
+      68061,
+      0,
+      0
+    ],
+    "toothy_tetra": [
+      68065,
+      68066,
+      0,
+      0
+    ],
+    "winter_piranha": [
+      68021,
+      68022,
+      0,
+      0
+    ],
+    "frostgill_smelt": [
+      68017,
+      68018,
+      0,
+      0
+    ],
+    "coach_loach": [
+      68023,
+      68024,
+      68025,
+      0
+    ],
+    "frozen_char": [
+      68026,
+      68027,
+      0,
+      0
+    ],
+    "ferocious_fangler": [
+      68008,
+      68008,
+      68008,
+      68008
+    ],
+    "blubracuda": [
+      68035,
+      68036,
+      68037,
+      0
+    ],
+    "spineless_stickleback": [
+      68038,
+      68039,
+      68040,
+      0
+    ],
+    "chilly_grouper": [
+      68010,
+      68011,
+      68012,
+      68013
+    ],
+    "blue_thornfin": [
+      0,
+      68014,
+      68015,
+      68016
+    ],
+    "talking_bass": [
+      0,
+      0,
+      68019,
+      68020
+    ],
+    "pacu_pacu": [
+      0,
+      68028,
+      68029,
+      0
+    ],
+    "goofy_grouper": [
+      0,
+      68030,
+      68031,
+      68032
+    ],
+    "plattypus": [
+      0,
+      0,
+      68033,
+      68034
+    ]
+  }
+}

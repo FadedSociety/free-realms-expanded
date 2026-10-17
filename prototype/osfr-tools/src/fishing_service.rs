@@ -13,19 +13,56 @@
 //! fish type ids, icons, lure-hint ids, sizes/weights/rarity, or inventory
 //! definition bindings. The client sends no bite, hook, tension or catch
 //! outcome. Only this service selects and awards a catch.
+//!
+//! # Ordinary entry (W160)
+//!
+//! [`FishingSpots`] (`fishing_spots.json`) lists the guide NPCs whose menu offers the trip, the
+//! area each one takes the player to, and the inventory item behind every fish size. The caller
+//! (the gameplay NPC menu) asks [`FishingService::enter`] to admit the player; every later
+//! packet goes through [`FishingService::route`], which owns the whole round: lifecycle,
+//! opcode 138, the server-owned payout and the player status flag that switches the native
+//! fishing processor on and off.
 
 use crate::{
     fishing::{self, ClientRequest, Error, Handle, Outcome, Phase, ResultBody, Sub, Vec4},
+    inventory::Inventory,
     minigame::{MinigameRuns, RunMode, RunSpec, RunState},
+    profiles::ProfileState,
     quest_engine::QuestEvent,
     rewards::{ItemGrant, RewardDisplay, RewardGrant, RewardState, apply_grant},
 };
 use serde::Deserialize;
-use std::{collections::BTreeMap, sync::LazyLock};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    io::{self, Read},
+    path::Path,
+    sync::LazyLock,
+};
 
 const CONTENT_JSON: &str = include_str!("../data/content/fishing.json");
 
 pub const MAX_SESSIONS: usize = 4;
+
+/// Player status flags (35/20). Bit 22 of the character status word turns the native fishing
+/// processor on: `BaseClient::DispatchBasePlayerUpdate` (`0092f460`) shifts the word by 0x16 and
+/// calls `FishingProcessor::SetActive` (`00b6bb90`) when it differs from the processor flag. The
+/// baseline 1 is the value the kart exit restores (R).
+const STATUS_FISHING: u32 = 0x40_0001;
+const STATUS_NORMAL: u32 = 1;
+/// The Fisherman job's profile id (`jobs.json`). Catches pay its XP when the job is unlocked.
+pub const FISHERMAN_PROFILE: i32 = 137;
+/// (R) How far from the spot a fisherman may wander before the round ends. The cast reach is at
+/// most 35 m (`MaxCastDistance`), so this is 15 m past the longest cast.
+const LEASH_M: f32 = 50.0;
+const SPOTS_FILE: &str = "fishing_spots.json";
+const MAX_SPOTS_FILE: usize = 64 * 1024;
+const MAX_SPOTS: usize = 16;
+const MAX_CATCH_XP: u32 = 1_000;
+/// The most new inventory stacks fishing can ever add: fish stack without limit, so a bag gains
+/// at most one stack per fish definition (40 species x 4 sizes). The payout bag floor is the
+/// player's current stacks plus this, so a catch never fails for want of a slot (R: the bag limit
+/// itself is unrecovered, and this keeps a large existing inventory from blocking every catch).
+const MAX_FISH_STACKS: usize = 160;
 
 static CONTENT: LazyLock<Content> = LazyLock::new(|| {
     serde_json::from_str(CONTENT_JSON).expect("bundled fishing content must parse")
@@ -38,6 +75,10 @@ pub struct Change {
     /// Authoritative objective events for the caller's QuestEngine.
     pub quest_events: Vec<QuestEvent>,
     pub changed: bool,
+    /// A catch was paid: the caller adopts [`FishingService::reward_state`] (W160).
+    pub paid: bool,
+    /// Player-readable lines the caller sends as chat (W160).
+    pub notices: Vec<&'static str>,
 }
 
 #[derive(Clone)]
@@ -47,6 +88,10 @@ struct Tracked {
     area_key: String,
     fisherman_level: u32,
     anchor: Vec4,
+    /// Zone of the spot; `None` for sessions started by `begin` (no zone supervision).
+    zone: Option<u32>,
+    /// Fisherman XP per paid catch (R, `fishing_spots.json`).
+    catch_xp: u32,
     rewards: RewardState,
     session: fishing::Session,
     attempt: Option<Attempt>,
@@ -147,6 +192,38 @@ impl FishingService {
         anchor: Vec4,
         rewards: RewardState,
     ) -> Result<Change, Error> {
+        let spec = RunSpec::empty(
+            game_id,
+            CONTENT.minigame_type_id,
+            RunMode::Encounter {
+                encounter_id,
+                player_guid: guid,
+            },
+        );
+        self.begin_spec(
+            guid,
+            spec,
+            area_key,
+            fisherman_level,
+            anchor,
+            None,
+            0,
+            rewards,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn begin_spec(
+        &mut self,
+        guid: u64,
+        spec: RunSpec,
+        area_key: &str,
+        fisherman_level: u32,
+        anchor: Vec4,
+        zone: Option<u32>,
+        catch_xp: u32,
+        rewards: RewardState,
+    ) -> Result<Change, Error> {
         if guid == 0
             || fisherman_level == 0
             || !finite_vec(anchor)
@@ -162,16 +239,7 @@ impl FishingService {
         }
         let id = self.next_instance_id.max(1);
         let mut runs = MinigameRuns::new(id).map_err(|_| Error::InvalidValue)?;
-        let offered = runs
-            .offer(RunSpec::empty(
-                game_id,
-                CONTENT.minigame_type_id,
-                RunMode::Encounter {
-                    encounter_id,
-                    player_guid: guid,
-                },
-            ))
-            .map_err(|_| Error::InvalidValue)?;
+        let offered = runs.offer(spec).map_err(|_| Error::InvalidValue)?;
         if !offered.accepted {
             return Err(Error::OutOfOrder);
         }
@@ -184,6 +252,8 @@ impl FishingService {
                 area_key: area_key.to_owned(),
                 fisherman_level,
                 anchor,
+                zone,
+                catch_xp,
                 rewards,
                 session: fishing::Session::new(),
                 attempt: None,
@@ -307,6 +377,9 @@ impl FishingService {
         if !tracked.playing || !tracked.session.registered() {
             return Err(Error::OutOfOrder);
         }
+        if tracked.fisherman_level == fisherman_level {
+            return Ok(Change::default());
+        }
         tracked.fisherman_level = fisherman_level;
         Ok(Change {
             replies: vec![fish_info_reply(tracked)?],
@@ -355,6 +428,164 @@ impl FishingService {
         let count = self.sessions.len();
         self.sessions.clear();
         count
+    }
+
+    /// Ordinary entry (W160): admit the player at a listed guide and offer the round. Staged:
+    /// a refusal changes nothing, and the 39/16 offer in the returned [`Change`] is the only
+    /// effect of success. `busy` is true while another activity runs; range and "this exact
+    /// option was offered" are already proven by the NPC menu service.
+    #[allow(clippy::too_many_arguments)]
+    pub fn enter(
+        &mut self,
+        spots: &FishingSpots,
+        npc_id: u64,
+        guid: u64,
+        zone: u32,
+        position: [f32; 3],
+        busy: bool,
+        fisherman_level: u32,
+        rewards: RewardState,
+    ) -> Result<Change, EntryDenied> {
+        let spot = spots.spot(npc_id).ok_or(EntryDenied::NotAGate)?;
+        if self.sessions.contains_key(&guid) {
+            return Err(EntryDenied::AlreadyFishing);
+        }
+        if busy {
+            return Err(EntryDenied::Busy);
+        }
+        if self.sessions.len() >= MAX_SESSIONS {
+            return Err(EntryDenied::Full);
+        }
+        // (R) The encounter id is the area's MiniGameData id: its native pairing is unresolved.
+        let mut spec = RunSpec::empty(
+            spot.game_id,
+            CONTENT.minigame_type_id,
+            RunMode::Encounter {
+                encounter_id: spot.game_id,
+                player_guid: guid,
+            },
+        );
+        spec.name_id = spot.name_id;
+        spec.description_id = spot.description_id;
+        spec.icon_id = spot.icon_id;
+        let anchor = Vec4 {
+            x: position[0],
+            y: position[1],
+            z: position[2],
+            w: 1.0,
+        };
+        let change = self
+            .begin_spec(
+                guid,
+                spec,
+                &spot.area,
+                fisherman_level,
+                anchor,
+                Some(zone),
+                spots.catch_xp,
+                rewards,
+            )
+            .map_err(|error| match error {
+                Error::AtCapacity => EntryDenied::Full,
+                _ => EntryDenied::Unavailable,
+            })?;
+        for (species, sizes) in &spots.items {
+            for (index, definition) in sizes.iter().enumerate() {
+                if *definition > 0 {
+                    // Idempotent; the file validated every key and id.
+                    let _ = self.bind_item_definition(species, index as u8 + 1, *definition);
+                }
+            }
+        }
+        Ok(change)
+    }
+
+    /// Route one in-world packet for a fishing player: the minigame lifecycle and opcode 138.
+    /// `Ok(None)` means it is not a fishing packet (or there is no round), so the caller carries
+    /// on with its other handlers. The player's live inventory and profiles are used for the
+    /// payout, not the copy taken at entry; a paid [`Change`] sets `paid` and the caller adopts
+    /// [`Self::reward_state`]. The status flag follows the round: on at start, off at any end.
+    pub fn route(
+        &mut self,
+        guid: u64,
+        inner: &[u8],
+        now_ms: u64,
+        inventory: &Inventory,
+        profiles: &ProfileState,
+    ) -> Result<Option<Change>, Error> {
+        let Some(tracked) = self.sessions.get_mut(&guid) else {
+            return Ok(None);
+        };
+        if inner.starts_with(&fishing::OPCODE.to_le_bytes()) {
+            tracked.rewards.inventory = inventory.clone();
+            tracked.rewards.profiles = profiles.clone();
+            tracked.rewards.bag_capacity = inventory.state().items.len() + MAX_FISH_STACKS;
+            return self.handle(inner, guid, now_ms).map(Some);
+        }
+        if !is_lifecycle(inner) {
+            return Ok(None);
+        }
+        let mut change = self.handle_minigame_lifecycle(guid, inner)?;
+        let starting = self
+            .sessions
+            .get(&guid)
+            .map(|t| !t.playing && t.runs.state(t.instance_id) == Some(RunState::Starting));
+        match starting {
+            None => change.replies.push(player_status(guid, STATUS_NORMAL)),
+            Some(true) => {
+                self.mark_started(guid);
+                change.replies.push(player_status(guid, STATUS_FISHING));
+            }
+            Some(false) => {}
+        }
+        Ok(Some(change))
+    }
+
+    /// Per-tick upkeep for a fishing player: fire the bite timers, and end the round when the
+    /// player has left the spot's zone or walked past the leash (R). `None` without a round.
+    pub fn supervise(
+        &mut self,
+        guid: u64,
+        zone: u32,
+        position: [f32; 3],
+        now_ms: u64,
+    ) -> Result<Option<Change>, Error> {
+        let Some(tracked) = self.sessions.get(&guid) else {
+            return Ok(None);
+        };
+        let away = tracked.zone.is_some_and(|spot_zone| {
+            let (dx, dz) = (
+                position[0] - tracked.anchor.x,
+                position[2] - tracked.anchor.z,
+            );
+            spot_zone != zone
+                || !(dx * dx + dz * dz).is_finite()
+                || dx * dx + dz * dz > LEASH_M * LEASH_M
+        });
+        if away {
+            return Ok(Some(self.end(guid)));
+        }
+        self.tick(guid, now_ms).map(Some)
+    }
+
+    /// End the round from the server side (the player left, or the slot is needed). The same
+    /// ordered cancel a 39/6 produces: state removal, school despawns and the status flag off.
+    /// Nothing is paid and the attempt in flight is dropped.
+    pub fn end(&mut self, guid: u64) -> Change {
+        let Some(id) = self.instance_id(guid) else {
+            return Change::default();
+        };
+        let mut cancel = vec![39, 0, 6];
+        cancel.extend(id.to_le_bytes());
+        cancel.extend((-1i32).to_le_bytes());
+        cancel.extend((-1i32).to_le_bytes());
+        let mut change = self
+            .handle_minigame_lifecycle(guid, &cancel)
+            .unwrap_or_default();
+        self.sessions.remove(&guid);
+        change.replies.push(player_status(guid, STATUS_NORMAL));
+        change.changed = true;
+        change
     }
 
     /// Decode and handle one opcode 138 request for the server-owned player.
@@ -573,10 +804,17 @@ fn settle_catch(
         return Ok(());
     }
 
-    let grade = choose_grade(fish, seed.rotate_left(17));
-    let definition_id = *item_definitions
-        .get(&(fish.key.clone(), grade))
-        .ok_or(Error::InvalidValue)?;
+    // Only sizes with a bound inventory item can be caught. A fish with none gets away instead
+    // of a catch that would pay nothing.
+    let bound = [1u8, 2, 3, 4].map(|g| item_definitions.contains_key(&(fish.key.clone(), g)));
+    let Some(grade) = choose_grade(fish, bound, seed.rotate_left(17)) else {
+        change
+            .replies
+            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change.changed = true;
+        return Ok(());
+    };
+    let definition_id = item_definitions[&(fish.key.clone(), grade)];
     let weight_roll = unit(seed.rotate_left(31));
     let weight = fish.weight_kg[0] + (fish.weight_kg[1] - fish.weight_kg[0]) * weight_roll;
     let elapsed = now_ms.saturating_sub(attempt.cast_at_ms) as f32 / 1000.0;
@@ -599,13 +837,25 @@ fn settle_catch(
     // apply_grant stages on a clone. Commit service state only after the full
     // inventory/display transaction succeeds; the caller persists it with the
     // fishing/minigame session before sending the returned packets.
+    // (R) Fisherman XP only while the job is unlocked: the reward transaction refuses a locked one.
+    let job_xp = if tracked.catch_xp > 0
+        && tracked
+            .rewards
+            .profiles
+            .unlocked
+            .contains(&FISHERMAN_PROFILE)
+    {
+        BTreeMap::from([(FISHERMAN_PROFILE, tracked.catch_xp)])
+    } else {
+        BTreeMap::new()
+    };
     let grant = RewardGrant {
         coins: 0,
         items: vec![ItemGrant {
             definition_id,
             count: 1,
         }],
-        job_xp: BTreeMap::new(),
+        job_xp,
         display: RewardDisplay {
             source_guid: guid,
             player_guid: guid,
@@ -619,8 +869,18 @@ fn settle_catch(
         "fishing:{guid}:{}:{}",
         tracked.instance_id, tracked.cast_sequence
     );
-    let (next_rewards, reward_packets) =
-        apply_grant(&tracked.rewards, &grant, &grant_key).map_err(|_| Error::InvalidValue)?;
+    let Ok((next_rewards, reward_packets)) = apply_grant(&tracked.rewards, &grant, &grant_key)
+    else {
+        // A full bag (or an item the catalogue lacks): the fish is released and nothing is paid.
+        change
+            .replies
+            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change
+            .notices
+            .push("Your bag is full, so the fish got away.");
+        change.changed = true;
+        return Ok(());
+    };
 
     change.replies.push(result_reply(&result));
     change.replies.extend(reward_packets);
@@ -629,10 +889,23 @@ fn settle_catch(
         quantity: 1,
     });
     change.changed = true;
+    change.paid = true;
     tracked.rewards = next_rewards;
     tracked.attempt = None;
     tracked.session.cancel();
     Ok(())
+}
+
+fn player_status(guid: u64, flags: u32) -> Vec<u8> {
+    crate::kart_gateway::player_status(guid, flags)
+}
+
+/// The shared lifecycle messages `MinigameRuns` consumes: 39/5 start, 39/6 leave, 39/7 ack,
+/// 39/46 wheel stop, 41/109 encounter close and 26/42 offer cancel (the length is checked there).
+fn is_lifecycle(inner: &[u8]) -> bool {
+    inner == [26, 0, 42, 0]
+        || inner.starts_with(&[41, 0, 109, 0])
+        || (inner.starts_with(&[39, 0]) && matches!(inner.get(2), Some(5 | 6 | 7 | 46)))
 }
 
 fn registration_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
@@ -856,16 +1129,27 @@ fn select_species(tracked: &Tracked, seed: u32) -> Result<&'static Species, Erro
     Err(Error::InvalidValue)
 }
 
-fn choose_grade(fish: &Species, seed: u64) -> u8 {
-    let total = fish.size_weights.iter().map(|n| u64::from(*n)).sum::<u64>();
-    let mut pick = mix64(seed) % total;
-    for (index, weight) in fish.size_weights.iter().enumerate() {
-        if pick < u64::from(*weight) {
-            return index as u8 + 1;
+/// Pick a size grade (1..=4) by weight among the sizes that have an inventory item.
+fn choose_grade(fish: &Species, bound: [bool; 4], seed: u64) -> Option<u8> {
+    let weight = |i: usize| {
+        if bound[i] {
+            u64::from(fish.size_weights[i])
+        } else {
+            0
         }
-        pick -= u64::from(*weight);
+    };
+    let total = (0..4).map(weight).sum::<u64>();
+    if total == 0 {
+        return None;
     }
-    4
+    let mut pick = mix64(seed) % total;
+    for index in 0..4 {
+        if pick < weight(index) {
+            return Some(index as u8 + 1);
+        }
+        pick -= weight(index);
+    }
+    None
 }
 
 fn school_ids(guid: u64, count: usize) -> Vec<u32> {
@@ -906,6 +1190,128 @@ fn area(key: &str) -> Option<&'static Area> {
 
 fn species(key: &str) -> Option<&'static Species> {
     CONTENT.species.iter().find(|fish| fish.key == key)
+}
+
+/// Why an ordinary entry was refused. Nothing moved; the player is told with [`Self::message`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EntryDenied {
+    /// The chosen NPC is not a listed guide (a forged choice, or the list changed).
+    NotAGate,
+    AlreadyFishing,
+    /// Another activity (crafting, gathering, a race, a battle) is running.
+    Busy,
+    Full,
+    /// The offer could not be built (bad content).
+    Unavailable,
+}
+
+impl EntryDenied {
+    pub fn message(self) -> &'static str {
+        match self {
+            Self::NotAGate => "Nobody here can take you fishing.",
+            Self::AlreadyFishing => "You are already fishing.",
+            Self::Busy => "Finish the active activity before fishing.",
+            Self::Full => "The fishing spots are full. Try again soon.",
+            Self::Unavailable => "Fishing isn't open yet.",
+        }
+    }
+}
+
+/// The optional `fishing_spots.json`: which guide NPCs offer a fishing trip (R), the area and
+/// client MiniGameData row each one stands for, the locale line of the menu option, the
+/// Fisherman XP a catch pays (R) and the inventory item behind every fish size. Absent file =
+/// nobody offers fishing. The file is operator content: bounded, regular-file only, strict.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FishingSpots {
+    schema_version: u32,
+    /// Locale id of the menu line (R: "Go fish!").
+    menu_string_id: u32,
+    catch_xp: u32,
+    spots: Vec<Spot>,
+    /// Species key to the item for sizes small, medium, large, extra large; 0 = no such size.
+    items: BTreeMap<String, [i32; 4]>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Spot {
+    npc: u64,
+    area: String,
+    game_id: i32,
+    name_id: i32,
+    description_id: i32,
+    icon_id: i32,
+    /// Provenance only: why this NPC stands for this area.
+    #[allow(dead_code)]
+    source: String,
+}
+
+impl FishingSpots {
+    /// Read `fishing_spots.json` from the content directory. `Ok(None)` when it is absent.
+    pub fn load(directory: &Path) -> io::Result<Option<Self>> {
+        let path = directory.join(SPOTS_FILE);
+        let metadata = match std::fs::symlink_metadata(&path) {
+            Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
+            Err(e) => return Err(e),
+            Ok(m) => m,
+        };
+        if !metadata.is_file() {
+            return Err(invalid("fishing spots must be a regular file"));
+        }
+        let mut bytes = Vec::new();
+        std::fs::File::open(path)?
+            .take(MAX_SPOTS_FILE as u64 + 1)
+            .read_to_end(&mut bytes)?;
+        Self::parse(&bytes).map(Some)
+    }
+
+    pub fn parse(bytes: &[u8]) -> io::Result<Self> {
+        if bytes.len() > MAX_SPOTS_FILE {
+            return Err(invalid("fishing spots exceed 64 KiB"));
+        }
+        let spots: Self = serde_json::from_slice(bytes).map_err(invalid)?;
+        let mut seen = BTreeSet::new();
+        if spots.schema_version != 1
+            || spots.menu_string_id == 0
+            || spots.catch_xp > MAX_CATCH_XP
+            || spots.spots.len() > MAX_SPOTS
+            || !spots.spots.iter().all(|s| {
+                s.npc != 0
+                    && seen.insert(s.npc)
+                    && area(&s.area).is_some()
+                    && s.game_id > 0
+                    && s.name_id >= 0
+                    && s.description_id >= 0
+                    && s.icon_id >= 0
+            })
+            || !spots.items.iter().all(|(key, sizes)| {
+                species(key).is_some()
+                    && sizes.iter().all(|id| *id >= 0)
+                    && sizes.iter().any(|id| *id > 0)
+            })
+        {
+            return Err(invalid("invalid fishing spots"));
+        }
+        Ok(spots)
+    }
+
+    /// The NPCs whose menu offers fishing.
+    pub fn gate_npcs(&self) -> Vec<u64> {
+        self.spots.iter().map(|s| s.npc).collect()
+    }
+
+    pub fn menu_string_id(&self) -> u32 {
+        self.menu_string_id
+    }
+
+    fn spot(&self, npc: u64) -> Option<&Spot> {
+        self.spots.iter().find(|s| s.npc == npc)
+    }
+}
+
+fn invalid(error: impl std::fmt::Display) -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, error.to_string())
 }
 
 #[derive(Deserialize)]

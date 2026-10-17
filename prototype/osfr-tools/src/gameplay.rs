@@ -132,6 +132,8 @@ pub struct Gameplay {
     /// Developer-only chat commands stay off unless the launcher opts in.
     dev_tools: bool,
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
+    /// 98/1 path-request budget for this session (W164).
+    pathing: crate::pathing::Pathing,
     // World Builder live layer (`--world`); None keeps building in content_dir.
     world_dir: Option<PathBuf>,
     // Who may run developer `realm` commands (Build Plan 1.5). Player until
@@ -150,6 +152,10 @@ pub struct Gameplay {
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
     portal_refreshed_ms: Option<u64>,
     kart_entry: Option<crate::kart_gateway::KartGateway>,
+    /// W160 (R): the guide NPCs that offer fishing (`fishing_spots.json`). Not persisted.
+    fishing_spots: Option<Arc<crate::fishing_service::FishingSpots>>,
+    /// The player's fishing round, if any. Ephemeral by design: a reconnect releases it.
+    fishing: crate::fishing_service::FishingService,
     /// The authored content directory (data/content), for developer reloads.
     content_dir: PathBuf,
     mystery_chests: Option<Arc<MysteryChests>>,
@@ -179,6 +185,12 @@ pub struct Gameplay {
     /// Warpstone attunement and travel cooldowns (W142).
     warp: piece_077::WarpRegistry,
     item_bar: crate::item_bar::ItemBar,
+    /// W162: the summoned ride and mount state. Session-only (the ride actor does not survive a
+    /// disconnect); absent when the content set has no `mounts.json`.
+    mounts: Option<crate::mounts::MountService>,
+    /// W162: a field enemy is chasing this player (from the last `receive_field_damage`). This is
+    /// the "combat start" signal for rides; set by the shared field tick and never saved.
+    field_engaged: bool,
 }
 
 #[derive(Default)]
@@ -194,6 +206,10 @@ pub struct Outcome {
     /// A developer relocation to apply to the staged character state. The
     /// gateway owns the packet so bytes and saved position cannot diverge.
     pub relocation: Option<dev_teleport::Relocation>,
+    /// W162: inner packets (already inside `replies`) that nearby players must also receive: the
+    /// ride actor, the rider's attachment and their removal. The gateway fans them out through
+    /// the player registry's interest set.
+    pub nearby: Vec<Vec<u8>>,
 }
 
 /// Horizontal distance in metres.
@@ -397,6 +413,7 @@ impl Gameplay {
         engaged: bool,
     ) -> io::Result<Outcome> {
         let mut out = Outcome::default();
+        self.field_engaged = engaged;
         if let Some(engine) = &mut self.encounter {
             let result = engine.receive_field_damage(damage, now_ms, engaged);
             self.apply_encounter(result, &mut out)?;
@@ -664,6 +681,14 @@ impl Gameplay {
         } else {
             bundled_npc_content.as_path()
         };
+        // W162: the ride catalogue ships with the bundled content; a set without it has no rides.
+        let mounts = if npc_content.join("mounts.json").is_file() {
+            Some(crate::mounts::MountService::new(
+                crate::mounts::MountCatalog::load(npc_content.join("mounts.json"))?,
+            ))
+        } else {
+            None
+        };
         let mut npc_visibility = if npc_content.join("npc_spawns_extra.json").is_file()
             && npc_content.join("npcs").is_dir()
         {
@@ -838,6 +863,18 @@ impl Gameplay {
                 );
             }
         }
+        let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
+        if let (Some(spots), Some(interaction)) = (&fishing_spots, &npc_interaction) {
+            let unknown = interaction
+                .lock()
+                .map_err(|_| invalid("NPC interaction state is unavailable"))?
+                .set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
+            for npc in unknown {
+                npc_event(
+                    serde_json::json!({"event": "fishing_gate_unknown_npc", "content_key": npc}),
+                );
+            }
+        }
         Ok(Self {
             mystery_chests,
             pending_chest: None,
@@ -861,6 +898,8 @@ impl Gameplay {
             learned_recipes,
             warp,
             item_bar,
+            mounts,
+            field_engaged: false,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -883,6 +922,7 @@ impl Gameplay {
             disappearing_actors,
             dev_tools: false,
             terrain: None,
+            pathing: crate::pathing::Pathing::default(),
             world_dir: None,
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
@@ -891,6 +931,8 @@ impl Gameplay {
             activities,
             portal_refreshed_ms: None,
             kart_entry,
+            fishing_spots,
+            fishing: Default::default(),
             content_dir: npc_content.to_path_buf(),
         })
     }
@@ -1307,6 +1349,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::TurnInQuest { .. } => "turn_in_quest",
                         npc_interaction::NpcAction::Shop => "shop",
                         npc_interaction::NpcAction::Race => "race",
+                        npc_interaction::NpcAction::Fish => "fish",
                     };
                     serde_json::json!({
                         "id": option.id,
@@ -1372,6 +1415,7 @@ impl Gameplay {
             );
             let mut out = Outcome::default();
             let mut race_gate = None;
+            let mut fish_gate = None;
             match selected {
                 Ok(NpcSelection::Talk(mut context)) => {
                     if let Some(engine) = &mut self.npc_quests {
@@ -1527,6 +1571,16 @@ impl Gameplay {
                         "outcome": "race"
                     }));
                 }
+                Ok(NpcSelection::Fish) => {
+                    fish_gate = Some(key);
+                    npc_event(serde_json::json!({
+                        "event": "npc_select",
+                        "guid": runtime_guid,
+                        "content_key": key,
+                        "option": option_id,
+                        "outcome": "fish"
+                    }));
+                }
                 Ok(NpcSelection::Quest(quest)) => {
                     let has_offer = quest.outbound.iter().any(|message| {
                         matches!(
@@ -1586,6 +1640,19 @@ impl Gameplay {
                     None => out.replies.push(chat::system(
                         crate::kart_gateway::EntryDenied::NoRace.message(),
                     )),
+                }
+            }
+            if let Some(gate) = fish_gate {
+                // (R) Ordinary entry: the NPC service proved range and that this exact option
+                // was offered; the fishing service decides admission. Staged, so a refusal
+                // leaves the player exactly as they were.
+                let mut staged = self.clone();
+                out = staged.begin_fishing(gate, character)?;
+                // Leave the NPC dialog camera first (it otherwise outlives a menu choice, as
+                // the quest accept showed in native run 200411).
+                out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                if out.changed {
+                    *self = staged;
                 }
             }
             return Ok(Some(out));
@@ -2071,12 +2138,19 @@ impl Gameplay {
         self.forging_tick_ms = None;
         self.type8_tick_ms = None;
         self.quests.reset_session();
+        self.field_engaged = false;
+        if let Some(mounts) = &mut self.mounts {
+            mounts.reset();
+        }
         if let Some(opening) = &mut self.opening {
             opening.reset_session();
         }
         if let Some(encounter) = &mut self.encounter {
             encounter.reset_session();
         }
+        // W160: a fishing round belongs to one connection. Paid catches are already saved;
+        // only the cast in flight is dropped.
+        self.fishing.reset_all();
     }
 
     /// Race clocks belong to one connection. A reconnect returns to the saved
@@ -2423,6 +2497,22 @@ impl Gameplay {
     }
 
     pub fn tick(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
+        // W160: bite timers and the leash run beside the world tick; nothing here is saved.
+        let fishing = match self.fishing.supervise(
+            character.guid,
+            character.zone_id,
+            character.position,
+            now_ms,
+        ) {
+            Ok(Some(change)) => change.replies,
+            _ => Vec::new(),
+        };
+        let mut out = self.tick_world(character, now_ms)?;
+        out.replies.splice(0..0, fishing);
+        Ok(out)
+    }
+
+    fn tick_world(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             let mut staged = self.clone();
             let kart = staged.kart_entry.as_mut().unwrap();
@@ -2520,6 +2610,89 @@ impl Gameplay {
         Ok(out)
     }
 
+    /// W162: true while the rider sits on a ride (the emote rules refuse emotes then).
+    pub fn is_mounted(&self) -> bool {
+        self.mounts
+            .as_ref()
+            .is_some_and(crate::mounts::MountService::is_mounted)
+    }
+
+    /// W162: the summoned ride as other players must see it; `None` without one.
+    pub fn ride_view(&self, guid: u64) -> Option<crate::mounts::RideView> {
+        self.mounts.as_ref()?.view(guid)
+    }
+
+    /// (R) No per-zone riding data was recovered, so every zone allows rides; fights (an instance
+    /// battle or a field enemy chasing the player), kart races and a knockout do not.
+    fn ride_restrictions(&self) -> crate::mounts::RideRestrictions {
+        crate::mounts::RideRestrictions {
+            zone_allows_riding: true,
+            in_minigame: self.encounter.as_ref().is_some_and(EncounterEngine::active)
+                || self.field_engaged
+                || self.kart_entry.as_ref().is_some_and(|k| k.active()),
+            ability_active: false,
+            knocked_out: self
+                .encounter
+                .as_ref()
+                .is_some_and(|e| e.state().player_health == 0),
+        }
+    }
+
+    fn ride_outcome(wire: crate::mounts::RideWire) -> Outcome {
+        let mut out = Outcome::default();
+        if let Some(notice) = wire.notice {
+            out.replies.push(chat::system(notice));
+        }
+        out.replies.extend(wire.private);
+        out.replies.extend(wire.shared.iter().cloned());
+        out.nearby = wire.shared;
+        out
+    }
+
+    /// W162: summon, board and put away a ride (family 168). Ownership is read from the
+    /// inventory on every request.
+    fn handle_mounts(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let restrictions = self.ride_restrictions();
+        let Some(mounts) = self.mounts.as_mut() else {
+            return Ok(None);
+        };
+        let context = crate::mounts::RideContext {
+            guid: character.guid,
+            inventory: self.inventory.state(),
+            restrictions,
+            pose: crate::mounts::RidePose {
+                position: character.position,
+                heading: character.rotation[0].atan2(character.rotation[2]),
+            },
+            now_ms,
+        };
+        Ok(mounts.handle(inner, &context)?.map(Self::ride_outcome))
+    }
+
+    /// W162 (R): a ride ends when the player zones, a fight or kart race
+    /// starts, or the player is knocked out. The gateway calls this after every handled message
+    /// and tick, once the new state is known.
+    pub fn settle_mounts(&mut self, character: &CharacterState, zoned: bool) -> Outcome {
+        let restrictions = self.ride_restrictions();
+        let Some(mounts) = self.mounts.as_mut() else {
+            return Outcome::default();
+        };
+        if !(zoned || restrictions.in_minigame || restrictions.knocked_out) {
+            return Outcome::default();
+        }
+        let ended = mounts.dismount_request(character.guid, self.inventory.state(), &[]);
+        let pose = crate::mounts::RidePose {
+            position: character.position,
+            heading: 0.0,
+        };
+        Self::ride_outcome(mounts.wire(&ended, pose))
+    }
+
     /// Quest-gated overworld enemies follow the player's active NPC quests.
     fn sync_field_quests(&mut self, out: &mut Outcome) -> io::Result<()> {
         let Some(quests) = &self.npc_quests else {
@@ -2583,6 +2756,22 @@ impl Gameplay {
         if let Some(out) = self.command_refusal(inner, character.guid)? {
             return Ok(out);
         }
+        if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
+            return Ok(out);
+        }
+        // 98/1 "Take Me There" path request (W164). A refusal sends nothing.
+        if let Some(answer) = self.pathing.answer(
+            inner,
+            character.zone_id,
+            character.position,
+            self.terrain.as_deref(),
+            now_ms,
+        ) {
+            return Ok(Outcome {
+                replies: answer.into_iter().collect(),
+                ..Outcome::default()
+            });
+        }
         if self.kart_entry.is_some() {
             let active = self.kart_entry.as_ref().unwrap().active();
             let command = chat::request(inner, character.guid)?;
@@ -2593,6 +2782,11 @@ impl Gameplay {
                 let mut staged = self.clone();
                 let out = staged.handle_kart_entry(inner, command.as_deref(), character, now_ms)?;
                 *self = staged;
+                return Ok(out);
+            }
+        }
+        if !self.fishing.is_empty() {
+            if let Some(out) = self.handle_fishing(inner, character, now_ms)? {
                 return Ok(out);
             }
         }
@@ -2731,6 +2925,7 @@ impl Gameplay {
             || self.mining.as_ref().is_some_and(Type8Engine::active)
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
             || self.encounter.as_ref().is_some_and(EncounterEngine::active)
+            || !self.fishing.is_empty()
     }
 
     /// Switches to Kart Driver and enters the track. Shared by the developer `realm race` command
@@ -2757,6 +2952,124 @@ impl Gameplay {
         out.scene_zoning = Some(scene);
         out.changed = true;
         Ok(out)
+    }
+
+    /// Profile state for a reward transaction; a default one without class content.
+    fn reward_profiles(&self) -> ProfileState {
+        self.profiles
+            .as_ref()
+            .map(|profiles| profiles.state().clone())
+            .unwrap_or_else(|| ProfileState {
+                version: 1,
+                active: 1,
+                unlocked: BTreeSet::from([1]),
+                experience: Default::default(),
+            })
+    }
+
+    /// W160 (R): start the fishing round the chosen guide offers. The caller stages `self`, so a
+    /// refusal (a chat line, `changed` false) leaves the player exactly as they were.
+    fn begin_fishing(&mut self, gate: u64, character: &CharacterState) -> io::Result<Outcome> {
+        use crate::fishing_service::{EntryDenied, FISHERMAN_PROFILE};
+        let mut out = Outcome::default();
+        let busy = self.activity_busy();
+        let Some(spots) = self.fishing_spots.clone() else {
+            out.replies
+                .push(chat::system(EntryDenied::Unavailable.message()));
+            return Ok(out);
+        };
+        let Some(profiles) = self.profiles.as_mut() else {
+            out.replies
+                .push(chat::system(EntryDenied::Unavailable.message()));
+            return Ok(out);
+        };
+        // (R) The Fisherman quest line is not built, so the first trip unlocks the job (no
+        // outfit change: fishing needs no active job, a quest video shows an Archer fishing).
+        let _ = profiles.unlock(FISHERMAN_PROFILE);
+        let level = self.job_level(FISHERMAN_PROFILE);
+        // (R) Same bag floor as quest turn-ins: never below what the player already holds.
+        let rewards = RewardState::new(
+            self.inventory.clone(),
+            self.reward_profiles(),
+            self.inventory.state().items.len().max(100),
+        );
+        match self.fishing.enter(
+            &spots,
+            gate,
+            character.guid,
+            character.zone_id,
+            character.position,
+            busy,
+            level,
+            rewards,
+        ) {
+            Ok(change) => {
+                out.replies = change.replies;
+                out.changed = true;
+            }
+            Err(denied) => out.replies.push(chat::system(denied.message())),
+        }
+        Ok(out)
+    }
+
+    /// W160: a packet while a fishing round exists. Hostile or out-of-order frames change
+    /// nothing and never end the connection; only a paid catch changes saved state.
+    fn handle_fishing(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let profiles = self.reward_profiles();
+        let change =
+            match self
+                .fishing
+                .route(character.guid, inner, now_ms, &self.inventory, &profiles)
+            {
+                Ok(Some(change)) => change,
+                Ok(None) => return Ok(None),
+                Err(error) => {
+                    npc_event(serde_json::json!({
+                        "event": "fishing_refused",
+                        "reason": error.to_string()
+                    }));
+                    return Ok(Some(Outcome::default()));
+                }
+            };
+        let mut out = Outcome {
+            replies: change.replies,
+            ..Outcome::default()
+        };
+        out.replies
+            .extend(change.notices.iter().map(|line| chat::system(line)));
+        if change.paid {
+            // The service paid on its staged copy of the player's inventory and profiles;
+            // adopt it, then let the inventory diff raise the quest events (the change's own
+            // `quest_events` are not forwarded, or a catch would count twice).
+            if let Some(next) = self.fishing.reward_state(character.guid).cloned() {
+                let before = self.inventory.state().clone();
+                if self
+                    .profiles
+                    .as_ref()
+                    .is_some_and(|p| *p.state() != next.profiles)
+                {
+                    let directory = self
+                        .profile_content_directory
+                        .as_deref()
+                        .ok_or_else(|| invalid("fishing XP needs profile content"))?;
+                    self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
+                }
+                self.inventory = next.inventory;
+                out.changed = true;
+                self.npc_inventory_events(&before, &mut out)?;
+                // A level-up unlocks fish and refreshes the client's Fish Finder.
+                let level = self.job_level(crate::fishing_service::FISHERMAN_PROFILE);
+                if let Ok(update) = self.fishing.update_fisherman_level(character.guid, level) {
+                    out.replies.extend(update.replies);
+                }
+            }
+        }
+        Ok(Some(out))
     }
 
     fn handle_kart_entry(
@@ -3451,7 +3764,8 @@ impl Gameplay {
             || self.cooking.as_ref().is_some_and(Cooking::active)
             || self.mining.as_ref().is_some_and(Type8Engine::active)
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
-            || self.kart_entry.as_ref().is_some_and(|k| k.active());
+            || self.kart_entry.as_ref().is_some_and(|k| k.active())
+            || !self.fishing.is_empty();
         busy.then_some(piece_077::Blocker::Busy)
     }
 
@@ -6714,6 +7028,88 @@ mod developer_teleport {
                 .iter()
                 .any(|packet| packet.starts_with(&[41, 0, 2, 0]))
         );
+    }
+
+    /// A 98/1 breadcrumb request from `from` to `to` (layout: `pathing.rs`).
+    fn path_request(from: [f32; 3], to: [f32; 3]) -> Vec<u8> {
+        let mut p = vec![98, 0, 1];
+        p.extend(1u64.to_le_bytes());
+        p.extend(1u32.to_le_bytes());
+        p.extend(0u32.to_le_bytes());
+        for v in [from, to] {
+            p.extend(v.iter().chain(&[1.0]).flat_map(|f| f.to_le_bytes()));
+        }
+        p.extend(0u32.to_le_bytes());
+        p
+    }
+
+    fn path_replies(out: &Outcome) -> Vec<&Vec<u8>> {
+        out.replies
+            .iter()
+            .filter(|r| r.starts_with(&[98, 0, 2]))
+            .collect()
+    }
+
+    #[test]
+    fn path_request_is_answered_from_the_terrain() {
+        let content = content_directory();
+        let mut game = Gameplay::load(&content, None).unwrap();
+        game.set_terrain(Some(flat_terrain("path", 42.0)));
+        let start = character();
+        let goal = [start.position[0] + 90.0, 42.0, start.position[2]];
+        let out = game
+            .handle_in_world(&path_request(start.position, goal), &start, 1_000)
+            .unwrap();
+        let replies = path_replies(&out);
+        assert_eq!(replies.len(), 1, "one 98/2 reply");
+        let reply = replies[0];
+        // kind 1, aux 0, then 19 points (90 m every 5 m); interior points sit on the ground.
+        assert_eq!(&reply[3..11], &[1, 0, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(&reply[11..15], &19i32.to_le_bytes());
+        let y = |i: usize| f32::from_le_bytes(reply[19 + i * 16..23 + i * 16].try_into().unwrap());
+        assert!((y(5) - 42.0).abs() < 0.1, "{}", y(5));
+    }
+
+    #[test]
+    fn path_request_without_terrain_gets_the_failure_reply() {
+        let content = content_directory();
+        let mut game = Gameplay::load(&content, None).unwrap();
+        let start = character();
+        let goal = [start.position[0] + 50.0, 4.0, start.position[2]];
+        let out = game
+            .handle_in_world(&path_request(start.position, goal), &start, 1_000)
+            .unwrap();
+        let expected = [98, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        assert_eq!(out.replies, vec![expected.to_vec()]);
+    }
+
+    #[test]
+    fn path_requests_are_capped_per_second_and_refusals_are_silent() {
+        let content = content_directory();
+        let mut game = Gameplay::load(&content, None).unwrap();
+        game.set_terrain(Some(flat_terrain("path-rate", 42.0)));
+        let start = character();
+        let goal = [start.position[0] + 50.0, 42.0, start.position[2]];
+        let ask = |game: &mut Gameplay, packet: &[u8], now| {
+            game.handle_in_world(packet, &start, now).unwrap()
+        };
+        let valid = path_request(start.position, goal);
+        let answered = (0..8)
+            .filter(|i| !path_replies(&ask(&mut game, &valid, 5_000 + i)).is_empty())
+            .count();
+        assert_eq!(answered, crate::pathing::MAX_PER_SECOND as usize);
+        assert!(
+            !path_replies(&ask(&mut game, &valid, 6_000)).is_empty(),
+            "next second"
+        );
+        // Too far, and a truncated packet: no reply and no error.
+        let far = path_request(start.position, [start.position[0] + 400.0, 0.0, 0.0]);
+        assert!(ask(&mut game, &far, 9_000).replies.is_empty());
+        assert!(ask(&mut game, &valid[..20], 9_000).replies.is_empty());
+        // The POI teleport request (kind 2) is not this module's.
+        let mut poi = valid.clone();
+        poi[11] = 2;
+        assert!(path_replies(&ask(&mut game, &poi, 9_000)).is_empty());
     }
 }
 

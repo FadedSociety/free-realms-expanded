@@ -510,6 +510,13 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     }
     result.push(("kart", words(41, 108, &[u32::MAX; 4])));
     result.push(("kart", words(102, 1, &[])));
+    // Family 168 (mounts, W162) has a one-byte subtype: 1 board, 3 dismount, 6 spawn, 8 spawn by
+    // item, and the family wildcard's unknown subtype.
+    result.push(("mounts", [vec![168, 0, 1], vec![0xff; 8]].concat()));
+    result.push(("mounts", vec![168, 0, 3, 0]));
+    result.push(("mounts", [vec![168, 0, 6], vec![0xff; 4]].concat()));
+    result.push(("mounts", [vec![168, 0, 8], vec![0xff; 4], vec![1]].concat()));
+    result.push(("mounts", vec![168, 0, 0xff, 0xff]));
     result.push(("combat", words(36, 10, &[1, 0, 0, u32::MAX, u32::MAX])));
     result.push(("combat", words(36, 12, &[u32::MAX])));
     for (sub, length) in [(2, 2), (3, 3), (8, 4), (15, 1), (16, 1)] {
@@ -534,6 +541,14 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         }
         result.push(("movie", p));
     }
+    // 98/1 path request (W164): handle, kind 1, aux, two vec4, tail; then the family's
+    // unknown subtype.
+    let mut path = vec![98, 0, 1];
+    path.extend(0u64.to_le_bytes());
+    path.extend(1u32.to_le_bytes());
+    path.extend([0; 4 + 32 + 4]);
+    result.push(("pathing", path));
+    result.push(("pathing", vec![98, 0, 0xff, 0xff]));
     result.push(("unknown", words(0xffff, 0xffff, &[u32::MAX; 2])));
     let mut movement = 125u16.to_le_bytes().to_vec();
     movement.extend(u64::MAX.to_le_bytes());

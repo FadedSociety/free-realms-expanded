@@ -78,6 +78,7 @@ fn restrictions() -> RideRestrictions {
         zone_allows_riding: true,
         in_minigame: false,
         ability_active: false,
+        knocked_out: false,
     }
 }
 
@@ -202,31 +203,27 @@ fn spawn_mount_dismount_then_despawn_have_expected_bytes_and_fanout() {
         vec![(vec![OWNER, OBSERVER], expected_mount_response())]
     );
 
+    // One 168/3 from a rider dismounts and removes the ride actor (R).
     let dismounted = service.dismount_request(OWNER, &owned, &[OBSERVER]);
     assert_eq!(
         packet_effects(&dismounted),
-        vec![(vec![OWNER, OBSERVER], expected_dismount_response())]
+        vec![
+            (vec![OWNER, OBSERVER], expected_dismount_response()),
+            (vec![OWNER], expected_mount_list(0)),
+        ]
     );
-    assert_eq!(
-        service.state(),
-        &MountState::Spawned(ActiveRide {
-            mount_id: MOUNT_ID,
-            actor_guid: MOUNT_ACTOR,
-        })
-    );
-
-    let despawned = service.dismount_request(OWNER, &owned, &[OBSERVER]);
     assert!(matches!(
-        &despawned.effects[0].kind,
+        &dismounted.effects[1].kind,
         MountEffectKind::DespawnRide {
             actor_guid: MOUNT_ACTOR
         }
     ));
-    assert_eq!(
-        packet_effects(&despawned),
-        vec![(vec![OWNER], expected_mount_list(0))]
-    );
+    assert_eq!(dismounted.effects[1].recipients, vec![OWNER, OBSERVER]);
     assert_eq!(service.state(), &MountState::Empty);
+
+    // A repeated request is an idempotent no-op.
+    let again = service.dismount_request(OWNER, &owned, &[OBSERVER]);
+    assert!(again.effects.is_empty() && !again.changed);
 }
 
 #[test]
@@ -361,31 +358,43 @@ fn item_definition_spawn_uses_the_catalog_crosswalk() {
 }
 
 #[test]
-fn minigame_and_ability_start_force_dismount() {
+fn minigame_and_ability_start_remove_the_ride() {
     let owned = inventory(&[ITEM_DEFINITION]);
     let mut service = MountService::new(catalog());
-    service
-        .spawn(OWNER, &owned, MOUNT_ID, MOUNT_ACTOR, restrictions(), 0, &[])
-        .unwrap();
-    service
-        .mount(OWNER, OWNER, &owned, MOUNT_ACTOR, 0, restrictions(), &[])
-        .unwrap();
-    let minigame = service.on_minigame_start(OWNER, &owned, &[]);
-    assert_eq!(
-        packet_effects(&minigame),
-        vec![(vec![OWNER], expected_dismount_response())]
-    );
-    assert!(matches!(service.state(), MountState::Spawned(_)));
-
-    service
-        .mount(OWNER, OWNER, &owned, MOUNT_ACTOR, 0, restrictions(), &[])
-        .unwrap();
-    let ability = service.on_ability_use(OWNER, &owned, &[]);
-    assert_eq!(
-        packet_effects(&ability),
-        vec![(vec![OWNER], expected_dismount_response())]
-    );
-    assert!(matches!(service.state(), MountState::Spawned(_)));
+    for (minigame, now_ms) in [(true, 0), (false, 5_000)] {
+        service
+            .spawn(
+                OWNER,
+                &owned,
+                MOUNT_ID,
+                MOUNT_ACTOR,
+                restrictions(),
+                now_ms,
+                &[],
+            )
+            .unwrap();
+        service
+            .mount(OWNER, OWNER, &owned, MOUNT_ACTOR, 0, restrictions(), &[])
+            .unwrap();
+        assert!(service.is_mounted());
+        let outcome = if minigame {
+            service.on_minigame_start(OWNER, &owned, &[])
+        } else {
+            service.on_ability_use(OWNER, &owned, &[])
+        };
+        assert_eq!(
+            packet_effects(&outcome)[0],
+            (vec![OWNER], expected_dismount_response())
+        );
+        assert!(matches!(
+            outcome.effects[1].kind,
+            MountEffectKind::DespawnRide {
+                actor_guid: MOUNT_ACTOR
+            }
+        ));
+        assert_eq!(service.state(), &MountState::Empty);
+        assert!(!service.is_mounted());
+    }
 }
 
 #[test]
@@ -403,6 +412,10 @@ fn restrictions_reject_spawn_in_minigame_ability_or_blocked_zone() {
         },
         RideRestrictions {
             zone_allows_riding: false,
+            ..restrictions()
+        },
+        RideRestrictions {
+            knocked_out: true,
             ..restrictions()
         },
     ] {
