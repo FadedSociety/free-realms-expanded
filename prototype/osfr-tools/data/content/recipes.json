@@ -3402,9 +3402,9 @@
     {
       "key": "miner.copper_bar.sample",
       "name": "Copper Bar",
-      "recipe_id": null,
+      "recipe_id": 990001,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 21785,
       "job": "miner",
       "job_profile_id": 14,
       "required_job_rank": null,
@@ -3439,7 +3439,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Recipe row id and XP remain unknown; old local output count 10 conflicts with the tutorial."
+          "evidence": "(R) The original recipe row id and pattern item are unrecovered. Local recipe id 990001 and the output item as a display fallback make the learned row selectable; XP remains unknown."
         }
       ],
       "experience_points": 0,
@@ -3479,6 +3479,14 @@
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 77 is the Copper Bar smelting game, TYPE 9 (Miner.md:194)."
+        },
+        "recipe_id": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local client recipe id 990001; the original pattern-item Param1 was not recovered."
+        },
+        "recipe_item_definition_id": {
+          "kind": "reconstructed",
+          "evidence": "(R) Display fallback uses Copper Bar 21785 because the original pattern item is unavailable."
         },
         "ingredients[0].definition_id": {
           "kind": "legacy",

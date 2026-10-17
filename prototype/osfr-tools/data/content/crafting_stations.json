@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "provenance": "Model ids are the client models already placed by npc_spawns_extra.json. The 12 m radius and job bindings are reconstructed (R) from the accepted opening station rules.",
+  "stations": [
+    {
+      "model_id": 419,
+      "job": "chef",
+      "interact_range": 12.0,
+      "source": "Models.txt 419 sg_cooking_table_nodes_01.adr; npc_spawns_extra.json Cooking Table rows."
+    },
+    {
+      "model_id": 1733,
+      "job": "miner",
+      "interact_range": 12.0,
+      "source": "Models.txt 1733 sh_forge_02.adr; npc_spawns_extra.json forge rows."
+    },
+    {
+      "model_id": 484,
+      "job": "miner",
+      "interact_range": 12.0,
+      "source": "Models.txt 484 sh_forge_01.adr; opening furnace actor."
+    },
+    {
+      "model_id": 273,
+      "job": "blacksmith",
+      "interact_range": 12.0,
+      "source": "Models.txt 273 sg_anvil_stump_01.adr; npc_spawns_extra.json Anvil."
+    },
+    {
+      "model_id": 4010,
+      "job": "blacksmith",
+      "interact_range": 12.0,
+      "source": "Models.txt 4010 gw_anvil_01.adr; npc_spawns_extra.json Spectrum Anvil."
+    }
+  ]
+}

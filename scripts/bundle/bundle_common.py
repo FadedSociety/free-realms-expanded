@@ -64,6 +64,7 @@ OPTIONAL_REPOSITORY_CONTENT = (
     "power_ups.json",  # power_ups.rs: combat power-up drop tables (W153)
     "fishing_spots.json",  # fishing_service.rs: guide NPCs, area rows and fish items (W160)
     "mining_nodes.json",  # harvest_nodes.rs: mining veins players click (W171)
+    "crafting_stations.json",  # recipe_book.rs: world cooking, smelting and anvil models
     "job_trainers.json",  # profiles.rs: trainer NPCs and "Become a <job>" menu labels (W176)
 )
 

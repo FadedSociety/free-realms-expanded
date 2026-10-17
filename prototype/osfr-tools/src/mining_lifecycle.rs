@@ -394,7 +394,9 @@ fn run_spec(engine: &Type8Engine) -> RunSpec {
     spec
 }
 
-fn reward_grant(
+/// Build the shared Mining payout from the engine's server-owned transaction.
+/// The live node adapter and this lifecycle use the same item and job-XP rules.
+pub fn reward_grant(
     transaction: Option<&Type8Transaction>,
     player_guid: u64,
 ) -> io::Result<RewardGrant> {

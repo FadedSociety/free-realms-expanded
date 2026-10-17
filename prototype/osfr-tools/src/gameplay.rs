@@ -167,6 +167,8 @@ pub struct Gameplay {
     fishing: crate::fishing_service::FishingService,
     /// W171 (R): this player's ore and mushroom nodes. Not persisted: a login sees every node.
     gathering_nodes: Option<crate::harvest_nodes::GatheringNodes>,
+    /// (R) Opening and content-model crafting stations known to this session.
+    crafting_stations: Vec<crate::recipe_book::Station>,
     /// The authored content directory (data/content), for developer reloads.
     content_dir: PathBuf,
     mystery_chests: Option<Arc<MysteryChests>>,
@@ -732,7 +734,7 @@ impl Gameplay {
         // packet sequence. Seed its two supplied starter patterns and the local
         // Copper Bar recipe so W61's cooking/smelting/forging flow remains usable.
         if opening.is_some() {
-            learned_recipes.extend([11, 70, 2002]);
+            learned_recipes.extend([11, 70, 990001, 2002]);
         }
         let bundled_npc_content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
         let npc_content = if directory.join("npc_spawns_extra.json").is_file()
@@ -965,6 +967,22 @@ impl Gameplay {
         {
             apply_node_changes(visibility, nodes.sync(0, false));
         }
+        let mut crafting_stations = opening
+            .as_ref()
+            .map(|engine| crate::recipe_book::stations(engine.actors()))
+            .unwrap_or_default();
+        let station_content = if npc_content.join("crafting_stations.json").is_file() {
+            npc_content
+        } else {
+            bundled_npc_content.as_path()
+        };
+        let world_station_rules = crate::recipe_book::load_world_station_rules(station_content)?;
+        if let Some(visibility) = &npc_visibility {
+            crate::recipe_book::merge_stations(
+                &mut crafting_stations,
+                crate::recipe_book::world_stations(&world_station_rules, visibility.model_actors()),
+            );
+        }
         if let (Some(profiles), Some(interaction)) = (&profiles, &npc_interaction) {
             let trainers = profiles.load_trainers(directory)?;
             let unknown = interaction
@@ -1039,6 +1057,7 @@ impl Gameplay {
             fishing_spots,
             fishing: Default::default(),
             gathering_nodes,
+            crafting_stations,
             content_dir: npc_content.to_path_buf(),
         })
     }
@@ -2690,6 +2709,7 @@ impl Gameplay {
         self.append_warp_definitions(character, &mut out);
         self.append_activity_list(&mut out);
         self.append_item_bar(now_ms, &mut out)?;
+        out.replies.push(self.recipe_replace_all_packet()?);
         out.replies.push(self.pets.list_packet());
         Ok(out)
     }
@@ -5616,7 +5636,6 @@ impl Gameplay {
         // range, rank and exact inputs before the service's own `begin_recipe`.
         if let Some(recipe_id) = crate::recipe_book::decode(inner)? {
             let profile = self.profiles.as_ref().unwrap().active();
-            let stations = crate::recipe_book::stations(self.opening.as_ref().unwrap().actors());
             let available = self.available_ingredients();
             let player = crate::recipe_book::Player {
                 zone_id: character.zone_id,
@@ -5631,7 +5650,7 @@ impl Gameplay {
                 recipe_id,
                 &self.recipe_catalog,
                 &player,
-                &stations,
+                &self.crafting_stations,
                 crate::recipe_book::Services {
                     cooking: self.cooking.as_mut(),
                     smelting: self.smelting.as_mut(),
@@ -6120,6 +6139,24 @@ impl Gameplay {
         })
     }
 
+    fn near_craft_station(
+        &self,
+        character: &CharacterState,
+        job: crate::recipes::CraftingJob,
+    ) -> bool {
+        self.crafting_stations.iter().any(|station| {
+            station.job == job
+                && station.zone_id == character.zone_id
+                && station
+                    .position
+                    .iter()
+                    .zip(character.position)
+                    .map(|(a, b)| (a - b).powi(2))
+                    .sum::<f32>()
+                    <= station.radius.powi(2)
+        })
+    }
+
     fn actor_hidden(&self, guid: u64) -> bool {
         self.disappearing_actors.iter().any(|a| {
             a.guid == guid
@@ -6166,23 +6203,11 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
-            let near_furnace = self.opening.as_ref().unwrap().actors().iter().any(|actor| {
-                actor.zone_id == character.zone_id
-                    && actor
-                        .position
-                        .iter()
-                        .zip(character.position)
-                        .map(|(a, b)| (a - b).powi(2))
-                        .sum::<f32>()
-                        <= actor.interaction_radius.powi(2)
-                    && matches!(
-                        actor.action,
-                        Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2002 })
-                    )
-            });
             // (R) A recipe-book run has no tutorial objective; the profile and
             // station checks still bind the completion.
-            if self.profiles.as_ref().unwrap().active() != 14 || !near_furnace {
+            if self.profiles.as_ref().unwrap().active() != 14
+                || !self.near_craft_station(character, crate::recipes::CraftingJob::Miner)
+            {
                 return Err(invalid("smelting completion is outside a Miner station"));
             }
             if transaction
@@ -6237,29 +6262,34 @@ impl Gameplay {
     /// the staged gameplay clone, which the gateway saves before sending.
     fn apply_mining(&mut self, result: Type8Outcome, out: &mut Outcome) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
+            let grant = crate::mining::lifecycle::reward_grant(Some(&transaction), 0)?;
             if self.profiles.as_ref().map(Profiles::active) != Some(mining::MINER_PROFILE_ID) {
                 return Err(invalid(
                     "mining completion is outside the accepted Miner job",
                 ));
             }
             self.consume_materials(transaction.consumes, out)?;
-            self.grant_reward(0, &transaction.grants, out)?;
+            let grants: Vec<_> = grant
+                .items
+                .iter()
+                .map(|item| (item.definition_id, item.count))
+                .collect();
+            self.grant_reward(0, &grants, out)?;
             // (R) TYPE8 resource keys use the configured output item definition;
             // no retail regional resource-to-quest table has been recovered.
-            for (id, quantity) in transaction.grants {
+            for item in &grant.items {
                 self.npc_quest_event(
                     crate::quest_engine::QuestEvent::GatherResource {
-                        resource_id: id as u32,
-                        quantity,
+                        resource_id: item.definition_id as u32,
+                        quantity: item.count,
                     },
                     out,
                 )?;
             }
             self.npc_minigame_win(&result.replies, out)?;
-            self.award_job_xp(
-                crate::mining::lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
-                out,
-            )?;
+            for amount in grant.job_xp.values() {
+                self.award_job_xp(*amount, out)?;
+            }
             if let Some(nodes) = self.gathering_nodes.as_mut() {
                 nodes.paid();
             }
@@ -6276,28 +6306,37 @@ impl Gameplay {
     /// gateway saves before sending.
     fn apply_harvesting(&mut self, result: Type8Outcome, out: &mut Outcome) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
+            let grant = crate::harvesting::lifecycle::reward_grant(
+                Some(&transaction),
+                HARVESTING_GAME_ID,
+                0,
+            )?;
             if self.profiles.as_ref().map(Profiles::active) != Some(harvesting::CHEF_PROFILE_ID) {
                 return Err(invalid(
                     "harvesting completion is outside the accepted Chef job",
                 ));
             }
             self.consume_materials(transaction.consumes, out)?;
-            self.grant_reward(0, &transaction.grants, out)?;
+            let grants: Vec<_> = grant
+                .items
+                .iter()
+                .map(|item| (item.definition_id, item.count))
+                .collect();
+            self.grant_reward(0, &grants, out)?;
             // (R) Resource identity is the configured output item definition.
-            for (id, quantity) in transaction.grants {
+            for item in &grant.items {
                 self.npc_quest_event(
                     crate::quest_engine::QuestEvent::GatherResource {
-                        resource_id: id as u32,
-                        quantity,
+                        resource_id: item.definition_id as u32,
+                        quantity: item.count,
                     },
                     out,
                 )?;
             }
             self.npc_minigame_win(&result.replies, out)?;
-            self.award_job_xp(
-                crate::harvesting::lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
-                out,
-            )?;
+            for amount in grant.job_xp.values() {
+                self.award_job_xp(*amount, out)?;
+            }
             if let Some(nodes) = self.gathering_nodes.as_mut() {
                 nodes.paid();
             }
@@ -6345,23 +6384,11 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
-            let near_station = self.opening.as_ref().unwrap().actors().iter().any(|actor| {
-                actor.zone_id == character.zone_id
-                    && actor
-                        .position
-                        .iter()
-                        .zip(character.position)
-                        .map(|(a, b)| (a - b).powi(2))
-                        .sum::<f32>()
-                        <= actor.interaction_radius.powi(2)
-                    && matches!(
-                        actor.action,
-                        Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2001 })
-                    )
-            });
             // (R) A recipe-book run has no tutorial objective; the profile and
             // station checks still bind the completion.
-            if self.profiles.as_ref().unwrap().active() != 45 || !near_station {
+            if self.profiles.as_ref().unwrap().active() != 45
+                || !self.near_craft_station(character, crate::recipes::CraftingJob::Chef)
+            {
                 return Err(invalid("cooking completion is outside a Chef station"));
             }
             if transaction
@@ -6411,23 +6438,11 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
-            let near_anvil = self.opening.as_ref().unwrap().actors().iter().any(|actor| {
-                actor.zone_id == character.zone_id
-                    && actor
-                        .position
-                        .iter()
-                        .zip(character.position)
-                        .map(|(a, b)| (a - b).powi(2))
-                        .sum::<f32>()
-                        <= actor.interaction_radius.powi(2)
-                    && matches!(
-                        actor.action,
-                        Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2003 })
-                    )
-            });
             // (R) A recipe-book run has no tutorial objective; the profile and
             // station checks still bind the completion.
-            if self.profiles.as_ref().unwrap().active() != 16 || !near_anvil {
+            if self.profiles.as_ref().unwrap().active() != 16
+                || !self.near_craft_station(character, crate::recipes::CraftingJob::Blacksmith)
+            {
                 return Err(invalid(
                     "forging completion is outside a Blacksmith station",
                 ));

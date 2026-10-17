@@ -11,10 +11,13 @@ use osfr_tools::{
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     harvest_nodes::{GatheringNodes, NodeActor},
-    harvesting::{self, CHEF_PROFILE_ID, FARMING_LAUNCH_MOVIE, FARMING_PRELOAD_FILE},
+    harvesting::{
+        self, CHEF_PROFILE_ID, FARMING_LAUNCH_MOVIE, FARMING_PRELOAD_FILE,
+        lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
+    },
     mining::{
         self, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Goal, Type8Kind,
-        Type8Output,
+        Type8Output, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
     },
     npc_interaction::NpcInteractRequest,
 };
@@ -371,6 +374,18 @@ fn xp(gateway: &Gateway, game: Game) -> u64 {
         .unwrap_or(0)
 }
 
+fn profile_xp(gateway: &Gateway, profile: i32) -> u64 {
+    gameplay_json(gateway)["profiles"]["experience"][profile.to_string()]
+        .as_u64()
+        .unwrap_or(0)
+}
+
+fn coins(gateway: &Gateway) -> i64 {
+    gameplay_json(gateway)["inventory"]["coins"]
+        .as_i64()
+        .unwrap()
+}
+
 /// Play the offered run to the win request and take the payout.
 fn win(gateway: &mut Gateway, game: Game, id: i32, base_ms: u64) {
     for (step, packet) in [
@@ -454,6 +469,7 @@ fn an_ordinary_player_gathers_from_a_node_is_paid_once_and_the_node_grows_back()
             active(&gateway, game).unwrap_or_else(|| panic!("{} run offered", game.node)) as i32;
         assert!(!inners(&started).is_empty(), "{}", game.node);
         assert_eq!(ore(&gateway, game), vec![0; game.goals]);
+        let coins_before = coins(&gateway);
 
         win(&mut gateway, game, id, 2_100);
         assert_eq!(
@@ -462,7 +478,24 @@ fn an_ordinary_player_gathers_from_a_node_is_paid_once_and_the_node_grows_back()
             "{} paid",
             game.node
         );
-        assert_eq!(xp(&gateway, game), 25, "{} (R) XP", game.node);
+        let reward_xp = match game.profile {
+            MINER_PROFILE_ID => RECONSTRUCTED_MINER_XP_PER_WIN,
+            CHEF_PROFILE_ID => RECONSTRUCTED_CHEF_XP_PER_WIN,
+            _ => unreachable!(),
+        };
+        assert_eq!(
+            xp(&gateway, game),
+            u64::from(reward_xp),
+            "{} (R) XP",
+            game.node
+        );
+        let other = if game.profile == MINER_PROFILE_ID {
+            CHEF_PROFILE_ID
+        } else {
+            MINER_PROFILE_ID
+        };
+        assert_eq!(profile_xp(&gateway, other), 0, "{} other job XP", game.node);
+        assert_eq!(coins(&gateway), coins_before, "{} coins", game.node);
 
         // The node stays until the results close, then hides.
         let waiting = tick(&mut gateway, 3_000);
@@ -488,7 +521,9 @@ fn an_ordinary_player_gathers_from_a_node_is_paid_once_and_the_node_grows_back()
         assert_eq!(second, id + 1, "{} fresh instance", game.node);
         win(&mut gateway, game, second, 63_500);
         assert_eq!(ore(&gateway, game), vec![2; game.goals]);
-        assert_eq!(xp(&gateway, game), 50);
+        assert_eq!(xp(&gateway, game), u64::from(reward_xp) * 2);
+        assert_eq!(profile_xp(&gateway, other), 0);
+        assert_eq!(coins(&gateway), coins_before);
     }
 }
 

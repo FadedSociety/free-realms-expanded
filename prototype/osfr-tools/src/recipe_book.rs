@@ -23,12 +23,15 @@ use crate::{
     recipes::{CraftingJob, RecipeCatalog},
     smelting::{Smelting, SmeltingOutcome},
 };
-use std::{collections::BTreeSet, io};
+use serde::Deserialize;
+use std::{collections::BTreeSet, fs, io, path::Path};
 
 pub const FAMILY: u16 = 26;
 pub const SUB: u16 = 24;
 /// 26/24 is family, sub and one i32.
 const LEN: usize = 8;
+const STATION_FILE: &str = "crafting_stations.json";
+const MAX_STATION_FILE_BYTES: u64 = 64 * 1024;
 
 /// Decode a 26/24 body. `Ok(None)` means another message; a recognised header
 /// with any other length is malformed (hostile or corrupt).
@@ -54,9 +57,103 @@ pub struct Station {
     pub radius: f32,
 }
 
-/// (R) The only stations the server knows are the opening world's craft
-/// actors, whose objective ids 2001/2002/2003 are the stove, furnace and anvil
-/// (the same binding `gameplay.rs` already uses for the tutorial crafts).
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+struct CraftingStationFile {
+    schema_version: u32,
+    provenance: String,
+    stations: Vec<WorldStationRule>,
+}
+
+/// A content model that acts as a crafting station wherever the world places it.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct WorldStationRule {
+    pub model_id: u32,
+    pub job: CraftingJob,
+    pub interact_range: f32,
+    pub source: String,
+}
+
+/// Load the optional world-station model table. A missing file keeps the
+/// opening stations available and leaves other world models inert.
+pub fn load_world_station_rules(directory: &Path) -> io::Result<Vec<WorldStationRule>> {
+    let path = directory.join(STATION_FILE);
+    if !path.is_file() {
+        return Ok(Vec::new());
+    }
+    if fs::metadata(&path)?.len() > MAX_STATION_FILE_BYTES {
+        return Err(invalid("crafting station file is too large"));
+    }
+    let file: CraftingStationFile =
+        serde_json::from_slice(&fs::read(path)?).map_err(|error| invalid(error.to_string()))?;
+    if file.schema_version != 1 || file.provenance.trim().is_empty() {
+        return Err(invalid("invalid crafting station metadata"));
+    }
+    let mut models = BTreeSet::new();
+    for station in &file.stations {
+        if station.model_id == 0
+            || !models.insert(station.model_id)
+            || !station.interact_range.is_finite()
+            || !(0.1..=100.0).contains(&station.interact_range)
+            || station.source.trim().is_empty()
+        {
+            return Err(invalid("invalid world crafting station"));
+        }
+    }
+    Ok(file.stations)
+}
+
+/// (R) Resolve placed world actors through the content's model table.
+pub fn world_stations(
+    rules: &[WorldStationRule],
+    actors: impl IntoIterator<Item = (u32, u32, [f32; 3])>,
+) -> Vec<Station> {
+    let mut stations = Vec::new();
+    for (zone_id, model_id, position) in actors {
+        let Some(rule) = rules.iter().find(|rule| rule.model_id == model_id) else {
+            continue;
+        };
+        if !position.iter().all(|value| value.is_finite()) {
+            continue;
+        }
+        push_unique(
+            &mut stations,
+            Station {
+                job: rule.job,
+                zone_id,
+                position,
+                radius: rule.interact_range,
+            },
+        );
+    }
+    stations
+}
+
+/// Add `extra` to `stations`, retaining one entry per job, zone and position.
+pub fn merge_stations(stations: &mut Vec<Station>, extra: impl IntoIterator<Item = Station>) {
+    for station in extra {
+        push_unique(stations, station);
+    }
+}
+
+fn push_unique(stations: &mut Vec<Station>, station: Station) {
+    if !stations.iter().any(|current| {
+        current.job == station.job
+            && current.zone_id == station.zone_id
+            && current.position == station.position
+    }) {
+        stations.push(station);
+    }
+}
+
+fn invalid(message: impl Into<String>) -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, message.into())
+}
+
+/// (R) The opening world's craft actors, whose objective ids 2001/2002/2003 are
+/// the stove, furnace and anvil. `load_world_station_rules` adds the ordinary
+/// world actors placed with the same client models.
 pub fn stations(actors: &[OpeningActor]) -> Vec<Station> {
     actors
         .iter()

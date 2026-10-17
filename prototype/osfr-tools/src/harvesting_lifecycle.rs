@@ -404,7 +404,9 @@ fn run_spec(engine: &Type8Engine, game_id: i32) -> io::Result<RunSpec> {
     Ok(spec)
 }
 
-fn reward_grant(
+/// Build the shared Harvesting payout from the engine's server-owned produce
+/// transaction. The live node adapter and this lifecycle use the same rules.
+pub fn reward_grant(
     transaction: Option<&Type8Transaction>,
     game_id: i32,
     player_guid: u64,

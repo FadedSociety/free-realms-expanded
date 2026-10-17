@@ -478,6 +478,21 @@ impl NpcVisibility {
             .flatten()
     }
 
+    /// Placed actor model ids and positions, for content-defined scene fixtures
+    /// such as crafting stations. Zones use the open-world label recorded by
+    /// the loader.
+    pub fn model_actors(&self) -> impl Iterator<Item = (u32, u32, [f32; 3])> + '_ {
+        self.by_zone.iter().flat_map(|(&zone_id, actors)| {
+            actors.iter().map(move |actor| {
+                (
+                    zone_id,
+                    u32::try_from(actor.spawn.model_id).unwrap_or(0),
+                    actor.position,
+                )
+            })
+        })
+    }
+
     /// Content NPC targets for the developer teleport index. The same rows
     /// back 35/2 visibility: regional `legacy_data` placements and renderable
     /// extra spawns only. Runtime-excluded startup actors stay excluded.
