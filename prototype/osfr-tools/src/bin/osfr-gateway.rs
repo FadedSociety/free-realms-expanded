@@ -12,6 +12,7 @@ use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
 use osfr_tools::mounts::{MountTail, RidePose, RideView};
 use osfr_tools::net_policy::{Bucket, IpLimiter};
+use osfr_tools::pets::{PetPresence, pet_removal_packet};
 use osfr_tools::player_radial::{Chosen, MenuOffer, PlayerRadial, PublicLook};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
 use osfr_tools::security_log::{EventKind, SecurityEvent, SecurityLog};
@@ -456,6 +457,8 @@ struct SharedWorld {
     trade_settlements: Vec<TradeSettlement>,
     /// W162: each mounted or ride-summoning character's ride, keyed by character guid.
     rides: BTreeMap<u64, RideView>,
+    /// W177: each summoned pet, keyed by its owner's character guid.
+    pets: BTreeMap<u64, PetPresence>,
     social: SocialService,
     identities: BTreeMap<u64, SocialIdentity>,
     social_paths: BTreeMap<u64, PathBuf>,
@@ -524,6 +527,7 @@ impl SharedWorld {
             players: PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap()),
             public_looks: BTreeMap::new(),
             rides: BTreeMap::new(),
+            pets: BTreeMap::new(),
             social: SocialService::new(17).unwrap(),
             identities: BTreeMap::new(),
             social_paths: BTreeMap::new(),
@@ -640,6 +644,10 @@ impl SharedWorld {
             if let Some(view) = self.rides.remove(&player.character_guid) {
                 deliveries = self.ride_fanout(session_id, &[view.removal_packet()]);
             }
+            if let Some(pet) = self.pets.remove(&player.character_guid) {
+                deliveries
+                    .extend(self.ride_fanout(session_id, &[pet_removal_packet(pet.actor_guid)]));
+            }
             // Leaving (disconnect or zoning) ends any trade the character is in (W163).
             deliveries.extend(trade_deliveries(
                 self.trades.unregister_player(player.character_guid),
@@ -719,6 +727,34 @@ impl SharedWorld {
         let inner = frame.get(7..)?;
         let rider = u64::from_le_bytes(inner.get(2..10)?.try_into().ok()?);
         Some(vec![self.rides.get(&rider)?.follow(inner)?])
+    }
+
+    /// W177: replay a summoned pet's actor to whoever is told that its owner entered, and
+    /// remove it from whoever loses the owner. This mirrors the W162 ride late-viewer path.
+    fn with_pets(&self, deliveries: Vec<Delivery>) -> Vec<Delivery> {
+        if self.pets.is_empty() {
+            return deliveries;
+        }
+        let mut out = Vec::with_capacity(deliveries.len());
+        for delivery in deliveries {
+            let recipient = delivery.recipient;
+            let extra = rider_event(&delivery.bytes).and_then(|(guid, added)| {
+                let pet = self.pets.get(&guid)?;
+                if !added {
+                    return Some(vec![pet_removal_packet(pet.actor_guid)]);
+                }
+                let mut view = pet.clone();
+                let player = self.players.get(*self.active_sessions.get(&guid)?)?;
+                view.position = player.position;
+                view.spawn_packet().map(|packet| vec![packet])
+            });
+            out.push(delivery);
+            out.extend(extra.into_iter().flatten().map(|packet| Delivery {
+                recipient,
+                bytes: wrap_application(&packet),
+            }));
+        }
+        out
     }
 
     fn social_delivery(&self, message: SocialMessage) -> Option<Delivery> {
@@ -884,6 +920,7 @@ fn load_gateway_from(
         Gateway::load(&options.reference, snapshot.character)?
     };
     let mut gateway = gateway;
+    gateway.load_pet_roster(state_path)?;
     gateway.take_shared_fields();
     gateway.set_dev_tools(options.dev_tools);
     // Decision 1: account-store roles are server-owned, so builder/admin
@@ -1612,6 +1649,12 @@ impl Session {
         let ended = staged_gateway.settle_rides(zoned);
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
+        let ended = staged_gateway.settle_pets(zoned, now_ms)?;
+        outcome.state_changed |= ended.state_changed;
+        outcome.gameplay_changed |= ended.gameplay_changed;
+        outcome.pets_changed |= ended.pets_changed;
+        outcome.replies.extend(ended.replies);
+        outcome.nearby.extend(ended.nearby);
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
         let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
@@ -1728,6 +1771,14 @@ impl Session {
                         staged_world.rides.remove(&current.guid);
                     }
                 }
+                match staged_gateway.pet_view() {
+                    Some(view) => {
+                        staged_world.pets.insert(current.guid, view);
+                    }
+                    None => {
+                        staged_world.pets.remove(&current.guid);
+                    }
+                }
                 for application in &outcome.applications {
                     if osfr_tools::chat::request(application, self.character_guid)
                         .ok()
@@ -1765,12 +1816,16 @@ impl Session {
                     .is_some_and(|saved| now_ms < saved.saturating_add(POSITION_SAVE_MS));
             if outcome.state_changed && !deferred {
                 save(&self.state_path, &staged_gateway.snapshot())?;
+                if outcome.pets_changed {
+                    staged_gateway.save_pet_roster(&self.state_path)?;
+                }
             }
             persist_social_changes(world, &staged_world)?;
             staged_world
                 .chat_settings
                 .save_changed(&world.chat_settings)?;
             let deliveries = staged_world.with_rides(deliveries);
+            let deliveries = staged_world.with_pets(deliveries);
             Ok((staged_world, deliveries, change, deferred))
         })();
         let (staged_world, deliveries, change, deferred) = match prepared {

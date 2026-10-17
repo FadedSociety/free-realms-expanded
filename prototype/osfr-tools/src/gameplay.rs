@@ -194,6 +194,9 @@ pub struct Gameplay {
     /// W162: a field enemy is chasing this player (from the last `receive_field_damage`). This is
     /// the "combat start" signal for rides; set by the shared field tick and never saved.
     field_engaged: bool,
+    /// W177: the saved pet roster and session-only active actor. The roster stays in the
+    /// canonical save's top-level `pets` payload; only the actor is reset on reconnect.
+    pets: crate::pets::PetService,
 }
 
 #[derive(Default)]
@@ -215,6 +218,9 @@ pub struct Outcome {
     /// ride actor, the rider's attachment and their removal. The gateway fans them out through
     /// the player registry's interest set.
     pub nearby: Vec<Vec<u8>>,
+    /// W177: the saved top-level pet roster changed and must be written through its own
+    /// `game_store` seam after the normal character snapshot commits.
+    pub pets_changed: bool,
 }
 
 /// Horizontal distance in metres.
@@ -954,6 +960,7 @@ impl Gameplay {
             item_bar,
             mounts,
             field_engaged: false,
+            pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -2285,6 +2292,7 @@ impl Gameplay {
         if let Some(mounts) = &mut self.mounts {
             mounts.reset();
         }
+        self.pets.reset_session();
         if let Some(opening) = &mut self.opening {
             opening.reset_session();
         }
@@ -2489,6 +2497,7 @@ impl Gameplay {
             self.append_warp_definitions(character, &mut out);
             self.append_activity_list(&mut out);
             self.append_item_bar(now_ms, &mut out)?;
+            out.replies.push(self.pets.list_packet());
             return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
@@ -2587,6 +2596,7 @@ impl Gameplay {
         self.append_warp_definitions(character, &mut out);
         self.append_activity_list(&mut out);
         self.append_item_bar(now_ms, &mut out)?;
+        out.replies.push(self.pets.list_packet());
         Ok(out)
     }
 
@@ -2858,6 +2868,76 @@ impl Gameplay {
         Self::ride_outcome(mounts.wire(&ended, pose))
     }
 
+    /// W177: the persisted pet roster is loaded from the character save before world entry.
+    pub fn load_pet_roster(&mut self, path: &Path) -> io::Result<()> {
+        self.pets =
+            crate::pets::PetService::load_from(crate::pets::PetService::bundled_content()?, path)?;
+        Ok(())
+    }
+
+    /// Persist the pet roster through the existing top-level envelope seam. This
+    /// must run after the ordinary gameplay snapshot so a committed request
+    /// cannot silently lose its name or need changes.
+    pub fn save_pet_roster(&self, path: &Path) -> io::Result<()> {
+        self.pets.save_to(path)
+    }
+
+    /// W177: the active pet as other players need it for AddNpc replay.
+    pub fn pet_view(&self, owner_guid: u64) -> Option<crate::pets::PetPresence> {
+        self.pets.view(owner_guid)
+    }
+
+    fn pet_outcome(wire: crate::pets::PetWire) -> Outcome {
+        let mut out = Outcome::default();
+        out.changed = wire.changed;
+        out.pets_changed = wire.pets_changed;
+        if let Some(notice) = wire.notice {
+            out.replies.push(chat::system(notice));
+        }
+        out.replies.extend(wire.private);
+        out.nearby = wire.shared;
+        out
+    }
+
+    /// W177: summon, dismiss and UI mode (family 53). Ownership comes only from the saved
+    /// roster loaded by `load_pet_roster`; the actor GUID is derived from the authenticated
+    /// character, never from request bytes.
+    fn handle_pets(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let busy = crate::pets::PetBusy {
+            minigame_active: self.activity_busy()
+                || self.kart_entry.as_ref().is_some_and(|k| k.active()),
+        };
+        let pets = &mut self.pets;
+        let inventory = &mut self.inventory;
+        let wire = pets.handle_with_inventory(
+            inner,
+            character.guid,
+            character.position,
+            inventory,
+            busy,
+            // Pet need clocks are stored in seconds; the gateway passes milliseconds.
+            now_ms / 1_000,
+        )?;
+        Ok(wire.map(Self::pet_outcome))
+    }
+
+    /// W177 (R): a pet does not zone with its owner; a fresh summon is required.
+    pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
+        if !zoned || self.pets.active_pet_id().is_none() {
+            return Ok(Outcome::default());
+        }
+        let mut pets = self.pets.clone();
+        pets.rebase_clock(now_ms / 1_000);
+        let transition = pets.dismiss(now_ms / 1_000)?;
+        self.pets = pets;
+        Ok(Self::pet_outcome(self.pets.wire(transition)))
+    }
+
     /// Quest-gated overworld enemies follow the player's active NPC quests.
     fn sync_field_quests(&mut self, out: &mut Outcome) -> io::Result<()> {
         let Some(quests) = &self.npc_quests else {
@@ -2922,6 +3002,9 @@ impl Gameplay {
             return Ok(out);
         }
         if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_pets(inner, character, now_ms)? {
             return Ok(out);
         }
         // 98/1 "Take Me There" path request (W164). A refusal sends nothing.

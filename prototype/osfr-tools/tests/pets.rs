@@ -1,12 +1,12 @@
 use osfr_tools::pets::{
-    PetBusy, PetContent, PetDefinition, PetEquipmentSlot, PetPresenceEvent, PetService,
+    PetBusy, PetContent, PetDefinition, PetEquipmentSlot, PetPresenceEvent, PetService, model_id,
 };
 use osfr_tools::{
     character_store::CharacterState,
     game_store,
     inventory::{EquippedItem, Inventory, InventoryItem, InventoryState},
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
     fs,
@@ -283,9 +283,11 @@ fn follow_and_equipment_state_validate_owned_items_and_slots() {
         .unequip_item(pet_id, PetEquipmentSlot::Utility(0))
         .unwrap();
     assert_eq!(service.pet(pet_id).unwrap().equipment.utilities[0], None);
-    assert!(service
-        .equip_item(pet_id, 999, PetEquipmentSlot::Head, &fixture.inventory)
-        .is_err());
+    assert!(
+        service
+            .equip_item(pet_id, 999, PetEquipmentSlot::Head, &fixture.inventory)
+            .is_err()
+    );
     for slot in [
         PetEquipmentSlot::Head,
         PetEquipmentSlot::Collar,
@@ -400,18 +402,20 @@ fn trick_list_favourite_and_roster_reload_persist() {
 fn minigame_busy_rule_rejects_summon_without_mutation() {
     let mut service = PetService::new(PetService::bundled_content().unwrap()).unwrap();
     let pet_id = service.adopt_vendor_grant(3, &definition(), 0).unwrap();
-    assert!(service
-        .summon(
-            pet_id,
-            44,
-            33,
-            [0.0; 3],
-            PetBusy {
-                minigame_active: true
-            },
-            0
-        )
-        .is_err());
+    assert!(
+        service
+            .summon(
+                pet_id,
+                44,
+                33,
+                [0.0; 3],
+                PetBusy {
+                    minigame_active: true
+                },
+                0
+            )
+            .is_err()
+    );
     assert_eq!(service.active_pet_id(), None);
 }
 
@@ -483,15 +487,19 @@ fn species_catalog_has_field_sources_and_resolved_or_unresolved_item_ids() {
                 if item_ids.contains(&item_id) {
                     resolved_item_ids += 1;
                 } else {
-                    assert!(adoption["unknown_reasons"]["store_item_id"]
-                        .as_str()
-                        .is_some_and(|reason| !reason.is_empty()));
+                    assert!(
+                        adoption["unknown_reasons"]["store_item_id"]
+                            .as_str()
+                            .is_some_and(|reason| !reason.is_empty())
+                    );
                     unresolved_item_ids += 1;
                 }
             } else {
-                assert!(adoption["unknown_reasons"]["store_item_id"]
-                    .as_str()
-                    .is_some_and(|reason| !reason.is_empty()));
+                assert!(
+                    adoption["unknown_reasons"]["store_item_id"]
+                        .as_str()
+                        .is_some_and(|reason| !reason.is_empty())
+                );
                 unresolved_item_ids += 1;
             }
         }
@@ -589,4 +597,19 @@ fn client_pet_bindings_exist_and_species_ids_are_unique() {
         species_ids.len(),
         content["species"].as_array().unwrap().len()
     );
+}
+
+#[test]
+fn every_bound_pet_model_has_a_models_txt_id() {
+    let content: Value = serde_json::from_str(include_str!("../data/content/pets.json")).unwrap();
+    let models: Vec<_> = content["species"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| row["model"].as_str())
+        .collect();
+    assert_eq!(models.len(), 26);
+    for model in models {
+        assert!(model_id(model) > 0, "missing Models.txt id for {model}");
+    }
 }

@@ -142,6 +142,8 @@ pub struct GatewayOutcome {
     pub began_zoning: bool,
     /// W158: a big heart was picked up; the server heals the rest of the group.
     pub group_heal: Option<crate::encounter::GroupHeal>,
+    /// W177: the saved top-level pet roster must be written after the normal snapshot.
+    pub pets_changed: bool,
     /// Populated only when the owning local server explicitly enables tracing.
     pub trace: Vec<GatewayTraceEvent>,
 }
@@ -521,6 +523,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         }
         // Family 168 carries a one-byte sub-opcode, so only the family is matched.
         (Some(168), _) => "mounts",
+        // Family 53 likewise has a one-byte subtype. Only the implemented pet requests
+        // carry the pet label; unknown subtypes remain visible as unknown traffic.
+        (Some(53), _) if matches!(body.get(2), Some(4 | 6 | 24 | 32)) => "pets",
         // W174: handled in gameplay.rs, where a refusal can send nothing. Naming them keeps
         // the gateway from logging an understood request as "unknown application message".
         (Some(26), Some(13)) => "class_selection",
@@ -1339,6 +1344,41 @@ impl Gateway {
         self.gameplay.as_ref()?.ride_view(self.state.guid)
     }
 
+    /// W177: load the top-level saved pet roster before world entry.
+    pub fn load_pet_roster(&mut self, path: &Path) -> io::Result<()> {
+        if let Some(game) = self.gameplay.as_mut() {
+            game.load_pet_roster(path)?;
+        }
+        Ok(())
+    }
+
+    /// Persist the top-level pet roster after a committed pet change.
+    pub fn save_pet_roster(&self, path: &Path) -> io::Result<()> {
+        if let Some(game) = self.gameplay.as_ref() {
+            game.save_pet_roster(path)?;
+        }
+        Ok(())
+    }
+
+    /// W177: the active pet for AddNpc fanout and late viewers.
+    pub fn pet_view(&self) -> Option<crate::pets::PetPresence> {
+        self.gameplay.as_ref()?.pet_view(self.state.guid)
+    }
+
+    /// W177 (R): a zone transition dismisses the active pet and removes its actor.
+    pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<GatewayOutcome> {
+        let mut outcome = GatewayOutcome::default();
+        if let Some(game) = self.gameplay.as_mut() {
+            let ended = game.settle_pets(zoned, now_ms)?;
+            outcome.state_changed = ended.changed;
+            outcome.gameplay_changed = ended.changed;
+            outcome.pets_changed = ended.pets_changed;
+            outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();
+            outcome.nearby = ended.nearby;
+        }
+        Ok(outcome)
+    }
+
     /// W162: end the ride after a message or tick when the player zoned, entered a fight or
     /// minigame, or was knocked out. Replies are wrapped like every gateway reply.
     pub fn settle_rides(&mut self, zoned: bool) -> GatewayOutcome {
@@ -1679,6 +1719,7 @@ impl Gateway {
                         gameplay = Some(staged_game);
                         outcome.state_changed |= result.changed;
                         outcome.gameplay_changed |= result.changed;
+                        outcome.pets_changed |= result.pets_changed;
                         if let Some(relocation) = result.relocation {
                             // A developer teleport stays in the current zone.
                             // Stage the position before the packet is built so
@@ -2147,6 +2188,17 @@ mod radial_routing {
         }
         // 167 carries a service byte and a one-byte sub: 1/2 Play and 1/4 Refresh only.
         assert_eq!(application_handler(&[167, 0, 1, 4]), "activity_portal");
+        assert_eq!(application_handler(&[53, 0, 4, 0, 0, 0, 0, 1]), "pets");
+        assert_eq!(application_handler(&[53, 0, 6, 1, 0, 0, 0, b'A']), "pets");
+        assert_eq!(application_handler(&[53, 0, 24, 2, 0, 0, 0]), "pets");
+        assert_eq!(
+            application_handler(&[53, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0]),
+            "pets"
+        );
+        assert_eq!(
+            application_handler(&[53, 0, 0xff, 0xff]),
+            "gameplay.handle_in_world"
+        );
         assert_eq!(
             application_handler(&[167, 0, 1, 2, 0, 0, 0, 0]),
             "activity_portal"
