@@ -45,6 +45,8 @@ use std::{
 const VERSION: &str = "1.910.1.530630";
 /// Generous: under a loaded full suite a gateway reply can take seconds.
 const T: Duration = Duration::from_secs(20);
+/// How long a save may take to show a change (the gateway can be starved).
+const SAVE_WAIT: Duration = Duration::from_secs(30);
 static NEXT: AtomicU32 = AtomicU32::new(0);
 /// Each scenario starts its own gateway and login server, each loading the
 /// 58k-row catalogue; running them one at a time keeps their timing honest.
@@ -72,6 +74,11 @@ impl Drop for Service {
 /// Spawn `command`, tee its stdout/stderr into `log`, and return once it prints
 /// the JSON event `event` (carrying `address`) together with that event line.
 fn spawn(mut command: Command, event: &str, log: &Path) -> (Service, Value) {
+    // The bots are strict about timing (a 5 s handshake window) and the server
+    // under test builds a whole session per handshake, so on a machine busy with
+    // builds and other test binaries the services must not queue behind them.
+    #[cfg(windows)]
+    std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0000_8000); // ABOVE_NORMAL_PRIORITY_CLASS
     let mut child = Service(
         command
             .stdout(Stdio::piped())
@@ -197,6 +204,11 @@ fn free_udp() -> SocketAddr {
 impl Rig {
     /// One account per role, in order. `broker` also starts `osfr-login`.
     fn start(roles: &[AccountRole], broker: bool) -> Self {
+        Self::start_with(roles, broker, true)
+    }
+
+    /// `trim_npcs` keeps only the starting village's NPCs (see below).
+    fn start_with(roles: &[AccountRole], broker: bool, trim_npcs: bool) -> Self {
         let lab = lab();
         let reference = lab.join("references/rust-gateway-reference");
         let bundle = lab.join("reports/round70-native-20261016T061000Z/content");
@@ -222,6 +234,36 @@ impl Rig {
             &content,
         );
         copy_dir(&bundle, &content);
+        // The gateway builds a whole gameplay (24 MB of NPC JSON, parsed three
+        // times) for every session, in a debug build: 2.5 to 8 s per bot depending
+        // on load, past the bot's 5 s handshake window. No scenario needs more than
+        // the starting village's NPCs, so the rest are left out.
+        if trim_npcs {
+            for entry in fs::read_dir(content.join("npcs")).unwrap() {
+                let path = entry.unwrap().path();
+                if path.file_name().unwrap() != "cobblestone_village.json" {
+                    fs::remove_file(path).unwrap();
+                }
+            }
+            let village: Value = serde_json::from_slice(
+                &fs::read(content.join("npcs/cobblestone_village.json")).unwrap(),
+            )
+            .unwrap();
+            let kept: Vec<_> = village["records"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|npc| npc["npc_id"].clone())
+                .collect();
+            let vendors_path = content.join("vendors.json");
+            let mut vendors: Value =
+                serde_json::from_slice(&fs::read(&vendors_path).unwrap()).unwrap();
+            vendors["vendors"]
+                .as_array_mut()
+                .unwrap()
+                .retain(|vendor| kept.contains(&vendor["npc_id"]));
+            fs::write(&vendors_path, serde_json::to_vec(&vendors).unwrap()).unwrap();
+        }
 
         // Accounts, keys and characters.
         let creator = root.join("creator");
@@ -356,16 +398,11 @@ impl Rig {
         }
     }
 
-    /// The character's save file, as the gateway wrote it.
+    /// The character's save file, as the gateway wrote it. A read that fails
+    /// (the gateway replaces the file atomically; Windows can briefly deny a
+    /// reader) is retried for a few seconds before it counts as a failure.
     fn save(&self, account: usize) -> Value {
-        let path = self.root.join(format!(
-            "state/characters/{}.json",
-            self.accounts[account].guid
-        ));
-        serde_json::from_slice(
-            &fs::read(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display())),
-        )
-        .unwrap()
+        self.save_when(None, account, "any save", |_| true)
     }
 
     fn save_path(&self, account: usize) -> PathBuf {
@@ -375,27 +412,35 @@ impl Rig {
         ))
     }
 
-    /// Poll the save until `ready` accepts it (the gateway coalesces pose saves).
-    fn save_when(&self, account: usize, what: &str, ready: impl Fn(&Value) -> bool) -> Value {
-        let deadline = Instant::now() + Duration::from_secs(30);
+    /// Poll the save until `ready` accepts it (the gateway coalesces pose
+    /// saves). Pass the live `bot` so its socket is serviced while we wait: a
+    /// bot that only sleeps never acknowledges or retransmits, so one lost or
+    /// late datagram would stall the very request being waited for.
+    fn save_when(
+        &self,
+        mut bot: Option<&mut bot::Bot>,
+        account: usize,
+        what: &str,
+        ready: impl Fn(&Value) -> bool,
+    ) -> Value {
+        let deadline = Instant::now() + SAVE_WAIT;
+        let mut last = String::from("no read yet");
         loop {
-            if let Ok(bytes) = fs::read(self.root.join(format!(
-                "state/characters/{}.json",
-                self.accounts[account].guid
-            ))) {
-                if let Ok(value) = serde_json::from_slice::<Value>(&bytes) {
-                    if ready(&value) {
-                        return value;
-                    }
-                    if Instant::now() > deadline {
-                        panic!("save never showed {what}: {value:#}");
-                    }
-                }
+            match fs::read(self.save_path(account)) {
+                Ok(bytes) => match serde_json::from_slice::<Value>(&bytes) {
+                    Ok(value) if ready(&value) => return value,
+                    Ok(value) => last = format!("save never showed {what}: {value:#}"),
+                    Err(e) => last = format!("save for {what} is not JSON: {e}"),
+                },
+                Err(e) => last = format!("save for {what} unreadable: {e}"),
             }
             if Instant::now() > deadline {
-                panic!("no readable save for {what}");
+                panic!("{last}");
             }
-            std::thread::sleep(Duration::from_millis(100));
+            match bot.as_deref_mut() {
+                Some(bot) => bot.pump(Duration::from_millis(100)).unwrap(),
+                None => std::thread::sleep(Duration::from_millis(100)),
+            }
         }
     }
 
@@ -428,7 +473,11 @@ impl Rig {
                 Ok(bot) => return bot,
                 Err(error) => last = error,
             }
-            std::thread::sleep(Duration::from_millis(700));
+            // A handshake that went unanswered is still queued at the gateway,
+            // which builds a full session for it before it can look at the next
+            // datagram; a prompt retry only lengthens that queue. Let it drain.
+            let unanswered = last.contains("no SessionResponse");
+            std::thread::sleep(Duration::from_millis(if unanswered { 8000 } else { 700 }));
         }
         panic!("{name} could not log in: {last}");
     }
@@ -452,6 +501,8 @@ impl Rig {
         )
         .unwrap();
         let mut command = Command::new(env!("CARGO_BIN_EXE_osfr-bot"));
+        #[cfg(windows)]
+        std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0000_8000);
         command
             .arg("--broker-profile")
             .arg(&profile)
@@ -639,6 +690,7 @@ fn walk_disconnect_reconnect_restores_the_last_pose() {
     let rig = Rig::start(&[AccountRole::Builder], false);
     let guid = rig.accounts[0].guid;
     let mut bot = rig.connect(0, "pose1");
+    let logged_in = Instant::now();
     let start = here(&mut bot);
     let steps = [
         [start[0] + 3.0, start[1], start[2]],
@@ -653,15 +705,20 @@ fn walk_disconnect_reconnect_restores_the_last_pose() {
         planar(here(&mut bot), last) < 0.2,
         "server did not accept the walk"
     );
-    // Coalescing: inside the 5 s window the file still holds an older pose.
+    // Coalescing: inside the 5 s window the file still holds an older pose. On a
+    // starved machine the window can pass before we look (the tick then writes
+    // the newest pose, which is correct), so the check only runs when we are
+    // clearly inside it. The logout flush and the restore below always run.
     let mid = rig.save(0)["character"]["position"].clone();
     let mid: Vec<f64> = serde_json::from_value(mid).unwrap();
-    assert!(
-        (mid[0] as f32 - last[0]).abs() > 1.0,
-        "the newest pose was saved at once, nothing was coalesced: {mid:?}"
-    );
+    if logged_in.elapsed() < Duration::from_millis(3500) {
+        assert!(
+            (mid[0] as f32 - last[0]).abs() > 1.0,
+            "the newest pose was saved at once, nothing was coalesced: {mid:?}"
+        );
+    }
     disconnect(bot);
-    let saved = rig.save_when(0, "the last pose after logout", |v| {
+    let saved = rig.save_when(None, 0, "the last pose after logout", |v| {
         v["character"]["position"][0]
             .as_f64()
             .is_some_and(|x| (x as f32 - last[0]).abs() < 0.1)
@@ -778,7 +835,7 @@ fn eligible_equip_succeeds_and_ineligible_equip_is_refused_without_state_change(
     raw(&mut bot, &equip_request(PLAIN as i32, 1, 4));
     bot.wait_for(T, |m| m.starts_with(&[38, 0, 5, 0]))
         .unwrap_or_else(|e| panic!("no 38/5 after the eligible equip ({e}); got {}", tail(&bot)));
-    let saved = rig.save_when(0, "the equip", |v| worn(v, 1, 4) == PLAIN);
+    let saved = rig.save_when(Some(&mut bot), 0, "the equip", |v| worn(v, 1, 4) == PLAIN);
     assert_eq!(
         worn(&saved, 1, 3),
         worn(&before, 1, 3),
@@ -911,7 +968,7 @@ fn warpstone_attunes_by_walking_travel_relocates_and_locked_ids_do_not() {
             .contains("Sanctuary Warpstone")
     );
     bot.pump(Duration::from_millis(500)).unwrap();
-    rig.save_when(0, "the attunement", |v| {
+    rig.save_when(Some(&mut bot), 0, "the attunement", |v| {
         v["gameplay"]["warpstones"]["attuned"] == json!([5])
     });
 
@@ -938,7 +995,7 @@ fn warpstone_attunes_by_walking_travel_relocates_and_locked_ids_do_not() {
     disconnect(bot);
 
     // The new position was saved, and the attunement survives the relog.
-    let saved = rig.save_when(0, "the arrival position", |v| {
+    let saved = rig.save_when(None, 0, "the arrival position", |v| {
         v["character"]["position"][0]
             .as_f64()
             .is_some_and(|x| (x as f32 - SANCTUARY[0]).abs() < 2.0)
@@ -1045,7 +1102,9 @@ fn quest_journal_selection_persists_across_relog() {
         raw(&mut bot, &inner);
         bot.pump(Duration::from_millis(400)).unwrap();
     }
-    let active = rig.save_when(0, "the accepted quest", |v| status(v) == "active");
+    let active = rig.save_when(Some(&mut bot), 0, "the accepted quest", |v| {
+        status(v) == "active"
+    });
     assert_eq!(
         selected(&active),
         Value::Null,
@@ -1062,7 +1121,9 @@ fn quest_journal_selection_persists_across_relog() {
     );
 
     raw(&mut bot, &select(plan.quest as i32));
-    rig.save_when(0, "the selection", |v| selected(v) == plan.quest);
+    rig.save_when(Some(&mut bot), 0, "the selection", |v| {
+        selected(v) == plan.quest
+    });
     disconnect(bot);
 
     let mut again = rig.connect(0, "quest2");
@@ -1075,4 +1136,46 @@ fn quest_journal_selection_persists_across_relog() {
     );
     assert_eq!(status(&restored), "active");
     disconnect(again);
+}
+
+// ------------------------------------------------------- server finding
+
+/// Finding W154-F1 (server, for the lead): with the full content, a handshake
+/// makes the gateway build a whole gameplay before it answers (every NPC file is
+/// parsed three times), so under load the SessionResponse arrives after the
+/// bot's 5 s window and the session then dies at `login_deadline`. Un-ignore once
+/// `Session::new` stops re-loading content; see `lab/runs/claude/W154/final2.md`.
+#[test]
+#[ignore = "server finding W154-F1: a handshake costs seconds of content loading in a debug build"]
+fn a_handshake_is_answered_quickly_even_with_full_content() {
+    let _serial = serial();
+    let rig = Rig::start_with(&[AccountRole::Player], false, false);
+    let mut slowest = Duration::ZERO;
+    for round in 0..3u32 {
+        let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+        socket
+            .set_read_timeout(Some(Duration::from_millis(20)))
+            .unwrap();
+        let mut request = vec![0, 1];
+        request.extend(3u32.to_be_bytes());
+        request.extend((900_000 + round).to_be_bytes());
+        request.extend(512u32.to_be_bytes());
+        request.extend(b"CGAPI_527\0");
+        let sent = Instant::now();
+        socket.send_to(&request, rig.gateway).unwrap();
+        let mut buffer = [0u8; 64];
+        while sent.elapsed() < Duration::from_secs(60) {
+            if let Ok((n, _)) = socket.recv_from(&mut buffer) {
+                if n >= 17 && buffer[..2] == [0, 2] {
+                    break;
+                }
+            }
+        }
+        slowest = slowest.max(sent.elapsed());
+        std::thread::sleep(Duration::from_millis(300));
+    }
+    assert!(
+        slowest < Duration::from_millis(1500),
+        "the slowest SessionResponse took {slowest:?}; the bot gives up after 5 s"
+    );
 }

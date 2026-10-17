@@ -447,7 +447,7 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
     let sensitive = top == Some(1)
         || family.zip(subtype).is_some_and(|(family, subtype)| {
             family == 1
-                || matches!(family, 15 | 22 | 40 | 68 | 74 | 112 | 149 | 175)
+                || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 149 | 175)
                 || (family == 26 && matches!(subtype, 14 | 15 | 16 | 17 | 30))
         });
     let handler = match event {
@@ -485,16 +485,29 @@ fn application_handler(body: &[u8]) -> &'static str {
     if body == [149, 0, 2] {
         return "player_radial";
     }
+    // W174 (R): a bare family 16 (two bytes) arrives once, right before the client disconnects
+    // (31 of 31 native runs that ended in a disconnect, none without). Meaning: exit notice.
+    if body == [16, 0] {
+        return "client_exit_notice";
+    }
     let word = |at: usize| {
         body.get(at..at + 2)
             .map(|b| u16::from_le_bytes([b[0], b[1]]))
     };
+    // W174: warpstone requests (56, 58, 90, 122) are handled in gameplay.rs. They sit outside
+    // the match on purpose: 56 and 122 are valid with an empty body, so a wildcard seed would
+    // make the hostile corpus replay a real teleport as a "cut".
+    if matches!(word(0), Some(56 | 58 | 90 | 122)) {
+        return "warp";
+    }
     match (word(0), word(2)) {
         (Some(15), Some(1)) => "social_chat",
         (Some(67), Some(2 | 3)) => "quick_chat",
         (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
         (Some(26), Some(19)) => "player_radial",
         (Some(26), Some(14 | 15 | 17 | 21 | 30)) => "social_router",
+        // W173: chat channel switches (32 on, 33 off) and bubble colour (18).
+        (Some(26), Some(18 | 32 | 33)) => "chat_settings",
         (Some(40), Some(1 | 3 | 4 | 6 | 14 | 16)) => "social_router",
         (Some(49), Some(2 | 14 | 15)) => "quest_engine",
         // Family 47 carries a one-byte subtype; word(2) would swallow the first body byte.
@@ -508,11 +521,44 @@ fn application_handler(body: &[u8]) -> &'static str {
         }
         // Family 168 carries a one-byte sub-opcode, so only the family is matched.
         (Some(168), _) => "mounts",
+        // W174: handled in gameplay.rs, where a refusal can send nothing. Naming them keeps
+        // the gateway from logging an understood request as "unknown application message".
+        (Some(26), Some(13)) => "class_selection",
+        (Some(26), Some(24)) => "recipe_book",
+        (Some(41), Some(109 | 122)) => "encounter",
+        (Some(42), Some(6 | 9)) => "item_bar",
+        (Some(42), Some(15 | 16)) => "item_use",
+        // Family 167 is a service byte (1 = activity) and a one-byte sub (2 Play, 4 Refresh).
+        (Some(167), _) if body.get(2) == Some(&1) && matches!(body.get(3), Some(2 | 4)) => {
+            "activity_portal"
+        }
+        // W174 quiet list (R): accepted and discarded, never stored (109 text can hold local
+        // paths), never relayed. 105/109/194 are Legacy PacketClientMetrics/PacketClientLog and
+        // Ui.SetWallOfData; 193/1 is the client's announcements request (native 00a3e050).
+        (Some(26), Some(20)) => "free_interaction",
+        (Some(26), Some(26 | 37)) => "profile_notice",
+        (Some(105), _) => "client_metrics",
+        (Some(109), _) => "client_log",
+        (Some(193), _) if body.get(2) == Some(&1) => "announcements_request",
+        (Some(194), _) => "ui_telemetry",
         (Some(36), Some(10 | 12)) => "combat",
         (Some(42), Some(2 | 3 | 8)) | (Some(35), Some(34)) => "inventory",
         (Some(66), Some(43)) | (Some(165), Some(4 | 5)) => "merchant",
         _ => "gameplay.handle_in_world",
     }
+}
+
+fn quiet_application(body: &[u8]) -> bool {
+    matches!(
+        application_handler(body),
+        "client_metrics"
+            | "client_log"
+            | "ui_telemetry"
+            | "announcements_request"
+            | "client_exit_notice"
+            | "free_interaction"
+            | "profile_notice"
+    )
 }
 
 fn set_trace(
@@ -1556,6 +1602,11 @@ impl Gateway {
                             );
                             continue;
                         }
+                        // W174: these requests are accepted and discarded before gameplay.
+                        if quiet_application(&inner) {
+                            outcome.applications.push(inner.clone());
+                            continue;
+                        }
                         let mut staged_game = game.clone();
                         if let Some(text) = crate::chat::request(&inner, state.guid).ok().flatten()
                         {
@@ -2047,5 +2098,122 @@ mod radial_routing {
             "gameplay.handle_in_world"
         );
         assert_eq!(application_handler(&[0x3b, 0]), "gameplay.handle_in_world");
+    }
+
+    #[test]
+    fn chat_settings_requests_are_forwarded_to_the_binary() {
+        // W173: 26/18 bubble colour, 26/32 channel on, 26/33 channel off.
+        for sub in [18u8, 32, 33] {
+            assert_eq!(
+                application_handler(&[26, 0, sub, 0, 0, 0, 0, 0]),
+                "chat_settings"
+            );
+        }
+        assert_eq!(
+            application_handler(&[26, 0, 34, 0]),
+            "gameplay.handle_in_world"
+        );
+    }
+
+    fn head(family: u16, sub: u16) -> Vec<u8> {
+        [family.to_le_bytes(), sub.to_le_bytes()].concat()
+    }
+
+    #[test]
+    fn handled_requests_carry_their_handler_names() {
+        // W174: these reach their handlers inside gameplay.rs; a refusal that sends nothing must
+        // not be logged as an unknown message.
+        for (family, sub, label) in [
+            (42, 6, "item_bar"),
+            (42, 9, "item_bar"),
+            (42, 15, "item_use"),
+            (42, 16, "item_use"),
+            (26, 24, "recipe_book"),
+            (26, 13, "class_selection"),
+            (36, 12, "combat"),
+            (41, 122, "encounter"),
+            (41, 109, "encounter"),
+            (56, 0, "warp"),
+            (58, 0, "warp"),
+            (90, 0, "warp"),
+            (122, 0, "warp"),
+        ] {
+            let mut body = head(family, sub);
+            body.extend([0u8; 8]);
+            assert_eq!(application_handler(&body), label, "{family}/{sub}");
+        }
+        // 167 carries a service byte and a one-byte sub: 1/2 Play and 1/4 Refresh only.
+        assert_eq!(application_handler(&[167, 0, 1, 4]), "activity_portal");
+        assert_eq!(
+            application_handler(&[167, 0, 1, 2, 0, 0, 0, 0]),
+            "activity_portal"
+        );
+        assert_eq!(
+            application_handler(&[167, 0, 1, 1]),
+            "gameplay.handle_in_world"
+        );
+        assert_eq!(
+            application_handler(&[167, 0, 2, 4]),
+            "gameplay.handle_in_world"
+        );
+    }
+
+    #[test]
+    fn telemetry_and_benign_requests_are_a_named_quiet_list() {
+        // W174 (R): accepted, answered with nothing, never stored or relayed.
+        let mut metrics = head(105, 1);
+        metrics.extend([0u8; 146]);
+        assert_eq!(application_handler(&metrics), "client_metrics");
+        // 109 is two strings after the opcode, no sub-opcode: any first byte is the same message.
+        for first in [17u8, 18, 19, 20, 25] {
+            assert_eq!(application_handler(&[109, 0, first, 0, 0, 0]), "client_log");
+        }
+        // 194 has a one-byte sub (2 and 3 in the traces).
+        assert_eq!(
+            application_handler(&[194, 0, 2, 1, 0, 0, 0]),
+            "ui_telemetry"
+        );
+        assert_eq!(application_handler(&[194, 0, 3, 5, 0]), "ui_telemetry");
+        // 193/1 is the client's AnnouncementDataRequestPacket; 193/2 and 193/4 are server sends.
+        assert_eq!(application_handler(&[193, 0, 1]), "announcements_request");
+        assert_eq!(
+            application_handler(&[193, 0, 2]),
+            "gameplay.handle_in_world"
+        );
+        assert_eq!(
+            application_handler(&[193, 0, 4]),
+            "gameplay.handle_in_world"
+        );
+        // Bare family 16 (two bytes) is the exit notice (R); anything longer stays unknown.
+        assert_eq!(application_handler(&[16, 0]), "client_exit_notice");
+        assert_eq!(application_handler(&[16, 0, 0]), "gameplay.handle_in_world");
+        assert_eq!(
+            application_handler(&[16, 0, 0, 0]),
+            "gameplay.handle_in_world"
+        );
+        assert_eq!(application_handler(&head(26, 20)), "free_interaction");
+        assert_eq!(application_handler(&head(26, 26)), "profile_notice");
+        assert_eq!(application_handler(&head(26, 37)), "profile_notice");
+    }
+
+    #[test]
+    fn real_unknowns_still_stand_out() {
+        // Neighbours of the quiet list and families nothing routes.
+        for (family, sub) in [
+            (104, 1),
+            (106, 1),
+            (192, 1),
+            (195, 1),
+            (777, 1),
+            (0xffff, 0xffff),
+        ] {
+            let mut body = head(family, sub);
+            body.extend([0u8; 8]);
+            assert_eq!(
+                application_handler(&body),
+                "gameplay.handle_in_world",
+                "{family}/{sub}"
+            );
+        }
     }
 }

@@ -549,6 +549,52 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     path.extend([0; 4 + 32 + 4]);
     result.push(("pathing", path));
     result.push(("pathing", vec![98, 0, 0xff, 0xff]));
+    // W173: channel switch on/off by name, and the bubble colour (three i32 and a u64).
+    for sub in [32u16, 33] {
+        let mut switch = vec![26, 0, sub as u8, 0, 9, 0, 0, 0];
+        switch.extend(b"WorldArea");
+        result.push(("chat_settings", switch));
+    }
+    let mut bubble = vec![26, 0, 18, 0];
+    bubble.extend(13_158i32.to_le_bytes());
+    bubble.extend(13_434_879i32.to_le_bytes());
+    bubble.extend(2i32.to_le_bytes());
+    bubble.extend(0u64.to_le_bytes());
+    result.push(("chat_settings", bubble));
+    // W174: handled requests whose refusal sends nothing, then the quiet list (R). A wildcard
+    // family needs a seed with an unknown subtype for the source inventory.
+    result.push(("recipe_book", words(26, 24, &[u32::MAX])));
+    result.push(("item_bar", words(42, 6, &[u32::MAX; 3])));
+    result.push(("item_bar", words(42, 9, &[u32::MAX; 3])));
+    result.push(("item_use", words(42, 15, &[u32::MAX])));
+    result.push(("encounter", [words(41, 122, &[0, 0]), vec![0]].concat()));
+    result.push(("activity_portal", vec![167, 0, 1, 4]));
+    result.push((
+        "activity_portal",
+        [vec![167, 0, 1, 2], vec![0xff; 8]].concat(),
+    ));
+    result.push(("activity_portal", vec![167, 0, 0xff, 0xff]));
+    result.push(("free_interaction", words(26, 20, &[])));
+    result.push(("profile_notice", words(26, 26, &[0x30, 0x30])));
+    result.push(("profile_notice", words(26, 37, &[0; 3])));
+    result.push(("client_metrics", words(105, 1, &[0; 3])));
+    result.push(("client_metrics", words(105, 0xffff, &[0; 2])));
+    result.push(("client_log", words(109, 0xffff, &[0; 2])));
+    result.push((
+        "client_log",
+        [
+            vec![109, 0],
+            vec![5, 0, 0, 0],
+            b"a.log".to_vec(),
+            vec![2, 0, 0, 0],
+            b"hi".to_vec(),
+        ]
+        .concat(),
+    ));
+    result.push(("ui_telemetry", vec![194, 0, 2, 1, 0, 0, 0, 0x58, 0, 0, 0]));
+    result.push(("ui_telemetry", vec![194, 0, 0xff, 0xff]));
+    result.push(("announcements_request", vec![193, 0, 1, 0]));
+    result.push(("announcements_request", vec![193, 0, 0xff, 0xff]));
     result.push(("unknown", words(0xffff, 0xffff, &[u32::MAX; 2])));
     let mut movement = 125u16.to_le_bytes().to_vec();
     movement.extend(u64::MAX.to_le_bytes());

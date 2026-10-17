@@ -156,6 +156,8 @@ pub struct Gameplay {
     fishing_spots: Option<Arc<crate::fishing_service::FishingSpots>>,
     /// The player's fishing round, if any. Ephemeral by design: a reconnect releases it.
     fishing: crate::fishing_service::FishingService,
+    /// W171 (R): this player's ore and mushroom nodes. Not persisted: a login sees every node.
+    gathering_nodes: Option<crate::harvest_nodes::GatheringNodes>,
     /// The authored content directory (data/content), for developer reloads.
     content_dir: PathBuf,
     mystery_chests: Option<Arc<MysteryChests>>,
@@ -245,6 +247,29 @@ fn current_unix_seconds() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs()
+}
+
+/// W171: draw and remove node actors. The caller sends `visibility.refresh()` to the client.
+fn apply_node_changes(
+    visibility: &mut crate::world::NpcVisibility,
+    changes: Vec<crate::harvest_nodes::NodeChange>,
+) {
+    use crate::harvest_nodes::NodeChange;
+    for change in changes {
+        match change {
+            NodeChange::Show(node) => visibility.add_static_actor(
+                node.guid,
+                &node.name,
+                0,
+                node.model_id as i32,
+                node.position,
+                0,
+            ),
+            NodeChange::Hide(guid) => {
+                visibility.remove(guid);
+            }
+        }
+    }
 }
 
 fn npc_event(value: serde_json::Value) {
@@ -886,6 +911,11 @@ impl Gameplay {
                 );
             }
         }
+        let mut gathering_nodes = crate::harvest_nodes::GatheringNodes::load(npc_content)?;
+        if let (Some(nodes), Some(visibility)) = (gathering_nodes.as_mut(), npc_visibility.as_mut())
+        {
+            apply_node_changes(visibility, nodes.sync(0, false));
+        }
         Ok(Self {
             mystery_chests,
             pending_chest: None,
@@ -944,6 +974,7 @@ impl Gameplay {
             kart_entry,
             fishing_spots,
             fishing: Default::default(),
+            gathering_nodes,
             content_dir: npc_content.to_path_buf(),
         })
     }
@@ -2566,6 +2597,7 @@ impl Gameplay {
             _ => Vec::new(),
         };
         let mut out = self.tick_world(character, now_ms)?;
+        self.tick_gathering_nodes(now_ms, &mut out)?;
         out.replies.splice(0..0, fishing);
         Ok(out)
     }
@@ -2883,6 +2915,9 @@ impl Gameplay {
         if let Some(outcome) = self.handle_warp(inner, character, now_ms)? {
             return Ok(outcome);
         }
+        if let Some(outcome) = self.handle_gathering_node(inner, character, now_ms)? {
+            return Ok(outcome);
+        }
         let inventory_before = self.inventory.state().clone();
         if let Some(mut outcome) = self.handle_npc_packet(inner, character)? {
             self.npc_inventory_events(&inventory_before, &mut outcome)?;
@@ -2975,6 +3010,92 @@ impl Gameplay {
         staged.append_journal_updates(&before, &mut out)?;
         *self = staged;
         Ok(out)
+    }
+
+    /// W171: hide paid nodes once their run closed, bring back grown-back ones. A change marks
+    /// the state changed so the staged clone (which holds the node timers) is kept.
+    fn tick_gathering_nodes(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        let busy = self.activity_busy();
+        let Some(nodes) = self.gathering_nodes.as_mut() else {
+            return Ok(());
+        };
+        let changes = nodes.sync(now_ms, busy);
+        let Some(visibility) = self.npc_visibility.as_mut().filter(|_| !changes.is_empty()) else {
+            return Ok(());
+        };
+        apply_node_changes(visibility, changes);
+        out.replies.extend(visibility.refresh()?);
+        out.changed = true;
+        Ok(())
+    }
+
+    /// W171 (R): the ordinary way into mining and harvesting. A click (26/8) on one of this
+    /// player's node actors starts the node's Type8 game on a staged copy, so a refusal changes
+    /// nothing. Anything that is not a node falls through to the NPC menu path.
+    fn handle_gathering_node(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        use crate::harvest_nodes::{Gather, Visitor, payout_fits};
+        if !inner.starts_with(&[26, 0, 8, 0]) || inner.len() < 12 {
+            return Ok(None);
+        }
+        let target = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+        let Some(nodes) = self.gathering_nodes.as_ref().filter(|n| n.is_node(target)) else {
+            return Ok(None);
+        };
+        npc_interaction::decode_npc_interact_26_8(inner)
+            .map_err(|_| invalid("invalid node interaction request"))?;
+        let mut out = Outcome::default();
+        let Some(profiles) = self.profiles.as_ref() else {
+            return Ok(None);
+        };
+        let visitor = Visitor {
+            zone: character.zone_id,
+            position: character.position,
+            busy: self.activity_busy(),
+            active_job: profiles.active(),
+            unlocked_jobs: &profiles.state().unlocked,
+        };
+        let gather = match nodes.admit(target, &visitor) {
+            Ok(gather) => gather,
+            Err(denied) => {
+                out.replies.push(chat::system(&denied.message()));
+                return Ok(Some(out));
+            }
+        };
+        let engine = match gather {
+            Gather::Mining => self.mining.as_ref(),
+            Gather::Harvesting => self.harvesting.as_ref(),
+        };
+        let Some(engine) = engine else {
+            out.replies
+                .push(chat::system("Gathering is not available in this campaign."));
+            return Ok(Some(out));
+        };
+        if !payout_fits(&self.inventory, engine.spec()) {
+            out.replies.push(chat::system(
+                "Your bag is full. Make room before gathering.",
+            ));
+            return Ok(Some(out));
+        }
+        let mut staged = self.clone();
+        staged.type8_tick_ms = Some(now_ms);
+        staged.gathering_nodes.as_mut().unwrap().begin(target);
+        match gather {
+            Gather::Mining => {
+                let result = staged.mining.as_mut().unwrap().begin(gather.job())?;
+                staged.apply_mining(result, &mut out)?;
+            }
+            Gather::Harvesting => {
+                let result = staged.harvesting.as_mut().unwrap().begin(gather.job())?;
+                staged.apply_harvesting(result, &mut out)?;
+            }
+        }
+        *self = staged;
+        Ok(Some(out))
     }
 
     /// True while a crafting, gathering or battle activity is running.
@@ -5595,6 +5716,13 @@ impl Gameplay {
                 )?;
             }
             self.npc_minigame_win(&result.replies, out)?;
+            self.award_job_xp(
+                crate::mining::lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
+                out,
+            )?;
+            if let Some(nodes) = self.gathering_nodes.as_mut() {
+                nodes.paid();
+            }
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -5626,6 +5754,13 @@ impl Gameplay {
                 )?;
             }
             self.npc_minigame_win(&result.replies, out)?;
+            self.award_job_xp(
+                crate::harvesting::lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
+                out,
+            )?;
+            if let Some(nodes) = self.gathering_nodes.as_mut() {
+                nodes.paid();
+            }
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);

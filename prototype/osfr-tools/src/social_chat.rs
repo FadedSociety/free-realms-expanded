@@ -4,8 +4,12 @@
 //! `notes/Research/Chat Core.md`. Recipient scopes, the local radius, account
 //! enforcement, text filtering, and ignore behavior are reconstructed policy (R).
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
+use std::io::{self, Read};
+use std::path::{Path, PathBuf};
 use std::time::Instant;
+
+use serde::{Deserialize, Serialize};
 
 use crate::net_policy::Bucket;
 
@@ -57,7 +61,7 @@ impl ActionBudgets {
             (family, sub),
             (15, 1)
                 | (67, 2 | 3)
-                | (26, 10 | 14 | 15 | 17 | 19 | 21 | 30)
+                | (26, 10 | 14 | 15 | 17 | 18 | 19 | 21 | 30 | 32 | 33)
                 | (40, 1 | 3 | 4 | 6 | 14 | 16)
         ) {
             return true;
@@ -1059,6 +1063,288 @@ pub fn intake_report(
     };
     inbox.0.push(report.clone());
     Ok(report)
+}
+
+// ---- Channel switches and bubble colour: 26/32, 26/33 and 26/18 (W173) ----
+//
+// Recovered from the client: the chat window can switch exactly four channels, named
+// WorldArea (8), WorldTrade (6), WorldLfg (7) and WorldMembersOnly (10); the name compare
+// ignores case (`00b978b0`, `StrICmpUpper`). 26/32 (`CommandPacketChatChannelOn`, ctor
+// `00c1dcb0`) and 26/33 (`...Off`, `00c1dd60`) carry one string: i32 length, then the name.
+// 26/18 (`CommandPacketSetChatBubbleColor`, ctor `008b6a20`, sent by `0092f380` for the Lua
+// `Ui.SetChatColorFgBgSz(fg, bg, size)`) is three i32 then a u64 the client always sends as 0;
+// the server never trusts that u64. Native trace bodies: 26/32 "WorldMembersOnly" is
+// `1a00 2000 10000000 <16 bytes>`; 26/18 is `1a00 1200 66330000 ffffcc00 02000000 <8 zero>`.
+// The client sends every switch at each zone load and keeps its own copy in UserOptions
+// (ScriptsBase.lua `setChannelsShowing`: Area and MembersOnly on, Trade and Lfg off by default).
+//
+// Reconstructed policy (R): a switched-off channel is not delivered to that player, whose own
+// echo is never dropped; the stored state starts all-on (today's behaviour) until the client
+// reports; colours are 24-bit RGB and the size is 0..=8; the stored bubble is kept and
+// exposed, and reaches other players only through `ChatSettings::bubble`.
+
+/// The four client-switchable channels by the name the client sends.
+const TOGGLE_CHANNELS: [(&str, ChatChannel); 4] = [
+    ("WorldArea", ChatChannel::Area),
+    ("WorldTrade", ChatChannel::Trade),
+    ("WorldLfg", ChatChannel::LookingForGroup),
+    ("WorldMembersOnly", ChatChannel::MembersOnly),
+];
+pub const MAX_CHANNEL_NAME_BYTES: usize = 32; // (R) The longest real name is 16.
+pub const MAX_BUBBLE_COLOR: i32 = 0x00FF_FFFF; // (R) 24-bit RGB; the client's defaults fit.
+pub const MAX_BUBBLE_SIZE: i32 = 8; // (R) Client default 2, server default 1.
+const MAX_CHAT_SETTINGS_FILE_BYTES: usize = 4096;
+const CHAT_SETTINGS_SCHEMA: u32 = 1;
+
+fn toggle_channel(name: &str) -> Option<ChatChannel> {
+    TOGGLE_CHANNELS
+        .iter()
+        .find(|(known, _)| known.eq_ignore_ascii_case(name))
+        .map(|(_, channel)| *channel)
+}
+
+fn is_toggle_wire(wire: u16) -> bool {
+    TOGGLE_CHANNELS
+        .iter()
+        .any(|(_, channel)| channel.wire() == wire)
+}
+
+/// Chat bubble text colour, bubble colour and text size, as the 26/18 fields.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BubbleStyle {
+    pub foreground: i32,
+    pub background: i32,
+    pub size: i32,
+}
+
+impl Default for BubbleStyle {
+    /// The captured NPC bubble defaults (`world.rs` `content_spawn_template`).
+    fn default() -> Self {
+        Self {
+            foreground: 408_679,
+            background: 13_951_728,
+            size: 1,
+        }
+    }
+}
+
+impl BubbleStyle {
+    fn in_range(self) -> bool {
+        (0..=MAX_BUBBLE_COLOR).contains(&self.foreground)
+            && (0..=MAX_BUBBLE_COLOR).contains(&self.background)
+            && (0..=MAX_BUBBLE_SIZE).contains(&self.size)
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SettingsRequest {
+    Channel { channel: ChatChannel, on: bool },
+    Bubble(BubbleStyle),
+}
+
+/// Decode 26/32, 26/33 or 26/18. A wrong header, truncation, trailing bytes, a name that is
+/// not one of the four, or an out-of-range value is an error and changes nothing.
+pub fn decode_settings_request(inner: &[u8]) -> Result<SettingsRequest, ChatError> {
+    let mut r = Reader {
+        bytes: inner,
+        at: 0,
+    };
+    let family = r.u16()?;
+    let sub = r.u16()?;
+    if family != 26 {
+        return Err(ChatError::InvalidPacket);
+    }
+    match sub {
+        32 | 33 => {
+            let name = r.string(MAX_CHANNEL_NAME_BYTES)?;
+            r.finish()?;
+            let channel = toggle_channel(&name).ok_or(ChatError::InvalidChannel)?;
+            Ok(SettingsRequest::Channel {
+                channel,
+                on: sub == 32,
+            })
+        }
+        18 => {
+            let style = BubbleStyle {
+                foreground: r.i32()?,
+                background: r.i32()?,
+                size: r.i32()?,
+            };
+            r.u64()?; // The client's guid slot: ignored, the server knows who sent this.
+            r.finish()?;
+            if style.in_range() {
+                Ok(SettingsRequest::Bubble(style))
+            } else {
+                Err(ChatError::InvalidMessage)
+            }
+        }
+        _ => Err(ChatError::InvalidPacket),
+    }
+}
+
+/// One character's chat switches and bubble. Persisted per character, never shared.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ChatSettings {
+    /// Wire numbers of switched-off channels; only the four in `TOGGLE_CHANNELS`.
+    muted: BTreeSet<u16>,
+    bubble: BubbleStyle,
+}
+
+impl ChatSettings {
+    pub fn is_muted(&self, channel: ChatChannel) -> bool {
+        self.muted.contains(&channel.wire())
+    }
+
+    pub fn bubble(&self) -> BubbleStyle {
+        self.bubble
+    }
+
+    /// True when the state changed. A request that is not one of the four channels or is out
+    /// of range changes nothing, even when built by hand.
+    pub fn apply(&mut self, request: SettingsRequest) -> bool {
+        match request {
+            SettingsRequest::Channel { channel, on } if is_toggle_wire(channel.wire()) => {
+                if on {
+                    self.muted.remove(&channel.wire())
+                } else {
+                    self.muted.insert(channel.wire())
+                }
+            }
+            SettingsRequest::Bubble(style) if style.in_range() => {
+                std::mem::replace(&mut self.bubble, style) != style
+            }
+            _ => false,
+        }
+    }
+
+    fn valid(&self) -> bool {
+        self.muted.iter().all(|wire| is_toggle_wire(*wire)) && self.bubble.in_range()
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ChatSettingsDocument {
+    schema_version: u32,
+    character_guid: u64,
+    settings: ChatSettings,
+}
+
+fn bad_settings(message: &str) -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, message.to_owned())
+}
+
+impl ChatSettings {
+    pub fn save(&self, path: &Path, character_guid: u64) -> io::Result<()> {
+        if !self.valid() {
+            return Err(bad_settings("invalid chat settings"));
+        }
+        if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
+            std::fs::create_dir_all(parent)?;
+        }
+        let bytes = serde_json::to_vec_pretty(&ChatSettingsDocument {
+            schema_version: CHAT_SETTINGS_SCHEMA,
+            character_guid,
+            settings: self.clone(),
+        })
+        .map_err(|error| bad_settings(&error.to_string()))?;
+        crate::character_store::replace_bytes(path, &bytes)
+    }
+
+    pub fn load(path: &Path, character_guid: u64) -> io::Result<Self> {
+        let mut bytes = Vec::new();
+        std::fs::File::open(path)?
+            .take((MAX_CHAT_SETTINGS_FILE_BYTES + 1) as u64)
+            .read_to_end(&mut bytes)?;
+        if bytes.len() > MAX_CHAT_SETTINGS_FILE_BYTES {
+            return Err(bad_settings("chat settings file too large"));
+        }
+        let document: ChatSettingsDocument =
+            serde_json::from_slice(&bytes).map_err(|error| bad_settings(&error.to_string()))?;
+        if document.schema_version != CHAT_SETTINGS_SCHEMA
+            || document.character_guid != character_guid
+            || !document.settings.valid()
+        {
+            return Err(bad_settings("chat settings do not match this character"));
+        }
+        Ok(document.settings)
+    }
+}
+
+/// Every joined character's settings, keyed by the server-bound character guid (never a wire
+/// id). Keep one in the shared world; a staged clone is committed or dropped with its message.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ChatSettingsBook {
+    settings: BTreeMap<u64, ChatSettings>,
+    paths: BTreeMap<u64, PathBuf>,
+}
+
+impl ChatSettingsBook {
+    pub fn get(&self, character_guid: u64) -> Option<&ChatSettings> {
+        self.settings.get(&character_guid)
+    }
+
+    /// Load a character at join. A missing or unreadable file starts from the defaults (R): a
+    /// cosmetic setting must never block a login, and the next change rewrites the file.
+    pub fn join(&mut self, character_guid: u64, path: Option<&Path>) {
+        if let Some(path) = path {
+            self.paths.insert(character_guid, path.to_owned());
+        }
+        self.settings.entry(character_guid).or_insert_with(|| {
+            path.and_then(|path| ChatSettings::load(path, character_guid).ok())
+                .unwrap_or_default()
+        });
+    }
+
+    /// Apply a client 26/32, 26/33 or 26/18 for the sending character. Ok(true) means the
+    /// state changed; an error changed nothing and is a silent drop for the caller (R).
+    pub fn handle(&mut self, character_guid: u64, inner: &[u8]) -> Result<bool, ChatError> {
+        let request = decode_settings_request(inner)?;
+        Ok(self
+            .settings
+            .entry(character_guid)
+            .or_default()
+            .apply(request))
+    }
+
+    /// Drop recipients that switched `channel` off. The sender's own session is never
+    /// dropped, and a channel the client cannot switch (tells, group, say) is untouched.
+    pub fn listeners(
+        &self,
+        channel: ChatChannel,
+        sender_session: u64,
+        sessions: &[ChatSession],
+        mut recipients: Vec<u64>,
+    ) -> Vec<u64> {
+        if is_toggle_wire(channel.wire()) {
+            let muted: HashSet<u64> = sessions
+                .iter()
+                .filter(|session| {
+                    session.session_id != sender_session
+                        && self
+                            .get(session.character_guid)
+                            .is_some_and(|settings| settings.is_muted(channel))
+                })
+                .map(|session| session.session_id)
+                .collect();
+            recipients.retain(|id| !muted.contains(id));
+        }
+        recipients
+    }
+
+    /// Write every character whose settings differ from `before` to its file.
+    pub fn save_changed(&self, before: &Self) -> io::Result<()> {
+        let default = ChatSettings::default();
+        for (guid, settings) in &self.settings {
+            if before.settings.get(guid).unwrap_or(&default) != settings {
+                if let Some(path) = self.paths.get(guid) {
+                    settings.save(path, *guid)?;
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]

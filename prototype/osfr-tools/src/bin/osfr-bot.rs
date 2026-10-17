@@ -575,7 +575,8 @@ impl Bot {
         self.pump(Duration::from_millis(200))?;
         self.send_message(&wrap(&10u16.to_le_bytes()), "loaded (10)")?;
         self.pump(Duration::from_millis(300))?;
-        self.inbox.clear();
+        // Keep the messages produced by 10/loaded. A late joiner's AddPc and
+        // ride actors arrive in this window and belong to the caller's scenario.
         self.in_world = true;
         self.log("in world");
         Ok(())

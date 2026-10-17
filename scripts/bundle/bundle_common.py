@@ -63,6 +63,7 @@ OPTIONAL_REPOSITORY_CONTENT = (
     "consumables.json",  # item_bar.rs: potion/food effect tuning (built-in table if absent)
     "power_ups.json",  # power_ups.rs: combat power-up drop tables (W153)
     "fishing_spots.json",  # fishing_service.rs: guide NPCs, area rows and fish items (W160)
+    "mining_nodes.json",  # harvest_nodes.rs: mining veins players click (W171)
 )
 
 # (R) Generated runtime content: the builder writes each file only when the
