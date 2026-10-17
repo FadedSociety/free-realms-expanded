@@ -7534,6 +7534,11 @@ mod w64_regional_quest_tests {
         let mut game = Gameplay::load(&reference(), None).unwrap();
         game.profiles = Some(Profiles::load(&reference(), Some(native_test_profiles())).unwrap());
         game.bind_npc_quest_catalogue(&scratch, 1).unwrap();
+        assert_eq!(
+            game.npc_quests.as_ref().unwrap().eligibility().player_level,
+            1,
+            "the active job starts at rank 1"
+        );
         assert!(
             !game
                 .npc_quests
@@ -7543,6 +7548,11 @@ mod w64_regional_quest_tests {
         );
         game.profiles.as_mut().unwrap().set_experience(200);
         game.refresh_npc_quest_eligibility(0);
+        assert_eq!(
+            game.npc_quests.as_ref().unwrap().eligibility().player_level,
+            3,
+            "eligibility follows the active job's XP"
+        );
         assert!(
             game.npc_quests
                 .as_mut()
@@ -7571,6 +7581,11 @@ mod w64_regional_quest_tests {
             .select(43, &game.inventory)
             .unwrap();
         game.refresh_npc_quest_eligibility(0);
+        assert_eq!(
+            game.npc_quests.as_ref().unwrap().eligibility().player_level,
+            3,
+            "eligibility follows the newly active job's XP"
+        );
         assert!(
             game.npc_quests
                 .as_mut()
