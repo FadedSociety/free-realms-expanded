@@ -265,20 +265,31 @@ impl Round {
 
     /// Entry, the client's Go (39/5) and the registration: the round is ready to cast.
     fn started(fisherman: bool) -> Self {
+        Self::started_with(spots(), fisherman)
+    }
+
+    fn started_with(spots: FishingSpots, fisherman: bool) -> Self {
         let mut round = Self::new(fisherman);
-        let offer = round.enter(REED, false).unwrap();
+        round.spots = spots;
+        round.start();
+        round
+    }
+
+    /// Offer and start a round with the current `spots`. Also reuses the same service, so a
+    /// session-scoped cap can be observed across trips.
+    fn start(&mut self) {
+        let offer = self.enter(REED, false).unwrap();
         assert_eq!(ids(&offer.replies), vec![(39, 16)]);
-        let instance = round.service.instance_id(PLAYER).unwrap();
-        let go = round.send(&lifecycle(5, instance), T0).unwrap().unwrap();
+        let instance = self.service.instance_id(PLAYER).unwrap();
+        let go = self.send(&lifecycle(5, instance), T0).unwrap().unwrap();
         assert_eq!(ids(&go.replies), vec![(41, 2), (35, 20)]);
         assert_eq!(
             status_flags(&go.replies),
             vec![0x40_0001],
             "fishing flag on"
         );
-        let registered = round.send(&register(), T0).unwrap().unwrap();
+        let registered = self.send(&register(), T0).unwrap().unwrap();
         assert_eq!(ids(&registered.replies)[0], (138, 3));
-        round
     }
 
     /// Cast, wait out the bite and hook, reel. Returns the reel's change.
@@ -308,6 +319,10 @@ impl Round {
             .copied()
             .unwrap_or(0)
     }
+
+    fn coins(&self) -> u32 {
+        self.inventory.state().coins
+    }
 }
 
 // ---- the spots file -----------------------------------------------------------------------
@@ -316,6 +331,26 @@ impl Round {
 fn shipped_spots_file_is_valid_and_names_real_npcs() {
     let spots = spots();
     assert_eq!(spots.gate_npcs().len(), 6, "one guide per fishing area");
+    let json: Value = serde_json::from_str(SPOTS_JSON).unwrap();
+    assert!(
+        !json["catch_cap"]["enabled"].as_bool().unwrap(),
+        "the shipped cap is off until the operator picks a value"
+    );
+    assert!(
+        json["catch_cap"]["max_paid_catches"].is_null(),
+        "the shipped file deliberately has no cap value"
+    );
+    assert_eq!(json["payout"]["by_grade"].as_array().unwrap().len(), 4);
+    for (index, row) in json["payout"]["by_grade"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .enumerate()
+    {
+        assert_eq!(row["grade"], json!(index + 1));
+        assert_eq!(row["coins"], json!(0), "no coin payout is evidenced");
+        assert_eq!(row["fisherman_xp"], json!(10), "the previous (R) policy");
+    }
     assert_eq!(spots.menu_string_id(), 73_552, "locale 'Go fish!'");
     // Every guide must be NPC content, or the menu option could never appear.
     let mut known = BTreeSet::new();
@@ -349,12 +384,71 @@ fn edited(mutate: impl FnOnce(&mut Value)) -> Vec<u8> {
     serde_json::to_vec(&json).unwrap()
 }
 
+fn spots_with(mutate: impl FnOnce(&mut Value)) -> FishingSpots {
+    FishingSpots::parse(&edited(mutate)).unwrap()
+}
+
 #[test]
 fn malformed_spots_files_are_refused() {
     let bad: Vec<(&str, Vec<u8>)> = vec![
         ("schema 2", edited(|j| j["schema_version"] = json!(2))),
         ("label 0", edited(|j| j["menu_string_id"] = json!(0))),
-        ("xp too high", edited(|j| j["catch_xp"] = json!(1_001))),
+        (
+            "payout source without provenance",
+            edited(|j| j["payout"]["source"] = json!("values")),
+        ),
+        (
+            "payout xp too high",
+            edited(|j| j["payout"]["by_grade"][0]["fisherman_xp"] = json!(1_001)),
+        ),
+        (
+            "payout coins too high",
+            edited(|j| j["payout"]["by_grade"][0]["coins"] = json!(1_000_001)),
+        ),
+        (
+            "payout missing grade",
+            edited(|j| {
+                j["payout"]["by_grade"].as_array_mut().unwrap().pop();
+            }),
+        ),
+        (
+            "payout wrong grade order",
+            edited(|j| j["payout"]["by_grade"][1]["grade"] = json!(1)),
+        ),
+        (
+            "cap enabled without a limit",
+            edited(|j| j["catch_cap"]["enabled"] = json!(true)),
+        ),
+        (
+            "cap limit zero",
+            edited(|j| {
+                j["catch_cap"]["enabled"] = json!(true);
+                j["catch_cap"]["max_paid_catches"] = json!(0);
+            }),
+        ),
+        (
+            "session cap over sanity bound",
+            edited(|j| {
+                j["catch_cap"]["enabled"] = json!(true);
+                j["catch_cap"]["max_paid_catches"] = json!(10_001);
+            }),
+        ),
+        (
+            "hour cap over sanity bound",
+            edited(|j| {
+                j["catch_cap"]["enabled"] = json!(true);
+                j["catch_cap"]["window"] = json!("hour");
+                j["catch_cap"]["max_paid_catches"] = json!(3_601);
+            }),
+        ),
+        (
+            "unknown cap window",
+            edited(|j| j["catch_cap"]["window"] = json!("day")),
+        ),
+        (
+            "cap source without provenance",
+            edited(|j| j["catch_cap"]["source"] = json!("off")),
+        ),
         ("zero npc", edited(|j| j["spots"][0]["npc"] = json!(0))),
         (
             "duplicate npc",
@@ -550,6 +644,139 @@ fn casting_again_after_a_catch_pays_the_next_catch_once_more() {
         assert_eq!(round.fisherman_xp(), 10 * caught);
         at += 10_000;
     }
+}
+
+#[test]
+fn the_cap_off_path_pays_every_catch_as_before() {
+    let mut round = Round::started(true);
+    let mut at = T0 + 100;
+    for caught in 1..=6u32 {
+        assert!(round.catch(at).paid);
+        assert_eq!(round.fish_held(), caught, "one fish per catch");
+        assert_eq!(round.fisherman_xp(), 10 * caught);
+        assert_eq!(round.coins(), 0, "the shipped table pays no coins");
+        at += 10_000;
+    }
+}
+
+#[test]
+fn the_payout_row_for_the_caught_grade_drives_coins_and_xp() {
+    let spots = spots_with(|j| {
+        for (index, row) in j["payout"]["by_grade"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .enumerate()
+        {
+            let grade = index as u64 + 1;
+            row["coins"] = json!(grade * 10);
+            row["fisherman_xp"] = json!(grade);
+        }
+    });
+    let mut round = Round::started_with(spots, true);
+    let caught = round.catch(T0 + 100);
+    assert!(caught.paid);
+    let grade = match ServerPacket::decode_known(Sub::Result, &caught.replies[0][4..]).unwrap() {
+        ServerPacket::Result { body } => body.at_3c,
+        packet => panic!("expected a catch result, got {packet:?}"),
+    };
+    assert!((1..=4).contains(&grade));
+    assert_eq!(round.fish_held(), 1);
+    assert_eq!(
+        round.fisherman_xp(),
+        grade,
+        "the caught grade's XP row, not a fixed value"
+    );
+    assert_eq!(round.coins(), grade * 10, "the caught grade's coin row");
+}
+
+#[test]
+fn a_session_cap_stops_payouts_and_survives_a_new_trip() {
+    let mut round = Round::started_with(
+        spots_with(|j| {
+            j["catch_cap"]["enabled"] = json!(true);
+            j["catch_cap"]["window"] = json!("session");
+            j["catch_cap"]["max_paid_catches"] = json!(2);
+        }),
+        true,
+    );
+    let mut at = T0 + 100;
+    for _ in 0..2 {
+        assert!(round.catch(at).paid);
+        at += 10_000;
+    }
+    let before_inventory = round.inventory.state().clone();
+    let before_profiles = round.profiles.clone();
+    let before_service = round.service.reward_state(PLAYER).unwrap().clone();
+
+    let blocked = round.catch(at);
+    assert!(!blocked.paid);
+    assert!(blocked.changed, "the attempt still ends");
+    assert_eq!(
+        ids(&blocked.replies),
+        vec![(138, 10), (138, 14)],
+        "the fish escapes instead of paying"
+    );
+    match ServerPacket::decode_known(Sub::Result, &blocked.replies[1][4..]).unwrap() {
+        ServerPacket::Result { body } => assert_eq!(body.at_18, 0),
+        packet => panic!("expected an escape result, got {packet:?}"),
+    }
+    assert_eq!(blocked.notices.len(), 1);
+    assert!(blocked.notices[0].contains("reward limit"));
+    assert!(blocked.quest_events.is_empty());
+    assert_eq!(round.fish_held(), 2);
+    assert_eq!(round.fisherman_xp(), 20);
+    assert_eq!(round.coins(), 0);
+    assert_eq!(round.inventory.state(), &before_inventory);
+    assert_eq!(round.profiles, before_profiles);
+    let after_service = round.service.reward_state(PLAYER).unwrap().clone();
+    assert_eq!(
+        after_service.inventory.state(),
+        before_service.inventory.state()
+    );
+    assert_eq!(after_service.profiles, before_service.profiles);
+    assert_eq!(
+        after_service.applied_grant_keys, before_service.applied_grant_keys,
+        "a refused catch adds no grant key"
+    );
+
+    // Re-entering within the same login session does not refresh the cap.
+    round.service.leave(PLAYER).unwrap();
+    round.start();
+    let blocked_again = round.catch(T0 + 100_000);
+    assert!(!blocked_again.paid);
+    assert_eq!(round.fish_held(), 2);
+
+    // Dropping the login session clears the ledger.
+    assert_eq!(round.service.reset_all(), 1);
+    round.start();
+    assert!(
+        round.catch(T0 + 200_000).paid,
+        "a fresh session starts the cap again"
+    );
+}
+
+#[test]
+fn an_hour_cap_uses_a_rolling_window() {
+    let mut round = Round::started_with(
+        spots_with(|j| {
+            j["catch_cap"]["enabled"] = json!(true);
+            j["catch_cap"]["window"] = json!("hour");
+            j["catch_cap"]["max_paid_catches"] = json!(1);
+        }),
+        true,
+    );
+    assert!(round.catch(T0 + 100).paid);
+    let blocked = round.catch(T0 + 10_000);
+    assert!(!blocked.paid);
+    assert_eq!(round.fish_held(), 1);
+
+    // The paid catch was at T0+2_520; one hour later its slot is free.
+    assert!(round.catch(T0 + 3_610_000).paid);
+    // The new catch is still inside the hour, so the next one is refused again.
+    let blocked_again = round.catch(T0 + 3_620_000);
+    assert!(!blocked_again.paid);
+    assert_eq!(round.fish_held(), 2);
 }
 
 #[test]

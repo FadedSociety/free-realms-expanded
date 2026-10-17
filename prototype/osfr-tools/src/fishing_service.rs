@@ -14,6 +14,11 @@
 //! definition bindings. The client sends no bite, hook, tension or catch
 //! outcome. Only this service selects and awards a catch.
 //!
+//! Payout rows and the optional paid-catch cap are operator content in
+//! `fishing_spots.json`; [`FishingService::begin`] keeps the low-level
+//! caller-owned payout, while the ordinary [`FishingService::enter`] path uses
+//! both.
+//!
 //! # Ordinary entry (W160)
 //!
 //! [`FishingSpots`] (`fishing_spots.json`) lists the guide NPCs whose menu offers the trip, the
@@ -58,6 +63,14 @@ const SPOTS_FILE: &str = "fishing_spots.json";
 const MAX_SPOTS_FILE: usize = 64 * 1024;
 const MAX_SPOTS: usize = 16;
 const MAX_CATCH_XP: u32 = 1_000;
+/// Sanity ceilings for the optional payout/cap content (R). They are not gameplay values: the
+/// shipped cap is disabled, and these only reject an operator file no live catch rate can reach.
+const MAX_PAYOUT_COINS: u32 = 1_000_000;
+const MAX_PAID_CATCHES_PER_SESSION: u32 = 10_000;
+const MAX_PAID_CATCHES_PER_HOUR: u32 = 3_600;
+const HOUR_MS: u64 = 60 * 60 * 1_000;
+/// (R) Player-readable line when the optional cap refuses to pay a catch.
+const CATCH_CAP_NOTICE: &str = "The fishing reward limit has been reached, so the fish got away.";
 /// The most new inventory stacks fishing can ever add: fish stack without limit, so a bag gains
 /// at most one stack per fish definition (40 species x 4 sizes). The payout bag floor is the
 /// player's current stacks plus this, so a catch never fails for want of a slot (R: the bag limit
@@ -92,8 +105,11 @@ struct Tracked {
     anchor: Vec4,
     /// Zone of the spot; `None` for sessions started by `begin` (no zone supervision).
     zone: Option<u32>,
-    /// Fisherman XP per paid catch (R, `fishing_spots.json`).
-    catch_xp: u32,
+    /// Per-grade payout rows for this round (R, `fishing_spots.json`); `None` for `begin`,
+    /// which keeps the low-level entry's caller-owned payout.
+    payout: Option<PayoutTable>,
+    /// Optional cap for this round (R, `fishing_spots.json`); `None` for `begin`.
+    cap: Option<CatchCap>,
     rewards: RewardState,
     session: fishing::Session,
     attempt: Option<Attempt>,
@@ -101,6 +117,16 @@ struct Tracked {
     lure_key: Option<String>,
     cast_sequence: u32,
     playing: bool,
+}
+
+/// Paid catches for one player's login session. The service is already scoped to one player;
+/// the map key keeps the accounting correct if several rounds are hosted together.
+#[derive(Clone, Default)]
+struct PaidCatches {
+    /// Paid catches across every round since this service was created or reset.
+    session: u32,
+    /// Paid-catch timestamps for the rolling hour window, oldest first.
+    hour: Vec<u64>,
 }
 
 #[derive(Clone)]
@@ -126,6 +152,9 @@ pub struct FishingService {
     sessions: BTreeMap<u64, Tracked>,
     item_definitions: BTreeMap<(String, u8), i32>,
     next_instance_id: i32,
+    /// Cap accounting for the login session (R). Not saved; `reset`/`reset_all`/`disconnect`
+    /// clear it with the session.
+    paid: BTreeMap<u64, PaidCatches>,
 }
 
 impl FishingService {
@@ -209,7 +238,8 @@ impl FishingService {
             fisherman_level,
             anchor,
             None,
-            0,
+            None,
+            None,
             rewards,
         )
     }
@@ -223,7 +253,8 @@ impl FishingService {
         fisherman_level: u32,
         anchor: Vec4,
         zone: Option<u32>,
-        catch_xp: u32,
+        payout: Option<PayoutTable>,
+        cap: Option<CatchCap>,
         rewards: RewardState,
     ) -> Result<Change, Error> {
         if guid == 0
@@ -257,7 +288,8 @@ impl FishingService {
                 fisherman_level,
                 anchor,
                 zone,
-                catch_xp,
+                payout,
+                cap,
                 rewards,
                 session: fishing::Session::new(),
                 attempt: None,
@@ -328,6 +360,7 @@ impl FishingService {
     /// Disconnect has no socket on which to send cleanup packets. Drop all
     /// ephemeral state and explicitly produce no rewards or quest events.
     pub fn disconnect(&mut self, guid: u64) -> Change {
+        self.paid.remove(&guid);
         let Some(mut tracked) = self.sessions.remove(&guid) else {
             return Change::default();
         };
@@ -425,12 +458,14 @@ impl FishingService {
     }
 
     pub fn reset(&mut self, guid: u64) -> bool {
+        self.paid.remove(&guid);
         self.sessions.remove(&guid).is_some()
     }
 
     pub fn reset_all(&mut self) -> usize {
         let count = self.sessions.len();
         self.sessions.clear();
+        self.paid.clear();
         count
     }
 
@@ -486,7 +521,8 @@ impl FishingService {
                 fisherman_level,
                 anchor,
                 Some(zone),
-                spots.catch_xp,
+                Some(spots.payout.clone()),
+                Some(spots.catch_cap.clone()),
                 rewards,
             )
             .map_err(|error| match error {
@@ -710,7 +746,14 @@ impl FishingService {
                     }
                     Some(AttemptStage::Hooked) if tracked.session.phase() == Phase::Reeling => {
                         tracked.session.request(&request)?;
-                        settle_catch(tracked, &self.item_definitions, guid, now_ms, &mut change)?;
+                        settle_catch(
+                            tracked,
+                            &self.item_definitions,
+                            &mut self.paid,
+                            guid,
+                            now_ms,
+                            &mut change,
+                        )?;
                     }
                     _ => return Err(Error::OutOfOrder),
                 }
@@ -790,6 +833,7 @@ fn escape(tracked: &mut Tracked, actor: Handle) -> Vec<Vec<u8>> {
 fn settle_catch(
     tracked: &mut Tracked,
     item_definitions: &BTreeMap<(String, u8), i32>,
+    paid: &mut BTreeMap<u64, PaidCatches>,
     guid: u64,
     now_ms: u64,
     change: &mut Change,
@@ -818,6 +862,25 @@ fn settle_catch(
         change.changed = true;
         return Ok(());
     };
+
+    // The optional cap is checked only after the server has selected a size: a blocked catch
+    // takes the same no-payout escape the bag-full path uses, and changes no reward state.
+    let cap = tracked.cap.clone();
+    let ledger = paid.entry(guid).or_default();
+    if !cap_allows(cap.as_ref(), ledger, now_ms) {
+        change
+            .replies
+            .extend(escape(tracked, tracked.session.actor().unwrap()));
+        change.notices.push(CATCH_CAP_NOTICE);
+        change.changed = true;
+        return Ok(());
+    }
+
+    let payout = tracked
+        .payout
+        .as_ref()
+        .and_then(|table| table.for_grade(grade))
+        .copied();
     let definition_id = item_definitions[&(fish.key.clone(), grade)];
     let weight_roll = unit(seed.rotate_left(31));
     let weight = fish.weight_kg[0] + (fish.weight_kg[1] - fish.weight_kg[0]) * weight_roll;
@@ -842,19 +905,20 @@ fn settle_catch(
     // inventory/display transaction succeeds; the caller persists it with the
     // fishing/minigame session before sending the returned packets.
     // (R) Fisherman XP only while the job is unlocked: the reward transaction refuses a locked one.
-    let job_xp = if tracked.catch_xp > 0
+    let xp = payout.map_or(0, |row| row.fisherman_xp);
+    let job_xp = if xp > 0
         && tracked
             .rewards
             .profiles
             .unlocked
             .contains(&FISHERMAN_PROFILE)
     {
-        BTreeMap::from([(FISHERMAN_PROFILE, tracked.catch_xp)])
+        BTreeMap::from([(FISHERMAN_PROFILE, xp)])
     } else {
         BTreeMap::new()
     };
     let grant = RewardGrant {
-        coins: 0,
+        coins: payout.map_or(0, |row| row.coins),
         items: vec![ItemGrant {
             definition_id,
             count: 1,
@@ -901,7 +965,35 @@ fn settle_catch(
     tracked.rewards = next_rewards;
     tracked.attempt = None;
     tracked.session.cancel();
+    cap_record(cap.as_ref(), ledger, now_ms);
     Ok(())
+}
+
+/// Whether another paid catch fits the optional cap. A disabled or absent cap never blocks.
+fn cap_allows(cap: Option<&CatchCap>, paid: &mut PaidCatches, now_ms: u64) -> bool {
+    let Some(cap) = cap.filter(|cap| cap.enabled) else {
+        return true;
+    };
+    let limit = cap.max_paid_catches.unwrap_or(0);
+    match cap.window {
+        CapWindow::Session => paid.session < limit,
+        CapWindow::Hour => {
+            let cutoff = now_ms.saturating_sub(HOUR_MS);
+            paid.hour.retain(|at| *at > cutoff);
+            paid.hour.len() < limit as usize
+        }
+    }
+}
+
+/// Count one paid catch. Only successful grants reach this call; escapes do not consume a slot.
+fn cap_record(cap: Option<&CatchCap>, paid: &mut PaidCatches, now_ms: u64) {
+    let Some(cap) = cap.filter(|cap| cap.enabled) else {
+        return;
+    };
+    match cap.window {
+        CapWindow::Session => paid.session = paid.session.saturating_add(1),
+        CapWindow::Hour => paid.hour.push(now_ms),
+    }
 }
 
 fn player_status(guid: u64, flags: u32) -> Vec<u8> {
@@ -1227,18 +1319,99 @@ impl EntryDenied {
 
 /// The optional `fishing_spots.json`: which guide NPCs offer a fishing trip (R), the area and
 /// client MiniGameData row each one stands for, the locale line of the menu option, the
-/// Fisherman XP a catch pays (R) and the inventory item behind every fish size. Absent file =
-/// nobody offers fishing. The file is operator content: bounded, regular-file only, strict.
+/// per-grade payout table and the optional catch cap (R), and the inventory item behind every
+/// fish size. Absent file = nobody offers fishing. The file is operator content: bounded,
+/// regular-file only, strict.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FishingSpots {
     schema_version: u32,
     /// Locale id of the menu line (R: "Go fish!").
     menu_string_id: u32,
-    catch_xp: u32,
+    payout: PayoutTable,
+    catch_cap: CatchCap,
     spots: Vec<Spot>,
     /// Species key to the item for sizes small, medium, large, extra large; 0 = no such size.
     items: BTreeMap<String, [i32; 4]>,
+}
+
+/// One reconstructed per-catch payout row, selected by the server-chosen size grade.
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GradePayout {
+    grade: u8,
+    coins: u32,
+    fisherman_xp: u32,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PayoutTable {
+    /// Provenance; every value is reconstructed because no original payout table was recovered.
+    source: String,
+    by_grade: Vec<GradePayout>,
+}
+
+impl PayoutTable {
+    fn valid(&self) -> bool {
+        self.source.contains("R:")
+            && self.by_grade.len() == 4
+            && self.by_grade.iter().enumerate().all(|(index, row)| {
+                row.grade == index as u8 + 1
+                    && row.coins <= MAX_PAYOUT_COINS
+                    && row.fisherman_xp <= MAX_CATCH_XP
+            })
+    }
+
+    fn for_grade(&self, grade: u8) -> Option<&GradePayout> {
+        self.by_grade.iter().find(|row| row.grade == grade)
+    }
+}
+
+/// The operator-selectable window. Both are reconstructed policies; neither is client-visible.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum CapWindow {
+    /// Paid catches across trips in this login session.
+    Session,
+    /// Paid catches in a rolling 3600-second window in this login session.
+    Hour,
+}
+
+/// Optional per-player cap on **paid** catches. A blocked catch escapes and changes no reward.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CatchCap {
+    /// Provenance; the cap is an operator choice, not a recovered original value.
+    source: String,
+    enabled: bool,
+    window: CapWindow,
+    /// Required (1..=window maximum) when enabled. Null keeps the shipped file off.
+    #[serde(default)]
+    max_paid_catches: Option<u32>,
+}
+
+impl CatchCap {
+    fn maximum(&self) -> u32 {
+        match self.window {
+            CapWindow::Session => MAX_PAID_CATCHES_PER_SESSION,
+            CapWindow::Hour => MAX_PAID_CATCHES_PER_HOUR,
+        }
+    }
+
+    fn valid(&self) -> bool {
+        if !self.source.contains("R:") {
+            return false;
+        }
+        match (self.enabled, self.max_paid_catches) {
+            (true, Some(limit)) => (1..=self.maximum()).contains(&limit),
+            // A pre-set value while disabled must still be sane, so flipping the switch cannot
+            // enable an absurd cap without another edit.
+            (false, Some(limit)) => (1..=self.maximum()).contains(&limit),
+            (false, None) => true,
+            (true, None) => false,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -1282,7 +1455,8 @@ impl FishingSpots {
         let mut seen = BTreeSet::new();
         if spots.schema_version != 1
             || spots.menu_string_id == 0
-            || spots.catch_xp > MAX_CATCH_XP
+            || !spots.payout.valid()
+            || !spots.catch_cap.valid()
             || spots.spots.len() > MAX_SPOTS
             || !spots.spots.iter().all(|s| {
                 s.npc != 0

@@ -1,7 +1,37 @@
 {
   "schema_version": 1,
   "menu_string_id": 73552,
-  "catch_xp": 10,
+  "payout": {
+    "source": "R: no original fishing payout table was recovered. The client result reader 00b66be0 carries name, icon, weight, size grade, time, difficulty, rarity and score, and no coin or XP field; the catch reaches the inventory as an ordinary item update. These rows reproduce the previous reconstructed server policy: zero coins and 10 Fisherman XP per catch. Per-grade rows are the tunable table; values are not original balance.",
+    "by_grade": [
+      {
+        "grade": 1,
+        "coins": 0,
+        "fisherman_xp": 10
+      },
+      {
+        "grade": 2,
+        "coins": 0,
+        "fisherman_xp": 10
+      },
+      {
+        "grade": 3,
+        "coins": 0,
+        "fisherman_xp": 10
+      },
+      {
+        "grade": 4,
+        "coins": 0,
+        "fisherman_xp": 10
+      }
+    ]
+  },
+  "catch_cap": {
+    "source": "R: no original fishing cap was recovered. The client sends no catch outcome and the server owns selection and payout, so a cap is an operator policy. It is disabled by default; the owner chooses the value. A session cap counts paid catches across trips until the login session resets. An hour cap counts paid catches in a rolling 3600-second window for this login session.",
+    "enabled": false,
+    "window": "session",
+    "max_paid_catches": null
+  },
   "spots": [
     {
       "npc": 9000000181,
