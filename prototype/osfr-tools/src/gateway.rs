@@ -521,6 +521,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
             "kart"
         }
+        // Family 34 is the demolition derby processor. Its client records are routed through the
+        // active derby service; unknown subtypes stay inert there.
+        (Some(34), _) => "derby",
         // Family 168 carries a one-byte sub-opcode, so only the family is matched.
         (Some(168), _) => "mounts",
         // Family 53 likewise has a one-byte subtype. Only the implemented pet requests
@@ -1822,7 +1825,10 @@ impl Gateway {
         let Some(game) = &self.gameplay else {
             return Ok(GatewayOutcome::default());
         };
-        if !game.is_opening() && !game.accepts_kart_loading_application(&[33, 0]) {
+        if !game.is_opening()
+            && !game.accepts_kart_loading_application(&[33, 0])
+            && !game.derby_active()
+        {
             return Ok(GatewayOutcome::default());
         }
         let mut gameplay = game.clone();
@@ -2177,6 +2183,7 @@ mod radial_routing {
             (36, 12, "combat"),
             (41, 122, "encounter"),
             (41, 109, "encounter"),
+            (34, 6, "derby"),
             (56, 0, "warp"),
             (58, 0, "warp"),
             (90, 0, "warp"),

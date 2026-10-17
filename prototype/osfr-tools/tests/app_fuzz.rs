@@ -510,6 +510,21 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     }
     result.push(("kart", words(41, 108, &[u32::MAX; 4])));
     result.push(("kart", words(102, 1, &[])));
+    // Family 34 is the demolition derby processor. Cover every implemented client record and the
+    // wildcard subtype required by the source inventory.
+    for (sub, length) in [
+        (2, 12),
+        (5, 128),
+        (6, 16),
+        (7, 12),
+        (14, 24),
+        (16, 24),
+        (0xffff, 16),
+    ] {
+        let mut input = words(34, sub, &[]);
+        input.extend(vec![0xff; length]);
+        result.push(("derby", input));
+    }
     // Family 168 (mounts, W162) has a one-byte subtype: 1 board, 3 dismount, 6 spawn, 8 spawn by
     // item, and the family wildcard's unknown subtype.
     result.push(("mounts", [vec![168, 0, 1], vec![0xff; 8]].concat()));
@@ -693,6 +708,7 @@ fn t3_source_inventory_covers_all_gateway_labels_and_gameplay_dispatch_families(
     let compact: String = game.chars().filter(|ch| !ch.is_whitespace()).collect();
     for call in [
         "handle_kart_entry(",
+        "handle_derby(",
         "handle_npc_packet(",
         "handle_opening_inner(",
         "handle_mystery_chest(",

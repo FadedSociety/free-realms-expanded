@@ -92,6 +92,9 @@ pub struct GameplayState {
     pub harvesting: Option<Type8State>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kart_entry: Option<crate::kart_gateway::KartGatewayState>,
+    /// A connection-local derby keeps only the job to restore after a reconnect.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub derby: Option<crate::derby_gateway::DerbyGatewayState>,
     /// Attuned warpstones (W142). Absent until the first attunement.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub warpstones: Option<piece_077::WarpState>,
@@ -152,6 +155,8 @@ pub struct Gameplay {
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
     portal_refreshed_ms: Option<u64>,
     kart_entry: Option<crate::kart_gateway::KartGateway>,
+    /// Opt-in demolition derby package. A match is connection-local; a reconnect drops it.
+    derby: Option<crate::derby_gateway::DerbyGateway>,
     /// W160 (R): the guide NPCs that offer fishing (`fishing_spots.json`). Not persisted.
     fishing_spots: Option<Arc<crate::fishing_service::FishingSpots>>,
     /// The player's fishing round, if any. Ephemeral by design: a reconnect releases it.
@@ -466,6 +471,7 @@ impl Gameplay {
 
     pub fn load(directory: &Path, state: Option<GameplayState>) -> io::Result<Self> {
         let mut warp = piece_077::WarpRegistry::curated();
+        let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
@@ -525,7 +531,7 @@ impl Gameplay {
                 BTreeSet::new(),
             ),
         };
-        let profiles = if directory.join("profiles.json").is_file() {
+        let mut profiles = if directory.join("profiles.json").is_file() {
             Some(Profiles::load(directory, profiles)?)
         } else if profiles.is_some() {
             return Err(invalid("class snapshot requires its opening content"));
@@ -709,6 +715,14 @@ impl Gameplay {
         // Load the item catalogue once here so content bindings can be checked
         // against the definitions this save actually has.
         let inventory = Inventory::load(directory, inventory)?;
+        if let (Some(saved), Some(profiles)) = (saved_derby, profiles.as_mut()) {
+            if saved.previous_job <= 0 {
+                return Err(invalid("invalid saved derby previous job"));
+            }
+            // The match itself is connection-local; restore only the job it replaced. Self data at
+            // login already carries the resulting profile, so no activation packet is needed here.
+            profiles.select(saved.previous_job, &inventory)?;
+        }
         let recipe_catalog = crate::recipes::RecipeCatalog::load_runtime(directory)?;
         // (R) The opening campaign historically has no recovered recipe-learn
         // packet sequence. Seed its two supplied starter patterns and the local
@@ -906,6 +920,18 @@ impl Gameplay {
                 );
             }
         }
+        let derby = crate::derby_gateway::DerbyGateway::load(directory)?;
+        if let (Some(derby), Some(interaction)) = (&derby, &npc_interaction) {
+            let unknown = interaction
+                .lock()
+                .map_err(|_| invalid("NPC interaction state is unavailable"))?
+                .set_derby_gates(derby.gate_npcs(), derby.menu_string_id());
+            for npc in unknown {
+                npc_event(
+                    serde_json::json!({"event": "derby_gate_unknown_npc", "content_key": npc}),
+                );
+            }
+        }
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &npc_interaction) {
             let unknown = interaction
@@ -992,6 +1018,7 @@ impl Gameplay {
             activities,
             portal_refreshed_ms: None,
             kart_entry,
+            derby,
             fishing_spots,
             fishing: Default::default(),
             gathering_nodes,
@@ -1411,6 +1438,7 @@ impl Gameplay {
                         npc_interaction::NpcAction::TurnInQuest { .. } => "turn_in_quest",
                         npc_interaction::NpcAction::Shop => "shop",
                         npc_interaction::NpcAction::Race => "race",
+                        npc_interaction::NpcAction::Derby => "derby",
                         npc_interaction::NpcAction::Fish => "fish",
                         npc_interaction::NpcAction::Learn { .. } => "learn",
                     };
@@ -1478,6 +1506,7 @@ impl Gameplay {
             );
             let mut out = Outcome::default();
             let mut race_gate = None;
+            let mut derby_gate = None;
             let mut fish_gate = None;
             let mut learn_trainer = None;
             match selected {
@@ -1635,6 +1664,16 @@ impl Gameplay {
                         "outcome": "race"
                     }));
                 }
+                Ok(NpcSelection::Derby) => {
+                    derby_gate = Some(key);
+                    npc_event(serde_json::json!({
+                        "event": "npc_select",
+                        "guid": runtime_guid,
+                        "content_key": key,
+                        "option": option_id,
+                        "outcome": "derby"
+                    }));
+                }
                 Ok(NpcSelection::Fish) => {
                     fish_gate = Some(key);
                     npc_event(serde_json::json!({
@@ -1713,6 +1752,22 @@ impl Gameplay {
                     Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
                     None => out.replies.push(chat::system(
                         crate::kart_gateway::EntryDenied::NoRace.message(),
+                    )),
+                }
+            }
+            if let Some(gate) = derby_gate {
+                // (R) The NPC service proved range and that this exact option was offered;
+                // the derby service decides admission. Staging keeps the job switch atomic.
+                let busy = self.activity_busy();
+                match self.derby.as_ref().map(|derby| derby.admit(gate, busy)) {
+                    Some(Ok(())) => {
+                        let mut staged = self.clone();
+                        out = staged.begin_derby(character)?;
+                        *self = staged;
+                    }
+                    Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
+                    None => out.replies.push(chat::system(
+                        crate::derby_gateway::DerbyEntryDenied::Unavailable.message(),
                     )),
                 }
             }
@@ -2185,6 +2240,10 @@ impl Gameplay {
             mining: self.mining.as_ref().map(|m| m.state().clone()),
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
+            derby: self
+                .derby
+                .as_ref()
+                .and_then(crate::derby_gateway::DerbyGateway::snapshot),
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
             item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
         }
@@ -2299,6 +2358,13 @@ impl Gameplay {
         if let Some(encounter) = &mut self.encounter {
             encounter.reset_session();
         }
+        // Derby state is connection-local (R): an unfinished match is dropped and its job switch
+        // is restored from the prior job. Paid closes have already committed their inventory.
+        if let Some(job) = self.abandon_derby_for_reconnect() {
+            if let Some(profiles) = &mut self.profiles {
+                let _ = profiles.select(job, &self.inventory);
+            }
+        }
         // W160: a fishing round belongs to one connection. Paid catches are already saved;
         // only the cast in flight is dropped.
         self.fishing.reset_all();
@@ -2315,6 +2381,12 @@ impl Gameplay {
             let _ = profiles.select(job, &self.inventory);
         }
         location
+    }
+
+    /// A derby's wire processor cannot resume after a reconnect. Drop the connection-local match
+    /// and return the job that was active before entry.
+    pub fn abandon_derby_for_reconnect(&mut self) -> Option<i32> {
+        self.derby.as_mut()?.exit()
     }
 
     /// Grant and equip a job's starter outfit from the content's starter table.
@@ -2387,12 +2459,10 @@ impl Gameplay {
             return Ok(());
         }
         out.replies.push(profiles.select(job, &self.inventory)?);
-        out.replies.extend(
-            self.abilities
-                .as_ref()
-                .unwrap()
-                .activation(job, self.job_level(job))?,
-        );
+        if let Some(abilities) = &self.abilities {
+            out.replies
+                .extend(abilities.activation(job, self.job_level(job))?);
+        }
         self.sync_player_level(out);
         self.ensure_outfit(job, out)
     }
@@ -2433,6 +2503,13 @@ impl Gameplay {
 
     pub fn is_opening(&self) -> bool {
         self.opening.is_some()
+    }
+
+    /// True while a demolition derby match or its results screen belongs to this session.
+    pub fn derby_active(&self) -> bool {
+        self.derby
+            .as_ref()
+            .is_some_and(crate::derby_gateway::DerbyGateway::active)
     }
 
     pub fn initial_character(
@@ -2604,6 +2681,13 @@ impl Gameplay {
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             return Ok(Outcome::default());
         }
+        if self
+            .derby
+            .as_ref()
+            .is_some_and(crate::derby_gateway::DerbyGateway::active)
+        {
+            return Ok(Outcome::default());
+        }
         let mut out = Outcome::default();
         let visited = self.warp.visit(&self.warp_context(character));
         out.changed |= visited.changed;
@@ -2676,6 +2760,20 @@ impl Gameplay {
     }
 
     fn tick_world(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
+        if self
+            .derby
+            .as_ref()
+            .is_some_and(crate::derby_gateway::DerbyGateway::active)
+        {
+            let mut staged = self.clone();
+            let replies = staged.derby.as_mut().unwrap().tick(now_ms)?;
+            *self = staged;
+            return Ok(Outcome {
+                changed: !replies.is_empty(),
+                replies,
+                ..Default::default()
+            });
+        }
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             let mut staged = self.clone();
             let kart = staged.kart_entry.as_mut().unwrap();
@@ -2804,7 +2902,11 @@ impl Gameplay {
             zone_allows_riding: true,
             in_minigame: self.encounter.as_ref().is_some_and(EncounterEngine::active)
                 || self.field_engaged
-                || self.kart_entry.as_ref().is_some_and(|k| k.active()),
+                || self.kart_entry.as_ref().is_some_and(|k| k.active())
+                || self
+                    .derby
+                    .as_ref()
+                    .is_some_and(crate::derby_gateway::DerbyGateway::active),
             ability_active: false,
             knocked_out: self
                 .encounter
@@ -3019,6 +3121,12 @@ impl Gameplay {
                 replies: answer.into_iter().collect(),
                 ..Outcome::default()
             });
+        }
+        if self.derby_active() {
+            let mut staged = self.clone();
+            let out = staged.handle_derby(inner, character, now_ms)?;
+            *self = staged;
+            return Ok(out);
         }
         if self.kart_entry.is_some() {
             let active = self.kart_entry.as_ref().unwrap().active();
@@ -3262,6 +3370,10 @@ impl Gameplay {
             || self.mining.as_ref().is_some_and(Type8Engine::active)
             || self.harvesting.as_ref().is_some_and(Type8Engine::active)
             || self.encounter.as_ref().is_some_and(EncounterEngine::active)
+            || self
+                .derby
+                .as_ref()
+                .is_some_and(crate::derby_gateway::DerbyGateway::active)
             || !self.fishing.is_empty()
     }
 
@@ -3288,6 +3400,37 @@ impl Gameplay {
         kart.set_previous_job(previous_job);
         out.replies.extend(replies);
         out.scene_zoning = Some(scene);
+        out.changed = true;
+        Ok(out)
+    }
+
+    /// (R) Switch to Demo Derby Driver and open the native type-11 offer. The caller has already
+    /// checked the NPC gate and that no other activity is running.
+    fn begin_derby(&mut self, character: &CharacterState) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        let profiles = self
+            .profiles
+            .as_mut()
+            .ok_or_else(|| invalid("derby entry requires class content"))?;
+        let previous_job = profiles.active();
+        let first_time = profiles.unlock(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)?;
+        out.replies.push(profiles.select(
+            crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+            &self.inventory,
+        )?);
+        if first_time {
+            self.give_starter_outfit(
+                crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+                false,
+                &mut out,
+            )?;
+        }
+        self.ensure_outfit(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE, &mut out)?;
+        let derby = self.derby.as_mut().unwrap();
+        let offer = derby.begin(character)?;
+        derby.set_previous_job(previous_job);
+        out.replies.insert(0, END_DIALOG_26_4.to_vec());
+        out.replies.push(offer);
         out.changed = true;
         Ok(out)
     }
@@ -3548,6 +3691,65 @@ impl Gameplay {
             out.replies.push(chat::system(
                 "Exit the race before changing jobs or starting another activity.",
             ));
+        }
+        Ok(out)
+    }
+
+    /// Route the native derby records while this session owns a match. The final 26/42 Close is
+    /// the only payout point; an early, malformed or replayed Close leaves every bank untouched.
+    fn handle_derby(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        if inner == [26, 0, 42, 0] {
+            let profiles_before = self.reward_profiles();
+            let rewards = RewardState::new(
+                self.inventory.clone(),
+                profiles_before.clone(),
+                self.inventory.state().items.len().max(100),
+            );
+            let outcome = self.derby.as_mut().unwrap().close(inner, &rewards)?;
+            if !outcome.accepted {
+                return Ok(out);
+            }
+            let next = outcome
+                .reward_state
+                .ok_or_else(|| invalid("accepted derby close has no reward state"))?;
+            let previous_job = self.derby.as_mut().unwrap().exit();
+            self.inventory = next.inventory;
+            if next.profiles != profiles_before {
+                if self.profiles.is_some() {
+                    let directory = self
+                        .profile_content_directory
+                        .as_deref()
+                        .ok_or_else(|| invalid("derby XP needs profile content"))?;
+                    self.profiles = Some(Profiles::load(directory, Some(next.profiles.clone()))?);
+                } else {
+                    return Err(invalid("derby XP needs character profile state"));
+                }
+            }
+            out.replies = outcome.reward_packets;
+            if let Some(job) = previous_job {
+                self.restore_job(job, &mut out)?;
+            }
+            out.replies
+                .push(crate::kart_gateway::player_status(character.guid, 1));
+            out.changed = true;
+            self.refresh_npc_quest_eligibility(current_unix_seconds());
+            return Ok(out);
+        }
+        if inner.starts_with(&[39, 0, 5]) {
+            let before = self.derby.as_ref().unwrap().phase();
+            out.replies = self.derby.as_mut().unwrap().start(inner)?;
+            out.changed = self.derby.as_ref().unwrap().phase() != before;
+            return Ok(out);
+        }
+        if inner.starts_with(&[34, 0]) {
+            out.replies = self.derby.as_mut().unwrap().handle(inner, now_ms)?;
+            out.changed = !out.replies.is_empty();
         }
         Ok(out)
     }

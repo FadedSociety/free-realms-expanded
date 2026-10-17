@@ -12,6 +12,7 @@ pub mod combat;
 pub mod content;
 pub mod cooking;
 pub mod derby;
+pub mod derby_gateway;
 pub mod dev_teleport;
 pub mod encounter;
 pub mod enemies;

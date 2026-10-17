@@ -71,6 +71,8 @@ pub enum NpcAction {
     Shop,
     /// (R) Start the solo kart race (W149). Offered only by NPCs named in `kart_gates.json`.
     Race,
+    /// (R) Start the solo demolition derby. Offered only by NPCs named in `derby_gates.json`.
+    Derby,
     /// (R) Go fishing (W160). Offered only by NPCs named in `fishing_spots.json`.
     Fish,
     /// (R) Learn a job from its trainer (W176). Offered only by NPCs named in `job_trainers.json`.
@@ -139,6 +141,8 @@ pub enum NpcSelection {
     Shop(MerchantWindow),
     /// The caller decides whether the race may start (`KartGateway::admit`).
     Race,
+    /// The caller decides whether the derby may start (`DerbyGateway::admit`).
+    Derby,
     /// The caller decides whether the trip may start (`FishingService::enter`).
     Fish,
     /// The caller decides whether the job is taught (`Profiles::learn`).
@@ -229,6 +233,9 @@ pub struct NpcInteraction {
     /// (R) NPCs whose menu lists the kart race, and the label's locale id.
     race_gates: BTreeSet<u64>,
     race_string_id: u32,
+    /// (R) NPCs whose menu lists the demolition derby, and the label's locale id.
+    derby_gates: BTreeSet<u64>,
+    derby_string_id: u32,
     /// (R) NPCs whose menu offers a fishing trip, and the label's locale id (W160).
     fish_gates: BTreeSet<u64>,
     fish_string_id: u32,
@@ -338,6 +345,8 @@ impl NpcInteraction {
             vendor_items,
             race_gates: BTreeSet::new(),
             race_string_id: 0,
+            derby_gates: BTreeSet::new(),
+            derby_string_id: 0,
             fish_gates: BTreeSet::new(),
             fish_string_id: 0,
             job_trainers: BTreeMap::new(),
@@ -352,6 +361,16 @@ impl NpcInteraction {
             npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
         self.race_gates = known.into_iter().collect();
         self.race_string_id = string_id;
+        unknown
+    }
+
+    /// (R) List the demolition derby in these NPCs' menus. Returns unknown content keys like
+    /// [`Self::set_race_gates`].
+    pub fn set_derby_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
+        let (known, unknown): (Vec<u64>, Vec<u64>) =
+            npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
+        self.derby_gates = known.into_iter().collect();
+        self.derby_string_id = string_id;
         unknown
     }
 
@@ -485,6 +504,10 @@ impl NpcInteraction {
                 // Choosing a race is not a conversation: drop the open menu.
                 self.active = None;
                 Ok(NpcSelection::Race)
+            }
+            NpcAction::Derby => {
+                self.active = None;
+                Ok(NpcSelection::Derby)
             }
             NpcAction::Fish => {
                 self.active = None;
@@ -770,6 +793,9 @@ impl NpcInteraction {
         }
         if self.race_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Race, self.race_string_id));
+        }
+        if self.derby_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Derby, self.derby_string_id));
         }
         if self.fish_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Fish, self.fish_string_id));

@@ -11,6 +11,7 @@
 //! persistence are external integration responsibilities.
 
 use crate::rewards::{RewardGrant, RewardState, apply_grant};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fmt,
@@ -221,7 +222,8 @@ impl fmt::Display for DerbyError {
 
 impl std::error::Error for DerbyError {}
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 #[repr(u32)]
 pub enum PickupKind {
     Health = 1,
@@ -276,13 +278,15 @@ pub struct VehicleState {
     pub unknown_floats_bits: [u32; 4],
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DerbyConfig {
     pub value_a_bits: u32,
     pub value_b: u32,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DerbyPickup {
     pub id: u32,
     pub definition_id: u32,
@@ -625,7 +629,8 @@ pub fn decode_inner(packet: &[u8]) -> Result<DerbyMessage, DerbyError> {
     Ok(message)
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DerbyVehicleTemplate {
     pub name: Vec<u8>,
     /// Serialized ReadVehicleDefinition bytes; content owns the still-opaque client schema.
@@ -635,7 +640,8 @@ pub struct DerbyVehicleTemplate {
     pub unknown_value_bits: u32,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DerbyRules {
     /// All numeric combat and scheduling values here are reconstructed policy (R).
     pub max_drivers: usize,
@@ -726,6 +732,7 @@ pub struct DerbyDriverState {
     pub ultimate_until_ms: Option<u64>,
 }
 
+#[derive(Clone)]
 struct Driver {
     state: DerbyDriverState,
     vehicle: DerbyVehicleTemplate,
@@ -740,6 +747,7 @@ pub struct DerbyCloseOutcome {
     pub reward_packets: Vec<Vec<u8>>,
 }
 
+#[derive(Clone)]
 pub struct DerbyService {
     instance_id: i32,
     game_id: i32,
@@ -852,6 +860,14 @@ impl DerbyService {
 
     pub fn phase(&self) -> DerbyPhase {
         self.phase
+    }
+
+    pub fn instance_id(&self) -> i32 {
+        self.instance_id
+    }
+
+    pub fn game_id(&self) -> i32 {
+        self.game_id
     }
 
     pub fn human_count(&self) -> usize {
