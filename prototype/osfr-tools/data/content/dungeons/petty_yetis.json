@@ -2426,9 +2426,8 @@
             "source_field": "enemies",
             "row_index": 0,
             "name": "Yetis",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930073,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2437,6 +2436,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Petty Yetis.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=2245 resolves to 'Yeti'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:3529 maps model_id=4547 to sh_standard_yeti_01.adr; lab/extracted/client-assets/catalog.tsv:59605 contains pack_14/002627.adr (128 bytes, CRC32 71ba6afa)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Yetis maps to the exact singular client name and the standard yeti model."
               }
             ]
           },

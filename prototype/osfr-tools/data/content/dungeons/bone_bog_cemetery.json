@@ -310,12 +310,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "bs_bone_bog_cemetery",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:75303 lists bs_bone_bog_cemetery.gzne.z (compressed size 5057); lab/extracted/client-assets/catalog.tsv:30218 lists bs_bone_bog_cemetery.gzne in AssetsW_008.pack entry 1499 at offset 73683632 (7793 extracted bytes, CRC32 588db697, extracted path pack_08/001499.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem bs_bone_bog_cemetery; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load."
             }
           ]
         },
@@ -2874,9 +2878,8 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Wraiths",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930072,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2889,6 +2892,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=118994 resolves to 'Wraith'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:752 maps model_id=751 to wraith_m_cloakedskelly.adr; lab/extracted/client-assets/catalog.tsv:17562 contains pack_04/003828.adr (18484 bytes, CRC32 ff8586d4)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wraiths maps to the exact singular client name and the cloaked-skeleton wraith model."
               }
             ]
           },
@@ -2896,9 +2907,8 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Bone Bog Skeletons",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930054,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2911,6 +2921,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=430428 resolves to 'Bone Bog Skeleton'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:1666 maps model_id=1692 to skeleton_m_01.adr; lab/extracted/client-assets/catalog.tsv:14382 contains pack_04/000648.adr (17158 bytes, CRC32 25524251)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Bone Bog Skeletons maps to the exact singular client name and the generic skeleton model; no Bone Bog capture was recovered."
               }
             ]
           },
@@ -2918,9 +2936,8 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Ravens",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930064,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2933,6 +2950,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=5159 resolves to 'Raven'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:199 maps model_id=198 to birds_raven.adr; lab/extracted/client-assets/catalog.tsv:21431 contains pack_06/000994.adr (5568 bytes, CRC32 889cfc1b)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ravens maps to the exact singular client name and the base raven model."
               }
             ]
           },

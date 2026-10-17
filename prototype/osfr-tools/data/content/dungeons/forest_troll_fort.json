@@ -3303,13 +3303,20 @@
             "source_field": "enemies",
             "row_index": 3,
             "name": "Trolls",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930070,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Forest Troll Fort.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=36768 resolves to 'Troll'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:78 maps model_id=77 to troll_forest.adr; lab/extracted/client-assets/catalog.tsv:22044 contains pack_06/001607.adr (7288 bytes, CRC32 21e6512f)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Trolls maps to the generic client Troll name and forest-troll combat body."
               }
             ]
           },
@@ -3359,13 +3366,20 @@
             "source_field": "enemies",
             "row_index": 3,
             "name": "Wolves",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930071,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Forest Troll Fort.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=374 resolves to 'Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered."
               }
             ]
           },

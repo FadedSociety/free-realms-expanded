@@ -2543,9 +2543,8 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Man-Eating Plants",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930062,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2554,6 +2553,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Bristlewood Glade.md > Enemies and boss > Enemies; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=4424 resolves to 'Man-Eating Plant'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:89 maps model_id=88 to maneatingplant.adr; lab/extracted/client-assets/catalog.tsv:6960 contains pack_02/000153.adr (11964 bytes, CRC32 3389a56e)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Man-Eating Plants maps to the exact singular client name and the combat man-eating-plant model."
               }
             ]
           },

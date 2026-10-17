@@ -2638,13 +2638,20 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Bristlewood Vultures",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930055,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Vale of the Ancients.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=73654 resolves to 'Bristlewood Vulture'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:344 maps model_id=343 to vulture.adr; lab/extracted/client-assets/catalog.tsv:19787 contains pack_05/002077.adr (19450 bytes, CRC32 a63f47ab)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Bristlewood Vultures maps to the exact singular client name/model."
               }
             ]
           },
@@ -2652,13 +2659,20 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Wolves",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930071,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Vale of the Ancients.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=374 resolves to 'Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered."
               }
             ]
           },

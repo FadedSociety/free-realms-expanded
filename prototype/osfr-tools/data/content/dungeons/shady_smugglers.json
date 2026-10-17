@@ -2404,9 +2404,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Smuggler Boss",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930068,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2415,6 +2414,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Shady Smugglers.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=91885 resolves to 'Smuggler Boss'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:670 maps model_id=669 to human_blackspore_thief_m.adr; lab/extracted/client-assets/catalog.tsv:21426 contains pack_06/000989.adr (7218 bytes, CRC32 da5b29bf)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Smuggler Boss has an exact client name; the model is the existing client Shady Smuggler body."
               }
             ]
           },
@@ -2422,9 +2429,8 @@
             "source_field": "bosses",
             "row_index": 0,
             "name": "Smuggler Boss",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930068,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2433,6 +2439,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Shady Smugglers.md > Enemies and boss > Boss; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=91885 resolves to 'Smuggler Boss'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:670 maps model_id=669 to human_blackspore_thief_m.adr; lab/extracted/client-assets/catalog.tsv:21426 contains pack_06/000989.adr (7218 bytes, CRC32 da5b29bf)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Smuggler Boss has an exact client name; the model is the existing client Shady Smuggler body."
               }
             ]
           }

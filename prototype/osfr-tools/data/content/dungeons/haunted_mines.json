@@ -270,12 +270,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "sg_haunted_mines",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:82955 lists sg_haunted_mines.gzne.z (compressed size 41); lab/extracted/client-assets/catalog.tsv:49531 lists sg_haunted_mines.gzne in Assets_000.pack entry 4865 at offset 39304679 (56 extracted bytes, CRC32 b471b85a, extracted path pack_12/004865.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Haunted Mines.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem sg_haunted_mines; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load. The .gzne is a header-only stub, so the scene name is recovered but the map geometry is not."
             }
           ]
         },

@@ -33,8 +33,10 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]  # <root>/project/scripts/content_check.py
-PROJECT = ROOT / "project"
+PROJECT = Path(__file__).resolve().parents[1]
+if not (PROJECT / "prototype").is_dir():
+    PROJECT = PROJECT / "project"
+ROOT = PROJECT.parent
 CONTENT = PROJECT / "prototype" / "osfr-tools" / "data" / "content"
 DEFAULT_CLIENT = ROOT / "lab" / "runs" / "client-baseline-20261014T203930Z" / "client"
 DEFAULT_OUT = PROJECT / "prototype" / "osfr-tools" / "studio" / "report.json"
@@ -567,6 +569,8 @@ class Checker:
         self.actor_kinds = set()             # enemy definition / actor-kind ids seen in content
         self.defeat_refs = []                # quest defeat objectives: model_id may be an actor kind
         self.npc_unresolved = set()
+        self.enemy_definitions = {}
+        self.dungeon_enemy_refs = []
         self.load_tables(client, item_catalogue)
 
     # -- tables ------------------------------------------------------------
@@ -650,6 +654,20 @@ class Checker:
             self.tables["items_legacy"] = {"path": str(legacy_items), "rows": len(self.items_legacy)}
         if not self.items_runtime and not self.items_legacy:
             self.notes.append("no item definition tables found; item id checks skipped")
+
+        enemies = CONTENT / "enemies.json"
+        if enemies.is_file():
+            try:
+                rows = json.loads(enemies.read_text(encoding="utf-8-sig")).get("definitions") or []
+            except (OSError, ValueError):
+                rows = []
+            self.enemy_definitions = {
+                row["definition_id"]: row for row in rows
+                if isinstance(row, dict) and type(row.get("definition_id")) is int
+            }
+            self.tables["enemies"] = {"path": str(enemies), "rows": len(self.enemy_definitions)}
+        else:
+            self.notes.append("enemies.json missing; dungeon enemy definition checks skipped")
 
     # -- findings ----------------------------------------------------------
     def add(self, severity, code, file, path, field, value, problem):
@@ -945,7 +963,118 @@ class Checker:
                     walk({k: v}, "", False, False, None, None)
         else:
             walk(data, "", False, False, None, None)
+        self.check_dungeon(rel, data)
         self.evidence[rel] = ev
+
+    def check_dungeon(self, rel, data):
+        """Shape and cross-file checks for the dungeon detail envelope and enemy mirror."""
+        if not rel.startswith("dungeons/") or rel.endswith("_unresolved.json"):
+            return
+        rows = data.get("records") if isinstance(data, dict) else None
+        if not isinstance(rows, list) or len(rows) != 1 or not isinstance(rows[0], dict):
+            self.add("error", "dungeon_shape", rel, "records", "records", None,
+                     "dungeon file must contain exactly one record")
+            return
+        detail = rows[0].get("dungeon_data")
+        if not isinstance(detail, dict):
+            self.add("error", "dungeon_shape", rel, "records[0].dungeon_data", "dungeon_data", None,
+                     "dungeon_data must be an object")
+            return
+
+        scene = detail.get("instance_scene_name")
+        if isinstance(scene, dict) and scene.get("value") is not None:
+            value = scene.get("value")
+            if not isinstance(value, str) or not re.fullmatch(r"[a-z0-9]+(?:_[a-z0-9]+)*", value):
+                self.add("error", "dungeon_scene_invalid", rel,
+                         "records[0].dungeon_data.instance_scene_name.value", "value", value,
+                         "scene name must be a lowercase underscore token")
+            sources = scene.get("source")
+            if not isinstance(sources, list) or not any(
+                    isinstance(source, dict) and source.get("kind") == "client" for source in sources):
+                self.add("error", "dungeon_scene_provenance", rel,
+                         "records[0].dungeon_data.instance_scene_name.source", "source", value,
+                         "a non-null scene name needs at least one client source entry")
+        elif scene is not None and not (
+                isinstance(scene, dict) and scene.get("value") is None
+                and isinstance(scene.get("reason"), str) and scene["reason"].strip()):
+            self.add("error", "dungeon_scene_invalid", rel,
+                     "records[0].dungeon_data.instance_scene_name", "instance_scene_name", scene,
+                     "scene must be a sourced value or null with a reason")
+
+        refs = detail.get("enemy_refs")
+        if not isinstance(refs, list):
+            self.add("error", "dungeon_enemy_refs_invalid", rel,
+                     "records[0].dungeon_data.enemy_refs", "enemy_refs", refs,
+                     "enemy_refs must be an array")
+            return
+
+        expected = set()
+        for field in ("enemies", "bosses"):
+            source_rows = detail.get(field)
+            source_rows = source_rows.get("value") if isinstance(source_rows, dict) else None
+            if not isinstance(source_rows, list):
+                continue
+            for row_index, row in enumerate(source_rows):
+                if not isinstance(row, dict):
+                    continue
+                names = row.get("names")
+                if not isinstance(names, list):
+                    name = row.get("name")
+                    name = name.get("value") if isinstance(name, dict) else name
+                    names = [name] if isinstance(name, str) else []
+                for name in names:
+                    if isinstance(name, str):
+                        expected.add((field, row_index, name))
+
+        actual = set()
+        for index, ref in enumerate(refs):
+            path = f"records[0].dungeon_data.enemy_refs[{index}]"
+            if not isinstance(ref, dict):
+                self.add("error", "dungeon_enemy_refs_invalid", rel, path, "enemy_refs", ref,
+                         "enemy reference must be an object")
+                continue
+            field, row_index, name = ref.get("source_field"), ref.get("row_index"), ref.get("name")
+            status, definition_id, reason = ref.get("status"), ref.get("definition_id"), ref.get("reason")
+            key = (field, row_index, name)
+            if field not in ("enemies", "bosses") or type(row_index) is not int or not isinstance(name, str):
+                self.add("error", "dungeon_enemy_refs_invalid", rel, path, "enemy_refs", ref,
+                         "reference needs source_field enemies/bosses, integer row_index and name")
+                continue
+            if key in actual:
+                self.add("error", "dungeon_enemy_refs_duplicate", rel, path, "name", name,
+                         "duplicate enemy reference")
+            actual.add(key)
+            if status == "resolved":
+                if type(definition_id) is not int or definition_id <= 0:
+                    self.add("error", "dungeon_enemy_refs_invalid", rel, path, "definition_id", definition_id,
+                             "a resolved reference needs a positive definition_id")
+                elif self.enemy_definitions and definition_id not in self.enemy_definitions:
+                    self.add("error", "dungeon_enemy_refs_definition_missing", rel, path,
+                             "definition_id", definition_id,
+                             "resolved definition_id is not present in enemies.json")
+                if reason not in (None, ""):
+                    self.add("warning", "dungeon_enemy_refs_resolved_reason", rel, path, "reason", reason,
+                             "resolved reference still carries an unresolved reason")
+            elif status == "unresolved":
+                if definition_id is not None:
+                    self.add("error", "dungeon_enemy_refs_invalid", rel, path, "definition_id", definition_id,
+                             "an unresolved reference must have a null definition_id")
+                if not isinstance(reason, str) or not reason.strip():
+                    self.add("error", "dungeon_enemy_refs_reason", rel, path, "reason", reason,
+                             "an unresolved reference needs a non-empty reason")
+            else:
+                self.add("error", "dungeon_enemy_refs_invalid", rel, path, "status", status,
+                         "status must be resolved or unresolved")
+            self.dungeon_enemy_refs.append((rel, ref))
+
+        for field, row_index, name in sorted(expected - actual):
+            self.add("error", "dungeon_enemy_refs_missing", rel,
+                     f"records[0].dungeon_data.enemy_refs", "enemy_refs", name,
+                     f"missing mirror reference for {field}[{row_index}] {name}")
+        for field, row_index, name in sorted(actual - expected):
+            self.add("error", "dungeon_enemy_refs_extra", rel,
+                     f"records[0].dungeon_data.enemy_refs", "enemy_refs", name,
+                     f"mirror reference has no source row {field}[{row_index}] {name}")
 
     def check_value(self, rel, path, k, val, holder, holder_path, soft):
         sev = "warning" if soft else "error"
@@ -1114,6 +1243,7 @@ class Checker:
         self.npc_ids = set(npc_owner)
 
     def finish(self):
+        self.check_dungeon_enemy_coverage()
         for guid, occ in self.guid_seen.items():
             if len(occ) < 2:
                 continue
@@ -1158,6 +1288,86 @@ class Checker:
                     where = " (only listed in npcs_unresolved.json)" if v in self.npc_unresolved else ""
                     self.add("warning", "npc_ref_unknown", rel, p, k, v,
                              f"npc id not defined in data/content/npcs or npc_spawns_extra.json{where}")
+
+    def check_dungeon_enemy_coverage(self):
+        """The unresolved file and its coverage table must mirror the dungeon JSON exactly."""
+        path = CONTENT / "enemies_unresolved.json"
+        if not path.is_file():
+            self.add("error", "dungeon_enemy_coverage_missing", "enemies_unresolved.json", "", "", None,
+                     "enemies_unresolved.json is required for the dungeon enemy mirror")
+            return
+        try:
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, ValueError) as exc:
+            self.add("error", "dungeon_enemy_coverage_missing", "enemies_unresolved.json", "", "", None,
+                     f"cannot parse: {exc}")
+            return
+        rows = data.get("dungeon_rows")
+        if not isinstance(rows, list):
+            self.add("error", "dungeon_enemy_coverage_invalid", "enemies_unresolved.json",
+                     "dungeon_rows", "dungeon_rows", rows, "dungeon_rows must be an array")
+            return
+
+        listed = set()
+        for index, row in enumerate(rows):
+            if not isinstance(row, dict):
+                self.add("error", "dungeon_enemy_coverage_invalid", "enemies_unresolved.json",
+                         f"dungeon_rows[{index}]", "dungeon_rows", row, "row must be an object")
+                continue
+            key = (row.get("dungeon_file"), row.get("source_field"), row.get("row_index"), row.get("name"))
+            if key in listed:
+                self.add("error", "dungeon_enemy_coverage_invalid", "enemies_unresolved.json",
+                         f"dungeon_rows[{index}]", "dungeon_rows", row.get("name"),
+                         "duplicate unresolved dungeon row")
+            listed.add(key)
+            if not (isinstance(row.get("dungeon_file"), str) and row.get("source_field") in ("enemies", "bosses")
+                    and type(row.get("row_index")) is int and isinstance(row.get("name"), str)
+                    and isinstance(row.get("reason"), str) and row["reason"].strip()):
+                self.add("error", "dungeon_enemy_coverage_invalid", "enemies_unresolved.json",
+                         f"dungeon_rows[{index}]", "dungeon_rows", row.get("name"),
+                         "row needs dungeon_file, enemies/bosses, integer row_index, name and reason")
+
+        actual = {
+            (Path(rel).name, ref.get("source_field"), ref.get("row_index"), ref.get("name"))
+            for rel, ref in self.dungeon_enemy_refs if ref.get("status") == "unresolved"
+        }
+        if listed != actual:
+            missing = sorted(actual - listed)
+            extra = sorted(listed - actual)
+            self.add("error", "dungeon_enemy_coverage_mismatch", "enemies_unresolved.json",
+                     "dungeon_rows", "dungeon_rows", len(listed),
+                     f"{len(listed)} listed, {len(actual)} actual; missing {missing[:3]}, extra {extra[:3]}")
+
+        resolved = [(rel, ref) for rel, ref in self.dungeon_enemy_refs if ref.get("status") == "resolved"]
+        pending = [(rel, ref) for rel, ref in self.dungeon_enemy_refs if ref.get("status") == "unresolved"]
+        expected = {
+            "dungeon_name_occurrences": len(self.dungeon_enemy_refs),
+            "unique_dungeon_names": len({ref.get("name") for _, ref in self.dungeon_enemy_refs}),
+            "resolved_dungeon_occurrences": len(resolved),
+            "unresolved_dungeon_occurrences": len(pending),
+            "resolved_unique_dungeon_names": len({ref.get("name") for _, ref in resolved}),
+            "unresolved_unique_dungeon_names": len({ref.get("name") for _, ref in pending}),
+        }
+        coverage = data.get("coverage")
+        if not isinstance(coverage, dict):
+            self.add("error", "dungeon_enemy_coverage_invalid", "enemies_unresolved.json",
+                     "coverage", "coverage", coverage, "coverage must be an object")
+        else:
+            for key, value in expected.items():
+                if coverage.get(key) != value:
+                    self.add("error", "dungeon_enemy_coverage_mismatch", "enemies_unresolved.json",
+                             f"coverage.{key}", key, coverage.get(key),
+                             f"expected {value} from the dungeon enemy mirror")
+
+        bindings = data.get("model_asset_bindings")
+        if isinstance(bindings, list):
+            bound = {row.get("definition_id") for row in bindings if isinstance(row, dict)}
+            defined = set(self.enemy_definitions)
+            if bound != defined:
+                self.add("error", "dungeon_enemy_bindings_mismatch", "enemies_unresolved.json",
+                         "model_asset_bindings", "definition_id", len(bindings),
+                         f"bindings cover {len(bound)} ids, enemies.json defines {len(defined)}; "
+                         f"missing {sorted(defined - bound)[:3]}, extra {sorted(bound - defined)[:3]}")
 
 
 # ---------------------------------------------------------------------------

@@ -302,12 +302,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "sh_deep_mines",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:92893 lists sh_deep_mines.gzne.z (compressed size 65); lab/extracted/client-assets/catalog.tsv:97504 lists sh_deep_mines.gzne in Assets_008.pack entry 3405 at offset 18558593 (84 extracted bytes, CRC32 ab82fb33, extracted path pack_20/003405.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Deep Mines.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem sh_deep_mines; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load. The .gzne is a header-only stub, so the scene name is recovered but the map geometry is not."
             }
           ]
         },
@@ -2616,9 +2620,8 @@
             "source_field": "enemies",
             "row_index": 2,
             "name": "Robgoblins",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930065,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2627,6 +2630,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Deep Mines.md > Enemies and boss > Enemies; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=2232 resolves to 'Robgoblin'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:5 maps model_id=4 to robgoblin_m_basic.adr; lab/extracted/client-assets/catalog.tsv:1362 contains pack_00/001360.adr (21845 bytes, CRC32 bbf01cfa)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Robgoblins uses the generic client Robgoblin name and basic combat body."
               }
             ]
           },

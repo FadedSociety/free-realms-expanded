@@ -2549,9 +2549,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Giant Toads",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930059,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2564,6 +2563,14 @@
               {
                 "kind": "video",
                 "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=433528 resolves to 'Giant Toad'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:142 maps model_id=141 to toad.adr; lab/extracted/client-assets/catalog.tsv:1369 contains pack_00/001367.adr (14056 bytes, CRC32 c2f600f8)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Giant Toads maps to the exact singular client name and the base toad model."
               }
             ]
           },
@@ -2571,9 +2578,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Cray",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930075,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2586,6 +2592,14 @@
               {
                 "kind": "video",
                 "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=90007 resolves to 'Cray'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:472 maps model_id=471 to cray_arctic_swamp.adr; lab/extracted/client-assets/catalog.tsv:28997 contains pack_08/000278.adr (12013 bytes, CRC32 2efee340)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Cray in Blackspore uses the arctic-swamp client cray model."
               }
             ]
           },
@@ -2615,9 +2629,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Elder Swamp Cray",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930078,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2630,6 +2643,14 @@
               {
                 "kind": "video",
                 "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=75949 resolves to 'Elder Swamp Cray'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:678 maps model_id=677 to cray_boss_swamp.adr; lab/extracted/client-assets/catalog.tsv:20186 contains pack_05/002476.adr (11780 bytes, CRC32 3f81a8cf)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Elder Swamp Cray maps to the exact client name and boss swamp cray model."
               }
             ]
           },

@@ -266,12 +266,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "mv_necronomicus",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:79944 lists mv_necronomicus.gzne.z (compressed size 282); lab/extracted/client-assets/catalog.tsv:72298 lists mv_necronomicus.gzne in Assets_004.pack entry 2960 at offset 8603111 (655 extracted bytes, CRC32 ede8c142, extracted path pack_16/002960.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Necronomicus Unleashed.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem mv_necronomicus; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load."
             }
           ]
         },

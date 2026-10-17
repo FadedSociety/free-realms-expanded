@@ -62,10 +62,10 @@
     "dungeon_files": 75,
     "dungeon_name_occurrences": 367,
     "unique_dungeon_names": 250,
-    "resolved_dungeon_occurrences": 74,
-    "unresolved_dungeon_occurrences": 293,
-    "resolved_unique_dungeon_names": 46,
-    "unresolved_unique_dungeon_names": 204,
+    "resolved_dungeon_occurrences": 130,
+    "unresolved_dungeon_occurrences": 237,
+    "resolved_unique_dungeon_names": 82,
+    "unresolved_unique_dungeon_names": 169,
     "existing_definitions_preserved": 5,
     "new_definitions_added": 50,
     "new_model_id_to_adr_pairs_checked": 50,
@@ -76,8 +76,8 @@
     "existing_model_id_gaps": 0,
     "known_ability_evidence_strings": 28,
     "w58b_definitions_added": 24,
-    "client_model_table_pairs_checked": 55,
-    "catalog_pairs_present": 53,
+    "client_model_table_pairs_checked": 85,
+    "catalog_pairs_present": 83,
     "catalog_pairs_missing": 2,
     "world_rows_resolved": 36,
     "world_rows_partial": 3,
@@ -96,7 +96,26 @@
       "resolved_unique_dungeon_names": 46,
       "regional_enemy_kind_rows": 82,
       "resolved_regional_enemy_kind_rows": 36
-    }
+    },
+    "before_t015": {
+      "dungeon_name_occurrences": 367,
+      "unique_dungeon_names": 250,
+      "resolved_dungeon_occurrences": 74,
+      "unresolved_dungeon_occurrences": 293,
+      "resolved_unique_dungeon_names": 46,
+      "unresolved_unique_dungeon_names": 204
+    },
+    "after_t015": {
+      "dungeon_name_occurrences": 367,
+      "unique_dungeon_names": 250,
+      "resolved_dungeon_occurrences": 130,
+      "unresolved_dungeon_occurrences": 237,
+      "resolved_unique_dungeon_names": 82,
+      "unresolved_unique_dungeon_names": 169
+    },
+    "t015_definitions_added": 30,
+    "t015_model_id_to_adr_pairs_checked": 30,
+    "total_definitions": 85
   },
   "definition_field_sources": {
     "3156": {
@@ -10339,42 +10358,6 @@
       ]
     },
     {
-      "dungeon_file": "bigfoot_defender.json",
-      "source_field": "enemies",
-      "row_index": 0,
-      "name": "bears",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot Defender.md > Enemies and boss > Enemies (wiki \"Mobs\"); cited [wiki] [client for the names]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot Defender.md > Enemies and boss > Enemies (wiki \"Mobs\"); cited [wiki] [client for the names]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bigfoot_s_lair.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Bears",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot's Lair.md > Enemies and boss > Enemies; cited [wiki] [video L27vxozHOls/00092]"
-        }
-      ]
-    },
-    {
       "dungeon_file": "bixie_hive.json",
       "source_field": "enemies",
       "row_index": 0,
@@ -10393,50 +10376,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Boss; cited [video 5_U-uAzDuR4/00188, 00190, PkDgb0sfUD8/00098] [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bixie_hive.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Bixie Soldiers",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Enemies; cited [wiki] [video 5_U-uAzDuR4/00050, 00120] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Enemies; cited [wiki] [video 5_U-uAzDuR4/00050, 00120] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Enemies; cited [wiki] [video 5_U-uAzDuR4/00050, 00120] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bixie_hive.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Bixie Battlemages",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Enemies; cited [wiki] [video 5_U-uAzDuR4/00050, 00120] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Enemies; cited [wiki] [video 5_U-uAzDuR4/00050, 00120] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Enemies; cited [wiki] [video 5_U-uAzDuR4/00050, 00120] [client]"
         }
       ]
     },
@@ -10481,72 +10420,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md > Enemies and boss > Boss; cited [video 5_U-uAzDuR4/00188, 00190, PkDgb0sfUD8/00098] [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bone_bog_cemetery.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Wraiths",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bone_bog_cemetery.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Bone Bog Skeletons",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bone_bog_cemetery.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Ravens",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bone Bog Cemetery.md > Enemies and boss > Enemies; cited [wiki] [video 0LoQe5VZ0PY/00002 to 00014, 00074] [client `loc 3650825494`, `553797784`, `912760119`, `2307843224`, `319395169`, `3625642073`]"
         }
       ]
     },
@@ -10623,48 +10496,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Briar Patch.md > Enemies and boss > Bonus targets; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "briar_patch.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Man-Eating Plants",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Briar Patch.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "briar_patch.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Briar Patch Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Briar Patch.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "briar_patch.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Bears",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Briar Patch.md > Enemies and boss > Enemies (wiki); cited [wiki]"
         }
       ]
     },
@@ -10788,24 +10619,6 @@
     },
     {
       "dungeon_file": "briarheart_caverns.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Briarheart Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Briarheart Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "briarheart_caverns.json",
       "source_field": "bosses",
       "row_index": 0,
       "name": "Geomancer Hailstorm",
@@ -10855,24 +10668,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Bristlewood Glade.md > Enemies and boss > Bonus targets; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "bristlewood_glade.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Man-Eating Plants",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bristlewood Glade.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Bristlewood Glade.md > Enemies and boss > Enemies; cited [client] [wiki]"
         }
       ]
     },
@@ -10970,73 +10765,7 @@
       "dungeon_file": "cracked_claw_caverns.json",
       "source_field": "enemies",
       "row_index": 1,
-      "name": "Giant Toads",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "cracked_claw_caverns.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Cray",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "cracked_claw_caverns.json",
-      "source_field": "enemies",
-      "row_index": 1,
       "name": "Lost Explorers",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md > Enemies and boss > Enemies; cited [wiki] [client] [video NtXTmB-wPW0/00042]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "cracked_claw_caverns.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Elder Swamp Cray",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
       "source": [
@@ -11105,48 +10834,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Boss; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "cray_caves.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Cray",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "cray_caves.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Ocean Cray Defenders",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "cray_caves.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Ocean Cray Brood Mothers",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
         }
       ]
     },
@@ -11666,24 +11353,6 @@
       "dungeon_file": "deep_mines.json",
       "source_field": "enemies",
       "row_index": 2,
-      "name": "Robgoblins",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Deep Mines.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Deep Mines.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "deep_mines.json",
-      "source_field": "enemies",
-      "row_index": 2,
       "name": "Robgoblin Wizards",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -11912,24 +11581,6 @@
       "dungeon_file": "floren_forest.json",
       "source_field": "enemies",
       "row_index": 2,
-      "name": "Floren",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Floren Forest.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Floren Forest.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "floren_forest.json",
-      "source_field": "enemies",
-      "row_index": 2,
       "name": "Vile Floren",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -11949,24 +11600,6 @@
       "source_field": "enemies",
       "row_index": 2,
       "name": "Evil Floren",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Floren Forest.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Floren Forest.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "floren_forest.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Snakes",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
       "source": [
@@ -12110,20 +11743,6 @@
       "dungeon_file": "forest_troll_fort.json",
       "source_field": "enemies",
       "row_index": 3,
-      "name": "Trolls",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Forest Troll Fort.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "forest_troll_fort.json",
-      "source_field": "enemies",
-      "row_index": 3,
       "name": "Elite Sneak Scouts",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -12153,20 +11772,6 @@
       "source_field": "enemies",
       "row_index": 3,
       "name": "Videez",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Forest Troll Fort.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "forest_troll_fort.json",
-      "source_field": "enemies",
-      "row_index": 3,
-      "name": "Wolves",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
       "source": [
@@ -12400,24 +12005,6 @@
       "dungeon_file": "frostfang_caverns.json",
       "source_field": "enemies",
       "row_index": 1,
-      "name": "Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "frostfang_caverns.json",
-      "source_field": "enemies",
-      "row_index": 1,
       "name": "Ice Crawlers",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -12447,24 +12034,6 @@
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "frostfang_caverns.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Giant Bat",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Frostfang Caverns.md > Enemies and boss > Bonus target; cited [client] [wiki]"
         }
       ]
     },
@@ -12739,42 +12308,6 @@
       ]
     },
     {
-      "dungeon_file": "highroad_hijinx.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Hooligans",
-      "definition_id": null,
-      "reason": "Legacy NPC name has multiple model or texture variants",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "highroad_hijinx.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Hooligan-At-Arms",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Highroad Hijinx.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
       "dungeon_file": "hot_springs_haven.json",
       "source_field": "enemies",
       "row_index": 0,
@@ -12909,60 +12442,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Boss; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "howling_hills.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Ice Trolls",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "howling_hills.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "howling_hills.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Big Mean Ice Trolls",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
         }
       ]
     },
@@ -13114,24 +12593,6 @@
       "dungeon_file": "misty_mountain.json",
       "source_field": "enemies",
       "row_index": 2,
-      "name": "Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Misty Mountain.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Misty Mountain.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "misty_mountain.json",
-      "source_field": "enemies",
-      "row_index": 2,
       "name": "Cray",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -13151,24 +12612,6 @@
       "source_field": "enemies",
       "row_index": 2,
       "name": "Broodmother",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Misty Mountain.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Misty Mountain.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "misty_mountain.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Floren",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
       "source": [
@@ -13255,42 +12698,6 @@
         {
           "kind": "video",
           "evidence": "notes/Build Guides/Content/Dungeons/Moldy Shamblers.md > Enemies and boss > Enemy; cited [client] [video ATNDJ0I3sf0/00046]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "mugwort_s_hollow.json",
-      "source_field": "enemies",
-      "row_index": 0,
-      "name": "Elder Mugwort",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "mugwort_s_hollow.json",
-      "source_field": "bosses",
-      "row_index": 0,
-      "name": "Elder Mugwort",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Mugwort's Hollow.md > Enemies and boss > Boss; cited [client] [wiki]"
         }
       ]
     },
@@ -13498,24 +12905,6 @@
       "dungeon_file": "petty_yetis.json",
       "source_field": "enemies",
       "row_index": 0,
-      "name": "Yetis",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Petty Yetis.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Petty Yetis.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "petty_yetis.json",
-      "source_field": "enemies",
-      "row_index": 0,
       "name": "Icy Yeti",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -13545,24 +12934,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Pixie Hunters.md > Enemies and boss > Boss; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "pixie_hunters.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Cruel Fairy Cultist",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Pixie Hunters.md > Enemies and boss > Enemies; cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Pixie Hunters.md > Enemies and boss > Enemies; cited [wiki] [client]"
         }
       ]
     },
@@ -13836,50 +13207,6 @@
       "dungeon_file": "robgoblin_treasure_trove.json",
       "source_field": "enemies",
       "row_index": 1,
-      "name": "Robgoblins",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Robgoblin Treasure Trove.md > Enemies and boss > Enemies; cited [wiki] [video qCG_K2piQgE/00104, 00150, WuTrZmFvTmI/00044] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Robgoblin Treasure Trove.md > Enemies and boss > Enemies; cited [wiki] [video qCG_K2piQgE/00104, 00150, WuTrZmFvTmI/00044] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Robgoblin Treasure Trove.md > Enemies and boss > Enemies; cited [wiki] [video qCG_K2piQgE/00104, 00150, WuTrZmFvTmI/00044] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "robgoblin_treasure_trove.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Robgoblin Mages",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Robgoblin Treasure Trove.md > Enemies and boss > Enemies; cited [wiki] [video qCG_K2piQgE/00104, 00150, WuTrZmFvTmI/00044] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Robgoblin Treasure Trove.md > Enemies and boss > Enemies; cited [wiki] [video qCG_K2piQgE/00104, 00150, WuTrZmFvTmI/00044] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Robgoblin Treasure Trove.md > Enemies and boss > Enemies; cited [wiki] [video qCG_K2piQgE/00104, 00150, WuTrZmFvTmI/00044] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "robgoblin_treasure_trove.json",
-      "source_field": "enemies",
-      "row_index": 1,
       "name": "Armored Robgoblins",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -13964,28 +13291,6 @@
       "dungeon_file": "sandscale_oasis.json",
       "source_field": "enemies",
       "row_index": 1,
-      "name": "Sandscale Water-seekers",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Enemies; cited [video] [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "sandscale_oasis.json",
-      "source_field": "enemies",
-      "row_index": 1,
       "name": "Cactus Bandits",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -14023,132 +13328,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Sandscale Oasis.md > Enemies and boss > Boss; cited [client] [video rWTxDOHv-eY/00052] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "shady_smugglers.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Smuggler Boss",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Shady Smugglers.md > Enemies and boss > Boss; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Shady Smugglers.md > Enemies and boss > Boss; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "shady_smugglers.json",
-      "source_field": "bosses",
-      "row_index": 0,
-      "name": "Smuggler Boss",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Shady Smugglers.md > Enemies and boss > Boss; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Shady Smugglers.md > Enemies and boss > Boss; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "sheep_watch.json",
-      "source_field": "enemies",
-      "row_index": 0,
-      "name": "Alpha Female Wolf",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "sheep_watch.json",
-      "source_field": "enemies",
-      "row_index": 0,
-      "name": "Alpha Male Wolf",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "sheep_watch.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Ravenous Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Enemies; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "sheep_watch.json",
-      "source_field": "bosses",
-      "row_index": 0,
-      "name": "Alpha Female Wolf",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "sheep_watch.json",
-      "source_field": "bosses",
-      "row_index": 0,
-      "name": "Alpha Male Wolf",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
         }
       ]
     },
@@ -14220,43 +13399,7 @@
       "dungeon_file": "snowy_canyon.json",
       "source_field": "enemies",
       "row_index": 1,
-      "name": "Ice Trolls",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "snowy_canyon.json",
-      "source_field": "enemies",
-      "row_index": 1,
       "name": "Icetroll Champion",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Snowy Canyon.md > Enemies and boss > Enemies (wiki); cited [wiki] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "snowy_canyon.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Yetis",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
       "source": [
@@ -14550,72 +13693,6 @@
     },
     {
       "dungeon_file": "tavern_cellar.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Hooligans",
-      "definition_id": null,
-      "reason": "Legacy NPC name has multiple model or texture variants",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "tavern_cellar.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "tavern_cellar.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Hooligan Guard Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        },
-        {
-          "kind": "video",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "tavern_cellar.json",
       "source_field": "bosses",
       "row_index": 0,
       "name": "Cal",
@@ -14697,24 +13774,6 @@
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Dungeons/The Mushroom Gigas.md > Enemies and boss > Boss; cited [wiki: The Mushroom Gigas!, Azure] [client]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "the_mushroom_gigas.json",
-      "source_field": "enemies",
-      "row_index": 1,
-      "name": "Mushroom Gigas",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Dungeons/The Mushroom Gigas.md > Enemies and boss > Enemy; cited [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/The Mushroom Gigas.md > Enemies and boss > Enemy; cited [client] [wiki]"
         }
       ]
     },
@@ -15168,20 +14227,6 @@
       "dungeon_file": "trail_of_betrayal.json",
       "source_field": "enemies",
       "row_index": 2,
-      "name": "Trolls",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Trail of Betrayal.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "trail_of_betrayal.json",
-      "source_field": "enemies",
-      "row_index": 2,
       "name": "Troll Sergeants",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
@@ -15197,20 +14242,6 @@
       "source_field": "enemies",
       "row_index": 2,
       "name": "Troll Summoners",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Trail of Betrayal.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "trail_of_betrayal.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Wolves",
       "definition_id": null,
       "reason": "no Legacy NPC row matches the exact or singularized guide label",
       "source": [
@@ -15347,34 +14378,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Dungeons/Vale of the Ancients.md > Enemies and boss > Bonus targets; cited [client] [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "vale_of_the_ancients.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Bristlewood Vultures",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Vale of the Ancients.md > Enemies and boss > Enemies (wiki); cited [wiki]"
-        }
-      ]
-    },
-    {
-      "dungeon_file": "vale_of_the_ancients.json",
-      "source_field": "enemies",
-      "row_index": 2,
-      "name": "Wolves",
-      "definition_id": null,
-      "reason": "no Legacy NPC row matches the exact or singularized guide label",
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Dungeons/Vale of the Ancients.md > Enemies and boss > Enemies (wiki); cited [wiki]"
         }
       ]
     },
@@ -20125,6 +19128,1056 @@
           10,
           12
         ]
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930050,
+      "enemy_id": "alpha_wolf",
+      "kind": "Alpha Wolf",
+      "model_id": 3284,
+      "adr": "wolf_generic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 2470,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 3284,
+        "filename": "wolf_generic.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 10255,
+        "extracted_path": "pack_03/000417.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "ba9d8986beb60e210763960f98abe9cdd67e46a2b589d791e842f545512ad2ae"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 102128 resolves to 'Alpha Wolf'; Models.txt maps 3284 to wolf_generic.adr; the catalog contains the asset. (R) Alpha Female Wolf and Alpha Male Wolf use the sole client name/model for Alpha Wolf; no sex-specific model was recovered.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930051,
+      "enemy_id": "bear",
+      "kind": "Bear",
+      "model_id": 91,
+      "adr": "bear_normal.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 92,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 91,
+        "filename": "bear_normal.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 87810,
+        "extracted_path": "pack_18/006138.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "61c7bf1fbf37f08ced7130323f3d2e41966d4e20e312542365b535505c54f198"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 5029 resolves to 'Bear'; Models.txt maps 91 to bear_normal.adr; the catalog contains the asset. (R) Bears uses the generic client bear model; no dungeon-specific bear variant was recovered.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930052,
+      "enemy_id": "bixie_battlemage",
+      "kind": "Bixie Battlemage",
+      "model_id": 211,
+      "adr": "bixie_f_mage.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 212,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 211,
+        "filename": "bixie_f_mage.adr",
+        "row_scale": "0.000000",
+        "description": "Bixie Female Mage"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 16352,
+        "extracted_path": "pack_04/002618.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "de1aca8f9b7e4d5d4dac2e1da09dbc2825096cbf620c7f64472f22fd8ce69d02"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 440712 resolves to 'Bixie Battlemage'; Models.txt maps 211 to bixie_f_mage.adr; the catalog contains the asset. (R) Bixie Battlemages maps to the exact singular client name and the Bixie mage model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930053,
+      "enemy_id": "bixie_soldier",
+      "kind": "Bixie Soldier",
+      "model_id": 220,
+      "adr": "bixie_m_warrior.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 221,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 220,
+        "filename": "bixie_m_warrior.adr",
+        "row_scale": "0.000000",
+        "description": "Bixie Male Warrior"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 16354,
+        "extracted_path": "pack_04/002620.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "35eb40429ab8467484e7561a50af370da42b685bdbb1e43bfc69a7dc7ce80f86"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 440711 resolves to 'Bixie Soldier'; Models.txt maps 220 to bixie_m_warrior.adr; the catalog contains the asset. (R) Bixie Soldiers maps to the exact singular client name and the Bixie warrior model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930054,
+      "enemy_id": "bone_bog_skeleton",
+      "kind": "Bone Bog Skeleton",
+      "model_id": 1692,
+      "adr": "skeleton_m_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1666,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1692,
+        "filename": "skeleton_m_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14382,
+        "extracted_path": "pack_04/000648.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "2148c4d36016c3908db812c1bc12a4d92f1fc8fc3797b42e1fe2f25ed590e59e"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 430428 resolves to 'Bone Bog Skeleton'; Models.txt maps 1692 to skeleton_m_01.adr; the catalog contains the asset. (R) Bone Bog Skeletons maps to the exact singular client name and the generic skeleton model; no Bone Bog capture was recovered.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930055,
+      "enemy_id": "bristlewood_vulture",
+      "kind": "Bristlewood Vulture",
+      "model_id": 343,
+      "adr": "vulture.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 344,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 343,
+        "filename": "vulture.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 19787,
+        "extracted_path": "pack_05/002077.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "7341c7e1c5e9bb18c34a0f5040db7faebfa028d112006c5daa6e06392a3e051a"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 73654 resolves to 'Bristlewood Vulture'; Models.txt maps 343 to vulture.adr; the catalog contains the asset. (R) Bristlewood Vultures maps to the exact singular client name/model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930056,
+      "enemy_id": "cruel_fairy_cultist",
+      "kind": "Cruel Fairy Cultist",
+      "model_id": 500,
+      "adr": "sprite_cultist_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 501,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 500,
+        "filename": "sprite_cultist_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 6781,
+        "extracted_path": "pack_01/003351.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "7efb5cac497d965d86a68e0ba2fcda04e7f70d2ed4a295a2a9bea06a92f425ab"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 141196 resolves to 'Cruel Fairy Cultist'; Models.txt maps 500 to sprite_cultist_m.adr; the catalog contains the asset. (R) Cruel Fairy Cultist has an exact client name; its model is the client Fairy Cultist body.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930057,
+      "enemy_id": "elder_mugwort",
+      "kind": "Elder Mugwort",
+      "model_id": 512,
+      "adr": "fairy_druidmugwort_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 513,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 512,
+        "filename": "fairy_druidmugwort_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 31457,
+        "extracted_path": "pack_08/002738.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "7e3837a468ffcaf641818d1c68829aa84cc9f2780ba6e66739bf8512a76de722"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 16811 resolves to 'Elder Mugwort'; Models.txt maps 512 to fairy_druidmugwort_m.adr; the catalog contains the asset. (R) Elder Mugwort has an exact client name; the unique model filename containing 'mugwort' is fairy_druidmugwort_m.adr.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930058,
+      "enemy_id": "floren",
+      "kind": "Floren",
+      "model_id": 134,
+      "adr": "floren.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 135,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 134,
+        "filename": "floren.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 16753,
+        "extracted_path": "pack_04/003019.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "58ea601c9a099bad5012ec2c65a27585ed66398be311ccb3594d67cee0b28333"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 20492 resolves to 'Floren'; Models.txt maps 134 to floren.adr; the catalog contains the asset. (R) Floren maps to the exact client name and the base floren model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930059,
+      "enemy_id": "giant_toad",
+      "kind": "Giant Toad",
+      "model_id": 141,
+      "adr": "toad.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 142,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 141,
+        "filename": "toad.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1369,
+        "extracted_path": "pack_00/001367.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "7f9519d07426882b7035780800e19687319d12d282653309084d6242d5a75454"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 433528 resolves to 'Giant Toad'; Models.txt maps 141 to toad.adr; the catalog contains the asset. (R) Giant Toads maps to the exact singular client name and the base toad model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930060,
+      "enemy_id": "hooligan",
+      "kind": "Hooligan",
+      "model_id": 203,
+      "adr": "human_m_hooligan_brawler_01.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 204,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 203,
+        "filename": "human_m_hooligan_brawler_01.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51345,
+        "extracted_path": "pack_13/000559.agr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "c82f5359693616d2ac838312744c4baa2fe7066e36f20b690e0e5085dfcc03ee"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 5100401 resolves to 'Hooligan'; Models.txt maps 203 to human_m_hooligan_brawler_01.agr; the catalog contains the asset. (R) Hooligans and Hooligan-At-Arms use the generic client Hooligan name and brawler body; the role-specific model was not recovered.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930061,
+      "enemy_id": "ice_troll",
+      "kind": "Ice Troll",
+      "model_id": 100,
+      "adr": "troll_ice.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 101,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 100,
+        "filename": "troll_ice.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22582,
+        "extracted_path": "pack_06/002145.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "e1b5a70bff3011bd048a4a0b25f7f085a09ba12040a99734a4cb5fd2b08395a6"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 4212 resolves to 'Ice Troll'; Models.txt maps 100 to troll_ice.adr; the catalog contains the asset. (R) Ice Trolls and Big Mean Ice Trolls use the exact client Ice Troll name and ice-troll body.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930062,
+      "enemy_id": "man_eating_plant",
+      "kind": "Man-Eating Plant",
+      "model_id": 88,
+      "adr": "maneatingplant.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 89,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 88,
+        "filename": "maneatingplant.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 6960,
+        "extracted_path": "pack_02/000153.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "4d2f1c0c361a9c518687bec3364089b2146f3518b365de95633efb1cf9793f96"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 4424 resolves to 'Man-Eating Plant'; Models.txt maps 88 to maneatingplant.adr; the catalog contains the asset. (R) Man-Eating Plants maps to the exact singular client name and the combat man-eating-plant model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930063,
+      "enemy_id": "mushroom_gigas",
+      "kind": "Mushroom Gigas",
+      "model_id": 121,
+      "adr": "shroomgiant.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 122,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 121,
+        "filename": "shroomgiant.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22951,
+        "extracted_path": "pack_06/002514.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "00accea06f95bc533db0837e5d2c192c2e7dc8e79bc262a55b143ac138be1390"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 74008 resolves to 'Mushroom Gigas'; Models.txt maps 121 to shroomgiant.adr; the catalog contains the asset. (R) Mushroom Gigas maps to the exact client name and shroomgiant.adr.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930064,
+      "enemy_id": "raven",
+      "kind": "Raven",
+      "model_id": 198,
+      "adr": "birds_raven.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 199,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 198,
+        "filename": "birds_raven.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21431,
+        "extracted_path": "pack_06/000994.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "fe40a01075018bff00c5120d58b42c88fb7d0dcb47d28f80dddf09db1015da16"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 5159 resolves to 'Raven'; Models.txt maps 198 to birds_raven.adr; the catalog contains the asset. (R) Ravens maps to the exact singular client name and the base raven model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930065,
+      "enemy_id": "robgoblin",
+      "kind": "Robgoblin",
+      "model_id": 4,
+      "adr": "robgoblin_m_basic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 5,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4,
+        "filename": "robgoblin_m_basic.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1362,
+        "extracted_path": "pack_00/001360.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "1d5ce3a303180c95ec87ba0a3af55544e8352c427afc7319ebe9466236862611"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 2232 resolves to 'Robgoblin'; Models.txt maps 4 to robgoblin_m_basic.adr; the catalog contains the asset. (R) Robgoblins uses the generic client Robgoblin name and basic combat body.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930066,
+      "enemy_id": "robgoblin_mage",
+      "kind": "Robgoblin Mage",
+      "model_id": 191,
+      "adr": "robgoblin_m_mage.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 192,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 191,
+        "filename": "robgoblin_m_mage.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 15461,
+        "extracted_path": "pack_04/001727.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "c2c89a44c8df9e81d7052a6cd0f3e2f19c619a96a0266e7de0062714436df9e2"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 6631 resolves to 'Robgoblin Mage'; Models.txt maps 191 to robgoblin_m_mage.adr; the catalog contains the asset. (R) Robgoblin Mages maps to the exact singular client name and the male Robgoblin mage model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930067,
+      "enemy_id": "sandscale_water_seeker",
+      "kind": "Sandscale Water-seeker",
+      "model_id": 4047,
+      "adr": "manguana_m_shaman.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3229,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4047,
+        "filename": "manguana_m_shaman.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 16007,
+        "extracted_path": "pack_04/002273.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "b6b2d7d818373c41caa71f3eb946f26ec052a8698d52d2058c35a8fec1980021"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 439204 resolves to 'Sandscale Water-seeker'; Models.txt maps 4047 to manguana_m_shaman.adr; the catalog contains the asset. (R) Sandscale Water-seekers maps to the exact singular client name and manguana shaman model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930068,
+      "enemy_id": "smuggler_boss",
+      "kind": "Smuggler Boss",
+      "model_id": 669,
+      "adr": "human_blackspore_thief_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 670,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 669,
+        "filename": "human_blackspore_thief_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21426,
+        "extracted_path": "pack_06/000989.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "322659c2d90512a87b18b96e3d295f6679d1736d239181b2e75ce80a41effbdd"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 91885 resolves to 'Smuggler Boss'; Models.txt maps 669 to human_blackspore_thief_m.adr; the catalog contains the asset. (R) Smuggler Boss has an exact client name; the model is the existing client Shady Smuggler body.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930069,
+      "enemy_id": "snake",
+      "kind": "Snake",
+      "model_id": 180,
+      "adr": "snake.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 181,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 180,
+        "filename": "snake.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 8731,
+        "extracted_path": "pack_02/001924.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "fb8ab2251254db0349e505ecfbbd2c20ec3e72b570244202b2fb2f11f0c09aef"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 4259 resolves to 'Snake'; Models.txt maps 180 to snake.adr; the catalog contains the asset. (R) Snakes maps to the exact singular client name and base snake model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930070,
+      "enemy_id": "troll",
+      "kind": "Troll",
+      "model_id": 77,
+      "adr": "troll_forest.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 78,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 77,
+        "filename": "troll_forest.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22044,
+        "extracted_path": "pack_06/001607.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "5ebb43af25485d09ee8d890c8b1576f581a4c1006cb77b31dcfffbde88149594"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 36768 resolves to 'Troll'; Models.txt maps 77 to troll_forest.adr; the catalog contains the asset. (R) Trolls maps to the generic client Troll name and forest-troll combat body.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930071,
+      "enemy_id": "wolf",
+      "kind": "Wolf",
+      "model_id": 3284,
+      "adr": "wolf_generic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 2470,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 3284,
+        "filename": "wolf_generic.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 10255,
+        "extracted_path": "pack_03/000417.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "ba9d8986beb60e210763960f98abe9cdd67e46a2b589d791e842f545512ad2ae"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 374 resolves to 'Wolf'; Models.txt maps 3284 to wolf_generic.adr; the catalog contains the asset. (R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930072,
+      "enemy_id": "wraith",
+      "kind": "Wraith",
+      "model_id": 751,
+      "adr": "wraith_m_cloakedskelly.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 752,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 751,
+        "filename": "wraith_m_cloakedskelly.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 17562,
+        "extracted_path": "pack_04/003828.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "24027f698b1e245bdb216b26f2828f3d78f2de5692b087d8937139a04f110fe4"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 118994 resolves to 'Wraith'; Models.txt maps 751 to wraith_m_cloakedskelly.adr; the catalog contains the asset. (R) Wraiths maps to the exact singular client name and the cloaked-skeleton wraith model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930073,
+      "enemy_id": "yeti",
+      "kind": "Yeti",
+      "model_id": 4547,
+      "adr": "sh_standard_yeti_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3529,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4547,
+        "filename": "sh_standard_yeti_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 59605,
+        "extracted_path": "pack_14/002627.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "b4e72b812ff31239869505f4c5592fec875c2825a48246e0ff9bde0ecc672cf0"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 2245 resolves to 'Yeti'; Models.txt maps 4547 to sh_standard_yeti_01.adr; the catalog contains the asset. (R) Yetis maps to the exact singular client name and the standard yeti model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930074,
+      "enemy_id": "ocean_cray",
+      "kind": "Cray",
+      "model_id": 470,
+      "adr": "cray_ocean.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 471,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 470,
+        "filename": "cray_ocean.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24920,
+        "extracted_path": "pack_07/000700.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 90007 resolves to 'Cray'; Models.txt maps 470 to cray_ocean.adr; the catalog contains the asset. (R) Cray in the Seaside dungeon uses the ocean client cray model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930075,
+      "enemy_id": "swamp_cray",
+      "kind": "Cray",
+      "model_id": 471,
+      "adr": "cray_arctic_swamp.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 472,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 471,
+        "filename": "cray_arctic_swamp.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 28997,
+        "extracted_path": "pack_08/000278.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "cb1e7c095635904c5ceeb55818c4d7c3cf28bb5bb14e5aef648744f5ffdf7e77"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 90007 resolves to 'Cray'; Models.txt maps 471 to cray_arctic_swamp.adr; the catalog contains the asset. (R) Cray in Blackspore uses the arctic-swamp client cray model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930076,
+      "enemy_id": "ocean_cray_defender",
+      "kind": "Ocean Cray Defender",
+      "model_id": 470,
+      "adr": "cray_ocean.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 471,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 470,
+        "filename": "cray_ocean.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24920,
+        "extracted_path": "pack_07/000700.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 76159 resolves to 'Ocean Cray Defender'; Models.txt maps 470 to cray_ocean.adr; the catalog contains the asset. (R) Ocean Cray Defenders maps to the exact singular client name and ocean cray model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930077,
+      "enemy_id": "ocean_cray_brood_mother",
+      "kind": "Ocean Cray Brood Mother",
+      "model_id": 470,
+      "adr": "cray_ocean.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 471,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 470,
+        "filename": "cray_ocean.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24920,
+        "extracted_path": "pack_07/000700.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 419788 resolves to 'Ocean Cray Brood Mother'; Models.txt maps 470 to cray_ocean.adr; the catalog contains the asset. (R) Ocean Cray Brood Mothers maps to the exact singular client name and ocean cray model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930078,
+      "enemy_id": "elder_swamp_cray",
+      "kind": "Elder Swamp Cray",
+      "model_id": 677,
+      "adr": "cray_boss_swamp.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 678,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 677,
+        "filename": "cray_boss_swamp.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 20186,
+        "extracted_path": "pack_05/002476.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "fffcdd16362225f176a97d1574c0a582eae4fc578e93ac5706297943acbbbdac"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 75949 resolves to 'Elder Swamp Cray'; Models.txt maps 677 to cray_boss_swamp.adr; the catalog contains the asset. (R) Elder Swamp Cray maps to the exact client name and boss swamp cray model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930079,
+      "enemy_id": "giant_bat",
+      "kind": "Giant Bat",
+      "model_id": 28,
+      "adr": "bat_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 29,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 28,
+        "filename": "bat_01.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 25645,
+        "extracted_path": "pack_07/001425.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "863ff8b934c02399f596dac1dca12dcc0e211f67b6c89997f02d709fcbe744dd"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "client_locale_plus_model_table",
+      "matched_tokens": [],
+      "binding_evidence": "Client locale id 100588 resolves to 'Giant Bat'; Models.txt maps 28 to bat_01.adr; the catalog contains the asset. (R) Giant Bat maps to the exact client name and the base bat combat model.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
       },
       "runtime_scale": null,
       "texture_alias": "",

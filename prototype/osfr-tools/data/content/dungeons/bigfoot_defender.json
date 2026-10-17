@@ -2181,9 +2181,8 @@
             "source_field": "enemies",
             "row_index": 0,
             "name": "bears",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930051,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2192,6 +2191,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Bigfoot Defender.md > Enemies and boss > Enemies (wiki \"Mobs\"); cited [wiki] [client for the names]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=5029 resolves to 'Bear'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:92 maps model_id=91 to bear_normal.adr; lab/extracted/client-assets/catalog.tsv:87810 contains pack_18/006138.adr (13538 bytes, CRC32 8933c548)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Bears uses the generic client bear model; no dungeon-specific bear variant was recovered."
               }
             ]
           }

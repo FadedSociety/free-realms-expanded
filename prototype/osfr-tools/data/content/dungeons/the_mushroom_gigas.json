@@ -2340,9 +2340,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Mushroom Gigas",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930063,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2351,6 +2350,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/The Mushroom Gigas.md > Enemies and boss > Enemy; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=74008 resolves to 'Mushroom Gigas'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:122 maps model_id=121 to shroomgiant.adr; lab/extracted/client-assets/catalog.tsv:22951 contains pack_06/002514.adr (8941 bytes, CRC32 bdcd037d)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Mushroom Gigas maps to the exact client name and shroomgiant.adr."
               }
             ]
           },

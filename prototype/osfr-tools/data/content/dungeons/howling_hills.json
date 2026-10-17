@@ -2891,9 +2891,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Ice Trolls",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930061,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2902,6 +2901,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=4212 resolves to 'Ice Troll'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:101 maps model_id=100 to troll_ice.adr; lab/extracted/client-assets/catalog.tsv:22582 contains pack_06/002145.adr (7833 bytes, CRC32 12568fb9)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ice Trolls and Big Mean Ice Trolls use the exact client Ice Troll name and ice-troll body."
               }
             ]
           },
@@ -2909,9 +2916,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Wolves",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930071,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2920,6 +2926,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=374 resolves to 'Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered."
               }
             ]
           },
@@ -2927,9 +2941,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Big Mean Ice Trolls",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930061,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2938,6 +2951,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Howling Hills.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=4212 resolves to 'Ice Troll'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:101 maps model_id=100 to troll_ice.adr; lab/extracted/client-assets/catalog.tsv:22582 contains pack_06/002145.adr (7833 bytes, CRC32 12568fb9)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ice Trolls and Big Mean Ice Trolls use the exact client Ice Troll name and ice-troll body."
               }
             ]
           },

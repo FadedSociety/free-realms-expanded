@@ -302,12 +302,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "ss_cray_caves",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:89207 lists ss_cray_caves.gzne.z (compressed size 2027); lab/extracted/client-assets/catalog.tsv:42489 lists ss_cray_caves.gzne in AssetsW_010.pack entry 6479 at offset 194500253 (3056 extracted bytes, CRC32 9f09462e, extracted path pack_10/006479.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Cray Caves.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem ss_cray_caves; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load."
             }
           ]
         },
@@ -3093,13 +3097,20 @@
             "source_field": "enemies",
             "row_index": 3,
             "name": "Cray",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930074,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=90007 resolves to 'Cray'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr; lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Cray in the Seaside dungeon uses the ocean client cray model."
               }
             ]
           },
@@ -3107,13 +3118,20 @@
             "source_field": "enemies",
             "row_index": 3,
             "name": "Ocean Cray Defenders",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930076,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=76159 resolves to 'Ocean Cray Defender'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr; lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ocean Cray Defenders maps to the exact singular client name and ocean cray model."
               }
             ]
           },
@@ -3121,13 +3139,20 @@
             "source_field": "enemies",
             "row_index": 3,
             "name": "Ocean Cray Brood Mothers",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930077,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Cray Caves.md > Enemies and boss > Enemies (wiki); cited [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=419788 resolves to 'Ocean Cray Brood Mother'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr; lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Ocean Cray Brood Mothers maps to the exact singular client name and ocean cray model."
               }
             ]
           },

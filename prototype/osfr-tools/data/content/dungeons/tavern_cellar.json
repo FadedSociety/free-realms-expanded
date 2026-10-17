@@ -230,12 +230,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "sg_tavern_cellar",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:86198 lists sg_tavern_cellar.gzne.z (compressed size 66); lab/extracted/client-assets/catalog.tsv:91193 lists sg_tavern_cellar.gzne in Assets_007.pack entry 3321 at offset 12713763 (84 extracted bytes, CRC32 21d42da1, extracted path pack_19/003321.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Tavern Cellar.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem sg_tavern_cellar; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load. The .gzne is a header-only stub, so the scene name is recovered but the map geometry is not."
             }
           ]
         },
@@ -2466,9 +2470,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Hooligans",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "Legacy NPC name has multiple model or texture variants",
+            "definition_id": 930060,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2481,6 +2484,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=5100401 resolves to 'Hooligan'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:204 maps model_id=203 to human_m_hooligan_brawler_01.agr; lab/extracted/client-assets/catalog.tsv:51345 contains pack_13/000559.agr (2316 bytes, CRC32 f0aea609)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Hooligans and Hooligan-At-Arms use the generic client Hooligan name and brawler body; the role-specific model was not recovered."
               }
             ]
           },
@@ -2488,9 +2499,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Wolves",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930071,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2503,6 +2513,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=374 resolves to 'Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered."
               }
             ]
           },
@@ -2510,9 +2528,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Hooligan Guard Wolves",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930071,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -2525,6 +2542,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Tavern Cellar.md > Enemies and boss > Enemies; cited [wiki] [video fktAs_GRrjM/00686, okySuCYFTXw/00054] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=374 resolves to 'Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered."
               }
             ]
           },

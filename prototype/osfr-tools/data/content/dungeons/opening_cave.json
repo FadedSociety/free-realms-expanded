@@ -279,6 +279,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+            },
+            {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:84554 lists sg_npx_cavern_01.gzne.z (compressed size 1631); lab/extracted/client-assets/catalog.tsv:5043 lists sg_npx_cavern_01.gzne in AssetsW_001.pack entry 1613 at offset 62736316 (2428 extracted bytes, CRC32 8cf4870c, extracted path pack_01/001613.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
             }
           ]
         },

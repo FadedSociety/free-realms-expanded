@@ -294,12 +294,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "sg_sheep_watch",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:85183 lists sg_sheep_watch.gzne.z (compressed size 461); lab/extracted/client-assets/catalog.tsv:54045 lists sg_sheep_watch.gzne in Assets_001.pack entry 3259 at offset 12559393 (865 extracted bytes, CRC32 c12f0aea, extracted path pack_13/003259.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/Sheep Watch.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem sg_sheep_watch; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load."
             }
           ]
         },
@@ -2454,9 +2458,8 @@
             "source_field": "enemies",
             "row_index": 0,
             "name": "Alpha Female Wolf",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930050,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2465,6 +2468,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=102128 resolves to 'Alpha Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Alpha Female Wolf and Alpha Male Wolf use the sole client name/model for Alpha Wolf; no sex-specific model was recovered."
               }
             ]
           },
@@ -2472,9 +2483,8 @@
             "source_field": "enemies",
             "row_index": 0,
             "name": "Alpha Male Wolf",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930050,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2483,6 +2493,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=102128 resolves to 'Alpha Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Alpha Female Wolf and Alpha Male Wolf use the sole client name/model for Alpha Wolf; no sex-specific model was recovered."
               }
             ]
           },
@@ -2490,9 +2508,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Ravenous Wolves",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930071,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2501,6 +2518,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Enemies; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=374 resolves to 'Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Wolves and the named wolf groups use the generic client Wolf name and wolf_generic.adr; the regional variant is not recovered."
               }
             ]
           },
@@ -2508,9 +2533,8 @@
             "source_field": "bosses",
             "row_index": 0,
             "name": "Alpha Female Wolf",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930050,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2519,6 +2543,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=102128 resolves to 'Alpha Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Alpha Female Wolf and Alpha Male Wolf use the sole client name/model for Alpha Wolf; no sex-specific model was recovered."
               }
             ]
           },
@@ -2526,9 +2558,8 @@
             "source_field": "bosses",
             "row_index": 0,
             "name": "Alpha Male Wolf",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930050,
+            "status": "resolved",
             "source": [
               {
                 "kind": "client",
@@ -2537,6 +2568,14 @@
               {
                 "kind": "wiki",
                 "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md > Enemies and boss > Bosses; cited [client] [wiki]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=102128 resolves to 'Alpha Wolf'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 maps model_id=3284 to wolf_generic.adr; lab/extracted/client-assets/catalog.tsv:10255 contains pack_03/000417.adr (10690 bytes, CRC32 e6ad9ca1)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Alpha Female Wolf and Alpha Male Wolf use the sole client name/model for Alpha Wolf; no sex-specific model was recovered."
               }
             ]
           }

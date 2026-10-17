@@ -258,12 +258,16 @@
           ]
         },
         "instance_scene_name": {
-          "value": null,
-          "reason": "No exact client instance scene name is stated; scripted cutscene labels do not map an instance scene.",
+          "value": "gw_rumbledome",
+          "reason": null,
           "source": [
             {
+              "kind": "client",
+              "evidence": "lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt:97251 lists gw_rumbledome.gzne.z (compressed size 600); lab/extracted/client-assets/catalog.tsv:60758 lists gw_rumbledome.gzne in Assets_002.pack entry 3780 at offset 20435736 (1039 extracted bytes, CRC32 4551cfb9, extracted path pack_14/003780.gzne). Catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9; manifest SHA256 935bc0d9f8097df9909dc4d339770deb2e7596e3c61eb58876913431657778c8."
+            },
+            {
               "kind": "reconstructed",
-              "evidence": "(R) notes/Build Guides/Content/Dungeons/The Rumbledome.md has no exact instance scene-name field."
+              "evidence": "(R) The dungeon's guide/content key is matched to the unique shipped scene stem gw_rumbledome; the association is inferred from the exact stem and has not been observed in a native opcode-31 scene load."
             }
           ]
         },

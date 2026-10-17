@@ -1732,9 +1732,8 @@
             "source_field": "enemies",
             "row_index": 1,
             "name": "Cruel Fairy Cultist",
-            "definition_id": null,
-            "status": "unresolved",
-            "reason": "no Legacy NPC row matches the exact or singularized guide label",
+            "definition_id": 930056,
+            "status": "resolved",
             "source": [
               {
                 "kind": "wiki",
@@ -1743,6 +1742,14 @@
               {
                 "kind": "client",
                 "evidence": "notes/Build Guides/Content/Dungeons/Pixie Hunters.md > Enemies and boss > Enemies; cited [wiki] [client]"
+              },
+              {
+                "kind": "client",
+                "evidence": "lab/reports/locale-id-to-text.json id=141196 resolves to 'Cruel Fairy Cultist'; lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:501 maps model_id=500 to sprite_cultist_m.adr; lab/extracted/client-assets/catalog.tsv:6781 contains pack_01/003351.adr (8017 bytes, CRC32 4a098aa6)."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) Cruel Fairy Cultist has an exact client name; its model is the client Fairy Cultist body."
               }
             ]
           },
