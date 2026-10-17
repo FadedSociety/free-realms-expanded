@@ -403,3 +403,146 @@ Security-reviewer pass is scoped to this documentation and proposed work. Automa
 Open gates: complete native sender recovery for the explicitly identified provenance gaps (notably kart collision/pickup callbacks, housing rating mapping, separate TCG commands, and unmapped UI actions); actual native UI symptoms for static-only rows; independent lead review; and integration/native acceptance of any chosen brief. This scoped worker did not edit the shared Plan, Ledger, MODLOG or Tasks; the lead owns those milestone updates.
 
 Ponytail: reused Build Guides, nmq, existing routing/feature modules, W90 corpus and stdlib source/trace checks. Deliberately did not build parsers, new services, dependencies, a bot gateway or a replacement client.
+
+## Next 10 (2026-10-16)
+
+W168 re-check, research only (no cargo, no code edits). Evidence: current `gateway.rs:481` `application_handler`, `gameplay.rs` `handle_in_world_inner` and its callees, `bin/osfr-gateway.rs:1815` `route_application`, `git log` to `5d522cf`, the Build Plan and Ledger, and a fresh aggregate of every inbound `unknown application message` event (6,483) in the 62 native `lab/runs/client-baseline-*/server-trace.jsonl` files. Those traces predate most of today's builds, so rows that are routed now are marked. The working tree also holds uncommitted lead work (mounts 168, fishing entry/138, `pathing.rs` 98/1, `trade.rs`, `player_radial.rs`); it counts as in flight, not as done.
+
+### Status of the original 15
+
+| # | Brief | Status | Evidence | What is missing |
+|---|---|---|---|---|
+| 1 | Vendor buy/sell feedback | **Built, partly proven** | W148 `e9088d3`; `npc_interaction.rs:473` answers every refused sell with a 165/6 failure; `tests/vendor_sell.rs` | Never run natively; the client merchant GUID is mapped as "merchant 0 = open shop" (R); only 62 of 192 vendors have fully grantable stock |
+| 2 | Activity portal refresh and Play | **Built** | W150 `5f06115`; `activity_portal.rs`, `gameplay.rs` `handle_activity_portal` | Only field battles are published; native not run; 167/4 throttled to 250 ms |
+| 3 | Kart entry from an NPC | **Built** | W149 `5f06115`; `kart_entry.rs`, `begin_kart_race` from the NPC option | Native not run; solo only; Kart Driver outfit not in starter content |
+| 4 | Mining/harvesting exit and payout | **Partly** | W140 `f4e397b` (reconnect release, once-only payout pinned by tests) | The brief's Quit defect was not found; the real gap is entry: `realm mine` / `realm harvest` are dev-only (`gameplay.rs:4839`); no Miner XP; no native win ever |
+| 5 | Native free revive | **Built** | W147 `f24c3ba`; `encounter.rs` `(41, 122) => resume`, 15 s server fallback | Native not run |
+| 6 | Item bar and one consumable | **Built** | W146 `86b1b0e`; `item_bar.rs`, `gameplay.rs:6017` (42/6, 42/9, 42/15, 42/16, 38/25) | One potion only; Key-3 power-up use waits on the owner; native not run |
+| 7 | Recipe book start | **Built** | W144 `4ba97ad`; `recipe_book.rs`, `gameplay.rs:4896` (26/24) | Stations are the opening craft actors only; Miner recipes have no ids; native not run |
+| 8 | Equip eligibility | **Built** | W138 `44c7fd0`; `inventory.rs` `handle_with` | Rental expiry off; refusal is a chat line (R) |
+| 9 | Quest select, lock, breadcrumb | **Partly** | W145 `f4e397b` (47/12, 47/13); tracked pin 47/14 in `dc27270` (`sync_tracked_target`) | 49/15 breadcrumb start refuses until an original-id crosswalk exists |
+| 10 | Ability lookup, unsupported casts | **Built** | W141 `f1de554`; `gameplay.rs:5227` (36/12), `abilities::unsupported_cast` | Ground/AOE (36/16, 36/10 kind 1) unsupported by design |
+| 11 | Warpstones | **Built** | W142 `378a680`; `handle_warp`, `restoration/piece_077.rs` (56, 90, 122, 58) | 58 friend teleport refused (`friend: &\|_\| None`); native not run |
+| 12 | Friend positions and group map | **Built** | W151 `86b1b0e`; `route_location` in `bin/osfr-gateway.rs` | Native two-client run pending |
+| 13 | Player radial menu and inspect | **Built** | W143 `4a7ab21`; `player_radial.rs`, handler label "player_radial" | Native not run |
+| 14 | Trade unavailable response | **Built** | W156 `dc27270`; `gateway.rs:503` "trade_unavailable", `osfr-gateway.rs` 59/ branch; `tests/trade_unavailable*.rs` | Uncommitted `trade.rs` edits in the tree; real trading still unbuilt |
+| 15 | Emote restrictions | **Built** | W139 `f1de554` | Dance 3200 refused (R); native not run |
+
+Totals: 13 built, 2 partly (4, 9), 0 not done. Every "built" row is bot-proven only and none has a native run yet, so the lead's native acceptance checklist (`cb4c837`, W165) is the next gate, not more code.
+
+### What the native traces say the server silently drops
+
+Counts are inbound events logged as `unknown application message`, summed over the 62 runs ("runs" = how many of the 62 contain it). One-byte-sub families (194, 47, 39, 53) are decoded as u16 sub, so their numbers mix the sub byte and the first body byte.
+
+| Request | Events / runs | What it is | Visible effect |
+|---|---|---|---|
+| 105/1 (150 B) | 2,355 / 49 (36% of all drops) | `PacketClientMetrics` frame stats, one every ~15 s | None. Pure log noise |
+| 194/* (many subs) | 1,150 / 48 (18%) | `Ui.SetWallOfData` telemetry (R068) | None |
+| 109/17..25 | 834 / 49 (13%) | `PacketClientLog` client log text; 109/25 arrives in bursts of up to 27 in 5 s | None; the text may hold local paths, so never store it |
+| 26/32 and 26/33 | 480 + 480 / 48 | Chat channel on / off, a burst of about 16 at each world entry (Legacy `ChatChannelOn/Off`, carries a channel name string) | The server never learns which channels the player muted |
+| 26/20 | 237 / 48 | FreeInteractionNpc (4 bytes), sent at each zone load and after a dialogue closes | None seen; dialogue works |
+| 141/1 | 96 / 48 | Matchmaking "list queues" (R086), paired with 26/20 at each zone load | None seen; the queue window gets no list |
+| 26/18 | 48 / 48 | Chat bubble colour, once per login (R201) | Colour not applied |
+| 66/10, 66/16, 66/18, 66/20, 66/25 and 193 | 261 (66) + 65 (193) / 49 | Marketplace wallet, currency codes, account info, once per login (R008-R011) | None seen; Station Cash and membership parts of the store stay blank |
+| 26/26, 26/37 | 46 + 38 / 45, 30 | Profile activation failed; reward preview refresh after every job switch (R033, R031) | None seen |
+| 164/1 (40 B) | 15 / 5 | Jump (Legacy `PlayerUpdatePacketJump`, same fields without the guid) | Local jump works; other players may not see the jump animation (R: the 125 state flag may already cover it) |
+| 53/24, 16 (2 B), 41/124, 39/7 idle | 17, 26, 3, 13 | Pet UI mode; an unidentified 2-byte family 16 once per run; cancel pending encounter; minigame leave while idle | None seen |
+| Routed since these runs | 98/1 (80), 26/19 (177), 36/12, 47/12 (29), 167/4, 168 | Built after the traces (W164, W143, W141, W145, W150, mount work) | Re-check on the next native run |
+
+No retry storm exists. The largest burst of one rejected request inside 5 s is 27 (109/25 log lines), then 98/1 path requests (10, now answered) and the 8 + 8 channel messages at world entry. The traces show no UI stuck on a dropped request; stuck-UI claims come only from the owner's observations in the R5 log, which name the vendor window, "Take Me There" and the Play window.
+
+One labelling defect: `application_handler` (`gateway.rs:481`) does not list 42/6, 42/9, 42/15, 42/16, 26/24, 26/13, 167, 41/122, 56/90/122/58 or 36/7. They reach their handlers earlier in `handle_in_world_inner`, but when a handler refuses with no reply and no change, the gateway logs `unknown application message` for a request that was understood (the `known_no_reply` test only consults that label list). Brief 3 fixes that so real unknowns stand out.
+
+### Selection rule
+
+Ranked for the friends playtest first (something a player sees, or a request that loops), then public play. Left out on purpose:
+
+- Housing 127: about 1,273 scene files are missing.
+- Derby 34, soccer 76, Battle Mages 133, ship combat 94: no entry content.
+- Card game: a separate TCP service.
+- Duel 41/105: needs a participant model.
+- Style cards 42/10..14: no item data.
+- Storage 42/17 and 26/44: no storage content.
+- Gift 165/14: cross-account grants need atomic saves; it stays a refusal (inside brief 1).
+- Purchase ability 36/7: no paid abilities.
+- 32/1 and 32/3: the 36/10 path works.
+- Reports 68/1 and 68/3: private intake with identities, so lead-owned.
+- Mounts 168 and fishing 138: already in flight in the lead's tree.
+
+### Briefs
+
+1. **Coin Store and Marketplace sibling requests (R004-R013).**
+   - Own: `gateway.rs` `application_handler` (add 165/2, 165/8, 165/12, 165/14 and the 66 rows 1, 3, 10, 12, 14, 16, 18, 20, 22, 25, 27, 38 to "merchant"), the 165 and 66 branches in `gameplay.rs` (~1662), `coin_shop.rs` replies.
+   - Reuse: `CoinShop::handle` already decodes 165/8 (empty list), 165/12 (`buy_back_with_context`) and 165/14 (`refuse_gift`), and `handle_marketplace` already answers every 66 row. The only gap is that the dispatcher forwards just 165/4, 165/5 and 66/43.
+   - Recover: that 165/2 is answered from the item catalogue; the 165/12 field order against `00c76600`; which 66 replies the client really waits on.
+   - (R): buy-back history bounded (10 recent sales), buy-back price equals the sale price, Station Cash and membership products explicitly empty.
+   - Gate: bot sells an item and buys it back once (coins and stack exact; a second try gets a 165/13 failure); the five login-time 66 requests each get a reply and the tick is unchanged; gifts refused; a replayed buy-back id pays nothing; the merchant and range check in `check_coin_store` still applies; native: Buy Back lists the sold item.
+
+2. **Mining and harvesting from a real node (R098-R104 plus the dev-only entry).**
+   - Own: a node-placement adapter and the `activity_busy` calls in `gameplay.rs`.
+   - Reuse: `harvest_nodes.json` (node types, pools, spawns), the W38/W140 type-8 lifecycle (`mining_lifecycle.rs`, `harvesting_lifecycle.rs`), and the staged `begin_*` pattern of `begin_fishing`.
+   - Recover: which request an ordinary node sends (26/10 radial choice or 26/8 interact on a node actor), the node actor's AddNpc shape, and the original Miner XP.
+   - (R): node respawn timer (tunable), Miner XP per win, bag-full policy (the open Ledger decision: pay what fits and tell the player).
+   - Gate: a bot without `--dev-tools` starts at a node, wins, is paid once, the node hides and returns; Quit before a win pays nothing; reconnect mid-run forfeits (W140 tests stay green); native: one mining and one harvesting win. Do not touch the accepted opening movies.
+
+3. **Telemetry and benign-request quiet list (R068, R031, R033, R050, plus 105/1, 109, 193, 16).**
+   - Own: `gateway.rs` `application_handler` only, plus its existing handler-label test.
+   - Reuse: the label pattern already used for "trade_unavailable" and "pathing".
+   - Recover: nothing for 105 and 109 (Legacy `PacketClientMetrics`, `PacketClientLog`); identify family 16 and 193 from the trace bytes before naming them.
+   - (R): accept and discard; never store 109 text; never forward; still count against the action budget.
+   - Gate: replaying a native trace yields no `unknown application message` for these families; an unknown family 33 seed in `app_fuzz.rs` still logs unknown; the label test shows 42/6, 42/9, 26/24 and 36/12 carry their real handler names.
+
+4. **Chat channel settings and bubble colour (R201, 26/32, 26/33).**
+   - Own: a small per-session flag set in `social_chat.rs` and `bin/osfr-gateway.rs` routing, plus the matching `application_handler` arms.
+   - Reuse: `ChatChannel::from_wire` and `chat_permissions`; Legacy shows the body (a channel name string).
+   - Recover: the channel name strings the client sends (text, not the wire u16), what 26/18's three values are, and whether the client filters locally when a channel is off.
+   - (R): a muted channel is not delivered to that session; a bubble colour is stored (bounded) and applied only if a presentation field exists.
+   - Gate: two bots, one mutes Local and still gets tells and group chat; forged names ignored; the budget still applies; the choice survives a relog (character save).
+
+5. **Client objective completed 45/7 and breadcrumb crosswalk 49/15 (R048, R045).**
+   - Own: the objective-event entry in `quest_engine.rs` and the breadcrumb table in `quest_journal.rs`.
+   - Reuse: the W104 event hooks (area, reach, talk) and `quest_journal::Tracker`.
+   - Recover: the 45/7 body (u8 sub, objective i32), which objectives the client reports itself (look, UI, movement), and an original-id crosswalk for the enabled starter quests.
+   - (R): accept 45/7 only for an objective currently open on the character's own active quest and marked client-reported in content; anything else drops with one bounded log line; never award from the claim.
+   - Gate: a bot completes one look or visit objective through 45/7 and the quest advances once; a forged id, a repeated id and an inactive quest change nothing; a listed breadcrumb offers its quest, an unlisted id is refused with text.
+
+6. **Jump relay 164.**
+   - Own: the 164 branch in `gateway.rs` `parse_message` (top-level tunnel opcode, not a family) and the relay in `bin/osfr-gateway.rs` and `players.rs`.
+   - Reuse: the 125 position path (`MovementState` validation) and the visibility grid.
+   - Recover: confirm the 40-byte body (vec4, quaternion, two bytes, vertical velocity) and whether the 125 state flag already shows the jump on a second client; if it does, this brief collapses into a note.
+   - (R): the position goes through the same validation as 125; the guid is the sender's, never the body's; relay only to viewers in range; rate cap.
+   - Gate: two bots, one jumps, the other receives exactly one relay with the sender's guid and finite values; NaN or huge velocity dropped; the sender never gets its own jump; a native two-client run shows it.
+
+7. **Guilds 129 (R069-R072).**
+   - Own: a thin binary router for family 129 beside `route_location`, a guild save file, and tests.
+   - Reuse: `guilds.rs` (create, invite, accept, leave, kick, promote, demote, transfer, disband, MOTD, login and logout notices, `save`/`load`, `decode_request`, `error_message`).
+   - Recover: the 129/13..16 rename layouts and the full-data and roster messages the client expects at login (`ReadGuildFullDataFields`).
+   - (R): name rules, size limit, rank powers and invite expiry (all already (R) in the module); rename refused; guild chat goes through the existing channel router.
+   - Gate: two bots create, invite, accept and chat; one relogs and sees the roster; non-members cannot invite or kick; forged guid and oversize names refused; guilds survive a gateway restart; the budget applies. Public play first.
+
+8. **Matchmaking list replies and an empty-games window (R085-R090).**
+   - Own: a `matchmaking.rs` adapter and a `gameplay.rs` route for 141/1, 141/13, 41/129 and 101/9. Leave join and create unrouted.
+   - Reuse: the existing server-status and empty-list encoders, and the activities `activity_portal.rs` already publishes.
+   - Recover: the 141/1 and 141/13 reply bodies (readers `00c08ae0`, `00a83b80`) and what the client shows for an empty list.
+   - (R): list only queues backed by a supported activity (the field battle); queue statistics are zero; a join returns an explicit "not available", never silence.
+   - Gate: opening the lobby or Play window at a zone load no longer drops 141/1; no join leaves state behind; forged queue ids refused; the 167 portal still works.
+
+9. **Pets: roster, summon, dismiss, name, UI mode (R172-R190, start with R173, R184, R187).**
+   - Own: a pet route and `gameplay.rs` hooks.
+   - Reuse: `pets.rs` (`adopt_from_owned_item`, `summon`, `dismiss`, `rename`, `set_in_water`, `care`, `play`), `pets.json`, the saved roster.
+   - Recover: the 53/4 summon body (u32 pet, u8 action), the short dismiss form, and the reply that creates the pet actor and roster.
+   - (R): pets come from owned pet items and vendor grants only; one active pet; care effects tunable.
+   - Gate: a bot owns a pet item, summons (one actor), dismisses, and relogs with the roster kept; a foreign pet id and a not-owned item are refused; no pet follows a zone change without a fresh summon. Public play; acquisition quests are separate.
+
+10. **Titles and the claim window (R205-R210).**
+    - Own: a `progression_extras.rs` route and the save entry.
+    - Reuse: `TitleState::handle_select_request`, `update_all_packet`, the claim ledger and `validate_reward_rows`.
+    - Recover: the 108/1 and 108/3 reply bodies (writer `00a045d0`) and the title list shape.
+    - (R): titles come only from achievements the engine already emits; claims are single-use per reward row and persist before the bag changes.
+    - Gate: a bot earns a title and selects it; a forged id is refused; a claim pays once and a replay pays nothing; the selection persists after a relog. Lowest priority; do it after native acceptance of the earlier briefs.
+
+Suggested order for the playtest week: 3 (log hygiene), then 1, 2, 4, 6, 5. Guilds, matchmaking, pets and titles are the public-play tranche. Briefs 1 and 3 touch `gateway.rs` and `gameplay.rs`, which carry uncommitted lead edits, so the lead should sequence them or apply the dispatch lines personally.
+
+### Security-relevant decisions (lead reviews)
+
+Every new request is rate-capped and counted against the action budget. 109 text and 194 rows are never stored (they may contain local paths). Guild and chat state use the authenticated session's character, never a body guid. Any brief that persists data saves before it commits the change. Reports 68/1 and 68/3 are left to the lead.
