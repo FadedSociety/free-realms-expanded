@@ -2,8 +2,17 @@
 //!
 //! Client wire facts come from `notes/Build Guides/Gameplay/Trade.md` and the native readers
 //! cited beside each packet builder. Two-party admission, offer ownership, capacity, lock reset,
-//! accept timing, timeout, and settlement are reconstructed server policy (R). The caller owns
-//! persistence and copies committed `InventoryState` snapshots back into the player save layer.
+//! accept timing, timeout, reach, and settlement are reconstructed server policy (R).
+//!
+//! Lifecycle (W163): the radial Trade entry (`player_radial.rs`, a 26/10 interaction choice)
+//! calls `invite` (59/2 to the target); the target's 59/3 reply opens the session (59/4 to
+//! both); offers (59/9, 59/10) and locks (59/8) edit it and any offer change clears both locks
+//! and accepts; both locks start the client's 10 s timer (59/18); both 59/6 accepts make
+//! `accept` return a `TradeSettlement`. **This service never moves items or coins.** The
+//! settlement carries both characters' exact before/after states for the host's all-or-nothing
+//! two-save commit, and `settled` reports that commit's result (status 6 + 59/5, or status 1 +
+//! 59/5). Distance, zoning, battle, disconnect and expiry cancel through `maintain`,
+//! `cancel_for`, `enter_instanced_zone` and `unregister_player`.
 
 use crate::{
     inventory::{Inventory, InventoryItem, InventoryState, RentalState},
@@ -13,6 +22,7 @@ use crate::{
 use std::collections::{BTreeMap, BTreeSet};
 
 const FAMILY: u16 = 0x3b;
+/// Native `TradeAcceptTimer` (`ClientTimerDefinitions.txt`): 10 s after the confirm message.
 const ACCEPT_DELAY_MS: u64 = 10_000;
 // (R) Reuse the signed 32-bit inventory/wire ceiling; native trade has no recovered coin cap.
 const MAX_COINS: u32 = i32::MAX as u32;
@@ -26,7 +36,7 @@ pub struct TradeItemDefinition {
     pub max_stack: Option<u32>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct TradeInventory {
     pub state: InventoryState,
     pub definitions: BTreeMap<i32, TradeItemDefinition>,
@@ -95,6 +105,12 @@ pub enum TradeError {
     RevisionExhausted,
     InvalidInventory,
     WireRange,
+    /// Not near enough, not in the same zone instance, or never shown to the inviter.
+    OutOfReach,
+    /// The session is waiting for the host's commit result; nothing else may change it.
+    Settling,
+    /// A client request that is not a well-formed family-59 request.
+    Malformed,
 }
 
 impl std::fmt::Display for TradeError {
@@ -105,21 +121,86 @@ impl std::fmt::Display for TradeError {
 
 impl std::error::Error for TradeError {}
 
-#[derive(Clone, Debug)]
+/// Reconstructed policy knobs (R); every value is tunable by the host.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct TradeRules {
+    /// Metres two players may be apart to start a trade and to keep one open.
+    pub reach_m: f32,
+    /// How long an unanswered invite lives.
+    pub invite_ttl_ms: u64,
+    /// How long a session may stay open after it starts.
+    pub session_ttl_ms: u64,
+}
+
+impl Default for TradeRules {
+    fn default() -> Self {
+        Self {
+            reach_m: 40.0,
+            invite_ttl_ms: 60_000,
+            session_ttl_ms: 300_000,
+        }
+    }
+}
+
+/// One stack of items moving between characters.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ItemMove {
+    /// Giver's side: the instance id removed from. Receiver's side: the instance id added to
+    /// (an existing stack that was merged into, or a fresh row).
+    pub item_id: i32,
+    pub definition_id: i32,
+    pub tint: i32,
+    pub count: u32,
+}
+
+/// One character's half of a validated exchange.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SettlementSide {
+    pub guid: u64,
+    /// The state every offer was validated against. A commit must refuse unless the saved state
+    /// still equals this exactly.
+    pub before: InventoryState,
+    /// The complete state to persist: coins and items already exchanged, validated.
+    pub after: InventoryState,
+    /// Stacks taken from this character.
+    pub gave: Vec<ItemMove>,
+    /// Stacks added to this character.
+    pub received: Vec<ItemMove>,
+}
+
+/// A fully validated two-character exchange. Produced only when both players locked and
+/// accepted the same counter; nothing has been moved yet.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TradeSettlement {
+    pub session_id: u32,
+    pub sides: [SettlementSide; 2],
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct TradeOutcome {
+    pub messages: Vec<TradeMessage>,
+    pub settlement: Option<TradeSettlement>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 struct TradePlayer {
     session_id: SessionId,
     inventory: TradeInventory,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 struct PendingInvite {
     inviter: u64,
     invitee: u64,
+    opened_ms: u64,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 struct Session {
     players: [u64; 2],
+    opened_ms: u64,
+    /// Set once both accepted and the exchange validated; until `settled` nothing may change.
+    settlement: Option<TradeSettlement>,
     offers: [BTreeMap<i32, u32>; 2],
     coins: [u32; 2],
     counter: u32,
@@ -141,10 +222,13 @@ impl Session {
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct TradeService {
+    rules: TradeRules,
     players: BTreeMap<u64, TradePlayer>,
     busy: BTreeMap<u64, u32>,
+    /// Players the host marked busy elsewhere (a battle, a dungeon): see `set_away`.
+    away: BTreeSet<u64>,
     pending: BTreeMap<u32, PendingInvite>,
     sessions: BTreeMap<u32, Session>,
     next_session_id: u32,
@@ -156,6 +240,18 @@ impl TradeService {
             next_session_id: 1,
             ..Self::default()
         }
+    }
+
+    /// `None` when a rule is not usable (non-finite or non-positive reach, zero lifetime).
+    pub fn with_rules(rules: TradeRules) -> Option<Self> {
+        (rules.reach_m.is_finite()
+            && rules.reach_m > 0.0
+            && rules.invite_ttl_ms > 0
+            && rules.session_ttl_ms > 0)
+            .then(|| Self {
+                rules,
+                ..Self::new()
+            })
     }
 
     /// Register the inventory snapshot bound to one live player session.
@@ -220,20 +316,36 @@ impl TradeService {
             .unwrap_or(false)
     }
 
-    /// Handle the inferred command 26/10 selection for the server-supplied Trade entry.
-    pub fn invite(
-        &mut self,
+    /// True when `invite` would admit this pair right now (both online and registered, in reach,
+    /// neither busy, target not ignoring the inviter). The radial offers its Trade entry only
+    /// when this holds, so a menu never offers what cannot work.
+    pub fn can_invite(
+        &self,
         players: &PlayerRegistry,
         social: &SocialService,
         inviter: u64,
         invitee: u64,
-    ) -> Result<Vec<TradeMessage>, TradeError> {
-        self.online_player(players, social, inviter)?;
-        self.online_player(players, social, invitee)?;
+    ) -> bool {
+        self.check_invite(players, social, inviter, invitee).is_ok()
+    }
+
+    fn check_invite(
+        &self,
+        players: &PlayerRegistry,
+        social: &SocialService,
+        inviter: u64,
+        invitee: u64,
+    ) -> Result<(), TradeError> {
+        let from = self.online_player(players, social, inviter)?;
+        let to = self.online_player(players, social, invitee)?;
         if inviter == invitee {
             return Err(TradeError::NotParticipant);
         }
-        if self.busy.contains_key(&inviter) || self.busy.contains_key(&invitee) {
+        if self.busy.contains_key(&inviter)
+            || self.busy.contains_key(&invitee)
+            || self.away.contains(&inviter)
+            || self.away.contains(&invitee)
+        {
             return Err(TradeError::PlayerBusy);
         }
         let target = social.profile(invitee).ok_or(TradeError::UnknownPlayer)?;
@@ -241,17 +353,41 @@ impl TradeService {
             // (R) Match the client's ignore check and prevent silent invite loss.
             return Err(TradeError::Ignored);
         }
+        // Only a player this inviter was sent an AddPc for can be named (ids are not guessable).
+        if !players.knows_character(from.session_id, invitee) || !self.in_reach(players, from, to) {
+            return Err(TradeError::OutOfReach);
+        }
+        Ok(())
+    }
+
+    /// The radial Trade entry (26/10): ask `invitee` to trade. `now_ms` is the host clock.
+    pub fn invite(
+        &mut self,
+        players: &PlayerRegistry,
+        social: &SocialService,
+        inviter: u64,
+        invitee: u64,
+        now_ms: u64,
+    ) -> Result<Vec<TradeMessage>, TradeError> {
+        self.check_invite(players, social, inviter, invitee)?;
         let session_id = self.allocate_session_id()?;
         let name = &social
             .profile(inviter)
             .ok_or(TradeError::UnknownPlayer)?
             .name;
         let bytes = invite_packet(name, inviter, session_id)?;
-        self.pending
-            .insert(session_id, PendingInvite { inviter, invitee });
+        let message = self.message(invitee, bytes)?;
+        self.pending.insert(
+            session_id,
+            PendingInvite {
+                inviter,
+                invitee,
+                opened_ms: now_ms,
+            },
+        );
         self.busy.insert(inviter, session_id);
         self.busy.insert(invitee, session_id);
-        Ok(vec![self.message(invitee, bytes)?])
+        Ok(vec![message])
     }
 
     /// Accept or decline the pending invite. The client sends sub 3; only acceptance opens a
@@ -263,6 +399,7 @@ impl TradeService {
         invitee: u64,
         session_id: u32,
         accept: bool,
+        now_ms: u64,
     ) -> Result<Vec<TradeMessage>, TradeError> {
         let invite = *self
             .pending
@@ -271,8 +408,8 @@ impl TradeService {
         if invite.invitee != invitee {
             return Err(TradeError::InvalidInviteReply);
         }
-        self.online_player(players, social, invitee)?;
-        self.online_player(players, social, invite.inviter)?;
+        let to = self.online_player(players, social, invitee)?;
+        let from = self.online_player(players, social, invite.inviter)?;
         let responder_name = &social
             .profile(invitee)
             .ok_or(TradeError::UnknownPlayer)?
@@ -283,6 +420,10 @@ impl TradeService {
             return Ok(vec![
                 self.message(invite.inviter, rejected_packet(responder_name)?)?,
             ]);
+        }
+        if !self.in_reach(players, from, to) {
+            // The inviter walked away while the toast was open (R): withdraw it.
+            return Ok(self.close_pending(session_id, invite));
         }
 
         let participants = [invite.inviter, invite.invitee];
@@ -297,6 +438,8 @@ impl TradeService {
             session_id,
             Session {
                 players: participants,
+                opened_ms: now_ms,
+                settlement: None,
                 offers: [BTreeMap::new(), BTreeMap::new()],
                 coins: [0, 0],
                 counter: 1,
@@ -320,10 +463,7 @@ impl TradeService {
         quantity: u32,
     ) -> Result<Vec<TradeMessage>, TradeError> {
         self.online_player(players, social, guid)?;
-        let session = self
-            .sessions
-            .get(&session_id)
-            .ok_or(TradeError::UnknownSession)?;
+        let session = self.open_session(session_id)?;
         let index = session.index(guid)?;
         let previous = session.offers[index].get(&item_id).copied().unwrap_or(0);
         if previous == quantity {
@@ -332,21 +472,11 @@ impl TradeService {
         if quantity > 0 {
             let player = self.players.get(&guid).ok_or(TradeError::UnknownPlayer)?;
             validate_offer_item(&player.inventory, item_id, quantity)?;
-        } else if previous == 0 {
-            return Err(TradeError::UnknownItem);
         }
         let counter = session
             .counter
             .checked_add(1)
             .ok_or(TradeError::RevisionExhausted)?;
-        let session = self.sessions.get_mut(&session_id).unwrap();
-        let unlocked = clear_acceptance(session);
-        session.counter = counter;
-        if quantity == 0 {
-            session.offers[index].remove(&item_id);
-        } else {
-            session.offers[index].insert(item_id, quantity);
-        }
         let item = if quantity > 0 {
             let mut item = self.players[&guid]
                 .inventory
@@ -364,6 +494,15 @@ impl TradeService {
         } else {
             None
         };
+        // Every fallible step is done: from here the session changes.
+        let session = self.sessions.get_mut(&session_id).unwrap();
+        let unlocked = clear_acceptance(session);
+        session.counter = counter;
+        if quantity == 0 {
+            session.offers[index].remove(&item_id);
+        } else {
+            session.offers[index].insert(item_id, quantity);
+        }
         let session = &self.sessions[&session_id];
         let mut out = self.lock_reset_messages(session, session_id, unlocked)?;
         for recipient_index in 0..2 {
@@ -390,10 +529,7 @@ impl TradeService {
         amount: u32,
     ) -> Result<Vec<TradeMessage>, TradeError> {
         self.online_player(players, social, guid)?;
-        let session = self
-            .sessions
-            .get(&session_id)
-            .ok_or(TradeError::UnknownSession)?;
+        let session = self.open_session(session_id)?;
         let index = session.index(guid)?;
         if session.coins[index] == amount {
             return Ok(Vec::new());
@@ -422,7 +558,8 @@ impl TradeService {
         Ok(out)
     }
 
-    /// Record a lock using the client's current counter. Both locks start the client-side 10 s timer.
+    /// Record a lock using the client's current counter (an unlock needs none). Both locks start
+    /// the client-side 10 s timer.
     pub fn set_lock(
         &mut self,
         players: &PlayerRegistry,
@@ -434,12 +571,11 @@ impl TradeService {
         now_ms: u64,
     ) -> Result<Vec<TradeMessage>, TradeError> {
         self.online_player(players, social, guid)?;
-        let session = self
-            .sessions
-            .get(&session_id)
-            .ok_or(TradeError::UnknownSession)?;
+        let session = self.open_session(session_id)?;
         let index = session.index(guid)?;
-        if counter != session.counter {
+        // A lock must name the state the player saw; an unlock cannot hurt anyone, and the
+        // client sends one with its old counter right after the server reset the locks.
+        if locked && counter != session.counter {
             return Err(TradeError::StaleCounter);
         }
         if session.locked[index] == locked {
@@ -477,8 +613,9 @@ impl TradeService {
         Ok(out)
     }
 
-    /// Accept only after both locks and the native ten-second timer. Both snapshots are staged
-    /// before either is replaced, following the existing atomic reward transaction pattern (R).
+    /// Accept only after both locks and the native ten-second timer. When the second accept
+    /// arrives both inventories are staged and, if the exchange is valid, the outcome carries
+    /// the `TradeSettlement` and the session waits for `settled`. Nothing is moved here (R).
     pub fn accept(
         &mut self,
         players: &PlayerRegistry,
@@ -487,13 +624,11 @@ impl TradeService {
         session_id: u32,
         counter: u32,
         now_ms: u64,
-    ) -> Result<Vec<TradeMessage>, TradeError> {
+    ) -> Result<TradeOutcome, TradeError> {
         self.online_player(players, social, guid)?;
-        let session = self
-            .sessions
-            .get(&session_id)
-            .ok_or(TradeError::UnknownSession)?;
+        let session = self.open_session(session_id)?;
         let index = session.index(guid)?;
+        self.online_player(players, social, session.players[session.other(index)])?;
         if counter != session.counter {
             return Err(TradeError::StaleCounter);
         }
@@ -507,31 +642,78 @@ impl TradeService {
             return Err(TradeError::AcceptTooEarly);
         }
         if session.accepted[index] {
-            return Ok(Vec::new());
+            return Ok(TradeOutcome::default());
         }
+        let [first, second] = session.players;
+        let staged_from = [
+            self.players
+                .get(&first)
+                .ok_or(TradeError::UnknownPlayer)?
+                .inventory
+                .clone(),
+            self.players
+                .get(&second)
+                .ok_or(TradeError::UnknownPlayer)?
+                .inventory
+                .clone(),
+        ];
         let session = self.sessions.get_mut(&session_id).unwrap();
         session.accepted[index] = true;
         if !session.accepted.iter().all(|value| *value) {
-            return Ok(Vec::new());
+            return Ok(TradeOutcome::default());
         }
-
-        let session = self.sessions[&session_id].clone();
-        let first = self.players[&session.players[0]].inventory.clone();
-        let second = self.players[&session.players[1]].inventory.clone();
-        match stage_swap(&session, first, second) {
-            Ok([first, second]) => {
-                self.players.get_mut(&session.players[0]).unwrap().inventory = first;
-                self.players.get_mut(&session.players[1]).unwrap().inventory = second;
-                Ok(self.close_active(session_id, [TradeStatus::Completed; 2]))
+        let [staged_first, staged_second] = staged_from;
+        match stage_swap(session_id, session, staged_first, staged_second) {
+            Ok(settlement) => {
+                self.sessions.get_mut(&session_id).unwrap().settlement = Some(settlement.clone());
+                Ok(TradeOutcome {
+                    messages: Vec::new(),
+                    settlement: Some(settlement),
+                })
             }
-            Err(failure) => Ok(self.close_active(session_id, failure.statuses())),
+            Err(failure) => Ok(TradeOutcome {
+                messages: self.close_active(session_id, failure.statuses()),
+                settlement: None,
+            }),
         }
     }
 
-    /// Client cancel (sub 7) or host timeout. Active sessions always receive status then end 5.
+    /// The host's answer for a settlement it was handed: `true` once both saves were committed
+    /// together (the cached snapshots take the committed states and both players get status 6
+    /// then 59/5), `false` when nothing was committed (status 1 then 59/5, snapshots untouched).
+    /// Anything that is not a session waiting for this answer changes nothing.
+    pub fn settled(
+        &mut self,
+        session_id: u32,
+        committed: bool,
+    ) -> Result<Vec<TradeMessage>, TradeError> {
+        let settlement = self
+            .sessions
+            .get(&session_id)
+            .and_then(|session| session.settlement.clone())
+            .ok_or(TradeError::UnknownSession)?;
+        if committed {
+            for side in &settlement.sides {
+                if let Some(player) = self.players.get_mut(&side.guid) {
+                    player.inventory.state = side.after.clone();
+                }
+            }
+        }
+        let status = if committed {
+            TradeStatus::Completed
+        } else {
+            TradeStatus::Cancelled
+        };
+        Ok(self.finish(session_id, [status; 2]))
+    }
+
+    /// Client cancel (sub 7). Active sessions always receive status then end 5.
     pub fn cancel(&mut self, guid: u64, session_id: u32) -> Result<Vec<TradeMessage>, TradeError> {
         if let Some(session) = self.sessions.get(&session_id) {
             session.index(guid)?;
+            if session.settlement.is_some() {
+                return Err(TradeError::Settling);
+            }
             return Ok(self.close_active(session_id, [TradeStatus::Cancelled; 2]));
         }
         if let Some(invite) = self.pending.get(&session_id).copied() {
@@ -541,6 +723,33 @@ impl TradeService {
             return Ok(self.close_pending(session_id, invite));
         }
         Err(TradeError::UnknownSession)
+    }
+
+    /// The host's "busy elsewhere" flag for events the registry cannot see, such as a battle or
+    /// a dungeon run. While set the player can neither start nor be asked to trade, and setting
+    /// it cancels any trade or invite the player is in.
+    pub fn set_away(&mut self, guid: u64, away: bool) -> Vec<TradeMessage> {
+        if !away {
+            self.away.remove(&guid);
+            return Vec::new();
+        }
+        if self.away.insert(guid) {
+            self.cancel_for(guid)
+        } else {
+            Vec::new()
+        }
+    }
+
+    /// Cancel whatever `guid` is in, with the plain cancelled status. For events the host sees
+    /// and the registry does not: a battle starting, a mini-game, a zone change.
+    pub fn cancel_for(&mut self, guid: u64) -> Vec<TradeMessage> {
+        let Some(session_id) = self.busy.get(&guid).copied() else {
+            return Vec::new();
+        };
+        match self.pending.get(&session_id).copied() {
+            Some(invite) => self.close_pending(session_id, invite),
+            None => self.close_active(session_id, [TradeStatus::Cancelled; 2]),
+        }
     }
 
     /// Disconnect cleanup. No inventory changes occur before both accepts commit successfully.
@@ -553,6 +762,17 @@ impl TradeService {
         } else {
             self.close_active(session_id, [TradeStatus::PartnerDisconnected; 2])
         }
+    }
+
+    /// Disconnect, then forget the player's snapshot (unless a settlement still waits for its
+    /// answer, in which case `settled` needs the entry).
+    pub fn unregister_player(&mut self, guid: u64) -> Vec<TradeMessage> {
+        let out = self.disconnect(guid);
+        if !self.busy.contains_key(&guid) {
+            self.players.remove(&guid);
+            self.away.remove(&guid);
+        }
+        out
     }
 
     /// Cancel when either participant enters an instanced zone (statuses 7/8).
@@ -596,8 +816,7 @@ impl TradeService {
         Vec::new()
     }
 
-    /// Called by the host's chosen expiry policy. No invite/session lifetime is recovered from the
-    /// client, so this service does not invent one. Active timeout closes with status 1 and end 5.
+    /// Host-chosen expiry for one invite or session. Active timeout closes with status 1 and end 5.
     pub fn timeout(&mut self, session_id: u32) -> Result<Vec<TradeMessage>, TradeError> {
         if let Some(invite) = self.pending.get(&session_id).copied() {
             return Ok(self.close_pending(session_id, invite));
@@ -606,6 +825,138 @@ impl TradeService {
             return Ok(self.close_active(session_id, [TradeStatus::Cancelled; 2]));
         }
         Err(TradeError::UnknownSession)
+    }
+
+    /// Housekeeping, safe to call after every routed message and on a timer: closes invites
+    /// and sessions whose player left the game (status 2), moved to another zone instance (this
+    /// covers a battle instance), walked out of reach, or ran out of time (status 1 / toast
+    /// withdrawn). A session waiting for `settled` is never touched.
+    pub fn maintain(
+        &mut self,
+        players: &PlayerRegistry,
+        social: &SocialService,
+        now_ms: u64,
+    ) -> Vec<TradeMessage> {
+        let mut out = Vec::new();
+        let pending: Vec<_> = self.pending.iter().map(|(id, i)| (*id, *i)).collect();
+        for (id, invite) in pending {
+            let who = [invite.inviter, invite.invitee];
+            if !self.pair_ok(players, social, who)
+                || now_ms.saturating_sub(invite.opened_ms) >= self.rules.invite_ttl_ms
+            {
+                out.extend(self.close_pending(id, invite));
+            }
+        }
+        let active: Vec<_> = self
+            .sessions
+            .iter()
+            .map(|(id, s)| (*id, s.players, s.opened_ms))
+            .collect();
+        for (id, who, opened_ms) in active {
+            let present = who
+                .iter()
+                .all(|guid| self.online_player(players, social, *guid).is_ok());
+            if !present {
+                out.extend(self.close_active(id, [TradeStatus::PartnerDisconnected; 2]));
+            } else if !self.pair_ok(players, social, who)
+                || now_ms.saturating_sub(opened_ms) >= self.rules.session_ttl_ms
+            {
+                out.extend(self.close_active(id, [TradeStatus::Cancelled; 2]));
+            }
+        }
+        out
+    }
+
+    /// Handle one client family-59 request from `guid` (the authenticated session's character,
+    /// never a value from the packet). `Err` means the request is dropped without a reply and
+    /// changed nothing. A request for a session the service does not know about is answered
+    /// with 59/5 so a stale client window closes; a refused item offer is answered with the
+    /// server's real row so the client's optimistic row is corrected; a lock on a stale counter
+    /// is answered with an unlock so the client's confirm popup closes (R).
+    pub fn handle(
+        &mut self,
+        players: &PlayerRegistry,
+        social: &SocialService,
+        guid: u64,
+        inner: &[u8],
+        now_ms: u64,
+    ) -> Result<TradeOutcome, TradeError> {
+        let [0x3b, 0, sub, rest @ ..] = inner else {
+            return Err(TradeError::Malformed);
+        };
+        let Some((id, body)) = rest.split_first_chunk::<4>() else {
+            return Err(TradeError::Malformed);
+        };
+        let session_id = u32::from_le_bytes(*id);
+        let word = |at: usize| u32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+        if session_id == u32::MAX || session_id == 0 {
+            return Err(TradeError::Malformed);
+        }
+        let sender = self
+            .players
+            .get(&guid)
+            .ok_or(TradeError::UnknownPlayer)?
+            .session_id;
+        let reply = |bytes: Vec<u8>| TradeMessage {
+            recipient: sender,
+            bytes,
+        };
+        let result = match (*sub, body.len()) {
+            (3, 1) => self
+                .reply_invite(players, social, guid, session_id, body[0] != 0, now_ms)
+                .map(plain),
+            (6, 4) => self.accept(players, social, guid, session_id, word(0), now_ms),
+            (7, 0) => self.cancel(guid, session_id).map(plain),
+            (8, 5) => self
+                .set_lock(
+                    players,
+                    social,
+                    guid,
+                    session_id,
+                    word(0),
+                    body[4] != 0,
+                    now_ms,
+                )
+                .map(plain),
+            (9, 8) => {
+                let item = i32::try_from(word(0)).map_err(|_| TradeError::Malformed)?;
+                self.offer_item(players, social, guid, session_id, item, word(4))
+                    .map(plain)
+                    .or_else(|error| match error {
+                        TradeError::UnknownItem
+                        | TradeError::UntradableItem
+                        | TradeError::InvalidQuantity => {
+                            let session = self.sessions.get(&session_id).ok_or(error)?;
+                            let index = session.index(guid)?;
+                            let total = session.offers[index].get(&item).copied().unwrap_or(0);
+                            let bytes = update_item_count_packet(
+                                session_id,
+                                session.counter,
+                                1,
+                                item,
+                                total,
+                            )?;
+                            Ok(plain(vec![reply(bytes)]))
+                        }
+                        other => Err(other),
+                    })
+            }
+            (10, 4) => self
+                .offer_coins(players, social, guid, session_id, word(0))
+                .map(plain),
+            _ => return Err(TradeError::Malformed),
+        };
+        match result {
+            Err(
+                TradeError::UnknownSession
+                | TradeError::NotParticipant
+                | TradeError::InvalidInviteReply,
+            ) => Ok(plain(vec![reply(end_packet(session_id))])),
+            Err(TradeError::StaleCounter) if *sub == 8 => {
+                Ok(plain(vec![reply(update_lock_packet(session_id, false))]))
+            }
+            other => other,
+        }
     }
 
     fn online_player<'a>(
@@ -624,6 +975,44 @@ impl TradeService {
             return Err(TradeError::PlayerOffline);
         }
         Ok(player)
+    }
+
+    fn open_session(&self, session_id: u32) -> Result<&Session, TradeError> {
+        let session = self
+            .sessions
+            .get(&session_id)
+            .ok_or(TradeError::UnknownSession)?;
+        if session.settlement.is_some() {
+            return Err(TradeError::Settling);
+        }
+        Ok(session)
+    }
+
+    /// Same zone instance and within `reach_m` (3-D, like the radial's selection reach).
+    fn in_reach(
+        &self,
+        players: &PlayerRegistry,
+        first: &TradePlayer,
+        second: &TradePlayer,
+    ) -> bool {
+        let (Some(a), Some(b)) = (
+            players.get(first.session_id),
+            players.get(second.session_id),
+        ) else {
+            return false;
+        };
+        let reach = f64::from(self.rules.reach_m);
+        let distance_squared: f64 = (0..3)
+            .map(|i| (f64::from(a.position[i]) - f64::from(b.position[i])).powi(2))
+            .sum();
+        a.zone == b.zone && distance_squared <= reach * reach
+    }
+
+    fn pair_ok(&self, players: &PlayerRegistry, social: &SocialService, who: [u64; 2]) -> bool {
+        match who.map(|guid| self.online_player(players, social, guid)) {
+            [Ok(a), Ok(b)] => self.in_reach(players, a, b),
+            _ => false,
+        }
     }
 
     fn allocate_session_id(&mut self) -> Result<u32, TradeError> {
@@ -664,7 +1053,20 @@ impl TradeService {
             .collect()
     }
 
+    /// Close an active session unless it waits for the host's commit answer (only `settled`
+    /// may end that one).
     fn close_active(&mut self, session_id: u32, statuses: [TradeStatus; 2]) -> Vec<TradeMessage> {
+        if self
+            .sessions
+            .get(&session_id)
+            .is_some_and(|session| session.settlement.is_some())
+        {
+            return Vec::new();
+        }
+        self.finish(session_id, statuses)
+    }
+
+    fn finish(&mut self, session_id: u32, statuses: [TradeStatus; 2]) -> Vec<TradeMessage> {
         let Some(session) = self.sessions.remove(&session_id) else {
             return Vec::new();
         };
@@ -758,6 +1160,13 @@ pub fn unavailable_replies(inner: &[u8]) -> Vec<Vec<u8>> {
     }
 }
 
+fn plain(messages: Vec<TradeMessage>) -> TradeOutcome {
+    TradeOutcome {
+        messages,
+        settlement: None,
+    }
+}
+
 fn clear_acceptance(session: &mut Session) -> bool {
     let had_lock = session.locked.iter().any(|value| *value);
     session.locked = [false, false];
@@ -812,6 +1221,7 @@ fn validate_offer_item(
         .checked_sub(used)
         .ok_or(TradeError::InvalidQuantity)?;
     if definition.no_trade
+        || item.rental.is_some()
         || inventory
             .state
             .equipment
@@ -819,7 +1229,7 @@ fn validate_offer_item(
             .any(|equipment| equipment.item_id == item_id)
         || inventory.equipped_on_pet.contains(&item_id)
     {
-        // (R) NO_TRADE, equipped state, and pet equipment block an offer.
+        // (R) NO_TRADE, rentals, equipped state, and pet equipment block an offer.
         return Err(TradeError::UntradableItem);
     }
     if quantity == 0
@@ -863,30 +1273,32 @@ impl TransferFailure {
 }
 
 fn stage_swap(
+    session_id: u32,
     session: &Session,
     first: TradeInventory,
     second: TradeInventory,
-) -> Result<[TradeInventory; 2], TransferFailure> {
-    // (R) Stage both owners before mutating either authoritative snapshot.
+) -> Result<TradeSettlement, TransferFailure> {
+    // (R) Stage both owners on copies; the originals ride along as the settlement's `before`.
+    let before = [first.state.clone(), second.state.clone()];
     let mut staged = [first, second];
+    let invalid = |source| TransferFailure {
+        source,
+        kind: TransferFailureKind::Invalid,
+    };
     for source in 0..2 {
         if session.coins[source] > staged[source].state.coins {
-            return Err(TransferFailure {
-                source,
-                kind: TransferFailureKind::Invalid,
-            });
+            return Err(invalid(source));
         }
         for (&item_id, &quantity) in &session.offers[source] {
             if validate_offer_item(&staged[source], item_id, quantity).is_err() {
-                return Err(TransferFailure {
-                    source,
-                    kind: TransferFailureKind::Invalid,
-                });
+                return Err(invalid(source));
             }
         }
     }
 
-    let mut offered = [Vec::new(), Vec::new()];
+    let mut offered: [Vec<(InventoryItem, TradeItemDefinition)>; 2] = [Vec::new(), Vec::new()];
+    let mut gave: [Vec<ItemMove>; 2] = [Vec::new(), Vec::new()];
+    let mut received: [Vec<ItemMove>; 2] = [Vec::new(), Vec::new()];
     for source in 0..2 {
         staged[source].state.coins -= session.coins[source];
         for (&item_id, &quantity) in &session.offers[source] {
@@ -896,12 +1308,12 @@ fn stage_swap(
                 .iter()
                 .position(|item| item.id == item_id)
             else {
-                return Err(TransferFailure {
-                    source,
-                    kind: TransferFailureKind::Invalid,
-                });
+                return Err(invalid(source));
             };
             let mut item = staged[source].state.items[index].clone();
+            // Validated above, so present: no-trade and max stack belong to the definition.
+            let definition = staged[source].definitions[&item.definition_id];
+            gave[source].push(item_move(&item, quantity));
             if quantity == item.count {
                 staged[source].state.items.remove(index);
             } else {
@@ -913,7 +1325,7 @@ fn stage_swap(
             item.count = quantity;
             item.consumed_count = 0;
             item.stored_count = 0;
-            offered[source].push(item);
+            offered[source].push((item, definition));
         }
     }
 
@@ -924,14 +1336,13 @@ fn stage_swap(
             .coins
             .checked_add(session.coins[source])
             .filter(|coins| *coins <= MAX_COINS)
-            .ok_or(TransferFailure {
-                source,
-                kind: TransferFailureKind::Invalid,
-            })?;
+            .ok_or(invalid(source))?;
         staged[target].state.coins = total;
-        for item in &offered[source] {
-            receive_item(&mut staged[target], item.clone())
+        for (item, definition) in &offered[source] {
+            let mut landed = item_move(item, item.count);
+            landed.item_id = receive_item(&mut staged[target], item.clone(), *definition)
                 .map_err(|kind| TransferFailure { source, kind })?;
+            received[target].push(landed);
         }
     }
 
@@ -940,23 +1351,51 @@ fn stage_swap(
             || staged[source].state.items.len() > staged[source].bag_capacity
         {
             // (R) No capacity-specific status exists; report the affected offer as invalid.
-            return Err(TransferFailure {
-                source: 1 - source,
-                kind: TransferFailureKind::Invalid,
-            });
+            return Err(invalid(1 - source));
         }
     }
-    Ok(staged)
+    let [after_first, after_second] = staged.map(|inventory| inventory.state);
+    let [before_first, before_second] = before;
+    let [gave_first, gave_second] = gave;
+    let [received_first, received_second] = received;
+    Ok(TradeSettlement {
+        session_id,
+        sides: [
+            SettlementSide {
+                guid: session.players[0],
+                before: before_first,
+                after: after_first,
+                gave: gave_first,
+                received: received_first,
+            },
+            SettlementSide {
+                guid: session.players[1],
+                before: before_second,
+                after: after_second,
+                gave: gave_second,
+                received: received_second,
+            },
+        ],
+    })
 }
 
+fn item_move(item: &InventoryItem, count: u32) -> ItemMove {
+    ItemMove {
+        item_id: item.id,
+        definition_id: item.definition_id,
+        tint: item.tint,
+        count,
+    }
+}
+
+/// Add `incoming` to `target` and return the instance id it landed in. The definition comes
+/// from the giver (it is the same for everyone), so a receiver needs no entry for items it
+/// does not own yet.
 fn receive_item(
     target: &mut TradeInventory,
     mut incoming: InventoryItem,
-) -> Result<(), TransferFailureKind> {
-    let definition = *target
-        .definitions
-        .get(&incoming.definition_id)
-        .ok_or(TransferFailureKind::Invalid)?;
+    definition: TradeItemDefinition,
+) -> Result<i32, TransferFailureKind> {
     if definition.no_trade {
         return Err(TransferFailureKind::Invalid);
     }
@@ -971,18 +1410,26 @@ fn receive_item(
             && item.count.checked_add(incoming.count).is_some_and(fits)
     }) {
         existing.count += incoming.count;
-        return Ok(());
-    }
-    if !fits(incoming.count) {
-        return Err(TransferFailureKind::Stack);
+        return Ok(existing.id);
     }
     if target.state.items.len() >= target.bag_capacity {
-        return Err(TransferFailureKind::Invalid);
+        // No free row: if a same-definition stack exists, it is its max stack that blocks.
+        let blocked_by_stack = target.state.items.iter().any(|item| {
+            item.definition_id == incoming.definition_id
+                && item.tint == incoming.tint
+                && item.rental.is_none()
+        });
+        return Err(if blocked_by_stack {
+            TransferFailureKind::Stack
+        } else {
+            TransferFailureKind::Invalid
+        });
     }
     // (R) Item instance ids are local to this inventory; transfer allocates a new destination id.
     incoming.id = allocate_item_id(&mut target.state).ok_or(TransferFailureKind::Invalid)?;
+    let id = incoming.id;
     target.state.items.push(incoming);
-    Ok(())
+    Ok(id)
 }
 
 fn allocate_item_id(state: &mut InventoryState) -> Option<i32> {

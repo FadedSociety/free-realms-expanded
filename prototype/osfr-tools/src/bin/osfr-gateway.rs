@@ -12,7 +12,7 @@ use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
 use osfr_tools::mounts::{RidePose, RideView};
 use osfr_tools::net_policy::{Bucket, IpLimiter};
-use osfr_tools::player_radial::{PlayerRadial, PublicLook};
+use osfr_tools::player_radial::{Chosen, MenuOffer, PlayerRadial, PublicLook};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
 use osfr_tools::security_log::{EventKind, SecurityEvent, SecurityLog};
 use osfr_tools::session::{CRC_SEED, SessionRequest, clock_reflect, decode_controls};
@@ -29,6 +29,7 @@ use osfr_tools::soe::{
 };
 use osfr_tools::soe_send::{ReliableSender, SendError, SenderConfig};
 use osfr_tools::studio;
+use osfr_tools::trade::{TradeMessage, TradeService, TradeSettlement};
 use osfr_tools::world::{World, WorldPose};
 
 /// Studio savestates sit next to the character save.
@@ -447,6 +448,12 @@ struct SharedWorld {
     /// What a stranger may see of each joined character, keyed by character guid (W143).
     /// Filled at join and on profile/equipment change; empty means no Inspect entry (R).
     public_looks: BTreeMap<u64, PublicLook>,
+    /// Player trade sessions (W163). Staged with the world, so a message that is rolled back
+    /// leaves no trade behind.
+    trades: TradeService,
+    /// Settlements produced while staging. They are committed only after the staged world is
+    /// installed (`settle_trades`), never inside the staging step (R).
+    trade_settlements: Vec<TradeSettlement>,
     /// W162: each mounted or ride-summoning character's ride, keyed by character guid.
     rides: BTreeMap<u64, RideView>,
     social: SocialService,
@@ -510,6 +517,8 @@ impl SharedWorld {
     fn new() -> Self {
         // (R) Local runner defaults; native visibility radius and group cap are unknown.
         Self {
+            trades: TradeService::new(),
+            trade_settlements: Vec::new(),
             players: PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap()),
             public_looks: BTreeMap::new(),
             rides: BTreeMap::new(),
@@ -618,6 +627,10 @@ impl SharedWorld {
             if let Some(view) = self.rides.remove(&player.character_guid) {
                 deliveries = self.ride_fanout(session_id, &[view.removal_packet()]);
             }
+            // Leaving (disconnect or zoning) ends any trade the character is in (W163).
+            deliveries.extend(trade_deliveries(
+                self.trades.unregister_player(player.character_guid),
+            ));
         }
         self.joined.remove(&session_id);
         self.chat_sessions.remove(&session_id);
@@ -1622,6 +1635,11 @@ impl Session {
             // change (equipment, job) and published at join; removed on leave.
             if outcome.gameplay_changed && staged_world.joined.contains(&self.id) {
                 refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
+                deliveries.extend(refresh_trade_player(
+                    &mut staged_world,
+                    self.id,
+                    &staged_gateway,
+                ));
             }
             if outcome.entered_world
                 && staged_gateway.is_world_loaded()
@@ -1630,6 +1648,11 @@ impl Session {
                 let look = staged_gateway.player_presentation(self.is_member)?;
                 deliveries.extend(staged_world.join_player(self, &current, look, instance)?);
                 refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
+                deliveries.extend(refresh_trade_player(
+                    &mut staged_world,
+                    self.id,
+                    &staged_gateway,
+                ));
             } else if moved && staged_world.joined.contains(&self.id) {
                 let messages = staged_world
                     .players
@@ -1670,10 +1693,21 @@ impl Session {
                     {
                         continue; // Gameplay's developer command path ran first.
                     }
-                    deliveries.extend(self.route_application(application, &mut staged_world));
+                    deliveries.extend(self.route_application(
+                        application,
+                        &mut staged_world,
+                        now_ms,
+                    ));
                     staged_world.refresh_group_ids();
                 }
             }
+            // W163: a trade ends when a player walks out of reach, changes zone instance (a
+            // battle runs in its own), leaves, or lets it run out.
+            deliveries.extend(trade_deliveries(staged_world.trades.maintain(
+                &staged_world.players,
+                &staged_world.social,
+                now_ms,
+            )));
 
             // (R) A pose-only change (no gameplay change, zone transfer or run
             // binding) is written at most every POSITION_SAVE_MS; `tick` and
@@ -1754,6 +1788,9 @@ impl Session {
             }
             queue_delivery(self, sessions, world, delivery)?;
         }
+        for delivery in settle_trades(self, sessions, world)? {
+            queue_delivery(self, sessions, world, delivery)?;
+        }
         if outcome.state_changed && !deferred {
             if let Some(trace) = &self.trace {
                 trace.record(json!({
@@ -1786,21 +1823,42 @@ impl Session {
 
     /// 26/19 select, 26/10 choice on an open player menu, 149/2 close (W143).
     /// A refusal is a silent drop (R): nothing is sent, so ids cannot be probed.
-    fn route_player_radial(&mut self, inner: &[u8], world: &mut SharedWorld) -> Vec<Delivery> {
+    fn route_player_radial(
+        &mut self,
+        inner: &[u8],
+        world: &mut SharedWorld,
+        now_ms: u64,
+    ) -> Vec<Delivery> {
         let looks = &world.public_looks;
+        let me = self.character_guid;
         let replies = if inner == [149, 0, 2] {
             self.radial.stop_inspect(inner).map(|()| Vec::new())
         } else if inner.starts_with(&[26, 0, 19, 0]) {
+            // W163: Trade is offered only where an invite would be admitted right now.
+            let trades = &world.trades;
             self.radial
-                .select_player(&world.players, self.id, inner, |guid| {
-                    looks.contains_key(&guid)
+                .select_menu(&world.players, self.id, inner, |guid| MenuOffer {
+                    inspect: looks.contains_key(&guid),
+                    trade: trades.can_invite(&world.players, &world.social, me, guid),
                 })
         } else {
-            self.radial
-                .choose(&world.players, self.id, inner, |guid| {
+            match self
+                .radial
+                .choose_entry(&world.players, self.id, inner, |guid| {
                     looks.get(&guid).cloned()
-                })
-                .map(Option::unwrap_or_default)
+                }) {
+                Ok(Some(Chosen::Trade(target))) => {
+                    // The service re-checks everything; a refusal is a silent drop (R).
+                    let invited =
+                        world
+                            .trades
+                            .invite(&world.players, &world.social, me, target, now_ms);
+                    return trade_deliveries(invited.unwrap_or_default());
+                }
+                Ok(Some(Chosen::Inspect(packet))) => Ok(vec![packet]),
+                Ok(None) => Ok(Vec::new()),
+                Err(error) => Err(error),
+            }
         };
         replies
             .unwrap_or_default()
@@ -1812,7 +1870,28 @@ impl Session {
             .collect()
     }
 
-    fn route_application(&mut self, inner: &[u8], world: &mut SharedWorld) -> Vec<Delivery> {
+    /// The six client trade requests (59/3, 6, 7, 8, 9, 10). The actor is `self.character_guid`;
+    /// the body never names anyone. A settlement is queued for `settle_trades`, not committed here.
+    fn route_trade(&mut self, inner: &[u8], world: &mut SharedWorld, now_ms: u64) -> Vec<Delivery> {
+        let Ok(outcome) = world.trades.handle(
+            &world.players,
+            &world.social,
+            self.character_guid,
+            inner,
+            now_ms,
+        ) else {
+            return Vec::new(); // dropped without a reply (R)
+        };
+        world.trade_settlements.extend(outcome.settlement);
+        trade_deliveries(outcome.messages)
+    }
+
+    fn route_application(
+        &mut self,
+        inner: &[u8],
+        world: &mut SharedWorld,
+        now_ms: u64,
+    ) -> Vec<Delivery> {
         // One social action budget per account (W91); a refusal is a silent drop (R).
         let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
         if !security
@@ -1831,17 +1910,10 @@ impl Session {
             || inner == [149, 0, 2]
             || (inner.starts_with(&[26, 0, 10, 0]) && self.radial.menu_target().is_some())
         {
-            return self.route_player_radial(inner, world);
+            return self.route_player_radial(inner, world, now_ms);
         }
         if inner.starts_with(&[59, 0]) {
-            // W156: player trade is not offered (R). Close any window the sender believes in.
-            return osfr_tools::trade::unavailable_replies(inner)
-                .iter()
-                .map(|reply| Delivery {
-                    recipient: self.id,
-                    bytes: wrap_application(reply),
-                })
-                .collect();
+            return self.route_trade(inner, world, now_ms);
         }
         if inner.starts_with(&[15, 0, 1, 0]) {
             return self.route_typed_chat(inner, world);
@@ -2119,6 +2191,239 @@ impl Session {
 
 /// (R) Longest a pose-only change waits before it is written (crash loss bound).
 const POSITION_SAVE_MS: u64 = 5_000;
+
+fn trade_deliveries(messages: Vec<TradeMessage>) -> Vec<Delivery> {
+    messages
+        .into_iter()
+        .map(|message| Delivery {
+            recipient: message.recipient,
+            bytes: wrap_application(&message.bytes),
+        })
+        .collect()
+}
+
+/// (W163) Keep the trade service's copy of this character's inventory current. A character
+/// whose inventory does not validate is not tradable: it is unregistered, which also ends a
+/// trade it is in.
+fn refresh_trade_player(
+    world: &mut SharedWorld,
+    session: SessionId,
+    gateway: &Gateway,
+) -> Vec<Delivery> {
+    let Some(player) = world.players.get(session).cloned() else {
+        return Vec::new();
+    };
+    let guid = player.character_guid;
+    match gateway.trade_inventory() {
+        Some(inventory) => {
+            if world.trades.inventory(guid).is_some() {
+                // A snapshot that fails the service's checks keeps the previous one (R).
+                let _ = world.trades.sync_inventory(guid, inventory);
+            } else {
+                let _ = world.trades.register_player(&player, inventory);
+            }
+            // A battle or dungeon run ends a trade and blocks a new one.
+            trade_deliveries(world.trades.set_away(guid, gateway.in_encounter()))
+        }
+        None => trade_deliveries(world.trades.unregister_player(guid)),
+    }
+}
+
+/// One side of a trade journal: a character save path and the complete snapshot to write.
+#[derive(serde::Serialize, serde::Deserialize)]
+struct TradeJournalEntry {
+    path: PathBuf,
+    snapshot: osfr_tools::game_store::Snapshot,
+}
+
+const TRADE_JOURNAL_EXTENSION: &str = "trade-journal";
+
+/// The live session playing `guid`: the session being dispatched, or one taken out of the map.
+fn trade_party<'a>(
+    guid: u64,
+    me: &'a mut Session,
+    taken: &'a mut [(SessionKey, Session)],
+) -> Option<&'a mut Session> {
+    if me.character_guid == guid {
+        return Some(me);
+    }
+    taken
+        .iter_mut()
+        .map(|(_, session)| session)
+        .find(|session| session.character_guid == guid)
+}
+
+/// Lead (security): the all-or-nothing commit of a settled trade (W163 settlement).
+///
+/// 1. Both players must be live in this gateway and their inventories must still equal the
+///    settlement's `before` exactly; otherwise nothing moves (the trade cancels).
+/// 2. Each side's `after` is adopted on a staged copy of its gateway, which validates it.
+/// 3. A journal holding both complete snapshots is written to a temporary file, synced and
+///    renamed into place, so it is either whole or absent.
+/// 4. Both character saves are written, then the journal is removed. A crash or write error in
+///    between leaves the journal, and the next start writes both saves from it
+///    (`recover_trade_journals`), so nobody keeps both sides or loses both.
+/// 5. Both live sessions adopt their staged gateways and are sent their inventory updates.
+fn commit_trade(
+    settlement: &TradeSettlement,
+    me: &mut Session,
+    sessions: &mut SessionMap,
+    world: &SharedWorld,
+) -> Result<Option<Vec<Delivery>>, Box<dyn std::error::Error>> {
+    let mut taken: Vec<(SessionKey, Session)> = Vec::new();
+    for side in &settlement.sides {
+        if side.guid == me.character_guid {
+            continue;
+        }
+        let key = world
+            .active_sessions
+            .get(&side.guid)
+            .and_then(|id| world.session_keys.get(id))
+            .copied();
+        match key.and_then(|key| sessions.remove(&key).map(|session| (key, session))) {
+            Some(pair) => taken.push(pair),
+            None => {
+                sessions.extend(taken);
+                return Ok(None);
+            }
+        }
+    }
+    let result = commit_trade_parties(settlement, me, &mut taken);
+    sessions.extend(taken);
+    result
+}
+
+fn commit_trade_parties(
+    settlement: &TradeSettlement,
+    me: &mut Session,
+    taken: &mut [(SessionKey, Session)],
+) -> Result<Option<Vec<Delivery>>, Box<dyn std::error::Error>> {
+    let [first, second] = &settlement.sides;
+    if first.guid == second.guid {
+        return Ok(None);
+    }
+    // 1-2. Still exactly what was agreed, and the result validates.
+    let mut staged = Vec::with_capacity(2);
+    for side in &settlement.sides {
+        let Some(party) = trade_party(side.guid, me, taken) else {
+            return Ok(None);
+        };
+        if !party.selected_character || party.gateway.inventory_state() != Some(&side.before) {
+            return Ok(None);
+        }
+        let mut gateway = party.gateway.clone();
+        let Ok(replies) = gateway.adopt_trade_inventory(side.after.clone()) else {
+            return Ok(None);
+        };
+        staged.push((
+            side.guid,
+            party.id,
+            party.state_path.clone(),
+            gateway,
+            replies,
+        ));
+    }
+    // 3. The journal: whole or absent.
+    let entries: Vec<TradeJournalEntry> = staged
+        .iter()
+        .map(|(_, _, path, gateway, _)| TradeJournalEntry {
+            path: path.clone(),
+            snapshot: gateway.snapshot(),
+        })
+        .collect();
+    let directory = staged[0]
+        .2
+        .parent()
+        .ok_or("character save has no directory")?
+        .to_path_buf();
+    let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
+    let journal = directory.join(format!(
+        "trade-{}-{stamp}.{TRADE_JOURNAL_EXTENSION}",
+        settlement.session_id
+    ));
+    let pending = journal.with_extension("tmp");
+    {
+        let mut file = fs::File::create(&pending)?;
+        std::io::Write::write_all(&mut file, &serde_json::to_vec(&entries)?)?;
+        file.sync_all()?;
+    }
+    fs::rename(&pending, &journal)?;
+    // 4. Both saves, then the journal goes.
+    for entry in &entries {
+        save(&entry.path, &entry.snapshot)?;
+    }
+    fs::remove_file(&journal)?;
+    // 5. Install and tell each player.
+    let mut deliveries = Vec::new();
+    for (guid, id, _, gateway, replies) in staged {
+        if let Some(party) = trade_party(guid, me, taken) {
+            party.gateway = gateway;
+        }
+        deliveries.extend(replies.iter().map(|reply| Delivery {
+            recipient: id,
+            bytes: wrap_application(reply),
+        }));
+    }
+    Ok(Some(deliveries))
+}
+
+/// Finish any trade a crash interrupted: write every save a complete journal names, then
+/// remove the journal. Rewriting a save that already holds the same snapshot is harmless.
+/// A `.tmp` journal was never completed, so that trade never started writing: delete it.
+fn recover_trade_journals(directory: &Path) -> Result<usize, Box<dyn std::error::Error>> {
+    let entries = match fs::read_dir(directory) {
+        Ok(entries) => entries,
+        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(0),
+        Err(error) => return Err(error.into()),
+    };
+    let mut recovered = 0;
+    for entry in entries {
+        let path = entry?.path();
+        let is_trade = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .is_some_and(|name| name.starts_with("trade-"));
+        if !is_trade {
+            continue;
+        }
+        match path.extension().and_then(|extension| extension.to_str()) {
+            Some("tmp") => fs::remove_file(&path)?,
+            Some(TRADE_JOURNAL_EXTENSION) => {
+                let journal: Vec<TradeJournalEntry> = serde_json::from_slice(&fs::read(&path)?)?;
+                for side in &journal {
+                    save(&side.path, &side.snapshot)?;
+                }
+                fs::remove_file(&path)?;
+                event(json!({"event":"trade_journal_recovered","sides":journal.len()}));
+                recovered += 1;
+            }
+            _ => {}
+        }
+    }
+    Ok(recovered)
+}
+
+/// Commit the settlements queued while staging, now that the staged world is installed, and
+/// tell the trade service and both players how each went.
+fn settle_trades(
+    me: &mut Session,
+    sessions: &mut SessionMap,
+    world: &mut SharedWorld,
+) -> Result<Vec<Delivery>, Box<dyn std::error::Error>> {
+    let mut deliveries = Vec::new();
+    for settlement in std::mem::take(&mut world.trade_settlements) {
+        let committed = commit_trade(&settlement, me, sessions, world)?;
+        let ok = committed.is_some();
+        deliveries.extend(committed.unwrap_or_default());
+        deliveries.extend(trade_deliveries(
+            world
+                .trades
+                .settled(settlement.session_id, ok)
+                .unwrap_or_default(),
+        ));
+    }
+    Ok(deliveries)
+}
 
 /// (R) Inspect shows only unlocked jobs with ranks and the active job's worn
 /// items; no look (no profiles loaded) means no Inspect entry.
@@ -2686,6 +2991,13 @@ impl Server {
         } else {
             let checked = load_gateway(&options)?;
             save(&options.state, &checked.snapshot())?;
+        }
+        if options.account_store.is_some() {
+            // Finish any trade a crash interrupted before a player can load either save.
+            let saves = character_state_path(&options.state, 0);
+            if let Some(directory) = saves.parent() {
+                recover_trade_journals(directory)?;
+            }
         }
         let socket = UdpSocket::bind(options.bind)?;
         socket.set_read_timeout(Some(Duration::from_millis(10)))?;
@@ -4026,7 +4338,7 @@ mod tests {
             let doc: serde_json::Value = serde_json::from_str(&text).unwrap();
             doc["character"]["position"][0].as_f64().unwrap() as f32
         };
-        let mut step = |session: &mut Session, server: &mut Server, dx: f32, now_ms: u64| {
+        let step = |session: &mut Session, server: &mut Server, dx: f32, now_ms: u64| {
             let mut pose = vec![125, 0];
             pose.extend(start.guid.to_le_bytes());
             let p = [start.position[0] + dx, start.position[1], start.position[2]];
@@ -4412,4 +4724,666 @@ fn shared_combat_budget_cannot_be_refunded_by_staging() {
     drop(clone);
     assert!(!world.security.lock().unwrap().allow_combat(101, now));
     assert!(world.security.lock().unwrap().allow_combat(202, now));
+}
+
+/// W163: the binary's trade glue, driven through `Session::route_application` exactly as
+/// `commit_outcome` does, with two sessions and no sockets. The commit is the lead's: with the
+/// fail-closed `commit_trade` a finished trade must cancel and move nothing.
+#[cfg(test)]
+mod w163_trade_routing {
+    use super::*;
+    use osfr_tools::inventory::{InventoryItem, InventoryState};
+    use osfr_tools::players::PlayerPresentation;
+    use osfr_tools::trade::{TradeInventory, TradeItemDefinition};
+    use std::collections::{BTreeMap, BTreeSet};
+
+    const A: u64 = 101;
+    const B: u64 = 202;
+
+    struct Rig {
+        a: Session,
+        b: Session,
+        world: SharedWorld,
+        scratch: PathBuf,
+    }
+
+    impl Drop for Rig {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.scratch);
+        }
+    }
+
+    fn row(id: i32, definition_id: i32, count: u32) -> InventoryItem {
+        InventoryItem {
+            definition_id,
+            tint: 0,
+            id,
+            count,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        }
+    }
+
+    fn inventory(coins: u32, items: Vec<InventoryItem>) -> TradeInventory {
+        let next = items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
+        TradeInventory::new(
+            InventoryState {
+                coins,
+                items,
+                equipment: Vec::new(),
+                next_instance_id: Some(i64::from(next)),
+            },
+            BTreeMap::from([(
+                100,
+                TradeItemDefinition {
+                    no_trade: false,
+                    max_stack: Some(99),
+                },
+            )]),
+            BTreeSet::new(),
+            100,
+        )
+        .unwrap()
+    }
+
+    fn rig(name: &str) -> Rig {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+        let scratch = std::env::temp_dir().join(format!("osfr-w163-{name}-{}", std::process::id()));
+        fs::create_dir_all(&scratch).unwrap();
+        let options = Options {
+            bind: "127.0.0.1:0".parse().unwrap(),
+            reference: root.join("references/rust-gateway-reference"),
+            state: scratch.join("character.json"),
+            content: Some(root.join("references/rust-opening-cooking-original-assets")),
+            identity: None,
+            account_store: None,
+            gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
+            handoff_key: Vec::new(),
+            seconds: 1,
+            dev_tools: false,
+            studio_port: 0,
+            client_logs: None,
+            terrain: None,
+            world: Some(scratch.join("world")),
+            stock_text: None,
+            allow_lan: false,
+            security_log: None,
+        };
+        let session = |id: u64, guid: u64| {
+            let mut session = Session::new(
+                SessionId(id),
+                "127.0.0.1:12345".parse().unwrap(),
+                SessionRequest {
+                    id: id as u32,
+                    crc_length: 3,
+                    buffer_size: 512,
+                },
+                &options,
+                CRC_SEED,
+                None,
+                None,
+            )
+            .unwrap();
+            session.character_guid = guid;
+            session
+        };
+        let (a, b) = (session(17, A), session(18, B));
+        let mut world = SharedWorld::new();
+        for (session, guid, x, coins, items) in [
+            (&a, A, 0.0, 50, vec![row(10, 100, 3)]),
+            (&b, B, 5.0, 70, vec![]),
+        ] {
+            let presentation = PlayerPresentation {
+                character_guid: guid,
+                first_name: format!("P{guid}"),
+                ..PlayerPresentation::default()
+            };
+            world
+                .players
+                .join_with_presentation(
+                    session.id,
+                    guid + 10_000,
+                    guid,
+                    ZoneInstance {
+                        zone_id: 1,
+                        instance_id: 1,
+                    },
+                    [x, 0.0, 0.0],
+                    0.0,
+                    presentation,
+                )
+                .unwrap();
+            let identity = SocialIdentity {
+                account_id: guid + 10_000,
+                character_guid: guid,
+                // Synthetic fixture identifiers, not recovered player names.
+                name: SocialName::new(format!("P{guid}"), "").unwrap(),
+            };
+            world
+                .social
+                .register(SocialLists::new(identity).unwrap())
+                .unwrap();
+            world.social.login(guid).unwrap();
+            world.joined.insert(session.id);
+            let player = world.players.get(session.id).unwrap().clone();
+            world
+                .trades
+                .register_player(&player, inventory(coins, items))
+                .unwrap();
+        }
+        Rig {
+            a,
+            b,
+            world,
+            scratch,
+        }
+    }
+
+    fn inner(delivery: &Delivery) -> &[u8] {
+        assert_eq!(&delivery.bytes[..3], &[5, 0, 1]);
+        &delivery.bytes[7..]
+    }
+
+    fn select(own: u64, target: u64) -> Vec<u8> {
+        let mut bytes = vec![26, 0, 19, 0];
+        bytes.extend(own.to_le_bytes());
+        bytes.extend(target.to_le_bytes());
+        bytes
+    }
+
+    fn choice(guid: u64, id: i32) -> Vec<u8> {
+        let mut bytes = vec![26, 0, 10, 0];
+        bytes.extend(guid.to_le_bytes());
+        bytes.extend(id.to_le_bytes());
+        bytes
+    }
+
+    fn pkt(sub: u8, session: u32, body: &[u8]) -> Vec<u8> {
+        let mut bytes = vec![0x3b, 0, sub];
+        bytes.extend(session.to_le_bytes());
+        bytes.extend(body);
+        bytes
+    }
+
+    /// Every delivery as (recipient session, family-59 sub).
+    fn subs(deliveries: &[Delivery]) -> Vec<(u64, u8)> {
+        deliveries
+            .iter()
+            .map(|delivery| (delivery.recipient.0, inner(delivery)[2]))
+            .collect()
+    }
+
+    #[test]
+    fn radial_trade_entry_starts_an_invite_for_the_other_session() {
+        let mut rig = rig("invite");
+        let menu = rig
+            .a
+            .route_application(&select(A, B), &mut rig.world, 1_000);
+        assert_eq!(menu.len(), 1);
+        assert_eq!(menu[0].recipient, rig.a.id);
+        let packet = inner(&menu[0]);
+        assert_eq!(&packet[..4], &[26, 0, 9, 0]);
+        // One entry, the Trade id: Inspect is absent because B has no public look here.
+        assert_eq!(i32::from_le_bytes(packet[13..17].try_into().unwrap()), 1);
+        assert_eq!(
+            i32::from_le_bytes(packet[17..21].try_into().unwrap()),
+            osfr_tools::player_radial::TRADE_ENTRY_ID
+        );
+        let invite = rig.a.route_application(
+            &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+            &mut rig.world,
+            1_001,
+        );
+        assert_eq!(subs(&invite), [(18, 2)], "the invite goes to B only");
+        assert!(rig.world.trades.session_id_for(A).is_some());
+        // Replaying the choice, or a second menu for a busy player, offers nothing.
+        assert!(
+            rig.a
+                .route_application(
+                    &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+                    &mut rig.world,
+                    1_002
+                )
+                .is_empty()
+        );
+        assert!(
+            rig.a
+                .route_application(&select(A, B), &mut rig.world, 1_003)
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn a_full_trade_ends_in_a_settlement_and_cancels_when_the_commit_refuses() {
+        let mut rig = rig("full");
+        rig.a
+            .route_application(&select(A, B), &mut rig.world, 1_000);
+        rig.a.route_application(
+            &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+            &mut rig.world,
+            1_000,
+        );
+        let id = rig.world.trades.session_id_for(A).unwrap();
+        let started = rig
+            .b
+            .route_application(&pkt(3, id, &[1]), &mut rig.world, 2_000);
+        let mut got = subs(&started);
+        got.sort();
+        assert_eq!(got, [(17, 4), (18, 4)]);
+
+        let mut item = 10i32.to_le_bytes().to_vec();
+        item.extend(2u32.to_le_bytes());
+        let echoed = rig
+            .a
+            .route_application(&pkt(9, id, &item), &mut rig.world, 2_100);
+        assert_eq!(subs(&echoed), [(17, 12), (18, 12)]);
+        let coins =
+            rig.b
+                .route_application(&pkt(10, id, &30u32.to_le_bytes()), &mut rig.world, 2_200);
+        assert_eq!(subs(&coins), [(17, 11), (18, 11)]);
+
+        let counter = rig.world.trades.session_counter(id).unwrap();
+        let mut lock = counter.to_le_bytes().to_vec();
+        lock.push(1);
+        rig.a
+            .route_application(&pkt(8, id, &lock), &mut rig.world, 2_300);
+        let confirm = rig
+            .b
+            .route_application(&pkt(8, id, &lock), &mut rig.world, 2_300);
+        assert_eq!(
+            subs(&confirm).iter().filter(|(_, sub)| *sub == 18).count(),
+            2
+        );
+        let accept = pkt(6, id, &counter.to_le_bytes());
+        assert!(
+            rig.a
+                .route_application(&accept, &mut rig.world, 12_300)
+                .is_empty()
+        );
+        let before = [
+            rig.world.trades.inventory(A).unwrap().clone(),
+            rig.world.trades.inventory(B).unwrap().clone(),
+        ];
+        // The second accept queues a settlement for `settle_trades`; nothing is sent or moved
+        // while staging, so a staged world that is dropped leaves no half trade behind.
+        assert!(
+            rig.b
+                .route_application(&accept, &mut rig.world, 12_300)
+                .is_empty()
+        );
+        assert_eq!(rig.world.trade_settlements.len(), 1);
+        let settlement = rig.world.trade_settlements[0].clone();
+        assert_eq!(settlement.session_id, id);
+        assert_eq!(settlement.sides[0].after.coins, 80);
+        assert_eq!(settlement.sides[1].after.coins, 40);
+        assert_eq!(rig.world.trades.inventory(A).unwrap(), &before[0]);
+
+        // This rig's sessions hold no live inventory equal to the settlement's `before`, so the
+        // lead's commit refuses: both are told "canceled" (status 1), the window closes (59/5)
+        // and nothing in either inventory changed (the commit's own tests cover success).
+        let end = settle_trades(&mut rig.a, &mut SessionMap::new(), &mut rig.world).unwrap();
+        assert_eq!(subs(&end).len(), 4);
+        for pair in end.chunks(2) {
+            assert_eq!(inner(&pair[0])[2], 15);
+            assert_eq!(inner(&pair[0])[3], 1);
+            assert_eq!(inner(&pair[1])[2], 5);
+        }
+        assert!(rig.world.trade_settlements.is_empty());
+        assert_eq!(rig.world.trades.inventory(A).unwrap(), &before[0]);
+        assert_eq!(rig.world.trades.inventory(B).unwrap(), &before[1]);
+        assert!(rig.world.trades.session_id_for(A).is_none());
+        // Replays after the end only get the stale-window close, to the sender.
+        let replay = rig.a.route_application(&accept, &mut rig.world, 13_000);
+        assert_eq!(subs(&replay), [(17, 5)]);
+        assert!(
+            settle_trades(&mut rig.a, &mut SessionMap::new(), &mut rig.world)
+                .unwrap()
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn leaving_the_world_or_walking_away_ends_the_trade_for_the_partner() {
+        let mut rig = rig("leave");
+        rig.a
+            .route_application(&select(A, B), &mut rig.world, 1_000);
+        rig.a.route_application(
+            &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+            &mut rig.world,
+            1_000,
+        );
+        let id = rig.world.trades.session_id_for(A).unwrap();
+        rig.b
+            .route_application(&pkt(3, id, &[1]), &mut rig.world, 1_100);
+        // B walks 60 m away: the housekeeping `commit_outcome` runs after each step ends it.
+        rig.world
+            .players
+            .update_pose(
+                rig.b.id,
+                ZoneInstance {
+                    zone_id: 1,
+                    instance_id: 1,
+                },
+                [60.0, 0.0, 0.0],
+                0.0,
+            )
+            .unwrap();
+        let end = trade_deliveries(rig.world.trades.maintain(
+            &rig.world.players,
+            &rig.world.social,
+            1_200,
+        ));
+        assert_eq!(subs(&end).len(), 4);
+        assert!(rig.world.trades.session_id_for(A).is_none());
+
+        // A second trade, ended by A leaving (disconnect or zoning both call leave_player).
+        rig.world
+            .players
+            .update_pose(
+                rig.b.id,
+                ZoneInstance {
+                    zone_id: 1,
+                    instance_id: 1,
+                },
+                [5.0, 0.0, 0.0],
+                0.0,
+            )
+            .unwrap();
+        rig.a
+            .route_application(&select(A, B), &mut rig.world, 2_000);
+        rig.a.route_application(
+            &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+            &mut rig.world,
+            2_000,
+        );
+        let id = rig.world.trades.session_id_for(A).unwrap();
+        rig.b
+            .route_application(&pkt(3, id, &[1]), &mut rig.world, 2_100);
+        let gone = rig.world.leave_player(rig.a.id);
+        let to_b: Vec<_> = gone
+            .iter()
+            .filter(|delivery| {
+                delivery.recipient == rig.b.id
+                    && delivery.bytes.starts_with(&[5, 0, 1])
+                    && inner(delivery)[..2] == [0x3b, 0]
+            })
+            .map(|delivery| inner(delivery)[2])
+            .collect();
+        assert_eq!(to_b, [15, 5], "status then end for the partner");
+        assert!(rig.world.trades.session_id_for(B).is_none());
+        assert!(rig.world.trades.inventory(A).is_none());
+    }
+
+    #[test]
+    fn hostile_trade_packets_from_one_session_cannot_reach_the_other() {
+        let mut rig = rig("hostile");
+        rig.a
+            .route_application(&select(A, B), &mut rig.world, 1_000);
+        rig.a.route_application(
+            &choice(B, osfr_tools::player_radial::TRADE_ENTRY_ID),
+            &mut rig.world,
+            1_000,
+        );
+        let id = rig.world.trades.session_id_for(A).unwrap();
+        rig.b
+            .route_application(&pkt(3, id, &[1]), &mut rig.world, 1_100);
+        let before = rig.world.trades.clone();
+        // A nobody session with the right ids: answered to itself only, state untouched.
+        let mut stranger = rig
+            .b
+            .route_application(&pkt(7, id + 9, &[]), &mut rig.world, 1_200);
+        stranger.extend(
+            rig.b
+                .route_application(&pkt(6, 0, &[0; 4]), &mut rig.world, 1_200),
+        );
+        assert_eq!(subs(&stranger), [(18, 5)]);
+        // Truncated, oversized and server-only subs are dropped.
+        for bad in [
+            vec![0x3b, 0, 9, 1, 0],
+            pkt(9, id, &[0; 9]),
+            pkt(5, id, &[]),
+            pkt(2, id, &[0; 8]),
+            vec![0x3b, 0],
+        ] {
+            assert!(
+                rig.a
+                    .route_application(&bad, &mut rig.world, 1_300)
+                    .is_empty()
+            );
+        }
+        assert_eq!(rig.world.trades, before);
+    }
+
+    #[test]
+    fn a_loaded_gameplay_inventory_is_registered_and_kept_current_for_trading() {
+        let mut rig = rig("refresh");
+        let mut login = 1u16.to_le_bytes().to_vec();
+        for (i, value) in ["w163", "1.910.1.530630", ""].into_iter().enumerate() {
+            login.extend((value.len() as u32).to_le_bytes());
+            login.extend(value.as_bytes());
+            if i == 0 {
+                login.extend(1u64.to_le_bytes());
+            }
+        }
+        rig.a.gateway.handle(&login).unwrap();
+        rig.a.gateway.handle(&wrap_application(&[13, 0])).unwrap();
+        rig.a.gateway.handle(&wrap_application(&[10, 0])).unwrap();
+        let loaded = rig
+            .a
+            .gateway
+            .trade_inventory()
+            .expect("a loaded gameplay validates as a trade inventory");
+        // Register, then sync: the service ends up with exactly the gameplay's inventory.
+        rig.world.trades.unregister_player(A);
+        assert!(refresh_trade_player(&mut rig.world, rig.a.id, &rig.a.gateway).is_empty());
+        assert_eq!(rig.world.trades.inventory(A), Some(&loaded.state));
+        assert!(refresh_trade_player(&mut rig.world, rig.a.id, &rig.a.gateway).is_empty());
+        assert_eq!(rig.world.trades.inventory(A), Some(&loaded.state));
+        // A session without loaded gameplay is not tradable: it is unregistered.
+        rig.world.trades.unregister_player(B);
+        assert!(rig.world.trades.inventory(B).is_none());
+        refresh_trade_player(&mut rig.world, rig.b.id, &rig.b.gateway);
+        assert_eq!(
+            rig.world.trades.inventory(B).is_some(),
+            rig.b.gateway.trade_inventory().is_some()
+        );
+    }
+}
+
+/// Lead (security): the journaled two-character trade commit on real gateways.
+#[cfg(test)]
+mod lead_trade_commit {
+    use super::*;
+    use osfr_tools::inventory::InventoryState;
+    use osfr_tools::trade::{SettlementSide, TradeSettlement};
+
+    fn scratch(name: &str) -> PathBuf {
+        let path =
+            std::env::temp_dir().join(format!("osfr-trade-commit-{name}-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&path);
+        fs::create_dir_all(&path).unwrap();
+        path
+    }
+
+    fn party(scratch: &Path, id: u64, guid: u64) -> Session {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+        let options = Options {
+            bind: "127.0.0.1:0".parse().unwrap(),
+            reference: root.join("references/rust-gateway-reference"),
+            state: scratch.join(format!("{guid}.json")),
+            content: Some(root.join("references/rust-opening-cooking-original-assets")),
+            identity: None,
+            account_store: None,
+            gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
+            handoff_key: Vec::new(),
+            seconds: 1,
+            dev_tools: false,
+            studio_port: 0,
+            client_logs: None,
+            terrain: None,
+            world: None,
+            stock_text: None,
+            allow_lan: false,
+            security_log: None,
+        };
+        let mut session = Session::new(
+            SessionId(id),
+            format!("127.0.0.1:{}", 20_000 + id).parse().unwrap(),
+            SessionRequest {
+                id: id as u32,
+                crc_length: 3,
+                buffer_size: 512,
+            },
+            &options,
+            CRC_SEED,
+            None,
+            None,
+        )
+        .unwrap();
+        session.character_guid = guid;
+        session.selected_character = true;
+        session.state_path = options.state;
+        session
+    }
+
+    fn with_coins(session: &mut Session, coins: u32) -> InventoryState {
+        let mut state = session.gateway.inventory_state().unwrap().clone();
+        state.coins = coins;
+        session
+            .gateway
+            .adopt_trade_inventory(state.clone())
+            .unwrap();
+        state
+    }
+
+    /// A gives B 10 coins.
+    fn settlement(a: &InventoryState, b: &InventoryState) -> TradeSettlement {
+        let side = |guid, before: &InventoryState, delta: i64| {
+            let mut after = before.clone();
+            after.coins = (i64::from(before.coins) + delta) as u32;
+            SettlementSide {
+                guid,
+                before: before.clone(),
+                after,
+                gave: Vec::new(),
+                received: Vec::new(),
+            }
+        };
+        TradeSettlement {
+            session_id: 7,
+            sides: [side(101, a, -10), side(202, b, 10)],
+        }
+    }
+
+    fn saved_coins(path: &Path) -> u64 {
+        let document: serde_json::Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+        document["gameplay"]["inventory"]["coins"].as_u64().unwrap()
+    }
+
+    fn leftovers(directory: &Path) -> Vec<String> {
+        fs::read_dir(directory)
+            .unwrap()
+            .filter_map(|entry| entry.ok()?.file_name().into_string().ok())
+            .filter(|name| name.starts_with("trade-"))
+            .collect()
+    }
+
+    #[test]
+    fn a_settled_trade_moves_coins_in_both_saves_and_both_live_sessions() {
+        let dir = scratch("ok");
+        let mut a = party(&dir, 1, 101);
+        let mut b = party(&dir, 2, 202);
+        let before_a = with_coins(&mut a, 25);
+        let before_b = with_coins(&mut b, 5);
+        let key = SessionKey {
+            peer: b.peer,
+            connection_id: b.request.id,
+        };
+        let mut taken = vec![(key, b)];
+        let deliveries =
+            commit_trade_parties(&settlement(&before_a, &before_b), &mut a, &mut taken)
+                .unwrap()
+                .expect("a matching trade commits");
+        assert_eq!(a.gateway.inventory_state().unwrap().coins, 15);
+        assert_eq!(taken[0].1.gateway.inventory_state().unwrap().coins, 15);
+        assert_eq!(saved_coins(&a.state_path), 15);
+        assert_eq!(saved_coins(&taken[0].1.state_path), 15);
+        // Each player is told their new balance (38/19); no journal is left behind.
+        for id in [a.id, taken[0].1.id] {
+            assert!(deliveries.iter().any(|delivery| delivery.recipient == id
+                && delivery.bytes.windows(4).any(|w| w == [38, 0, 19, 0])));
+        }
+        assert!(leftovers(&dir).is_empty(), "{:?}", leftovers(&dir));
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn a_stale_trade_moves_nothing_and_writes_nothing() {
+        let dir = scratch("stale");
+        let mut a = party(&dir, 3, 101);
+        let mut b = party(&dir, 4, 202);
+        let before_a = with_coins(&mut a, 25);
+        let before_b = with_coins(&mut b, 5);
+        // A spends coins after the offers were validated: the settlement is stale.
+        with_coins(&mut a, 24);
+        let saves = |a: &Session, b: &Session| {
+            [&a.state_path, &b.state_path].map(|path| fs::read(path).ok())
+        };
+        let before_saves = saves(&a, &b);
+        let key = SessionKey {
+            peer: b.peer,
+            connection_id: b.request.id,
+        };
+        let mut taken = vec![(key, b)];
+        let result =
+            commit_trade_parties(&settlement(&before_a, &before_b), &mut a, &mut taken).unwrap();
+        assert!(result.is_none(), "a stale trade must be refused");
+        assert_eq!(a.gateway.inventory_state().unwrap().coins, 24);
+        assert_eq!(taken[0].1.gateway.inventory_state().unwrap().coins, 5);
+        assert_eq!(saves(&a, &taken[0].1), before_saves);
+        assert!(leftovers(&dir).is_empty());
+        // Canary: the same settlement against the state it was made for does commit.
+        with_coins(&mut a, 25);
+        assert!(
+            commit_trade_parties(&settlement(&before_a, &before_b), &mut a, &mut taken)
+                .unwrap()
+                .is_some()
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
+        let dir = scratch("recover");
+        let mut a = party(&dir, 5, 101);
+        let mut b = party(&dir, 6, 202);
+        with_coins(&mut a, 15);
+        with_coins(&mut b, 15);
+        // The crash happened after the journal and before either save.
+        let journal: Vec<TradeJournalEntry> = [&a, &b]
+            .iter()
+            .map(|party| TradeJournalEntry {
+                path: party.state_path.clone(),
+                snapshot: party.gateway.snapshot(),
+            })
+            .collect();
+        fs::write(
+            dir.join(format!("trade-7-1.{TRADE_JOURNAL_EXTENSION}")),
+            serde_json::to_vec(&journal).unwrap(),
+        )
+        .unwrap();
+        // A half-written journal means the trade never started writing saves.
+        fs::write(dir.join("trade-8-2.tmp"), b"{ half").unwrap();
+        assert_eq!(recover_trade_journals(&dir).unwrap(), 1);
+        assert_eq!(saved_coins(&a.state_path), 15);
+        assert_eq!(saved_coins(&b.state_path), 15);
+        assert!(leftovers(&dir).is_empty(), "{:?}", leftovers(&dir));
+        // Running recovery again is harmless.
+        assert_eq!(recover_trade_journals(&dir).unwrap(), 0);
+        fs::remove_dir_all(dir).unwrap();
+    }
 }

@@ -114,7 +114,7 @@ fn world(first: TradeInventory, second: TradeInventory) -> World {
 fn open(world: &mut World) -> u32 {
     let messages = world
         .trades
-        .invite(&world.players, &world.social, A, B)
+        .invite(&world.players, &world.social, A, B, 0)
         .unwrap();
     assert_eq!(messages.len(), 1);
     assert_eq!(sub(&messages[0]), 2);
@@ -122,7 +122,7 @@ fn open(world: &mut World) -> u32 {
     assert_ne!(session, u32::MAX);
     let started = world
         .trades
-        .reply_invite(&world.players, &world.social, B, session, true)
+        .reply_invite(&world.players, &world.social, B, session, true, 0)
         .unwrap();
     assert_eq!(started.len(), 2);
     assert!(started.iter().all(|message| sub(message) == 4));
@@ -202,12 +202,22 @@ fn items_and_coins_swap_exactly_and_close_both_windows() {
             .trades
             .accept(&world.players, &world.social, A, session, counter, 10_200)
             .unwrap()
+            .messages
             .is_empty()
     );
-    let finished = world
+    let accepted = world
         .trades
         .accept(&world.players, &world.social, B, session, counter, 10_200)
         .unwrap();
+    // The service moved nothing: the settlement is the host's to commit.
+    assert!(accepted.messages.is_empty());
+    assert_eq!(state_of(&world, A).coins, 50);
+    let settlement = accepted.settlement.unwrap();
+    assert_eq!(settlement.session_id, session);
+    assert_eq!(settlement.sides[0].before.coins, 50);
+    assert_eq!(settlement.sides[0].after.coins, 40);
+    assert_eq!(settlement.sides[1].after.coins, 30);
+    let finished = world.trades.settled(session, true).unwrap();
     assert_eq!(
         finished.iter().map(sub).collect::<Vec<_>>(),
         vec![15, 5, 15, 5]
@@ -246,7 +256,7 @@ fn builders_match_native_trade_reader_layouts() {
     );
     let invite = world
         .trades
-        .invite(&world.players, &world.social, A, B)
+        .invite(&world.players, &world.social, A, B, 0)
         .unwrap();
     let session = world.trades.session_id_for(A).unwrap();
     let invite_bytes = &invite[0].bytes;
@@ -263,7 +273,7 @@ fn builders_match_native_trade_reader_layouts() {
 
     let starts = world
         .trades
-        .reply_invite(&world.players, &world.social, B, session, true)
+        .reply_invite(&world.players, &world.social, B, session, true, 0)
         .unwrap();
     assert_eq!(starts[0].bytes.len(), 39);
     assert_eq!(&starts[0].bytes[..3], &[0x3b, 0, 4]);
@@ -444,13 +454,16 @@ fn offer_change_after_lock_clears_locks_and_prior_acceptance() {
             .trades
             .accept(&world.players, &world.social, B, session, counter, 10_200)
             .unwrap()
+            .messages
             .is_empty()
     );
     assert!(world.trades.session_counter(session).is_some());
-    let completed = world
+    let accepted = world
         .trades
         .accept(&world.players, &world.social, A, session, counter, 10_200)
         .unwrap();
+    assert!(accepted.settlement.is_some());
+    let completed = world.trades.settled(session, true).unwrap();
     assert_eq!(
         completed
             .iter()
@@ -545,6 +558,8 @@ fn full_bag_rejects_exchange_without_mutating_either_inventory() {
         .trades
         .accept(&world.players, &world.social, B, session, counter, 10_000)
         .unwrap();
+    assert!(cancelled.settlement.is_none());
+    let cancelled = cancelled.messages;
     assert_eq!(state_of(&world, A), &before_a);
     assert_eq!(state_of(&world, B), &before_b);
     assert!(
@@ -608,7 +623,7 @@ fn ignored_target_cannot_be_invited() {
         .ignored
         .insert(A, inviter_name);
     assert_eq!(
-        world.trades.invite(&world.players, &world.social, A, B),
+        world.trades.invite(&world.players, &world.social, A, B, 0),
         Err(TradeError::Ignored)
     );
     assert_eq!(world.trades.session_id_for(A), None);
@@ -622,12 +637,12 @@ fn decline_notifies_inviter_and_releases_both_players() {
     );
     world
         .trades
-        .invite(&world.players, &world.social, A, B)
+        .invite(&world.players, &world.social, A, B, 0)
         .unwrap();
     let session = world.trades.session_id_for(A).unwrap();
     let declined = world
         .trades
-        .reply_invite(&world.players, &world.social, B, session, false)
+        .reply_invite(&world.players, &world.social, B, session, false, 0)
         .unwrap();
     assert_eq!(declined.len(), 1);
     assert_eq!(sub(&declined[0]), 16);
@@ -664,10 +679,15 @@ fn duplicate_accept_cannot_settle_twice() {
         .trades
         .accept(&world.players, &world.social, A, session, counter, 10_000)
         .unwrap();
-    world
-        .trades
-        .accept(&world.players, &world.social, B, session, counter, 10_000)
-        .unwrap();
+    assert!(
+        world
+            .trades
+            .accept(&world.players, &world.social, B, session, counter, 10_000)
+            .unwrap()
+            .settlement
+            .is_some()
+    );
+    world.trades.settled(session, true).unwrap();
     let after_a = state_of(&world, A).clone();
     let after_b = state_of(&world, B).clone();
     assert_eq!(

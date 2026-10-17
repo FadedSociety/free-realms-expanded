@@ -488,9 +488,9 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         let mut p = vec![59, 0, sub];
         p.extend(u32::MAX.to_le_bytes());
         p.extend(vec![0xff; 8]);
-        result.push(("trade_unavailable", p));
+        result.push(("trade", p));
     }
-    result.push(("trade_unavailable", vec![59, 0, 0xff, 0xff]));
+    result.push(("trade", vec![59, 0, 0xff, 0xff]));
     result.push(("kart", words(26, 42, &[])));
     // 33/* routes as a family, even unknown subtypes. Include all implemented client cases.
     for sub in [2, 6, 7, 9, 10, 17, 19, 22, 0xffff] {
@@ -678,8 +678,8 @@ fn t3_routed_hostile_corpus_content_and_trace_on_off() {
 
 #[test]
 fn trade_requests_reach_the_binary_with_gameplay_loaded() {
-    // W156: gameplay answers nothing for family 59, so only the handler label forwards it
-    // to the gateway binary's trade_unavailable route (otherwise it is rejected as unknown).
+    // W163: gameplay answers nothing for family 59, so only the handler label forwards it
+    // to the gateway binary's trade route (otherwise it is rejected as unknown).
     let fixture = Fixture::new();
     for trace in [false, true] {
         let mut gateway = fixture.gateway(true, trace);

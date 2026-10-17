@@ -2009,6 +2009,53 @@ impl Gameplay {
         })
     }
 
+    /// A battle or dungeon run is under way, so the player is busy elsewhere (W163 trade).
+    pub fn in_encounter(&self) -> bool {
+        self.encounter
+            .as_ref()
+            .is_some_and(|encounter| encounter.active())
+    }
+
+    /// The inventory a trade validates offers against (W163): this character's items and
+    /// coins plus the trade flags of the definitions it owns. `None` when the inventory does
+    /// not validate, so such a character cannot trade. (R) The bag holds 100 stacks like the
+    /// reward bag (see `RewardState` below); nothing is equipped on a pet yet.
+    /// The live inventory a trade commit compares with the settlement's `before` (lead).
+    pub fn inventory_state(&self) -> &crate::inventory::InventoryState {
+        self.inventory.state()
+    }
+
+    /// Adopt a settled trade's validated inventory; returns the client updates (lead).
+    pub fn adopt_trade_inventory(
+        &mut self,
+        after: crate::inventory::InventoryState,
+    ) -> io::Result<Vec<Vec<u8>>> {
+        self.inventory.adopt_state(after)
+    }
+
+    pub fn trade_inventory(&self) -> Option<crate::trade::TradeInventory> {
+        let state = self.inventory.state();
+        let definitions = state
+            .items
+            .iter()
+            .filter_map(|item| {
+                let (no_trade, max_stack) = self.inventory.trade_flags(item.definition_id)?;
+                let definition = crate::trade::TradeItemDefinition {
+                    no_trade,
+                    max_stack,
+                };
+                Some((item.definition_id, definition))
+            })
+            .collect();
+        crate::trade::TradeInventory::new(
+            state.clone(),
+            definitions,
+            Default::default(),
+            state.items.len().max(100),
+        )
+        .ok()
+    }
+
     /// One profile's outfit as the native attachment list (count + rows).
     pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
         self.inventory.profile_attachments(profile_id)

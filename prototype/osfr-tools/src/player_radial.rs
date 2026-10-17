@@ -24,6 +24,13 @@
 //! 5. Closing the panel: `149/2` StopInspect (C>S), header only: `u16 149, u8 2`
 //!    (`009347d0`, ctor `008a3bd0`). Nothing is sent back.
 //!
+//! Trade (W163): the same menu carries a Trade entry (label 3299 "Trade" in the shipped
+//! en_us locale, `Tcg_contextMenu.trade` in `CodeStringMappings.txt`; icon 43188 from the peer
+//! schema, not checked against client assets). Its click is the same 26/10 as Inspect, which is
+//! how the client starts a trade: family 59 has no invite request (`Trade.md`, "Starting a
+//! trade"), so the server turns the choice into a 59/2 invite (`trade.rs`). The entry is offered
+//! only when the caller says an invite would work right now (visible, in reach, nobody busy).
+//!
 //! Recovered facts: everything above plus the label string 3902 = "Inspect" in the
 //! shipped en_us locale. Icon 133 and the seven-field row come from the peer
 //! emulator schema (behaviour reference only, no code copied). Reconstructed
@@ -39,6 +46,10 @@ pub const SELECT_PLAYER_LEN: usize = 20;
 pub const INSPECT_ENTRY_ID: i32 = 1001;
 const INSPECT_ICON: i32 = 133; // peer schema; not checked against client assets.
 const INSPECT_LABEL: i32 = 3902; // en_us locale "Inspect".
+/// (R) Server-chosen radial entry id for Trade (next to Inspect).
+pub const TRADE_ENTRY_ID: i32 = 1002;
+const TRADE_ICON: i32 = 43188; // peer schema; not checked against client assets.
+const TRADE_LABEL: i32 = 3299; // en_us locale "Trade".
 /// (R) Default selection reach in metres, tunable per instance.
 pub const DEFAULT_REACH_M: f32 = 40.0;
 const MAX_NAME_BYTES: usize = 64; // (R)
@@ -97,11 +108,28 @@ pub struct PublicLook {
     pub items: Vec<PublicItem>,
 }
 
+/// Which entries a player menu carries.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct MenuOffer {
+    pub inspect: bool,
+    pub trade: bool,
+}
+
+/// What a valid 26/10 choice asks the server to do.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Chosen {
+    /// The 149/1 StartInspect packet to send.
+    Inspect(Vec<u8>),
+    /// Start a trade with this character; `TradeService::invite` re-checks everything.
+    Trade(u64),
+}
+
 /// Per-session radial state: at most one open menu and one open inspect.
 #[derive(Clone, Debug)]
 pub struct PlayerRadial {
     reach_m: f32,
     menu_target: Option<u64>,
+    menu_offer: MenuOffer,
     inspecting: Option<u64>,
 }
 
@@ -110,6 +138,7 @@ impl Default for PlayerRadial {
         Self {
             reach_m: DEFAULT_REACH_M,
             menu_target: None,
+            menu_offer: MenuOffer::default(),
             inspecting: None,
         }
     }
@@ -135,11 +164,11 @@ impl PlayerRadial {
     /// Call on zoning and when the target despawns.
     pub fn reset(&mut self) {
         self.menu_target = None;
+        self.menu_offer = MenuOffer::default();
         self.inspecting = None;
     }
 
-    /// 26/19 -> 26/9. Refusals return an error and send nothing, so a probe
-    /// cannot tell an unknown id from a hidden one.
+    /// Inspect-only menu (the pre-trade entry point; `select_menu` supersedes it).
     pub fn select_player(
         &mut self,
         registry: &PlayerRegistry,
@@ -147,7 +176,24 @@ impl PlayerRadial {
         inner: &[u8],
         has_look: impl FnOnce(u64) -> bool,
     ) -> Result<Vec<Vec<u8>>, RadialError> {
+        self.select_menu(registry, viewer, inner, |guid| MenuOffer {
+            inspect: has_look(guid),
+            trade: false,
+        })
+    }
+
+    /// 26/19 -> 26/9. Refusals return an error and send nothing, so a probe
+    /// cannot tell an unknown id from a hidden one. `offer` says which entries to show for the
+    /// target; a menu with no entry is refused (`NoLook`).
+    pub fn select_menu(
+        &mut self,
+        registry: &PlayerRegistry,
+        viewer: SessionId,
+        inner: &[u8],
+        offer: impl FnOnce(u64) -> MenuOffer,
+    ) -> Result<Vec<Vec<u8>>, RadialError> {
         self.menu_target = None;
+        self.menu_offer = MenuOffer::default();
         if inner.len() != SELECT_PLAYER_LEN || inner[..4] != [26, 0, 19, 0] {
             return Err(RadialError::Malformed);
         }
@@ -155,15 +201,17 @@ impl PlayerRadial {
         let target = u64::from_le_bytes(inner[12..20].try_into().unwrap());
         let name = self.visible_name(registry, viewer, target)?;
         // Only offer an action that can work: no public look, no Inspect entry.
-        if !has_look(target) {
+        let offer = offer(target);
+        if !offer.inspect && !offer.trade {
             return Err(RadialError::NoLook);
         }
         self.menu_target = Some(target);
-        Ok(vec![menu_packet(target, &name)])
+        self.menu_offer = offer;
+        Ok(vec![menu_packet(target, &name, offer)])
     }
 
-    /// 26/10. `Ok(None)` means "not a player menu choice": hand it to the NPC
-    /// path unchanged. A matching guid always consumes the menu (one-shot).
+    /// Inspect-only choice (the pre-trade entry point; `choose_entry` supersedes it). A Trade
+    /// choice is refused here because this path cannot start one.
     pub fn choose(
         &mut self,
         registry: &PlayerRegistry,
@@ -171,6 +219,23 @@ impl PlayerRadial {
         inner: &[u8],
         look_of: impl FnOnce(u64) -> Option<PublicLook>,
     ) -> Result<Option<Vec<Vec<u8>>>, RadialError> {
+        match self.choose_entry(registry, viewer, inner, look_of)? {
+            None => Ok(None),
+            Some(Chosen::Inspect(packet)) => Ok(Some(vec![packet])),
+            Some(Chosen::Trade(_)) => Err(RadialError::InvalidChoice),
+        }
+    }
+
+    /// 26/10. `Ok(None)` means "not a player menu choice": hand it to the NPC
+    /// path unchanged. A matching guid always consumes the menu (one-shot), and an entry that
+    /// was not on that menu is refused even if its id is valid.
+    pub fn choose_entry(
+        &mut self,
+        registry: &PlayerRegistry,
+        viewer: SessionId,
+        inner: &[u8],
+        look_of: impl FnOnce(u64) -> Option<PublicLook>,
+    ) -> Result<Option<Chosen>, RadialError> {
         if inner.len() != 16 || inner[..4] != [26, 0, 10, 0] {
             return Ok(None);
         }
@@ -179,15 +244,24 @@ impl PlayerRadial {
             return Ok(None);
         }
         self.menu_target = None;
+        let offered = std::mem::take(&mut self.menu_offer);
         let id = i32::from_le_bytes(inner[12..16].try_into().unwrap());
-        if id != INSPECT_ENTRY_ID {
+        let allowed = match id {
+            INSPECT_ENTRY_ID => offered.inspect,
+            TRADE_ENTRY_ID => offered.trade,
+            _ => false,
+        };
+        if !allowed {
             return Err(RadialError::InvalidChoice);
         }
         self.visible_name(registry, viewer, guid)?; // stale or moved away since the menu
+        if id == TRADE_ENTRY_ID {
+            return Ok(Some(Chosen::Trade(guid)));
+        }
         let look = look_of(guid).ok_or(RadialError::NoLook)?;
         let packet = start_inspect_packet(guid, &look)?;
         self.inspecting = Some(guid);
-        Ok(Some(vec![packet]))
+        Ok(Some(Chosen::Inspect(packet)))
     }
 
     /// 149/2. Idempotent; no reply.
@@ -253,13 +327,26 @@ fn put_i32(out: &mut Vec<u8>, value: i32) {
 
 /// 26/9 body: guid, auto-select bool, entry count, seven-i32 rows, name,
 /// two trailing bools (`00aa2220`; same shape as the proven NPC menus).
-fn menu_packet(guid: u64, name: &str) -> Vec<u8> {
+fn menu_packet(guid: u64, name: &str, offer: MenuOffer) -> Vec<u8> {
     let mut out = vec![26, 0, 9, 0];
     out.extend_from_slice(&guid.to_le_bytes());
     out.push(0);
-    put_i32(&mut out, 1);
-    for value in [INSPECT_ENTRY_ID, INSPECT_ICON, INSPECT_LABEL, 0, 0, 0, 0] {
-        put_i32(&mut out, value);
+    // Trade before Inspect, as in the original menu (video `fjZluIfbUIo/00024`).
+    let entries: Vec<[i32; 3]> = [
+        (offer.trade, [TRADE_ENTRY_ID, TRADE_ICON, TRADE_LABEL]),
+        (
+            offer.inspect,
+            [INSPECT_ENTRY_ID, INSPECT_ICON, INSPECT_LABEL],
+        ),
+    ]
+    .into_iter()
+    .filter_map(|(shown, entry)| shown.then_some(entry))
+    .collect();
+    put_i32(&mut out, entries.len() as i32);
+    for [id, icon, label] in entries {
+        for value in [id, icon, label, 0, 0, 0, 0] {
+            put_i32(&mut out, value);
+        }
     }
     put_i32(&mut out, name.len() as i32);
     out.extend_from_slice(name.as_bytes());

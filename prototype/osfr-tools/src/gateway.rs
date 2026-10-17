@@ -499,8 +499,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(47), _) if matches!(body.get(2), Some(12 | 13)) => "quest_engine",
         // Family 98 also has a one-byte subtype: 98/1 is the client's path request (W164).
         (Some(98), _) if body.get(2) == Some(&1) => "pathing",
-        // Family 59 also has a one-byte subtype: trade requests, answered as unavailable (W156, R).
-        (Some(59), _) if matches!(body.get(2), Some(3 | 6..=10)) => "trade_unavailable",
+        // Family 59 also has a one-byte subtype: the six client trade requests (W163).
+        (Some(59), _) if matches!(body.get(2), Some(3 | 6..=10)) => "trade",
         (Some(26), Some(42)) | (Some(33), _) | (Some(41), Some(108)) | (Some(102), Some(1)) => {
             "kart"
         }
@@ -994,6 +994,32 @@ impl Gateway {
     /// See `Gameplay::public_look` (W143 Inspect).
     pub fn public_look(&self) -> Option<crate::player_radial::PublicLook> {
         self.gameplay.as_ref()?.public_look()
+    }
+
+    /// See `Gameplay::in_encounter` (W163 player trade).
+    pub fn in_encounter(&self) -> bool {
+        self.gameplay.as_ref().is_some_and(Gameplay::in_encounter)
+    }
+
+    /// See `Gameplay::trade_inventory` (W163 player trade).
+    /// See `Gameplay::inventory_state` (trade commit).
+    pub fn inventory_state(&self) -> Option<&crate::inventory::InventoryState> {
+        self.gameplay.as_ref().map(Gameplay::inventory_state)
+    }
+
+    /// See `Gameplay::adopt_trade_inventory` (trade commit).
+    pub fn adopt_trade_inventory(
+        &mut self,
+        after: crate::inventory::InventoryState,
+    ) -> io::Result<Vec<Vec<u8>>> {
+        self.gameplay
+            .as_mut()
+            .ok_or_else(|| invalid("no gameplay to trade with"))?
+            .adopt_trade_inventory(after)
+    }
+
+    pub fn trade_inventory(&self) -> Option<crate::trade::TradeInventory> {
+        self.gameplay.as_ref()?.trade_inventory()
     }
 
     pub fn player_presentation(&self, member: bool) -> io::Result<PlayerPresentation> {
@@ -2000,15 +2026,12 @@ mod radial_routing {
     }
 
     #[test]
-    fn trade_requests_are_forwarded_to_the_unavailable_answer() {
-        // Client trade senders: sub 3 reply, 6 accept, 7 cancel, 8 lock, 9 item, 10 coins.
+    fn trade_requests_are_forwarded_to_the_binary() {
+        // W163: the six client trade senders (sub 3 reply, 6 accept, 7 cancel, 8 lock, 9 item,
+        // 10 coins). Server-only subs and a bare header stay unknown.
         for sub in [3u8, 6, 7, 8, 9, 10] {
-            assert_eq!(
-                application_handler(&[0x3b, 0, sub, 1, 0, 0, 0]),
-                "trade_unavailable"
-            );
+            assert_eq!(application_handler(&[0x3b, 0, sub, 1, 0, 0, 0]), "trade");
         }
-        // Server-only subs stay unknown, and so does a bare header.
         assert_eq!(
             application_handler(&[0x3b, 0, 5, 1, 0, 0, 0]),
             "gameplay.handle_in_world"

@@ -489,6 +489,19 @@ impl Inventory {
             .map(|definition| definition.bytes.as_slice())
     }
 
+    /// What a trade needs from a definition (W163), as `(no_trade, max_stack)`. NO_TRADE is the
+    /// byte after the eleven leading words of the serialized row (`piece_096`
+    /// `ItemDefinition.no_trade`, inside the 46-byte prefix `Requirement::from_wire` skips) and
+    /// a max stack of zero or less means uncapped (R). A row too short to carry the flag has no
+    /// entry, so it cannot be offered.
+    pub fn trade_flags(&self, definition_id: i32) -> Option<(bool, Option<u32>)> {
+        let definition = self.content.definitions.get(&definition_id)?;
+        let max_stack = u32::try_from(definition.max_stack)
+            .ok()
+            .filter(|max| *max > 0);
+        Some((*definition.bytes.get(44)? != 0, max_stack))
+    }
+
     pub fn presentation(&self, definition_id: i32) -> io::Result<ItemPresentation> {
         let definition = self
             .content
@@ -763,6 +776,64 @@ impl Inventory {
             replies: vec![reply],
             changed: true,
         })
+    }
+
+    /// Replace the whole state with `after`, a settled trade's validated state (W163, lead),
+    /// and return the client updates that turn the current view into it: removed stacks
+    /// (38/4), new stacks with their definitions (38/2), changed counts (item update) and the
+    /// coin balance (38/19). Nothing changes if `after` does not validate.
+    pub fn adopt_state(&mut self, after: InventoryState) -> io::Result<Vec<Vec<u8>>> {
+        let mut staged = self.clone();
+        staged.state = after;
+        staged.validate_content_state()?;
+        let mut replies = Vec::new();
+        for old in &self.state.items {
+            if !staged.state.items.iter().any(|item| item.id == old.id) {
+                let mut reply = header(38, 4);
+                put(&mut reply, old.id);
+                replies.push(reply);
+            }
+        }
+        for item in &staged.state.items {
+            match self.state.items.iter().find(|old| old.id == item.id) {
+                Some(old) if old == item => {}
+                Some(_) => replies.push(item_update(item)),
+                None => {
+                    let definition = staged
+                        .content
+                        .definitions
+                        .get(&item.definition_id)
+                        .ok_or_else(|| invalid("unknown traded definition"))?;
+                    if !staged
+                        .content
+                        .captured_definition_ids
+                        .contains(&item.definition_id)
+                    {
+                        replies.push(
+                            v2_fixes::encode_definition_batch_v2(
+                                &[definition.bytes.clone()],
+                                &[item.definition_id],
+                            )
+                            .map_err(invalid)?,
+                        );
+                    }
+                    let mut payload = Vec::new();
+                    write_item(&mut payload, item)?;
+                    payload.extend_from_slice(&definition.bytes);
+                    let mut reply = header(38, 2);
+                    put(&mut reply, payload.len() as i32);
+                    reply.extend(payload);
+                    replies.push(reply);
+                }
+            }
+        }
+        if staged.state.coins != self.state.coins {
+            let mut reply = header(38, 19);
+            put(&mut reply, staged.state.coins as i32);
+            replies.push(reply);
+        }
+        *self = staged;
+        Ok(replies)
     }
 
     pub fn grant(
