@@ -436,16 +436,19 @@ struct Content {
 }
 
 /// Overworld enemy that patrols outside the opening's story stages (e.g. the
-/// Hooligan Delinquents south of Jones). Loaded from world content, never saved:
-/// it respawns after `respawn_seconds`. Spawn, hit, HP and defeat use the same
-/// packets as the opening's world enemies (native-tested on the Hooligan Wolves).
+/// Hooligan Delinquents south of Jones). Loaded from world content, never saved.
+/// A spawn group supplies shared policy and the individual respawn timer; the
+/// actor keeps its own GUID, home and roam disc. Spawn, hit, HP and defeat use
+/// the same packets as the opening's world enemies.
 #[derive(Clone, Debug, Deserialize)]
 struct FieldActor {
     #[serde(flatten)]
     actor: Actor,
-    respawn_seconds: u32,
+    #[serde(default)]
+    respawn_seconds: Option<u32>,
     /// The enemy chases a player within this range and otherwise walks home.
-    aggro_range: f32,
+    #[serde(default)]
+    aggro_range: Option<f32>,
     #[serde(default)]
     level_band: Option<[u32; 2]>,
     #[serde(default)]
@@ -464,6 +467,24 @@ struct FieldActor {
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
+}
+
+/// One always-on population. The group owns the policy shared by its explicit
+/// placed actors; each member keeps its own GUID, home position and spawn disc.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FieldSpawnGroup {
+    id: String,
+    zone_id: u32,
+    region: String,
+    respawn_seconds: u32,
+    aggro_range: f32,
+    #[serde(default)]
+    level_band: Option<[u32; 2]>,
+    leash_radius: f32,
+    behaviour: serde_json::Value,
+    members: Vec<u64>,
+    source: Vec<serde_json::Value>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -486,6 +507,8 @@ enum FieldMotion {
 struct FieldContent {
     schema_version: u32,
     enemies: Vec<FieldActor>,
+    #[serde(default)]
+    spawn_groups: Vec<FieldSpawnGroup>,
 }
 
 #[derive(Clone, Debug)]
@@ -1694,8 +1717,82 @@ impl EncounterEngine {
         }
         let content: FieldContent =
             serde_json::from_slice(&bytes).map_err(|e| invalid(&e.to_string()))?;
-        if content.schema_version != 1 || content.enemies.len() > 64 {
+        if content.schema_version != 1
+            || content.enemies.len() > 64
+            || content.spawn_groups.len() > 64
+        {
             return Err(invalid("unsupported field enemy content"));
+        }
+        let FieldContent {
+            mut enemies,
+            spawn_groups,
+            ..
+        } = content;
+        let mut actor_index = BTreeMap::new();
+        for (index, actor) in enemies.iter().enumerate() {
+            if actor_index.insert(actor.actor.guid, index).is_some() {
+                return Err(invalid("duplicate field enemy GUID"));
+            }
+        }
+        let mut group_ids = BTreeSet::new();
+        let mut grouped = BTreeSet::new();
+        for group in spawn_groups {
+            if group.id.is_empty()
+                || group.id.len() > 120
+                || group.id.chars().any(char::is_control)
+                || !group_ids.insert(group.id.clone())
+                || group.region.is_empty()
+                || group.region.len() > 120
+                || group.region.chars().any(char::is_control)
+                || !(1..=3600).contains(&group.respawn_seconds)
+                || !(group.aggro_range > 0.0 && group.aggro_range <= 40.0)
+                || !group.leash_radius.is_finite()
+                || group.leash_radius <= 0.0
+                || group.leash_radius > 1000.0
+                || group.members.is_empty()
+                || group.members.len() > 64
+                || group.source.is_empty()
+            {
+                return Err(invalid("invalid field spawn group"));
+            }
+            for source in &group.source {
+                let Some(evidence) = source.get("evidence").and_then(|v| v.as_str()) else {
+                    return Err(invalid("field spawn group source needs evidence"));
+                };
+                if evidence.trim().is_empty() {
+                    return Err(invalid("invalid field spawn group source"));
+                }
+                if source.get("kind").and_then(|v| v.as_str()) == Some("reconstructed")
+                    && !evidence.starts_with("(R)")
+                {
+                    return Err(invalid("reconstructed field spawn group source needs (R)"));
+                }
+            }
+            if !group.source.iter().any(|source| {
+                source.get("kind").and_then(|v| v.as_str()) == Some("reconstructed")
+                    && source
+                        .get("evidence")
+                        .and_then(|v| v.as_str())
+                        .is_some_and(|evidence| evidence.starts_with("(R)"))
+            }) {
+                return Err(invalid("field spawn group needs reconstructed provenance"));
+            }
+            for guid in group.members {
+                if !grouped.insert(guid) {
+                    return Err(invalid("duplicate field spawn group member"));
+                }
+                let index = *actor_index
+                    .get(&guid)
+                    .ok_or_else(|| invalid("unknown field spawn group member"))?;
+                let actor = &mut enemies[index];
+                actor.respawn_seconds = Some(group.respawn_seconds);
+                actor.aggro_range = Some(group.aggro_range);
+                actor.level_band = group.level_band;
+                actor.zone_id = group.zone_id;
+                actor.region = Some(group.region.clone());
+                actor.leash_radius = Some(group.leash_radius);
+                actor.actor.behaviour = Some(group.behaviour.clone());
+            }
         }
         let mut guids: BTreeSet<u64> = self
             .content
@@ -1709,17 +1806,23 @@ impl EncounterEngine {
                     .chain(d.guide.iter().map(|g| g.guid))
             }))
             .collect();
-        let mut field = Vec::with_capacity(content.enemies.len());
+        let mut field = Vec::with_capacity(enemies.len());
         let mut areas = BTreeSet::new();
-        for mut f in content.enemies {
+        for mut f in enemies {
             validate_actor(&f.actor)?;
             let behaviour =
                 resolve_behaviour(&f.actor, &self.behaviour_presets).map_err(|e| invalid(&e))?;
             let leash = f.leash_radius.unwrap_or(behaviour.leash);
+            let respawn_seconds = f
+                .respawn_seconds
+                .ok_or_else(|| invalid("field enemy has no respawn timer"))?;
+            let aggro_range = f
+                .aggro_range
+                .ok_or_else(|| invalid("field enemy has no aggro range"))?;
             if !f.actor.stages.is_empty()
                 || f.actor.boss
-                || !(1..=3600).contains(&f.respawn_seconds)
-                || !(f.aggro_range > 0.0 && f.aggro_range <= 40.0)
+                || !(1..=3600).contains(&respawn_seconds)
+                || !(aggro_range > 0.0 && aggro_range <= 40.0)
                 || !(1..=20).contains(&f.actor.level)
                 || f.level_band.is_some_and(|[lo, hi]| {
                     lo == 0 || lo > f.actor.level || hi < f.actor.level || hi > 20
@@ -1760,8 +1863,8 @@ impl EncounterEngine {
                 .round() as u32;
             field.push(FieldEnemy {
                 state: enemy_state(&f.actor),
-                respawn_ms: u64::from(f.respawn_seconds) * 1000,
-                aggro_range: f.aggro_range,
+                respawn_ms: u64::from(respawn_seconds) * 1000,
+                aggro_range,
                 present: f.quest_ids.is_empty(),
                 quest_ids: f.quest_ids,
                 leash_radius: f.leash_radius,

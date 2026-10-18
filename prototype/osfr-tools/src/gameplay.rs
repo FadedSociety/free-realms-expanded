@@ -779,16 +779,16 @@ impl Gameplay {
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
         let mut encounter = encounter;
         if let Some(engine) = encounter.as_mut() {
+            let behaviours = npc_content.join("behaviours.json");
+            if behaviours.is_file() {
+                engine.load_behaviours(&behaviours)?;
+            }
             let path = npc_content.join("field_enemies.json");
             if path.is_file() {
                 engine.load_field_enemies(&path)?;
                 if let Some(visibility) = npc_visibility.as_mut() {
                     visibility.exclude_actor_guids(engine.field_guids());
                 }
-            }
-            let behaviours = npc_content.join("behaviours.json");
-            if behaviours.is_file() {
-                engine.load_behaviours(&behaviours)?;
             }
             // W158: combat power-up drop tables (slice 1 data, slice 2 drops).
             let power_ups = npc_content.join("power_ups.json");
@@ -4398,6 +4398,15 @@ impl Gameplay {
                 }
             }
         }
+        if all || what == "behaviours" {
+            let path = dir.join("behaviours.json");
+            if path.is_file() {
+                if let Some(encounter) = self.encounter.as_mut() {
+                    encounter.load_behaviours(&path)?;
+                    done.push("behaviours");
+                }
+            }
+        }
         if all || what == "enemies" {
             let path = dir.join("field_enemies.json");
             if path.is_file() {
@@ -4414,15 +4423,6 @@ impl Gameplay {
                 if let Some(encounter) = self.encounter.as_mut() {
                     encounter.load_power_ups(&path)?;
                     done.push("power-ups");
-                }
-            }
-        }
-        if all || what == "behaviours" {
-            let path = dir.join("behaviours.json");
-            if path.is_file() {
-                if let Some(encounter) = self.encounter.as_mut() {
-                    encounter.load_behaviours(&path)?;
-                    done.push("behaviours");
                 }
             }
         }

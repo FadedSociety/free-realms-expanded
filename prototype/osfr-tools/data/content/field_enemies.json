@@ -1,5 +1,119 @@
 {
   "schema_version": 1,
+  "spawn_groups": [
+    {
+      "id": "starting_farnum_wolves",
+      "zone_id": 0,
+      "region": "Farnum outskirts",
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "level_band": [
+        1,
+        2
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102001,
+        131000102002,
+        131000102003
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "notes/Design/Field Enemies.md > Scope and coordinates; notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional context and the reconstructed placement policy."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Three explicit Farnum wolf placements use three community NPC anchors, selected on full-leash height and slope checks. Free-field use, exact count, level band and timer are local policy, not a recovered 2014 spawn table."
+        }
+      ]
+    },
+    {
+      "id": "starting_highroad_hooligans",
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "level_band": [
+        3,
+        4
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102004,
+        131000102005,
+        131000102006
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "notes/Design/Field Enemies.md > Scope and coordinates; notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional context and the reconstructed placement policy."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Three always-on Highroad Hooligans use independent GUIDs and community NPC anchors. They do not alter the four quest-gated Hooligans or their nearby quest. Count, level band and timer are local policy."
+        }
+      ]
+    },
+    {
+      "id": "starting_queensfields_bixies",
+      "zone_id": 0,
+      "region": "Sanctuary / Queensfields",
+      "respawn_seconds": 45,
+      "aggro_range": 8.0,
+      "level_band": [
+        1,
+        2
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102007,
+        131000102008,
+        131000102009
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "notes/Design/Field Enemies.md > Scope and coordinates; notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123 and notes/Build Guides/Content/Dungeons/Bixie Hive.md:18,26,48. Regional context only."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Three Bixie Soldier placements sit outside Sanctuary's protected inner town on checked Queensfields terrain. Free-field use, the resource/name pairing, count, level band and timer are local policy."
+        }
+      ]
+    },
+    {
+      "id": "starting_wilds_shamans",
+      "zone_id": 0,
+      "region": "Lakeshore / northeast Wilds",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "level_band": [
+        1,
+        2
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102010,
+        131000102011,
+        131000102012
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "notes/Design/Field Enemies.md > Scope and coordinates; notes/Build Guides/Content/NPCs/NPCs - Wilds.md:111 and notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43. Regional context only."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Three full-size field shamans are placed away from the Troll Summoner battle and referral corridor; T3 is an additional actor anchored on NPC 3149. Battle 96, its summons and friendly trolls are unchanged."
+        }
+      ]
+    }
+  ],
   "enemies": [
     {
       "guid": 100000004154,
@@ -193,20 +307,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 45,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Farnum outskirts",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-F1",
@@ -218,7 +319,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000004164,
       "source": [
         {
@@ -235,7 +335,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 26.83 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 26.83 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -255,20 +355,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 45,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Farnum outskirts",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-F2",
@@ -280,7 +367,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000004165,
       "source": [
         {
@@ -297,7 +383,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -317,20 +403,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 45,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Farnum outskirts",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-F3",
@@ -342,7 +415,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000004166,
       "source": [
         {
@@ -359,7 +431,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -379,20 +451,7 @@
       "damage": 8,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Highroad outskirts",
-      "level_band": [
-        3,
-        4
-      ],
       "level": 3,
       "spawn_area": {
         "id": "W102-H1",
@@ -404,7 +463,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000004159,
       "source": [
         {
@@ -421,7 +479,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -441,20 +499,7 @@
       "damage": 8,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Highroad outskirts",
-      "level_band": [
-        3,
-        4
-      ],
       "level": 3,
       "spawn_area": {
         "id": "W102-H2",
@@ -466,7 +511,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000004160,
       "source": [
         {
@@ -483,7 +527,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -503,20 +547,7 @@
       "damage": 8,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Highroad outskirts",
-      "level_band": [
-        3,
-        4
-      ],
       "level": 3,
       "spawn_area": {
         "id": "W102-H3",
@@ -528,7 +559,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000004161,
       "source": [
         {
@@ -545,7 +575,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 60.13 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 60.13 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -565,20 +595,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 45,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Sanctuary / Queensfields",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-Q1",
@@ -590,7 +607,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000002920,
       "source": [
         {
@@ -607,7 +623,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -627,20 +643,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 45,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Sanctuary / Queensfields",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-Q2",
@@ -652,7 +655,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000002932,
       "source": [
         {
@@ -669,7 +671,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 5.66 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 5.66 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -689,20 +691,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 45,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Sanctuary / Queensfields",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-Q3",
@@ -714,7 +703,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000002933,
       "source": [
         {
@@ -731,7 +719,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -751,20 +739,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Lakeshore / northeast Wilds",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-T1",
@@ -776,7 +751,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000003149,
       "source": [
         {
@@ -793,7 +767,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 112.07 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 112.07 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -813,20 +787,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Lakeshore / northeast Wilds",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-T2",
@@ -838,7 +799,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000003150,
       "source": [
         {
@@ -855,7 +815,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.82 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.82 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         }
       ]
     },
@@ -875,20 +835,7 @@
       "damage": 7,
       "boss": false,
       "power_up_table": "standard",
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
       "quest_ids": [],
-      "behaviour": {
-        "reach": 2.5,
-        "chase_limit": 12.0,
-        "leash": 12.0
-      },
-      "zone_id": 0,
-      "region": "Lakeshore / northeast Wilds",
-      "level_band": [
-        1,
-        2
-      ],
       "level": 1,
       "spawn_area": {
         "id": "W102-T3",
@@ -900,7 +847,6 @@
         "radius": 6.0,
         "count": 1
       },
-      "leash_radius": 12.0,
       "reference_spawn_guid": 100000003149,
       "source": [
         {
@@ -917,7 +863,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; implicit melee preset with inline overrides (explicit preset name fails initial load order), 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.28 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. level/level_band/spawn_area/leash_radius/reference_spawn_guid/region/zone_id are authoring metadata currently ignored by runtime; respawn_seconds, behaviour and quest_ids are consumed."
+          "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.28 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
         },
         {
           "kind": "reconstructed",
