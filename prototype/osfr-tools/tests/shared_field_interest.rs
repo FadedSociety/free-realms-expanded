@@ -250,30 +250,42 @@ fn t032_two_bot_private_instance_shared_death() {
     assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
     let child = f.host(|s| s.test_field_child());
     assert_ne!(child, 0);
-    let mut total_entered = [Vec::new(), Vec::new()];
-    for guid in [101, 202] {
-        f.host(move |s| s.test_transfer(guid, child, false))
-            .unwrap();
-        let mut entered = f.ready(guid, &mut a, &mut b);
-        assert_eq!(f.host(move |s| s.test_field_health_in(child, E)), Some(300));
-        let own = if guid == 101 { 0 } else { 1 };
-        settle(&mut a, &mut b, &mut entered, |messages| {
-            actor_packets(&messages[own], 2, E) == 1
-                && hp_values(&messages[own]) == vec![300]
-                && f.host(move |s| s.test_known_npcs(guid).contains(&E))
-        });
-        for i in 0..2 {
-            total_entered[i].extend(entered[i].clone());
-        }
-        assert_eq!(f.host(move |s| s.test_location(guid).unwrap().1), child);
-    }
-    for packets in &total_entered {
-        assert_eq!(actor_packets(packets, 2, E), 1);
-        assert_eq!(hp_values(packets), vec![300]);
-    }
+    f.host(move |s| s.test_transfer(101, child, false)).unwrap();
+    let mut entered_a = f.ready(101, &mut a, &mut b);
+    assert_eq!(f.host(move |s| s.test_field_health_in(child, E)), Some(300));
+    settle(&mut a, &mut b, &mut entered_a, |messages| {
+        actor_packets(&messages[0], 2, E) == 1
+            && hp_values(&messages[0]) == vec![300]
+            && f.host(|s| s.test_known_npcs(101).contains(&E))
+    });
+    assert_eq!(actor_packets(&entered_a[0], 2, E), 1);
+    assert_eq!(hp_values(&entered_a[0]), vec![300]);
+    assert_eq!(f.host(|s| s.test_location(101).unwrap().1), child);
     let child_banks = interest_banks(&f);
     interest_cast(&mut a);
     let first = interest_committed_result_in(&f, child, &mut a, &mut b, 200, 0);
+    assert_eq!(hp_values(&first[0]), vec![200]);
+    assert_eq!(hits_from(&first[0], 101), 1);
+    assert!(hp_values(&first[1]).is_empty());
+
+    // The second member joins only after the first hit. Its initial actor
+    // snapshot must use the committed HP and must not reset the child field.
+    f.host(move |s| s.test_transfer(202, child, false)).unwrap();
+    let mut entered_b = f.ready(202, &mut a, &mut b);
+    assert_eq!(
+        f.host(move |s| s.test_field_health_in(child, E)),
+        Some(200),
+        "joining must preserve damage already committed in the child"
+    );
+    settle(&mut a, &mut b, &mut entered_b, |messages| {
+        actor_packets(&messages[1], 2, E) == 1
+            && hp_values(&messages[1]) == vec![200]
+            && f.host(|s| s.test_known_npcs(202).contains(&E))
+    });
+    assert_eq!(actor_packets(&entered_b[1], 2, E), 1);
+    assert_eq!(hp_values(&entered_b[1]), vec![200]);
+    assert_eq!(f.host(|s| s.test_location(202).unwrap().1), child);
+
     interest_cast(&mut b);
     let second = interest_committed_result_in(&f, child, &mut a, &mut b, 100, 1);
     let cooldown = collect(&mut a, &mut b, Duration::from_millis(500));
@@ -282,11 +294,7 @@ fn t032_two_bot_private_instance_shared_death() {
     }
     interest_cast(&mut a);
     let lethal = interest_committed_result_in(&f, child, &mut a, &mut b, 0, 0);
-    for (batch, hp, attacker) in [
-        (&first, 200, 101_u64),
-        (&second, 100, 202),
-        (&lethal, 0, 101),
-    ] {
+    for (batch, hp, attacker) in [(&second, 100, 202), (&lethal, 0, 101)] {
         for packets in batch {
             assert_eq!(hp_values(packets), vec![hp]);
             assert_eq!(hits_from(packets, attacker), 1);
@@ -311,7 +319,49 @@ fn t032_two_bot_private_instance_shared_death() {
         "shared deaths still pay no personal credit or items"
     );
     println!(
-        "T032 socket: two sessions in child {child} observed HP [200,100,0] and one death each; public field remained full"
+        "T032 socket: first hit at 200, late second member kept 200, then HP 100/0 and one death each; public field remained full"
+    );
+}
+
+#[test]
+#[ignore = "requires private OSFR_PLAY_PACKAGE; synthetic accounts/content only"]
+fn f132_not_ready_same_instance_removes_known_field_actor() {
+    let f = interest_fixture(0, false);
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let _public_startup = interest_login(&f, &mut a, &mut b);
+    assert!(f.host(|s| s.test_known_npcs(101).contains(&E)));
+    assert!(f.host(|s| s.test_known_npcs(202).contains(&E)));
+    let before = f.host(|s| s.test_location(202).unwrap());
+    assert!(before.2, "observer starts ready");
+
+    f.host(|s| s.test_mark_not_ready(202));
+    let after = f.host(|s| s.test_location(202).unwrap());
+    assert_eq!(after.1, before.1, "readiness changed in the same instance");
+    assert!(!after.2, "observer is no longer ready");
+
+    let mut removed = [Vec::new(), Vec::new()];
+    settle(&mut a, &mut b, &mut removed, |messages| {
+        removals(&messages[1], E) >= 1
+    });
+    assert_eq!(removals(&removed[1], E), 1);
+    assert_eq!(removals(&removed[0], E), 0);
+    let removal = removed[1]
+        .iter()
+        .find(|packet| {
+            is_sub(packet, 35, 3) && packet.get(6..14) == Some(E.to_le_bytes().as_slice())
+        })
+        .unwrap();
+    let mut expected = vec![35_u8, 0, 3, 0];
+    expected.extend(1_u16.to_le_bytes());
+    expected.extend(E.to_le_bytes());
+    expected.extend([0; 17]);
+    assert_eq!(removal, &expected, "35/3 field layout");
+    assert!(!f.host(|s| s.test_known_npcs(202).contains(&E)));
+    assert!(f.host(|s| s.test_known_npcs(101).contains(&E)));
+    println!(
+        "F132 socket: not-ready observer kept instance {} but received one 35/3 removal for the stale field actor; ready observer unchanged",
+        after.1
     );
 }
 
@@ -449,6 +499,12 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
         "a second member must not reset the private field"
     );
     world.commit_membership(second);
+    field = world.field(child).unwrap().clone();
+    assert_eq!(
+        world.field(child).unwrap().health(E),
+        Some(200),
+        "committing the second member must preserve damaged HP"
+    );
     assert_eq!(
         world.field_instances(),
         [0, child],
