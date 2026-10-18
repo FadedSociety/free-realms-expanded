@@ -47,6 +47,9 @@ const VERSION: &str = "1.910.1.530630";
 const T: Duration = Duration::from_secs(20);
 /// How long a save may take to show a change (the gateway can be starved).
 const SAVE_WAIT: Duration = Duration::from_secs(30);
+/// How long a negative check listens after the server has answered the
+/// request. Two seconds, so a starved gateway cannot hide a late packet.
+const QUIET: Duration = Duration::from_secs(2);
 static NEXT: AtomicU32 = AtomicU32::new(0);
 /// Each scenario starts its own gateway and login server, each loading the
 /// 58k-row catalogue; running them one at a time keeps their timing honest.
@@ -444,6 +447,46 @@ impl Rig {
         }
     }
 
+    /// Client-initiated session ends the gateway has logged. `end_session`
+    /// writes the character save before printing its event, so a seed written
+    /// after this count increases is the logged-out state, not the login's.
+    fn client_disconnects(&self) -> usize {
+        fs::read_to_string(self.root.join("gateway.out.log"))
+            .map(|text| {
+                text.lines()
+                    .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+                    .filter(|value| {
+                        value["event"] == "session_ended" && value["reason"] == "client_disconnect"
+                    })
+                    .count()
+            })
+            .unwrap_or(0)
+    }
+
+    /// Wait until a gateway stdout line is JSON for which `ready` is true.
+    /// Gateway events (`event()`, `npc_event()`) are one JSON line each.
+    fn wait_log(&self, what: &str, ready: impl Fn(&Value) -> bool) {
+        let path = self.root.join("gateway.out.log");
+        let deadline = Instant::now() + T;
+        loop {
+            if let Ok(text) = fs::read_to_string(&path) {
+                if text
+                    .lines()
+                    .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+                    .any(|value| ready(&value))
+                {
+                    return;
+                }
+            }
+            assert!(
+                Instant::now() < deadline,
+                "{what}: nothing matching in {}",
+                path.display()
+            );
+            std::thread::sleep(Duration::from_millis(50));
+        }
+    }
+
     fn ticket(&self, account: usize) -> String {
         let store = AccountStore::load(&self.root.join("accounts.json")).unwrap();
         let a = &self.accounts[account];
@@ -587,6 +630,18 @@ fn planar(a: [f32; 3], b: [f32; 3]) -> f32 {
     ((a[0] - b[0]).powi(2) + (a[2] - b[2]).powi(2)).sqrt()
 }
 
+fn is_add_pc_of(message: &[u8], guid: u64) -> bool {
+    message.starts_with(&[35, 0, 1, 0]) && message.get(4..12) == Some(&guid.to_le_bytes()[..])
+}
+
+/// Wait until `bot`'s field view contains `guid`. A login can return before
+/// the gateway has joined the bot, and a state change sent in between (a chat
+/// line) is not replayed to the late joiner.
+fn sees(bot: &mut bot::Bot, guid: u64, what: &str) {
+    bot.wait_for(T, |m| is_add_pc_of(m, guid))
+        .unwrap_or_else(|e| panic!("{what}: no AddPc ({e}); got {}", tail(bot)));
+}
+
 /// The last few (family, sub, length) triples a bot received, for failure messages.
 fn tail(bot: &bot::Bot) -> String {
     let from = bot.received.len().saturating_sub(8);
@@ -595,6 +650,26 @@ fn tail(bot: &bot::Bot) -> String {
 
 fn disconnect(mut bot: bot::Bot) {
     bot.disconnect();
+}
+
+/// Disconnect `bot` and wait until the gateway has written its logout save.
+/// The SOE disconnect is an unreliable datagram, so it is resent while waiting;
+/// a repeated disconnect for an absent session is ignored.
+fn logout(rig: &Rig, mut bot: bot::Bot, what: &str) {
+    let before = rig.client_disconnects();
+    bot.disconnect();
+    let deadline = Instant::now() + T;
+    let mut resent = Instant::now();
+    while rig.client_disconnects() <= before {
+        if Instant::now() >= deadline {
+            panic!("{what}: the gateway never logged the logout");
+        }
+        if resent.elapsed() >= Duration::from_secs(1) {
+            bot.disconnect();
+            resent = Instant::now();
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
 }
 
 fn text_of(output: &Output) -> String {
@@ -788,8 +863,9 @@ fn eligible_equip_succeeds_and_ineligible_equip_is_refused_without_state_change(
     const GIRLS_ONLY: i64 = 102;
     const RANK_4: i64 = 103;
     let rig = Rig::start(&[AccountRole::Player], false);
-    disconnect(rig.connect(0, "equip0")); // first login writes the save
-    std::thread::sleep(Duration::from_millis(1500)); // let the logout finish saving
+    // The first login writes the save; the logout must be finished (and the
+    // save written) before the seeded items are added.
+    logout(&rig, rig.connect(0, "equip0"), "the first login");
     seed_items(
         &rig,
         0,
@@ -811,14 +887,19 @@ fn eligible_equip_succeeds_and_ineligible_equip_is_refused_without_state_change(
             bot,
             &equip_request(item as i32, profile as i32, slot as i32),
         );
-        let line = bot
-            .wait_for(T, |m| system_text(m).is_some_and(|t| t == text))
+        // Match the refusal or the accepted acknowledgement, so an out-of-order
+        // 38/5 cannot slip past the assertion below.
+        let answered = bot
+            .wait_for(T, |m| {
+                system_text(m).is_some_and(|t| t == text) || m.starts_with(&[38, 0, 5, 0])
+            })
             .unwrap_or_else(|e| panic!("no `{text}` for item {item} ({e}); got {}", tail(bot)));
-        assert_eq!(system_text(&line).unwrap(), text);
-        bot.pump(Duration::from_millis(700)).unwrap();
         assert!(
-            bot.wait_for(Duration::from_millis(300), |m| m
-                .starts_with(&[38, 0, 5, 0]))
+            system_text(&answered).is_some_and(|t| t == text),
+            "refused equip of {item} still answered 38/5"
+        );
+        assert!(
+            bot.wait_for(QUIET, |m| m.starts_with(&[38, 0, 5, 0]))
                 .is_err(),
             "refused equip of {item} still answered 38/5"
         );
@@ -878,8 +959,10 @@ fn emote_reaches_a_second_bot_and_dance_does_not() {
     let rig = Rig::start(&[AccountRole::Player, AccountRole::Player], false);
     let mut a = rig.connect(0, "emoteA");
     let mut b = rig.connect(1, "emoteB");
-    a.pump(Duration::from_millis(500)).unwrap();
-    b.pump(Duration::from_millis(500)).unwrap();
+    // Both sessions must be joined before A's chat: a bot that joins after
+    // the broadcast never receives it.
+    sees(&mut a, rig.accounts[1].guid, "emoteA: B enters the field");
+    sees(&mut b, rig.accounts[0].guid, "emoteB: A is in the field");
 
     raw(&mut a, &quick_chat(WAVE, "FixtureA"));
     b.wait_for(T, |m| is_quick_chat(m, WAVE))
@@ -887,8 +970,7 @@ fn emote_reaches_a_second_bot_and_dance_does_not() {
 
     raw(&mut a, &quick_chat(DANCE, "FixtureA"));
     assert!(
-        b.wait_for(Duration::from_secs(2), |m| is_quick_chat(m, DANCE))
-            .is_err(),
+        b.wait_for(QUIET, |m| is_quick_chat(m, DANCE)).is_err(),
         "Dance (184) was delivered"
     );
 
@@ -926,7 +1008,6 @@ fn warpstone_attunes_by_walking_travel_relocates_and_locked_ids_do_not() {
             &format!("realm goto {} {} {}", at[0], at[1], at[2]),
             "Developer teleport",
         );
-        bot.pump(Duration::from_millis(500)).unwrap();
         assert!(planar(here(bot), at) < 0.5, "goto did not land at {at:?}");
     };
 
@@ -967,7 +1048,6 @@ fn warpstone_attunes_by_walking_travel_relocates_and_locked_ids_do_not() {
             .unwrap()
             .contains("Sanctuary Warpstone")
     );
-    bot.pump(Duration::from_millis(500)).unwrap();
     rig.save_when(Some(&mut bot), 0, "the attunement", |v| {
         v["gameplay"]["warpstones"]["attuned"] == json!([5])
     });
@@ -986,7 +1066,6 @@ fn warpstone_attunes_by_walking_travel_relocates_and_locked_ids_do_not() {
     raw(&mut bot, &travel(5));
     bot.wait_for(T, |m| m.starts_with(&[38, 0, 12, 0]))
         .expect("no 38/12 location update");
-    bot.pump(Duration::from_millis(500)).unwrap();
     let arrived = here(&mut bot);
     assert!(
         planar(arrived, SANCTUARY) < 2.0,
@@ -1100,7 +1179,6 @@ fn quest_journal_selection_persists_across_relog() {
         [&[49u8, 0, 2, 0, 0, 0][..], &plan.quest.to_le_bytes(), &[1]].concat(),
     ] {
         raw(&mut bot, &inner);
-        bot.pump(Duration::from_millis(400)).unwrap();
     }
     let active = rig.save_when(Some(&mut bot), 0, "the accepted quest", |v| {
         status(v) == "active"
@@ -1111,9 +1189,17 @@ fn quest_journal_selection_persists_across_relog() {
         "accepting must not select the quest"
     );
 
-    // A quest the character does not own cannot be selected.
+    // A quest the character does not own cannot be selected. The gateway logs
+    // the journal outcome before the handler returns, so wait for that line
+    // rather than guessing how long the request takes.
     raw(&mut bot, &select(999_999));
-    bot.pump(Duration::from_millis(700)).unwrap();
+    rig.wait_log("the forged selection", |value| {
+        value["event"] == "quest_journal"
+            && value["outcome"] == "rejected"
+            && value["request"]
+                .as_str()
+                .is_some_and(|request| request.contains("999999"))
+    });
     assert_eq!(
         selected(&rig.save(0)),
         Value::Null,
@@ -1127,7 +1213,16 @@ fn quest_journal_selection_persists_across_relog() {
     disconnect(bot);
 
     let mut again = rig.connect(0, "quest2");
-    again.pump(Duration::from_secs(1)).unwrap();
+    // Selecting the same quest again must be an unchanged no-op: that is only
+    // true if the relog restored both the active quest and its selection.
+    raw(&mut again, &select(plan.quest as i32));
+    rig.wait_log("the restored selection", |value| {
+        value["event"] == "quest_journal"
+            && value["outcome"] == "unchanged"
+            && value["request"]
+                .as_str()
+                .is_some_and(|request| request.contains(&format!("quest_id: {}", plan.quest)))
+    });
     let restored = rig.save(0);
     assert_eq!(
         selected(&restored),

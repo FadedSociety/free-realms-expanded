@@ -37,6 +37,11 @@ use std::{
 const VERSION: &str = "1.910.1.530630";
 /// Generous: under a loaded full suite a gateway reply can take seconds.
 const T: Duration = Duration::from_secs(20);
+/// How long a negative check listens after the server has answered the
+/// request. Two seconds, so a starved gateway cannot hide a late packet.
+const QUIET: Duration = Duration::from_secs(2);
+/// Mirrors `mounts::SPAWN_DEBOUNCE_MS` (src/mounts.rs:22).
+const SPAWN_DEBOUNCE: Duration = Duration::from_millis(1_000);
 static NEXT: AtomicU32 = AtomicU32::new(0);
 /// Each scenario starts its own gateway and login server, each loading the
 /// 58k-row catalogue; running them one at a time keeps their timing honest.
@@ -391,6 +396,22 @@ impl Rig {
         }
     }
 
+    /// Client-initiated session ends the gateway has logged. `end_session`
+    /// writes the character save before printing its event, so a seed written
+    /// after this count increases is the logged-out state, not the login's.
+    fn client_disconnects(&self) -> usize {
+        fs::read_to_string(self.root.join("gateway.out.log"))
+            .map(|text| {
+                text.lines()
+                    .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+                    .filter(|value| {
+                        value["event"] == "session_ended" && value["reason"] == "client_disconnect"
+                    })
+                    .count()
+            })
+            .unwrap_or(0)
+    }
+
     fn ticket(&self, account: usize) -> String {
         let store = AccountStore::load(&self.root.join("accounts.json")).unwrap();
         let a = &self.accounts[account];
@@ -420,7 +441,11 @@ impl Rig {
                 Ok(bot) => return bot,
                 Err(error) => last = error,
             }
-            std::thread::sleep(Duration::from_millis(700));
+            // A handshake that went unanswered is still queued at the gateway,
+            // which builds a full session for it before it can look at the next
+            // datagram; a prompt retry only lengthens that queue. Let it drain.
+            let unanswered = last.contains("no SessionResponse");
+            std::thread::sleep(Duration::from_millis(if unanswered { 8000 } else { 700 }));
         }
         panic!("{name} could not log in: {last}");
     }
@@ -476,6 +501,26 @@ fn tail(bot: &bot::Bot) -> String {
 
 fn disconnect(mut bot: bot::Bot) {
     bot.disconnect();
+}
+
+/// Disconnect `bot` and wait until the gateway has written its logout save.
+/// The SOE disconnect is an unreliable datagram, so it is resent while waiting;
+/// a repeated disconnect for an absent session is ignored.
+fn logout(rig: &Rig, mut bot: bot::Bot, what: &str) {
+    let before = rig.client_disconnects();
+    bot.disconnect();
+    let deadline = Instant::now() + T;
+    let mut resent = Instant::now();
+    while rig.client_disconnects() <= before {
+        if Instant::now() >= deadline {
+            panic!("{what}: the gateway never logged the logout");
+        }
+        if resent.elapsed() >= Duration::from_secs(1) {
+            bot.disconnect();
+            resent = Instant::now();
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
 }
 
 /// Add owned items to a character's save while it is logged out, the way a
@@ -545,22 +590,43 @@ fn is_ride_removal(m: &[u8], ride: u64) -> bool {
 fn is_mount_reply(m: &[u8], sub: u8, rider: u64) -> bool {
     m.starts_with(&[168, 0, sub]) && m.get(3..11) == Some(&rider.to_le_bytes()[..])
 }
+fn is_add_pc_of(m: &[u8], guid: u64) -> bool {
+    m.starts_with(&[35, 0, 1, 0]) && m.get(4..12) == Some(&guid.to_le_bytes()[..])
+}
+
+/// Wait until `bot`'s field view contains `guid`. A login can return before
+/// the gateway has joined the bot, and a state change sent in between (a
+/// boarding broadcast) is not replayed to the late joiner.
+fn sees(bot: &mut bot::Bot, guid: u64, what: &str) {
+    bot.wait_for(T, |m| is_add_pc_of(m, guid))
+        .unwrap_or_else(|e| panic!("{what}: no AddPc ({e}); got {}", tail(bot)));
+}
+
+/// Wait until `deadline` (used to clear the gateway's spawn debounce).
+fn wait_past(deadline: Instant) {
+    let now = Instant::now();
+    if now < deadline {
+        std::thread::sleep(deadline - now);
+    }
+}
 
 #[test]
 fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_dropped() {
     let _serial = serial();
     let rig = Rig::start(&[AccountRole::Player; 3], false);
-    // The first login writes the save; give player A the wolf ride item while logged out.
-    disconnect(rig.connect(0, "mountA0"));
-    std::thread::sleep(Duration::from_millis(1500));
+    // The first login writes the save; give player A the wolf ride item while
+    // logged out. The wait proves the gateway wrote and released the character.
+    logout(&rig, rig.connect(0, "mountA0"), "the first login");
     seed_items(&rig, 0, &[(900_001, WOLF_ITEM)]);
 
     let (ga, gb) = (rig.accounts[0].guid, rig.accounts[1].guid);
     let ride = ride_of(ga);
     let mut a = rig.connect(0, "mountA");
     let mut b = rig.connect(1, "mountB");
-    a.pump(Duration::from_millis(500)).unwrap();
-    b.pump(Duration::from_millis(500)).unwrap();
+    // Each login can return before the gateway joins the bot to the shared
+    // field. Wait until both see each other before A changes any state.
+    sees(&mut a, gb, "A: B enters the field");
+    sees(&mut b, ga, "B: A is in the field");
 
     // B owns no ride: refused with a notice, and A never sees a ride for B.
     raw(&mut b, &spawn_request(WOLF));
@@ -569,7 +635,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     })
     .unwrap_or_else(|e| panic!("no refusal ({e}); got {}", tail(&b)));
     assert!(
-        a.wait_for(Duration::from_secs(1), |m| is_ride_actor(m, ride_of(gb)))
+        a.wait_for(QUIET, |m| is_ride_actor(m, ride_of(gb)))
             .is_err(),
         "an unowned ride appeared"
     );
@@ -582,6 +648,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
         .expect("A: ride actor");
     b.wait_for(T, |m| is_ride_actor(m, ride))
         .expect("B: ride actor");
+    let first_spawn = Instant::now();
 
     // The client automounts with 168/1; the boarding reaches both players.
     raw(&mut a, &board_request(ride));
@@ -593,8 +660,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     // A mounted player's emote is dropped; B hears nothing.
     raw(&mut a, &quick_chat(WAVE, "FixtureA"));
     assert!(
-        b.wait_for(Duration::from_secs(2), |m| is_quick_chat(m, WAVE))
-            .is_err(),
+        b.wait_for(QUIET, |m| is_quick_chat(m, WAVE)).is_err(),
         "a mounted emote was delivered"
     );
 
@@ -617,8 +683,10 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     b.wait_for(T, |m| is_quick_chat(m, WAVE))
         .expect("the emote stayed refused after dismounting");
 
-    // Leaving takes the ride away as well.
-    std::thread::sleep(Duration::from_millis(1200)); // server spawn debounce (1 s)
+    // Leaving takes the ride away as well. The gateway silently drops a
+    // re-summon inside its 1 s debounce, measured from the first spawn it
+    // processed (before the actor reached us), so wait that window out.
+    wait_past(first_spawn + SPAWN_DEBOUNCE + Duration::from_millis(250));
     raw(&mut a, &spawn_request(WOLF));
     b.wait_for(T, |m| is_ride_actor(m, ride))
         .expect("B: second ride actor");
@@ -635,10 +703,6 @@ fn is_move_of(m: &[u8], guid: u64) -> bool {
     m.starts_with(&[125, 0]) && m.get(2..10) == Some(&guid.to_le_bytes()[..])
 }
 
-fn is_add_pc_of(m: &[u8], guid: u64) -> bool {
-    m.starts_with(&[35, 0, 1, 0]) && m.get(4..12) == Some(&guid.to_le_bytes()[..])
-}
-
 /// `bot` walks to `from` shifted by each `dx`; each step is one 125 to the server.
 fn walk(bot: &mut bot::Bot, guid: u64, from: [f32; 3], steps: &[f32]) {
     for dx in steps {
@@ -652,17 +716,17 @@ fn walk(bot: &mut bot::Bot, guid: u64, from: [f32; 3], steps: &[f32]) {
 fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail() {
     let _serial = serial();
     let rig = Rig::start(&[AccountRole::Player; 3], false);
-    disconnect(rig.connect(0, "followA0"));
-    std::thread::sleep(Duration::from_millis(1500));
+    logout(&rig, rig.connect(0, "followA0"), "the first login");
     seed_items(&rig, 0, &[(900_001, WOLF_ITEM)]);
 
     let ga = rig.accounts[0].guid;
+    let gb = rig.accounts[1].guid;
     let ride = ride_of(ga);
     let start = rig.start_position;
     let mut a = rig.connect(0, "followA");
     let mut b = rig.connect(1, "followB");
-    a.pump(Duration::from_millis(500)).unwrap();
-    b.pump(Duration::from_millis(500)).unwrap();
+    sees(&mut a, gb, "A: B enters the field");
+    sees(&mut b, ga, "B: A is in the field");
 
     // Summoned but not boarded: the ride stands where it appeared, so B gets A's move only.
     raw(&mut a, &spawn_request(WOLF));
@@ -672,8 +736,7 @@ fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail()
     b.wait_for(T, |m| is_move_of(m, ga))
         .unwrap_or_else(|e| panic!("B: no move of A ({e}); got {}", tail(&b)));
     assert!(
-        b.wait_for(Duration::from_secs(1), |m| is_move_of(m, ride))
-            .is_err(),
+        b.wait_for(QUIET, |m| is_move_of(m, ride)).is_err(),
         "an unboarded ride followed"
     );
 
@@ -716,8 +779,7 @@ fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail()
     b.wait_for(T, |m| is_move_of(m, ga))
         .unwrap_or_else(|e| panic!("B: no move of A ({e}); got {}", tail(&b)));
     assert!(
-        b.wait_for(Duration::from_secs(1), |m| is_move_of(m, ride))
-            .is_err(),
+        b.wait_for(QUIET, |m| is_move_of(m, ride)).is_err(),
         "a put-away ride kept following"
     );
     disconnect(a);
