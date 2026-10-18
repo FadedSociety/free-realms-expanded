@@ -795,11 +795,20 @@ fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
         game.active_profile(),
         Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
     );
-    assert!(
-        entered
-            .nearby
-            .iter()
-            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+    let driver_outfit = game
+        .profile_attachments(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+        .unwrap();
+    let entry_switch = entered
+        .nearby
+        .iter()
+        .find(|packet| {
+            packet.starts_with(&[35, 0, 7, 0])
+                && packet.get(4..12) == Some(&OWNER.raw().to_le_bytes()[..])
+        })
+        .expect("derby entry announces the new visible outfit");
+    assert_eq!(
+        &entry_switch[12..entry_switch.len() - 4],
+        &driver_outfit[..]
     );
     let offer = entered
         .replies
@@ -896,6 +905,19 @@ fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
         game.state().profiles.as_ref().unwrap().active,
         before_job,
         "leaving restores the job active before entry"
+    );
+    let restored_outfit = game.profile_attachments(before_job).unwrap();
+    let close_switch = paid
+        .nearby
+        .iter()
+        .find(|packet| {
+            packet.starts_with(&[35, 0, 7, 0])
+                && packet.get(4..12) == Some(&OWNER.raw().to_le_bytes()[..])
+        })
+        .expect("an accepted derby close announces the restored visible outfit");
+    assert_eq!(
+        &close_switch[12..close_switch.len() - 4],
+        &restored_outfit[..]
     );
     assert_eq!(game.state().inventory.coins, before_coins + 5);
     assert!(

@@ -1321,16 +1321,35 @@ impl Gameplay {
     }
 
     /// (R) 35/7 EquippedItemsChange for a job switch: the new active outfit,
-    /// which the client applies as a profile-swap attachment group.
-    fn profile_switch_packet(&self, guid: u64) -> io::Result<Option<Vec<u8>>> {
-        let Some(profiles) = &self.profiles else {
-            return Ok(None);
-        };
+    /// which the client applies as a profile-swap attachment group. Client
+    /// reader 0x0091af50 (ctor 0x0091d3b0).
+    fn profile_switch_packet(&self, guid: u64, attachments: &[u8]) -> Vec<u8> {
         let mut packet = vec![35, 0, 7, 0];
         packet.extend(guid.to_le_bytes());
-        packet.extend(self.inventory.profile_attachments(profiles.active())?);
+        packet.extend_from_slice(attachments);
         packet.extend(0i32.to_le_bytes()); // (R) trailing value; the client reads one i32.
-        Ok(Some(packet))
+        packet
+    }
+
+    /// Announce the active outfit after the complete profile operation, not
+    /// just a change of profile id: activating the same job can restore a
+    /// missing starter outfit.
+    fn announce_profile_outfit(
+        &self,
+        guid: u64,
+        before: &[u8],
+        switched: bool,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(profiles) = &self.profiles else {
+            return Ok(());
+        };
+        let after = self.inventory.profile_attachments(profiles.active())?;
+        if !switched && after == before {
+            return Ok(());
+        }
+        out.nearby.push(self.profile_switch_packet(guid, &after));
+        Ok(())
     }
 
     /// T027: whether an equip names an inactive job (whose 35/6 must not reach
@@ -1661,18 +1680,22 @@ impl Gameplay {
 
     /// (R) Leaving a race puts the player back in the job they had before it;
     /// Kart Driver stays only when chosen or required (the owner, 2026-10-15).
-    fn restore_job(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
-        let profiles = self.profiles.as_mut().unwrap();
-        if profiles.active() == job {
+    fn restore_job(&mut self, job: i32, guid: u64, out: &mut Outcome) -> io::Result<()> {
+        if self.profiles.as_ref().unwrap().active() == job {
             return Ok(());
         }
+        let outfit_before = self
+            .inventory
+            .profile_attachments(self.profiles.as_ref().unwrap().active())?;
+        let profiles = self.profiles.as_mut().unwrap();
         out.replies.push(profiles.select(job, &self.inventory)?);
         if let Some(abilities) = &self.abilities {
             out.replies
                 .extend(abilities.activation(job, self.job_level(job))?);
         }
         self.sync_player_level(out);
-        self.ensure_outfit(job, out)
+        self.ensure_outfit(job, out)?;
+        self.announce_profile_outfit(guid, &outfit_before, true, out)
     }
 
     /// Stage an ordinary 26/13 job switch. The candidate job is committed only
@@ -2745,16 +2768,18 @@ impl Gameplay {
             .profiles
             .as_mut()
             .ok_or_else(|| invalid("kart entry requires class content"))?;
+        let previous_job = profiles.active();
+        let outfit_before = self.inventory.profile_attachments(previous_job)?;
         // (R) First use still unlocks Kart Driver for saves that predate trainers; the
         // option is idempotent. W176 also offers the job from a trainer. The prior job is
         // restored on exit.
-        let previous_job = profiles.active();
         let first_time = profiles.unlock(48)?;
         out.replies.push(profiles.select(48, &self.inventory)?);
         if first_time {
             self.give_starter_outfit(48, false, &mut out)?;
         }
         self.ensure_outfit(48, &mut out)?;
+        self.announce_profile_outfit(character.guid, &outfit_before, previous_job != 48, &mut out)?;
         let kart = self.kart_entry.as_mut().unwrap();
         let (replies, scene) = kart.begin(character)?;
         kart.set_previous_job(previous_job);
@@ -2979,7 +3004,7 @@ impl Gameplay {
             let previous_job = self.kart_entry.as_ref().unwrap().previous_job();
             let return_location = self.kart_entry.as_mut().unwrap().exit().unwrap();
             if let Some(job) = previous_job {
-                self.restore_job(job, &mut out)?;
+                self.restore_job(job, character.guid, &mut out)?;
             }
             // Captured return frame44446 clears racing bit10 (0x401 ->1).
             out.replies
@@ -5000,6 +5025,9 @@ impl Gameplay {
                 return Err(invalid("invalid class selection request"));
             }
             let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
+            let outfit_before = self
+                .inventory
+                .profile_attachments(self.profiles.as_ref().unwrap().active())?;
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 out.replies.extend(
                     self.abilities
@@ -5010,10 +5038,7 @@ impl Gameplay {
                 self.sync_player_level(&mut out);
                 self.opening_equipment_events(&mut out)?;
                 self.sync_world_stage(&mut out)?;
-                // T027: neighbours swap the whole attachment group on a job change.
-                if changed && let Some(packet) = self.profile_switch_packet(character.guid)? {
-                    out.nearby.push(packet);
-                }
+                self.announce_profile_outfit(character.guid, &outfit_before, changed, &mut out)?;
             }
             return Ok(out);
         }
@@ -6145,6 +6170,9 @@ impl Gameplay {
             .unwrap()
             .supports_basic(self.profiles.as_ref().unwrap().active())
         {
+            let outfit_before = self
+                .inventory
+                .profile_attachments(self.profiles.as_ref().unwrap().active())?;
             let reply = self
                 .profiles
                 .as_mut()
@@ -6161,6 +6189,7 @@ impl Gameplay {
             out.replies
                 .push(chat::system("Switched to Brawler for the opening cave."));
             self.opening_equipment_events(out)?;
+            self.announce_profile_outfit(character.guid, &outfit_before, true, out)?;
         }
         let result = self.encounter.as_mut().unwrap().begin(
             encounter_id,
@@ -6502,11 +6531,11 @@ impl Gameplay {
                 return Err(invalid("invalid class selection request"));
             }
             let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            if let Some(changed) = self.stage_job_selection(id, &mut out)?
-                && changed
-                && let Some(packet) = self.profile_switch_packet(guid)?
-            {
-                out.nearby.push(packet);
+            let outfit_before = self
+                .inventory
+                .profile_attachments(self.profiles.as_ref().unwrap().active())?;
+            if let Some(changed) = self.stage_job_selection(id, &mut out)? {
+                self.announce_profile_outfit(guid, &outfit_before, changed, &mut out)?;
             }
         }
         let combat = self

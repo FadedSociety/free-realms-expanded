@@ -1593,6 +1593,60 @@ fn neighbours_see_equipment_and_job_changes_live() {
         json!(UNLOCKED_JOB)
     );
 
+    // Re-selecting the same job still repairs a completely empty outfit, so
+    // neighbours must receive the restored attachment group.
+    let slots: Vec<i32> = rig.save(0)["gameplay"]["inventory"]["equipment"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|entry| {
+            entry["profile_id"] == json!(UNLOCKED_JOB)
+                && entry["item_id"].as_i64().is_some_and(|item| item != 0)
+        })
+        .map(|entry| entry["slot"].as_i64().unwrap() as i32)
+        .collect();
+    assert!(!slots.is_empty(), "the selected job has no gear to remove");
+    for slot in slots {
+        let mut unequip = vec![42, 0, 2, 0];
+        unequip.extend(slot.to_le_bytes());
+        unequip.extend(UNLOCKED_JOB.to_le_bytes());
+        raw(&mut a, &unequip);
+        b.wait_for(T, |m| {
+            equip_change(m, guid).is_some_and(|change| {
+                change.slot == slot && change.profile == UNLOCKED_JOB && change.item == 0
+            })
+        })
+        .unwrap_or_else(|e| panic!("the neighbour missed slot {slot} unequip ({e})"));
+    }
+    rig.save_when(Some(&mut a), 0, "the empty outfit", |save| {
+        save["gameplay"]["inventory"]["equipment"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|entry| entry["profile_id"] == json!(UNLOCKED_JOB))
+            .all(|entry| entry["item_id"] == json!(0))
+    });
+    raw(&mut a, &switch);
+    let message = b
+        .wait_for(T, |m| equipped_change(m, guid).is_some())
+        .expect("the neighbour did not see the same-job outfit repair");
+    let (count, models, _) = equipped_change(&message, guid).unwrap();
+    assert!(count >= 5, "the repaired outfit is incomplete: {count}");
+    assert!(
+        models.iter().any(|model| model.starts_with("brawler_")),
+        "{models:?}"
+    );
+    rig.save_when(Some(&mut a), 0, "the repaired outfit", |save| {
+        save["gameplay"]["inventory"]["equipment"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|entry| {
+                entry["profile_id"] == json!(UNLOCKED_JOB)
+                    && entry["item_id"].as_i64().is_some_and(|item| item != 0)
+            })
+    });
+
     // A viewer who arrives after the switch gets the new outfit in AddPc.
     disconnect(b);
     std::thread::sleep(Duration::from_millis(1_500));

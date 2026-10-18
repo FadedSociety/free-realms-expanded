@@ -44,10 +44,7 @@ impl Gameplay {
             ..Default::default()
         };
         if let Some(job) = previous_job {
-            staged.restore_job(job, &mut out)?;
-            if let Some(packet) = staged.profile_switch_packet(character.guid)? {
-                out.nearby.push(packet);
-            }
+            staged.restore_job(job, character.guid, &mut out)?;
             out.replies
                 .push(crate::kart_gateway::player_status(character.guid, 1));
             out.changed = true;
@@ -70,6 +67,7 @@ impl Gameplay {
             .as_mut()
             .ok_or_else(|| invalid("derby entry requires class content"))?;
         let previous_job = profiles.active();
+        let outfit_before = self.inventory.profile_attachments(previous_job)?;
         let first_time = profiles.unlock(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)?;
         out.replies.push(profiles.select(
             crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
@@ -83,11 +81,12 @@ impl Gameplay {
             )?;
         }
         self.ensure_outfit(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE, &mut out)?;
-        if previous_job != crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
-            && let Some(packet) = self.profile_switch_packet(character.guid)?
-        {
-            out.nearby.push(packet);
-        }
+        self.announce_profile_outfit(
+            character.guid,
+            &outfit_before,
+            previous_job != crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+            &mut out,
+        )?;
         let derby = self.derby.as_mut().unwrap();
         let offer = derby.begin_at(character, now_ms)?;
         derby.set_previous_job(previous_job);
@@ -144,10 +143,7 @@ impl Gameplay {
             }
             out.replies = outcome.reward_packets;
             if let Some(job) = previous_job {
-                self.restore_job(job, &mut out)?;
-                if let Some(packet) = self.profile_switch_packet(character.guid)? {
-                    out.nearby.push(packet);
-                }
+                self.restore_job(job, character.guid, &mut out)?;
             }
             out.replies
                 .push(crate::kart_gateway::player_status(character.guid, 1));
@@ -181,10 +177,7 @@ impl Gameplay {
         let previous_job = self.derby.as_mut().unwrap().exit();
         out.replies = removals;
         if let Some(job) = previous_job {
-            self.restore_job(job, &mut out)?;
-            if let Some(packet) = self.profile_switch_packet(character.guid)? {
-                out.nearby.push(packet);
-            }
+            self.restore_job(job, character.guid, &mut out)?;
         }
         out.replies
             .push(crate::kart_gateway::player_status(character.guid, 1));

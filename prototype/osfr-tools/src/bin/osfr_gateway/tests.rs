@@ -508,3 +508,68 @@ fn studio_hex_refuses_non_hex_input_instead_of_panicking() {
     assert_eq!(trace::parse_hex("230"), None);
     assert_eq!(trace::parse_hex(""), None);
 }
+
+#[test]
+fn live_outfit_fanout_respects_directed_visibility_cap() {
+    let mut world = SharedWorld::new();
+    world.players = PlayerRegistry::new(InterestPolicy::new(100.0, 1).unwrap());
+    let zone = ZoneInstance {
+        zone_id: 1,
+        instance_id: 1,
+    };
+    for (session, character, position) in [
+        (1, 101, [0.0, 0.0, 0.0]),
+        (2, 103, [20.0, 0.0, 0.0]),
+        (3, 102, [50.0, 0.0, 0.0]),
+    ] {
+        let mut presentation = osfr_tools::players::PlayerPresentation::default();
+        presentation.character_guid = character;
+        world
+            .players
+            .join_with_presentation(
+                SessionId(session),
+                1_000 + session,
+                character,
+                zone,
+                position,
+                0.0,
+                presentation,
+            )
+            .unwrap();
+        world.joined.insert(SessionId(session));
+    }
+    assert!(world.players.knows_character(SessionId(2), 101));
+    assert!(!world.players.knows_character(SessionId(3), 101));
+
+    let mut outfit = vec![35, 0, 7, 0];
+    outfit.extend(101u64.to_le_bytes());
+    outfit.extend(0i32.to_le_bytes());
+    outfit.extend(0i32.to_le_bytes());
+    let mut slot = vec![35, 0, 6, 0];
+    slot.extend(101u64.to_le_bytes());
+    slot.extend(0i32.to_le_bytes());
+    let nearby = pet_removal_packet(900);
+    let deliveries = world.ride_fanout(
+        SessionId(1),
+        &[outfit.clone(), slot.clone(), nearby.clone()],
+    );
+    assert!(deliveries.iter().any(|delivery| {
+        delivery.recipient == SessionId(2) && delivery.bytes.ends_with(&outfit)
+    }));
+    assert!(
+        deliveries.iter().any(|delivery| {
+            delivery.recipient == SessionId(2) && delivery.bytes.ends_with(&slot)
+        })
+    );
+    assert!(!deliveries.iter().any(|delivery| {
+        delivery.recipient == SessionId(3) && delivery.bytes.ends_with(&outfit)
+    }));
+    assert!(
+        !deliveries.iter().any(|delivery| {
+            delivery.recipient == SessionId(3) && delivery.bytes.ends_with(&slot)
+        })
+    );
+    assert!(deliveries.iter().any(|delivery| {
+        delivery.recipient == SessionId(3) && delivery.bytes.ends_with(&nearby)
+    }));
+}

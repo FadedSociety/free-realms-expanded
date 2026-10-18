@@ -519,6 +519,13 @@ impl Security {
     }
 }
 
+/// Live appearance updates name a player and are safe only for viewers who
+/// already received that player's AddPc.
+fn live_outfit_packet(packet: &[u8]) -> bool {
+    // 35/7 reader 0x0091af50; 35/6 is T027's existing equipment-change prefix.
+    matches!(packet, [35, 0, 6, 0, ..] | [35, 0, 7, 0, ..])
+}
+
 impl SharedWorld {
     fn new() -> Self {
         // (R) Local runner defaults; native visibility radius and group cap are unknown.
@@ -669,8 +676,9 @@ impl SharedWorld {
         deliveries
     }
 
-    /// W162: `packets` for every other player within interest range of `session`, found from the
-    /// registry's current position (so call it before a zone transfer removes the player).
+    /// W162: `packets` for other players in interest range of `session`. Live appearance updates
+    /// also require the recipient's directed view to contain the actor. The registry position is
+    /// read before a zone transfer removes the player.
     fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
         let Some(player) = self
             .players
@@ -679,17 +687,22 @@ impl SharedWorld {
         else {
             return Vec::new();
         };
-        self.players
-            .nearby_sessions(player.zone, player.position)
-            .into_iter()
-            .filter(|other| *other != session)
-            .flat_map(|other| {
-                packets.iter().map(move |packet| Delivery {
-                    recipient: other,
-                    bytes: wrap_application(packet),
-                })
-            })
-            .collect()
+        let mut deliveries = Vec::new();
+        for other in self.players.nearby_sessions(player.zone, player.position) {
+            if other == session {
+                continue;
+            }
+            let knows_character = self.players.knows_character(other, player.character_guid);
+            for packet in packets {
+                if knows_character || !live_outfit_packet(packet) {
+                    deliveries.push(Delivery {
+                        recipient: other,
+                        bytes: wrap_application(packet),
+                    });
+                }
+            }
+        }
+        deliveries
     }
 
     /// W162: whoever is told about a mounted player (AddPc, 35/1) also gets the ride actor and
