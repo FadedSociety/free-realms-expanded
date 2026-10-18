@@ -21,6 +21,8 @@ use std::{
 const MAX_OBJECTIVES: usize = 64;
 const MAX_QUESTS: usize = 1024;
 const MAX_COUNT: u32 = 1_000_000;
+/// Local bound on a registered UI event name (R; the native limit is not recovered).
+const MAX_UI_EVENT_BYTES: usize = 64;
 const MAX_SPLIT_CONTENT_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_SPLIT_TOTAL_BYTES: u64 = 32 * 1024 * 1024;
 
@@ -70,6 +72,12 @@ enum RuntimeGoal {
         zone_id: u32,
         position: [f32; 3],
         radius: f32,
+        source: Vec<crate::content::SourceTag>,
+    },
+    ClientReported {
+        id: u32,
+        client_id: u32,
+        trigger: ClientTrigger,
         source: Vec<crate::content::SourceTag>,
     },
     // Explicit reach geometry avoids guessing a radius from a POI id.
@@ -128,6 +136,17 @@ fn runtime_objective(
             definition_id,
             source,
         } => (id, 1, ObjectiveKind::EquipItem { definition_id }, source),
+        RuntimeGoal::ClientReported {
+            id,
+            client_id,
+            trigger,
+            source,
+        } => (
+            id,
+            1,
+            ObjectiveKind::ClientReported { client_id, trigger },
+            source,
+        ),
         RuntimeGoal::VisitPosition {
             id,
             zone_id,
@@ -307,6 +326,35 @@ pub enum ObjectiveKind {
         zone_id: u32,
         position: [f32; 3],
         radius: f32,
+    },
+    /// A goal only the client can judge (a look, a UI event, a first movement). The client
+    /// reports it with 45/7; `client_id` names it on the wire and is unique in the
+    /// catalogue (R, W175).
+    ClientReported {
+        client_id: u32,
+        trigger: ClientTrigger,
+    },
+}
+
+/// What the client is told to watch for: 45/6 LookAt, 45/10 UIEvent or 45/11 FirstMovement
+/// (piece 072, readers `00c436b0`, `00c437a0`, `00c43870`).
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
+pub enum ClientTrigger {
+    /// Actor target. The world-position branch needs the client's private sentinel GUID,
+    /// which is not recovered, so content must name an actor (R).
+    LookAt {
+        guid: u64,
+        /// Raw vertical offset; the client applies its recovered 0.1 scale.
+        offset: f32,
+        range: u32,
+        angle_degrees: u32,
+    },
+    UiEvent {
+        event: String,
+    },
+    FirstMovement {
+        mouse: bool,
     },
 }
 
@@ -539,6 +587,7 @@ pub enum QuestEvent {
     CompleteDungeon { encounter_id: u32 },
     UseAbility { ability_id: i32 },
     VisitPosition { zone_id: u32, position: [f32; 3] },
+    ClientReported { client_id: u32 },
 }
 
 impl From<OpeningTrigger> for ObjectiveKind {
@@ -696,7 +745,7 @@ impl QuestEngine {
                     match goal.get("kind").and_then(Value::as_str) {
                         Some(
                             "gather_resource" | "craft_recipe" | "finish_minigame" | "equip_item"
-                            | "visit_position" | "reach_poi",
+                            | "visit_position" | "reach_poi" | "client_reported",
                         ) => {
                             let (objective, location) = runtime_objective(goal.clone())?;
                             if let Some((id, zone, position, radius)) = location {
@@ -1019,6 +1068,15 @@ impl QuestEngine {
                 return Err(invalid(
                     "quest prerequisite references unknown or self quest",
                 ));
+            }
+        }
+        // (R) A 45/7 claim must name exactly one objective, so client ids are unique.
+        let mut client_ids = BTreeSet::new();
+        for objective in indexed.values().flat_map(|d| &d.objectives) {
+            if let ObjectiveKind::ClientReported { client_id, .. } = &objective.kind {
+                if !client_ids.insert(*client_id) {
+                    return Err(invalid("duplicate client objective id"));
+                }
             }
         }
         let mut state = state.unwrap_or_else(|| QuestState {
@@ -2289,6 +2347,28 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
         ObjectiveKind::EquipItem { definition_id } => *definition_id > 0,
         ObjectiveKind::CompleteDungeon { encounter_id } => *encounter_id != 0,
         ObjectiveKind::UseAbility { ability_id } => *ability_id > 0,
+        ObjectiveKind::ClientReported { client_id, trigger } => {
+            (1..=i32::MAX as u32).contains(client_id)
+                && match trigger {
+                    ClientTrigger::LookAt {
+                        guid,
+                        offset,
+                        range,
+                        angle_degrees,
+                    } => {
+                        *guid != 0
+                            && offset.is_finite()
+                            && offset.abs() <= 1_000_000.0
+                            && (1..=i32::MAX as u32).contains(range)
+                            && (1..=360).contains(angle_degrees)
+                    }
+                    ClientTrigger::UiEvent { event } => {
+                        (1..=MAX_UI_EVENT_BYTES).contains(&event.len())
+                            && event.bytes().all(|byte| byte.is_ascii_graphic())
+                    }
+                    ClientTrigger::FirstMovement { .. } => true,
+                }
+        }
         ObjectiveKind::VisitPosition {
             zone_id: _,
             position,
@@ -2331,6 +2411,7 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
         } => *profile_id > 0,
         QuestEvent::EquipItem { definition_id } => *definition_id > 0,
         QuestEvent::CompleteDungeon { encounter_id } => *encounter_id != 0,
+        QuestEvent::ClientReported { client_id } => (1..=i32::MAX as u32).contains(client_id),
         QuestEvent::VisitPosition { position, .. } => position
             .iter()
             .all(|value| value.is_finite() && value.abs() <= 1_000_000.0),
@@ -2426,7 +2507,96 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
                 position,
             },
         ) if a == b && within(*target, *position, *radius) => 1,
+        (
+            ObjectiveKind::ClientReported { client_id: a, .. },
+            QuestEvent::ClientReported { client_id: b },
+        ) if a == b => 1,
         _ => 0,
+    }
+}
+
+/// Client 45/7 `ClientComplete` (`00cffba0` builds it, `00cffa70` sends it; piece 072):
+/// `u16 45`, `u8 7`, `i32 objective id` = 7 bytes. `Ok(None)` means another packet. The length
+/// must be exact and the id positive (R). The id only names a goal; whether that goal is open
+/// is the engine's call.
+pub fn decode_client_complete(inner: &[u8]) -> io::Result<Option<u32>> {
+    let [45, 0, 7, rest @ ..] = inner else {
+        return Ok(None);
+    };
+    let bytes: [u8; 4] = rest
+        .try_into()
+        .map_err(|_| invalid("client objective completion must be 7 bytes"))?;
+    u32::try_from(i32::from_le_bytes(bytes))
+        .ok()
+        .filter(|id| *id != 0)
+        .map(Some)
+        .ok_or_else(|| invalid("client objective id out of range"))
+}
+
+impl QuestEngine {
+    /// The client-reported goals the client should be watching right now: the open goals of
+    /// active quests (R).
+    pub fn open_client_objectives(&self) -> Vec<(u32, &ClientTrigger)> {
+        self.state
+            .quests
+            .keys()
+            .flat_map(|quest_id| self.current_objectives(*quest_id))
+            .filter_map(|objective| match &objective.kind {
+                ObjectiveKind::ClientReported { client_id, trigger } => Some((*client_id, trigger)),
+                _ => None,
+            })
+            .collect()
+    }
+}
+
+/// What this session has told the client about client-reported goals; not saved. The client
+/// keeps registrations and never de-duplicates them (`00c43140`), so each id is registered
+/// once (45/6, 45/10 or 45/11) and a goal that opens again is re-armed with 45/9 (R).
+#[derive(Clone, Debug, Default)]
+pub struct ClientObjectives {
+    registered: BTreeSet<u32>,
+    armed: BTreeSet<u32>,
+}
+
+impl ClientObjectives {
+    /// The packets that tell the client about goals opened since the last call.
+    pub fn update(&mut self, engine: &QuestEngine) -> Vec<Vec<u8>> {
+        let open = engine.open_client_objectives();
+        let mut packets = Vec::new();
+        for (client_id, trigger) in &open {
+            if self.armed.contains(client_id) {
+                continue;
+            }
+            let (sub, tail) = match trigger {
+                _ if !self.registered.insert(*client_id) => (9, Vec::new()),
+                ClientTrigger::LookAt {
+                    guid,
+                    offset,
+                    range,
+                    angle_degrees,
+                } => {
+                    // 45/6 actor form, consumed by 009b2760 -> 00c435c0: id, GUID,
+                    // vertical offset (f32), range (i32), angle in degrees (i32).
+                    let mut tail = guid.to_le_bytes().to_vec();
+                    tail.extend(offset.to_le_bytes());
+                    tail.extend(range.to_le_bytes());
+                    tail.extend(angle_degrees.to_le_bytes());
+                    (6, tail)
+                }
+                ClientTrigger::UiEvent { event } => {
+                    let mut tail = (event.len() as u32).to_le_bytes().to_vec();
+                    tail.extend(event.as_bytes());
+                    (10, tail)
+                }
+                ClientTrigger::FirstMovement { mouse } => (11, vec![u8::from(*mouse)]),
+            };
+            let mut packet = vec![45, 0, sub];
+            packet.extend(client_id.to_le_bytes());
+            packet.extend(tail);
+            packets.push(packet);
+        }
+        self.armed = open.into_iter().map(|(client_id, _)| client_id).collect();
+        packets
     }
 }
 

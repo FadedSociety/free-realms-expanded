@@ -23,13 +23,23 @@
 //! Nothing here awards or completes a quest. Selection only reads QuestEngine
 //! state, and a breadcrumb only makes the regular 49/1 offer; the player still
 //! has to accept it and earn its objectives from server events.
+//!
+//! The client's 49/15 carries an ORIGINAL quest id (the POI `BreadcrumbQuestId`), which the
+//! regional catalogue does not use. `data/content/breadcrumb_quests.json` is the crosswalk
+//! from those ids to regional quests (W175); an id it does not list is refused (R).
 
+use crate::content::{SCHEMA_VERSION, SourceTag, VersionedFile};
 use crate::quest_engine::{
     ObjectiveKind, OutboundMessage, QuestDenial, QuestEngine, QuestMessage, QuestObjective,
     QuestOutcome, QuestStatus,
 };
 use crate::world::OPEN_WORLD_ZONE;
-use std::collections::BTreeMap;
+use serde::Deserialize;
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs, io,
+    path::Path,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum JournalRequest {
@@ -124,6 +134,84 @@ fn breadcrumb(
     // Prerequisites, level, job, membership, limit and hollow content are all
     // checked by the engine's regular offer path.
     engine.offer(quest_id, giver)
+}
+
+/// Original breadcrumb quest id -> the regional quest that stands in for it (R).
+pub type Crosswalk = BTreeMap<u32, u32>;
+
+/// What the player reads when a 49/15 start is refused and nothing else is answered (R).
+pub const BREADCRUMB_REFUSED: &str = "That quest can't be started from here right now.";
+
+const CROSSWALK_FILE: &str = "breadcrumb_quests.json";
+const MAX_CROSSWALK_BYTES: u64 = 1 << 20;
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CrosswalkRecord {
+    original_quest_id: u32,
+    poi_ids: Vec<u32>,
+    poi_name: String,
+    /// `None`: no regional quest stands in for the original one.
+    regional_quest_id: Option<u32>,
+    source: Vec<SourceTag>,
+}
+
+/// Read `breadcrumb_quests.json` from a content folder. A missing file is an empty
+/// crosswalk; a malformed one is an error so a bad edit cannot silently list nothing.
+pub fn load_crosswalk(dir: &Path) -> io::Result<Crosswalk> {
+    let invalid = |message: &'static str| io::Error::new(io::ErrorKind::InvalidData, message);
+    let path = dir.join(CROSSWALK_FILE);
+    if !path.is_file() {
+        return Ok(Crosswalk::new());
+    }
+    if fs::metadata(&path)?.len() > MAX_CROSSWALK_BYTES {
+        return Err(invalid("breadcrumb crosswalk over 1 MiB"));
+    }
+    let file: VersionedFile<CrosswalkRecord> = serde_json::from_slice(&fs::read(&path)?)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    if file.schema_version != SCHEMA_VERSION {
+        return Err(invalid("unsupported breadcrumb crosswalk schema"));
+    }
+    let (mut crosswalk, mut seen) = (Crosswalk::new(), BTreeSet::new());
+    for record in file.records {
+        let positive = |id: u32| (1..=i32::MAX as u32).contains(&id);
+        if !positive(record.original_quest_id)
+            || !seen.insert(record.original_quest_id)
+            || record.poi_ids.is_empty()
+            || record.poi_ids.contains(&0)
+            || record
+                .poi_ids
+                .iter()
+                .copied()
+                .collect::<BTreeSet<_>>()
+                .len()
+                != record.poi_ids.len()
+            || record.poi_name.is_empty()
+            || record.poi_name.len() > 256
+            || record.source.is_empty()
+            || record.source.iter().any(
+                |tag| matches!(tag, SourceTag::Reconstructed(text) if !text.starts_with("(R)")),
+            )
+            || record.regional_quest_id.is_some_and(|id| !positive(id))
+        {
+            return Err(invalid("invalid breadcrumb crosswalk record"));
+        }
+        if let Some(regional) = record.regional_quest_id {
+            crosswalk.insert(record.original_quest_id, regional);
+        }
+    }
+    Ok(crosswalk)
+}
+
+/// A 49/15 start names an ORIGINAL id: rewrite it to the regional quest, or `None` when the
+/// crosswalk does not list it. Other requests carry ids the server sent and pass through.
+pub fn translate(request: JournalRequest, crosswalk: &Crosswalk) -> Option<JournalRequest> {
+    match request {
+        JournalRequest::Breadcrumb { quest_id } => crosswalk
+            .get(&quest_id)
+            .map(|&quest_id| JournalRequest::Breadcrumb { quest_id }),
+        other => Some(other),
+    }
 }
 
 /// What the client's "Take Me There" pin needs (47/14 `ObjectiveTargetUpdate`).

@@ -514,6 +514,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(49), Some(2 | 14 | 15)) => "quest_engine",
         // Family 47 carries a one-byte subtype; word(2) would swallow the first body byte.
         (Some(47), _) if matches!(body.get(2), Some(12 | 13)) => "quest_engine",
+        // Family 45 also has a one-byte subtype: 45/7 is the client's goal-complete claim (W175).
+        (Some(45), _) if body.get(2) == Some(&7) => "quest_engine",
         // Family 98 also has a one-byte subtype: 98/1 is the client's path request (W164).
         (Some(98), _) if body.get(2) == Some(&1) => "pathing",
         // Family 59 also has a one-byte subtype: the six client trade requests (W163).

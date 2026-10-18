@@ -196,6 +196,10 @@ pub struct Gameplay {
     saved_npc_quests: Option<crate::quest_engine::QuestState>,
     /// Quests a player may start remotely with 49/15 (R), each with its giver NPC.
     breadcrumb_quests: std::collections::BTreeMap<u32, u64>,
+    /// Original breadcrumb quest id -> regional quest (`data/content/breadcrumb_quests.json`).
+    breadcrumb_crosswalk: crate::quest_journal::Crosswalk,
+    /// Client-reported goals the client has been told to watch; not saved.
+    client_objectives: crate::quest_engine::ClientObjectives,
     /// The "Take Me There" pin (47/14) the client currently shows; not saved.
     tracked_pin: crate::quest_journal::Tracker,
     /// Regional quest state is sent once per network session, not after every zone load.
@@ -1031,6 +1035,8 @@ impl Gameplay {
             npc_quests: None,
             saved_npc_quests,
             breadcrumb_quests: std::collections::BTreeMap::new(),
+            breadcrumb_crosswalk: Default::default(),
+            client_objectives: Default::default(),
             tracked_pin: crate::quest_journal::Tracker::default(),
             npc_quests_synced: false,
             game_rules: GameRuleSet::default(),
@@ -1142,6 +1148,7 @@ impl Gameplay {
             crate::quest_engine::CharacterEligibility::default(),
             self.saved_npc_quests.take(),
         )?);
+        self.register_breadcrumb_crosswalk(crate::quest_journal::load_crosswalk(source)?);
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         Ok(())
     }
@@ -1156,6 +1163,13 @@ impl Gameplay {
             .into_iter()
             .filter_map(|id| Some((id, engine.giver_npc_id(id)?)))
             .collect();
+    }
+
+    /// Bind the original-id crosswalk (W175): a 49/15 start may only name an original id it
+    /// lists, and only quests with a definition can be started (R).
+    pub fn register_breadcrumb_crosswalk(&mut self, crosswalk: crate::quest_journal::Crosswalk) {
+        self.register_breadcrumb_quests(crosswalk.values().copied());
+        self.breadcrumb_crosswalk = crosswalk;
     }
 
     /// Replace account rules after account configuration or membership changes.
@@ -1328,13 +1342,45 @@ impl Gameplay {
             }
             return Ok(Some(Outcome::default()));
         }
+        // 45/7: the client says a goal it judges itself is met (W175). Only an open goal of
+        // the character's own active quest can move; anything else changes nothing (R).
+        if let Some(client_id) = crate::quest_engine::decode_client_complete(inner)
+            .map_err(|_| invalid("invalid client objective completion"))?
+        {
+            let mut out = Outcome::default();
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::ClientReported { client_id },
+                &mut out,
+            )?;
+            npc_event(serde_json::json!({
+                "event": "client_objective",
+                "outcome": if out.changed { "advanced" } else { "ignored" }
+            }));
+            return Ok(Some(out));
+        }
         if let Some(request) = crate::quest_journal::decode(inner)
             .map_err(|_| invalid("invalid quest journal request"))?
         {
+            // 49/15 names an ORIGINAL quest id; an id the crosswalk does not list gets one
+            // chat line and changes nothing (R).
+            let Some(request) =
+                crate::quest_journal::translate(request, &self.breadcrumb_crosswalk)
+            else {
+                npc_event(serde_json::json!({"event": "quest_journal", "outcome": "unlisted"}));
+                return Ok(Some(Outcome {
+                    replies: vec![chat::system(crate::quest_journal::BREADCRUMB_REFUSED)],
+                    ..Outcome::default()
+                }));
+            };
             let Some(engine) = self.npc_quests.as_mut() else {
                 return Ok(Some(Outcome::default()));
             };
+            let breadcrumb = matches!(
+                request,
+                crate::quest_journal::JournalRequest::Breadcrumb { .. }
+            );
             let result = crate::quest_journal::handle(engine, request, &self.breadcrumb_quests);
+            let refused = breadcrumb && result.denial.is_some() && result.outbound.is_empty();
             npc_event(serde_json::json!({
                 "event": "quest_journal",
                 "request": format!("{request:?}"),
@@ -1348,6 +1394,10 @@ impl Gameplay {
             }));
             let mut out = Outcome::default();
             self.append_npc_quest_outcome(result, &mut out)?;
+            if refused {
+                out.replies
+                    .push(chat::system(crate::quest_journal::BREADCRUMB_REFUSED));
+            }
             return Ok(Some(out));
         }
         if inner.starts_with(&[49, 0, 2, 0]) {
@@ -2690,6 +2740,7 @@ impl Gameplay {
             self.append_activity_list(&mut out);
             self.append_item_bar(now_ms, &mut out)?;
             out.replies.push(self.pets.list_packet());
+            self.sync_client_objectives(&mut out);
             return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
@@ -2790,6 +2841,7 @@ impl Gameplay {
         self.append_item_bar(now_ms, &mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);
         out.replies.push(self.pets.list_packet());
+        self.sync_client_objectives(&mut out);
         Ok(out)
     }
 
@@ -3206,7 +3258,17 @@ impl Gameplay {
     ) -> io::Result<Outcome> {
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
         self.sync_tracked_target(character, &mut out);
+        self.sync_client_objectives(&mut out);
         Ok(out)
+    }
+
+    /// Tell the client to watch the client-reported goals that just opened: 45/6, 45/10 or
+    /// 45/11 once per session, 45/9 when a goal opens again (W175, R; rules in
+    /// `quest_engine::ClientObjectives`).
+    fn sync_client_objectives(&mut self, out: &mut Outcome) {
+        if let Some(engine) = &self.npc_quests {
+            out.replies.extend(self.client_objectives.update(engine));
+        }
     }
 
     /// Send the "Take Me There" pin (47/14) when the target of the character's own
@@ -8566,8 +8628,373 @@ mod w64_regional_quest_tests {
         let mut crumb = vec![49, 0, 15, 0, 0, 0];
         crumb.extend(999_999i32.to_le_bytes());
         let out = game.handle_in_world(&crumb, &character, 1_011).unwrap();
-        assert!(!out.changed && out.replies.is_empty());
+        assert!(!out.changed);
+        // W175: an unlisted original id is refused with one chat line.
+        assert_eq!(
+            out.replies,
+            vec![chat::system(crate::quest_journal::BREADCRUMB_REFUSED)]
+        );
         assert_eq!(state(&game), before);
+    }
+
+    // ---- W175: the 49/15 original-id crosswalk and 45/7 client-reported goals ----
+
+    /// "Introduce Yourself" at Highroad Junction: enabled, no prerequisite, no level gate.
+    const CROSSWALK_QUEST: u32 = 3_000_022;
+    /// "Farming 101": disabled in the catalogue today, so the engine refuses to offer it.
+    const DISABLED_QUEST: u32 = 3_000_006;
+
+    fn quest_game() -> (Gameplay, CharacterState) {
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        game.profiles = Some(Profiles::load(&reference, Some(native_test_profiles())).unwrap());
+        game.bind_npc_quest_catalogue(&bundled_content(), 1)
+            .unwrap();
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [0.0; 3],
+            rotation: [1.0, 0.0, 0.0],
+        };
+        (game, character)
+    }
+
+    fn breadcrumb_packet(quest_id: u32) -> Vec<u8> {
+        let mut packet = vec![49, 0, 15, 0, 0, 0];
+        packet.extend((quest_id as i32).to_le_bytes());
+        packet
+    }
+
+    fn claim_packet(client_id: i32) -> Vec<u8> {
+        let mut packet = vec![45, 0, 7];
+        packet.extend(client_id.to_le_bytes());
+        packet
+    }
+
+    fn quest_state(game: &Gameplay) -> crate::quest_engine::QuestState {
+        game.npc_quests.as_ref().unwrap().state().clone()
+    }
+
+    #[test]
+    fn binding_the_catalogue_loads_the_shipped_crosswalk() {
+        let (game, _) = quest_game();
+        assert!(!game.breadcrumb_crosswalk.is_empty());
+        // Every listed target has a definition, so every one is registered with its giver.
+        let targets: BTreeSet<u32> = game.breadcrumb_crosswalk.values().copied().collect();
+        let registered: BTreeSet<u32> = game.breadcrumb_quests.keys().copied().collect();
+        assert_eq!(targets, registered);
+    }
+
+    #[test]
+    fn breadcrumb_start_goes_through_the_original_id_crosswalk() {
+        let (mut game, character) = quest_game();
+        game.register_breadcrumb_crosswalk(std::collections::BTreeMap::from([
+            (1807, CROSSWALK_QUEST),
+            (1806, DISABLED_QUEST),
+        ]));
+        let refusal = chat::system(crate::quest_journal::BREADCRUMB_REFUSED);
+        let before = quest_state(&game);
+
+        // An unlisted original id, a regional id used as an original one and a forged id are
+        // each answered with one chat line and change nothing. So does a listed id whose
+        // quest the engine will not offer (disabled content).
+        for (step, id) in [1808, CROSSWALK_QUEST, 999_999, 1806]
+            .into_iter()
+            .enumerate()
+        {
+            let out = game
+                .handle_in_world(&breadcrumb_packet(id), &character, 2_000 + step as u64)
+                .unwrap();
+            assert!(!out.changed, "id {id}");
+            assert_eq!(out.replies, vec![refusal.clone()], "id {id}");
+            assert_eq!(quest_state(&game), before, "id {id}");
+        }
+
+        // A listed original id offers its REGIONAL quest (49/1), once.
+        let out = game
+            .handle_in_world(&breadcrumb_packet(1807), &character, 2_010)
+            .unwrap();
+        assert!(out.changed);
+        assert!(out.replies.iter().any(|p| p.starts_with(&[49, 0, 1, 0])));
+        assert!(!out.replies.contains(&refusal));
+        let offered = quest_state(&game);
+        assert_eq!(offered.pending_offer, Some(CROSSWALK_QUEST));
+        assert_eq!(offered.quests.len(), 1);
+        // Pressed again with the offer still open: shown again, nothing new made.
+        let again = game
+            .handle_in_world(&breadcrumb_packet(1807), &character, 2_011)
+            .unwrap();
+        assert!(!again.changed);
+        assert!(again.replies.iter().any(|p| p.starts_with(&[49, 0, 1, 0])));
+        assert_eq!(quest_state(&game), offered);
+    }
+
+    #[test]
+    fn an_unlisted_breadcrumb_is_refused_without_a_quest_engine() {
+        let mut game = Gameplay::load(&reference(), None).unwrap();
+        assert!(game.npc_quests.is_none());
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [0.0; 3],
+            rotation: [1.0, 0.0, 0.0],
+        };
+        let out = game
+            .handle_in_world(&breadcrumb_packet(1807), &character, 6_000)
+            .unwrap();
+        assert!(!out.changed);
+        assert_eq!(
+            out.replies,
+            vec![chat::system(crate::quest_journal::BREADCRUMB_REFUSED)]
+        );
+    }
+
+    /// Two synthetic quests that each ask the client to judge one goal.
+    fn client_goal_engine() -> crate::quest_engine::QuestEngine {
+        use crate::quest_engine::{
+            CharacterEligibility, ClientTrigger, ObjectiveKind, QuestDefinition, QuestEngine,
+            QuestObjective, QuestRequirements,
+        };
+        let quest = |id: u32, client_id: u32, trigger: ClientTrigger| QuestDefinition {
+            id,
+            title: format!("Client goal {id} (R)"),
+            description: String::new(),
+            giver_npc_id: 1,
+            turnin_npc_id: 1,
+            prerequisite_quest_ids: vec![],
+            requirements: QuestRequirements::default(),
+            ordered: true,
+            objectives: vec![QuestObjective {
+                id: 1,
+                required: 1,
+                description: "Judged by the client (R)".into(),
+                kind: ObjectiveKind::ClientReported { client_id, trigger },
+            }],
+            reward: crate::rewards::RewardGrant {
+                coins: 5,
+                items: vec![],
+                job_xp: std::collections::BTreeMap::new(),
+                display: crate::rewards::RewardDisplay {
+                    source_guid: 1,
+                    player_guid: 1,
+                    reward_kind: 0,
+                    icon_id: 0,
+                    name_id: 0,
+                    rows: vec![],
+                },
+            },
+        };
+        QuestEngine::new(
+            1,
+            vec![
+                quest(
+                    7001,
+                    55,
+                    ClientTrigger::UiEvent {
+                        event: "onTestEvent".into(),
+                    },
+                ),
+                quest(7002, 77, ClientTrigger::FirstMovement { mouse: true }),
+                quest(
+                    7003,
+                    73,
+                    ClientTrigger::LookAt {
+                        guid: 0x1122_3344_5566_7788,
+                        offset: 1.5,
+                        range: 12,
+                        angle_degrees: 45,
+                    },
+                ),
+            ],
+            CharacterEligibility {
+                member: true,
+                member_quest_limit: 10,
+                nonmember_quest_limit: 10,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap()
+    }
+
+    fn engine_mut(game: &mut Gameplay) -> &mut crate::quest_engine::QuestEngine {
+        game.npc_quests.as_mut().unwrap()
+    }
+
+    #[test]
+    fn client_goal_claims_move_only_an_open_goal_of_an_active_quest() {
+        let (mut game, character) = quest_game();
+        game.npc_quests = Some(client_goal_engine());
+
+        // Nothing is active yet: a claim for a real id changes nothing and registers nothing.
+        let out = game
+            .handle_in_world(&claim_packet(55), &character, 3_000)
+            .unwrap();
+        assert!(!out.changed && out.replies.is_empty());
+
+        // 7001 becomes active; 7002 stays offered.
+        assert!(engine_mut(&mut game).offer(7001, 1).changed);
+        assert!(engine_mut(&mut game).accept(7001).changed);
+        assert!(engine_mut(&mut game).offer(7002, 1).changed);
+        let before = quest_state(&game);
+
+        // A forged id moves nothing; the client is told to watch goal 55 (45/10, exact bytes)
+        // and not goal 77, whose quest is only offered.
+        let mut watch = vec![45, 0, 10];
+        watch.extend(55u32.to_le_bytes());
+        watch.extend(11u32.to_le_bytes());
+        watch.extend(b"onTestEvent");
+        let out = game
+            .handle_in_world(&claim_packet(99), &character, 3_001)
+            .unwrap();
+        assert!(!out.changed);
+        assert_eq!(out.replies, vec![watch]);
+        assert_eq!(quest_state(&game), before);
+
+        // A claim for the goal of the merely offered quest changes nothing.
+        let out = game
+            .handle_in_world(&claim_packet(77), &character, 3_002)
+            .unwrap();
+        assert!(!out.changed && out.replies.is_empty());
+        assert_eq!(quest_state(&game), before);
+
+        // Malformed claims are errors and change nothing.
+        for bad in [
+            claim_packet(0),
+            claim_packet(-1),
+            claim_packet(i32::MIN),
+            vec![45, 0, 7, 55, 0, 0],
+            vec![45, 0, 7, 55, 0, 0, 0, 0],
+            vec![45, 0, 7],
+        ] {
+            assert!(game.handle_in_world(&bad, &character, 3_003).is_err());
+            assert_eq!(quest_state(&game), before);
+        }
+
+        // The real claim advances the goal once: update and completion are sent, the quest
+        // waits for its turn-in and nothing is paid.
+        let out = game
+            .handle_in_world(&claim_packet(55), &character, 3_004)
+            .unwrap();
+        assert!(out.changed);
+        assert!(
+            out.replies
+                .iter()
+                .any(|p| p.starts_with(&[49, 0, 9, 0, 0, 0]))
+        );
+        assert!(
+            out.replies
+                .iter()
+                .any(|p| p.starts_with(&[49, 0, 10, 0, 0, 0]))
+        );
+        assert!(!out.replies.iter().any(|p| p.starts_with(&[45, 0, 10])));
+        let state = quest_state(&game);
+        assert_eq!(state.quests[&7001].counts, vec![1]);
+        assert_eq!(
+            state.quests[&7001].status,
+            crate::quest_engine::QuestStatus::Active
+        );
+        assert_eq!(state.quests[&7002].counts, vec![0]);
+
+        // A repeat, and a claim for the other quest's goal, change nothing.
+        for id in [55, 77] {
+            let out = game
+                .handle_in_world(&claim_packet(id), &character, 3_005)
+                .unwrap();
+            assert!(!out.changed && out.replies.is_empty());
+            assert_eq!(quest_state(&game), state);
+        }
+    }
+    #[test]
+    fn a_look_goal_claim_advances_only_an_open_goal_of_an_active_quest() {
+        let (mut game, character) = quest_game();
+        game.npc_quests = Some(client_goal_engine());
+        assert!(engine_mut(&mut game).offer(7003, 1).changed);
+        assert!(engine_mut(&mut game).accept(7003).changed);
+        let before = quest_state(&game);
+
+        // The client receives the recovered 45/6 actor form: id, GUID, raw vertical
+        // offset, range, and angle in degrees.
+        let out = game
+            .handle_in_world(&claim_packet(99), &character, 5_000)
+            .unwrap();
+        let mut watch = vec![45, 0, 6];
+        watch.extend(73u32.to_le_bytes());
+        watch.extend(0x1122_3344_5566_7788u64.to_le_bytes());
+        watch.extend(1.5f32.to_le_bytes());
+        watch.extend(12u32.to_le_bytes());
+        watch.extend(45u32.to_le_bytes());
+        assert_eq!(watch.len(), 27);
+        assert_eq!(out.replies, vec![watch]);
+        assert_eq!(quest_state(&game), before);
+
+        let out = game
+            .handle_in_world(&claim_packet(73), &character, 5_001)
+            .unwrap();
+        assert!(out.changed);
+        assert!(
+            out.replies
+                .iter()
+                .any(|p| p.starts_with(&[49, 0, 10, 0, 0, 0]))
+        );
+        assert!(!out.replies.iter().any(|p| p.starts_with(&[50, 0, 1])));
+        let state = quest_state(&game);
+        assert_eq!(state.quests[&7003].counts, vec![1]);
+        assert_eq!(
+            state.quests[&7003].status,
+            crate::quest_engine::QuestStatus::Active
+        );
+
+        // Claim replay changes nothing.
+        let replay = game
+            .handle_in_world(&claim_packet(73), &character, 5_002)
+            .unwrap();
+        assert!(!replay.changed && replay.replies.is_empty());
+        assert_eq!(quest_state(&game), state);
+    }
+
+    #[test]
+    fn a_goal_that_opens_again_is_rearmed_not_registered_twice() {
+        let (mut game, character) = quest_game();
+        game.npc_quests = Some(client_goal_engine());
+        let watching = |out: &Outcome, sub: u8| {
+            out.replies
+                .iter()
+                .filter(|p| p.starts_with(&[45, 0, sub]))
+                .count()
+        };
+        assert!(engine_mut(&mut game).offer(7002, 1).changed);
+        assert!(engine_mut(&mut game).accept(7002).changed);
+
+        // 45/11 FirstMovement with the mouse flag, once.
+        let out = game
+            .handle_in_world(&claim_packet(99), &character, 4_000)
+            .unwrap();
+        let mut first = vec![45, 0, 11];
+        first.extend(77u32.to_le_bytes());
+        first.push(1);
+        assert_eq!(out.replies, vec![first]);
+        let out = game
+            .handle_in_world(&claim_packet(99), &character, 4_001)
+            .unwrap();
+        assert!(out.replies.is_empty());
+
+        // Abandon and take it again: the client still holds the registration, so it gets a
+        // 45/9 re-arm and no second 45/11.
+        assert!(engine_mut(&mut game).abandon(7002).changed);
+        let out = game
+            .handle_in_world(&claim_packet(99), &character, 4_002)
+            .unwrap();
+        assert!(out.replies.is_empty());
+        assert!(engine_mut(&mut game).offer(7002, 1).changed);
+        assert!(engine_mut(&mut game).accept(7002).changed);
+        let out = game
+            .handle_in_world(&claim_packet(99), &character, 4_003)
+            .unwrap();
+        let mut rearm = vec![45, 0, 9];
+        rearm.extend(77u32.to_le_bytes());
+        assert_eq!(out.replies, vec![rearm]);
+        assert_eq!(watching(&out, 11), 0);
     }
 
     fn tracked_pins(out: &Outcome) -> Vec<Vec<u8>> {

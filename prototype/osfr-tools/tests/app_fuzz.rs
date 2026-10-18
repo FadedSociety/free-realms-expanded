@@ -483,6 +483,11 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("quest_engine", select));
     result.push(("quest_engine", vec![47, 0, 13, 2]));
     result.push(("quest_engine", vec![47, 0, 0xff, 0xff]));
+    // Family 45 also uses a one-byte subtype: 45/7 is the client's goal-complete claim (i32 id).
+    let mut claim = vec![45, 0, 7];
+    claim.extend(u32::MAX.to_le_bytes());
+    result.push(("quest_engine", claim));
+    result.push(("quest_engine", vec![45, 0, 0xff, 0xff]));
     // Family 59 uses a one-byte subtype like 47: every client trade sub, then the wildcard.
     for sub in [3u8, 6, 7, 8, 9, 10] {
         let mut p = vec![59, 0, sub];

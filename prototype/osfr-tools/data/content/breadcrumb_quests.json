@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "original_quest_id": 1799,
+      "poi_ids": [40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 115, 116, 118, 122],
+      "poi_name": "Checkers & Chess",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1799 on POI 40,41,42,43,44,45,46,47,48,49,50,51,115,116,118,122 ('Checkers & Chess'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no chess or checkers quest exists in the regional catalogue."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1801,
+      "poi_ids": [31],
+      "poi_name": "Wildwood Speedway",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1801 on POI 31 ('Wildwood Speedway'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: Kart Driver has per-track Sprint/Endurance challenge quests (3080010 and others) but nothing that is evidently the first quest started from the speedway gate; not guessed."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1802,
+      "poi_ids": [33],
+      "poi_name": "Frost Ridge Speedway",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1802 on POI 33 ('Frost Ridge Speedway'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: as 1801 (Frost Ridge: 3080020)."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1803,
+      "poi_ids": [32],
+      "poi_name": "Thunder Falls Speedway",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1803 on POI 32 ('Thunder Falls Speedway'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: as 1801 (Thunder Falls: 3080030)."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1804,
+      "poi_ids": [34],
+      "poi_name": "Tangletrack Speedway",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1804 on POI 34 ('Tangletrack Speedway'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: as 1801 (Tangletrack: 3080041)."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1805,
+      "poi_ids": [24],
+      "poi_name": "Queensfields",
+      "regional_quest_id": 3050009,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1805 on POI 24 ('Queensfields'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 crosswalk by activity/title match, not recovered from the original server: 3050009 'Chef: Queensfields' carries the POI's own name as its title (Chef.md C4); 3050018 is the Stillwater variant with the same title. Both are hollow and disabled in the catalogue today, so this entry stays refused until a quest is authored and enabled."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1806,
+      "poi_ids": [23],
+      "poi_name": "Farnum's Farm",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1806 on POI 23 ('Farnum's Farm'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: Farnum's Farm: 'Farming 101' (3000006) is part of the opening chain behind the hollow prerequisite 3000005, so it is not a stand-alone farm start; not guessed."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1807,
+      "poi_ids": [21],
+      "poi_name": "Chugaroot Farm",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1807 on POI 21 ('Chugaroot Farm'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no regional quest names or teaches this farm."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1808,
+      "poi_ids": [20],
+      "poi_name": "Perry's Pasture",
+      "regional_quest_id": 3050013,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1808 on POI 20 ('Perry's Pasture'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 crosswalk by activity/title match, not recovered from the original server: 3050013 'Chef: Perry's Pastures' carries the POI's own name as its title (Chef.md H4). Hollow and disabled today, so refused until a quest is authored and enabled."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1809,
+      "poi_ids": [22],
+      "poi_name": "Lakeshore Fields",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1809 on POI 22 ('Lakeshore Fields'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no regional quest names or teaches this farm."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1810,
+      "poi_ids": [25],
+      "poi_name": "Brambleback Farm",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1810 on POI 25 ('Brambleback Farm'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no regional quest names or teaches this farm."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1811,
+      "poi_ids": [94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 114],
+      "poi_name": "Cooking Table",
+      "regional_quest_id": 3050004,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1811 on POI 94,95,96,97,98,99,100,101,102,103,114 ('Cooking Table'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 crosswalk by activity/title match, not recovered from the original server: 3050004 'Cooking 101' ('Learn how to cook some supplies for your journey') is the quest that teaches the cooking table (Chef.md E4). Hollow and disabled today, so refused until authored and enabled."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1812,
+      "poi_ids": [38],
+      "poi_name": "Garden Tower Defense",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1812 on POI 38 ('Garden Tower Defense'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no Tower Defense quest exists in the regional catalogue."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1813,
+      "poi_ids": [36],
+      "poi_name": "Bixie Tower Defense",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1813 on POI 36 ('Bixie Tower Defense'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no Tower Defense quest exists in the regional catalogue."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1814,
+      "poi_ids": [37],
+      "poi_name": "Penguin Tower Defense",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1814 on POI 37 ('Penguin Tower Defense'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no Tower Defense quest exists in the regional catalogue."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1815,
+      "poi_ids": [35],
+      "poi_name": "Briarwood Tower Defense",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1815 on POI 35 ('Briarwood Tower Defense'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: no Tower Defense quest exists in the regional catalogue."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1880,
+      "poi_ids": [39],
+      "poi_name": "Sandstorm Speedway",
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1880 on POI 39 ('Sandstorm Speedway'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 unmapped: as 1801 (Sandstorm Speedway has no regional kart quest)."
+        }
+      ]
+    },
+    {
+      "original_quest_id": 1881,
+      "poi_ids": [117],
+      "poi_name": "Snowhill Soccer Field",
+      "regional_quest_id": 3140001,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json BreadcrumbQuestId=1881 on POI 117 ('Snowhill Soccer Field'); lab/content/startup-snapshot/startup.json world.points_of_interest agrees. Data rows only, no code copied."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client Lua (ScriptsBase.lua 31343) 'showPOIBreadcrumbs' calls Ui.StartBreadcrumbQuest(poi BreadcrumbQuestId); 00c18aa0 sends 49/15 with that original id. See notes/Build Guides/Gameplay/Quests and Objectives.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) W175 crosswalk by activity/title match, not recovered from the original server: 3140001 'Become a Soccer Star' ('Learn how to be a soccer star') starts the soccer line, which the wiki unlocks from the Snowhill Soccer Field entrance (Pieces/042). Hollow and disabled today, so refused until authored and enabled."
+        }
+      ]
+    }
+  ]
+}
