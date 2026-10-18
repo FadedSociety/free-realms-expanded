@@ -36,7 +36,9 @@ The Build Guide's top-level DLL section was written before the later DLL
 analysis. [[Research/TCG Client Protocol]] W61/W61b supersedes its "everything else is
 unknown" boundary for the numeric factory map, framing, login command IDs,
 native localization stream, and outer collection/archetype layers. The Build
-Guide remains the best source for the launch bridge and Treasure War UI.
+Guide remains the best source for the launch bridge and Treasure War UI. Its
+network-command 546/575 rows describe the separate in-executable Treasure War
+client; they are not evidence that those IDs are registered by `FreeRealmsTCG.dll`.
 
 Build Guide anchors used here:
 
@@ -106,8 +108,8 @@ The client creates a mini-game state with type 16 (DLL TCG) or type 23
     i16 opcode = 39
     i8  sub-opcode
     i32 state/instance id
-    i32 header slot +0x14
-    i32 header slot +0x10
+    i32 second header id (reader slot +0x14)
+    i32 third header id (reader slot +0x10)
 
 Observed card-specific/generic flow:
 
@@ -164,7 +166,7 @@ This is the launch and shared-results layer only.
 
 | ID | Decimal | Name / effect | Direction | Payload and status |
 |---|---:|---|---|---|
-| `39/5` | 39/5 | `RequestStartMiniGame` | C>S | header plus two sentinel ids; confirmed sender |
+| `39/5` | 39/5 | `RequestStartMiniGame` | C>S | header only (15 bytes); the three header integers are `[instance, -1, -1]` (sender `009be7d0`, writer `009bdc60`); confirmed |
 | `39/6` | 39/6 | leave card/mini-game | C>S | header; sent when the card client closes |
 | `39/7` | 39/7 | results acknowledgement | C>S | header; generic framework |
 | `39/16` | 39/16 | mini-game info/create state | S>C | state definition, goals, rewards and preload fields; field meanings partly inferred |
@@ -198,11 +200,9 @@ registration table. 22 class names match exactly, 22 are shared
 | 411 (`0x19b`) | `LoginCommand_SendSessionID` | C>S | v7; SessionID, Platform, challenge key, parent-session flag, login client, locale, character name/id, ticket, int map, flag |
 | 410 (`0x19a`) | `LoginCommand_SendPassword` | C>S | v7; manual credential branch |
 | 78 (`0x4e`) | `LoginCommand_GetChallenge` | C>S | manual login route |
-| 79 (`0x4f`) | `LoginCommand_SendChallenge` | C>S | v2; client computes MD5/SHA-1 response |
+| 79 (`0x4f`) | `LoginCommand_SendChallenge` | S>C | v2; inbound challenge; client computes MD5/SHA-1 answer |
 | 80 (`0x50`) | `LoginCommand_RespondToChallenge` | C>S | challenge answer |
 | 81 (`0x51`) | `LoginCommand_Results` | S>C | v6; success, explanation, account id, server id, session string, restrictions |
-| 575 (`0x23f`) | `NetworkCommand_RequestData` | C>S | request data version/base after main login; Build Guide records payload `0x9f3` |
-| 546 (`0x222`) | `NetworkCommand_UpdateDataVersion` | S>C | v2; a data version plus two string lists; mismatch closes the client |
 | 103 (`0x67`) | `TradingCard::Lobby` | S>C | v3 lobby snapshot: five child lists, roles, groups, lobby type, deck, tournament fields |
 | 92 (`0x5c`) | `LobbyCommand_Join` | C>S | v5; group id, role, string; body has further version-gated fields |
 | 93 (`0x5d`) | `LobbyCommand_Leave` | C>S | v3; body not decoded |
@@ -235,6 +235,26 @@ registration table. 22 class names match exactly, 22 are shared
 | 440 (`0x1b8`) | `ECommCommand_OrderHistory` | S>C likely | commerce history |
 | 441 (`0x1b9`) | `ECommCommand_RedeemItemGrant` | S>C likely | v3 item grant bridge |
 | 97, 446 | `LobbyCommand_SendText`, `_SendUChatText` | C>S likely | chat only; no text is recorded here |
+
+The manual challenge exchange is **78 C>S, 79 S>C, 80 C>S**. Command 79's
+DLL execute slot is `FUN_1017a080`; that function computes the client answer,
+calls the `LoginCommand_RespondToChallenge` (80) constructor `FUN_101790a0`,
+and queues the result through `FUN_10068af0` (`w61b-decompiled-excerpts.c`,
+function 1017a080). A server must send 79 after receiving 78; waiting for a
+client-sent 79 stalls manual login.
+
+Two network IDs in the Build Guide are not part of this DLL table or the
+499-row registration map:
+
+| ID | Name / effect | Direction | Evidence boundary |
+|---:|---|---|---|
+| 546 (`0x222`) | `NetworkCommand_UpdateDataVersion` | S>C (in-exe) | v2 described by the Treasure War Build Guide; no DLL factory registration, reader, writer, or handshake ordering recovered |
+| 575 (`0x23f`) | `NetworkCommand_RequestData` | C>S (in-exe) | Build Guide records payload `0x9f3`; no DLL factory registration, reader, writer, or handshake ordering recovered |
+
+These are EXE-only candidates until a DLL-specific registration and
+field-level reader/writer are recovered. Do not add them to the DLL card
+service's accepted-command map merely because the two clients share command
+family names.
 
 Unresolved operations are explicit in `message-table.json`: `attack`,
 `end_turn`, pack purchase/open, and ratings read/write. No attack-named
@@ -479,8 +499,13 @@ Deliver the separate listener and the DLL-compatible framing:
 1. `GatewayCommand_GetConnectionServer` (414) with the unrouted form;
 2. session login 411 and results 81;
 3. manual challenge 78-80 only as a separate path;
-4. data version/request path 546/575;
-5. lobby snapshot 103.
+4. lobby snapshot 103.
+
+Do not schedule the 546/575 data-version path here yet. Both IDs currently
+come from the in-executable Treasure War client in the Build Guide and are
+absent from the DLL's 60-row curated map and 499-row registration table.
+First recover a DLL-specific registration plus field-level readers/writers and
+handshake ordering, then add them as a separate reviewed slice.
 
 Gate:
 
@@ -490,6 +515,8 @@ Gate:
   ticket, replay, and wrong account are refusals with no state change;
 - a real DLL handshake transcript is required before marking the login path
   recovered; a synthetic fixture alone is not native acceptance;
+- every accepted DLL command ID resolves to a direct registration row; an
+  in-exe command name alone is not sufficient;
 - security review is required before exposing the listener.
 
 ### Slice 4: catalogue delivery and account collection
@@ -614,7 +641,11 @@ Gate:
 8. The sessionID dialog trigger and the exact gateway-to-card login transcript.
 9. Card Duelist quest prerequisites, coin/XP amounts, and prize-card grants.
 10. TYPE 3 rows 7, 107, and 108, which do not resolve cleanly to TCG content.
-11. No native TCG run exists. No end-to-end card-game claim is supported by
+11. DLL registration, field layouts, and handshake ordering for
+    `NetworkCommand_RequestData` (575) and `NetworkCommand_UpdateDataVersion`
+    (546). The current evidence is from the separate in-exe Treasure War
+    client, not `FreeRealmsTCG.dll`.
+12. No native TCG run exists. No end-to-end card-game claim is supported by
     the current evidence.
 
 ## Source map
