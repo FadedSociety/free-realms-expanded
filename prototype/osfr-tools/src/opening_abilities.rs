@@ -19,6 +19,11 @@ struct Basic {
     description_id: i32,
     icon_id: i32,
     weapon_name_id: i32,
+    /// (R) Canonical starter weapon granted when a clothed job has no weapon.
+    /// Older campaigns predate this field; the loader fills it from the
+    /// built-in roster below, just as it fills a missing weapon class.
+    #[serde(default)]
+    weapon_definition_id: i32,
     /// (R) Required item class in Weapon slot 7, not an instance/definition id.
     #[serde(default)]
     weapon_class: Option<i32>,
@@ -145,6 +150,14 @@ impl OpeningAbilities {
         self.basics.contains_key(&profile_id)
     }
 
+    /// Canonical starter weapon for a supported combat job. The definition,
+    /// rather than a display name, seeds the item grant and equip path.
+    pub fn starter_weapon(&self, profile_id: i32) -> Option<i32> {
+        self.basics
+            .get(&profile_id)
+            .map(|basic| basic.weapon_definition_id)
+    }
+
     pub fn load(directory: &Path) -> io::Result<Self> {
         let file = File::open(directory.join("opening-abilities.json"))?;
         let mut bytes = Vec::new();
@@ -158,25 +171,32 @@ impl OpeningAbilities {
             return Err(invalid("unsupported opening ability content"));
         }
         let mut basics = BTreeMap::new();
-        // (R) Old frozen campaigns predate weapon requirements. Fill only the
-        // missing class from the authored roster; never let omission mean unarmed.
+        // (R) Old frozen campaigns predate weapon metadata. Fill its missing
+        // class and starter definition from the authored roster; never let
+        // omission mean unarmed.
         let defaults: Content =
             serde_json::from_str(include_str!("../data/content/opening-abilities.json"))
                 .map_err(|_| invalid("invalid built-in weapon requirements"))?;
         for mut basic in content.basics {
-            basic.weapon_class = basic.weapon_class.or_else(|| {
-                defaults
-                    .basics
-                    .iter()
-                    .find(|row| row.profile_id == basic.profile_id)
-                    .and_then(|row| row.weapon_class)
-            });
+            let default = defaults
+                .basics
+                .iter()
+                .find(|row| row.profile_id == basic.profile_id);
+            basic.weapon_class = basic
+                .weapon_class
+                .or_else(|| default.and_then(|row| row.weapon_class));
+            if basic.weapon_definition_id == 0 {
+                basic.weapon_definition_id = default
+                    .map(|row| row.weapon_definition_id)
+                    .unwrap_or_default();
+            }
             if basic.profile_id <= 0
                 || basic.definition_id <= 0
                 || basic.name_id < 0
                 || basic.description_id < 0
                 || basic.icon_id <= 0
                 || basic.weapon_name_id <= 0
+                || basic.weapon_definition_id <= 0
                 || !basic
                     .weapon_class
                     .is_some_and(|class| (1..=999).contains(&class))

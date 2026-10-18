@@ -81,7 +81,7 @@ fn shipped_roster() -> OpeningAbilities {
     let mut fixture = Fixture::new();
     fixture.content["basics"] = json!([11, 32, 12, 2, 43, 35].map(
         |profile| json!({"profile_id":profile,"definition_id":4895,"name_id":1,
-            "description_id":0,"icon_id":1,"weapon_name_id":1})
+            "description_id":0,"icon_id":1,"weapon_name_id":1,"weapon_definition_id":1})
     ));
     fixture.write();
     let jobs: Value =
@@ -279,7 +279,7 @@ impl Fixture {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&path).unwrap();
-        let content = json!({"schema_version":1,"basics":[{"profile_id":43,"definition_id":1234,"name_id":2301,"description_id":2302,"icon_id":2303,"weapon_name_id":2401}]});
+        let content = json!({"schema_version":1,"basics":[{"profile_id":43,"definition_id":1234,"name_id":2301,"description_id":2302,"icon_id":2303,"weapon_name_id":2401,"weapon_definition_id":2501}]});
         let f = Self { path, content };
         f.write();
         f
@@ -500,6 +500,10 @@ fn loaded_metadata_rejects_invalid_fields_duplicates_and_oversized_content() {
         assert!(OpeningAbilities::load(&f.path).is_err(), "{field}");
     }
     f.content = original.clone();
+    f.content["basics"][0]["weapon_definition_id"] = json!(-1);
+    f.write();
+    assert!(OpeningAbilities::load(&f.path).is_err());
+    f.content = original.clone();
     f.content["basics"]
         .as_array_mut()
         .unwrap()
@@ -512,6 +516,17 @@ fn loaded_metadata_rejects_invalid_fields_duplicates_and_oversized_content() {
     assert!(OpeningAbilities::load(&f.path).is_err());
     fs::write(f.path.join("opening-abilities.json"), vec![b' '; 65537]).unwrap();
     assert!(OpeningAbilities::load(&f.path).is_err());
+}
+
+#[test]
+fn frozen_basic_rows_inherit_the_canonical_starter_weapon() {
+    let mut f = Fixture::new();
+    f.content["basics"][0]
+        .as_object_mut()
+        .unwrap()
+        .remove("weapon_definition_id");
+    f.write();
+    assert_eq!(f.load().starter_weapon(43), Some(75030));
 }
 
 #[test]

@@ -2587,6 +2587,34 @@ impl Gameplay {
         {
             self.give_starter_outfit(job, true, out)?;
         }
+        let has_weapon = self
+            .inventory
+            .state()
+            .equipment
+            .iter()
+            .any(|entry| entry.profile_id == job && entry.slot == 7 && entry.item_id != 0);
+        let starter = self
+            .abilities
+            .as_ref()
+            .and_then(|abilities| abilities.starter_weapon(job));
+        if !has_weapon
+            && let Some(definition) = starter
+            && self.inventory.has_definition(definition)
+        {
+            if !self
+                .inventory
+                .state()
+                .items
+                .iter()
+                .any(|item| item.definition_id == definition)
+            {
+                out.replies
+                    .extend(self.inventory.grant(0, definition, 1)?.replies);
+            }
+            let equipped = self.inventory.equip_owned_definition(definition, job)?;
+            out.changed |= equipped.changed;
+            out.replies.extend(equipped.replies);
+        }
         Ok(())
     }
 
