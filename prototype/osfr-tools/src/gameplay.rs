@@ -8549,6 +8549,159 @@ mod w64_regional_quest_tests {
         std::fs::remove_dir_all(scratch).unwrap();
     }
 
+    fn level_three_world_game(label: &str) -> (Gameplay, CharacterState, PathBuf) {
+        let source = bundled_content();
+        let scratch = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
+            "../../../lab/build/f111/{label}-{}",
+            std::process::id()
+        ));
+        if scratch.exists() {
+            std::fs::remove_dir_all(&scratch).unwrap();
+        }
+        std::fs::create_dir_all(&scratch).unwrap();
+        std::fs::copy(source.join("jobs.json"), scratch.join("jobs.json")).unwrap();
+        for folder in ["quests", "npcs"] {
+            std::fs::create_dir_all(scratch.join(folder)).unwrap();
+            for entry in std::fs::read_dir(source.join(folder)).unwrap() {
+                let path = entry.unwrap().path();
+                std::fs::copy(&path, scratch.join(folder).join(path.file_name().unwrap())).unwrap();
+            }
+        }
+        let path = scratch.join("quests/adventurer.json");
+        let mut file: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        let quest = file["records"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|quest| quest["id"] == INTRODUCE_YOURSELF_ID)
+            .unwrap();
+        quest["min_level"] = serde_json::json!(3);
+        quest["job"] = serde_json::Value::Null;
+        std::fs::write(&path, serde_json::to_vec(&file).unwrap()).unwrap();
+
+        let mut game = Gameplay::load(&reference(), None).unwrap();
+        game.profiles = Some(Profiles::load(&reference(), Some(native_test_profiles())).unwrap());
+        // Exercise the non-opening request path, which does not refresh eligibility
+        // while switching jobs. Only the NPC request path can make the offer legal.
+        game.opening = None;
+        game.bind_npc_quest_catalogue(&scratch, 1).unwrap();
+
+        let npc_file: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(source.join("npcs/cobblestone_village.json")).unwrap(),
+        )
+        .unwrap();
+        let giver = npc_file["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|record| record["npc_id"].as_u64() == Some(SAMANTHA_ID))
+            .unwrap();
+        let position: [f32; 3] = serde_json::from_value(giver["position"].clone()).unwrap();
+        let character = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position,
+            rotation: [1.0, 0.0, 0.0],
+        };
+        game.update_npc_visibility(&character).unwrap();
+        (game, character, scratch)
+    }
+
+    #[test]
+    fn npc_request_path_refreshes_eligibility_after_a_request_handler_job_switch() {
+        let (mut game, character, scratch) = level_three_world_game("npc-refresh");
+        let mut switch = vec![26, 0, 13, 0];
+        switch.extend(43i32.to_le_bytes());
+        assert!(
+            game.handle_in_world(&switch, &character, 1_000)
+                .unwrap()
+                .changed
+        );
+        assert_eq!(game.profiles.as_ref().unwrap().active(), 43);
+
+        game.handle_in_world(&packet_for_npc(SAMANTHA_ID), &character, 1_001)
+            .unwrap();
+        game.handle_in_world(&select_npc_option(SAMANTHA_ID, 1), &character, 1_002)
+            .unwrap();
+        let chosen = game
+            .handle_in_world(&choose_quest_row(), &character, 1_003)
+            .unwrap();
+        assert!(
+            chosen
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[49, 0, 1, 0])),
+            "the NPC request path must refresh eligibility after the job switch"
+        );
+        assert_eq!(
+            game.npc_quests.as_ref().unwrap().state().pending_offer,
+            Some(INTRODUCE_YOURSELF_ID)
+        );
+        std::fs::remove_dir_all(scratch).unwrap();
+    }
+
+    #[test]
+    fn denied_accept_after_a_request_handler_job_switch_changes_nothing_and_requests_no_save() {
+        let (mut game, character, scratch) = level_three_world_game("npc-denied");
+        let mut switch = vec![26, 0, 13, 0];
+        switch.extend(43i32.to_le_bytes());
+        assert!(
+            game.handle_in_world(&switch, &character, 1_000)
+                .unwrap()
+                .changed
+        );
+        assert_eq!(game.profiles.as_ref().unwrap().active(), 43);
+
+        game.handle_in_world(&packet_for_npc(SAMANTHA_ID), &character, 1_001)
+            .unwrap();
+        game.handle_in_world(&select_npc_option(SAMANTHA_ID, 1), &character, 1_002)
+            .unwrap();
+        let offered = game
+            .handle_in_world(&choose_quest_row(), &character, 1_003)
+            .unwrap();
+        assert!(
+            offered
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[49, 0, 1, 0]))
+        );
+
+        let mut back = vec![26, 0, 13, 0];
+        back.extend(48i32.to_le_bytes());
+        assert!(
+            game.handle_in_world(&back, &character, 2_000)
+                .unwrap()
+                .changed
+        );
+        let before = game.npc_quests.as_ref().unwrap().state().clone();
+        assert_eq!(before.pending_offer, Some(INTRODUCE_YOURSELF_ID));
+        assert_eq!(
+            before.quests[&INTRODUCE_YOURSELF_ID].status,
+            crate::quest_engine::QuestStatus::Offered
+        );
+
+        let mut accept = vec![49, 0, 2, 0, 0, 0];
+        accept.extend(INTRODUCE_YOURSELF_ID.to_le_bytes());
+        accept.push(1);
+        let refused = game.handle_in_world(&accept, &character, 3_000).unwrap();
+        // Gateway (src/gateway.rs:1758-1759) requests persistence only from `changed`.
+        assert!(!refused.changed, "a denied accept must not request a save");
+        assert!(refused.relocation.is_none());
+        assert!(refused.zoning.is_none());
+        assert!(refused.scene_zoning.is_none());
+        assert!(!refused.pets_changed);
+        assert_eq!(game.npc_quests.as_ref().unwrap().state(), &before);
+        assert!(
+            !refused
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[49, 0, 3, 0])),
+            "a denied accept must not activate the quest"
+        );
+        std::fs::remove_dir_all(scratch).unwrap();
+    }
+
     fn reference() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../../lab/references/rust-opening-cooking-original-assets")

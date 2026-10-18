@@ -186,3 +186,43 @@ fn job_requirement_uses_the_matching_job_level_and_refusals_are_atomic() {
     assert!(offered.changed);
     assert_eq!(engine.state().pending_offer, Some(VALID_QUEST));
 }
+
+#[test]
+fn denied_accept_preserves_pending_offer_for_requirement_and_limit() {
+    let mut requirements = QuestRequirements::default();
+    requirements.player_level = Some(3);
+    let mut engine = QuestEngine::new(
+        CHARACTER,
+        vec![definition(VALID_QUEST, valid_objective(), requirements)],
+        eligibility(3),
+        None,
+    )
+    .unwrap();
+    assert!(engine.offer(VALID_QUEST, QUEST_GIVER).changed);
+
+    let before = engine.state().clone();
+    engine.set_eligibility(eligibility(2));
+    let refused = engine.accept(VALID_QUEST);
+    assert_eq!(refused.denial, Some(QuestDenial::Level));
+    assert!(!refused.changed);
+    assert_eq!(engine.state(), &before);
+    assert_eq!(
+        engine.progress(VALID_QUEST).unwrap().status,
+        QuestStatus::Offered
+    );
+
+    let mut limited = eligibility(3);
+    limited.member_quest_limit = 0;
+    engine.set_eligibility(limited);
+    let before = engine.state().clone();
+    let refused = engine.accept(VALID_QUEST);
+    assert_eq!(refused.denial, Some(QuestDenial::Limit));
+    assert!(!refused.changed);
+    assert_eq!(engine.state(), &before);
+    assert!(matches!(
+        refused.outbound.as_slice(),
+        [OutboundMessage::Quest(QuestMessage::QuestLimit {
+            member: true
+        })]
+    ));
+}

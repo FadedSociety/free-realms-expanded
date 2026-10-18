@@ -1590,12 +1590,11 @@ impl QuestEngine {
             return denied(QuestDenial::Unavailable);
         }
         let definition = &self.definitions[&quest_id];
-        let developer_offer = self.dev_offer.take() == Some(quest_id);
+        let developer_offer = self.dev_offer == Some(quest_id);
         if let Some(denial) = self
             .requirement_denial(definition)
             .filter(|_| !developer_offer)
         {
-            self.decline(quest_id);
             return denied(denial);
         }
         let active_limit = if self.eligibility.member {
@@ -1611,7 +1610,6 @@ impl QuestEngine {
             .count()
             >= active_limit
         {
-            self.decline(quest_id);
             let mut outcome = denied(QuestDenial::Limit);
             outcome
                 .outbound
@@ -1619,6 +1617,9 @@ impl QuestEngine {
                     member: self.eligibility.member,
                 }));
             return outcome;
+        }
+        if developer_offer {
+            self.dev_offer = None;
         }
         self.state.pending_offer = None;
         let progress = self
