@@ -57,13 +57,13 @@
     "named_video_stock_claims_without_item_id": 1,
     "named_content_stock_claims": 5,
     "item_names_considered": 1139,
-    "items_resolved": 1026,
-    "items_ambiguous": 31,
+    "items_resolved": 1037,
+    "items_ambiguous": 20,
     "items_unmatched": 82,
     "unique_name_id_matches_missing_from_startup": 0,
     "no_exact_name_id_match": 81,
     "member_only_flags_recovered": 0,
-    "items_with_stores_price": 1024,
+    "items_with_stores_price": 1035,
     "mapped_items_without_stores_price": 2,
     "vendors_with_runtime_item_ids": 94
   },
@@ -1109,6 +1109,8 @@
         75552,
         75560,
         76426,
+        76427,
+        76428,
         76429,
         76430,
         76431,
@@ -1122,30 +1124,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Adherent Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76427,
-            76428
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Melninster",
-            "url": "https://freerealms.fandom.com/wiki/Melninster",
-            "revision_timestamp": "2025-03-16T01:56:21Z",
-            "section": "Sells",
-            "listed_as": "Adherent Wizard Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -1156,7 +1135,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 93; source cell: [client name] [wiki Melninster]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Melninster",
         "wiki_exact_page": "Melninster",
@@ -1166,7 +1145,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 1 unique item ID(s) map into the startup catalogue; 14 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000051,
@@ -1511,6 +1491,8 @@
       "vendor_stock": "Express Postman set (hat, shirt, shorts, skirt, gloves, shoes); Timing IV Power Shard and Necklace; Talent IV Ring",
       "resolved_item_ids": [
         76002,
+        76003,
+        76004,
         76005,
         76006,
         76007,
@@ -1526,30 +1508,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Express Postman Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76003,
-            76004
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Tipper",
-            "url": "https://freerealms.fandom.com/wiki/Tipper",
-            "revision_timestamp": "2013-10-09T21:48:04Z",
-            "section": "Sells",
-            "listed_as": "Express Postman Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -1560,7 +1519,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 98; source cell: [client name] [wiki Tipper]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Tipper",
         "wiki_exact_page": "Tipper",
@@ -1570,7 +1529,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 0 unique item ID(s) map into the startup catalogue; 9 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000072,
@@ -1943,6 +1903,8 @@
         75553,
         75561,
         76442,
+        76443,
+        76444,
         76445,
         76447,
         76448,
@@ -1978,28 +1940,6 @@
             "listed_as": "Adept Wizard Hat",
             "license": "CC BY-SA"
           }
-        },
-        {
-          "item_name": "Adept Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76443,
-            76444
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Falemicent",
-            "url": "https://freerealms.fandom.com/wiki/Falemicent",
-            "revision_timestamp": "2025-03-26T23:11:35Z",
-            "section": "Sells",
-            "listed_as": "Adept Wizard Shoes",
-            "license": "CC BY-SA"
-          }
         }
       ],
       "vendor_stock_evidence": [
@@ -2023,7 +1963,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 0 unique item ID(s) map into the startup catalogue; 17 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000155,
@@ -6157,6 +6098,8 @@
         75554,
         75557,
         76386,
+        76387,
+        76388,
         76389,
         76390,
         76391,
@@ -6170,30 +6113,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Novice Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76387,
-            76388
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Linraist",
-            "url": "https://freerealms.fandom.com/wiki/Linraist",
-            "revision_timestamp": "2025-05-31T20:10:53Z",
-            "section": "Sells",
-            "listed_as": "Novice Wizard Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -6204,7 +6124,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part B. Merchants and shops, row 89; source cell: [client name] [wiki]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Linraist",
         "wiki_exact_page": "Linraist",
@@ -6214,7 +6134,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 2 unique item ID(s) map into the startup catalogue; 11 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000515,
@@ -7077,6 +6998,8 @@
         75521,
         75539,
         76394,
+        76395,
+        76396,
         76397,
         76398,
         76399,
@@ -7091,28 +7014,6 @@
         "license": "CC BY-SA"
       },
       "unresolved_items": [
-        {
-          "item_name": "Hedge Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76395,
-            76396
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Merhione",
-            "url": "https://freerealms.fandom.com/wiki/Merhione",
-            "revision_timestamp": "2025-03-26T23:18:36Z",
-            "section": "Sells",
-            "listed_as": "Hedge Wizard Shoes",
-            "license": "CC BY-SA"
-          }
-        },
         {
           "item_name": "Wizard's Flair Shard of Gifted",
           "status": "unmatched",
@@ -7153,7 +7054,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 3 unique item ID(s) map into the startup catalogue; 10 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000608,
@@ -7612,6 +7514,8 @@
       "vendor_stock": "Global Postman set (skirt, pants, hat, gloves, shoes, jacket); Power Shard of Timing V; Necklace of Timing V; Ring of Talent V. Ids on Postman (hat 2750038008 and others).",
       "resolved_item_ids": [
         76016,
+        76017,
+        76018,
         76019,
         76020,
         76021,
@@ -7627,30 +7531,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Global Postman Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76017,
-            76018
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Clavin",
-            "url": "https://freerealms.fandom.com/wiki/Clavin",
-            "revision_timestamp": "2013-10-09T00:59:21Z",
-            "section": "Sells",
-            "listed_as": "Global Postman Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -7661,7 +7542,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part E. Gear merchants, row 111; source cell: [client name] [wiki Clavin, Merchants]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Clavin",
         "wiki_exact_page": "Clavin",
@@ -7671,7 +7552,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 2 unique item ID(s) map into the startup catalogue; 7 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000676,
@@ -8240,6 +8122,8 @@
         75551,
         75559,
         76410,
+        76411,
+        76412,
         76413,
         76414,
         76415,
@@ -8253,30 +8137,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Scholar Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76411,
-            76412
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Fladnag",
-            "url": "https://freerealms.fandom.com/wiki/Fladnag",
-            "revision_timestamp": "2025-03-16T01:47:39Z",
-            "section": "Sells",
-            "listed_as": "Scholar Wizard Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -8291,7 +8152,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 106; source cell: [client name][video][wiki]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Fladnag",
         "wiki_exact_page": "Fladnag",
@@ -8302,7 +8163,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 1 unique item ID(s) map into the startup catalogue; 13 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000748,
@@ -8920,6 +8782,8 @@
         75512,
         75522,
         75540,
+        76419,
+        76420,
         76421,
         76422,
         76423,
@@ -8934,28 +8798,6 @@
         "license": "CC BY-SA"
       },
       "unresolved_items": [
-        {
-          "item_name": "Practitioner Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76419,
-            76420
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Glenda",
-            "url": "https://freerealms.fandom.com/wiki/Glenda",
-            "revision_timestamp": "2025-03-21T01:33:21Z",
-            "section": "Sells",
-            "listed_as": "Practitioner Wizard Shoes",
-            "license": "CC BY-SA"
-          }
-        },
         {
           "item_name": "Practitioner Wizard Cloak",
           "status": "unmatched",
@@ -8996,7 +8838,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 4 unique item ID(s) map into the startup catalogue; 9 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000790,
@@ -9097,6 +8940,8 @@
       "vendor_stock": "Special Postman set (Skirt, Shorts, Hat, Gloves, Shoes, Shirt); Postman's Power Shard of Talent IV; Necklace of Timing IV; Ring of Talent IV. Also listed on the Postman page (tier IV).",
       "resolved_item_ids": [
         75995,
+        75996,
+        75997,
         75998,
         75999,
         76000,
@@ -9112,30 +8957,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Special Postman Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            75996,
-            75997
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Newman",
-            "url": "https://freerealms.fandom.com/wiki/Newman",
-            "revision_timestamp": "2025-03-21T01:30:31Z",
-            "section": "Sells",
-            "listed_as": "Special Postman Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -9146,7 +8968,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part D. Merchants, row 68; source cell: [client name][wiki Newman, Merchants]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Newman",
         "wiki_exact_page": "Newman",
@@ -9156,7 +8978,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 0 unique item ID(s) map into the startup catalogue; 9 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000805,
@@ -9813,6 +9636,8 @@
         75516,
         75550,
         76402,
+        76403,
+        76404,
         76405,
         76406,
         76408,
@@ -9844,28 +9669,6 @@
             "listed_as": "Journeyman Wizard Slicks",
             "license": "CC BY-SA"
           }
-        },
-        {
-          "item_name": "Journeyman Wizard Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            76403,
-            76404
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Redsden",
-            "url": "https://freerealms.fandom.com/wiki/Redsden",
-            "revision_timestamp": "2025-03-21T01:27:17Z",
-            "section": "Sells",
-            "listed_as": "Journeyman Wizard Shoes",
-            "license": "CC BY-SA"
-          }
         }
       ],
       "vendor_stock_evidence": [
@@ -9888,7 +9691,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 3 unique item ID(s) map into the startup catalogue; 9 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000935,
@@ -10397,6 +10201,8 @@
       "vendor_stock": "Postman's Power Shard of Timing III, Necklace of Timing III, Ring of Talent III; Priority Postman Skirt, Shorts, Hat, Gloves, Shoes, Shirt.",
       "resolved_item_ids": [
         75981,
+        75982,
+        75983,
         75984,
         75985,
         75986,
@@ -10412,30 +10218,7 @@
         "has_item_list": true,
         "license": "CC BY-SA"
       },
-      "unresolved_items": [
-        {
-          "item_name": "Priority Postman Shoes",
-          "status": "ambiguous_item_id",
-          "candidate_item_ids": [
-            75982,
-            75983
-          ],
-          "reason": "Multiple catalogue definitions share this exact locale display name; variant not identified.",
-          "source_tags": [
-            "wiki",
-            "client"
-          ],
-          "stock_source": {
-            "kind": "wiki",
-            "page": "Cliff",
-            "url": "https://freerealms.fandom.com/wiki/Cliff",
-            "revision_timestamp": "2013-10-09T21:52:01Z",
-            "section": "Sells",
-            "listed_as": "Priority Postman Shoes",
-            "license": "CC BY-SA"
-          }
-        }
-      ],
+      "unresolved_items": [],
       "vendor_stock_evidence": [
         {
           "kind": "client",
@@ -10446,7 +10229,7 @@
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part C. Merchants (wiki-only places and stock), row 81; source cell: [client name][wiki]"
         }
       ],
-      "reason": "Partial evidence stock recovered against W84; remaining names or price gaps are explicit. No captured native merchant list.",
+      "reason": "All named evidence items mapped; no captured native merchant list.",
       "w118_research": {
         "npc_name": "Cliff",
         "wiki_exact_page": "Cliff",
@@ -10460,7 +10243,8 @@
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 1 unique item ID(s) map into the startup catalogue; 8 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
-      }
+      },
+      "t108_resolution": "(R) The stock revision lists this exact shoes name twice; both positive-priced catalogue definitions map to complementary GenderUsage 1/2."
     },
     {
       "npc_id": 9500000976,
@@ -10630,8 +10414,8 @@
           "Trading Card Game",
           "Treant",
           "Vere",
-          "Warrior’s Double Axe of Berserking",
-          "Warrior’s Warlord Axe of Berserking"
+          "Warriorâ€™s Double Axe of Berserking",
+          "Warriorâ€™s Warlord Axe of Berserking"
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 3 unique item ID(s) map into the startup catalogue; 7 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."

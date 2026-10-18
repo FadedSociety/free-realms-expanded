@@ -47,7 +47,8 @@
         "kind": "reference data, not shipped client table"
       },
       "policy": "(R) Exact names only, including default {n}name{pl=...} display form. Wiki establishes named stock where client is silent. Non-client prices are reconstructed references in existing stores.json style; no claim of complete final-2014 stock or prices. Retired-only goods and unknown variants remain unresolved."
-    }
+    },
+    "t108_gender_pair_policy": "(R) Two identical wiki Sells entries for one exact default locale name map to one male and one female catalogue definition only when those are the only positive-priced candidates; no colour or item-family substitution."
   },
   "coverage": {
     "vendor_keys_total": 192,
@@ -58,13 +59,13 @@
     "named_video_stock_claims_without_item_id": 1,
     "named_content_stock_claims": 5,
     "item_names_considered": 1139,
-    "items_resolved": 1083,
-    "items_ambiguous": 31,
+    "items_resolved": 1105,
+    "items_ambiguous": 20,
     "items_unmatched": 82,
     "unique_name_id_matches_missing_from_startup": 0,
     "no_exact_name_id_match": 81,
     "member_only_flags_recovered": 0,
-    "items_with_stores_price": 1081,
+    "items_with_stores_price": 1103,
     "mapped_items_without_stores_price": 2,
     "vendors_with_runtime_item_ids": 96
   },
@@ -4377,7 +4378,7 @@
       "npc_name": "Melninster",
       "npc_content_file": "blackspore_swamp.json",
       "vendor_stock_description": "Adherent Wizard set; Flair Shard of Necromancy; Power Shard of Vitality IV; Necklace of Vitality IV; Ring of Regeneration IV; Jewel Wands of Energy, Vortex, Glaciers and Shock",
-      "stock_completeness": "partial_evidence_reference",
+      "stock_completeness": "all_named_evidence_items_mapped",
       "item_ids": [
         75162,
         75163,
@@ -4392,7 +4393,9 @@
         76430,
         76431,
         76432,
-        76433
+        76433,
+        76427,
+        76428
       ],
       "wiki_stock_page": {
         "title": "Melninster",
@@ -4989,6 +4992,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76427,
+          "item_name": "{n}Adherent Wizard Shoes{pl=\"Adherent Wizard Shoes\"}",
+          "source_stock_name": "Adherent Wizard Shoes",
+          "item_name_id": 133435,
+          "purchase_price_coins": 752,
+          "member_price_coins": 676,
+          "sell_price_coins": 376,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Melninster",
+            "url": "https://freerealms.fandom.com/wiki/Melninster",
+            "revision_timestamp": "2025-03-16T01:56:21Z",
+            "section": "Sells",
+            "listed_as": "Adherent Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "c1ad252a99312c837e17fb6c84456256d966fa15dd61a2e06ca0849e1da6ebc8",
+            "name_id": 133435,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Adherent Wizard Shoes{pl=\"Adherent Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76427,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76428
+          ]
+        },
+        {
+          "item_id": 76428,
+          "item_name": "{n}Adherent Wizard Shoes{pl=\"Adherent Wizard Shoes\"}",
+          "source_stock_name": "Adherent Wizard Shoes",
+          "item_name_id": 133435,
+          "purchase_price_coins": 752,
+          "member_price_coins": 676,
+          "sell_price_coins": 376,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Melninster",
+            "url": "https://freerealms.fandom.com/wiki/Melninster",
+            "revision_timestamp": "2025-03-16T01:56:21Z",
+            "section": "Sells",
+            "listed_as": "Adherent Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "0a9fdd647fff82666d35077962e9243c4b9d4008426f7705041a2e43757a22f1",
+            "name_id": 133435,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Adherent Wizard Shoes{pl=\"Adherent Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76428,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76427
+          ]
         }
       ]
     },
@@ -7605,6 +7704,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76003,
+          "item_name": "{n}Express Postman Shoes{pl=\"Express Postman Shoes\"}",
+          "source_stock_name": "Express Postman Shoes",
+          "item_name_id": 133011,
+          "purchase_price_coins": 902,
+          "member_price_coins": 811,
+          "sell_price_coins": 451,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Tipper",
+            "url": "https://freerealms.fandom.com/wiki/Tipper",
+            "revision_timestamp": "2013-10-09T21:48:04Z",
+            "section": "Sells",
+            "listed_as": "Express Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "a4bc4ad6648187f3c0a89e308bc9bc1f50bf8913e8bf352a9a82aa7d61900a0c",
+            "name_id": 133011,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Express Postman Shoes{pl=\"Express Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76003,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76004
+          ]
+        },
+        {
+          "item_id": 76004,
+          "item_name": "{n}Express Postman Shoes{pl=\"Express Postman Shoes\"}",
+          "source_stock_name": "Express Postman Shoes",
+          "item_name_id": 133011,
+          "purchase_price_coins": 902,
+          "member_price_coins": 811,
+          "sell_price_coins": 451,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Tipper",
+            "url": "https://freerealms.fandom.com/wiki/Tipper",
+            "revision_timestamp": "2013-10-09T21:48:04Z",
+            "section": "Sells",
+            "listed_as": "Express Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "6d0ef60be2b09e9932e7e72b8772446a52edd148a1f2586a9bb396eee78cbbb9",
+            "name_id": 133011,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Express Postman Shoes{pl=\"Express Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76004,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76003
+          ]
         }
       ],
       "item_ids": [
@@ -7615,9 +7810,11 @@
         76008,
         76513,
         76514,
-        76524
+        76524,
+        76003,
+        76004
       ],
-      "stock_completeness": "partial_evidence_reference"
+      "stock_completeness": "all_named_evidence_items_mapped"
     },
     {
       "npc_id": 9500000092,
@@ -10440,6 +10637,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76443,
+          "item_name": "{n}Adept Wizard Shoes{pl=\"Adept Wizard Shoes\"}",
+          "source_stock_name": "Adept Wizard Shoes",
+          "item_name_id": 133451,
+          "purchase_price_coins": 1076,
+          "member_price_coins": 968,
+          "sell_price_coins": 538,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Falemicent",
+            "url": "https://freerealms.fandom.com/wiki/Falemicent",
+            "revision_timestamp": "2025-03-26T23:11:35Z",
+            "section": "Sells",
+            "listed_as": "Adept Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "a16b3420978cbba7db16264061148238bf40d42aaada3b27ac8dd8963812ee6c",
+            "name_id": 133451,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Adept Wizard Shoes{pl=\"Adept Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76443,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76444
+          ]
+        },
+        {
+          "item_id": 76444,
+          "item_name": "{n}Adept Wizard Shoes{pl=\"Adept Wizard Shoes\"}",
+          "source_stock_name": "Adept Wizard Shoes",
+          "item_name_id": 133451,
+          "purchase_price_coins": 1076,
+          "member_price_coins": 968,
+          "sell_price_coins": 538,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Falemicent",
+            "url": "https://freerealms.fandom.com/wiki/Falemicent",
+            "revision_timestamp": "2025-03-26T23:11:35Z",
+            "section": "Sells",
+            "listed_as": "Adept Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "8d6acb448656707975d966d2b35a60b926c6d257e661551a5b633823fd611386",
+            "name_id": 133451,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Adept Wizard Shoes{pl=\"Adept Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76444,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76443
+          ]
         }
       ],
       "item_ids": [
@@ -10457,7 +10750,9 @@
         76445,
         76447,
         76448,
-        76449
+        76449,
+        76443,
+        76444
       ],
       "stock_completeness": "partial_evidence_reference"
     },
@@ -23347,7 +23642,7 @@
       "npc_name": "Linraist",
       "npc_content_file": "sanctuary.json",
       "vendor_stock_description": "Novice Wizard clothing and talisman; Wizard flair and power shards, ring, necklace, twig",
-      "stock_completeness": "partial_evidence_reference",
+      "stock_completeness": "all_named_evidence_items_mapped",
       "item_ids": [
         75151,
         75510,
@@ -23360,7 +23655,9 @@
         76390,
         76391,
         76392,
-        76393
+        76393,
+        76387,
+        76388
       ],
       "wiki_stock_page": {
         "title": "Linraist",
@@ -23873,6 +24170,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76387,
+          "item_name": "{n}Novice Wizard Shoes{pl=\"Novice Wizard Shoes\"}",
+          "source_stock_name": "Novice Wizard Shoes",
+          "item_name_id": 133395,
+          "purchase_price_coins": 375,
+          "member_price_coins": 337,
+          "sell_price_coins": 187,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Linraist",
+            "url": "https://freerealms.fandom.com/wiki/Linraist",
+            "revision_timestamp": "2025-05-31T20:10:53Z",
+            "section": "Sells",
+            "listed_as": "Novice Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "dc380c8334090043a13a8d4cd24d031616f473516a0e6a27e328ef4652de203e",
+            "name_id": 133395,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Novice Wizard Shoes{pl=\"Novice Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76387,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76388
+          ]
+        },
+        {
+          "item_id": 76388,
+          "item_name": "{n}Novice Wizard Shoes{pl=\"Novice Wizard Shoes\"}",
+          "source_stock_name": "Novice Wizard Shoes",
+          "item_name_id": 133395,
+          "purchase_price_coins": 375,
+          "member_price_coins": 337,
+          "sell_price_coins": 187,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Linraist",
+            "url": "https://freerealms.fandom.com/wiki/Linraist",
+            "revision_timestamp": "2025-05-31T20:10:53Z",
+            "section": "Sells",
+            "listed_as": "Novice Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "bfa9b1b40c3c993596550f9386618bbcc4c2f6c96fde60a01c1bf87f5130fb66",
+            "name_id": 133395,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Novice Wizard Shoes{pl=\"Novice Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76388,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76387
+          ]
         }
       ]
     },
@@ -26649,7 +27042,9 @@
         76398,
         76399,
         76400,
-        76401
+        76401,
+        76395,
+        76396
       ],
       "wiki_stock_page": {
         "title": "Merhione",
@@ -27120,6 +27515,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76395,
+          "item_name": "{n}Hedge Wizard Shoes{pl=\"Hedge Wizard Shoes\"}",
+          "source_stock_name": "Hedge Wizard Shoes",
+          "item_name_id": 133403,
+          "purchase_price_coins": 403,
+          "member_price_coins": 362,
+          "sell_price_coins": 201,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Merhione",
+            "url": "https://freerealms.fandom.com/wiki/Merhione",
+            "revision_timestamp": "2025-03-26T23:18:36Z",
+            "section": "Sells",
+            "listed_as": "Hedge Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "46d6bf53aba45f747c4b8a3f9310ff1986adabb744f2733b688357379d79fe8f",
+            "name_id": 133403,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Hedge Wizard Shoes{pl=\"Hedge Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76395,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76396
+          ]
+        },
+        {
+          "item_id": 76396,
+          "item_name": "{n}Hedge Wizard Shoes{pl=\"Hedge Wizard Shoes\"}",
+          "source_stock_name": "Hedge Wizard Shoes",
+          "item_name_id": 133403,
+          "purchase_price_coins": 403,
+          "member_price_coins": 362,
+          "sell_price_coins": 201,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Merhione",
+            "url": "https://freerealms.fandom.com/wiki/Merhione",
+            "revision_timestamp": "2025-03-26T23:18:36Z",
+            "section": "Sells",
+            "listed_as": "Hedge Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "ceaba0e622dfc50be968a5d1379fab793b9638e5e86dc8c7a4a006c1d251d671",
+            "name_id": 133403,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Hedge Wizard Shoes{pl=\"Hedge Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76396,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76395
+          ]
         }
       ]
     },
@@ -28386,7 +28877,7 @@
       "npc_name": "Clavin",
       "npc_content_file": "shrouded_glade.json",
       "vendor_stock_description": "Global Postman set (skirt, pants, hat, gloves, shoes, jacket); Power Shard of Timing V; Necklace of Timing V; Ring of Talent V. Ids on Postman (hat 2750038008 and others).",
-      "stock_completeness": "partial_evidence_reference",
+      "stock_completeness": "all_named_evidence_items_mapped",
       "item_ids": [
         76016,
         76019,
@@ -28395,7 +28886,9 @@
         76022,
         76515,
         76516,
-        76526
+        76526,
+        76017,
+        76018
       ],
       "wiki_stock_page": {
         "title": "Clavin",
@@ -28740,6 +29233,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76017,
+          "item_name": "{n}Global Postman Shoes{pl=\"Global Postman Shoes\"}",
+          "source_stock_name": "Global Postman Shoes",
+          "item_name_id": 133025,
+          "purchase_price_coins": 1276,
+          "member_price_coins": 1148,
+          "sell_price_coins": 638,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Clavin",
+            "url": "https://freerealms.fandom.com/wiki/Clavin",
+            "revision_timestamp": "2013-10-09T00:59:21Z",
+            "section": "Sells",
+            "listed_as": "Global Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "495ba143cf0a49c150bc946ce32c17c37a2a1f522fab150a362c513ef1cfae6f",
+            "name_id": 133025,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Global Postman Shoes{pl=\"Global Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76017,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76018
+          ]
+        },
+        {
+          "item_id": 76018,
+          "item_name": "{n}Global Postman Shoes{pl=\"Global Postman Shoes\"}",
+          "source_stock_name": "Global Postman Shoes",
+          "item_name_id": 133025,
+          "purchase_price_coins": 1276,
+          "member_price_coins": 1148,
+          "sell_price_coins": 638,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Clavin",
+            "url": "https://freerealms.fandom.com/wiki/Clavin",
+            "revision_timestamp": "2013-10-09T00:59:21Z",
+            "section": "Sells",
+            "listed_as": "Global Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "a63733a799300f100056e9f66a6a91a916d836540c75055cf818e2fa2d3b5445",
+            "name_id": 133025,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Global Postman Shoes{pl=\"Global Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76018,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76017
+          ]
         }
       ]
     },
@@ -32873,7 +33462,7 @@
       "npc_name": "Fladnag",
       "npc_content_file": "snowhill.json",
       "vendor_stock_description": "Scholar Wizard set; Flair Shard of Subtlety; Power Shard, Necklace, Ring; Bone Wands of Lightning, Tsunami, Glaciers. Added 15 Oct 2013.",
-      "stock_completeness": "partial_evidence_reference",
+      "stock_completeness": "all_named_evidence_items_mapped",
       "item_ids": [
         75157,
         75159,
@@ -32887,7 +33476,9 @@
         76414,
         76415,
         76416,
-        76417
+        76417,
+        76411,
+        76412
       ],
       "wiki_stock_page": {
         "title": "Fladnag",
@@ -33442,6 +34033,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76411,
+          "item_name": "{n}Scholar Wizard Shoes{pl=\"Scholar Wizard Shoes\"}",
+          "source_stock_name": "Scholar Wizard Shoes",
+          "item_name_id": 133419,
+          "purchase_price_coins": 528,
+          "member_price_coins": 475,
+          "sell_price_coins": 264,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Fladnag",
+            "url": "https://freerealms.fandom.com/wiki/Fladnag",
+            "revision_timestamp": "2025-03-16T01:47:39Z",
+            "section": "Sells",
+            "listed_as": "Scholar Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "c48fefaa0d96254f1d95ccf47d0476d35fdb13d1449359b02dd542d7265647cf",
+            "name_id": 133419,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Scholar Wizard Shoes{pl=\"Scholar Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76411,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76412
+          ]
+        },
+        {
+          "item_id": 76412,
+          "item_name": "{n}Scholar Wizard Shoes{pl=\"Scholar Wizard Shoes\"}",
+          "source_stock_name": "Scholar Wizard Shoes",
+          "item_name_id": 133419,
+          "purchase_price_coins": 528,
+          "member_price_coins": 475,
+          "sell_price_coins": 264,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Fladnag",
+            "url": "https://freerealms.fandom.com/wiki/Fladnag",
+            "revision_timestamp": "2025-03-16T01:47:39Z",
+            "section": "Sells",
+            "listed_as": "Scholar Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "829c5f00d53a416576a12e359685662cc06ccbc9f6f0012da44b7cd15e319f58",
+            "name_id": 133419,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Scholar Wizard Shoes{pl=\"Scholar Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76412,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76411
+          ]
         }
       ]
     },
@@ -36727,7 +37414,9 @@
         76422,
         76423,
         76424,
-        76425
+        76425,
+        76419,
+        76420
       ],
       "wiki_stock_page": {
         "title": "Glenda",
@@ -37198,6 +37887,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76419,
+          "item_name": "{n}Practitioner Wizard Shoes{pl=\"Practitioner Wizard Shoes\"}",
+          "source_stock_name": "Practitioner Wizard Shoes",
+          "item_name_id": 133427,
+          "purchase_price_coins": 627,
+          "member_price_coins": 564,
+          "sell_price_coins": 313,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Glenda",
+            "url": "https://freerealms.fandom.com/wiki/Glenda",
+            "revision_timestamp": "2025-03-21T01:33:21Z",
+            "section": "Sells",
+            "listed_as": "Practitioner Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "dd42b24d7ea037c7abb35f037ad279f00dd338675f2ebfac01fe575e297a6648",
+            "name_id": 133427,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Practitioner Wizard Shoes{pl=\"Practitioner Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76419,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76420
+          ]
+        },
+        {
+          "item_id": 76420,
+          "item_name": "{n}Practitioner Wizard Shoes{pl=\"Practitioner Wizard Shoes\"}",
+          "source_stock_name": "Practitioner Wizard Shoes",
+          "item_name_id": 133427,
+          "purchase_price_coins": 627,
+          "member_price_coins": 564,
+          "sell_price_coins": 313,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Glenda",
+            "url": "https://freerealms.fandom.com/wiki/Glenda",
+            "revision_timestamp": "2025-03-21T01:33:21Z",
+            "section": "Sells",
+            "listed_as": "Practitioner Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "0dd266cdeee95a8129c0a0e4d10fbf3fc8de9beb151f9c22c2aa84d23733db06",
+            "name_id": 133427,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Practitioner Wizard Shoes{pl=\"Practitioner Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76420,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76419
+          ]
         }
       ]
     },
@@ -38488,6 +39273,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 75996,
+          "item_name": "{n}Special Postman Shoes{pl=\"Special Postman Shoes\"}",
+          "source_stock_name": "Special Postman Shoes",
+          "item_name_id": 133004,
+          "purchase_price_coins": 752,
+          "member_price_coins": 676,
+          "sell_price_coins": 376,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Newman",
+            "url": "https://freerealms.fandom.com/wiki/Newman",
+            "revision_timestamp": "2025-03-21T01:30:31Z",
+            "section": "Sells",
+            "listed_as": "Special Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "55964d635205ddde57932ba99371b1837141ebaf1383298165394768d752db48",
+            "name_id": 133004,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Special Postman Shoes{pl=\"Special Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 75996,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            75997
+          ]
+        },
+        {
+          "item_id": 75997,
+          "item_name": "{n}Special Postman Shoes{pl=\"Special Postman Shoes\"}",
+          "source_stock_name": "Special Postman Shoes",
+          "item_name_id": 133004,
+          "purchase_price_coins": 752,
+          "member_price_coins": 676,
+          "sell_price_coins": 376,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Newman",
+            "url": "https://freerealms.fandom.com/wiki/Newman",
+            "revision_timestamp": "2025-03-21T01:30:31Z",
+            "section": "Sells",
+            "listed_as": "Special Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "1c11d6b39ad595efeab73eefa76d76c0e9054cd7756700727cabd3450cee0485",
+            "name_id": 133004,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Special Postman Shoes{pl=\"Special Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 75997,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            75996
+          ]
         }
       ],
       "item_ids": [
@@ -38498,9 +39379,11 @@
         76001,
         76513,
         76514,
-        76523
+        76523,
+        75996,
+        75997
       ],
-      "stock_completeness": "partial_evidence_reference"
+      "stock_completeness": "all_named_evidence_items_mapped"
     },
     {
       "npc_id": 9500000817,
@@ -41028,7 +41911,9 @@
         76405,
         76406,
         76408,
-        76409
+        76409,
+        76403,
+        76404
       ],
       "wiki_stock_page": {
         "title": "Redsden",
@@ -41457,6 +42342,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 76403,
+          "item_name": "{n}Journeyman Wizard Shoes{pl=\"Journeyman Wizard Shoes\"}",
+          "source_stock_name": "Journeyman Wizard Shoes",
+          "item_name_id": 133411,
+          "purchase_price_coins": 453,
+          "member_price_coins": 407,
+          "sell_price_coins": 226,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Redsden",
+            "url": "https://freerealms.fandom.com/wiki/Redsden",
+            "revision_timestamp": "2025-03-21T01:27:17Z",
+            "section": "Sells",
+            "listed_as": "Journeyman Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "80d672e81233bb4b69cdb05810a6b43500a66003cb95bc85edf8fcb41feab004",
+            "name_id": 133411,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Journeyman Wizard Shoes{pl=\"Journeyman Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76403,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            76404
+          ]
+        },
+        {
+          "item_id": 76404,
+          "item_name": "{n}Journeyman Wizard Shoes{pl=\"Journeyman Wizard Shoes\"}",
+          "source_stock_name": "Journeyman Wizard Shoes",
+          "item_name_id": 133411,
+          "purchase_price_coins": 453,
+          "member_price_coins": 407,
+          "sell_price_coins": 226,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Redsden",
+            "url": "https://freerealms.fandom.com/wiki/Redsden",
+            "revision_timestamp": "2025-03-21T01:27:17Z",
+            "section": "Sells",
+            "listed_as": "Journeyman Wizard Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "4c4873835a45c7c137b00484bdb129b25f9e31334abd2c358b408fdf2f391f42",
+            "name_id": 133411,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Journeyman Wizard Shoes{pl=\"Journeyman Wizard Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 76404,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            76403
+          ]
         }
       ]
     },
@@ -44178,7 +45159,7 @@
       "npc_name": "Cliff",
       "npc_content_file": "wugachug.json",
       "vendor_stock_description": "Postman's Power Shard of Timing III, Necklace of Timing III, Ring of Talent III; Priority Postman Skirt, Shorts, Hat, Gloves, Shoes, Shirt.",
-      "stock_completeness": "partial_evidence_reference",
+      "stock_completeness": "all_named_evidence_items_mapped",
       "item_ids": [
         75981,
         75984,
@@ -44187,7 +45168,9 @@
         75987,
         76511,
         76512,
-        76522
+        76522,
+        75982,
+        75983
       ],
       "wiki_stock_page": {
         "title": "Cliff",
@@ -44532,6 +45515,102 @@
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true
+        },
+        {
+          "item_id": 75982,
+          "item_name": "{n}Priority Postman Shoes{pl=\"Priority Postman Shoes\"}",
+          "source_stock_name": "Priority Postman Shoes",
+          "item_name_id": 132990,
+          "purchase_price_coins": 528,
+          "member_price_coins": 475,
+          "sell_price_coins": 264,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Cliff",
+            "url": "https://freerealms.fandom.com/wiki/Cliff",
+            "revision_timestamp": "2013-10-09T21:52:01Z",
+            "section": "Sells",
+            "listed_as": "Priority Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "0875556a8d612c80a443d1122f9db7a68b04cb5e22de70fe5d41688cf8c15e2b",
+            "name_id": 132990,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Priority Postman Shoes{pl=\"Priority Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 75982,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 1,
+          "variant_sibling_item_ids": [
+            75983
+          ]
+        },
+        {
+          "item_id": 75983,
+          "item_name": "{n}Priority Postman Shoes{pl=\"Priority Postman Shoes\"}",
+          "source_stock_name": "Priority Postman Shoes",
+          "item_name_id": 132990,
+          "purchase_price_coins": 528,
+          "member_price_coins": 475,
+          "sell_price_coins": 264,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "wiki",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "wiki",
+            "page": "Cliff",
+            "url": "https://freerealms.fandom.com/wiki/Cliff",
+            "revision_timestamp": "2013-10-09T21:52:01Z",
+            "section": "Sells",
+            "listed_as": "Priority Postman Shoes",
+            "listed_occurrences": 2,
+            "license": "CC BY-SA",
+            "variant_basis": "(R) two listed occurrences and complementary GenderUsage 1/2 select both exact-name variants"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "6445f453c7bdadda43125edbbe571df1af7e1c9669aa0483b9996aaebced47a6",
+            "name_id": 132990,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Priority Postman Shoes{pl=\"Priority Postman Shoes\"}",
+            "mapping_policy": "(R) exact default locale display name; gender variant selected only by wiki occurrence count and GenderUsage"
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 75983,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true,
+          "gender_usage": 2,
+          "variant_sibling_item_ids": [
+            75982
+          ]
         }
       ]
     },
