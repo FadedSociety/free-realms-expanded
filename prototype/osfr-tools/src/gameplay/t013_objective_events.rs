@@ -11,6 +11,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "s6_characterization.rs"]
+mod s6_characterization;
+
 static NEXT: AtomicU64 = AtomicU64::new(0);
 const FISHING_T0: u64 = 1_000_000;
 const FISHING_ACTOR: crate::fishing::Handle = crate::fishing::Handle {
@@ -780,7 +783,14 @@ fn ordinary_harvest_nodes_advance_gather_twice_through_gameplay() {
     let (mut game, _scratch) = gathering_game(
         harvesting::CHEF_PROFILE_ID,
         4,
-        definition(1, ObjectiveKind::GatherResource { resource_id: 2739 }, 2),
+        definition_many(
+            1,
+            vec![
+                (1, ObjectiveKind::GatherResource { resource_id: 2739 }, 2),
+                (2, ObjectiveKind::FinishMinigame { minigame_id: 111 }, 2),
+            ],
+            false,
+        ),
     );
     let (first_guid, first) = gather_node(&game, "Mushrooms", 0);
     game.tick(&first, 1_000).unwrap();
@@ -796,7 +806,15 @@ fn ordinary_harvest_nodes_advance_gather_twice_through_gameplay() {
         .expect("first harvest run")
         .instance_id;
     finish_type8(&mut game, &first, first_id, 4, 2_000);
-    count(&game, 1);
+    assert_eq!(
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts,
+        vec![1, 1]
+    );
 
     send(&mut game, &first, &[26, 0, 42, 0], 3_000);
     let (second_guid, second) = gather_node(&game, "Mushrooms", 1);
@@ -811,7 +829,15 @@ fn ordinary_harvest_nodes_advance_gather_twice_through_gameplay() {
         .expect("second harvest run")
         .instance_id;
     finish_type8(&mut game, &second, second_id, 4, 4_000);
-    count(&game, 2);
+    assert_eq!(
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts,
+        vec![2, 2]
+    );
 }
 
 #[test]
