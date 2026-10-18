@@ -464,8 +464,9 @@ impl Rig {
     }
 
     /// Wait until a gateway stdout line is JSON for which `ready` is true.
-    /// Gateway events (`event()`, `npc_event()`) are one JSON line each.
-    fn wait_log(&self, what: &str, ready: impl Fn(&Value) -> bool) {
+    /// Gateway events (`event()`, `npc_event()`) are one JSON line each. Pump
+    /// the live bot while waiting so a dropped request can be retransmitted.
+    fn wait_log(&self, bot: &mut bot::Bot, what: &str, ready: impl Fn(&Value) -> bool) {
         let path = self.root.join("gateway.out.log");
         let deadline = Instant::now() + T;
         loop {
@@ -483,7 +484,7 @@ impl Rig {
                 "{what}: nothing matching in {}",
                 path.display()
             );
-            std::thread::sleep(Duration::from_millis(50));
+            bot.pump(Duration::from_millis(100)).unwrap();
         }
     }
 
@@ -1192,14 +1193,19 @@ fn quest_journal_selection_persists_across_relog() {
     // A quest the character does not own cannot be selected. The gateway logs
     // the journal outcome before the handler returns, so wait for that line
     // rather than guessing how long the request takes.
+    bot.drop_next_matching(&[47, 0, 12]);
     raw(&mut bot, &select(999_999));
-    rig.wait_log("the forged selection", |value| {
+    rig.wait_log(&mut bot, "the forged selection", |value| {
         value["event"] == "quest_journal"
             && value["outcome"] == "rejected"
             && value["request"]
                 .as_str()
                 .is_some_and(|request| request.contains("999999"))
     });
+    assert!(
+        bot.dropped_datagram(),
+        "the first forged selection was not dropped"
+    );
     assert_eq!(
         selected(&rig.save(0)),
         Value::Null,
@@ -1216,7 +1222,7 @@ fn quest_journal_selection_persists_across_relog() {
     // Selecting the same quest again must be an unchanged no-op: that is only
     // true if the relog restored both the active quest and its selection.
     raw(&mut again, &select(plan.quest as i32));
-    rig.wait_log("the restored selection", |value| {
+    rig.wait_log(&mut again, "the restored selection", |value| {
         value["event"] == "quest_journal"
             && value["outcome"] == "unchanged"
             && value["request"]

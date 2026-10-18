@@ -250,6 +250,10 @@ pub struct Bot {
     rezone: bool,
     in_world: bool,
     login_crypto: Option<(login::Rc4, login::Rc4)>,
+    #[cfg(test)]
+    drop_marker: Option<Vec<u8>>,
+    #[cfg(test)]
+    dropped_datagram: bool,
 }
 
 impl Bot {
@@ -351,6 +355,10 @@ impl Bot {
                     ))
                 })
                 .transpose()?,
+            #[cfg(test)]
+            drop_marker: None,
+            #[cfg(test)]
+            dropped_datagram: false,
         };
         bot.log(&format!("connected seed={seed:08x} crc={crc_length}"));
         Ok(bot)
@@ -383,6 +391,14 @@ impl Bot {
             .poll(now)
             .map_err(|e| format!("reliable send: {e}"))?
         {
+            #[cfg(test)]
+            if self.drop_marker.as_ref().is_some_and(|marker| {
+                !marker.is_empty() && wire.windows(marker.len()).any(|part| part == marker)
+            }) {
+                self.drop_marker = None;
+                self.dropped_datagram = true;
+                continue;
+            }
             self.socket
                 .send_to(&wire, self.config.gateway)
                 .map_err(|e| format!("send: {e}"))?;
@@ -412,6 +428,17 @@ impl Bot {
             })
             .map_err(|e| format!("queue: {e}"))?;
         self.flush()
+    }
+
+    #[cfg(test)]
+    pub fn drop_next_matching(&mut self, marker: &[u8]) {
+        self.drop_marker = Some(marker.to_vec());
+        self.dropped_datagram = false;
+    }
+
+    #[cfg(test)]
+    pub fn dropped_datagram(&self) -> bool {
+        self.dropped_datagram
     }
 
     /// Drain every waiting datagram, then send one coalesced acknowledgement
