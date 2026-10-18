@@ -106,7 +106,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) W110: the local prerequisite key [3000020] follows the guide's narrative ordering; no retail prerequisite table was recovered."
         },
         {
           "kind": "reconstructed",
@@ -118,22 +118,58 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Direct Highroad follow-up: Chad, Mustang Alli and Burt have only poi_anchor placements; pen transfer/location entry unresolved. Talk sequence is partial only."
+          "evidence": "(R) W110 objective order retained. The three Frost Ridge targets now have legacy_data placements in data/content/npcs/snowhill.json (Chad 9500000735, Mustang Alli 9500000759, Burt 9500000731), so the direct-talk sequence is enabled. No pen item is transferred: the client text and video name the conversations, not an item grant."
         }
       ],
       "description_string_id": 104107,
       "intro_text_string_id": 104105,
       "end_text_string_id": 104108,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3080002,
       "title_string_id": 117323,
-      "giver_npc_id": 9000000412,
+      "giver_npc_id": 9500000759,
       "prerequisite_quest_ids": [
         3080001
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 31,
+          "count": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49: Racing Tutorial goals are 'Complete the racing tutorial' then 'Return to Mustang Alli'; client locale 2217784590 tells the player to talk to Mustang Alli to learn about racing."
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49: yJ2KHN9I7EI/00032,/00034 and fktAs_GRrjM/00478 show the tutorial race and return objective."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Bind completion to speedway 31, the stable race identity emitted by the current paid NPC-entry kart bridge. That is the normal Wildwood race in the play package, not a recovered retail tutorial minigame id; this substitutes the existing normal race for the unavailable Frost Ridge tutorial-specific game."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000759,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49: Racing Tutorial's second goal is 'Return to Mustang Alli' (yJ2KHN9I7EI/00034)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Objective id 2 and the Mustang Alli content key 9500000759 are the existing authored target; the guide does not provide a retail objective id."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 5,
@@ -166,7 +202,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) W110: the two goals follow the client/video order; their numeric ids and Mustang Alli content-key binding are local authored policy."
         },
         {
           "kind": "reconstructed",
@@ -174,7 +210,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) W110: the local prerequisite key [3080001] follows the guide's narrative ordering; no retail prerequisite table was recovered."
         },
         {
           "kind": "reconstructed",
@@ -182,10 +218,14 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Direct follow-up: exact racing tutorial minigame id/normal entry unresolved; Mustang giver 9000000412 absent. Do not substitute dev kart race."
+          "evidence": "(R) W110: Racing Tutorial is offered by Mustang Alli at Frost Ridge. The current paid NPC-entry bridge reports speedway 31 (the normal Wildwood race); the retail tutorial-specific minigame id is unrecovered, so that normal race is the explicit stand-in. Complete the race, then return to Mustang Alli."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/snowhill.json records Mustang Alli (9500000759) with placement=legacy_data at Frost Ridge; its quest relation now offers and accepts 3080002."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3080003,

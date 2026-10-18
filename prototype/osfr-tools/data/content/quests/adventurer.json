@@ -1662,7 +1662,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) W110: the client locale names Ricky Danger as the target; the objective id and authored NPC content key are the local binding."
         },
         {
           "kind": "reconstructed",
@@ -1670,11 +1670,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) W110: no local prerequisite key is required for this first Cobblestone referral; the guide's order does not recover a retail prerequisite table."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) W110: the five-coin payout is labelled by its reward source because the exact original amount is unknown."
         },
         {
           "kind": "client",
@@ -3870,7 +3870,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) quest id 3000059 is a stable batch key; reward unknown ('Here's something for your trouble'), left empty"
+          "evidence": "(R) quest id 3000059 is a stable batch key; the five-coin fallback is recorded on the reward because the exact payout is unknown."
         }
       ]
     },
@@ -3917,7 +3917,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) giver Ricky Danger from intro 94262 ('Samantha was looking for you'); follows Call the Crew! in locale order, skipping the unreleased 'NOT LIVE - Raceway Regulators' (94259); quest id 3000060 is a stable batch key; reward unknown"
+          "evidence": "(R) giver Ricky Danger from intro 94262 ('Samantha was looking for you'); follows Call the Crew! in locale order, skipping the unreleased 'NOT LIVE - Raceway Regulators' (94259); quest id 3000060 is a stable batch key; the five-coin fallback is recorded on the reward because the exact payout is unknown."
         }
       ]
     }

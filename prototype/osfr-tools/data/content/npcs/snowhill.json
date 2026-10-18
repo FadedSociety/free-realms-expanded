@@ -28667,13 +28667,46 @@
       "location_evidence": [
         "Frost Ridge Speedway, \"just outside of Snowhill\" (client 3868232181). [video fktAs_GRrjM/00172, /00178]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080002,
+          "title": "Racing Tutorial",
+          "title_string_id": 117323,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49: the Racing Tutorial starts at Frost Ridge and its completion goal is 'Return to Mustang Alli' (yJ2KHN9I7EI/00032,/00034)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Bind the guide/video giver to the existing Mustang Alli content key 9500000759; no numeric retail giver id is recovered."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080002
+      ],
       "quests_given_text": [
         "Racing Tutorial (see Kart Driver page)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3080002,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49: Racing Tutorial's final goal is 'Return to Mustang Alli'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Use the same authored Mustang Alli key for turn-in; the retail hand-in binding is not recovered."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "(R) Racing Tutorial returns to Mustang Alli after the tutorial race.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
