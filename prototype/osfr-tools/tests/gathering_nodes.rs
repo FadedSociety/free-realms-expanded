@@ -15,6 +15,7 @@ use osfr_tools::{
         self, CHEF_PROFILE_ID, FARMING_LAUNCH_MOVIE, FARMING_PRELOAD_FILE,
         lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
     },
+    inventory::InventoryItem,
     mining::{
         self, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Goal, Type8Kind,
         Type8Output, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
@@ -36,6 +37,8 @@ const BOTTOM: usize = TOP + PLAYABLE - 1;
 const OUTPUTS: [i32; 4] = [2739, 879, 65834, 2436];
 const VALUES: [u16; 4] = [601, 602, 603, 604];
 const FILLER: i32 = 1195;
+const COPPER_RECIPE: i32 = 990001;
+const WORLD_FORGE: [f32; 3] = [-2631.933, 0.03999766, -216.5819];
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 #[derive(Clone, Copy)]
@@ -321,6 +324,22 @@ fn click(gateway: &mut Gateway, guid: u64, now_ms: u64) -> GatewayOutcome {
     send(gateway, &request.encode(), now_ms)
 }
 
+fn move_pose(gateway: &mut Gateway, position: [f32; 3], now_ms: u64) -> GatewayOutcome {
+    let mut body = 125u16.to_le_bytes().to_vec();
+    body.extend(1u64.to_le_bytes());
+    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
+        body.extend(value.to_le_bytes());
+    }
+    body.extend([0, 0]);
+    send(gateway, &body, now_ms)
+}
+
+fn book_start(gateway: &mut Gateway, recipe: i32, now_ms: u64) -> GatewayOutcome {
+    let mut body = vec![26, 0, 24, 0];
+    body.extend(recipe.to_le_bytes());
+    send(gateway, &body, now_ms)
+}
+
 fn frame(sub: u8, instance: i32, game: i32) -> Vec<u8> {
     let mut b = 39_u16.to_le_bytes().to_vec();
     b.push(sub);
@@ -449,6 +468,27 @@ fn fill_inventory(state: &mut GameplayState) {
             rental: None,
             ability_count: 0,
             activate_enabled: false,
+        });
+        next += 1;
+    }
+    state.inventory.next_instance_id = Some(i64::from(next));
+}
+
+fn stock_copper_recipe(state: &mut GameplayState) {
+    let items = &mut state.inventory.items;
+    let mut next = items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
+    for (definition_id, count) in [(2739, 5), (879, 3)] {
+        items.push(InventoryItem {
+            definition_id,
+            tint: 0,
+            id: next,
+            count,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: true,
         });
         next += 1;
     }
@@ -673,6 +713,37 @@ fn a_full_bag_refuses_the_start_instead_of_stranding_the_win() {
         assert_eq!(gateway.snapshot(), before);
         assert!(active(&gateway, game).is_none());
     }
+}
+
+#[test]
+fn an_unclosed_mining_run_refuses_recipe_start_without_a_save() {
+    let fixture = Fixture::new(MINING);
+    let mut state = fixture.state(true, true);
+    stock_copper_recipe(&mut state);
+    let mut gateway = fixture.gateway_at(state, &fixture.node, 2.0);
+
+    click(&mut gateway, fixture.node.guid, 2_000);
+    assert!(active(&gateway, MINING).is_some());
+
+    let near_node = [
+        fixture.node.position[0] + 1.0,
+        fixture.node.position[1],
+        fixture.node.position[2],
+    ];
+    move_pose(&mut gateway, near_node, 2_100);
+    move_pose(&mut gateway, WORLD_FORGE, 600_000);
+    assert_eq!(gateway.snapshot().character.position, WORLD_FORGE);
+
+    let before = gateway.snapshot();
+    let refused = book_start(&mut gateway, COPPER_RECIPE, 600_100);
+    assert!(said(&refused, "Finish what"));
+    assert!(!refused.state_changed, "refusal must not request a save");
+    assert!(
+        !refused.gameplay_changed,
+        "refusal must not persist gameplay"
+    );
+    assert_eq!(gateway.snapshot(), before);
+    assert!(active(&gateway, MINING).is_some());
 }
 
 #[test]
