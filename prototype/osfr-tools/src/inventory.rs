@@ -138,6 +138,11 @@ fn slot_min_rank(slot: i32) -> i32 {
     }
 }
 
+/// Slots the client's `ProcessProfileSwap` (`00bfb620`) requires before it
+/// applies a job outfit. The shipped slot table marks Chest and Legs required;
+/// see `notes/Build Guides/Gameplay/Character and Customization.md`.
+pub const REQUIRED_PROFILE_SLOTS: [i32; 2] = [3, 4];
+
 /// The player facts equip eligibility needs, owned by the gameplay layer.
 /// (R) Server-side enforcement: the client only greys out and ignores some
 /// requests, and the original server rule was not recovered.
@@ -601,6 +606,17 @@ impl Inventory {
         let mut bytes = count.to_le_bytes().to_vec();
         bytes.extend(attachments);
         Ok(bytes)
+    }
+
+    /// Whether this profile has every slot `ProcessProfileSwap` requires.
+    /// Uses the same visible equipment rows that `profile_attachments` sends.
+    pub fn has_required_profile_slots(&self, profile_id: i32) -> bool {
+        let visible = self.client_visible_state();
+        REQUIRED_PROFILE_SLOTS.into_iter().all(|slot| {
+            visible.equipment.iter().any(|entry| {
+                entry.profile_id == profile_id && entry.slot == slot && entry.item_id != 0
+            })
+        })
     }
 
     pub fn equip_owned_definition(

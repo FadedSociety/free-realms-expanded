@@ -58,6 +58,7 @@ impl Fixture {
         )
         .unwrap();
         patch_weapon_definitions(&path);
+        patch_starter_outfits(&path);
         patch_encounter(&path);
         Self(path)
     }
@@ -130,6 +131,24 @@ fn patch_weapon_definitions(path: &Path) {
         }
     }
     fs::write(inventory_path, serde_json::to_vec(&inventory).unwrap()).unwrap();
+}
+
+/// The pinned package has no starter lists for Ninja, Wizard or Warrior, so a
+/// job switch is refused before their weapons can be checked. Add the captured
+/// Chest and Legs pieces those profiles allow; the client's profile swap
+/// requires both (ProcessProfileSwap `00bfb620`).
+fn patch_starter_outfits(path: &Path) {
+    let profiles_path = path.join("profiles.json");
+    let mut profiles: Value = serde_json::from_slice(&fs::read(&profiles_path).unwrap()).unwrap();
+    let starter_items = profiles["starter_items"].as_object_mut().unwrap();
+    for (job, items) in [
+        (2, [19197, 19787]),
+        (12, [12060, 12709]),
+        (32, [46137, 46732]),
+    ] {
+        starter_items.insert(job.to_string(), serde_json::json!([items[0], items[1]]));
+    }
+    fs::write(profiles_path, serde_json::to_vec(&profiles).unwrap()).unwrap();
 }
 
 impl Drop for Fixture {

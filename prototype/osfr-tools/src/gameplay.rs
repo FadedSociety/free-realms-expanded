@@ -1647,6 +1647,7 @@ impl Gameplay {
             let mut derby_gate = None;
             let mut fish_gate = None;
             let mut learn_trainer = None;
+            let mut consume_menu = false;
             match selected {
                 Ok(NpcSelection::Talk(mut context)) => {
                     if let Some(engine) = &mut self.npc_quests {
@@ -1794,6 +1795,7 @@ impl Gameplay {
                 }
                 Ok(NpcSelection::Race) => {
                     race_gate = Some(key);
+                    consume_menu = true;
                     npc_event(serde_json::json!({
                         "event": "npc_select",
                         "guid": runtime_guid,
@@ -1804,6 +1806,7 @@ impl Gameplay {
                 }
                 Ok(NpcSelection::Derby) => {
                     derby_gate = Some(key);
+                    consume_menu = true;
                     npc_event(serde_json::json!({
                         "event": "npc_select",
                         "guid": runtime_guid,
@@ -1814,6 +1817,7 @@ impl Gameplay {
                 }
                 Ok(NpcSelection::Fish) => {
                     fish_gate = Some(key);
+                    consume_menu = true;
                     npc_event(serde_json::json!({
                         "event": "npc_select",
                         "guid": runtime_guid,
@@ -1824,6 +1828,7 @@ impl Gameplay {
                 }
                 Ok(NpcSelection::Learn(trainer)) => {
                     learn_trainer = Some(trainer);
+                    consume_menu = true;
                     npc_event(serde_json::json!({
                         "event": "npc_select",
                         "guid": runtime_guid,
@@ -1931,6 +1936,13 @@ impl Gameplay {
                 out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 if out.changed {
                     *self = staged;
+                }
+            }
+            if consume_menu && out.changed {
+                if let Some(interaction) = &self.npc_interaction
+                    && let Ok(mut service) = interaction.lock()
+                {
+                    service.consume_active();
                 }
             }
             return Ok(Some(out));
@@ -2626,6 +2638,7 @@ impl Gameplay {
     /// Grant and equip a job's starter outfit from the content's starter table.
     /// With `reuse_owned`, a piece the player already owns is equipped instead
     /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.
+    /// Inventory quest events are emitted once for the whole call.
     fn give_starter_outfit(
         &mut self,
         job: i32,
@@ -2633,6 +2646,20 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         let before = self.inventory.state().clone();
+        self.grant_starter_outfit(job, reuse_owned, out)?;
+        self.npc_inventory_events(&before, out)?;
+        Ok(())
+    }
+
+    /// The starter grant without inventory quest events. The caller emits them
+    /// once over its committed transaction (the trainer path already diffs the
+    /// whole request in `handle_in_world_inner`).
+    fn grant_starter_outfit(
+        &mut self,
+        job: i32,
+        reuse_owned: bool,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
         let items = self.profiles.as_ref().unwrap().starter_items(job).to_vec();
         let inactive = job != self.profiles.as_ref().unwrap().active();
         for definition in items {
@@ -2667,7 +2694,6 @@ impl Gameplay {
                     .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
             );
         }
-        self.npc_inventory_events(&before, out)?;
         Ok(())
     }
 
@@ -2727,6 +2753,51 @@ impl Gameplay {
         }
         self.sync_player_level(out);
         self.ensure_outfit(job, out)
+    }
+
+    /// Stage an ordinary 26/13 job switch. The candidate job is committed only
+    /// when its outfit carries the Chest and Legs attachments the client's
+    /// `ProcessProfileSwap` requires; otherwise the previous job stays active.
+    fn stage_job_selection(&mut self, id: i32, out: &mut Outcome) -> io::Result<Option<bool>> {
+        let Some(profiles) = &self.profiles else {
+            return Ok(None);
+        };
+        if !profiles.state().unlocked.contains(&id) {
+            out.replies.push(chat::system(
+                "Cannot switch classes: that class has not been unlocked",
+            ));
+            return Ok(None);
+        }
+        let mut staged = self.clone();
+        let mut selection = Outcome::default();
+        let changed = staged.profiles.as_ref().unwrap().active() != id;
+        match staged
+            .profiles
+            .as_mut()
+            .unwrap()
+            .select(id, &staged.inventory)
+        {
+            Ok(reply) => selection.replies.push(reply),
+            Err(error) => {
+                out.replies
+                    .push(chat::system(&format!("Cannot switch classes: {error}")));
+                return Ok(None);
+            }
+        }
+        staged.ensure_outfit(id, &mut selection)?;
+        // Client ProcessProfileSwap 0x00bfb620 rejects a group without these.
+        if !staged.inventory.has_required_profile_slots(id) {
+            out.replies.push(chat::system(
+                "Cannot switch classes: that job's outfit is missing a required Chest or Legs item.",
+            ));
+            return Ok(None);
+        }
+        selection.changed |= changed;
+        *self = staged;
+        out.changed |= selection.changed;
+        out.replies.extend(selection.replies);
+        out.nearby.extend(selection.nearby);
+        Ok(Some(changed))
     }
 
     /// A save taken inside a battle arena loads with the battle dropped (the
@@ -3871,12 +3942,21 @@ impl Gameplay {
             return Ok(out);
         }
         // The job is not made active; the player picks it in the job list (R).
-        self.give_starter_outfit(trainer.profile, false, &mut out)?;
+        // Inventory quest events are emitted once by the request boundary.
+        self.grant_starter_outfit(trainer.profile, false, &mut out)?;
         out.changed = true;
-        out.replies.push(chat::system(&format!(
-            "You learned the {} job. Pick it in your job list to switch.",
-            trainer.job
-        )));
+        let message = if self.inventory.has_required_profile_slots(trainer.profile) {
+            format!(
+                "You learned the {} job. Pick it in your job list to switch.",
+                trainer.job
+            )
+        } else {
+            format!(
+                "You learned the {} job. Its starter outfit is unavailable, so it cannot be selected yet.",
+                trainer.job
+            )
+        };
+        out.replies.push(chat::system(&message));
         Ok(out)
     }
 
@@ -6105,30 +6185,20 @@ impl Gameplay {
                 return Err(invalid("invalid class selection request"));
             }
             let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let profiles = self.profiles.as_mut().unwrap();
-            let changed = profiles.active() != id;
-            match profiles.select(id, &self.inventory) {
-                Ok(reply) => {
-                    out.replies.push(reply);
-                    out.replies.extend(
-                        self.abilities
-                            .as_ref()
-                            .unwrap()
-                            .activation(id, self.job_level(id))?,
-                    );
-                    self.sync_player_level(&mut out);
-                    out.changed |= changed;
-                    self.ensure_outfit(id, &mut out)?;
-                    self.opening_equipment_events(&mut out)?;
-                    self.sync_world_stage(&mut out)?;
-                    // T027: neighbours swap the whole attachment group on a job change.
-                    if changed && let Some(packet) = self.profile_switch_packet(character.guid)? {
-                        out.nearby.push(packet);
-                    }
+            if let Some(changed) = self.stage_job_selection(id, &mut out)? {
+                out.replies.extend(
+                    self.abilities
+                        .as_ref()
+                        .unwrap()
+                        .activation(id, self.job_level(id))?,
+                );
+                self.sync_player_level(&mut out);
+                self.opening_equipment_events(&mut out)?;
+                self.sync_world_stage(&mut out)?;
+                // T027: neighbours swap the whole attachment group on a job change.
+                if changed && let Some(packet) = self.profile_switch_packet(character.guid)? {
+                    out.nearby.push(packet);
                 }
-                Err(error) => out
-                    .replies
-                    .push(chat::system(&format!("Cannot switch classes: {error}"))),
             }
             return Ok(out);
         }
@@ -7598,25 +7668,11 @@ impl Gameplay {
                 return Err(invalid("invalid class selection request"));
             }
             let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let mut switched = false;
-            if let Some(profiles) = &mut self.profiles {
-                switched = profiles.active() != id;
-                match profiles.select(id, &self.inventory) {
-                    Ok(reply) => {
-                        out.replies.push(reply);
-                        out.changed = true;
-                    }
-                    Err(error) => {
-                        switched = false;
-                        out.replies
-                            .push(chat::system(&format!("Cannot switch classes: {error}")));
-                    }
-                }
-            }
-            if switched {
-                if let Some(packet) = self.profile_switch_packet(guid)? {
-                    out.nearby.push(packet);
-                }
+            if let Some(changed) = self.stage_job_selection(id, &mut out)?
+                && changed
+                && let Some(packet) = self.profile_switch_packet(guid)?
+            {
+                out.nearby.push(packet);
             }
         }
         let combat = self
@@ -8749,7 +8805,9 @@ mod w64_regional_quest_tests {
         );
 
         let mut back = vec![26, 0, 13, 0];
-        back.extend(48i32.to_le_bytes());
+        // Chef has a complete starter outfit in this package; Kart Driver does
+        // not, and the client rejects a profile swap without Chest and Legs.
+        back.extend(45i32.to_le_bytes());
         assert!(
             game.handle_in_world(&back, &character, 2_000)
                 .unwrap()

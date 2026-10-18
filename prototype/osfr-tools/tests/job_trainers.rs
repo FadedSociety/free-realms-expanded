@@ -7,9 +7,11 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
+    inventory::REQUIRED_PROFILE_SLOTS,
     mining,
     npc_interaction::{NpcAction, NpcInteraction, NpcSelection},
     profiles::{LearnDenied, ProfileState, Profiles, Trainer},
+    quest_engine::{CharacterEligibility, QuestEngine, QuestState},
 };
 use serde_json::Value;
 use std::{
@@ -21,6 +23,8 @@ use std::{
 const CRATE: &str = env!("CARGO_MANIFEST_DIR");
 /// The four jobs today's features need: Miner, Chef, Fisherman, Kart Driver.
 const PRIORITY: [i32; 4] = [14, 45, 137, 48];
+/// Synthetic collect objective used to prove one starter grant raises one count.
+const COLLECT_QUEST: u32 = 9_900_001;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 fn data() -> PathBuf {
@@ -66,6 +70,98 @@ impl Content {
         .unwrap();
         mining::write_content(&dir, mining::MINING_GAME_ID).unwrap();
         Self(dir)
+    }
+
+    /// Add one active collect goal. Its item is a trainer starter definition, so
+    /// one grant must raise the count once.
+    fn install_collect_quest(&self, npc: u64, item_id: i32, quantity: u32) -> QuestState {
+        let source = serde_json::json!([{
+            "kind": "reconstructed",
+            "evidence": "F110 synthetic trainer collect objective"
+        }]);
+        fs::create_dir_all(self.0.join("quests")).unwrap();
+        fs::write(
+            self.0.join("quests/f110_collect.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "schema_version": 1,
+                "records": [{
+                    "id": COLLECT_QUEST,
+                    "title_string_id": 1,
+                    "giver_npc_id": npc,
+                    "prerequisite_quest_ids": [],
+                    "objectives": [{
+                        "kind": "collect_item",
+                        "id": 1,
+                        "item_id": item_id,
+                        "quantity": quantity,
+                        "source": source.clone()
+                    }],
+                    "rewards": [],
+                    "source": source.clone()
+                }]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            self.0.join("jobs.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "schema_version": 1,
+                "records": [{
+                    "id": "f110_synthetic",
+                    "name": "Synthetic",
+                    "profile_id": null,
+                    "category": "freestyle",
+                    "max_level": 20,
+                    "members_only": false,
+                    "trainer_npc_ids": [],
+                    "quest_ids": [COLLECT_QUEST],
+                    "abilities": [],
+                    "source": source
+                }]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        fs::create_dir_all(self.0.join("npcs")).unwrap();
+        fs::write(
+            self.0.join("npcs/f110_collect.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "schema_version": 1,
+                "records": [{
+                    "npc_id": npc,
+                    "quest_ids_given": [COLLECT_QUEST]
+                }]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        let mut engine = QuestEngine::from_split_content(
+            &self.0,
+            1,
+            CharacterEligibility {
+                player_level: 1,
+                member: true,
+                nonmember_quest_limit: 10,
+                member_quest_limit: 10,
+                ..CharacterEligibility::default()
+            },
+            None,
+        )
+        .unwrap();
+        assert!(engine.offer(COLLECT_QUEST, npc).changed);
+        assert!(engine.accept(COLLECT_QUEST).changed);
+        engine.state().clone()
+    }
+
+    /// Make the trainer's starter grant fail after the unlock commits in the
+    /// staged clone: the definition exists and is owned, but this profile does
+    /// not allow its class.
+    fn install_unusable_starter(&self, profile: i32, definition: i32) {
+        let path = self.0.join("profiles.json");
+        let mut profiles: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        profiles["starter_items"][profile.to_string()] = serde_json::json!([definition]);
+        fs::write(path, serde_json::to_vec(&profiles).unwrap()).unwrap();
     }
 }
 
@@ -506,6 +602,39 @@ fn equipped(gateway: &Gateway, job: i32) -> usize {
         .count()
 }
 
+fn switch(gateway: &mut Gateway, job: i32, now: u64) -> io_result::R {
+    let mut packet = vec![26, 0, 13, 0];
+    packet.extend(job.to_le_bytes());
+    send(gateway, &packet, now)
+}
+
+/// Attachment slot ids from a 38/21 body, read in the order the client does.
+fn activation_attachment_slots(body: &[u8]) -> Vec<i32> {
+    assert_eq!(&body[..4], &[38, 0, 21, 0]);
+    let payload = u32::from_le_bytes(body[4..8].try_into().unwrap()) as usize;
+    let mut at = 8 + payload;
+    let count = i32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+    at += 4;
+    let mut slots = Vec::new();
+    for _ in 0..count {
+        for _ in 0..3 {
+            let length = u32::from_le_bytes(body[at..at + 4].try_into().unwrap()) as usize;
+            at += 4 + length;
+        }
+        slots.push(i32::from_le_bytes(
+            body[at + 8..at + 12].try_into().unwrap(),
+        ));
+        at += 12;
+    }
+    slots
+}
+
+fn collect_count(gateway: &Gateway) -> u64 {
+    gameplay_json(gateway)["npc_quests"]["quests"][COLLECT_QUEST.to_string()]["counts"][0]
+        .as_u64()
+        .unwrap()
+}
+
 fn gateway_at(content: &Content, state: GameplayState, near: [f32; 3]) -> Gateway {
     let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
         .map(PathBuf::from)
@@ -531,10 +660,11 @@ fn trainer_position(npcs: &[Value], trainer: &Trainer) -> [f32; 3] {
 }
 
 #[test]
-fn an_ordinary_player_learns_each_trainers_job_once_and_gets_its_outfit() {
+fn an_ordinary_player_learns_each_trainers_job_once_and_only_switches_to_a_complete_outfit() {
     let content = Content::new();
     let npcs = npc_rows();
     let mut checked = Vec::new();
+    let mut selectable = 0;
     for trainer in trainers(&content) {
         let position = trainer_position(&npcs, &trainer);
         let near = [position[0] + 2.0, position[1], position[2]];
@@ -544,7 +674,7 @@ fn an_ordinary_player_learns_each_trainers_job_once_and_gets_its_outfit() {
             "{}",
             trainer.job
         );
-        let active = gameplay_json(&gateway)["profiles"]["active"].clone();
+        let active_before = gameplay_json(&gateway)["profiles"]["active"].clone();
         let outfit_before = equipped(&gateway, trainer.profile);
 
         let menu = click(&mut gateway, trainer.npc, 2_000);
@@ -563,37 +693,69 @@ fn an_ordinary_player_learns_each_trainers_job_once_and_gets_its_outfit() {
         );
         assert_eq!(
             gameplay_json(&gateway)["profiles"]["active"],
-            active,
+            active_before,
             "{}: learning must not switch jobs",
             trainer.job
         );
-        if Profiles::load(&content.0, None)
-            .unwrap()
-            .starter_items(trainer.profile)
-            .is_empty()
+        let learned_state = gameplay_json(&gateway);
+
+        // The client cannot apply a job outfit without Chest and Legs. A job
+        // whose content lacks them stays unlocked but is refused at selection.
+        let selected = switch(&mut gateway, trainer.profile, 2_900).unwrap();
+        let selected_bodies = bodies(&selected);
+        if let Some(activation) = selected_bodies
+            .iter()
+            .find(|body| body.starts_with(&[38, 0, 21, 0]))
         {
+            selectable += 1;
+            let slots = activation_attachment_slots(activation);
+            for required in REQUIRED_PROFILE_SLOTS {
+                assert!(
+                    slots.contains(&required),
+                    "{}: activation is missing required slot {required}: {slots:?}",
+                    trainer.job
+                );
+            }
+            assert!(
+                equipped(&gateway, trainer.profile) >= outfit_before,
+                "{} lost starter outfit pieces",
+                trainer.job
+            );
             assert_eq!(
-                equipped(&gateway, trainer.profile),
-                outfit_before,
-                "{} has no starter items",
+                gameplay_json(&gateway)["profiles"]["active"],
+                Value::from(trainer.profile),
+                "{} selected",
                 trainer.job
             );
         } else {
             assert!(
-                equipped(&gateway, trainer.profile) > outfit_before,
-                "{} got its starter outfit",
+                said(&selected_bodies, "outfit is missing"),
+                "{}: selection refusal: {}",
+                trainer.job,
+                String::from_utf8_lossy(&selected_bodies.concat())
+            );
+            assert_eq!(
+                gameplay_json(&gateway),
+                learned_state,
+                "{}: refused selection changed state",
+                trainer.job
+            );
+            assert_eq!(
+                gameplay_json(&gateway)["profiles"]["active"],
+                active_before,
+                "{}: refused selection switched jobs",
                 trainer.job
             );
         }
-        let after = gameplay_json(&gateway);
 
         // The same choice again is refused with a line, changing nothing.
+        let before_again = gameplay_json(&gateway);
         click(&mut gateway, trainer.npc, 3_000);
         let again = choose(&mut gateway, trainer.npc, choice, 3_100).unwrap();
         assert!(said(&bodies(&again), "already know"), "{}", trainer.job);
         assert_eq!(
             gameplay_json(&gateway),
-            after,
+            before_again,
             "{}: refusal changed state",
             trainer.job
         );
@@ -605,6 +767,111 @@ fn an_ordinary_player_learns_each_trainers_job_once_and_gets_its_outfit() {
             "priority job {profile} has a spawned trainer"
         );
     }
+    assert!(
+        selectable >= 5,
+        "the five trainer jobs with complete starter kits must remain selectable"
+    );
+}
+
+#[test]
+fn learning_a_starter_grant_counts_each_item_once() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let miner = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 14)
+        .unwrap();
+    // 21665 is the Miner starter hat in profiles.json.
+    let quest_state = content.install_collect_quest(miner.npc, 21665, 2);
+    let position = trainer_position(&npcs, &miner);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut state = state_for(&content, &miner, false);
+    state.npc_quests = Some(quest_state);
+    let mut gateway = gateway_at(&content, state, near);
+    assert_eq!(collect_count(&gateway), 0);
+
+    let menu = click(&mut gateway, miner.npc, 2_000);
+    let choice = option_with_label(&menu, miner.label_string_id).unwrap();
+    let learned = choose(&mut gateway, miner.npc, choice, 2_100).unwrap();
+    assert!(said(&bodies(&learned), "You learned the"));
+    assert_eq!(
+        collect_count(&gateway),
+        1,
+        "one starter grant must raise a collect objective once"
+    );
+}
+
+#[test]
+fn an_outfit_grant_error_leaves_the_trainer_menu_usable() {
+    let content = Content::new();
+    // The Ninja weapon is owned, but its class is not allowed on the Miner
+    // profile, so the starter grant errors after the staged unlock.
+    content.install_unusable_starter(14, 75091);
+    let npcs = npc_rows();
+    let miner = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 14)
+        .unwrap();
+    let position = trainer_position(&npcs, &miner);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut gateway = gateway_at(&content, state_for(&content, &miner, false), near);
+    let menu = click(&mut gateway, miner.npc, 2_000);
+    let choice = option_with_label(&menu, miner.label_string_id).unwrap();
+    let before = gameplay_json(&gateway);
+
+    // The gateway drops an application error without committing the staged
+    // gameplay clone; the save must remain exactly as it was.
+    let failed = choose(&mut gateway, miner.npc, choice, 2_100).unwrap();
+    assert!(
+        !failed.state_changed && !failed.gameplay_changed,
+        "the bad starter must fail the transaction"
+    );
+    assert!(failed.replies.is_empty());
+    assert_eq!(gameplay_json(&gateway), before);
+    assert!(!unlocked(&gateway).contains(&14));
+
+    // A different offered option still works: the failed grant must not have
+    // consumed the shared menu before the transaction rolled back.
+    let talked = choose(&mut gateway, miner.npc, 1, 2_200).unwrap();
+    assert!(!talked.replies.is_empty(), "the dialog option still opens");
+}
+
+#[test]
+fn selecting_an_unlocked_job_without_an_outfit_is_refused_atomically() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let fisherman = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 137)
+        .unwrap();
+    let position = trainer_position(&npcs, &fisherman);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut state = state_for(&content, &fisherman, false);
+    state
+        .profiles
+        .as_mut()
+        .unwrap()
+        .unlocked
+        .insert(fisherman.profile);
+    let mut gateway = gateway_at(&content, state, near);
+    let before = gameplay_json(&gateway);
+
+    let refused = switch(&mut gateway, fisherman.profile, 2_000).unwrap();
+    assert!(
+        !refused.state_changed && !refused.gameplay_changed,
+        "a refused switch must not mark the save changed"
+    );
+    let bodies = bodies(&refused);
+    assert!(
+        said(&bodies, "outfit is missing"),
+        "{}",
+        String::from_utf8_lossy(&bodies.concat())
+    );
+    assert!(
+        bodies.iter().all(|body| !body.starts_with(&[38, 0, 21, 0])),
+        "a refused switch must not send an activation"
+    );
+    assert_eq!(gameplay_json(&gateway), before);
 }
 
 #[test]
@@ -650,6 +917,15 @@ fn gateway_refusals_leave_the_save_untouched() {
     let before = gameplay_json(&gateway);
     let refused = choose(&mut gateway, ninja.npc, choice, 2_100).unwrap();
     assert!(said(&bodies(&refused), "level 20 Archer"));
+    assert!(
+        !refused.state_changed && !refused.gameplay_changed,
+        "a prerequisite refusal must not mark the save changed"
+    );
+    // The refused choice leaves the menu active, so the same option is still
+    // understood instead of failing with NoInteraction.
+    let again = choose(&mut gateway, ninja.npc, choice, 2_200).unwrap();
+    assert!(said(&bodies(&again), "level 20 Archer"));
+    assert!(!again.state_changed && !again.gameplay_changed);
     assert_eq!(gameplay_json(&gateway), before);
     assert!(!unlocked(&gateway).contains(&2));
 

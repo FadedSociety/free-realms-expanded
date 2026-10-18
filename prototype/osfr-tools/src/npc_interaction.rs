@@ -500,19 +500,9 @@ impl NpcInteraction {
                 active.shop_items = self.vendor_items.get(&npc_id).cloned().unwrap_or_default();
                 Ok(NpcSelection::Shop(self.merchant_window(npc)))
             }
-            NpcAction::Race => {
-                // Choosing a race is not a conversation: drop the open menu.
-                self.active = None;
-                Ok(NpcSelection::Race)
-            }
-            NpcAction::Derby => {
-                self.active = None;
-                Ok(NpcSelection::Derby)
-            }
-            NpcAction::Fish => {
-                self.active = None;
-                Ok(NpcSelection::Fish)
-            }
+            NpcAction::Race => Ok(NpcSelection::Race),
+            NpcAction::Derby => Ok(NpcSelection::Derby),
+            NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::Learn { profile } => {
                 let trainer = self
                     .job_trainers
@@ -520,7 +510,6 @@ impl NpcInteraction {
                     .and_then(|list| list.iter().find(|t| t.profile == profile))
                     .cloned()
                     .ok_or(NpcInteractionError::InvalidOption)?;
-                self.active = None;
                 Ok(NpcSelection::Learn(trainer))
             }
             NpcAction::TurnInQuest { quest_id } => {
@@ -692,6 +681,12 @@ impl NpcInteraction {
         if self.active.as_ref().is_some_and(|active| !active.shop_open) {
             self.active = None;
         }
+    }
+
+    /// End the offered menu once its choice committed. Refused choices keep it
+    /// open so the player can pick another option from the same list.
+    pub fn consume_active(&mut self) {
+        self.active = None;
     }
 
     pub fn quest_title_string_id(&self, npc_id: u64, quest_id: u32) -> Option<u32> {
