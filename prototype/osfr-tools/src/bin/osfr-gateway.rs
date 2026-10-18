@@ -1763,13 +1763,20 @@ impl Session {
                 hours.retain(|at| *at > cutoff);
                 !hours.is_empty()
             });
-            if let Some(hours) = staged_gateway.fishing_hour_history() {
-                let guid = staged_gateway.state().guid;
-                if hours.is_empty() {
-                    staged_world.fishing_hours.remove(&guid);
-                } else {
-                    staged_world.fishing_hours.insert(guid, hours);
-                }
+            // Lead (security): only the session that owns this character publishes its
+            // fishing history, and only a non-empty one (expiry is the retain above). A
+            // handshake session still carries the template guid, which equals the first
+            // account's, so publishing its empty history erased that account's hour cap.
+            let owns_character = self.selected_character
+                && staged_gateway.state().guid == self.character_guid
+                && staged_world.active_sessions.get(&self.character_guid) == Some(&self.id);
+            if owns_character
+                && let Some(hours) = staged_gateway.fishing_hour_history()
+                && !hours.is_empty()
+            {
+                staged_world
+                    .fishing_hours
+                    .insert(self.character_guid, hours);
             }
             let mut deliveries = staged_world.ride_fanout(self.id, &outcome.nearby);
             if transfer && staged_world.joined.contains(&self.id) {

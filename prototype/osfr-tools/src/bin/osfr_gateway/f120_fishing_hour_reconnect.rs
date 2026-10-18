@@ -383,6 +383,24 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         world.fishing_hours.get(&first.character_guid),
         Some(&history)
     );
+    // Lead (security): a handshake session that never logged in still carries the template
+    // guid, which equals this character's. Its tick must not erase the hour-cap ledger.
+    let mut stranger = new_session(77);
+    assert_eq!(stranger.gateway.state().guid, first.character_guid);
+    stranger
+        .tick(
+            &options,
+            caught_at + 500,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+        )
+        .unwrap();
+    assert_eq!(
+        world.fishing_hours.get(&first.character_guid),
+        Some(&history),
+        "an unauthenticated tick erased the fishing-hour ledger"
+    );
     let saved_after_payout = fs::read(&state_path).unwrap();
     let guid = first.character_guid;
     world.leave_player(first.id);
