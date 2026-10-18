@@ -199,8 +199,11 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // Placing a guessed NPC with evidence moves it between these two counts (W117 moved 4);
     // the regional total is the invariant, not either count.
     assert_eq!(regional_legacy + regional_reconstructed, 1199);
-    assert!(regional_legacy >= 578, "regional NPCs dropped to {regional_legacy}");
-    assert_eq!(extra_rows.len(), 3265);
+    assert!(
+        regional_legacy >= 578,
+        "regional NPCs dropped to {regional_legacy}"
+    );
+    assert_eq!(extra_rows.len(), 3266);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

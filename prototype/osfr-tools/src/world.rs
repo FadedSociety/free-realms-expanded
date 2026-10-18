@@ -134,6 +134,9 @@ struct RegionalNpc {
 #[derive(Deserialize)]
 struct ExtraNpc {
     spawn_guid: u64,
+    /// Optional stable NPC content key used by interaction and quest bindings.
+    #[serde(default)]
+    content_key: Option<u64>,
     #[serde(default)]
     name: Option<String>,
     #[serde(default)]
@@ -310,6 +313,7 @@ impl NpcVisibility {
                     .as_deref()
                     .is_some_and(|name| name.eq_ignore_ascii_case("knocker_m_boss.adr"))
                 || !npc.position.iter().all(|v| v.is_finite())
+                || npc.content_key == Some(0)
             {
                 continue;
             }
@@ -335,6 +339,11 @@ impl NpcVisibility {
                 npc.position_w.unwrap_or(1.0),
             ];
             spawn.rotation = facing(npc.heading);
+            // Server-only binding; client AddNpc reader 0x00921a10 reads the
+            // ordinary name/model/transform fields already populated above.
+            if let Some(content_key) = npc.content_key {
+                result.content_keys.insert(npc.spawn_guid, content_key);
+            }
             let _ = zone_id; // nearest-anchor label kept for diagnostics only
             Arc::make_mut(&mut result.by_zone)
                 .entry(OPEN_WORLD_ZONE)

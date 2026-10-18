@@ -259,9 +259,7 @@
       "id": 3030006,
       "title_string_id": 94295,
       "giver_npc_id": 9000000042,
-      "prerequisite_quest_ids": [
-        3030005
-      ],
+      "prerequisite_quest_ids": [],
       "objectives": [
         {
           "kind": "talk_to_npc",
@@ -271,11 +269,27 @@
             {
               "kind": "client",
               "evidence": "description 94296 'Find Jones at his makeshift camp, along the road leading east out of Cobblestone Village towards Blackspore.'; target resolved by scripts/quest_talk_objectives.py"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T101: objective ordinal 1 and target 9000000121 are server content bindings for the recovered Jones referral; they are not recovered retail objective or target identifiers."
             }
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T101: five-coin fallback for an unknown quest payout, matching the W110/W114 small final-era coin-reward policy; no item or XP reward is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -295,7 +309,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) ContentDb v1 stores a typed objective without the client free text; objective id 1 and target 9000000121 are server bindings."
         },
         {
           "kind": "reconstructed",
@@ -303,11 +317,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row C2; mapped that page label to the preceding batch content key"
+          "evidence": "(R) T101 playtest prerequisite: C3 starts directly from Carlos without completed C2 because C1/C2 require the unbuilt Mongo ring; this is a reconstruction for playtest, not recovered retail order."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T101: the five-coin fallback is recorded on rewards[0].source; the retail payout remains unknown."
         },
         {
           "kind": "reconstructed",
@@ -315,13 +329,13 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000042]; objectives and rewards preserved."
+          "evidence": "(R) T101: re-enabled because giver 9000000042 is bound to a renderable extra spawn and talk target 9000000121 has a legacy_data spawn; no Mongo encounter is added."
         }
       ],
       "description_string_id": 94296,
       "intro_text_string_id": 94294,
       "end_text_string_id": 94297,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3030007,
@@ -343,12 +357,24 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) count 4 and kill id 930050 (field_enemies.json definition_id); the original artifact drops are not modelled"
+              "evidence": "(R) T101: count 4 and kill target 930050 are reconstructed playtest bindings; the four quest-gated Hooligan spawn rows in field_enemies.json carry quest_ids [3030007]. Original artifact drops are not modelled."
             }
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T101: five-coin fallback for an unknown quest payout, matching the W110/W114 small final-era coin-reward policy; no item or XP reward is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -368,7 +394,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) ContentDb v1 stores a typed objective without the client free text; objective id 1 and target 930050 are server bindings."
         },
         {
           "kind": "reconstructed",
@@ -376,11 +402,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row C3; mapped that page label to the preceding batch content key"
+          "evidence": "(R) prerequisite 3030006 is the reconstructed numeric binding for recovered C3 to C4 order; no retail quest-id table was recovered."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T101: the five-coin fallback is recorded on rewards[0].source; the retail payout remains unknown."
         },
         {
           "kind": "reconstructed",
@@ -410,12 +436,24 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+              "evidence": "(R) T101: one Talk completes the referral; objective id 1 and target 9000000446 are server bindings, not recovered retail quest or target identifiers."
             }
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T101: five-coin fallback for an unknown quest payout, matching the W110/W114 small final-era coin-reward policy; no item or XP reward is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -435,7 +473,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) ContentDb v1 stores a typed objective without the client free text; objective id 1 and target 9000000446 are server bindings."
         },
         {
           "kind": "reconstructed",
@@ -443,11 +481,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row C4; mapped that page label to the preceding batch content key"
+          "evidence": "(R) prerequisite 3030007 is the reconstructed numeric binding for recovered C4 to C5 order; no retail quest-id table was recovered."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T101: the five-coin fallback is recorded on rewards[0].source; the retail payout remains unknown."
         },
         {
           "kind": "reconstructed",

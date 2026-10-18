@@ -2,6 +2,37 @@
   "schema_version": 1,
   "records": [
     {
+      "spawn_guid": 9000000042,
+      "legacy_npc_id": null,
+      "content_key": 9000000042,
+      "model_id": 964,
+      "model_file_name": "human_m_carlos_brazenfist.agr",
+      "name": "Carlos Brazenfist",
+      "name_string_id": 20671,
+      "position": [
+        -1906.11908,
+        -39.79,
+        414.835853
+      ],
+      "heading": 0.596,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2950 (ModelId=964, ModelFileName=human_m_carlos_brazenfist.agr). The original asset name supplies the model; the legacy row itself names a different character."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.20671 resolves to 'Carlos Brazenfist'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position is the reconstructed Cobblestone Village POI 7 XZ offset recorded in notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md:46. The original actor GUID is unknown; the server reuses NPC key 9000000042 as the runtime GUID so ordinary NPC requests address the same stable content identity."
+        }
+      ],
+      "position_w": null
+    },
+    {
       "spawn_guid": 100000001186,
       "legacy_npc_id": 1186,
       "model_id": 1062,
