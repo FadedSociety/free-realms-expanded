@@ -27,7 +27,7 @@
     ]
   },
   "catch_cap": {
-    "source": "R: no original fishing cap was recovered. The client sends no catch outcome and the server owns selection and payout, so a cap is an operator policy. It is disabled by default; the owner chooses the value. A session cap counts paid catches across trips until the login session resets. An hour cap counts paid catches in a rolling 3600-second window for this login session.",
+    "source": "R: no original fishing cap was recovered. The client sends no catch outcome and the server owns selection and payout, so a cap is an operator policy. It is disabled by default; the owner chooses the value. A session cap counts paid catches across trips until the login session resets. An hour cap counts paid catches in a rolling 3600-second window keyed by character, so reconnecting does not refresh it; the server keeps that ledger for its process lifetime until save-schema persistence is approved.",
     "enabled": false,
     "window": "session",
     "max_paid_catches": null

@@ -953,6 +953,26 @@ impl Gateway {
         self.gameplay.as_ref()
     }
 
+    /// Restore the host-owned rolling-hour fishing ledger for this character. A fresh
+    /// `Gameplay` starts empty, so the gateway calls this from its character-scoped state after
+    /// loading a save; the timestamps never enter the save envelope.
+    pub fn restore_fishing_hours(&mut self, hours: Vec<u64>) -> io::Result<()> {
+        let Some(gameplay) = self.gameplay.as_mut() else {
+            return if hours.is_empty() {
+                Ok(())
+            } else {
+                Err(invalid("fishing cap history requires gameplay"))
+            };
+        };
+        gameplay.restore_fishing_hours(self.state.guid, hours)
+    }
+
+    pub fn fishing_hour_history(&self) -> Option<Vec<u64>> {
+        self.gameplay
+            .as_ref()
+            .map(|gameplay| gameplay.fishing_hour_history(self.state.guid))
+    }
+
     pub fn state(&self) -> &CharacterState {
         &self.state
     }

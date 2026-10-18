@@ -2441,6 +2441,18 @@ impl Gameplay {
         }
     }
 
+    /// Restore the character's rolling-hour fishing cap ledger after a reconnect. This is
+    /// host-owned state, deliberately outside `GameplayState` until the save schema is extended.
+    pub fn restore_fishing_hours(&mut self, guid: u64, hours: Vec<u64>) -> io::Result<()> {
+        self.fishing
+            .restore_hour_history(guid, hours)
+            .map_err(|error| invalid(error.to_string()))
+    }
+
+    pub fn fishing_hour_history(&self, guid: u64) -> Vec<u64> {
+        self.fishing.hour_history(guid)
+    }
+
     /// W178: trusted store/event code queues a server-owned claim. No client
     /// request reaches this method or supplies its reward payload.
     pub fn issue_claim(

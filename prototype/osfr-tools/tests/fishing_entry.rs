@@ -780,6 +780,42 @@ fn an_hour_cap_uses_a_rolling_window() {
 }
 
 #[test]
+fn reconnect_clears_only_the_session_count_not_the_hour_history() {
+    let mut round = Round::started_with(
+        spots_with(|j| {
+            j["catch_cap"]["enabled"] = json!(true);
+            j["catch_cap"]["window"] = json!("hour");
+            j["catch_cap"]["max_paid_catches"] = json!(1);
+        }),
+        true,
+    );
+    assert!(round.catch(T0 + 100).paid);
+    let history = round.service.hour_history(PLAYER);
+    assert_eq!(history, vec![T0 + 2_520]);
+    assert_eq!(round.service.reset_all(), 1);
+    assert_eq!(round.service.hour_history(PLAYER), history);
+
+    let before_bad_restore = round.service.hour_history(PLAYER);
+    assert!(
+        round
+            .service
+            .restore_hour_history(PLAYER, vec![T0 + 3, T0 + 1])
+            .is_err()
+    );
+    assert_eq!(
+        round.service.hour_history(PLAYER),
+        before_bad_restore,
+        "a refused ledger restore changes nothing"
+    );
+
+    round.start();
+    let blocked = round.catch(T0 + 20_000);
+    assert!(!blocked.paid, "the reconnect did not refresh the hour cap");
+    assert_eq!(round.fish_held(), 1);
+    assert!(round.catch(T0 + 3_700_000).paid);
+}
+
+#[test]
 fn reeling_before_the_hook_pays_nothing() {
     let mut round = Round::started(true);
     round.send(&cast_at(10.0), T0 + 10).unwrap();

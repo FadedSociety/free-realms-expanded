@@ -68,7 +68,8 @@ const MAX_CATCH_XP: u32 = 1_000;
 const MAX_PAYOUT_COINS: u32 = 1_000_000;
 const MAX_PAID_CATCHES_PER_SESSION: u32 = 10_000;
 const MAX_PAID_CATCHES_PER_HOUR: u32 = 3_600;
-const HOUR_MS: u64 = 60 * 60 * 1_000;
+/// (R) The rolling output-cap window exposed to the gateway's character ledger.
+pub const HOUR_WINDOW_MS: u64 = 60 * 60 * 1_000;
 /// (R) Player-readable line when the optional cap refuses to pay a catch.
 const CATCH_CAP_NOTICE: &str = "The fishing reward limit has been reached, so the fish got away.";
 /// The most new inventory stacks fishing can ever add: fish stack without limit, so a bag gains
@@ -119,13 +120,14 @@ struct Tracked {
     playing: bool,
 }
 
-/// Paid catches for one player's login session. The service is already scoped to one player;
-/// the map key keeps the accounting correct if several rounds are hosted together.
+/// Paid catches for one character. The service is already scoped to one player; the map key
+/// keeps the accounting correct if several rounds are hosted together.
 #[derive(Clone, Default)]
 struct PaidCatches {
-    /// Paid catches across every round since this service was created or reset.
+    /// Paid catches across every round since the login session began.
     session: u32,
-    /// Paid-catch timestamps for the rolling hour window, oldest first.
+    /// Paid-catch timestamps for the rolling hour window, oldest first. Unlike `session`, this
+    /// survives a reconnect and is restored with the character's server-side cap ledger.
     hour: Vec<u64>,
 }
 
@@ -152,8 +154,8 @@ pub struct FishingService {
     sessions: BTreeMap<u64, Tracked>,
     item_definitions: BTreeMap<(String, u8), i32>,
     next_instance_id: i32,
-    /// Cap accounting for the login session (R). Not saved; `reset`/`reset_all`/`disconnect`
-    /// clear it with the session.
+    /// Cap accounting keyed by character (R). Reconnect clears `session` only; the caller
+    /// restores `hour` into a fresh service.
     paid: BTreeMap<u64, PaidCatches>,
 }
 
@@ -360,7 +362,7 @@ impl FishingService {
     /// Disconnect has no socket on which to send cleanup packets. Drop all
     /// ephemeral state and explicitly produce no rewards or quest events.
     pub fn disconnect(&mut self, guid: u64) -> Change {
-        self.paid.remove(&guid);
+        self.clear_session_count(guid);
         let Some(mut tracked) = self.sessions.remove(&guid) else {
             return Change::default();
         };
@@ -458,15 +460,61 @@ impl FishingService {
     }
 
     pub fn reset(&mut self, guid: u64) -> bool {
-        self.paid.remove(&guid);
+        self.clear_session_count(guid);
         self.sessions.remove(&guid).is_some()
     }
 
     pub fn reset_all(&mut self) -> usize {
         let count = self.sessions.len();
         self.sessions.clear();
-        self.paid.clear();
+        for paid in self.paid.values_mut() {
+            paid.session = 0;
+        }
+        self.paid.retain(|_, paid| !paid.hour.is_empty());
         count
+    }
+
+    /// The character's paid catches inside the rolling hour, oldest first. The gateway keeps
+    /// this beside the character and passes it back to [`Self::restore_hour_history`] on
+    /// reconnect; it deliberately stays out of the saved gameplay schema.
+    pub fn hour_history(&self, guid: u64) -> Vec<u64> {
+        self.paid
+            .get(&guid)
+            .map(|paid| paid.hour.clone())
+            .unwrap_or_default()
+    }
+
+    /// Restore a character's rolling-hour history into a fresh service. The caller supplies
+    /// server-owned timestamps; reject a malformed or oversized ledger rather than letting it
+    /// strengthen or evade the configured cap.
+    pub fn restore_hour_history(&mut self, guid: u64, mut history: Vec<u64>) -> Result<(), Error> {
+        if guid == 0
+            || history.len() > MAX_PAID_CATCHES_PER_HOUR as usize
+            || !history.windows(2).all(|pair| pair[0] <= pair[1])
+        {
+            return Err(Error::InvalidValue);
+        }
+        history.dedup();
+        if history.is_empty() {
+            if let Some(paid) = self.paid.get_mut(&guid) {
+                paid.hour.clear();
+                if paid.session == 0 {
+                    self.paid.remove(&guid);
+                }
+            }
+        } else {
+            self.paid.entry(guid).or_default().hour = history;
+        }
+        Ok(())
+    }
+
+    fn clear_session_count(&mut self, guid: u64) {
+        if let Some(paid) = self.paid.get_mut(&guid) {
+            paid.session = 0;
+            if paid.hour.is_empty() {
+                self.paid.remove(&guid);
+            }
+        }
     }
 
     /// Ordinary entry (W160): admit the player at a listed guide and offer the round. Staged:
@@ -978,7 +1026,7 @@ fn cap_allows(cap: Option<&CatchCap>, paid: &mut PaidCatches, now_ms: u64) -> bo
     match cap.window {
         CapWindow::Session => paid.session < limit,
         CapWindow::Hour => {
-            let cutoff = now_ms.saturating_sub(HOUR_MS);
+            let cutoff = now_ms.saturating_sub(HOUR_WINDOW_MS);
             paid.hour.retain(|at| *at > cutoff);
             paid.hour.len() < limit as usize
         }
@@ -1374,7 +1422,7 @@ impl PayoutTable {
 enum CapWindow {
     /// Paid catches across trips in this login session.
     Session,
-    /// Paid catches in a rolling 3600-second window in this login session.
+    /// Paid catches in a rolling 3600-second window, retained across reconnects by character.
     Hour,
 }
 
