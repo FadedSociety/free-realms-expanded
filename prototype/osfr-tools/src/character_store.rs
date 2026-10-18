@@ -103,7 +103,7 @@ pub fn save(path: &Path, state: &CharacterState) -> io::Result<()> {
 }
 
 /// Shared same-directory replacement used by the expanded gameplay snapshot.
-pub(crate) fn replace_bytes(path: &Path, bytes: &[u8]) -> io::Result<()> {
+pub fn replace_bytes(path: &Path, bytes: &[u8]) -> io::Result<()> {
     replace_bytes_with(path, bytes, |from, to| fs::rename(from, to))
 }
 

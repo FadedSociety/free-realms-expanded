@@ -502,9 +502,9 @@ fn private_direct_pose_reaches_session_and_unlocks_reliable_rocket_use() {
 /// multi-byte character ("0\u{e9}0") panicked the server. Non-hex input is now refused.
 #[test]
 fn studio_hex_refuses_non_hex_input_instead_of_panicking() {
-    assert_eq!(parse_hex("2300"), Some(vec![0x23, 0x00]));
-    assert_eq!(parse_hex("0\u{e9}0"), None);
-    assert_eq!(parse_hex("zz"), None);
-    assert_eq!(parse_hex("230"), None);
-    assert_eq!(parse_hex(""), None);
+    assert_eq!(trace::parse_hex("2300"), Some(vec![0x23, 0x00]));
+    assert_eq!(trace::parse_hex("0\u{e9}0"), None);
+    assert_eq!(trace::parse_hex("zz"), None);
+    assert_eq!(trace::parse_hex("230"), None);
+    assert_eq!(trace::parse_hex(""), None);
 }

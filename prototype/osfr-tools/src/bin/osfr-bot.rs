@@ -95,15 +95,9 @@ pub fn parse_step(line: &str) -> Result<Option<Step>, String> {
         },
         "raw" if !rest.is_empty() => {
             let hex: String = rest.chars().filter(|c| !c.is_whitespace()).collect();
-            if hex.len() % 2 != 0 {
-                return Err(format!("`{line}`: odd hex length"));
-            }
             Step::Raw(
-                (0..hex.len())
-                    .step_by(2)
-                    .map(|i| u8::from_str_radix(&hex[i..i + 2], 16))
-                    .collect::<Result<_, _>>()
-                    .map_err(|_| format!("`{line}`: bad hex"))?,
+                osfr_tools::trace::parse_hex(&hex)
+                    .ok_or_else(|| format!("`{line}`: bad hex (even-length ASCII hex)"))?,
             )
         }
         "expect" if (1..=3).contains(&args.len()) => Step::Expect {

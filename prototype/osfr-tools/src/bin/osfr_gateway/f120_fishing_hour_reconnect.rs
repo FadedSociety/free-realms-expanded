@@ -387,6 +387,11 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     // guid, which equals this character's. Its tick must not erase the hour-cap ledger.
     let mut stranger = new_session(77);
     assert_eq!(stranger.gateway.state().guid, first.character_guid);
+    // A non-empty forged history: only the owner check (not the empty-history rule) stops it.
+    stranger
+        .gateway
+        .restore_fishing_hours(vec![caught_at + 400])
+        .unwrap();
     stranger
         .tick(
             &options,

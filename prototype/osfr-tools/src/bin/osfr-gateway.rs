@@ -41,19 +41,6 @@ fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
 }
 
 /// Percent-decoding for Studio query strings and paths.
-/// Parse separator-free hex. Anything that is not ASCII hex (including non-ASCII text) is
-/// refused before slicing: slicing a multi-byte character by byte index panics, and one bad
-/// Studio request must never take the server down.
-fn parse_hex(hex: &str) -> Option<Vec<u8>> {
-    if hex.is_empty() || hex.len() % 2 != 0 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
-        return None;
-    }
-    (0..hex.len())
-        .step_by(2)
-        .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
-        .collect()
-}
-
 fn studio_decode(text: &str) -> String {
     let bytes = text.as_bytes();
     let mut out = Vec::with_capacity(bytes.len());
@@ -1473,18 +1460,8 @@ impl Session {
             .family
             .zip(summary.subtype)
             .and_then(|(f, s)| trace::family_subtype_name(f, s));
-        let hex = if summary.sensitive {
-            None
-        } else {
-            Some(
-                summary
-                    .body
-                    .iter()
-                    .take(96)
-                    .map(|b| format!("{b:02x}"))
-                    .collect::<String>(),
-            )
-        };
+        // The one redaction rule; a bundle can hide a chat child, so bundles stay hidden too.
+        let hex = trace::hex_prefix_len(summary.body, summary.sensitive || summary.combined, 96);
         if self.recent.len() >= 400 {
             self.recent.pop_front();
         }
@@ -3870,7 +3847,7 @@ impl Server {
                     .chars()
                     .filter(|c| !c.is_whitespace())
                     .collect();
-                let Some(inner) = parse_hex(&hex).filter(|b| b.len() <= 64 * 1024) else {
+                let Some(inner) = trace::parse_hex(&hex).filter(|b| b.len() <= 64 * 1024) else {
                     return json_reply(
                         400,
                         json!({"error": "expected {\"hex\": \"<inner message hex>\"}"}),
@@ -4036,7 +4013,8 @@ impl Server {
                 if serde_json::from_slice::<serde_json::Value>(&request.body).is_err() {
                     return json_reply(400, json!({"error": "not valid JSON; nothing written"}));
                 }
-                if let Err(error) = fs::write(&path, &request.body) {
+                if let Err(error) = osfr_tools::character_store::replace_bytes(&path, &request.body)
+                {
                     return json_reply(400, json!({"error": error.to_string()}));
                 }
                 json_reply(

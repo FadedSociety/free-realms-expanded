@@ -6,10 +6,25 @@
 //! are exhaustive, so the build fails until every gate and the detection are decided.
 use super::*;
 
-/// One activity a player can be engaged in. Several can be active at once (for example a
-/// shared-field fight while a kart entry is queued), so every gate asks "is any active".
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(super) enum Occupation {
+/// Declares the enum and `Occupation::ALL` from one list, so a variant can never exist without
+/// being consulted by `Gameplay::blocks`.
+macro_rules! occupations {
+    ($($variant:ident),+ $(,)?) => {
+        /// One activity a player can be engaged in. Several can be active at once (for example a
+        /// shared-field fight while a kart entry is queued), so every gate asks "is any active".
+        #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+        pub(super) enum Occupation {
+            $($variant),+
+        }
+
+        impl Occupation {
+            /// Every variant, in the order gates are evaluated.
+            pub(super) const ALL: &[Occupation] = &[$(Occupation::$variant),+];
+        }
+    };
+}
+
+occupations!(
     Forging,
     Smelting,
     Cooking,
@@ -22,7 +37,7 @@ pub(super) enum Occupation {
     Soccer,
     Kart,
     FieldEngaged,
-}
+);
 
 /// What an occupation blocks while it is active.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -40,23 +55,6 @@ pub(super) struct Gates {
 }
 
 impl Occupation {
-    /// Every variant, in the order gates are evaluated. Keep in step with the enum
-    /// (`all_lists_every_variant` fails otherwise).
-    pub(super) const ALL: [Occupation; 12] = [
-        Occupation::Forging,
-        Occupation::Smelting,
-        Occupation::Cooking,
-        Occupation::Mining,
-        Occupation::Harvesting,
-        Occupation::Chess,
-        Occupation::Encounter,
-        Occupation::Derby,
-        Occupation::Fishing,
-        Occupation::Soccer,
-        Occupation::Kart,
-        Occupation::FieldEngaged,
-    ];
-
     /// (R) Today's rules, reproduced exactly. Derby does not block warp and kart does not
     /// block starting another activity; both are known gaps kept until a tested change.
     pub(super) const fn gates(self) -> Gates {
@@ -106,7 +104,8 @@ impl Gameplay {
     /// Whether any active occupation closes this gate.
     pub(super) fn blocks(&self, gate: fn(Gates) -> bool) -> bool {
         Occupation::ALL
-            .into_iter()
+            .iter()
+            .copied()
             .any(|occupation| gate(occupation.gates()) && self.is_occupied(occupation))
     }
 }
@@ -115,36 +114,13 @@ impl Gameplay {
 mod tests {
     use super::Occupation::{self, *};
 
-    #[test]
-    fn all_lists_every_variant() {
-        // Exhaustive: a new variant fails to compile here until it gets a position and ALL.
-        fn position(occupation: Occupation) -> usize {
-            match occupation {
-                Forging => 0,
-                Smelting => 1,
-                Cooking => 2,
-                Mining => 3,
-                Harvesting => 4,
-                Chess => 5,
-                Encounter => 6,
-                Derby => 7,
-                Fishing => 8,
-                Soccer => 9,
-                Kart => 10,
-                FieldEngaged => 11,
-            }
-        }
-        for (index, occupation) in Occupation::ALL.into_iter().enumerate() {
-            assert_eq!(position(occupation), index);
-        }
-    }
-
     /// Pins the table to the lists it replaced; changing a gate is a deliberate, tested edit.
     #[test]
     fn gates_reproduce_the_replaced_busy_lists() {
         let members = |gate: fn(super::Gates) -> bool| -> Vec<Occupation> {
             Occupation::ALL
-                .into_iter()
+                .iter()
+                .copied()
                 .filter(|occupation| gate(occupation.gates()))
                 .collect()
         };

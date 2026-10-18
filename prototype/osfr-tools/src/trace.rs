@@ -125,10 +125,16 @@ pub fn sensitive_payload(family: u16, subtype: u16) -> bool {
     family == 1
         || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 149 | 175)
         || (family == 26 && matches!(subtype, 14 | 15 | 16 | 17 | 30))
+        || (family == 53 && subtype == 6)
 }
 
 pub fn hex_prefix(bytes: &[u8], sensitive: bool) -> Option<String> {
-    let head = bytes.iter().take(32).copied().collect::<Vec<_>>();
+    hex_prefix_len(bytes, sensitive, 32)
+}
+
+/// `hex_prefix` with a longer window for the Studio packet inspector. One formatter, one rule.
+pub fn hex_prefix_len(bytes: &[u8], sensitive: bool, len: usize) -> Option<String> {
+    let head = bytes.iter().take(len).copied().collect::<Vec<_>>();
     let mut letters = 0;
     let looks_like_text = head.iter().any(|byte| {
         if byte.is_ascii_alphabetic() {
@@ -140,6 +146,19 @@ pub fn hex_prefix(bytes: &[u8], sensitive: bool) -> Option<String> {
     });
     (!sensitive && !looks_like_text)
         .then(|| head.iter().map(|byte| format!("{byte:02x}")).collect())
+}
+
+/// Parse separator-free hex. Anything that is not ASCII hex (including non-ASCII text) is
+/// refused before slicing: slicing a multi-byte character by byte index panics, and one bad
+/// request or script line must never take a process down.
+pub fn parse_hex(hex: &str) -> Option<Vec<u8>> {
+    if hex.is_empty() || hex.len() % 2 != 0 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return None;
+    }
+    (0..hex.len())
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
+        .collect()
 }
 
 pub fn transport_name(opcode: u16) -> &'static str {
@@ -219,6 +238,7 @@ mod tests {
             (26, 16),
             (26, 17),
             (26, 30),
+            (53, 6),
         ] {
             assert!(
                 sensitive_payload(family, subtype),
