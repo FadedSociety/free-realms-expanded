@@ -1,4 +1,5 @@
-//! Optional private race entry binding. Captured templates remain in the lab.
+//! Optional race entry binding. The reviewed playtest binding is tracked in
+//! `data/content/kart_entry.json`; private captures remain in the lab.
 //! Entry alone never awards anything; the race authority owns completion.
 //!
 //! Ordinary entry (W149, brief #3): a player starts a race by choosing the race option in the

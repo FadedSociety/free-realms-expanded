@@ -27,6 +27,7 @@ from bundle_common import (  # noqa: E402
     REFERENCE,
     STARTUP_SNAPSHOT,
     MANIFEST_VERSION,
+    check_activity_content,
     check_runtime_content,
     sha256_file,
     TERRAIN,
@@ -72,10 +73,34 @@ def write_private_json(source: Path, target: Path) -> None:
         shutil.copyfile(source, target)
 
 
-def copy_repository_content(target: Path) -> int:
+def copy_repository_content(target: Path, source_dir: Path | None) -> int:
+    if source_dir is not None:
+        if source_dir.is_symlink():
+            raise ValueError("--content-source must not be a symbolic link")
+        source_dir = source_dir.resolve(strict=True)
+        if not source_dir.is_dir():
+            raise ValueError("--content-source must be a regular directory")
+        count = 0
+        for path in sorted(source_dir.rglob("*")):
+            if not path.is_file():
+                continue
+            require_regular_source(path, source_dir)
+            relative = path.relative_to(source_dir).as_posix()
+            safe_manifest_path("content/" + relative)
+            destination = target / "content" / Path(*Path(relative).parts)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, destination)
+            count += 1
+        if not count:
+            raise ValueError("--content-source contains no files")
+        return count
+
     prefix = "prototype/osfr-tools/data/content/"
     process = subprocess.Popen(
-        ["git", "-C", str(PROJECT), "archive", "--format=tar", "HEAD", "prototype/osfr-tools/data/content"],
+        [
+            "git", "-C", str(PROJECT), "archive", "--format=tar", "HEAD",
+            "prototype/osfr-tools/data/content",
+        ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -224,13 +249,19 @@ def source_revision() -> str:
     return revision
 
 
-def readme(bundle_id: str, revision: str) -> str:
+def readme(bundle_id: str, revision: str, content_source: Path | None) -> str:
+    content_line = (
+        ""
+        if content_source is None
+        else f"\nContent source: `{content_source}` (pre-commit verification build)."
+    )
     return f"""# Free Realms playtest bundle {bundle_id}
 
-Private local bundle, manifest version {MANIFEST_VERSION}. Source Git revision: `{revision}`.
+Private local bundle, manifest version {MANIFEST_VERSION}. Source Git revision: `{revision}`.{content_line}
 
 This folder contains current repository gameplay content, the frozen round70
-activity package, the verified gateway startup reference, journal locale files,
+activity content now tracked in the repository, the verified gateway startup
+reference, journal locale files,
 the typed startup snapshot, character-creation resource tables, and terrain
 grids. It contains no player identity or save, no populated account store, and
 no private account key.
@@ -334,6 +365,12 @@ def main() -> int:
         "--name",
         help="bundle folder name under lab/bundles (default: playtest-<UTC stamp>)",
     )
+    parser.add_argument(
+        "--content-source",
+        type=Path,
+        help="verification only: copy this content directory instead of committed HEAD "
+        "content (the default and reviewed path is still HEAD)",
+    )
     args = parser.parse_args()
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     bundle_id = args.name or f"playtest-{stamp}"
@@ -350,7 +387,7 @@ def main() -> int:
         raise FileExistsError(f"bundle already exists: {bundle_id}")
     target.mkdir()
     try:
-        repo_files = copy_repository_content(target)
+        repo_files = copy_repository_content(target, args.content_source)
         private_files = copy_private_content(target)
         generated = add_generated_content(target)
         reference_files = copy_reference(target)
@@ -369,9 +406,12 @@ def main() -> int:
             json.dumps(empty_account_store(), indent=2) + "\n", encoding="utf-8"
         )
         (server / "server-id.bin").write_bytes(secrets.token_bytes(32))
-        (target / "README.md").write_text(readme(bundle_id, revision), encoding="utf-8")
+        (target / "README.md").write_text(
+            readme(bundle_id, revision, args.content_source), encoding="utf-8"
+        )
 
         present = check_runtime_content(target)
+        activity = check_activity_content(target)
         item_content = check_item_content(target)  # a bundle whose items cannot load is not built
         manifest = make_manifest(target)
         (target / "manifest.json").write_text(
@@ -396,8 +436,9 @@ def main() -> int:
             "absent optional="
             f"{[n for n in OPTIONAL_REPOSITORY_CONTENT if n not in present] or 'none'}"
         )
+        print(f"Frozen activity content: PASS ({activity})")
         print(f"Item content: PASS ({item_content})")
-        pending = uncommitted_content()
+        pending = [] if args.content_source is not None else uncommitted_content()
         if pending:
             print(
                 "WARNING: content edited but not committed is NOT in this bundle "

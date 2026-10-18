@@ -1121,7 +1121,13 @@ class Checker:
                 self.npc_refs.append((rel, p, k, x))
 
     def check_list_ids(self, rel, path, items, soft):
-        for idk in LIST_ID_KEYS:
+        # kart_lobby.json is the five-table 102/2 wire body: `key` groups rows
+        # and repeats, and row order carries the meaning. The Rust codec test
+        # checks its shape; a unique-key rule here would reject valid content.
+        keys = LIST_ID_KEYS
+        if rel == "kart_lobby.json":
+            keys = tuple(k for k in LIST_ID_KEYS if k != "key")
+        for idk in keys:
             seen = {}
             for i, x in enumerate(items):
                 if not isinstance(x, dict):

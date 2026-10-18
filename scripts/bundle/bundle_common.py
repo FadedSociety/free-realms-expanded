@@ -34,18 +34,12 @@ PRIVATE_CONTENT_FILES = (
     "cooking-campaign.json",
     "cooking-item-definitions.json",
     "cooking.json",
-    "encounters.json",
-    "encounter-template.bin",
     "forging-campaign.json",
     "forging-item-definitions.json",
     "forging.json",
-    "harvesting.json",
     "inventory.json",
     "item-catalogue.json",
     "journal-text.json",
-    "kart_entry.json",
-    "kart_lobby.json",
-    "mining.json",
     "opening-abilities.json",
     "opening.json",
     "profiles.json",
@@ -62,11 +56,43 @@ PRIVATE_CONTENT_FILES = (
 OPTIONAL_REPOSITORY_CONTENT = (
     "consumables.json",  # item_bar.rs: potion/food effect tuning (built-in table if absent)
     "power_ups.json",  # power_ups.rs: combat power-up drop tables (W153)
-    "fishing_spots.json",  # fishing_service.rs: guide NPCs, area rows and fish items (W160)
-    "mining_nodes.json",  # harvest_nodes.rs: mining veins players click (W171)
     "crafting_stations.json",  # recipe_book.rs: world cooking, smelting and anvil models
     "job_trainers.json",  # profiles.rs: trainer NPCs and "Become a <job>" menu labels (W176)
 )
+
+# Frozen activity content tracked in the repository. These files used to be
+# overlaid from the private round70 package; a playtest bundle must not depend on
+# that package at build time. The bytes are pinned by
+# `tests/bundle_activity_content.rs`: `kart_entry.json` and `encounters.json`
+# hashes are also embedded in saved kart/encounter state, so reformatting either
+# file would refuse an existing character. `kart_gates.json` is reconstructed
+# (R) policy; the builder's generated copy remains a fallback for old trees.
+ACTIVITY_CONTENT = (
+    "encounters.json",  # encounter.rs: the opening world and dungeon 411
+    "encounter-template.bin",  # hash-bound by encounters.json
+    "kart_entry.json",  # kart_gateway.rs: race entry, vehicle and race service
+    "kart_lobby.json",  # gameplay.rs: the 102/2 lobby body
+    "kart_gates.json",  # kart_gateway.rs: (R) NPC menu gates and reward cooldown
+    "mining.json",  # mining.rs: Mining18 board
+    "harvesting.json",  # harvesting.rs: Harvesting111 board
+    "fishing_spots.json",  # fishing_service.rs: guide NPCs and fish items
+    "mining_nodes.json",  # harvest_nodes.rs: clickable copper veins
+    "harvest_nodes.json",  # harvest_nodes.rs: clickable mushroom nodes
+)
+
+# Mirrors the per-file bounds in the Rust loaders and bundle checks.
+ACTIVITY_MAX_BYTES = {
+    "encounters.json": 128 * 1024,
+    "encounter-template.bin": 334,
+    "kart_entry.json": 512 * 1024,
+    "kart_lobby.json": 256 * 1024,
+    "kart_gates.json": 16 * 1024,
+    "mining.json": 1024 * 1024,
+    "harvesting.json": 1024 * 1024,
+    "fishing_spots.json": 64 * 1024,
+    "mining_nodes.json": 1024 * 1024,
+    "harvest_nodes.json": 1024 * 1024,
+}
 
 # (R) Generated runtime content: the builder writes each file only when the
 # committed content does not already carry it, so a reviewed repository copy
@@ -255,31 +281,230 @@ def verify_manifest(bundle: Path) -> tuple[dict, int]:
     return manifest, len(expected)
 
 
+def _bounded_bytes(path: Path, limit: int) -> bytes:
+    if path.is_symlink():
+        raise ValueError(f"activity content is a symbolic link: {path.name}")
+    metadata = path.stat()
+    if not stat.S_ISREG(metadata.st_mode):
+        raise ValueError(f"activity content is not a regular file: {path.name}")
+    if metadata.st_size > limit:
+        raise ValueError(f"activity content exceeds {limit} bytes: {path.name}")
+    data = path.read_bytes()
+    if len(data) > limit:
+        raise ValueError(f"activity content exceeds {limit} bytes: {path.name}")
+    return data
+
+
+def _is_int(value) -> bool:
+    return type(value) is int
+
+
+def _check_kart_gates(gates) -> list[int]:
+    npcs = gates.get("npcs") if isinstance(gates, dict) else None
+    cooldown = gates.get("reward_cooldown_s", 0) if isinstance(gates, dict) else None
+    if (
+        not isinstance(gates, dict)
+        or gates.get("schema_version") != 1
+        or not set(gates) <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s"}
+        or not isinstance(npcs, list)
+        or len(npcs) > 16
+        or any(type(n) is not int or n <= 0 for n in npcs)
+        or len(set(npcs)) != len(npcs)
+        or type(cooldown) is not int
+        or not 0 <= cooldown <= 86_400
+        or (gates.get("menu_string_id") is not None
+            and (type(gates["menu_string_id"]) is not int or gates["menu_string_id"] <= 0))
+    ):
+        raise ValueError("content/kart_gates.json is invalid")
+    return npcs
+
+
+def _check_board(
+    name: str, value, game_id: int, profile_id: int, preload: str | None = None,
+    launch: str | None = None,
+) -> None:
+    if not isinstance(value, dict) or value.get("schema_version") != 1:
+        raise ValueError(f"content/{name} has an unsupported schema")
+    if value.get("game_id") != game_id or value.get("profile_id") != profile_id:
+        raise ValueError(f"content/{name} does not bind game {game_id} / profile {profile_id}")
+    if preload is not None and value.get("preload_file") != preload:
+        raise ValueError(f"content/{name} does not launch {preload}")
+    if launch is not None and value.get("launch_movie") != launch:
+        raise ValueError(f"content/{name} does not launch {launch}")
+    spec = value.get("spec")
+    if not isinstance(spec, dict):
+        raise ValueError(f"content/{name} has no board spec")
+    width, height, shape = spec.get("width"), spec.get("height"), spec.get("shape")
+    if (
+        not _is_int(width) or not _is_int(height) or width <= 0 or height <= 0
+        or not isinstance(shape, list) or len(shape) != width * height
+        or any(not _is_int(cell) for cell in shape)
+    ):
+        raise ValueError(f"content/{name} has an invalid board shape")
+    for key in ("goals", "outputs", "selectable", "collectable", "tiles"):
+        if not isinstance(spec.get(key, []), list):
+            raise ValueError(f"content/{name} spec.{key} must be an array")
+
+
+def check_activity_content(bundle: Path) -> str:
+    """Validate the frozen kart, fishing, mining, minigame and dungeon content.
+
+    The files are tracked in the repository and reach the bundle through the
+    committed-content copy; none may be supplied by the private round70 overlay.
+    These checks mirror the Rust loaders closely enough to reject a truncated or
+    mismatched freeze before a bundle is published.
+    """
+    content = Path(bundle) / "content"
+    for name in ACTIVITY_CONTENT:
+        path = content / name
+        if not path.is_file():
+            raise ValueError(f"frozen activity content is missing: {name}")
+        _bounded_bytes(path, ACTIVITY_MAX_BYTES[name])
+
+    encounters = read_json(content / "encounters.json")
+    if (
+        not isinstance(encounters, dict)
+        or encounters.get("schema_version") != 1
+        or encounters.get("template_file") != "encounter-template.bin"
+        or encounters.get("template_sha256") != sha256_file(content / "encounter-template.bin")
+    ):
+        raise ValueError("content/encounters.json is not bound to its encounter template")
+    dungeons = encounters.get("dungeons")
+    world_enemies = encounters.get("world_enemies")
+    if (
+        not isinstance(dungeons, list) or not 1 <= len(dungeons) <= 4
+        or not isinstance(world_enemies, list) or len(world_enemies) > 32
+    ):
+        raise ValueError("content/encounters.json has invalid record counts")
+    guids = set()
+    for actor in world_enemies:
+        guid = actor.get("guid") if isinstance(actor, dict) else None
+        if not _is_int(guid) or guid <= 0 or guid in guids:
+            raise ValueError("content/encounters.json has an invalid world enemy")
+        guids.add(guid)
+    for dungeon in dungeons:
+        if not isinstance(dungeon, dict) or not _is_int(dungeon.get("id")) or dungeon["id"] <= 0:
+            raise ValueError("content/encounters.json has an invalid dungeon")
+        enemies = dungeon.get("enemies")
+        if not isinstance(enemies, list) or not 1 <= len(enemies) <= 32:
+            raise ValueError("content/encounters.json has an invalid dungeon enemy list")
+        for actor in enemies + ([dungeon["guide"]] if dungeon.get("guide") else []):
+            guid = actor.get("guid") if isinstance(actor, dict) else None
+            if not _is_int(guid) or guid <= 0 or guid in guids:
+                raise ValueError("content/encounters.json has a duplicate or invalid GUID")
+            guids.add(guid)
+
+    kart = read_json(content / "kart_entry.json")
+    if not isinstance(kart, dict) or kart.get("schema_version") != 1:
+        raise ValueError("content/kart_entry.json has an unsupported schema")
+    entry = kart.get("entry")
+    context = kart.get("context")
+    vehicles = entry.get("entry_vehicles") if isinstance(entry, dict) else None
+    if not isinstance(entry, dict) or not isinstance(context, dict):
+        raise ValueError("content/kart_entry.json has no entry or context")
+    if not isinstance(vehicles, list) or len(vehicles) != 1:
+        raise ValueError("content/kart_entry.json must carry exactly one starter vehicle")
+    session = context.get("session")
+    offset = kart.get("vehicle_guid_offset")
+    attribute_block = vehicles[0].get("attribute_block") if isinstance(vehicles[0], dict) else None
+    if (
+        not _is_int(session) or session <= 0
+        or not _is_int(offset) or offset < 0
+        or not isinstance(attribute_block, list)
+        or len(attribute_block) < offset + 8
+        or any(not _is_int(byte) or not 0 <= byte <= 255 for byte in attribute_block)
+        or int.from_bytes(bytes(attribute_block[offset:offset + 8]), "little") != session
+    ):
+        raise ValueError("content/kart_entry.json has no owned-vehicle GUID proof")
+    for frame in (kart.get("details_loading"), kart.get("details_ready")):
+        if (
+            not isinstance(frame, list) or not 65 <= len(frame) <= 4096
+            or frame[:4] != [41, 0, 114, 0]
+            or any(not _is_int(byte) or not 0 <= byte <= 255 for byte in frame)
+        ):
+            raise ValueError("content/kart_entry.json has an invalid 41/114 frame")
+    progress = entry.get("progress")
+    if not isinstance(progress, list) or not any(
+        isinstance(row, dict) and row.get("racer_guid") == session
+        and row.get("tail_0x29") == session
+        for row in progress
+    ):
+        raise ValueError("content/kart_entry.json has no owned-racer progress proof")
+    # Mirrors the T028 loader gate: a race schedule that loses its final
+    # `countdown: 0` step makes the server refuse to start, so the bundle gate
+    # must refuse it before publication.
+    race = kart.get("race")
+    if race is not None:
+        schedule = race.get("schedule") if isinstance(race, dict) else None
+        if (
+            not isinstance(schedule, list) or not 1 <= len(schedule) <= 64
+            or any(
+                not isinstance(step, dict)
+                or not _is_int(step.get("at_ms"))
+                or step["at_ms"] < 0
+                or not isinstance(step.get("frame"), dict)
+                or len(step["frame"]) != 1
+                or any(not _is_int(value) for value in step["frame"].values())
+                for step in schedule
+            )
+            or not any(
+                _is_int(step["frame"].get("countdown"))
+                and step["frame"]["countdown"] == 0
+                for step in schedule
+            )
+        ):
+            raise ValueError(
+                "content/kart_entry.json race schedule never reaches countdown zero"
+            )
+
+    lobby = read_json(content / "kart_lobby.json")
+    if (
+        not isinstance(lobby, dict)
+        or set(lobby) != {"games", "options", "values", "display", "settings"}
+        or any(not isinstance(rows, list) or len(rows) > 4096 for rows in lobby.values())
+    ):
+        raise ValueError("content/kart_lobby.json is not a five-table lobby body")
+
+    gates = _check_kart_gates(read_json(content / "kart_gates.json"))
+    _check_board("mining.json", read_json(content / "mining.json"), 18, 14)
+    _check_board(
+        "harvesting.json", read_json(content / "harvesting.json"), 111, 45,
+        "FarmingAssets.txt", "game_farming.gfx",
+    )
+
+    spots = read_json(content / "fishing_spots.json")
+    if (
+        not isinstance(spots, dict) or spots.get("schema_version") != 1
+        or not isinstance(spots.get("spots"), list) or not 1 <= len(spots["spots"]) <= 64
+        or not isinstance(spots.get("items"), dict) or not spots["items"]
+        or any(not isinstance(row, dict) or not _is_int(row.get("npc")) or row["npc"] <= 0
+               for row in spots["spots"])
+        or len({row["npc"] for row in spots["spots"]}) != len(spots["spots"])
+    ):
+        raise ValueError("content/fishing_spots.json is invalid")
+
+    for name in ("mining_nodes.json", "harvest_nodes.json"):
+        nodes = read_json(content / name)
+        if (
+            not isinstance(nodes, dict) or nodes.get("schema_version") != 1
+            or any(not isinstance(nodes.get(key), list) or not nodes[key]
+                   for key in ("node_types", "pools", "spawns"))
+        ):
+            raise ValueError(f"content/{name} is invalid")
+
+    return (
+        f"kart entry {sha256_file(content / 'kart_entry.json')[:12]} "
+        f"({len(gates)} gate NPCs, lobby 5 tables), mining 18, harvesting 111, "
+        f"encounter {dungeons[0]['id']} + {len(world_enemies)} world enemies, "
+        f"fishing {len(spots['spots'])} spots, nodes 2 tables"
+    )
+
+
 def check_runtime_content(bundle: Path) -> list[str]:
     """Check the optional runtime content files that are present; return notes."""
     content = bundle / "content"
     notes = []
-    gates_path = content / "kart_gates.json"
-    if gates_path.is_file():
-        gates = read_json(gates_path)
-        npcs = gates.get("npcs") if isinstance(gates, dict) else None
-        cooldown = gates.get("reward_cooldown_s", 0) if isinstance(gates, dict) else None
-        # Mirrors the gateway's own bounds (kart_gateway.rs load_gates).
-        if (
-            not isinstance(gates, dict)
-            or gates.get("schema_version") != 1
-            or not set(gates) <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s"}
-            or not isinstance(npcs, list)
-            or len(npcs) > 16
-            or len(set(npcs)) != len(npcs)
-            or any(type(n) is not int or n <= 0 for n in npcs)
-            or type(cooldown) is not int
-            or not 0 <= cooldown <= 86_400
-            or gates_path.stat().st_size > 16 * 1024
-            or (not gates_path.parent.joinpath("kart_entry.json").is_file())
-        ):
-            raise ValueError("content/kart_gates.json is invalid or has no kart_entry.json beside it")
-        notes.append(f"kart_gates.json ({len(npcs)} gate NPCs)")
+    # kart_gates.json is required activity content now; the activity gate checks it.
     for name in OPTIONAL_REPOSITORY_CONTENT:
         path = content / name
         if path.is_file():

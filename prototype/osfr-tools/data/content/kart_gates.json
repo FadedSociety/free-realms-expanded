@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "npcs": [
+    9000000273,
+    9000000039
+  ],
+  "reward_cooldown_s": 300
+}

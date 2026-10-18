@@ -16,6 +16,13 @@ source commit in the bundle README. It does not modify the active play package.
   package reports are not copied. `combat-template.bin` and
   `encounter-template.bin` accompany their JSON definitions; each config pins
   its template hash, and the Rust loaders require those packet templates.
+  Activity content is tracked, not overlaid: `kart_entry.json`, `kart_lobby.json`,
+  `kart_gates.json`, `mining.json`, `harvesting.json`, `encounters.json`,
+  `encounter-template.bin`, `fishing_spots.json`, `mining_nodes.json` and
+  `harvest_nodes.json` come from the committed content tree (T026). The builder
+  and checker validate these files before a bundle is used; the exact bytes are
+  pinned by `tests/bundle_activity_content.rs` because kart and encounter saves
+  embed their content hashes.
 - `reference/`: the 46 files listed by
   `lab/references/rust-gateway-reference/manifest.json`; the builder checks
   each source length and SHA-256 before copying.
@@ -36,20 +43,26 @@ source commit in the bundle README. It does not modify the active play package.
   server identifier. Neither is copied from an existing server or player.
 - `README.md` and `manifest.json`: startup instructions and integrity metadata.
 
+Activity content is required by the bundle gate. `check_activity_content` validates
+the ten files above against bounds that mirror the Rust loaders (encounter template
+hash, one owned kart vehicle and its 41/114 frames, the five-table lobby body,
+game/profile bindings, a race schedule that reaches `countdown: 0` (the T028 loader
+gate), board shapes, node tables and fishing spots). A bundle with a missing or
+mismatched activity file is refused. `kart_gates.json`
+(`{"schema_version": 1, "npcs": [9000000273, 9000000039], "reward_cooldown_s": 300}`)
+is now committed; the builder's generated copy remains a fallback for old trees.
+**(R)** Chase Wheeler and Cale Yardbird were picked from wiki and map-marker evidence;
+the original NPC-to-kart mapping is not recovered.
+
 Optional runtime content (W159, 2026-10-16). The gateway reads these from `content/`
 when present and runs without them, so the builder never fails on a missing one and
 reports each as included or absent (`Runtime content:` line). `consumables.json`
-(item-bar potion and food tuning, `item_bar.rs`; a built-in table applies without it)
-and `power_ups.json` (combat power-up drop tables, `power_ups.rs`) are tracked
-repository content and enter through the committed-`HEAD` copy, so the same hashing
-and manifest checks cover them; as of 2026-10-16 neither is committed, and the
-builder prints a `WARNING` for uncommitted `data/content` edits. `kart_gates.json`
-(`{"schema_version": 1, "npcs": [9000000273, 9000000039], "reward_cooldown_s": 300}`)
-is written by the builder beside `kart_entry.json` when the committed content does not
-carry it; a committed copy wins. **(R)** Chase Wheeler and Cale Yardbird were picked
-from wiki and map-marker evidence; the original NPC-to-kart mapping is not recovered.
-`check_bundle.py` validates `kart_gates.json` against the gateway's own bounds (schema 1,
-at most 16 distinct non-zero NPCs, cooldown 0 to 86,400 s, `kart_entry.json` present).
+(item-bar potion and food tuning, `item_bar.rs`; a built-in table applies without it),
+`power_ups.json` (combat power-up drop tables, `power_ups.rs`),
+`crafting_stations.json` (world cooking, smelting and anvil models, `recipe_book.rs`)
+and `job_trainers.json` are tracked repository content and enter through the
+committed-`HEAD` copy, so the same hashing and manifest checks cover them. The
+builder prints a `WARNING` for uncommitted `data/content` edits.
 Warpstone and quest-journal data need no entry: quest-journal text is `journal-text.json`
 and `quest-journal.bin`, already in the private overlay.
 
