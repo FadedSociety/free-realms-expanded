@@ -1,8 +1,8 @@
 use osfr_tools::{
     character_store::CharacterState,
     game_store,
-    inventory::{Inventory, InventoryItem, InventoryState},
-    pets::{PetBusy, PetDefinition, PetRequest, PetService},
+    inventory::Inventory,
+    pets::{PetBusy, PetContent, PetDefinition, PetRequest, PetService},
     startup_world,
 };
 use std::{
@@ -44,32 +44,15 @@ fn owned_pet(service: &mut PetService) -> u32 {
     service.adopt_vendor_grant(1, &definition(), 0).unwrap()
 }
 
-fn inventory(item_definition: i32) -> InventoryState {
-    InventoryState {
-        coins: 0,
-        items: vec![InventoryItem {
-            definition_id: item_definition,
-            tint: 0,
-            id: 10,
-            count: 1,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: i64::from(i32::MAX),
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        }],
-        equipment: Vec::new(),
-        next_instance_id: None,
-    }
-}
-
 fn summon(pet_id: u32) -> Vec<u8> {
     [vec![53, 0, 4], pet_id.to_le_bytes().to_vec(), vec![1]].concat()
 }
 
-fn recall(pet_id: u32) -> Vec<u8> {
-    [vec![53, 0, 4], pet_id.to_le_bytes().to_vec(), vec![0]].concat()
+/// Client `Pet.Dismiss` shape: writer 00b5a650 always emits a u32 id followed by
+/// the action byte, and 00c07420 sets only the action (the id word is whatever
+/// the stack held), so the id must never select a pet.
+fn dismiss(stale_id: u32) -> Vec<u8> {
+    [vec![53, 0, 4], stale_id.to_le_bytes().to_vec(), vec![0]].concat()
 }
 
 fn name_request(name: &str) -> Vec<u8> {
@@ -81,11 +64,12 @@ fn name_request(name: &str) -> Vec<u8> {
     .concat()
 }
 
-fn summon_by_item(pet_id: u32, item_instance_id: u32) -> Vec<u8> {
+/// Client `ItemRecord`: definition id then tint (Items guide; `00a1ec00`).
+fn summon_by_item(definition_id: u32, tint: u32) -> Vec<u8> {
     [
         vec![53, 0, 32],
-        pet_id.to_le_bytes().to_vec(),
-        item_instance_id.to_le_bytes().to_vec(),
+        definition_id.to_le_bytes().to_vec(),
+        tint.to_le_bytes().to_vec(),
     ]
     .concat()
 }
@@ -117,7 +101,7 @@ fn name_response(packets: &[Vec<u8>], actor: u64, accepted: bool) -> bool {
 }
 
 #[test]
-fn an_owned_pet_summons_one_server_actor_and_the_short_dismiss_removes_it() {
+fn an_owned_pet_summons_one_server_actor_and_the_serializer_dismiss_removes_it() {
     let mut service = service();
     let pet_id = owned_pet(&mut service);
     let actor = PetService::pet_guid(OWNER);
@@ -126,9 +110,19 @@ fn an_owned_pet_summons_one_server_actor_and_the_short_dismiss_removes_it() {
         PetRequest::decode(&summon(pet_id)).unwrap(),
         Some(PetRequest::Summon { pet_id })
     );
+    // The native dismiss sender leaves the id word uninitialized, so any four
+    // bytes followed by action 0 mean "dismiss the active pet".
     assert_eq!(
-        PetRequest::decode(&recall(pet_id)).unwrap(),
-        Some(PetRequest::Recall { pet_id })
+        PetRequest::decode(&dismiss(0)).unwrap(),
+        Some(PetRequest::Dismiss)
+    );
+    assert_eq!(
+        PetRequest::decode(&dismiss(0xdead_beef)).unwrap(),
+        Some(PetRequest::Dismiss)
+    );
+    assert!(
+        PetRequest::decode(&[53, 0, 4, 0]).is_err(),
+        "a one-byte body is not the client's serializer shape"
     );
 
     let summon_wire = service
@@ -136,13 +130,11 @@ fn an_owned_pet_summons_one_server_actor_and_the_short_dismiss_removes_it() {
             &summon(pet_id),
             OWNER,
             [1.0, 2.0, 3.0],
-            &inventory(9001),
             PetBusy::default(),
             NOW,
         )
         .unwrap()
         .unwrap();
-    assert!(has(&summon_wire.private, 53, 9));
     assert_eq!(
         summon_wire
             .shared
@@ -152,16 +144,27 @@ fn an_owned_pet_summons_one_server_actor_and_the_short_dismiss_removes_it() {
         1
     );
     assert!(actor_packet(&summon_wire.shared, actor));
-    assert_eq!(summon_wire.private[1..], summon_wire.shared);
+    // Actor creation precedes activation: the client resolves the actor as soon
+    // as PetActive arrives.
+    assert_eq!(
+        summon_wire.private[..summon_wire.private.len() - 1],
+        summon_wire.shared
+    );
+    let active = summon_wire
+        .private
+        .last()
+        .expect("activation follows the actor");
+    assert_eq!(&active[..3], [53, 0, 9]);
+    assert_eq!(&active[3..7], &pet_id.to_le_bytes());
+    assert_eq!(&active[7..15], &actor.to_le_bytes());
     assert_eq!(service.active_pet_id(), Some(pet_id));
     assert_eq!(service.view(OWNER).unwrap().actor_guid, actor);
 
     let dismiss_wire = service
         .handle(
-            &[53, 0, 4, 0],
+            &dismiss(0),
             OWNER,
             [1.0, 2.0, 3.0],
-            &inventory(9001),
             PetBusy::default(),
             NOW + 1,
         )
@@ -169,8 +172,36 @@ fn an_owned_pet_summons_one_server_actor_and_the_short_dismiss_removes_it() {
         .unwrap();
     assert!(has(&dismiss_wire.private, 53, 9));
     assert!(removal_packet(&dismiss_wire.shared, actor));
+    assert_eq!(
+        dismiss_wire.private[..dismiss_wire.private.len() - 1],
+        dismiss_wire.shared
+    );
     assert_eq!(service.active_pet_id(), None);
     assert!(service.view(OWNER).is_none());
+
+    // A stale non-zero id from the same sender still dismisses.
+    service
+        .handle(
+            &summon(pet_id),
+            OWNER,
+            [1.0, 2.0, 3.0],
+            PetBusy::default(),
+            NOW + 2,
+        )
+        .unwrap()
+        .unwrap();
+    let stale = service
+        .handle(
+            &dismiss(0x7fff_ffff),
+            OWNER,
+            [1.0, 2.0, 3.0],
+            PetBusy::default(),
+            NOW + 3,
+        )
+        .unwrap()
+        .unwrap();
+    assert!(removal_packet(&stale.shared, actor));
+    assert_eq!(service.active_pet_id(), None);
 }
 
 #[test]
@@ -186,7 +217,6 @@ fn a_bundled_pet_actor_carries_its_models_txt_id_and_texture_alias() {
             &summon(pet_id),
             OWNER,
             [1.0, 2.0, 3.0],
-            &inventory(70352),
             PetBusy::default(),
             NOW,
         )
@@ -214,7 +244,6 @@ fn unowned_pet_item_and_malformed_refusals_each_change_nothing() {
             &summon(pet_id + 100),
             OWNER,
             [1.0, 2.0, 3.0],
-            &inventory(9001),
             PetBusy::default(),
             NOW,
         )
@@ -228,10 +257,9 @@ fn unowned_pet_item_and_malformed_refusals_each_change_nothing() {
 
     let wrong_item = service
         .handle(
-            &summon_by_item(pet_id, 10),
+            &summon_by_item(9001, 0),
             OWNER,
             [1.0, 2.0, 3.0],
-            &inventory(9002),
             PetBusy::default(),
             NOW + 1,
         )
@@ -249,7 +277,6 @@ fn unowned_pet_item_and_malformed_refusals_each_change_nothing() {
                 &malformed,
                 OWNER,
                 [1.0, 2.0, 3.0],
-                &inventory(9001),
                 PetBusy::default(),
                 NOW + 2,
             )
@@ -259,23 +286,58 @@ fn unowned_pet_item_and_malformed_refusals_each_change_nothing() {
     assert_eq!(service.active_pet_id(), None);
 }
 
+/// Lead (2026-10-18): each adoption item is redeemed once into its own pet, even when the
+/// species is already owned; a definition match must not re-summon the old pet and strand
+/// the certificate. With none left, the request is refused and changes nothing.
 #[test]
-fn an_owned_adoption_item_can_summon_through_the_item_form() {
+fn each_adoption_item_adopts_a_new_pet_even_when_the_species_is_owned() {
     let mut service = service();
-    let pet_id = owned_pet(&mut service);
-    let wire = service
-        .handle(
-            &summon_by_item(pet_id, 10),
+    let mut inventory = inventory_handle(70352);
+    inventory.grant(0, 70352, 1).unwrap();
+    let certificates = |inventory: &Inventory| -> u32 {
+        inventory
+            .state()
+            .items
+            .iter()
+            .filter(|item| item.definition_id == 70352)
+            .map(|item| item.count)
+            .sum()
+    };
+    assert_eq!(certificates(&inventory), 2);
+    for pet in [1u32, 2] {
+        let wire = service
+            .handle_with_inventory(
+                &summon_by_item(70352, 0),
+                OWNER,
+                [0.0, 1.0, 2.0],
+                &mut inventory,
+                PetBusy::default(),
+                NOW + u64::from(pet),
+            )
+            .unwrap()
+            .unwrap();
+        assert!(wire.pets_changed);
+        assert_eq!(service.active_pet_id(), Some(pet));
+        assert_eq!(certificates(&inventory), 2 - pet);
+    }
+    assert!(service.pet(1).is_some() && service.pet(2).is_some());
+
+    let roster = service.roster_snapshot();
+    let refused = service
+        .handle_with_inventory(
+            &summon_by_item(70352, 0),
             OWNER,
             [0.0, 1.0, 2.0],
-            &inventory(9001),
+            &mut inventory,
             PetBusy::default(),
-            NOW,
+            NOW + 3,
         )
         .unwrap()
         .unwrap();
-    assert!(has(&wire.private, 53, 9));
-    assert_eq!(service.active_pet_id(), Some(pet_id));
+    assert!(refused.notice.is_some());
+    assert!(!refused.pets_changed);
+    assert_eq!(service.roster_snapshot(), roster);
+    assert_eq!(service.active_pet_id(), Some(2));
 }
 
 #[test]
@@ -288,7 +350,7 @@ fn an_owned_adoption_item_can_create_and_summon_a_roster_pet() {
         .iter()
         .find(|item| item.definition_id == 70352)
         .map_or(0, |item| item.count);
-    let request = summon_by_item(1, 70352);
+    let request = summon_by_item(70352, 0);
     let wire = service
         .handle_with_inventory(
             &request,
@@ -302,8 +364,33 @@ fn an_owned_adoption_item_can_create_and_summon_a_roster_pet() {
         .unwrap();
     assert!(wire.changed);
     assert!(wire.pets_changed);
-    assert!(has(&wire.private, 53, 5));
-    assert!(has(&wire.private, 53, 9));
+    // Actor creation precedes the roster (whose trailing active pair activates
+    // the pet) and the explicit activation.
+    let actor_at = wire
+        .private
+        .iter()
+        .position(|packet| packet.starts_with(&[35, 0, 2, 0]))
+        .expect("new pet actor");
+    let list_at = wire
+        .private
+        .iter()
+        .position(|packet| packet.starts_with(&[53, 0, 5]))
+        .expect("roster after creation");
+    let active_at = wire
+        .private
+        .iter()
+        .position(|packet| packet.starts_with(&[53, 0, 9]))
+        .expect("activation last");
+    assert!(
+        actor_at < list_at && list_at < active_at,
+        "order was actor={actor_at} list={list_at} active={active_at}"
+    );
+    let (keys, pets, active, actor) = decode_pet_list(&wire.private[list_at]);
+    assert_eq!(keys, vec![1]);
+    assert_eq!(pets.len(), 1);
+    assert_eq!(pets[0].id, 1);
+    assert_eq!(active, 1);
+    assert_eq!(actor, PetService::pet_guid(OWNER));
     assert_eq!(service.active_pet_id(), Some(1));
     assert!(service.pet(1).is_some());
     let after = inventory
@@ -329,7 +416,6 @@ fn ui_mode_is_bounded_and_a_reconnect_keeps_the_roster_but_not_the_actor() {
             &[53, 0, 24, 2, 0, 0, 0],
             OWNER,
             [0.0; 3],
-            &inventory(9001),
             PetBusy::default(),
             NOW,
         )
@@ -341,7 +427,6 @@ fn ui_mode_is_bounded_and_a_reconnect_keeps_the_roster_but_not_the_actor() {
                 &[53, 0, 24, 3, 0, 0, 0],
                 OWNER,
                 [0.0; 3],
-                &inventory(9001),
                 PetBusy::default(),
                 NOW,
             )
@@ -355,7 +440,6 @@ fn ui_mode_is_bounded_and_a_reconnect_keeps_the_roster_but_not_the_actor() {
             &summon(pet_id),
             OWNER,
             [4.0, 5.0, 6.0],
-            &inventory(9001),
             PetBusy::default(),
             NOW,
         )
@@ -377,7 +461,6 @@ fn a_selected_name_updates_only_the_active_pet_and_refusals_change_nothing() {
             &name_request("Admiral Ace"),
             OWNER,
             [0.0; 3],
-            &inventory(9001),
             PetBusy::default(),
             NOW,
         )
@@ -392,7 +475,6 @@ fn a_selected_name_updates_only_the_active_pet_and_refusals_change_nothing() {
             &summon(pet_id),
             OWNER,
             [0.0; 3],
-            &inventory(9001),
             PetBusy::default(),
             NOW + 1,
         )
@@ -402,7 +484,6 @@ fn a_selected_name_updates_only_the_active_pet_and_refusals_change_nothing() {
             &name_request("Admiral Ace"),
             OWNER,
             [0.0; 3],
-            &inventory(9001),
             PetBusy::default(),
             NOW + 2,
         )
@@ -423,7 +504,6 @@ fn a_selected_name_updates_only_the_active_pet_and_refusals_change_nothing() {
             &name_request("not a selected name"),
             OWNER,
             [0.0; 3],
-            &inventory(9001),
             PetBusy::default(),
             NOW + 3,
         )
@@ -501,7 +581,6 @@ fn roster_reload_preserves_ownership_and_the_client_list_reports_no_active_actor
             &summon(pet_id),
             OWNER,
             [7.0, 8.0, 9.0],
-            &inventory(9001),
             PetBusy::default(),
             NOW,
         )
@@ -512,22 +591,238 @@ fn roster_reload_preserves_ownership_and_the_client_list_reports_no_active_actor
     assert_eq!(reloaded.pet(pet_id).unwrap().id, pet_id);
     assert_eq!(reloaded.active_pet_id(), None);
     let list = reloaded.list_packet();
-    assert_eq!(list[..3], [53, 0, 5]);
-    assert_eq!(
-        u32::from_le_bytes(list[3..7].try_into().unwrap()),
-        1,
-        "one owned pet"
-    );
-    assert_eq!(
-        u32::from_le_bytes(list[7..11].try_into().unwrap()),
-        pet_id,
-        "list key"
-    );
-    assert_eq!(
-        u32::from_le_bytes(list[11..15].try_into().unwrap()),
-        pet_id,
-        "record id"
-    );
-    assert_eq!(&list[list.len() - 12..list.len() - 8], &[0; 4]);
-    assert_eq!(&list[list.len() - 8..], &[0; 8]);
+    // Client `00b5aea0` reads one key per pet and `00912cf0` then reads one
+    // record that starts with its own id. Decode the whole packet independently
+    // and require exact consumption: a duplicate id shifts every later field.
+    let (keys, pets, active, actor) = decode_pet_list(&list);
+    assert_eq!(keys, vec![pet_id], "one list key per pet");
+    assert_eq!(pets.len(), 1, "one owned pet");
+    assert_eq!(pets[0].id, pet_id, "record id");
+    assert_eq!(pets[0].species_id, 652);
+    assert_eq!(pets[0].name, "");
+    assert_eq!(pets[0].tricks, vec![1]);
+    assert_eq!(active, 0);
+    assert_eq!(actor, 0);
+}
+
+/// Independent client-shaped decoder for subtype 5. Mirrors the reader layout
+/// (`00912cf0` fixed fields, counted trick/item rows, three strings, four
+/// favourite dwords, eight utility dwords) and asserts the trailing active pair.
+fn decode_pet_list(bytes: &[u8]) -> (Vec<u32>, Vec<DecodedPet>, u32, u64) {
+    let mut at = ListCursor::new(bytes);
+    assert_eq!(at.take(2), [53, 0], "pet family");
+    assert_eq!(at.u8(), 5, "PetList subtype");
+    let count = at.u32();
+    let mut keys = Vec::new();
+    let mut pets = Vec::new();
+    for _ in 0..count {
+        keys.push(at.u32());
+        let mut pet = DecodedPet {
+            id: at.u32(),
+            species_id: 0,
+            name: String::new(),
+            tricks: Vec::new(),
+            items: Vec::new(),
+            favorites: Vec::new(),
+            utilities: Vec::new(),
+        };
+        assert_eq!(at.u8(), 0, "unknown record flag at +0x04");
+        pet.species_id = at.u32();
+        for _ in 0..4 {
+            assert!(at.f32().is_finite(), "need value");
+        }
+        assert_eq!(at.u8(), 0, "unknown record flag at +0x30");
+        for _ in 0..at.u32() {
+            pet.tricks.push(at.u32());
+            for _ in 0..8 {
+                at.u32();
+            }
+            assert_eq!(at.u8(), 1, "known trick flag");
+        }
+        for _ in 0..at.u32() {
+            pet.items.push(at.u32());
+        }
+        assert_eq!(at.u32(), 0, "profile item rows");
+        pet.name = at.string();
+        at.u32();
+        at.u32();
+        assert_eq!(at.string(), "", "second string");
+        at.u32();
+        assert_eq!(at.u8(), 0);
+        at.u32();
+        assert_eq!(at.u8(), 0);
+        for _ in 0..4 {
+            pet.favorites.push(at.u32());
+        }
+        for _ in 0..8 {
+            pet.utilities.push(at.u32());
+        }
+        pets.push(pet);
+    }
+    let active = at.u32();
+    let actor = at.u64();
+    assert_eq!(at.at, bytes.len(), "PetList must be fully consumed");
+    (keys, pets, active, actor)
+}
+
+struct DecodedPet {
+    id: u32,
+    species_id: u32,
+    name: String,
+    tricks: Vec<u32>,
+    items: Vec<u32>,
+    favorites: Vec<u32>,
+    utilities: Vec<u32>,
+}
+
+struct ListCursor<'a> {
+    bytes: &'a [u8],
+    at: usize,
+}
+
+impl<'a> ListCursor<'a> {
+    fn new(bytes: &'a [u8]) -> Self {
+        Self { bytes, at: 0 }
+    }
+
+    fn take(&mut self, count: usize) -> &'a [u8] {
+        let end = self.at.checked_add(count).expect("bounded list");
+        let slice = &self.bytes[self.at..end];
+        self.at = end;
+        slice
+    }
+
+    fn u8(&mut self) -> u8 {
+        self.take(1)[0]
+    }
+
+    fn u32(&mut self) -> u32 {
+        u32::from_le_bytes(self.take(4).try_into().unwrap())
+    }
+
+    fn u64(&mut self) -> u64 {
+        u64::from_le_bytes(self.take(8).try_into().unwrap())
+    }
+
+    fn f32(&mut self) -> f32 {
+        f32::from_bits(self.u32())
+    }
+
+    fn string(&mut self) -> String {
+        let length = self.u32() as usize;
+        String::from_utf8(self.take(length).to_vec()).unwrap()
+    }
+}
+
+#[test]
+fn switching_pets_removes_the_old_actor_then_creates_and_activates_the_new_one() {
+    let mut service = service();
+    let first = service.adopt_vendor_grant(1, &definition(), 0).unwrap();
+    let second = service.adopt_vendor_grant(2, &definition(), 0).unwrap();
+    let actor = PetService::pet_guid(OWNER);
+    service
+        .handle(&summon(first), OWNER, [0.0; 3], PetBusy::default(), NOW)
+        .unwrap()
+        .unwrap();
+
+    let switched = service
+        .handle(
+            &summon(second),
+            OWNER,
+            [0.0; 3],
+            PetBusy::default(),
+            NOW + 1,
+        )
+        .unwrap()
+        .unwrap();
+    assert_eq!(switched.shared.len(), 2);
+    assert_eq!(switched.private[..2], switched.shared[..]);
+    let removal = &switched.private[0];
+    assert!(removal.starts_with(&[35, 0, 3, 0, 1, 0]));
+    assert_eq!(&removal[6..14], &actor.to_le_bytes());
+    let created = &switched.private[1];
+    assert!(created.starts_with(&[35, 0, 2, 0]));
+    assert_eq!(&created[4..12], &actor.to_le_bytes());
+    let active = &switched.private[2];
+    assert_eq!(&active[..3], [53, 0, 9]);
+    assert_eq!(&active[3..7], &second.to_le_bytes());
+    assert_eq!(&active[7..15], &actor.to_le_bytes());
+    assert_eq!(service.active_pet_id(), Some(second));
+}
+
+#[test]
+fn an_item_record_with_a_wrong_tint_refuses_without_consuming_or_saving() {
+    let file = SaveFile::new();
+    game_store::save(
+        &file.path,
+        &game_store::Snapshot {
+            character: CharacterState {
+                guid: OWNER,
+                zone_id: 0,
+                position: [0.0; 3],
+                rotation: [0.0, 0.0, 1.0],
+            },
+            gameplay: None,
+        },
+    )
+    .unwrap();
+    let mut service = service();
+    service.save_to(&file.path).unwrap();
+    let saved_before = fs::read(&file.path).unwrap();
+    let mut inventory = inventory_handle(70352);
+    let inventory_before = inventory.state().clone();
+    let roster_before = service.roster_snapshot();
+
+    // The old cross-field fallback read the first word as an instance or
+    // definition id when the second found nothing, so this pair consumed the
+    // owned 70352 item and created a pet.
+    let wire = service
+        .handle_with_inventory(
+            &summon_by_item(70352, 999_999),
+            OWNER,
+            [0.0; 3],
+            &mut inventory,
+            PetBusy::default(),
+            NOW,
+        )
+        .unwrap()
+        .expect("refusal is a private roster refresh");
+    assert!(wire.notice.is_some());
+    assert!(!wire.changed && !wire.pets_changed);
+    assert!(wire.shared.is_empty());
+    assert_eq!(inventory.state(), &inventory_before);
+    assert_eq!(service.roster_snapshot(), roster_before);
+    assert_eq!(service.active_pet_id(), None);
+    assert!(service.pet(1).is_none());
+    assert_eq!(fs::read(&file.path).unwrap(), saved_before);
+    service.save_to(&file.path).unwrap();
+    assert_eq!(fs::read(&file.path).unwrap(), saved_before);
+}
+
+#[test]
+fn a_package_configured_pet_speed_reaches_the_actor_packet() {
+    let mut document: serde_json::Value =
+        serde_json::from_str(include_str!("../data/content/pets.json")).unwrap();
+    document["movement_speed"]["speed"] = serde_json::json!(7.5);
+    let content = PetContent::from_json(&serde_json::to_vec(&document).unwrap()).unwrap();
+    let mut service = PetService::new(content).unwrap();
+    let pet_id = service.adopt_vendor_grant(1, &definition(), 0).unwrap();
+    service
+        .handle(
+            &summon(pet_id),
+            OWNER,
+            [1.0, 2.0, 3.0],
+            PetBusy::default(),
+            NOW,
+        )
+        .unwrap();
+    let presence = service.view(OWNER).unwrap();
+    assert_eq!(presence.speed, 7.5);
+    let npc = startup_world::parse_add_npc(&presence.spawn_packet().unwrap()).unwrap();
+    assert_eq!(npc.speed, 7.5);
+
+    document["movement_speed"]["speed"] = serde_json::json!(0.0);
+    assert!(PetContent::from_json(&serde_json::to_vec(&document).unwrap()).is_err());
+    document["movement_speed"]["speed"] = serde_json::json!(1000.0);
+    assert!(PetContent::from_json(&serde_json::to_vec(&document).unwrap()).is_err());
 }

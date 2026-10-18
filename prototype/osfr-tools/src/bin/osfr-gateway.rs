@@ -1888,9 +1888,13 @@ impl Session {
                     .position_saved_ms
                     .is_some_and(|saved| now_ms < saved.saturating_add(POSITION_SAVE_MS));
             if outcome.state_changed && !deferred {
-                save(&self.state_path, &staged_gateway.snapshot())?;
+                // Lead (persistence): a pet change saves character and roster in ONE atomic
+                // write. Two writes could crash between them and keep a consumed adoption item
+                // without its pet, or the pet without spending the item.
                 if outcome.pets_changed {
-                    staged_gateway.save_pet_roster(&self.state_path)?;
+                    staged_gateway.save_with_pet_roster(&self.state_path)?;
+                } else {
+                    save(&self.state_path, &staged_gateway.snapshot())?;
                 }
             }
             persist_social_changes(world, &staged_world)?;

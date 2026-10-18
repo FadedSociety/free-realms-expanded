@@ -65,10 +65,22 @@ pub fn load_or_create(path: &Path, initial: CharacterState) -> io::Result<Snapsh
 }
 
 pub fn save(path: &Path, snapshot: &Snapshot) -> io::Result<()> {
+    save_document(path, snapshot, None)
+}
+
+/// Write the character snapshot and the pet roster in one atomic replace. A pet change that also
+/// changes the character (adoption consumes an item) must never land as two writes: a crash
+/// between them would keep the item without the pet, or the pet without spending the item.
+pub fn save_with_pets<T: Serialize>(path: &Path, snapshot: &Snapshot, pets: &T) -> io::Result<()> {
+    let pets = serde_json::to_value(pets).map_err(invalid)?;
+    save_document(path, snapshot, Some(pets))
+}
+
+fn save_document(path: &Path, snapshot: &Snapshot, new_pets: Option<Value>) -> io::Result<()> {
     snapshot.character.validate()?;
     let (housing, pets) = match read_document(path) {
-        Ok(document) => (document.housing, document.pets),
-        Err(error) if error.kind() == io::ErrorKind::NotFound => (None, None),
+        Ok(document) => (document.housing, new_pets.or(document.pets)),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => (None, new_pets),
         Err(error) => return Err(error),
     };
     let document = Document {

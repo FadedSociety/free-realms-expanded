@@ -537,9 +537,11 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("mounts", [vec![168, 0, 6], vec![0xff; 4]].concat()));
     result.push(("mounts", [vec![168, 0, 8], vec![0xff; 4], vec![1]].concat()));
     result.push(("mounts", vec![168, 0, 0xff, 0xff]));
-    // Family 53 (pets, W177) has a one-byte subtype: summon/recall, short dismiss, UI mode,
-    // summon by item, and the family wildcard retained as an ordinary unknown body.
+    // Family 53 (pets, W177) has a one-byte subtype: summon, the serializer-shaped
+    // dismiss (u32 id + action), a truncated dismiss, UI mode, summon by item, and
+    // the family wildcard retained as an ordinary unknown body.
     result.push(("pets", [vec![53, 0, 4], vec![0xff; 4], vec![1]].concat()));
+    result.push(("pets", vec![53, 0, 4, 0, 0, 0, 0, 0]));
     result.push(("pets", vec![53, 0, 4, 0]));
     result.push(("pets", vec![53, 0, 6, 0]));
     result.push((

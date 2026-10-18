@@ -3461,6 +3461,16 @@ impl Gameplay {
         self.pets.save_to(path)
     }
 
+    /// Persist the character snapshot and the pet roster in one atomic write (adoption consumes
+    /// an item and adds a pet; both must land or neither).
+    pub fn save_with_pet_roster(
+        &self,
+        path: &Path,
+        snapshot: &crate::game_store::Snapshot,
+    ) -> io::Result<()> {
+        self.pets.save_with(path, snapshot)
+    }
+
     /// W177: the active pet as other players need it for AddNpc replay.
     pub fn pet_view(&self, owner_guid: u64) -> Option<crate::pets::PetPresence> {
         self.pets.view(owner_guid)

@@ -1566,6 +1566,13 @@
     "summoned_decay_per_second": 0.02,
     "maximum": 100
   },
+  "movement_speed": {
+    "speed": 5.0,
+    "source": {
+      "kind": "reconstructed",
+      "evidence": "Pet actor movement speed is package policy (R). W177 used 5.0 in code; no recovered pet content or client table supplies a speed."
+    }
+  },
   "species": [
     {
       "species_id": 1000001,

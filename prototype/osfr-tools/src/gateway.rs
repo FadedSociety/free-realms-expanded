@@ -1423,12 +1423,14 @@ impl Gateway {
         Ok(())
     }
 
-    /// Persist the top-level pet roster after a committed pet change.
-    pub fn save_pet_roster(&self, path: &Path) -> io::Result<()> {
-        if let Some(game) = self.gameplay.as_ref() {
-            game.save_pet_roster(path)?;
+    /// Persist the character snapshot and, when gameplay owns pets, the pet roster in one atomic
+    /// write after a committed pet change.
+    pub fn save_with_pet_roster(&self, path: &Path) -> io::Result<()> {
+        let snapshot = self.snapshot();
+        match self.gameplay.as_ref() {
+            Some(game) => game.save_with_pet_roster(path, &snapshot),
+            None => crate::game_store::save(path, &snapshot),
         }
-        Ok(())
     }
 
     /// W177: the active pet for AddNpc fanout and late viewers.

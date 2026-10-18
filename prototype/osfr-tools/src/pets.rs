@@ -68,6 +68,7 @@ pub struct PetContent {
     tricks: Vec<PetTrickDefinition>,
     care_items: Vec<PetCareItem>,
     need_policy: NeedPolicy,
+    movement_speed: MovementSpeed,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -202,6 +203,15 @@ struct NeedPolicy {
     source: SourceTag,
 }
 
+/// (R) Pet actor movement speed. No recovered pet content supplies a speed, so
+/// the package owns the value instead of every actor taking a code constant.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+struct MovementSpeed {
+    speed: f32,
+    source: SourceTag,
+}
+
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "kind", content = "evidence", rename_all = "snake_case")]
 enum SourceTag {
@@ -259,6 +269,8 @@ impl PetContent {
             || !self.need_policy.summoned_decay_per_second.is_finite()
             || self.need_policy.idle_decay_per_second <= 0.0
             || self.need_policy.summoned_decay_per_second < self.need_policy.idle_decay_per_second
+            || !self.movement_speed.speed.is_finite()
+            || !(0.1..=20.0).contains(&self.movement_speed.speed)
         {
             return Err(invalid("unsupported pet content"));
         }
@@ -456,6 +468,8 @@ pub struct PetPresence {
     pub model_id: i32,
     pub texture_alias: String,
     pub name: String,
+    /// Package-configured actor speed copied from the pet content.
+    pub speed: f32,
     pub position: [f32; 3],
 }
 
@@ -494,11 +508,21 @@ enum Need {
 /// A decoded pet request. Only layouts pinned by a client sender are accepted.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PetRequest {
-    Summon { pet_id: u32 },
-    Recall { pet_id: u32 },
-    ForcedDismiss,
-    SummonByItem { pet_id: u32, item_instance_id: u32 },
-    Rename { name: String },
+    Summon {
+        pet_id: u32,
+    },
+    /// Client `Pet.Dismiss`/forced dismiss: action 0 with the id word left
+    /// uninitialized by the client, so the id never selects a pet.
+    Dismiss,
+    /// One client `ItemRecord`: definition id then tint. The pair names an
+    /// owned inventory instance; neither word is a pet or instance id.
+    SummonByItem {
+        definition_id: u32,
+        tint: u32,
+    },
+    Rename {
+        name: String,
+    },
     UiMode(u32),
 }
 
@@ -521,23 +545,23 @@ impl PetRequest {
                 .map(u32::from_le_bytes)
         };
         match subtype {
-            4 => match body {
-                [pet_id @ .., action] if body.len() == 5 => {
-                    let pet_id = word(0).ok_or_else(|| invalid("short pet summon request"))?;
-                    let request = match (*action, pet_id) {
-                        (1, pet_id) => PetRequest::Summon { pet_id },
-                        (0, pet_id) => PetRequest::Recall { pet_id },
-                        (_, _) => return Err(invalid("unknown pet summon action")),
-                    };
-                    if pet_id == 0 {
-                        return Err(invalid("pet summon request has a zero pet id"));
-                    }
-                    Ok(Some(request))
+            4 => {
+                // Client writer 00b5a650 (summon 00b60080, recall 00b601a0, dismiss
+                // 00c07420/00b60610) always serializes a u32 id followed by the action
+                // byte. `Pet.Dismiss` assigns only the action (00c07454) and never the
+                // id word, so an action-0 request must dismiss the active pet whatever
+                // four bytes precede the action.
+                if body.len() != 5 {
+                    return Err(invalid("pet summon request has the wrong length"));
                 }
-                [0] => Ok(Some(PetRequest::ForcedDismiss)),
-                [1] => Err(invalid("forced pet dismissal cannot summon")),
-                _ => Err(invalid("pet summon request has the wrong length")),
-            },
+                let pet_id = word(0).ok_or_else(|| invalid("short pet summon request"))?;
+                match (body[4], pet_id) {
+                    (1, 0) => Err(invalid("pet summon request has a zero pet id")),
+                    (1, pet_id) => Ok(Some(PetRequest::Summon { pet_id })),
+                    (0, _) => Ok(Some(PetRequest::Dismiss)),
+                    (_, _) => Err(invalid("unknown pet summon action")),
+                }
+            }
             6 => {
                 if body.len() < 4 {
                     return Err(invalid("pet name request is truncated"));
@@ -567,14 +591,16 @@ impl PetRequest {
                 if body.len() != 8 {
                     return Err(invalid("pet item summon request has the wrong length"));
                 }
-                let pet_id = word(0).ok_or_else(|| invalid("short pet item request"))?;
-                let item_instance_id = word(4).ok_or_else(|| invalid("short pet item instance"))?;
-                if pet_id == 0 || item_instance_id == 0 {
-                    return Err(invalid("pet item summon request has a zero field"));
+                let definition_id = word(0).ok_or_else(|| invalid("short pet item request"))?;
+                let tint = word(4).ok_or_else(|| invalid("short pet item tint"))?;
+                if definition_id == 0 {
+                    return Err(invalid(
+                        "pet item summon request has a zero item definition",
+                    ));
                 }
                 Ok(Some(PetRequest::SummonByItem {
-                    pet_id,
-                    item_instance_id,
+                    definition_id,
+                    tint,
                 }))
             }
             // Other client-bound pet subtypes are not enabled without a recovered layout.
@@ -661,6 +687,12 @@ impl PetService {
         game_store::save_pets_state(path, &self.roster)
     }
 
+    /// Persist the roster together with the character snapshot in one atomic write.
+    pub fn save_with(&self, path: &Path, snapshot: &game_store::Snapshot) -> io::Result<()> {
+        validate_roster(&self.content, &self.roster)?;
+        game_store::save_with_pets(path, snapshot, &self.roster)
+    }
+
     pub fn pet(&self, pet_id: u32) -> Option<&Pet> {
         self.roster.pets.iter().find(|pet| pet.id == pet_id)
     }
@@ -714,6 +746,7 @@ impl PetService {
             model_id: model_id(&pet.model),
             texture_alias: self.texture_alias(pet.species_id),
             name: self.display_name(pet),
+            speed: self.content.movement_speed.speed,
             position: active.position,
         })
     }
@@ -900,6 +933,7 @@ impl PetService {
             model_id,
             texture_alias: self.texture_alias(species_id),
             name,
+            speed: self.content.movement_speed.speed,
             position: owner_position,
         }));
         Ok(PetTransition {
@@ -942,42 +976,15 @@ impl PetService {
         self.dismiss(now)
     }
 
-    /// Summon by an inventory instance only when it is the same adoption item that created
-    /// this saved pet. The roster remains the ownership authority.
-    pub fn summon_by_item(
-        &mut self,
-        pet_id: u32,
-        item_instance_id: u32,
-        actor_guid: u64,
-        owner_guid: u64,
-        owner_position: [f32; 3],
-        inventory: &InventoryState,
-        busy: PetBusy,
-        now: u64,
-    ) -> io::Result<PetTransition> {
-        let expected = self
-            .pet(pet_id)
-            .ok_or_else(|| invalid("pet is not owned"))?
-            .adoption_item_definition_id
-            .ok_or_else(|| invalid("pet has no adoption item"))?;
-        let owned = inventory.items.iter().any(|item| {
-            i32::try_from(item_instance_id).ok() == Some(item.id)
-                && item.count > 0
-                && item.definition_id == expected
-        });
-        if !owned {
-            return Err(invalid("pet adoption item is not owned"));
-        }
-        self.summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)
-    }
-
-    /// Route subtype 32. The two recovered words have no settled field meaning,
-    /// so an owned item may be named by either instance or definition id; the
-    /// roster and item definition still decide whether a pet is created.
+    /// Route subtype 32 through the live inventory. The client sends the
+    /// definition and tint of the item record it used (client `ItemRecord` +0x04
+    /// and +0x08; `00a1ec00` passes them to `00b60110`); the server resolves the
+    /// owned instance, adopts one new pet from it and summons that pet. It never
+    /// treats either word as a pet or instance id.
     fn summon_by_item_owned(
         &mut self,
-        pet_id: u32,
-        item_id: u32,
+        definition_id: u32,
+        tint: u32,
         actor_guid: u64,
         owner_guid: u64,
         owner_position: [f32; 3],
@@ -985,40 +992,17 @@ impl PetService {
         busy: PetBusy,
         now: u64,
     ) -> io::Result<(PetTransition, Vec<Vec<u8>>)> {
-        let item = inventory
-            .state()
-            .items
-            .iter()
-            .filter(|item| item.count > 0)
-            .find(|item| {
-                i32::try_from(item_id).ok() == Some(item.id)
-                    || i32::try_from(item_id).ok() == Some(item.definition_id)
-            })
-            .or_else(|| {
-                inventory.state().items.iter().find(|item| {
-                    item.count > 0
-                        && (i32::try_from(pet_id).ok() == Some(item.id)
-                            || i32::try_from(pet_id).ok() == Some(item.definition_id))
-                })
-            })
-            .cloned()
-            .ok_or_else(|| invalid("pet adoption item is not owned"))?;
-
-        if let Some(pet) = self.pet(pet_id) {
-            if pet.adoption_item_definition_id != Some(item.definition_id) {
-                return Err(invalid("pet adoption item is not owned"));
-            }
-            return self
-                .summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)
-                .map(|transition| (transition, Vec::new()));
-        }
-
+        let (instance_id, item_definition) =
+            owned_item_for_record(inventory.state(), definition_id, tint)?;
+        // Lead (2026-10-18): every owned adoption item adopts a new pet and is consumed.
+        // Pets may be owned in duplicate (Pets.md:20); an owned pet is summoned by id
+        // (subtype 3). Matching an owned species here stranded later certificates.
         let definition = self
             .content
-            .definition_for_item(item.definition_id)
+            .definition_for_item(item_definition)
             .ok_or_else(|| invalid("item is not a configured pet adoption item"))?;
         let (new_pet_id, replies) =
-            self.adopt_with_replies(inventory, item.id, &definition, now)?;
+            self.adopt_with_replies(inventory, instance_id, &definition, now)?;
         let transition = self.summon(
             new_pet_id,
             actor_guid,
@@ -1037,7 +1021,6 @@ impl PetService {
         inner: &[u8],
         owner_guid: u64,
         owner_position: [f32; 3],
-        inventory: &InventoryState,
         busy: PetBusy,
         now: u64,
     ) -> io::Result<Option<PetWire>> {
@@ -1051,31 +1034,16 @@ impl PetService {
                 next.rebase_clock(now);
                 next.summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)
             }
-            PetRequest::Recall { pet_id } => {
-                next.rebase_clock(now);
-                next.recall(pet_id, now)
-            }
-            PetRequest::ForcedDismiss => {
+            PetRequest::Dismiss => {
                 if next.active.is_some() {
                     next.rebase_clock(now);
                 }
                 next.dismiss(now)
             }
-            PetRequest::SummonByItem {
-                pet_id,
-                item_instance_id,
-            } => {
-                next.rebase_clock(now);
-                next.summon_by_item(
-                    pet_id,
-                    item_instance_id,
-                    actor_guid,
-                    owner_guid,
-                    owner_position,
-                    inventory,
-                    busy,
-                    now,
-                )
+            // Redeeming an adoption item consumes it, which needs the live inventory
+            // (`handle_with_inventory`); this read-only view cannot adopt.
+            PetRequest::SummonByItem { .. } => {
+                Err(invalid("pet adoption requires the live inventory"))
             }
             PetRequest::Rename { name } => {
                 let Some(active) = next.active else {
@@ -1140,18 +1108,11 @@ impl PetService {
             return Ok(None);
         };
         let PetRequest::SummonByItem {
-            pet_id,
-            item_instance_id,
+            definition_id,
+            tint,
         } = request
         else {
-            return self.handle(
-                inner,
-                owner_guid,
-                owner_position,
-                inventory.state(),
-                busy,
-                now,
-            );
+            return self.handle(inner, owner_guid, owner_position, busy, now);
         };
 
         let actor_guid = Self::pet_guid(owner_guid);
@@ -1159,8 +1120,8 @@ impl PetService {
         next.rebase_clock(now);
         let mut next_inventory = inventory.clone();
         let applied = next.summon_by_item_owned(
-            pet_id,
-            item_instance_id,
+            definition_id,
+            tint,
             actor_guid,
             owner_guid,
             owner_position,
@@ -1172,10 +1133,13 @@ impl PetService {
             Ok((transition, inventory_replies)) => {
                 *self = next;
                 *inventory = next_inventory;
-                let mut wire = self.wire(transition);
+                // Actor creation precedes both the roster (whose trailing active
+                // pair activates the pet) and the explicit activation.
+                let mut wire = self.wire(transition.clone());
                 let mut private = inventory_replies;
+                private.extend(wire.shared.iter().cloned());
                 private.push(self.list_packet());
-                private.extend(wire.private);
+                private.push(transition.owner_message);
                 wire.private = private;
                 Ok(Some(wire))
             }
@@ -1189,7 +1153,6 @@ impl PetService {
 
     pub fn wire(&self, transition: PetTransition) -> PetWire {
         let mut wire = PetWire {
-            private: vec![transition.owner_message],
             changed: transition.changed,
             pets_changed: transition.pets_changed,
             ..PetWire::default()
@@ -1207,7 +1170,11 @@ impl PetService {
                 PetPresenceEvent::Follow { .. } => {}
             }
         }
-        wire.private.extend(wire.shared.iter().cloned());
+        // Actor removal and creation must precede activation: the client's
+        // PetActive handler (00b58bd0 -> 00b54080) resolves the actor at once and
+        // skips binding when the proxied actor does not exist yet.
+        wire.private = wire.shared.clone();
+        wire.private.push(transition.owner_message);
         wire
     }
 
@@ -1216,7 +1183,6 @@ impl PetService {
         bytes.extend((self.roster.pets.len() as u32).to_le_bytes());
         for pet in &self.roster.pets {
             bytes.extend(pet.id.to_le_bytes()); // list key, before the record
-            bytes.extend(pet.id.to_le_bytes());
             append_pet_record(&mut bytes, pet);
         }
         let (pet_id, actor_guid) = self
@@ -1598,6 +1564,25 @@ fn pet_mut(roster: &mut PetRoster, pet_id: u32) -> io::Result<&mut Pet> {
         .ok_or_else(|| invalid("pet is not owned"))
 }
 
+/// Resolve one owned inventory instance from the client `ItemRecord` pair.
+/// Returns `(instance id, definition id)`; a tint mismatch is not a fallback.
+fn owned_item_for_record(
+    inventory: &InventoryState,
+    definition_id: u32,
+    tint: u32,
+) -> io::Result<(i32, i32)> {
+    let definition_id = i32::try_from(definition_id)
+        .map_err(|_| invalid("pet adoption item definition is out of range"))?;
+    let tint =
+        i32::try_from(tint).map_err(|_| invalid("pet adoption item tint is out of range"))?;
+    inventory
+        .items
+        .iter()
+        .find(|item| item.count > 0 && item.definition_id == definition_id && item.tint == tint)
+        .map(|item| (item.id, item.definition_id))
+        .ok_or_else(|| invalid("pet adoption item is not owned"))
+}
+
 fn validate_name(name: &str) -> io::Result<()> {
     if name.is_empty() || name.chars().count() > 64 || name.chars().any(char::is_control) {
         return Err(invalid("invalid pet name"));
@@ -1685,8 +1670,7 @@ impl PetPresence {
             model_id: self.model_id,
             texture_alias: self.texture_alias.clone(),
             npc_name: self.name.clone(),
-            // (R) Pet movement speed is not present in the recovered content tables.
-            speed: 5.0,
+            speed: self.speed,
             position: [self.position[0], self.position[1], self.position[2], 1.0],
             rotation: [0.0, 0.0, 1.0, 0.0],
             is_interactable: 0,

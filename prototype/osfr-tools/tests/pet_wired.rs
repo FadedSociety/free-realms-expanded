@@ -147,7 +147,7 @@ fn an_owned_saved_pet_is_listed_summoned_seen_nearby_and_dismissed() {
     assert_eq!(game.pet_view(1).unwrap().pet_id, 1);
 
     let dismissed = game
-        .handle_in_world(&[53, 0, 4, 0], &who(), NOW + 2)
+        .handle_in_world(&[53, 0, 4, 0, 0, 0, 0, 0], &who(), NOW + 2)
         .unwrap();
     assert!(has(&dismissed.replies, 53, 9));
     assert!(removal_packet(&dismissed.nearby, actor));

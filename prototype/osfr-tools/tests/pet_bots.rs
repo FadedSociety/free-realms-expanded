@@ -579,10 +579,11 @@ fn a_saved_pet_is_summoned_seen_by_two_players_and_dismissed() {
 
     // A summons exactly one saved pet. A receives its own actor and active pair; B sees the actor.
     raw(&mut a, &summon_request(pet_id));
-    a.wait_for(T, |m| is_pet_active(m, pet_id))
-        .unwrap_or_else(|e| panic!("A: no active pair ({e}); got {}", tail(&a)));
+    // The actor must precede activation (the client resolves it on PetActive).
     a.wait_for(T, |m| is_pet_actor(m, actor))
         .expect("A: pet actor");
+    a.wait_for(T, |m| is_pet_active(m, pet_id))
+        .unwrap_or_else(|e| panic!("A: no active pair ({e}); got {}", tail(&a)));
     b.wait_for(T, |m| is_pet_actor(m, actor))
         .expect("B: neighbour sees pet actor");
 
@@ -591,8 +592,9 @@ fn a_saved_pet_is_summoned_seen_by_two_players_and_dismissed() {
     c.wait_for(T, |m| is_pet_actor(m, actor))
         .unwrap_or_else(|e| panic!("C: late pet actor missing ({e}); got {}", tail(&c)));
 
-    // The short client dismiss form removes the actor for everyone.
-    raw(&mut a, &[53, 0, 4, 0]);
+    // The client's serializer-shaped dismiss (u32 id word, action 0) removes the
+    // actor for everyone.
+    raw(&mut a, &[53, 0, 4, 0, 0, 0, 0, 0]);
     for (name, bot) in [("A", &mut a), ("B", &mut b), ("C", &mut c)] {
         bot.wait_for(T, |m| is_pet_removal(m, actor))
             .unwrap_or_else(|e| panic!("{name}: pet not removed ({e}); got {}", tail(bot)));
