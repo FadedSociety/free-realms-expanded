@@ -1233,6 +1233,194 @@ fn quest_journal_selection_persists_across_relog() {
     disconnect(again);
 }
 
+// ------------------------------------------------------------ scenario 8 (T027)
+
+fn read_string(message: &[u8], at: &mut usize) -> Option<String> {
+    let length = i32::from_le_bytes(message.get(*at..*at + 4)?.try_into().ok()?);
+    if length < 0 {
+        return None;
+    }
+    let length = length as usize;
+    let text = String::from_utf8(message.get(*at + 4..*at + 4 + length)?.to_vec()).ok()?;
+    *at += 4 + length;
+    Some(text)
+}
+
+struct EquipChange {
+    item: i32,
+    model: String,
+    slot: i32,
+    profile: i32,
+}
+
+/// 35/6 EquipItemChange for `guid`: item, model, slot and profile.
+fn equip_change(message: &[u8], guid: u64) -> Option<EquipChange> {
+    if message.get(..4)? != [35, 0, 6, 0]
+        || u64::from_le_bytes(message.get(4..12)?.try_into().ok()?) != guid
+    {
+        return None;
+    }
+    let item = i32::from_le_bytes(message.get(12..16)?.try_into().ok()?);
+    let mut at = 16;
+    let model = read_string(message, &mut at)?;
+    read_string(message, &mut at)?;
+    read_string(message, &mut at)?;
+    if message.len() != at + 24 {
+        return None;
+    }
+    let slot = i32::from_le_bytes(message.get(at + 8..at + 12)?.try_into().ok()?);
+    let profile = i32::from_le_bytes(message.get(at + 12..at + 16)?.try_into().ok()?);
+    Some(EquipChange {
+        item,
+        model,
+        slot,
+        profile,
+    })
+}
+
+/// 35/7 EquippedItemsChange for `guid`: count, model names and trailing value.
+fn equipped_change(message: &[u8], guid: u64) -> Option<(i32, Vec<String>, i32)> {
+    if message.get(..4)? != [35, 0, 7, 0]
+        || u64::from_le_bytes(message.get(4..12)?.try_into().ok()?) != guid
+    {
+        return None;
+    }
+    let count = i32::from_le_bytes(message.get(12..16)?.try_into().ok()?);
+    if !(0..=64).contains(&count) {
+        return None;
+    }
+    let mut at = 16;
+    let mut models = Vec::new();
+    for _ in 0..count {
+        models.push(read_string(message, &mut at)?);
+        read_string(message, &mut at)?;
+        read_string(message, &mut at)?;
+        at += 12; // tint, effect, slot
+    }
+    if message.len() != at + 4 {
+        return None;
+    }
+    let trailing = i32::from_le_bytes(message.get(at..at + 4)?.try_into().ok()?);
+    Some((count, models, trailing))
+}
+
+/// T027: a neighbour sees an equip, an unequip and a job switch as the native
+/// player-update packets. A replay and a refused switch tell nobody and leave
+/// the saved state alone.
+#[test]
+fn neighbours_see_equipment_and_job_changes_live() {
+    let _serial = serial();
+    const CHEST_SLOT: i32 = 3;
+    const UNLOCKED_JOB: i32 = 43; // Brawler, in the default unlocked set
+    const LOCKED_JOB: i32 = 45; // not in the default unlocked set
+    let rig = Rig::start(&[AccountRole::Player, AccountRole::Player], false);
+    let mut a = rig.connect(0, "lookA");
+    let mut b = rig.connect(1, "lookB");
+    let guid = rig.accounts[0].guid;
+    a.pump(Duration::from_millis(600)).unwrap();
+    b.pump(Duration::from_millis(600)).unwrap();
+    // B knows A, so its client can resolve the actor a 35/6 names.
+    assert!(
+        b.wait_for(T, |m| m.starts_with(&[35, 0, 1, 0])
+            && m.get(4..12) == Some(&guid.to_le_bytes()[..]))
+            .is_ok(),
+        "B did not receive A's AddPc: {}",
+        tail(&b)
+    );
+    let chest_item = worn(&rig.save(0), 1, CHEST_SLOT as i64) as i32;
+    assert!(chest_item > 0, "the fixture has no starting chest");
+
+    // Unequip the starting chest: an empty model is the client's removal path.
+    let mut unequip = vec![42, 0, 2, 0];
+    unequip.extend(CHEST_SLOT.to_le_bytes());
+    unequip.extend(1i32.to_le_bytes());
+    raw(&mut a, &unequip);
+    let message = b
+        .wait_for(T, |m| {
+            equip_change(m, guid).is_some_and(|change| change.slot == CHEST_SLOT)
+        })
+        .expect("the neighbour did not see the unequip");
+    let change = equip_change(&message, guid).unwrap();
+    assert_eq!(change.model, "", "the removal carries an empty model");
+    assert_eq!(change.item, 0);
+    assert_eq!(change.profile, 1);
+
+    // Equip it again: the same slot with the real attachment.
+    let mut equip = vec![42, 0, 3, 0];
+    equip.extend(chest_item.to_le_bytes());
+    equip.extend(1i32.to_le_bytes());
+    equip.extend(CHEST_SLOT.to_le_bytes());
+    raw(&mut a, &equip);
+    let message = b
+        .wait_for(T, |m| {
+            equip_change(m, guid)
+                .is_some_and(|change| change.slot == CHEST_SLOT && change.item == chest_item)
+        })
+        .expect("the neighbour did not see the equip");
+    assert!(!equip_change(&message, guid).unwrap().model.is_empty());
+
+    // A replay changes nothing and tells nobody.
+    raw(&mut a, &equip);
+    assert!(
+        b.wait_for(Duration::from_secs(2), |m| equip_change(m, guid).is_some())
+            .is_err(),
+        "a no-op equip was broadcast"
+    );
+
+    // A job switch sends the whole new outfit (35/7).
+    let mut switch = vec![26, 0, 13, 0];
+    switch.extend(UNLOCKED_JOB.to_le_bytes());
+    raw(&mut a, &switch);
+    let message = b
+        .wait_for(T, |m| equipped_change(m, guid).is_some())
+        .expect("the neighbour did not see the job switch");
+    let (count, models, trailing) = equipped_change(&message, guid).unwrap();
+    assert!(count >= 5, "the new outfit is not just a hat: {count}");
+    assert_eq!(trailing, 0);
+    assert!(
+        models.iter().any(|model| model.starts_with("brawler_")),
+        "{models:?}"
+    );
+    let saved = rig.save_when(Some(&mut a), 0, "the job switch", |save| {
+        save["gameplay"]["profiles"]["active"] == json!(UNLOCKED_JOB)
+    });
+    assert_eq!(saved["gameplay"]["profiles"]["active"], json!(UNLOCKED_JOB));
+
+    // A locked job is refused and tells nobody; the save still names the job above.
+    let mut refused = vec![26, 0, 13, 0];
+    refused.extend(LOCKED_JOB.to_le_bytes());
+    raw(&mut a, &refused);
+    assert!(
+        b.wait_for(Duration::from_secs(2), |m| equipped_change(m, guid)
+            .is_some())
+            .is_err(),
+        "a refused switch was broadcast"
+    );
+    assert_eq!(
+        rig.save(0)["gameplay"]["profiles"]["active"],
+        json!(UNLOCKED_JOB)
+    );
+
+    // A viewer who arrives after the switch gets the new outfit in AddPc.
+    disconnect(b);
+    std::thread::sleep(Duration::from_millis(1_500));
+    let mut late = rig.connect(1, "lookLate");
+    late.pump(Duration::from_millis(600)).unwrap();
+    let add_pc = late
+        .wait_for(T, |m| {
+            m.starts_with(&[35, 0, 1, 0]) && m.get(4..12) == Some(&guid.to_le_bytes()[..])
+        })
+        .expect("the late viewer did not receive A's AddPc");
+    assert!(
+        add_pc
+            .windows(b"brawler_".len())
+            .any(|part| part == b"brawler_"),
+        "the late viewer got the stale outfit"
+    );
+    disconnect(late);
+    disconnect(a);
+}
+
 // ------------------------------------------------------- server finding
 
 /// Finding W154-F1 (server, for the lead): with the full content, a handshake

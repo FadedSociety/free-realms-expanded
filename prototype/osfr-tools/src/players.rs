@@ -332,6 +332,22 @@ impl PlayerRegistry {
         }
     }
 
+    /// T027: replace a joined player's public snapshot after a live outfit or job change, so a
+    /// viewer who meets them later gets the current look in AddPc. Current viewers are told by
+    /// the gameplay 35/6 or 35/7 packet instead.
+    pub fn set_presentation(
+        &mut self,
+        session_id: SessionId,
+        presentation: PlayerPresentation,
+    ) -> Result<(), RegistryError> {
+        let Some(player) = self.sessions.get(&session_id) else {
+            return Err(RegistryError::UnknownSession);
+        };
+        presentation.validate(player.character_guid)?;
+        self.sessions.get_mut(&session_id).unwrap().presentation = presentation;
+        Ok(())
+    }
+
     /// Change pose and/or zone while preserving accepted relay bytes. Interest
     /// radius and visible-count rules are reconstructed policy (R).
     pub fn update_pose(

@@ -130,8 +130,9 @@ pub struct GatewayOutcome {
     pub dev_command_denials: usize,
     pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
-    /// W162: inner packets (also in `replies`, wrapped) that players near this one must receive
-    /// too: a ride actor, its rider's attachment and their removal.
+    /// Inner packets (also in `replies`, wrapped) that players near this one must receive too:
+    /// W162's ride actor, its rider's attachment and their removal, and T027's live 35/6 equip
+    /// change / 35/7 job switch.
     pub nearby: Vec<Vec<u8>>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,

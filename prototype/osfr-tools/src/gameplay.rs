@@ -239,9 +239,9 @@ pub struct Outcome {
     pub relocation: Option<dev_teleport::Relocation>,
     /// W158: a big heart was picked up; the gateway heals the rest of the group.
     pub group_heal: Option<crate::encounter::GroupHeal>,
-    /// W162: inner packets (already inside `replies`) that nearby players must also receive: the
-    /// ride actor, the rider's attachment and their removal. The gateway fans them out through
-    /// the player registry's interest set.
+    /// Inner packets that nearby players must also receive: W162's ride actor, the rider's
+    /// attachment and their removal, and T027's live 35/6 equip change / 35/7 job switch. The
+    /// gateway fans them out through the player registry's interest set.
     pub nearby: Vec<Vec<u8>>,
     /// W177: the saved top-level pet roster changed and must be written through its own
     /// `game_store` seam after the normal character snapshot commits.
@@ -279,6 +279,33 @@ fn current_unix_seconds() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs()
+}
+
+/// (R) 35/6 EquipItemChange a neighbour needs after an active-job equip or
+/// unequip. Inventory content names its own player guid in the packet, so the
+/// broadcast names the authenticated character instead. An empty model is the
+/// client's removal path (`0092f460` case 6).
+fn item_change_packet(inner: &[u8], guid: u64, replies: &[Vec<u8>]) -> Option<Vec<u8>> {
+    if inner.len() == 12 && inner.starts_with(&[42, 0, 2, 0]) {
+        let slot = i32::from_le_bytes(inner[4..8].try_into().ok()?);
+        let profile = i32::from_le_bytes(inner[8..12].try_into().ok()?);
+        let mut packet = vec![35, 0, 6, 0];
+        packet.extend(guid.to_le_bytes());
+        packet.extend(0i32.to_le_bytes()); // no item; the empty model removes the slot
+        for _ in 0..3 {
+            packet.extend(0i32.to_le_bytes()); // empty model, texture and tint alias
+        }
+        for value in [0, 0, slot, profile, 0, 0] {
+            packet.extend(value.to_le_bytes()); // tint, effect, slot, profile, unused, wield
+        }
+        return Some(packet);
+    }
+    let packet = replies
+        .iter()
+        .find(|packet| packet.starts_with(&[35, 0, 6, 0]))?;
+    let mut packet = packet.clone();
+    packet.get_mut(4..12)?.copy_from_slice(&guid.to_le_bytes());
+    Some(packet)
 }
 
 /// W171: draw and remove node actors. The caller sends `visibility.refresh()` to the client.
@@ -2330,6 +2357,48 @@ impl Gameplay {
     /// One profile's outfit as the native attachment list (count + rows).
     pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
         self.inventory.profile_attachments(profile_id)
+    }
+
+    /// (R) 35/7 EquippedItemsChange for a job switch: the new active outfit,
+    /// which the client applies as a profile-swap attachment group.
+    fn profile_switch_packet(&self, guid: u64) -> io::Result<Option<Vec<u8>>> {
+        let Some(profiles) = &self.profiles else {
+            return Ok(None);
+        };
+        let mut packet = vec![35, 0, 7, 0];
+        packet.extend(guid.to_le_bytes());
+        packet.extend(self.inventory.profile_attachments(profiles.active())?);
+        packet.extend(0i32.to_le_bytes()); // (R) trailing value; the client reads one i32.
+        Ok(Some(packet))
+    }
+
+    /// T027: whether an equip names an inactive job (whose 35/6 must not reach
+    /// the owner or neighbours), and the 35/6 a neighbour needs for an active
+    /// change.
+    fn inventory_visibility(
+        &self,
+        inner: &[u8],
+        guid: u64,
+        changed: bool,
+        replies: &[Vec<u8>],
+    ) -> (bool, Option<Vec<u8>>) {
+        let target_profile = if inner.starts_with(&[42, 0, 2, 0]) && inner.len() == 12 {
+            Some(i32::from_le_bytes(inner[8..12].try_into().unwrap()))
+        } else if inner.starts_with(&[42, 0, 3, 0]) && inner.len() == 16 {
+            Some(i32::from_le_bytes(inner[8..12].try_into().unwrap()))
+        } else if inner.starts_with(&[42, 0, 8, 0]) && inner.len() == 20 {
+            Some(i32::from_le_bytes(inner[12..16].try_into().unwrap()))
+        } else {
+            None
+        };
+        let active = self.profiles.as_ref().map(|profiles| profiles.active());
+        let inactive = active
+            .zip(target_profile)
+            .is_some_and(|(active, target)| active != target);
+        let packet = (changed && target_profile.is_some() && !inactive)
+            .then(|| item_change_packet(inner, guid, replies))
+            .flatten();
+        (inactive, packet)
     }
 
     pub fn state(&self) -> GameplayState {
@@ -6025,6 +6094,10 @@ impl Gameplay {
                     self.ensure_outfit(id, &mut out)?;
                     self.opening_equipment_events(&mut out)?;
                     self.sync_world_stage(&mut out)?;
+                    // T027: neighbours swap the whole attachment group on a job change.
+                    if changed && let Some(packet) = self.profile_switch_packet(character.guid)? {
+                        out.nearby.push(packet);
+                    }
                 }
                 Err(error) => out
                     .replies
@@ -6085,21 +6158,19 @@ impl Gameplay {
             let inventory_before = self.inventory.state().clone();
             let result = self.handle_inventory(inner)?;
             out.changed |= result.changed;
-            let target_profile = if inner.starts_with(&[42, 0, 3, 0]) && inner.len() == 16 {
-                Some(i32::from_le_bytes(inner[8..12].try_into().unwrap()))
-            } else if inner.starts_with(&[42, 0, 8, 0]) && inner.len() == 20 {
-                Some(i32::from_le_bytes(inner[12..16].try_into().unwrap()))
-            } else {
-                None
-            };
-            let inactive =
-                target_profile.is_some_and(|id| id != self.profiles.as_ref().unwrap().active());
+            // T027: only a change a stranger can see goes to neighbours; an alt
+            // job's outfit and a no-op replay stay local.
+            let (inactive, broadcast) =
+                self.inventory_visibility(&inner, character.guid, result.changed, &result.replies);
             out.replies.extend(
                 result
                     .replies
                     .into_iter()
                     .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
             );
+            if let Some(packet) = broadcast {
+                out.nearby.push(packet);
+            }
             if result.changed {
                 self.npc_inventory_events(&inventory_before, &mut out)?;
                 self.opening_equipment_events(&mut out)?;
@@ -7427,7 +7498,17 @@ impl Gameplay {
             let before = self.inventory.state().clone();
             let inventory = self.handle_inventory(inner)?;
             out.changed |= inventory.changed;
-            out.replies.extend(inventory.replies);
+            let (inactive, broadcast) =
+                self.inventory_visibility(inner, guid, inventory.changed, &inventory.replies);
+            out.replies.extend(
+                inventory
+                    .replies
+                    .into_iter()
+                    .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
+            );
+            if let Some(packet) = broadcast {
+                out.nearby.push(packet);
+            }
             self.npc_inventory_events(&before, &mut out)?;
             out.replies.extend(self.learn_consumed_patterns(&before)?);
         }
@@ -7435,16 +7516,25 @@ impl Gameplay {
             if inner.len() != 8 {
                 return Err(invalid("invalid class selection request"));
             }
+            let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
+            let mut switched = false;
             if let Some(profiles) = &mut self.profiles {
-                let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
+                switched = profiles.active() != id;
                 match profiles.select(id, &self.inventory) {
                     Ok(reply) => {
                         out.replies.push(reply);
                         out.changed = true;
                     }
-                    Err(error) => out
-                        .replies
-                        .push(chat::system(&format!("Cannot switch classes: {error}"))),
+                    Err(error) => {
+                        switched = false;
+                        out.replies
+                            .push(chat::system(&format!("Cannot switch classes: {error}")));
+                    }
+                }
+            }
+            if switched {
+                if let Some(packet) = self.profile_switch_packet(guid)? {
+                    out.nearby.push(packet);
                 }
             }
         }
@@ -10072,6 +10162,186 @@ mod w64_regional_quest_tests {
         let after = game.public_look().unwrap();
         assert_eq!(after.items, look.items);
         assert!(after.profiles.iter().any(|&(id, _)| id == 11));
+    }
+
+    /// T027: an active-job equip or unequip, and a job switch, produce the
+    /// neighbour packets the gateway fans out; alt-job changes and no-op
+    /// replays stay local.
+    #[test]
+    fn live_equipment_and_job_changes_are_ready_for_neighbours() {
+        fn i32_at(bytes: &[u8], at: usize) -> i32 {
+            i32::from_le_bytes(bytes[at..at + 4].try_into().unwrap())
+        }
+        fn text_at(bytes: &[u8], at: &mut usize) -> String {
+            let length = i32_at(bytes, *at) as usize;
+            let text = String::from_utf8(bytes[*at + 4..*at + 4 + length].to_vec()).unwrap();
+            *at += 4 + length;
+            text
+        }
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        let equipped_profile = game
+            .inventory
+            .state()
+            .equipment
+            .iter()
+            .find(|entry| {
+                entry.item_id != 0
+                    && game
+                        .inventory
+                        .state()
+                        .items
+                        .iter()
+                        .any(|item| item.id == entry.item_id)
+            })
+            .expect("the fixture has an equipped job")
+            .profile_id;
+        game.profiles
+            .as_mut()
+            .unwrap()
+            .select(equipped_profile, &game.inventory)
+            .unwrap();
+        let alt_profile = 35;
+        game.profiles.as_mut().unwrap().unlock(alt_profile).unwrap();
+        game.ensure_outfit(alt_profile, &mut Outcome::default())
+            .unwrap();
+        let who = CharacterState {
+            guid: 42,
+            zone_id: 0,
+            position: [-440.0, 0.8, 1292.0],
+            rotation: [1.0, 0.0, 0.0],
+        };
+        let state = game.inventory.state().clone();
+        let active = game.profiles.as_ref().unwrap().active();
+        let worn = state
+            .equipment
+            .iter()
+            .find(|entry| {
+                entry.profile_id == active
+                    && entry.item_id != 0
+                    && state.items.iter().any(|item| item.id == entry.item_id)
+            })
+            .unwrap()
+            .clone();
+        let item = state
+            .items
+            .iter()
+            .find(|item| item.id == worn.item_id)
+            .unwrap()
+            .clone();
+
+        // Unequip: an empty model is the client's removal path.
+        let mut unequip = vec![42, 0, 2, 0];
+        unequip.extend(worn.slot.to_le_bytes());
+        unequip.extend(active.to_le_bytes());
+        let removed = game.handle_in_world(&unequip, &who, 1_000).unwrap();
+        assert!(removed.changed);
+        let change = removed
+            .nearby
+            .iter()
+            .find(|packet| packet.starts_with(&[35, 0, 6, 0]))
+            .expect("an unequip is broadcast");
+        assert_eq!(u64::from_le_bytes(change[4..12].try_into().unwrap()), 42);
+        assert_eq!(i32_at(change, 12), 0);
+        let mut at = 16;
+        assert_eq!(text_at(change, &mut at), "");
+        assert_eq!(text_at(change, &mut at), "");
+        assert_eq!(text_at(change, &mut at), "");
+        assert_eq!(i32_at(change, at), 0); // tint
+        assert_eq!(i32_at(change, at + 4), 0); // effect
+        assert_eq!(i32_at(change, at + 8), worn.slot);
+        assert_eq!(i32_at(change, at + 12), active);
+        assert_eq!(change.len(), at + 24);
+
+        // Equip it again: one slot with the real attachment row.
+        let mut equip = vec![42, 0, 3, 0];
+        equip.extend(item.id.to_le_bytes());
+        equip.extend(active.to_le_bytes());
+        equip.extend(worn.slot.to_le_bytes());
+        let worn_again = game.handle_in_world(&equip, &who, 2_000).unwrap();
+        assert!(worn_again.changed);
+        let change = worn_again
+            .nearby
+            .iter()
+            .find(|packet| packet.starts_with(&[35, 0, 6, 0]))
+            .expect("an equip is broadcast");
+        assert_eq!(u64::from_le_bytes(change[4..12].try_into().unwrap()), 42);
+        assert_eq!(i32_at(change, 12), item.id);
+        let mut at = 16;
+        assert!(!text_at(change, &mut at).is_empty());
+        text_at(change, &mut at);
+        text_at(change, &mut at);
+        assert_eq!(i32_at(change, at + 8), worn.slot);
+
+        // A replay is not a change, so nobody is told.
+        let replay = game.handle_in_world(&equip, &who, 3_000).unwrap();
+        assert!(!replay.changed);
+        assert!(replay.nearby.is_empty());
+
+        // An alt job's outfit is not visible to a stranger.
+        let alt = game
+            .inventory
+            .state()
+            .equipment
+            .iter()
+            .find(|entry| entry.profile_id == alt_profile && entry.item_id != 0)
+            .unwrap()
+            .clone();
+        let mut alt_unequip = vec![42, 0, 2, 0];
+        alt_unequip.extend(alt.slot.to_le_bytes());
+        alt_unequip.extend(alt_profile.to_le_bytes());
+        let local = game.handle_in_world(&alt_unequip, &who, 4_000).unwrap();
+        assert!(local.changed);
+        assert!(local.nearby.is_empty(), "an alt job stays local");
+        let mut alt_equip = vec![42, 0, 3, 0];
+        alt_equip.extend(alt.item_id.to_le_bytes());
+        alt_equip.extend(alt_profile.to_le_bytes());
+        alt_equip.extend(alt.slot.to_le_bytes());
+        assert!(
+            game.handle_in_world(&alt_equip, &who, 5_000)
+                .unwrap()
+                .nearby
+                .is_empty()
+        );
+
+        // A job switch sends the whole new outfit (35/7).
+        let mut switch = vec![26, 0, 13, 0];
+        switch.extend(alt_profile.to_le_bytes());
+        let switched = game.handle_in_world(&switch, &who, 6_000).unwrap();
+        assert!(switched.changed);
+        let packet = switched
+            .nearby
+            .iter()
+            .find(|packet| packet.starts_with(&[35, 0, 7, 0]))
+            .expect("a job switch is broadcast");
+        assert_eq!(u64::from_le_bytes(packet[4..12].try_into().unwrap()), 42);
+        let expected = game
+            .inventory
+            .state()
+            .equipment
+            .iter()
+            .filter(|entry| entry.profile_id == alt_profile && entry.item_id != 0)
+            .count() as i32;
+        assert_eq!(i32_at(packet, 12), expected);
+        assert_eq!(game.public_look().unwrap().active_profile, alt_profile);
+
+        // Switching back reports the previous outfit.
+        let mut back = vec![26, 0, 13, 0];
+        back.extend(active.to_le_bytes());
+        let switched = game.handle_in_world(&back, &who, 7_000).unwrap();
+        let packet = switched
+            .nearby
+            .iter()
+            .find(|packet| packet.starts_with(&[35, 0, 7, 0]))
+            .expect("the next job switch is broadcast");
+        let expected = game
+            .inventory
+            .state()
+            .equipment
+            .iter()
+            .filter(|entry| entry.profile_id == active && entry.item_id != 0)
+            .count() as i32;
+        assert_eq!(i32_at(packet, 12), expected);
     }
 
     /// W141: 36/12 resolves only this job's own toolbar definitions; a miss is

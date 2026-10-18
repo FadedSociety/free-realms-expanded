@@ -163,6 +163,22 @@ fn expected_remove_player(guid: u64) -> Vec<u8> {
     wrap(&inner)
 }
 
+fn presentation_with(model: &str, profile: i32) -> PlayerPresentation {
+    let mut presentation = oracle_presentation();
+    presentation.character_guid = 0;
+    presentation.active_profile = profile;
+    let mut attachments = 1_i32.to_le_bytes().to_vec();
+    for value in [model, "", "t"] {
+        attachments.extend_from_slice(&(value.len() as i32).to_le_bytes());
+        attachments.extend_from_slice(value.as_bytes());
+    }
+    for value in [7_i32, 8, 9] {
+        attachments.extend_from_slice(&value.to_le_bytes());
+    }
+    presentation.attachments_wire = attachments;
+    presentation
+}
+
 fn message<'a>(messages: &'a [OutboundMessage], recipient: u64, kind: MessageKind) -> &'a [u8] {
     &messages
         .iter()
@@ -238,6 +254,72 @@ fn two_sessions_spawn_move_and_disconnect_with_exact_wire_bytes() {
     assert_eq!(
         message(&left, 1, MessageKind::Despawn),
         expected_remove_player(1002)
+    );
+}
+
+/// T027: a live outfit/job change updates the AddPc snapshot a later viewer
+/// gets; a snapshot bound to another character is refused.
+#[test]
+fn a_live_presentation_change_reaches_a_later_viewer() {
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join_presented(
+        &mut registry,
+        1,
+        101,
+        1001,
+        shared_zone,
+        [1.0, 2.0, 3.0],
+        0.0,
+        presentation_with("oldmodel", 1),
+    );
+    let mut updated = presentation_with("newmodel", 43);
+    updated.character_guid = 1001;
+    registry.set_presentation(SessionId(1), updated).unwrap();
+    let joined = join_presented(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [4.0, 5.0, 6.0],
+        1.0,
+        presentation_with("viewer", 1),
+    );
+    let spawn = spawn_message(&joined, 2, 1001);
+    assert!(
+        spawn.windows(8).any(|window| window == b"newmodel"),
+        "the late viewer got the stale outfit"
+    );
+    assert!(!spawn.windows(8).any(|window| window == b"oldmodel"));
+    assert_eq!(
+        registry
+            .get(SessionId(1))
+            .unwrap()
+            .presentation
+            .active_profile,
+        43
+    );
+
+    // A snapshot bound to another character, or an unknown session, is refused.
+    let mut wrong_character = presentation_with("other", 1);
+    wrong_character.character_guid = 1002;
+    assert_eq!(
+        registry.set_presentation(SessionId(1), wrong_character),
+        Err(RegistryError::InvalidPresentation)
+    );
+    assert_eq!(
+        registry.set_presentation(SessionId(9), presentation_with("other", 1)),
+        Err(RegistryError::UnknownSession)
+    );
+    assert_eq!(
+        registry
+            .get(SessionId(1))
+            .unwrap()
+            .presentation
+            .active_profile,
+        43,
+        "a refused update changed the live snapshot"
     );
 }
 

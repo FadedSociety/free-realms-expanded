@@ -1717,8 +1717,15 @@ impl Session {
                 || (state, unknown) != self.gateway.movement_bytes();
             // W143: what strangers may see on Inspect. Refreshed on any gameplay
             // change (equipment, job) and published at join; removed on leave.
+            // T027: the same snapshot feeds AddPc, so a viewer who arrives after
+            // the change sees the new outfit and job. Current viewers were told
+            // by the gameplay 35/6 or 35/7 fanout.
             if outcome.gameplay_changed && staged_world.joined.contains(&self.id) {
                 refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
+                let presentation = staged_gateway.player_presentation(self.is_member)?;
+                staged_world
+                    .players
+                    .set_presentation(self.id, presentation)?;
                 deliveries.extend(refresh_trade_player(
                     &mut staged_world,
                     self.id,
