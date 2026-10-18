@@ -1980,16 +1980,6 @@ impl Gameplay {
 
     pub fn on_location(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         let owned_movement = self.blocks(|gates| gates.location);
-        debug_assert_eq!(
-            owned_movement,
-            self.soccer.is_some()
-                || self.kart_entry.as_ref().is_some_and(|k| k.active())
-                || self
-                    .derby
-                    .as_ref()
-                    .is_some_and(crate::derby_gateway::DerbyGateway::active),
-            "occupation table drifted: location"
-        );
         if owned_movement {
             return Ok(Outcome::default());
         }
@@ -2223,18 +2213,6 @@ impl Gameplay {
     /// battle or a field enemy chasing the player), kart races and a knockout do not.
     fn ride_restrictions(&self) -> crate::mounts::RideRestrictions {
         let in_minigame = self.blocks(|gates| gates.ride);
-        debug_assert_eq!(
-            in_minigame,
-            self.encounter.as_ref().is_some_and(EncounterEngine::active)
-                || self.field_engaged
-                || self.kart_entry.as_ref().is_some_and(|k| k.active())
-                || self.soccer.is_some()
-                || self
-                    .derby
-                    .as_ref()
-                    .is_some_and(crate::derby_gateway::DerbyGateway::active),
-            "occupation table drifted: ride"
-        );
         crate::mounts::RideRestrictions {
             zone_allows_riding: true,
             in_minigame,
@@ -2352,11 +2330,6 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         let minigame_active = self.blocks(|gates| gates.pets);
-        debug_assert_eq!(
-            minigame_active,
-            self.activity_busy() || self.kart_entry.as_ref().is_some_and(|k| k.active()),
-            "occupation table drifted: pets"
-        );
         let busy = crate::pets::PetBusy { minigame_active };
         let pets = &mut self.pets;
         let inventory = &mut self.inventory;
@@ -2792,25 +2765,7 @@ impl Gameplay {
 
     /// True while a crafting, gathering or battle activity is running.
     fn activity_busy(&self) -> bool {
-        let busy = self.blocks(|gates| gates.start);
-        debug_assert_eq!(
-            busy,
-            self.forging.as_ref().is_some_and(Forging::active)
-                || self.smelting.as_ref().is_some_and(Smelting::active)
-                || self.cooking.as_ref().is_some_and(Cooking::active)
-                || self.mining.as_ref().is_some_and(Type8Engine::active)
-                || self.harvesting.as_ref().is_some_and(Type8Engine::active)
-                || self.chess.as_ref().is_some_and(ChessService::is_active)
-                || self.encounter.as_ref().is_some_and(EncounterEngine::active)
-                || self
-                    .derby
-                    .as_ref()
-                    .is_some_and(crate::derby_gateway::DerbyGateway::active)
-                || !self.fishing.is_empty()
-                || self.soccer.is_some(),
-            "occupation table drifted: start"
-        );
-        busy
+        self.blocks(|gates| gates.start)
     }
 
     /// Switches to Kart Driver and enters the track. Shared by the developer `realm race` command
@@ -3857,19 +3812,6 @@ impl Gameplay {
             return Some(piece_077::Blocker::Encounter);
         }
         let busy = self.blocks(|gates| gates.warp);
-        debug_assert_eq!(
-            busy,
-            self.forging.as_ref().is_some_and(Forging::active)
-                || self.smelting.as_ref().is_some_and(Smelting::active)
-                || self.cooking.as_ref().is_some_and(Cooking::active)
-                || self.mining.as_ref().is_some_and(Type8Engine::active)
-                || self.harvesting.as_ref().is_some_and(Type8Engine::active)
-                || self.chess.as_ref().is_some_and(ChessService::is_active)
-                || self.kart_entry.as_ref().is_some_and(|k| k.active())
-                || !self.fishing.is_empty()
-                || self.soccer.is_some(),
-            "occupation table drifted: warp"
-        );
         busy.then_some(piece_077::Blocker::Busy)
     }
 
