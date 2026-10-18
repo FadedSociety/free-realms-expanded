@@ -493,6 +493,153 @@
           "icon_id": 730
         }
       ]
+    },
+    {
+      "id": 12303,
+      "title_id": 426971,
+      "description_id": 426974,
+      "objective_id": 426977,
+      "difficulty": 5,
+      "required_combat_level": 13,
+      "spawner": {
+        "guid": 100001230300,
+        "definition_id": 1230300,
+        "model_id": 2056,
+        "name_id": 426971,
+        "name": "Stone Heart's Hideaway",
+        "texture_alias": "",
+        "position": [
+          -950.582,
+          -34.42554,
+          -651.9259
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001230301,
+          "definition_id": 930022,
+          "model_id": 2055,
+          "name_id": 427068,
+          "name": "Stone Heart",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 1020,
+          "damage": 62,
+          "level": 13,
+          "boss": true
+        },
+        {
+          "guid": 100001230302,
+          "definition_id": 930002,
+          "model_id": 2041,
+          "name_id": 427522,
+          "name": "Changeling Heartbreaker",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 340,
+          "damage": 31,
+          "level": 13,
+          "boss": false
+        },
+        {
+          "guid": 100001230303,
+          "definition_id": 930002,
+          "model_id": 2041,
+          "name_id": 427522,
+          "name": "Changeling Heartbreaker",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 340,
+          "damage": 31,
+          "level": 13,
+          "boss": false
+        },
+        {
+          "guid": 100001230304,
+          "definition_id": 930002,
+          "model_id": 2041,
+          "name_id": 427522,
+          "name": "Changeling Heartbreaker",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 340,
+          "damage": 31,
+          "level": 13,
+          "boss": false
+        }
+      ],
+      "reward_coins": 0,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Locale Global.Text ids 426971 'Stone Heart's Hideaway', 426974 'Stop Stone Heart by entering his hideout and defeating him in combat!', 426977 'Defeat Stone Heart', 426947 'Defeat the minions of Stone Heart!', 427068 'Stone Heart' and 427522 'Changeling Heartbreaker'; models 2055 stoneheart_m.adr and 2041 changeling_emo_f.adr."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "Entrance marker 4750: lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3321 and Resources/Npcs.json Id=4750 (model 2056, changeling_emo_m.adr, name 426971), recorded in data/content/npc_spawns_extra.json at position [-950.582,-34.42554,-651.9259]."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/Stone Heart's Hideaway.md: difficulty 5, level 13 combat job, western side of Merry Vale, Stone Heart plus Changeling Heartbreakers, and level-16 job weapons on the prize wheel."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Local battle id 12303 and its GUIDs; one Stone Heart plus three Changeling Heartbreakers as the current schema's single kill-all roster; arena sg_random_encounter_clearing zone 9600 (the original instance scene is unknown); the three arena positions; no power-up table because the client dev note says these encounters drop only health and mana; and the Brawler wheel reward Match-Maker Mallet 76471 selected as this slice's deterministic reward. Difficulty 5 scales the authored level-13 enemy baseline through the existing template."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The recovered probable main and minion goals collapse into the template's single kill-all counter using objective 426977. Original wave/boss phases, the other five job-wheel outcomes, coin payout, members-only bonus and daily repeat timing remain unknown."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The item 76471 row names id 4777 and icon 6236, but Images.txt has no image 6236. The playable slice uses shipped generic hammer icon 3955 (icon_item_weapon_ar_ag_hammer_sledge-iron_64.dds) while retaining the recovered item and name ids; native wheel presentation remains unverified."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": -1,
+      "prizes": [
+        {
+          "item_id": 76471,
+          "name_id": 4777,
+          "icon_id": 3955
+        }
+      ]
     }
   ]
 }
