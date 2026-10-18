@@ -4394,7 +4394,9 @@ impl Gameplay {
             records,
         };
         let text = serde_json::to_string_pretty(&file).map_err(invalid)?;
-        std::fs::write(self.placements_path(), text + "\n")
+        // Atomic (temp + fsync + rename): a crash mid-write must not leave a corrupt file
+        // that every later login fails to load.
+        crate::character_store::replace_bytes(&self.placements_path(), (text + "\n").as_bytes())
     }
 
     /// `realm place <model id> [name text id] [at <x> <z>]`: an NPC where you
@@ -4563,7 +4565,7 @@ impl Gameplay {
             marks,
         };
         let text = serde_json::to_string_pretty(&file).map_err(invalid)?;
-        std::fs::write(self.marks_path(), text + "\n")
+        crate::character_store::replace_bytes(&self.marks_path(), (text + "\n").as_bytes())
     }
 
     /// (R) Diagnostic only: use the native 41/2 clear byte to test the client

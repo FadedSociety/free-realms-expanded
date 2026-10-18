@@ -173,7 +173,8 @@ impl TextPool {
         };
         let text = serde_json::to_string_pretty(&file)
             .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
-        fs::write(&self.path, text + "\n")
+        // Atomic (temp + fsync + rename), like every other persisted file.
+        crate::character_store::replace_bytes(&self.path, (text + "\n").as_bytes())
     }
 }
 
