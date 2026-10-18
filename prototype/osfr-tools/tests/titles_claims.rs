@@ -7,7 +7,7 @@
 
 use osfr_tools::{
     account_store::AccountRole,
-    game_store,
+    chat, game_store,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     inventory::Inventory,
@@ -130,6 +130,70 @@ fn inner_packets(out: &GatewayOutcome) -> Vec<Vec<u8>> {
         .collect()
 }
 
+#[derive(Debug, PartialEq, Eq)]
+struct WireClaimItem {
+    ids: Vec<u64>,
+    name_id: u32,
+    description_id: u32,
+    icon: [u32; 2],
+    entries: Vec<[u32; 3]>,
+    tail: [u32; 2],
+}
+
+fn read_u32(bytes: &[u8], cursor: &mut usize) -> u32 {
+    let value = u32::from_le_bytes(bytes[*cursor..*cursor + 4].try_into().unwrap());
+    *cursor += 4;
+    value
+}
+
+fn read_u64(bytes: &[u8], cursor: &mut usize) -> u64 {
+    let value = u64::from_le_bytes(bytes[*cursor..*cursor + 8].try_into().unwrap());
+    *cursor += 8;
+    value
+}
+
+/// Independent parser for the row consumed by native reader `00a040e0`.
+fn decode_claim_rows(packet: &[u8], count_offset: usize) -> Vec<WireClaimItem> {
+    assert_eq!(packet[count_offset - 1], 1, "success byte");
+    let count =
+        u32::from_le_bytes(packet[count_offset..count_offset + 4].try_into().unwrap()) as usize;
+    assert!(count <= 256);
+    let mut cursor = count_offset + 4;
+    let mut rows = Vec::with_capacity(count);
+    for _ in 0..count {
+        let id_count = read_u32(packet, &mut cursor) as usize;
+        assert!(id_count <= 256);
+        let ids = (0..id_count)
+            .map(|_| read_u64(packet, &mut cursor))
+            .collect::<Vec<_>>();
+        let name_id = read_u32(packet, &mut cursor);
+        let description_id = read_u32(packet, &mut cursor);
+        let icon = [read_u32(packet, &mut cursor), read_u32(packet, &mut cursor)];
+        let entry_count = read_u32(packet, &mut cursor) as usize;
+        assert!(entry_count <= 256);
+        let entries = (0..entry_count)
+            .map(|_| {
+                [
+                    read_u32(packet, &mut cursor),
+                    read_u32(packet, &mut cursor),
+                    read_u32(packet, &mut cursor),
+                ]
+            })
+            .collect::<Vec<_>>();
+        let tail = [read_u32(packet, &mut cursor), read_u32(packet, &mut cursor)];
+        rows.push(WireClaimItem {
+            ids,
+            name_id,
+            description_id,
+            icon,
+            entries,
+            tail,
+        });
+    }
+    assert_eq!(cursor, packet.len(), "complete claim response consumed");
+    rows
+}
+
 fn item_grant() -> RewardGrant {
     let mut body = vec![0; 34];
     body[17..21].copy_from_slice(&8u32.to_le_bytes());
@@ -179,6 +243,23 @@ fn item_count(snapshot: &game_store::Snapshot, definition_id: i32) -> u32 {
         .filter(|item| item.definition_id == definition_id)
         .map(|item| item.count)
         .sum()
+}
+
+fn enable_adventurer_claim_reward(fixture: &Fixture) {
+    let bundled = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    for file in ["achievements.json", "titles.json", "jobs.json"] {
+        fs::copy(bundled.join(file), fixture.content.join(file)).unwrap();
+    }
+    let path = fixture.content.join("achievements.json");
+    let mut content: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let achievement = content["definitions"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|row| row["key"] == "wiki:achievement:005:adventurer-level-20")
+        .unwrap();
+    achievement["reward"]["item_ids"] = serde_json::json!([8]);
+    fs::write(&path, serde_json::to_vec(&content).unwrap()).unwrap();
 }
 
 fn assert_snapshot_canary(gateway: &Gateway) {
@@ -280,15 +361,14 @@ fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() 
     let before = gateway.snapshot();
     assert_eq!(item_count(&before, 8), 0);
 
-    gateway
-        .issue_claim(CLAIM, item_grant(), CLAIM.to_le_bytes().to_vec())
-        .unwrap();
+    gateway.issue_claim(CLAIM, item_grant()).unwrap();
     let listed = send(&mut gateway, &ClaimWindow::list_request());
     assert_eq!(listed.trace[0].handler, "claims");
     let list = inner_packets(&listed).pop().unwrap();
-    assert_eq!(&list[..5], &[108, 0, 2, 0, 1]);
-    assert_eq!(u32::from_le_bytes(list[5..9].try_into().unwrap()), 1);
-    assert_eq!(&list[9..17], &CLAIM.to_le_bytes());
+    let rows = decode_claim_rows(&list, 5);
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].ids, [CLAIM]);
+    assert_eq!(rows[0].entries, [[1, 8, 0]]);
 
     assert_snapshot_canary(&gateway);
     let before_forged = gateway.snapshot();
@@ -304,11 +384,11 @@ fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() 
     let request = progression_extras::claim_request(0xBEEF, &[CLAIM]).unwrap();
     let claimed = send(&mut gateway, &request);
     let replies = inner_packets(&claimed);
-    assert!(
-        replies
-            .iter()
-            .any(|packet| { packet.starts_with(&[108, 0, 4, 0, 0xef, 0xbe, 0, 0, 1]) })
-    );
+    let claimed_row = replies
+        .iter()
+        .find(|packet| packet.starts_with(&[108, 0, 4, 0, 0xef, 0xbe, 0, 0]))
+        .unwrap();
+    assert_eq!(decode_claim_rows(claimed_row, 9).len(), 1);
     let paid = gateway.snapshot();
     assert_eq!(item_count(&paid, 8), 1);
     assert!(
@@ -353,9 +433,7 @@ fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() 
     );
     let mut fresh = fixture.gateway(reloaded.gameplay.clone());
     assert!(
-        fresh
-            .issue_claim(CLAIM, item_grant(), CLAIM.to_le_bytes().to_vec())
-            .is_err(),
+        fresh.issue_claim(CLAIM, item_grant()).is_err(),
         "a claimed reward row was reissued"
     );
     let before = fresh.snapshot();
@@ -365,6 +443,189 @@ fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() 
         &[108, 0, 4, 0, 0xef, 0xbe, 0, 0, 0]
     );
     assert_eq!(fresh.snapshot(), before);
+}
+
+#[test]
+fn definitions_before_claim_use_pending_contents_without_consuming_them() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(None);
+    gateway.issue_claim(CLAIM, item_grant()).unwrap();
+    let before = gateway.snapshot();
+
+    // Native 00a04ea0 and 00a04f40 both open a tracker and send 108/5 before
+    // 108/3. Each path must receive its own complete definitions response.
+    for tracker in [0x1111_u32, 0x2222] {
+        let response = inner_packets(&send(
+            &mut gateway,
+            &definitions_request(tracker, &[8]).unwrap(),
+        ))
+        .pop()
+        .expect("pre-claim definitions response");
+        assert_eq!(
+            &response[..9],
+            &[108, 0, 6, 0, tracker as u8, (tracker >> 8) as u8, 0, 0, 1],
+            "response must echo the client tracker"
+        );
+    }
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "opening a definition path consumed the reward"
+    );
+
+    let paid = send(
+        &mut gateway,
+        &progression_extras::claim_request(0x3333, &[CLAIM]).unwrap(),
+    );
+    assert!(
+        inner_packets(&paid)
+            .iter()
+            .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x33, 0x33, 0, 0, 1]))
+    );
+    assert_eq!(item_count(&gateway.snapshot(), 8), 1);
+}
+
+#[test]
+fn pending_claim_survives_a_reconnect_and_pays_exactly_once() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(None);
+    gateway.issue_claim(CLAIM, item_grant()).unwrap();
+    assert_eq!(item_count(&gateway.snapshot(), 8), 0);
+
+    let path = fixture.content.join("pending-claim-save.json");
+    let queued = gateway.snapshot();
+    game_store::save(&path, &queued).unwrap();
+    let reloaded = game_store::load_or_create(&path, queued.character.clone()).unwrap();
+    let mut fresh = fixture.gateway(reloaded.gameplay.clone());
+
+    let listed = send(&mut fresh, &ClaimWindow::list_request());
+    let rows = decode_claim_rows(&inner_packets(&listed).pop().unwrap(), 5);
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].ids, [CLAIM]);
+
+    let claim = progression_extras::claim_request(0x4444, &[CLAIM]).unwrap();
+    let paid = send(&mut fresh, &claim);
+    assert!(
+        inner_packets(&paid)
+            .iter()
+            .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x44, 0x44, 0, 0, 1]))
+    );
+    assert_eq!(item_count(&fresh.snapshot(), 8), 1);
+
+    let replay = send(&mut fresh, &claim);
+    assert_eq!(
+        &inner_packets(&replay).pop().unwrap()[..9],
+        &[108, 0, 4, 0, 0x44, 0x44, 0, 0, 0]
+    );
+    assert_eq!(item_count(&fresh.snapshot(), 8), 1);
+}
+
+#[test]
+fn claim_payout_uses_live_coins_after_queueing() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(None);
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    gateway.issue_claim(CLAIM, item_grant()).unwrap();
+
+    let _ = send(&mut gateway, &chat::local_request("realm coins 7"));
+    let before = gateway.snapshot();
+    assert_eq!(before.gameplay.as_ref().unwrap().inventory.coins, 7);
+
+    let paid = send(
+        &mut gateway,
+        &progression_extras::claim_request(0x8888, &[CLAIM]).unwrap(),
+    );
+    assert!(
+        inner_packets(&paid)
+            .iter()
+            .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x88, 0x88, 0, 0, 1]))
+    );
+    let after = gateway.snapshot();
+    assert_eq!(
+        after.gameplay.as_ref().unwrap().inventory.coins,
+        7,
+        "claim restored a stale wallet snapshot"
+    );
+    assert_eq!(item_count(&after, 8), 1);
+}
+
+#[test]
+fn job_rank_completion_awards_a_data_bound_title_and_select_request_equips_it() {
+    let fixture = Fixture::new();
+    let mut state = fixture.state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = 1;
+    profiles.unlocked.insert(1);
+    profiles.experience.insert(1, 1_800);
+    let mut gateway = fixture.gateway(Some(state));
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+
+    let titles = progression_extras::parse_title_content(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/titles.json"))
+            .unwrap(),
+    )
+    .unwrap();
+    let title_id = titles
+        .definitions
+        .iter()
+        .find(|title| title.name == "The Adventurer Enthusiast")
+        .and_then(|title| title.client_id)
+        .unwrap();
+
+    let earned = send(&mut gateway, &chat::local_request("realm level 20"));
+    let earned_packets = inner_packets(&earned);
+    assert!(
+        earned_packets.iter().any(|packet| {
+            packet.starts_with(&[152, 0, 1, 0])
+                && packet.get(6..10) == Some(&title_id.to_le_bytes())
+        }),
+        "authoritative job XP completion did not award the bound title: {earned_packets:?}"
+    );
+
+    let selected = send(
+        &mut gateway,
+        &progression_extras::title_select_request(title_id),
+    );
+    let replies = inner_packets(&selected);
+    assert_eq!(replies[0][..6], [152, 0, 3, 0, 0, 0]);
+    assert_eq!(
+        u32::from_le_bytes(replies[0][30..34].try_into().unwrap()),
+        title_id
+    );
+}
+
+#[test]
+fn achievement_item_reward_is_issued_to_the_claim_window_by_gameplay() {
+    let fixture = Fixture::new();
+    enable_adventurer_claim_reward(&fixture);
+    let mut state = fixture.state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = 1;
+    profiles.unlocked.insert(1);
+    profiles.experience.insert(1, 1_800);
+    let mut gateway = fixture.gateway(Some(state));
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+
+    let _ = send(&mut gateway, &chat::local_request("realm level 20"));
+    assert_eq!(item_count(&gateway.snapshot(), 8), 0);
+    let listed = send(&mut gateway, &ClaimWindow::list_request());
+    let rows = decode_claim_rows(&inner_packets(&listed).pop().unwrap(), 5);
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].entries, [[1, 8, 0]]);
+
+    let paid = send(
+        &mut gateway,
+        &progression_extras::claim_request(0x7777, &rows[0].ids).unwrap(),
+    );
+    assert!(
+        inner_packets(&paid)
+            .iter()
+            .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x77, 0x77, 0, 0, 1]))
+    );
+    assert_eq!(item_count(&gateway.snapshot(), 8), 1);
 }
 
 fn gateway_claim_history_contains(

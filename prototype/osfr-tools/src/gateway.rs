@@ -737,6 +737,20 @@ impl Gateway {
         }
         Ok(messages.into_iter().map(<[u8]>::to_vec).collect())
     }
+
+    /// Application payloads only, in request order. Used by the server's
+    /// account action budget before it clones gameplay.
+    pub fn application_requests(&self, message: &[u8]) -> io::Result<Vec<Vec<u8>>> {
+        application_messages(message)?
+            .into_iter()
+            .map(|message| parse_message(message, &self.state, &self.version))
+            .filter_map(|event| match event {
+                Ok(Event::Application(inner)) => Some(Ok(inner)),
+                Ok(_) => None,
+                Err(error) => Some(Err(error)),
+            })
+            .collect()
+    }
     pub fn take_shared_fields(&mut self) -> Option<crate::encounter::SharedFieldState> {
         self.gameplay.as_mut()?.take_shared_fields()
     }
@@ -1354,12 +1368,11 @@ impl Gateway {
         &mut self,
         claim_id: u64,
         grant: crate::rewards::RewardGrant,
-        client_record: Vec<u8>,
     ) -> io::Result<()> {
         self.gameplay
             .as_mut()
             .ok_or_else(|| invalid("claims require gameplay"))?
-            .issue_claim(claim_id, grant, client_record)
+            .issue_claim(claim_id, grant)
     }
 
     /// W178: trusted achievement-completion hook; clients cannot grant a title.

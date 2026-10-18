@@ -31,7 +31,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
-    collections::{BTreeSet, HashSet},
+    collections::{BTreeMap, BTreeSet, HashSet},
     io::{self, Read},
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -223,6 +223,8 @@ pub struct Gameplay {
     pets: crate::pets::PetService,
     /// W178 titles and claim history, staged with the rest of this character.
     progression_extras: crate::progression_extras::ProgressionExtras,
+    /// Data-driven achievement counters and exact title-name bindings.
+    achievement_bindings: crate::progression_extras::AchievementBindings,
 }
 
 #[derive(Default)]
@@ -530,6 +532,7 @@ impl Gameplay {
         let progression_extras = crate::progression_extras::ProgressionExtras::load(
             state.as_ref().and_then(|s| s.progression_extras.clone()),
         )?;
+        let achievement_bindings = crate::progression_extras::AchievementBindings::load(directory)?;
         let (
             inventory,
             quests,
@@ -1070,6 +1073,7 @@ impl Gameplay {
             field_engaged: false,
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             progression_extras,
+            achievement_bindings,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -2195,6 +2199,97 @@ impl Gameplay {
         )
     }
 
+    fn achievement_counters(&self) -> BTreeMap<String, u32> {
+        let mut counters = BTreeMap::<String, u32>::new();
+        if let Some(profiles) = &self.profiles {
+            for profile in profiles
+                .state()
+                .unlocked
+                .iter()
+                .copied()
+                .chain(profiles.state().experience.keys().copied())
+            {
+                if let Some(slug) = self.achievement_bindings.job_slug(profile) {
+                    counters.insert(
+                        format!("job_rank:{slug}"),
+                        profiles.rank(profile).saturating_sub(1),
+                    );
+                }
+            }
+        }
+        if let Some(quests) = &self.npc_quests {
+            counters.insert(
+                "quest_completed_count".into(),
+                u32::try_from(
+                    quests
+                        .state()
+                        .quests
+                        .values()
+                        .filter(|quest| quest.status == crate::quest_engine::QuestStatus::Completed)
+                        .count(),
+                )
+                .unwrap_or(1_000_000),
+            );
+        }
+        counters
+    }
+
+    /// Observe authoritative persisted progress on each gameplay stage. Job
+    /// promotions and completed regional quests feed the data-bound
+    /// achievement rules; only a newly completed rule emits packets, grants
+    /// its title or marks the character changed (R). Progress-only observation
+    /// stays session-local.
+    fn sync_achievement_progress(
+        &mut self,
+        out: &mut Outcome,
+        only: Option<&BTreeSet<String>>,
+    ) -> io::Result<()> {
+        if self.achievement_bindings.rules().is_empty() {
+            return Ok(());
+        }
+        let counters = self.achievement_counters();
+        let rewards = RewardState::new(
+            self.inventory.clone(),
+            self.reward_profiles(),
+            self.inventory.state().items.len().max(100),
+        );
+        let before = self.progression_extras.achievement_state();
+        let mut achievements = crate::progression_extras::AchievementProgression::new(
+            self.achievement_bindings.rules().to_vec(),
+            before.clone(),
+        )?;
+        let mut completed = Vec::new();
+        for (counter, value) in counters {
+            if only.is_some_and(|keys| !keys.contains(&counter)) {
+                continue;
+            }
+            let transition = achievements.observe(&counter, value, &rewards)?;
+            if !transition.newly_completed.is_empty() {
+                out.replies.extend(transition.packets);
+                out.replies.extend(transition.reward_packets);
+                completed.extend(transition.newly_completed);
+            }
+        }
+        let changed = !completed.is_empty();
+        let claim_bindings = self.achievement_bindings.claim_bindings().to_vec();
+        for binding in &claim_bindings {
+            if completed.contains(&binding.achievement_key) {
+                self.issue_claim(binding.claim_id, binding.grant.clone())?;
+            }
+        }
+        out.replies
+            .extend(self.progression_extras.award_completed_achievement_titles(
+                &completed,
+                self.achievement_bindings.title_bindings(),
+            )?);
+        let after = achievements.state().clone();
+        if changed {
+            self.progression_extras.set_achievement_state(after);
+            out.changed = true;
+        }
+        Ok(())
+    }
+
     // (R) Collect counts newly granted, non-rental items, not login snapshots
     // or existing stock. Equip counts changed owned slots, not packet claims.
     fn npc_inventory_events(
@@ -2478,10 +2573,8 @@ impl Gameplay {
         &mut self,
         claim_id: u64,
         grant: crate::rewards::RewardGrant,
-        client_record: Vec<u8>,
     ) -> io::Result<()> {
-        self.progression_extras
-            .issue_server_grant(claim_id, grant, client_record)
+        self.progression_extras.issue_server_grant(claim_id, grant)
     }
 
     /// W178: award titles only for achievements completed by the existing
@@ -2936,6 +3029,7 @@ impl Gameplay {
             self.append_item_bar(now_ms, &mut out)?;
             out.replies.push(self.pets.list_packet());
             self.sync_client_objectives(&mut out);
+            self.sync_achievement_progress(&mut out, None)?;
             return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
@@ -3029,6 +3123,7 @@ impl Gameplay {
         out.replies.push(self.recipe_replace_all_packet()?);
         out.replies.push(self.pets.list_packet());
         self.sync_client_objectives(&mut out);
+        self.sync_achievement_progress(&mut out, None)?;
         Ok(out)
     }
 
@@ -3443,9 +3538,19 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
+        let counters_before = self.achievement_counters();
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
         self.sync_tracked_target(character, &mut out);
         self.sync_client_objectives(&mut out);
+        let changed: BTreeSet<_> = self
+            .achievement_counters()
+            .into_iter()
+            .filter(|(key, value)| counters_before.get(key) != Some(value))
+            .map(|(key, _)| key)
+            .collect();
+        if !changed.is_empty() {
+            self.sync_achievement_progress(&mut out, Some(&changed))?;
+        }
         Ok(out)
     }
 

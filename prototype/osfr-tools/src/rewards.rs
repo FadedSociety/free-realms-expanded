@@ -7,6 +7,7 @@
 //! its save snapshot.
 
 use crate::{inventory::Inventory, profiles::ProfileState};
+use serde::{Deserialize, Serialize};
 use std::{collections::BTreeSet, io};
 
 const MAX_GRANT_KEY_BYTES: usize = 256;
@@ -15,7 +16,8 @@ const REWARD_BUNDLE_SUBTYPE: u8 = 1;
 const BASE_ENTRY_BODY_MIN_BYTES: usize = 34;
 
 /// One inventory award. The simple reward API uses tint zero (R).
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ItemGrant {
     pub definition_id: i32,
     pub count: u32,
@@ -25,14 +27,16 @@ pub struct ItemGrant {
 ///
 /// Bodies must follow the client entry reader. For Item and Chest entries, a successful bundle
 /// also requires the entry-specific trailing u32 described by reader `008e7930` and its callees.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RewardBundleRow {
     pub type_id: u32,
     pub body: Vec<u8>,
 }
 
 /// Display-only fields for family 50/subtype 1. Rows never mutate inventory or progression.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RewardDisplay {
     pub source_guid: u64,
     pub player_guid: u64,
@@ -43,7 +47,8 @@ pub struct RewardDisplay {
 }
 
 /// One atomic server grant. `job_xp` maps profile/job ids to XP amounts.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RewardGrant {
     pub coins: u32,
     pub items: Vec<ItemGrant>,

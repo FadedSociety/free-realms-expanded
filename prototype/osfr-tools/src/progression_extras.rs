@@ -12,8 +12,11 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::collections::{BTreeMap, BTreeSet};
-use std::io;
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs, io,
+    path::Path,
+};
 
 #[path = "restoration/piece_074.rs"]
 mod collection_ledger;
@@ -163,6 +166,20 @@ pub struct AchievementDefinitionContent {
     pub image_set_id: Option<u32>,
     pub counter_key: Option<String>,
     pub threshold: Option<u32>,
+    #[serde(default)]
+    pub reward: Option<AchievementRewardContent>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+pub struct AchievementRewardContent {
+    #[serde(default)]
+    pub title_names: Vec<String>,
+    #[serde(default)]
+    pub client_trophy_id: Option<u32>,
+    #[serde(default)]
+    pub trophy_points: u32,
+    #[serde(default)]
+    pub item_ids: Option<Vec<u32>>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -200,6 +217,181 @@ pub fn parse_achievement_content(bytes: &[u8]) -> io::Result<AchievementContent>
 
 pub fn parse_title_content(bytes: &[u8]) -> io::Result<TitleContent> {
     serde_json::from_slice(bytes).map_err(|_| invalid("invalid title content"))
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AchievementBindings {
+    rules: Vec<AchievementRule>,
+    title_bindings: Vec<AchievementTitleBinding>,
+    claim_bindings: Vec<AchievementClaimBinding>,
+    job_slugs: BTreeMap<i32, String>,
+}
+
+impl AchievementBindings {
+    /// Load achievement counters and exact name joins to the shipped title
+    /// definitions. Missing optional content yields no bindings.
+    pub fn load(directory: &Path) -> io::Result<Self> {
+        let bundled = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let source = [directory, bundled.as_path()]
+            .into_iter()
+            .find(|path| path.join("achievements.json").is_file());
+        let Some(source) = source else {
+            return Ok(Self::default());
+        };
+        let achievements = parse_achievement_content(&fs::read(source.join("achievements.json"))?)?;
+        let titles = if source.join("titles.json").is_file() {
+            parse_title_content(&fs::read(source.join("titles.json"))?)?
+        } else {
+            TitleContent {
+                schema_version: 1,
+                definitions: Vec::new(),
+            }
+        };
+        let jobs = if source.join("jobs.json").is_file() {
+            serde_json::from_slice::<JobsContent>(&fs::read(source.join("jobs.json"))?)
+                .map_err(|_| invalid("invalid jobs content"))?
+        } else {
+            JobsContent {
+                records: Vec::new(),
+            }
+        };
+
+        let mut title_by_name = BTreeMap::new();
+        for title in &titles.definitions {
+            if let Some(id) = title.client_id {
+                title_by_name.entry(title.name.as_str()).or_insert([
+                    id,
+                    title.title_type.unwrap_or(0),
+                    title.name_id.unwrap_or(0),
+                    title.image_id.unwrap_or(0),
+                ]);
+            }
+        }
+        let mut rules = Vec::new();
+        let mut title_bindings = Vec::new();
+        let mut claim_bindings = Vec::new();
+        for definition in achievements.definitions {
+            let (Some(client_id), Some(counter_key), Some(threshold)) = (
+                definition.client_id,
+                definition.counter_key,
+                definition.threshold,
+            ) else {
+                continue;
+            };
+            let reward = definition.reward.unwrap_or_default();
+            let item_ids: BTreeSet<_> = reward
+                .item_ids
+                .clone()
+                .unwrap_or_default()
+                .into_iter()
+                .collect();
+            rules.push(AchievementRule {
+                key: definition.key.clone(),
+                client_id: Some(client_id),
+                counter_key,
+                objective_id: 1,
+                threshold,
+                trophy_id: reward.client_trophy_id,
+                reward: empty_grant(),
+            });
+            for name in reward.title_names {
+                if let Some(&title) = title_by_name.get(name.as_str()) {
+                    title_bindings.push(AchievementTitleBinding {
+                        achievement_key: definition.key.clone(),
+                        title,
+                    });
+                }
+            }
+            let items: Vec<_> = item_ids
+                .into_iter()
+                .map(|id| {
+                    i32::try_from(id).map(|definition_id| rewards::ItemGrant {
+                        definition_id,
+                        count: 1,
+                    })
+                })
+                .collect::<Result<_, _>>()
+                .map_err(|_| invalid("achievement item reward exceeds i32"))?;
+            if !items.is_empty() {
+                claim_bindings.push(AchievementClaimBinding {
+                    achievement_key: definition.key.clone(),
+                    claim_id: achievement_claim_id(&definition.key),
+                    grant: RewardGrant {
+                        coins: 0,
+                        items,
+                        job_xp: BTreeMap::new(),
+                        display: rewards::RewardDisplay {
+                            source_guid: 0,
+                            player_guid: 0,
+                            reward_kind: 0,
+                            icon_id: 0,
+                            name_id: 0,
+                            rows: Vec::new(),
+                        },
+                    },
+                });
+            }
+        }
+        let mut job_slugs = BTreeMap::new();
+        for job in jobs.records {
+            if job.profile_id > 0
+                && !job.id.is_empty()
+                && job_slugs.insert(job.profile_id, job.id).is_some()
+            {
+                return Err(invalid("duplicate achievement job binding"));
+            }
+        }
+        AchievementProgression::new(rules.clone(), AchievementState::default())?;
+        Ok(Self {
+            rules,
+            title_bindings,
+            claim_bindings,
+            job_slugs,
+        })
+    }
+
+    pub fn rules(&self) -> &[AchievementRule] {
+        &self.rules
+    }
+
+    pub fn title_bindings(&self) -> &[AchievementTitleBinding] {
+        &self.title_bindings
+    }
+
+    pub fn claim_bindings(&self) -> &[AchievementClaimBinding] {
+        &self.claim_bindings
+    }
+
+    pub fn job_slug(&self, profile_id: i32) -> Option<&str> {
+        self.job_slugs.get(&profile_id).map(String::as_str)
+    }
+}
+
+/// An achievement whose recovered reward contains item definitions queues a
+/// server-owned claim rather than granting inventory before the player claims.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AchievementClaimBinding {
+    pub achievement_key: String,
+    pub claim_id: u64,
+    pub grant: RewardGrant,
+}
+
+fn achievement_claim_id(key: &str) -> u64 {
+    let digest = Sha256::digest(format!("achievement-claim:{key}").as_bytes());
+    let mut id = u64::from_le_bytes(digest[..8].try_into().unwrap());
+    id |= 1 << 63;
+    id
+}
+
+#[derive(Deserialize)]
+struct JobsContent {
+    records: Vec<JobRow>,
+}
+
+#[derive(Deserialize)]
+struct JobRow {
+    id: String,
+    profile_id: i32,
 }
 
 // World collection wire messages use signed 16-bit family/subtype headers.
@@ -469,13 +661,15 @@ impl AchievementProgression {
                 if let Some(id) = rule.client_id {
                     packets.push(achievement_complete_packet(id, rule.trophy_id.unwrap_or(0)));
                 }
-                let (next, mut emitted) = apply_award(
-                    &staged_rewards,
-                    &rule.reward,
-                    &format!("achievement:{}", rule.key),
-                )?;
-                staged_rewards = next;
-                reward_packets.append(&mut emitted);
+                if !grant_is_empty(&rule.reward) {
+                    let (next, mut emitted) = apply_award(
+                        &staged_rewards,
+                        &rule.reward,
+                        &format!("achievement:{}", rule.key),
+                    )?;
+                    staged_rewards = next;
+                    reward_packets.append(&mut emitted);
+                }
                 newly_completed.push(rule.key.clone());
             }
         }
@@ -488,6 +682,93 @@ impl AchievementProgression {
             reward_packets,
             newly_completed,
         })
+    }
+
+    /// Set a counter to an authoritative absolute value. This is used for
+    /// values already stored by gameplay (job rank, completed quest count).
+    pub fn observe(
+        &mut self,
+        counter_key: &str,
+        value: u32,
+        reward_state: &RewardState,
+    ) -> io::Result<AchievementTransition> {
+        if value > MAX_COUNTER {
+            return Err(invalid("invalid achievement counter"));
+        }
+        let mut staged_state = self.state.clone();
+        let mut staged_rewards = reward_state.clone();
+        let mut packets = Vec::new();
+        let mut reward_packets = Vec::new();
+        let mut newly_completed = Vec::new();
+
+        for rule in self.rules.iter().filter(|r| r.counter_key == counter_key) {
+            let current = value.min(MAX_COUNTER);
+            if staged_state.counters.get(&rule.key).copied().unwrap_or(0) == current
+                && (current < rule.threshold || staged_state.completed.contains(&rule.key))
+            {
+                continue;
+            }
+            staged_state.counters.insert(rule.key.clone(), current);
+            if staged_state.completed.contains(&rule.key) {
+                continue;
+            }
+            if let Some(id) = rule.client_id {
+                packets.push(achievement_progress_packet(
+                    id,
+                    rule.objective_id,
+                    current,
+                    rule.threshold,
+                ));
+            }
+            if current >= rule.threshold {
+                staged_state.completed.insert(rule.key.clone());
+                if let Some(id) = rule.client_id {
+                    packets.push(achievement_complete_packet(id, rule.trophy_id.unwrap_or(0)));
+                }
+                if !grant_is_empty(&rule.reward) {
+                    let (next, mut emitted) = apply_award(
+                        &staged_rewards,
+                        &rule.reward,
+                        &format!("achievement:{}", rule.key),
+                    )?;
+                    staged_rewards = next;
+                    reward_packets.append(&mut emitted);
+                }
+                newly_completed.push(rule.key.clone());
+            }
+        }
+
+        self.state = staged_state.clone();
+        Ok(AchievementTransition {
+            state: staged_state,
+            packets,
+            reward_state: staged_rewards,
+            reward_packets,
+            newly_completed,
+        })
+    }
+}
+
+fn grant_is_empty(grant: &RewardGrant) -> bool {
+    grant.coins == 0
+        && grant.items.is_empty()
+        && grant.job_xp.is_empty()
+        && grant.display.rows.is_empty()
+}
+
+fn empty_grant() -> RewardGrant {
+    RewardGrant {
+        coins: 0,
+        items: Vec::new(),
+        job_xp: BTreeMap::new(),
+        display: rewards::RewardDisplay {
+            source_guid: 0,
+            player_guid: 0,
+            reward_kind: 0,
+            icon_id: 0,
+            name_id: 0,
+            rows: Vec::new(),
+        },
     }
 }
 
@@ -633,13 +914,185 @@ pub struct AchievementTitleBinding {
     pub title: [u32; 4],
 }
 
-// Claim records are supplied as opaque client-reader bytes. The client row
-// reader's middle fields are not fully recovered; this module never invents them.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ClaimItemEntry {
+    /// Two leading dwords consumed into entry+4/+8. The second is the item
+    /// definition id used by native predicate `00a012a0`.
+    pub field_4: u32,
+    pub item_id: u32,
+    /// The dword consumed into entry+0x14 by native reader `00a033e0`.
+    pub field_14: u32,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ClaimItem {
+    pub claim_ids: Vec<u64>,
+    pub name_id: u32,
+    pub description_id: u32,
+    pub icon: [u32; 2],
+    pub entries: Vec<ClaimItemEntry>,
+    pub field_150: [u32; 2],
+}
+
+impl ClaimItem {
+    pub fn for_grant(claim_id: u64, grant: &RewardGrant) -> io::Result<Self> {
+        let entries = grant
+            .items
+            .iter()
+            .map(|item| {
+                let item_id = u32::try_from(item.definition_id)
+                    .map_err(|_| invalid("claim item definition id exceeds u32"))?;
+                Ok(ClaimItemEntry {
+                    // (R) The native +4 field is not named; use the stack count.
+                    field_4: item.count,
+                    item_id,
+                    field_14: 0,
+                })
+            })
+            .collect::<io::Result<Vec<_>>>()?;
+        let item = Self {
+            claim_ids: vec![claim_id],
+            name_id: 0,
+            description_id: 0,
+            icon: [0; 2],
+            entries,
+            field_150: [0; 2],
+        };
+        item.validate()?;
+        Ok(item)
+    }
+
+    /// Exact row consumed by native reader `00a040e0`.
+    pub fn encode(&self) -> io::Result<Vec<u8>> {
+        self.validate()?;
+        let mut bytes = Vec::new();
+        put_u32(
+            &mut bytes,
+            u32::try_from(self.claim_ids.len()).map_err(|_| invalid("too many claim ids"))?,
+        );
+        for id in &self.claim_ids {
+            bytes.extend_from_slice(&id.to_le_bytes());
+        }
+        put_u32(&mut bytes, self.name_id);
+        put_u32(&mut bytes, self.description_id);
+        for value in self.icon {
+            put_u32(&mut bytes, value);
+        }
+        put_u32(
+            &mut bytes,
+            u32::try_from(self.entries.len()).map_err(|_| invalid("too many claim entries"))?,
+        );
+        for entry in &self.entries {
+            for value in [entry.field_4, entry.item_id, entry.field_14] {
+                put_u32(&mut bytes, value);
+            }
+        }
+        for value in self.field_150 {
+            put_u32(&mut bytes, value);
+        }
+        if bytes.len() > MAX_PACKET_BYTES - 9 {
+            return Err(invalid("claim row exceeds packet bound"));
+        }
+        Ok(bytes)
+    }
+
+    pub fn decode(bytes: &[u8], cursor: &mut usize) -> io::Result<Self> {
+        let claim_count = take_u32(bytes, cursor)? as usize;
+        if claim_count == 0 || claim_count > MAX_CLAIM_ITEMS {
+            return Err(invalid("invalid claim id count"));
+        }
+        let mut claim_ids = Vec::with_capacity(claim_count);
+        for _ in 0..claim_count {
+            let id = u64::from_le_bytes(
+                take(bytes, cursor, 8)?
+                    .try_into()
+                    .map_err(|_| invalid("invalid claim id"))?,
+            );
+            if id == 0 || claim_ids.last().is_some_and(|last| *last >= id) {
+                return Err(invalid("claim ids are not sorted and unique"));
+            }
+            claim_ids.push(id);
+        }
+        let name_id = take_u32(bytes, cursor)?;
+        let description_id = take_u32(bytes, cursor)?;
+        let icon = [take_u32(bytes, cursor)?, take_u32(bytes, cursor)?];
+        let entry_count = take_u32(bytes, cursor)? as usize;
+        if entry_count > MAX_CLAIM_ITEMS {
+            return Err(invalid("too many claim entries"));
+        }
+        let entries = (0..entry_count)
+            .map(|_| {
+                Ok(ClaimItemEntry {
+                    field_4: take_u32(bytes, cursor)?,
+                    item_id: take_u32(bytes, cursor)?,
+                    field_14: take_u32(bytes, cursor)?,
+                })
+            })
+            .collect::<io::Result<Vec<_>>>()?;
+        let field_150 = [take_u32(bytes, cursor)?, take_u32(bytes, cursor)?];
+        let item = Self {
+            claim_ids,
+            name_id,
+            description_id,
+            icon,
+            entries,
+            field_150,
+        };
+        item.validate()?;
+        Ok(item)
+    }
+
+    pub fn validate(&self) -> io::Result<()> {
+        if self.claim_ids.is_empty()
+            || self.claim_ids.len() > MAX_CLAIM_ITEMS
+            || self.claim_ids.contains(&0)
+            || self.claim_ids.windows(2).any(|ids| ids[0] >= ids[1])
+            || self.entries.len() > MAX_CLAIM_ITEMS
+            || self.entries.iter().any(|entry| entry.item_id == 0)
+        {
+            return Err(invalid("invalid claim item"));
+        }
+        Ok(())
+    }
+
+    fn definition_ids(&self) -> impl Iterator<Item = u32> + '_ {
+        self.entries.iter().map(|entry| entry.item_id)
+    }
+}
+
+fn take<'a>(bytes: &'a [u8], cursor: &mut usize, count: usize) -> io::Result<&'a [u8]> {
+    let end = cursor
+        .checked_add(count)
+        .ok_or_else(|| invalid("claim cursor overflow"))?;
+    let slice = bytes
+        .get(*cursor..end)
+        .ok_or_else(|| invalid("truncated claim row"))?;
+    *cursor = end;
+    Ok(slice)
+}
+
+fn take_u32(bytes: &[u8], cursor: &mut usize) -> io::Result<u32> {
+    Ok(u32::from_le_bytes(
+        take(bytes, cursor, 4)?
+            .try_into()
+            .map_err(|_| invalid("invalid claim dword"))?,
+    ))
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PendingClaimState {
+    claim_id: u64,
+    grant: RewardGrant,
+    record: ClaimItem,
+}
 
 #[derive(Clone, Debug)]
 struct PendingClaim {
     grant: RewardGrant,
-    client_record: Vec<u8>,
+    record: ClaimItem,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -661,39 +1114,28 @@ pub struct ClaimTransition {
 
 impl ClaimWindow {
     /// R: only trusted server grant code calls this method to queue a claim.
-    pub fn issue_server_grant(
-        &mut self,
-        claim_id: u64,
-        grant: RewardGrant,
-        client_record: Vec<u8>,
-    ) -> io::Result<()> {
+    pub fn issue_server_grant(&mut self, claim_id: u64, grant: RewardGrant) -> io::Result<()> {
         validate_reward_rows(&grant.display.rows)?;
-        let pending_bytes = self
-            .pending
-            .values()
-            .try_fold(0usize, |total, item| {
-                total.checked_add(item.client_record.len())
-            })
-            .ok_or_else(|| invalid("claim record total overflow"))?;
+        let record = ClaimItem::for_grant(claim_id, &grant)?;
+        let record_bytes = record.encode()?.len();
+        let mut pending_bytes = 0usize;
+        for item in self.pending.values() {
+            pending_bytes = pending_bytes
+                .checked_add(item.record.encode()?.len())
+                .ok_or_else(|| invalid("claim record total overflow"))?;
+        }
         if claim_id == 0
             || self.pending.contains_key(&claim_id)
             || self.claimed.contains(&claim_id)
-            || client_record.is_empty()
-            || client_record.len() > MAX_PACKET_BYTES
             || self.pending.len() >= MAX_CLAIM_ITEMS
             || pending_bytes
-                .checked_add(client_record.len())
+                .checked_add(record_bytes)
                 .is_none_or(|total| total > MAX_PACKET_BYTES - 13)
         {
             return Err(invalid("invalid or duplicate pending claim"));
         }
-        self.pending.insert(
-            claim_id,
-            PendingClaim {
-                grant,
-                client_record,
-            },
-        );
+        self.pending
+            .insert(claim_id, PendingClaim { grant, record });
         Ok(())
     }
 
@@ -709,6 +1151,65 @@ impl ClaimWindow {
         }
     }
 
+    fn from_saved(claimed: BTreeSet<u64>, pending: Vec<PendingClaimState>) -> io::Result<Self> {
+        if claimed.len() > MAX_CLAIM_HISTORY
+            || claimed.contains(&0)
+            || pending.len() > MAX_CLAIM_ITEMS
+        {
+            return Err(invalid("invalid claim history"));
+        }
+        let mut window = Self {
+            pending: BTreeMap::new(),
+            claimed,
+            trackers: BTreeMap::new(),
+        };
+        let mut bytes = 0usize;
+        for saved in pending {
+            validate_reward_rows(&saved.grant.display.rows)?;
+            if saved.claim_id == 0
+                || saved.record.claim_ids.as_slice() != [saved.claim_id]
+                || ClaimItem::for_grant(saved.claim_id, &saved.grant)? != saved.record
+                || window.claimed.contains(&saved.claim_id)
+            {
+                return Err(invalid("invalid saved pending claim"));
+            }
+            bytes = bytes
+                .checked_add(saved.record.encode()?.len())
+                .ok_or_else(|| invalid("saved claim record total overflow"))?;
+            if bytes > MAX_PACKET_BYTES - 13 {
+                return Err(invalid("saved claim records exceed packet bound"));
+            }
+            if window
+                .pending
+                .insert(
+                    saved.claim_id,
+                    PendingClaim {
+                        grant: saved.grant,
+                        record: saved.record,
+                    },
+                )
+                .is_some()
+            {
+                return Err(invalid("duplicate saved pending claim"));
+            }
+        }
+        if window.pending.len().saturating_add(window.claimed.len()) > MAX_CLAIM_HISTORY {
+            return Err(invalid("claim history is full"));
+        }
+        Ok(window)
+    }
+
+    fn pending_state(&self) -> Vec<PendingClaimState> {
+        self.pending
+            .iter()
+            .map(|(&claim_id, item)| PendingClaimState {
+                claim_id,
+                grant: item.grant.clone(),
+                record: item.record.clone(),
+            })
+            .collect()
+    }
+
     pub fn claimed_ids(&self) -> &BTreeSet<u64> {
         &self.claimed
     }
@@ -718,14 +1219,17 @@ impl ClaimWindow {
     }
 
     pub fn list_response(&self) -> io::Result<Vec<u8>> {
-        let records: Vec<_> = self
+        // 108/2 reader 00a04950; each row uses 00a040e0.
+        let records = self
             .pending
             .values()
-            .map(|item| item.client_record.as_slice())
-            .collect();
+            .map(|item| item.record.encode())
+            .collect::<io::Result<Vec<_>>>()?;
         let mut packet = packet_u16_u16(108, 2);
         packet.push(1);
-        packet.extend(encode_claim_array(&records)?);
+        packet.extend(encode_claim_array(
+            &records.iter().map(Vec::as_slice).collect::<Vec<_>>(),
+        )?);
         Ok(packet)
     }
 
@@ -734,6 +1238,7 @@ impl ClaimWindow {
         request: &[u8],
         reward_state: &RewardState,
     ) -> io::Result<ClaimTransition> {
+        // 108/4 reader 00a049b0; rows are read by 00a040e0.
         let (tracker_id, ids) = parse_claim_request(request)?;
         let reject = || {
             let mut response = packet_u16_u16(108, 4);
@@ -751,6 +1256,7 @@ impl ClaimWindow {
         };
         if ids.is_empty()
             || ids.len() > MAX_CLAIM_ITEMS
+            || tracker_id == 0
             || self.trackers.contains_key(&tracker_id)
             || self.trackers.len() >= MAX_CLAIM_ITEMS
             || self.claimed.len().saturating_add(ids.len()) > MAX_CLAIM_HISTORY
@@ -770,14 +1276,16 @@ impl ClaimWindow {
             Ok(result) => result,
             Err(_) => return Ok(reject()),
         };
-        let records: Vec<_> = ids
+        let records = ids
             .iter()
-            .map(|id| self.pending[id].client_record.as_slice())
-            .collect();
+            .map(|id| self.pending[id].record.encode())
+            .collect::<io::Result<Vec<_>>>()?;
         let mut response = packet_u16_u16(108, 4);
         put_u32(&mut response, tracker_id);
         response.push(1);
-        response.extend(encode_claim_array(&records)?);
+        response.extend(encode_claim_array(
+            &records.iter().map(Vec::as_slice).collect::<Vec<_>>(),
+        )?);
 
         let item_ids: BTreeSet<u32> = grant
             .items
@@ -801,46 +1309,51 @@ impl ClaimWindow {
         })
     }
 
-    pub fn handle_definitions_request(
+    pub fn definitions_response(
         &mut self,
         request: &[u8],
-        definitions_blob: &[u8],
+        inventory: &Inventory,
     ) -> io::Result<Vec<u8>> {
+        // 108/6 reader 00a02ac0; both opener paths send 108/5 first
+        // (00a04ea0 and 00a04f40).
         let (tracker_id, ids) = parse_definitions_request(request)?;
-        let expected = self
-            .trackers
-            .get(&tracker_id)
-            .ok_or_else(|| invalid("unknown claim tracker"))?;
-        if ids.is_empty() || ids.iter().any(|id| !expected.contains(id)) {
+        if tracker_id == 0 {
+            return Err(invalid("invalid claim tracker"));
+        }
+        let requested: BTreeSet<_> = ids.iter().copied().collect();
+        if requested.len() != ids.len() {
             return Err(invalid("claim tracker does not own requested definitions"));
         }
-        if definitions_blob.len() > MAX_PACKET_BYTES - 13 {
-            return Err(invalid("claim definitions exceed packet bound"));
+        let pending_ids: BTreeSet<_> = self
+            .pending
+            .values()
+            .flat_map(|item| item.record.definition_ids())
+            .collect();
+        let mut trackers = self.trackers.clone();
+        if let Some(expected) = trackers.get(&tracker_id) {
+            if ids.iter().any(|id| !expected.contains(id)) {
+                return Err(invalid("claim tracker does not own requested definitions"));
+            }
+        } else {
+            if ids.iter().any(|id| !pending_ids.contains(id)) || trackers.len() >= MAX_CLAIM_ITEMS {
+                return Err(invalid("claim tracker does not own requested definitions"));
+            }
+            trackers.insert(tracker_id, requested);
         }
+        let definitions_blob = self.definition_blob(&ids, inventory)?;
         let len = i32::try_from(definitions_blob.len())
             .map_err(|_| invalid("claim definitions exceed wire length"))?;
         let mut response = packet_u16_u16(108, 6);
         put_u32(&mut response, tracker_id);
         response.push(1);
         response.extend(len.to_le_bytes());
-        response.extend_from_slice(definitions_blob);
-        self.trackers.remove(&tracker_id);
+        response.extend_from_slice(&definitions_blob);
+        trackers.remove(&tracker_id);
+        self.trackers = trackers;
         Ok(response)
     }
 
-    fn definition_blob(
-        &self,
-        tracker_id: u32,
-        ids: &[u32],
-        inventory: &Inventory,
-    ) -> io::Result<Vec<u8>> {
-        let expected = self
-            .trackers
-            .get(&tracker_id)
-            .ok_or_else(|| invalid("unknown claim tracker"))?;
-        if ids.is_empty() || ids.iter().any(|id| !expected.contains(id)) {
-            return Err(invalid("claim tracker does not own requested definitions"));
-        }
+    fn definition_blob(&self, ids: &[u32], inventory: &Inventory) -> io::Result<Vec<u8>> {
         let count = u32::try_from(ids.len()).map_err(|_| invalid("too many claim definitions"))?;
         let mut blob = Vec::new();
         put_u32(&mut blob, count);
@@ -863,8 +1376,8 @@ impl ClaimWindow {
     }
 }
 
-/// Persisted title and claim history. Pending claim payloads and in-flight
-/// definition trackers remain session state.
+/// Persisted titles, achievement counters and the claim inbox. Definition
+/// trackers remain per-session.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProgressionExtrasState {
@@ -872,6 +1385,10 @@ pub struct ProgressionExtrasState {
     pub titles: TitleState,
     #[serde(default)]
     pub claimed_ids: BTreeSet<u64>,
+    #[serde(default)]
+    achievements: AchievementState,
+    #[serde(default)]
+    pending_claims: Vec<PendingClaimState>,
 }
 
 #[derive(Clone, Default)]
@@ -889,6 +1406,7 @@ pub struct ProgressionOutcome {
 pub struct ProgressionExtras {
     titles: TitleState,
     claims: ClaimWindow,
+    achievements: AchievementState,
 }
 
 impl ProgressionExtras {
@@ -897,12 +1415,20 @@ impl ProgressionExtras {
             return Ok(Self::default());
         };
         saved.titles.validate()?;
-        if saved.claimed_ids.len() > MAX_CLAIM_HISTORY || saved.claimed_ids.contains(&0) {
-            return Err(invalid("invalid claim history"));
+        if saved
+            .achievements
+            .counters
+            .values()
+            .any(|value| *value > MAX_COUNTER)
+            || saved.achievements.counters.len() > MAX_CLAIM_HISTORY
+            || saved.achievements.completed.len() > MAX_CLAIM_HISTORY
+        {
+            return Err(invalid("invalid achievement state"));
         }
         Ok(Self {
             titles: saved.titles,
-            claims: ClaimWindow::with_claimed_ids(saved.claimed_ids),
+            claims: ClaimWindow::from_saved(saved.claimed_ids, saved.pending_claims)?,
+            achievements: saved.achievements,
         })
     }
 
@@ -910,11 +1436,16 @@ impl ProgressionExtras {
         ProgressionExtrasState {
             titles: self.titles.clone(),
             claimed_ids: self.claims.claimed_ids().clone(),
+            achievements: self.achievements.clone(),
+            pending_claims: self.claims.pending_state(),
         }
     }
 
     pub fn is_empty(&self) -> bool {
-        self.titles.is_empty() && self.claims.claimed_ids().is_empty()
+        self.titles.is_empty()
+            && self.claims.claimed_ids().is_empty()
+            && self.claims.pending_count() == 0
+            && self.achievements == AchievementState::default()
     }
 
     pub fn titles(&self) -> &TitleState {
@@ -925,14 +1456,17 @@ impl ProgressionExtras {
         self.claims.pending_count()
     }
 
+    pub fn achievement_state(&self) -> AchievementState {
+        self.achievements.clone()
+    }
+
+    pub fn set_achievement_state(&mut self, state: AchievementState) {
+        self.achievements = state;
+    }
+
     /// Trusted server/store code queues a claim. No client request can name or
     /// synthesize the reward.
-    pub fn issue_server_grant(
-        &mut self,
-        claim_id: u64,
-        grant: RewardGrant,
-        client_record: Vec<u8>,
-    ) -> io::Result<()> {
+    pub fn issue_server_grant(&mut self, claim_id: u64, grant: RewardGrant) -> io::Result<()> {
         if self
             .claims
             .claimed_ids()
@@ -942,8 +1476,7 @@ impl ProgressionExtras {
         {
             return Err(invalid("claim history is full"));
         }
-        self.claims
-            .issue_server_grant(claim_id, grant, client_record)
+        self.claims.issue_server_grant(claim_id, grant)
     }
 
     /// Award only the titles bound to achievements completed by the existing
@@ -1017,18 +1550,10 @@ impl ProgressionExtras {
             return Ok(outcome);
         }
         if request.len() >= 4 && request[..4] == [108, 0, 5, 0] {
-            let (tracker_id, ids) = match parse_definitions_request(request) {
-                Ok(parsed) => parsed,
-                Err(_) => return Ok(outcome),
-            };
-            let blob = match self
+            let reply = match self
                 .claims
-                .definition_blob(tracker_id, &ids, &reward_state.inventory)
+                .definitions_response(request, &reward_state.inventory)
             {
-                Ok(blob) => blob,
-                Err(_) => return Ok(outcome),
-            };
-            let reply = match self.claims.handle_definitions_request(request, &blob) {
                 Ok(reply) => reply,
                 Err(_) => return Ok(outcome),
             };

@@ -45,8 +45,8 @@ pub struct ActionBudgets {
 }
 
 impl ActionBudgets {
-    /// Check each validated INNER application before cloning, parsing text,
-    /// SpamGate, mutation or fanout, including every application-bundle child.
+    /// Check each budgeted INNER application before cloning gameplay, parsing
+    /// text, SpamGate, mutation or fanout, including every bundle child.
     /// `account_id` must come from the authenticated server binding, never wire ids.
     /// Typed tells and realm commands use 15/1, so share typed chat's allowance.
     /// False means silent drop (R): no disconnect and no refusal amplification.
@@ -63,6 +63,8 @@ impl ActionBudgets {
                 | (67, 2 | 3)
                 | (26, 10 | 14 | 15 | 17 | 18 | 19 | 21 | 30 | 32 | 33)
                 | (40, 1 | 3 | 4 | 6 | 14 | 16)
+                | (108, 1 | 3 | 5)
+                | (152, 4 | 5)
         ) {
             return true;
         }

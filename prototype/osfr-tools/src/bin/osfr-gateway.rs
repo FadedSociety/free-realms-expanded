@@ -1497,6 +1497,22 @@ impl Session {
         sessions: &mut SessionMap,
         transport: Option<(u16, Option<u16>, &'static str, bool)>,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        self.dispatch_message_inner(
+            message, options, now_ms, world, membership, sessions, transport, false,
+        )
+    }
+
+    fn dispatch_message_inner(
+        &mut self,
+        message: &[u8],
+        options: &Options,
+        now_ms: u64,
+        world: &mut SharedWorld,
+        membership: &mut World,
+        sessions: &mut SessionMap,
+        transport: Option<(u16, Option<u16>, &'static str, bool)>,
+        budget_checked: bool,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if self.recent_on {
             self.note_packet("in", message);
         }
@@ -1531,6 +1547,31 @@ impl Session {
             }
             return Err(error);
         }
+        let children = self.gateway.ordered_messages(message)?;
+        if !budget_checked {
+            // Account-wide action budget runs before the gateway clones gameplay
+            // or stages a bundle. Every application child is charged once; one
+            // refusal drops the whole bundle without mutations or replies (R).
+            let budget_requests = self.gateway.application_requests(message)?;
+            let now = Instant::now();
+            let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
+            let mut refused = false;
+            for request in &budget_requests {
+                if !security.budgets.allow(self.account_guid, request, now) {
+                    refused = true;
+                    break;
+                }
+            }
+            if refused {
+                security.record(
+                    EventKind::BudgetRefusal,
+                    Some(self.account_guid),
+                    Some(self.id.0),
+                );
+                return Ok(());
+            }
+            drop(security);
+        }
         self.gateway.restore_fishing_hours(
             world
                 .fishing_hours
@@ -1538,7 +1579,6 @@ impl Session {
                 .cloned()
                 .unwrap_or_default(),
         )?;
-        let children = self.gateway.ordered_messages(message)?;
         let combat = children.iter().try_fold(false, |seen, child| {
             self.gateway
                 .is_combat_request(child)
@@ -1548,8 +1588,8 @@ impl Session {
         // keep Gateway's staged character/inventory transaction intact.
         if children.len() > 1 && combat {
             for child in children {
-                self.dispatch_message(
-                    &child, options, now_ms, world, membership, sessions, transport,
+                self.dispatch_message_inner(
+                    &child, options, now_ms, world, membership, sessions, transport, true,
                 )?;
             }
             return Ok(());
@@ -2030,20 +2070,6 @@ impl Session {
         world: &mut SharedWorld,
         now_ms: u64,
     ) -> Vec<Delivery> {
-        // One social action budget per account (W91); a refusal is a silent drop (R).
-        let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
-        if !security
-            .budgets
-            .allow(self.account_guid, inner, Instant::now())
-        {
-            security.record(
-                EventKind::BudgetRefusal,
-                Some(self.account_guid),
-                Some(self.id.0),
-            );
-            return Vec::new();
-        }
-        drop(security);
         if inner.starts_with(&[26, 0, 19, 0])
             || inner == [149, 0, 2]
             || (inner.starts_with(&[26, 0, 10, 0]) && self.radial.menu_target().is_some())
@@ -5477,6 +5503,8 @@ fn shared_combat_budget_cannot_be_refunded_by_staging() {
 mod w173_chat_settings_routing {
     use super::*;
     use osfr_tools::players::PlayerPresentation;
+    use osfr_tools::progression_extras::{ClaimWindow, claim_request};
+    use osfr_tools::rewards::{RewardDisplay, RewardGrant};
     use osfr_tools::social_chat::{BubbleStyle, ChatChannel, PacketChat};
 
     const GUIDS: [u64; 3] = [301, 302, 303];
@@ -5485,6 +5513,7 @@ mod w173_chat_settings_routing {
         sessions: [Session; 3],
         world: SharedWorld,
         scratch: PathBuf,
+        options: Options,
     }
 
     impl Drop for Rig {
@@ -5586,6 +5615,7 @@ mod w173_chat_settings_routing {
             sessions,
             world,
             scratch,
+            options,
         }
     }
 
@@ -5593,6 +5623,13 @@ mod w173_chat_settings_routing {
         let mut bytes = vec![26, 0, sub, 0];
         bytes.extend((name.len() as i32).to_le_bytes());
         bytes.extend(name.as_bytes());
+        bytes
+    }
+
+    fn wrap(inner: &[u8]) -> Vec<u8> {
+        let mut bytes = vec![5, 0, 1];
+        bytes.extend((inner.len() as u32).to_le_bytes());
+        bytes.extend(inner);
         bytes
     }
 
@@ -5703,6 +5740,158 @@ mod w173_chat_settings_routing {
         };
         assert_eq!(style(GUIDS[1]), chosen);
         assert_eq!(style(GUIDS[0]), BubbleStyle::default());
+    }
+
+    #[test]
+    fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
+        const CLAIM: u64 = 0xA11C_E5;
+        let mut rig = rig("claim-budget");
+        let session = &mut rig.sessions[0];
+        let mut login = 1u16.to_le_bytes().to_vec();
+        for (index, text) in ["claim-budget", "1.910.1.530630", ""]
+            .into_iter()
+            .enumerate()
+        {
+            login.extend((text.len() as u32).to_le_bytes());
+            login.extend(text.as_bytes());
+            if index == 0 {
+                login.extend(1u64.to_le_bytes());
+            }
+        }
+        session.gateway.handle(&login).unwrap();
+        session.gateway.handle(&wrap(&[13, 0])).unwrap();
+        session.gateway.handle(&wrap(&[10, 0])).unwrap();
+        session
+            .gateway
+            .issue_claim(
+                CLAIM,
+                RewardGrant {
+                    coins: 1,
+                    items: Vec::new(),
+                    job_xp: Default::default(),
+                    display: RewardDisplay {
+                        source_guid: 0,
+                        player_guid: 1,
+                        reward_kind: 0,
+                        icon_id: 0,
+                        name_id: 0,
+                        rows: Vec::new(),
+                    },
+                },
+            )
+            .unwrap();
+        session.recent_on = true;
+        let mut membership = World::runtime();
+        let mut sessions = SessionMap::new();
+        let recover = |session: &Session| {
+            (
+                session.gateway.snapshot(),
+                fs::read(&session.state_path).ok(),
+            )
+        };
+        let baseline = recover(session);
+        for _ in 0..9 {
+            session
+                .dispatch_message(
+                    &wrap(&ClaimWindow::list_request()),
+                    &rig.options,
+                    1_000,
+                    &mut rig.world,
+                    &mut membership,
+                    &mut sessions,
+                    None,
+                )
+                .unwrap();
+        }
+        session.recent.clear();
+
+        let mut bundle = vec![0, 25];
+        for request in [
+            wrap(&claim_request(0x5151, &[CLAIM]).unwrap()),
+            wrap(&ClaimWindow::list_request()),
+        ] {
+            bundle.push(request.len() as u8);
+            bundle.extend(request);
+        }
+        session
+            .dispatch_message(
+                &bundle,
+                &rig.options,
+                1_000,
+                &mut rig.world,
+                &mut membership,
+                &mut sessions,
+                None,
+            )
+            .unwrap();
+
+        assert_eq!(
+            recover(session),
+            baseline,
+            "refusal changed gameplay or saved bytes"
+        );
+        assert!(
+            session.recent.iter().all(|row| row["dir"] != "out"),
+            "a refused bundle produced replies: {:?}",
+            session.recent
+        );
+    }
+
+    #[test]
+    fn combat_bundle_children_are_budgeted_once() {
+        let mut rig = rig("combat-budget");
+        let session = &mut rig.sessions[0];
+        let mut login = 1u16.to_le_bytes().to_vec();
+        for (index, text) in ["combat-budget", "1.910.1.530630", ""]
+            .into_iter()
+            .enumerate()
+        {
+            login.extend((text.len() as u32).to_le_bytes());
+            login.extend(text.as_bytes());
+            if index == 0 {
+                login.extend(1u64.to_le_bytes());
+            }
+        }
+        session.gateway.handle(&login).unwrap();
+        session.gateway.handle(&wrap(&[13, 0])).unwrap();
+        session.gateway.handle(&wrap(&[10, 0])).unwrap();
+
+        let mut bundle = vec![0, 25];
+        for _ in 0..2 {
+            let mut request = vec![26, 0, 10, 0];
+            request.extend(0u64.to_le_bytes());
+            request.extend(0i32.to_le_bytes());
+            let request = wrap(&request);
+            bundle.push(request.len() as u8);
+            bundle.extend(request);
+        }
+        let mut membership = World::runtime();
+        let mut sessions = SessionMap::new();
+        session
+            .dispatch_message(
+                &bundle,
+                &rig.options,
+                1_000,
+                &mut rig.world,
+                &mut membership,
+                &mut sessions,
+                None,
+            )
+            .unwrap();
+
+        let now = Instant::now();
+        let mut security = rig.world.security.lock().unwrap_or_else(|e| e.into_inner());
+        let allowed = (0..10)
+            .filter(|_| {
+                security
+                    .budgets
+                    .allow(session.account_guid, &ClaimWindow::list_request(), now)
+            })
+            .count();
+        assert_eq!(
+            allowed, 8,
+            "a combat bundle must charge each child once, not once per recursive dispatch"
+        );
     }
 }
 

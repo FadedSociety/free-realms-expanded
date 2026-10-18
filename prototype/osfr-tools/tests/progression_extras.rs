@@ -5,10 +5,11 @@ use osfr_tools::{
     rewards::{ItemGrant, RewardBundleRow, RewardDisplay, RewardGrant, RewardState},
 };
 use progression_extras::{
-    AchievementProgression, AchievementRule, ClaimWindow, CollectionCatalogue,
-    CollectionDefinition, CollectionEntryUpdate, CollectionEvent, CollectionEventOrigin,
-    CollectionLedger, CollectionMessage, CollectionProgression, TitleState, claim_request,
-    definitions_request, promotional_packet, title_select_request, validate_reward_rows,
+    AchievementBindings, AchievementProgression, AchievementRule, ClaimItem, ClaimWindow,
+    CollectionCatalogue, CollectionDefinition, CollectionEntryUpdate, CollectionEvent,
+    CollectionEventOrigin, CollectionLedger, CollectionMessage, CollectionProgression, TitleState,
+    claim_request, definitions_request, promotional_packet, title_select_request,
+    validate_reward_rows,
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -381,9 +382,7 @@ fn claim_tracker_grants_only_queued_server_reward_once() {
     let rewards = fixture.state();
     let mut claims = ClaimWindow::default();
     let claim_id = 0x0102_0304_0506_0708;
-    claims
-        .issue_server_grant(claim_id, item_grant(), claim_id.to_le_bytes().to_vec())
-        .unwrap();
+    claims.issue_server_grant(claim_id, item_grant()).unwrap();
     assert_eq!(&ClaimWindow::list_request(), &[108, 0, 1, 0]);
     let list = claims.list_response().unwrap();
     assert_eq!(&list[..4], &[108, 0, 2, 0]);
@@ -407,10 +406,10 @@ fn claim_tracker_grants_only_queued_server_reward_once() {
 
     let defs = definitions_request(0xBEEF, &[100]).unwrap();
     let defs_reply = claims
-        .handle_definitions_request(&defs, &[1, 2, 3])
+        .definitions_response(&defs, &claimed.reward_state.inventory)
         .unwrap();
     assert_eq!(&defs_reply[..8], &[108, 0, 6, 0, 0xef, 0xbe, 0, 0]);
-    assert_eq!(i32::from_le_bytes(defs_reply[9..13].try_into().unwrap()), 3);
+    assert!(i32::from_le_bytes(defs_reply[9..13].try_into().unwrap()) > 0);
 
     let replay = claims
         .handle_claim_request(&request, &claimed.reward_state)
@@ -423,16 +422,46 @@ fn claim_tracker_grants_only_queued_server_reward_once() {
 }
 
 #[test]
+fn claim_row_encoder_and_decoder_round_trip_the_native_body() {
+    let claim_id = 0x0102_0304_0506_0708;
+    let row = ClaimItem::for_grant(claim_id, &item_grant()).unwrap();
+    let bytes = row.encode().unwrap();
+    let mut cursor = 0;
+    assert_eq!(ClaimItem::decode(&bytes, &mut cursor).unwrap(), row);
+    assert_eq!(cursor, bytes.len());
+    let mut truncated = bytes.clone();
+    truncated.pop();
+    let mut cursor = 0;
+    assert!(ClaimItem::decode(&truncated, &mut cursor).is_err());
+}
+
+#[test]
+fn failed_definition_lookup_does_not_leave_a_claim_tracker() {
+    let fixture = InventoryFixture::new();
+    let inventory = fixture.state().inventory;
+    let mut claims = ClaimWindow::default();
+    claims.issue_server_grant(1001, item_grant()).unwrap();
+    let mut unavailable = item_grant();
+    unavailable.items[0].definition_id = 999_999;
+    claims.issue_server_grant(1002, unavailable).unwrap();
+
+    let tracker = 0xA5A5;
+    let missing = definitions_request(tracker, &[999_999]).unwrap();
+    assert!(claims.definitions_response(&missing, &inventory).is_err());
+    let available = definitions_request(tracker, &[100]).unwrap();
+    assert!(
+        claims.definitions_response(&available, &inventory).is_ok(),
+        "a failed lookup must not reserve the tracker or its requested ids"
+    );
+}
+
+#[test]
 fn claim_batch_cannot_grow_saved_history_past_its_load_bound() {
     let fixture = InventoryFixture::new();
     let rewards = fixture.state();
     let mut claims = ClaimWindow::with_claimed_ids((1..=4095).collect());
-    claims
-        .issue_server_grant(9001, coin_grant(1), vec![1])
-        .unwrap();
-    claims
-        .issue_server_grant(9002, coin_grant(1), vec![2])
-        .unwrap();
+    claims.issue_server_grant(9001, coin_grant(1)).unwrap();
+    claims.issue_server_grant(9002, coin_grant(1)).unwrap();
 
     let request = claim_request(0xCAFE, &[9001, 9002]).unwrap();
     let rejected = claims.handle_claim_request(&request, &rewards).unwrap();
@@ -633,4 +662,18 @@ fn source_content_ids_are_unique_and_locale_backed() {
         .unwrap()[..4],
         [38, 0, 11, 0]
     );
+}
+
+#[test]
+fn shipped_achievement_rules_join_every_title_by_name() {
+    let bindings =
+        AchievementBindings::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
+            .unwrap();
+    assert_eq!(bindings.rules().len(), 90);
+    assert_eq!(bindings.title_bindings().len(), 17);
+    assert!(
+        bindings.claim_bindings().is_empty(),
+        "the shipped recovery has no confirmed achievement item grants"
+    );
+    assert_eq!(bindings.job_slug(1), Some("adventurer"));
 }
