@@ -36,14 +36,14 @@ The request path runs packet → `gateway.rs` (per-character application gateway
 
 | System | Modules |
 |---|---|
-| Transport and session | `soe.rs`, `soe_send.rs` (SOE framing and reliable channel), `session.rs`, `net_policy.rs` (bind and peer rules, token buckets), `trace.rs` |
+| Transport and session | `soe.rs`, `soe_send.rs` (SOE framing and reliable channel), `session.rs`, `net_policy.rs` (bind and peer rules, token buckets), `trace.rs` (library module; the one packet-redaction rule every tracer uses) |
 | Login, accounts and security | `login.rs`, `login_auth.rs` (AUTH2 key-pair), `account.rs`, `account_store.rs` (roles, public keys), `character_store.rs`, `identity.rs`, `security_log.rs` |
 | World entry | `startup_snapshot.rs`, `startup_world.rs`, `startup_selfdata.rs`, `startup_catalogues.rs`, `startup_messages.rs`, `zone_transition.rs` |
 | Shared world | `players.rs` (sessions, interest grid, nearest-64 fanout, AddPc mount tail), `world.rs` (zone instances, membership, transfers, group-heal claims), `movement.rs` (pose validation), `terrain.rs` |
-| Gameplay core | `gameplay.rs`, `game_store.rs` (save envelope), `game_rules.rs` (membership policy), `rewards.rs` |
-| Combat and enemies | `encounter.rs` (encounters, shared field fights, HP, revive, kill credits, pickups, group-heal outcome), `enemies.rs`, `combat.rs`, `abilities.rs` (36/10 casts, 36/12–13 definitions), `opening_abilities.rs` (job bars), `power_ups.rs` (drop tables and participation roll) |
+| Gameplay core | `gameplay.rs` (hub: state, load, request and tick dispatch only), `gameplay/occupation.rs` (**the busy table**: one row per activity, one column per gate; add new activities here), `game_store.rs` (save envelope), `game_rules.rs` (membership policy), `rewards.rs`. Inline tests live in `gameplay/<module>.rs` with unchanged names |
+| Combat and enemies | `encounter.rs` (encounters, HP, revive, kill credits, pickups, solo field path), `encounter/skills.rs` (job abilities, DoTs, buffs, mitigation, energy, crits), `encounter/shared.rs` (`SharedFieldState`: one enemy simulation per instance), `encounter/field.rs` (field enemies and battle markers: loading, reloads, wander/chase AI, battle start screen), `enemies.rs`, `combat.rs`, `abilities.rs` (36/10 casts, 36/12–13 definitions), `opening_abilities.rs` (job bars), `power_ups.rs` (drop tables and participation roll) |
 | Quests and story | `quest_engine.rs` (definition-driven quests), `quest_journal.rs` (47/12, 47/13, 49/15, 47/14 tracked-target pin), `quests.rs`, `opening.rs`, `opening_journal.rs`, `opening_world.rs`, `profiles.rs` (jobs/classes) |
-| NPCs and vendors | `npc_interaction.rs` (menus, quest offers, merchant 66/42), `coin_shop.rs` (165/4 buy, 165/5 sell, 165/6 result) |
+| NPCs and vendors | `gameplay/npc.rs` (the NPC router: 26/x, 45/7, 49/x, 165/x, 66/x, plus dialogue/merchant/quest-offer builders), `gameplay/npc_quests.rs` (quest glue: catalogue, breadcrumbs, eligibility), `npc_interaction.rs` (menus, quest offers, merchant 66/42), `coin_shop.rs` (165/4 buy, 165/5 sell, 165/6 result) |
 | Items | `inventory.rs` (state, equip with eligibility, `adopt_state` for trade commits), `inventory_v2_fixes.rs`, `item_categories.rs`, `item_bar.rs` (four-slot bar, potion), `mystery_chest.rs`, `mystery_chest_loot.rs` |
 | Crafting and gathering | `recipes.rs`, `recipe_book.rs` (26/24 at a station), `cooking.rs`, `smelting.rs`, `forging.rs`, `mining.rs`, `harvesting.rs`, `minigame.rs` (shared run lifecycle), `mining_lifecycle.rs`, `harvesting_lifecycle.rs`, `harvest_nodes.rs` (W171 per-player ore and mushroom node actors; 26/8 starts the matching Type8 run; placements in `mining_nodes.json` and `harvest_nodes.json`) |
 | Social | `chat.rs`, `social_chat.rs` (chat policy, quick chat and emotes, per-account action budget, W173 persisted channel switches and bubble colour), `social_lists.rs` (friends, ignore, groups), `guilds.rs`, `trade.rs` (radial invite; 59/3 and 59/6–10 lifecycle; validated settlement), `player_radial.rs` (click menu, Inspect, Trade). The commit in `bin/osfr-gateway.rs` writes `trade-<session>-<ns>.trade-journal` beside character saves and recovers it before accepting logins. |
@@ -53,6 +53,14 @@ The request path runs packet → `gateway.rs` (per-character application gateway
 | Content loading | `content.rs` (content JSON schema and cross-checks), `world_text.rs`; item definitions are the union of `inventory.json` and `item-catalogue.json` (58,835 ids in the shipped packages) |
 | Developer tools | `studio.rs` (loopback HTTP), World Builder layer (`--world`), `realm` commands (by role on account-store servers) |
 | Restoration pieces | `src/restoration/piece_NNN.rs`: recovered native codecs and rules, one per work item (`notes/WorkItems/NNN.md`). Some are included by a host module via `#[path]` instead of `lib.rs`. |
+
+## The spine (2026-10-18)
+
+The four hubs (`gameplay.rs`, `bin/osfr-gateway.rs`, `encounter.rs`, `gateway.rs`) are dispatch only. A feature lives in its owning module and the hub gets the few lines that call it; the autopilot refuses a builder diff that grows a hub by more than 40 net lines. Charter: the owner's tables-and-registry vision (values in content tables with atomic reload; features slot in; one feature's failure never takes down another; idle systems cost nothing).
+
+- **Busy rules:** `gameplay/occupation.rs`. A new activity adds an `Occupation` variant; the build fails until it decides every gate (start, warp, ride, pets, location) and its detection.
+- **Find the owner first:** the code graph (codebase-memory, project `C-Users-the owner-Documents-Projects-CartoonMMO-autopilot-int`, re-indexed after every integration) answers "who owns X" and "who calls X"; read the owning module and the hub's call site, not the whole hub.
+- **Proof for moves:** a pure move keeps `cargo test -- --list` identical; the integrator also refuses any change that loses a named passing test (`lab/autopilot/protected-pass.txt`).
 
 ## Tests and gates
 
