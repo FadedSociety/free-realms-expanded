@@ -5731,11 +5731,9 @@ mod t020_group_routing {
         }
     }
 
-    fn rig(name: &str) -> Rig {
+    fn options(scratch: &Path) -> Options {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let scratch = std::env::temp_dir().join(format!("osfr-t020-{name}-{}", std::process::id()));
-        fs::create_dir_all(&scratch).unwrap();
-        let options = Options {
+        Options {
             bind: "127.0.0.1:0".parse().unwrap(),
             reference: root.join("references/rust-gateway-reference"),
             state: scratch.join("character.json"),
@@ -5753,8 +5751,11 @@ mod t020_group_routing {
             stock_text: None,
             allow_lan: false,
             security_log: None,
-        };
-        let session = |index: usize| {
+        }
+    }
+
+    fn sessions(options: &Options) -> [Session; 3] {
+        std::array::from_fn(|index| {
             let id = 17 + index as u64;
             let mut session = Session::new(
                 SessionId(id),
@@ -5773,9 +5774,17 @@ mod t020_group_routing {
             session.character_guid = GUIDS[index];
             session.account_guid = GUIDS[index] + 10_000;
             session
-        };
-        let sessions = [session(0), session(1), session(2)];
-        let mut world = SharedWorld::new();
+        })
+    }
+
+    fn session_key(session: &Session) -> SessionKey {
+        SessionKey {
+            peer: session.peer,
+            connection_id: session.request.id,
+        }
+    }
+
+    fn seed_world(world: &mut SharedWorld, sessions: &[Session; 3]) {
         for (index, session) in sessions.iter().enumerate() {
             let guid = GUIDS[index];
             let first = NAMES[index];
@@ -5830,7 +5839,17 @@ mod t020_group_routing {
             );
             world.chat_settings.join(guid, None);
             world.joined.insert(session.id);
+            world.session_keys.insert(session.id, session_key(session));
         }
+    }
+
+    fn rig(name: &str) -> Rig {
+        let scratch = std::env::temp_dir().join(format!("osfr-t020-{name}-{}", std::process::id()));
+        fs::create_dir_all(&scratch).unwrap();
+        let options = options(&scratch);
+        let sessions = sessions(&options);
+        let mut world = SharedWorld::new();
+        seed_world(&mut world, &sessions);
         Rig {
             sessions,
             world,
@@ -5839,11 +5858,32 @@ mod t020_group_routing {
         }
     }
 
+    fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
+        let scratch = std::env::temp_dir().join(format!("osfr-t020-{name}-{}", std::process::id()));
+        fs::create_dir_all(&scratch).unwrap();
+        let mut server = Server::new(options(&scratch)).unwrap();
+        let sessions = sessions(&server.options);
+        let keys = std::array::from_fn(|index| session_key(&sessions[index]));
+        seed_world(&mut server.world, &sessions);
+        for (key, session) in keys.into_iter().zip(sessions) {
+            server.sessions.insert(key, session);
+        }
+        (server, keys, scratch)
+    }
+
     fn send(rig: &mut Rig, index: usize, packet: &[u8]) -> Vec<Delivery> {
         let deliveries = rig.sessions[index].route_application(packet, &mut rig.world, 1_000);
         // Production calls this after every routed application message; group chat reads the
         // same canonical membership from the chat session.
         rig.world.refresh_group_ids();
+        deliveries
+    }
+
+    fn route_server(server: &mut Server, key: SessionKey, packet: &[u8]) -> Vec<Delivery> {
+        let mut session = server.sessions.remove(&key).unwrap();
+        let deliveries = session.route_application(packet, &mut server.world, 1_000);
+        server.sessions.insert(key, session);
+        server.world.refresh_group_ids();
         deliveries
     }
 
@@ -6074,6 +6114,8 @@ mod t020_group_routing {
             rig.world.social.group_members(group_id),
             Some([GUIDS[a], GUIDS[b]].as_slice())
         );
+        assert_eq!(rig.world.chat_sessions[&rig.sessions[c].id].group_id, None);
+        rig.sessions[c].spam_gate = SpamGate::default();
         assert!(send(&mut rig, c, &chat(ChatChannel::Group)).is_empty());
 
         // 40/3 leaves; with one member left the volatile party dissolves for both players.
@@ -6083,6 +6125,70 @@ mod t020_group_routing {
         assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
         assert_eq!(rig.world.social.group_of(GUIDS[b]), None);
         assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
+    }
+
+    #[test]
+    fn interleaved_invites_cannot_overlap_membership_or_group_chat() {
+        let mut rig = rig("interleaved");
+        let (a, b, c) = (0, 1, 2);
+
+        // A invited B, but B created a different party and C joined it first.
+        send(&mut rig, a, &invite(a, b, 0));
+        let a_group = rig.world.social.group_of(GUIDS[a]).unwrap();
+        send(&mut rig, b, &invite(b, c, 0));
+        let b_group = rig.world.social.group_of(GUIDS[b]).unwrap();
+        assert_ne!(a_group, b_group);
+        send(&mut rig, c, &response(b, c, b_group, true));
+
+        // B's stale acceptance of A's invite must leave both parties untouched.
+        let refused = send(&mut rig, b, &response(a, b, a_group, true));
+        assert_eq!(result_for(&refused, b, 5), Some(1));
+        assert_eq!(rig.world.social.group_of(GUIDS[a]), Some(a_group));
+        assert_eq!(rig.world.social.group_of(GUIDS[b]), Some(b_group));
+        assert_eq!(rig.world.social.group_of(GUIDS[c]), Some(b_group));
+        assert_eq!(
+            rig.world.social.group_members(a_group),
+            Some([GUIDS[a]].as_slice())
+        );
+        assert_eq!(
+            rig.world.social.group_members(b_group),
+            Some([GUIDS[b], GUIDS[c]].as_slice())
+        );
+        assert_eq!(
+            rig.world.social.group_invitee(GUIDS[b]),
+            Some((a_group, GUIDS[a]))
+        );
+
+        // Chat follows the same canonical mappings as both rosters.
+        let b_chat = send(&mut rig, b, &chat(ChatChannel::Group));
+        assert_eq!(
+            recipients(&b_chat),
+            vec![rig.sessions[b].id.0, rig.sessions[c].id.0]
+        );
+        let a_chat = send(&mut rig, a, &chat(ChatChannel::Group));
+        assert_eq!(recipients(&a_chat), vec![rig.sessions[a].id.0]);
+
+        // C leaving dissolves B's two-member party, not A's unrelated party.
+        send(&mut rig, c, &leave(c));
+        assert_eq!(rig.world.social.group_of(GUIDS[a]), Some(a_group));
+        assert_eq!(rig.world.social.group_of(GUIDS[b]), None);
+        assert_eq!(rig.world.social.group_of(GUIDS[c]), None);
+        assert_eq!(
+            rig.world.social.group_members(a_group),
+            Some([GUIDS[a]].as_slice())
+        );
+        assert_eq!(
+            rig.world.social.group_invitee(GUIDS[b]),
+            Some((a_group, GUIDS[a]))
+        );
+        assert_eq!(
+            rig.world.chat_sessions[&rig.sessions[a].id].group_id,
+            Some(u64::from(a_group))
+        );
+        assert_eq!(rig.world.chat_sessions[&rig.sessions[b].id].group_id, None);
+        assert_eq!(rig.world.chat_sessions[&rig.sessions[c].id].group_id, None);
+        rig.sessions[b].spam_gate = SpamGate::default();
+        assert!(send(&mut rig, b, &chat(ChatChannel::Group)).is_empty());
     }
 
     #[test]
@@ -6154,6 +6260,107 @@ mod t020_group_routing {
         assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
         assert_eq!(rig.world.chat_sessions[&rig.sessions[a].id].group_id, None);
         assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
+    }
+
+    #[test]
+    fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
+        let (mut server, keys, scratch) = server_rig("end-session-owner");
+        let (a, b) = (0, 1);
+        route_server(&mut server, keys[a], &invite(a, b, 0));
+        let group_id = server.world.social.group_of(GUIDS[a]).unwrap();
+        route_server(&mut server, keys[b], &response(a, b, group_id, true));
+        assert_eq!(
+            server.world.chat_sessions[&server.sessions[&keys[a]].id].group_id,
+            Some(u64::from(group_id))
+        );
+
+        let session_b = server.sessions.remove(&keys[b]).unwrap();
+        server
+            .end_session(keys[b], session_b, "test_owner")
+            .unwrap();
+
+        assert_eq!(server.world.social.group_of(GUIDS[a]), None);
+        assert_eq!(server.world.social.group_of(GUIDS[b]), None);
+        assert_eq!(server.world.social.group_members(group_id), None);
+        assert_eq!(
+            server.world.chat_sessions[&server.sessions[&keys[a]].id].group_id,
+            None
+        );
+        assert!(!server.world.active_sessions.contains_key(&GUIDS[b]));
+        assert!(route_server(&mut server, keys[a], &chat(ChatChannel::Group)).is_empty());
+
+        drop(server);
+        fs::remove_dir_all(scratch).unwrap();
+    }
+
+    #[test]
+    fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
+        let (mut server, keys, scratch) = server_rig("end-session-stale");
+        let (a, b) = (0, 1);
+        route_server(&mut server, keys[a], &invite(a, b, 0));
+        let group_id = server.world.social.group_of(GUIDS[a]).unwrap();
+        route_server(&mut server, keys[b], &response(a, b, group_id, true));
+
+        let live_b_id = server.sessions[&keys[b]].id;
+        let mut stale = Session::new(
+            SessionId(40),
+            "127.0.0.1:12348".parse().unwrap(),
+            SessionRequest {
+                id: 40,
+                crc_length: 3,
+                buffer_size: 512,
+            },
+            &server.options,
+            CRC_SEED,
+            None,
+            None,
+        )
+        .unwrap();
+        stale.character_guid = GUIDS[b];
+        stale.account_guid = GUIDS[b] + 10_000;
+        let stale_key = session_key(&stale);
+        server.world.session_keys.insert(stale.id, stale_key);
+        server.sessions.insert(stale_key, stale);
+
+        let memberships = GUIDS.map(|guid| server.world.social.group_of(guid));
+        let roster = server
+            .world
+            .social
+            .group_members(group_id)
+            .unwrap()
+            .to_vec();
+        let chat_groups = [a, b]
+            .map(|index| server.world.chat_sessions[&server.sessions[&keys[index]].id].group_id);
+
+        let stale = server.sessions.remove(&stale_key).unwrap();
+        server
+            .end_session(stale_key, stale, "duplicate_session")
+            .unwrap();
+
+        assert!(server.sessions.contains_key(&keys[b]));
+        assert_eq!(server.world.active_sessions[&GUIDS[b]], live_b_id);
+        assert_eq!(
+            GUIDS.map(|guid| server.world.social.group_of(guid)),
+            memberships
+        );
+        assert_eq!(
+            server.world.social.group_members(group_id),
+            Some(roster.as_slice())
+        );
+        assert_eq!(
+            [a, b].map(|index| {
+                server.world.chat_sessions[&server.sessions[&keys[index]].id].group_id
+            }),
+            chat_groups
+        );
+        let party_chat = route_server(&mut server, keys[a], &chat(ChatChannel::Group));
+        assert_eq!(
+            recipients(&party_chat),
+            vec![server.sessions[&keys[a]].id.0, live_b_id.0]
+        );
+
+        drop(server);
+        fs::remove_dir_all(scratch).unwrap();
     }
 }
 

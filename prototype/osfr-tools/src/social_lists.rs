@@ -781,6 +781,13 @@ impl SocialService {
             .get(&invite.inviter_guid)
             .ok_or(SocialError::MissingProfile)?
             .clone();
+        if accepted && self.member_group.contains_key(&target_guid) {
+            // (R) Joining another party after this invite arrived makes the old
+            // invitation unactionable until that party dissolves. Do not consume
+            // it or append a second roster entry. No recovered 40/5 result means
+            // "already grouped", so use the existing no-group refusal.
+            return Ok(vec![message(target_guid, encode_group_result(5, 1))]);
+        }
         let group_data = encode_group_invite(invite.group_id, &inviter, &target.identity())?;
         self.group_invites.remove(&target_guid);
         if !accepted {

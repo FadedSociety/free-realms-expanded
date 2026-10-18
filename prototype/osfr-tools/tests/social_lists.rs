@@ -491,6 +491,53 @@ fn refused_group_invites_leave_membership_and_pending_invites_unchanged() {
 }
 
 #[test]
+fn grouped_acceptance_is_refused_without_overlapping_party_membership() {
+    let (mut social, directory) = service(3);
+    for guid in [101, 202, 303] {
+        social.login(guid).unwrap();
+    }
+    let b_name = identity(20, 202, "FixtureB").name;
+    let c_name = identity(30, 303, "FixtureC").name;
+
+    social.invite_to_group(101, &b_name, &directory, 0).unwrap();
+    let a_group = social.group_of(101).unwrap();
+    social.invite_to_group(202, &c_name, &directory, 0).unwrap();
+    let b_group = social.group_of(202).unwrap();
+    assert_ne!(a_group, b_group);
+    social.respond_group_invite(303, true, 0).unwrap();
+
+    // B accepted C into B's party after A had invited B. A second acceptance
+    // must not move B out of that party or append B to A's roster.
+    let refused = social.respond_group_invite(202, true, 0).unwrap();
+    assert_eq!((family(&refused[0]), sub(&refused[0])), (40, 5));
+    assert_eq!(result(&refused[0]), 1);
+    assert_eq!(social.group_of(101), Some(a_group));
+    assert_eq!(social.group_of(202), Some(b_group));
+    assert_eq!(social.group_of(303), Some(b_group));
+    assert_eq!(social.group_members(a_group), Some([101].as_slice()));
+    assert_eq!(social.group_members(b_group), Some([202, 303].as_slice()));
+    assert_eq!(social.group_invitee(202), Some((a_group, 101)));
+
+    // Dissolving B's party must not remove B's mapping from A's unrelated party.
+    social.leave_group(303).unwrap();
+    assert_eq!(social.group_of(202), None);
+    assert_eq!(social.group_of(303), None);
+    assert_eq!(social.group_of(101), Some(a_group));
+    assert_eq!(social.group_members(a_group), Some([101].as_slice()));
+    assert_eq!(social.group_invitee(202), Some((a_group, 101)));
+
+    // With the conflicting party gone, B can still decline the older invitation.
+    let declined = social.respond_group_invite(202, false, 0).unwrap();
+    assert!(
+        declined
+            .iter()
+            .all(|packet| family(packet) == 40 && sub(packet) == 4)
+    );
+    assert_eq!(social.group_invitee(202), None);
+    assert_eq!(social.group_members(a_group), Some([101].as_slice()));
+}
+
+#[test]
 fn friend_validation_and_group_result_tables_reject_invalid_requests_cleanly() {
     let (mut social, directory) = service(5);
     let self_name = identity(10, 101, "FixtureA").name;
