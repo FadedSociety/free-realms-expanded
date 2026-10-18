@@ -55,8 +55,9 @@ pub(super) struct Gates {
 }
 
 impl Occupation {
-    /// (R) Today's rules, reproduced exactly. Derby does not block warp and kart does not
-    /// block starting another activity; both are known gaps kept until a tested change.
+    /// (R) Reconstructed rules. the owner, 2026-10-19: a kart race blocks starting another activity
+    /// and a derby blocks warpstone travel, like every other minigame (the old hand-written
+    /// lists had left both open).
     pub(super) const fn gates(self) -> Gates {
         use Occupation::*;
         let (start, warp, ride, pets, location) = match self {
@@ -64,9 +65,7 @@ impl Occupation {
                 (true, true, false, true, false)
             }
             Encounter => (true, true, true, true, false),
-            Derby => (true, false, true, true, true),
-            Soccer => (true, true, true, true, true),
-            Kart => (false, true, true, true, true),
+            Derby | Soccer | Kart => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
         };
         Gates {
@@ -114,7 +113,8 @@ impl Gameplay {
 mod tests {
     use super::Occupation::{self, *};
 
-    /// Pins the table to the lists it replaced; changing a gate is a deliberate, tested edit.
+    /// Pins the table; changing a gate is a deliberate, tested edit. The start and warp rows
+    /// include kart and derby since the owner closed those gaps (2026-10-19).
     #[test]
     fn gates_reproduce_the_replaced_busy_lists() {
         let members = |gate: fn(super::Gates) -> bool| -> Vec<Occupation> {
@@ -128,14 +128,14 @@ mod tests {
             members(|g| g.start),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer
+                Soccer, Kart
             ]
         );
         assert_eq!(
             members(|g| g.warp),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Fishing, Soccer,
-                Kart
+                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
+                Soccer, Kart
             ]
         );
         assert_eq!(
