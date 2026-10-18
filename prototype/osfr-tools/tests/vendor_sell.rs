@@ -1073,7 +1073,7 @@ fn gateway_bundle_failure_does_not_commit_a_vendor_buy() {
     let before = gateway.snapshot();
     let request = vendor_buy_packet(91_005, 8, 1);
 
-    let failed = gateway.handle_at(&bundle(&[request.clone(), vec![26, 0, 8, 0]]), NOW);
+    let failed = gateway.handle_at(&bundle(&[wrap(&request), wrap(&[26, 0, 8, 0])]), NOW);
     assert!(
         failed.is_err(),
         "the malformed child must reject the bundle"
