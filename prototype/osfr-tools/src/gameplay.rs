@@ -1189,11 +1189,7 @@ impl Gameplay {
             return Ok(());
         }
         let counters = self.achievement_counters();
-        let rewards = RewardState::new(
-            self.inventory.clone(),
-            self.reward_profiles(),
-            self.inventory.state().items.len().max(100),
-        );
+        let rewards = self.reward_snapshot();
         let before = self.progression_extras.achievement_state();
         let mut achievements = crate::progression_extras::AchievementProgression::new(
             self.achievement_bindings.rules().to_vec(),
@@ -2781,9 +2777,21 @@ impl Gameplay {
             })
     }
 
-    /// Adopt a staged minigame reward transaction. The caller has already
-    /// committed the activity/run ledger on a clone; a profile reload failure
-    /// therefore discards the whole staged gameplay state.
+    /// Snapshot the inventory and profiles for a staged reward transaction.
+    fn reward_snapshot(&self) -> RewardState {
+        RewardState::new(
+            self.inventory.clone(),
+            self.reward_profiles(),
+            self.inventory.state().items.len().max(100),
+        )
+    }
+
+    /// Adopt the inventory and profiles from a staged minigame transaction.
+    ///
+    /// Soccer ticks, fishing catches, and chess results use this path. Derby Close,
+    /// progression-extras claims, and quest turn-in deliberately keep their
+    /// existing payout implementations because their rollback and commit
+    /// ordering differ.
     fn adopt_reward_state(&mut self, next: RewardState, out: &mut Outcome) -> io::Result<()> {
         let before = self.inventory.state().clone();
         if self
@@ -2860,11 +2868,7 @@ impl Gameplay {
         let _ = profiles.unlock(FISHERMAN_PROFILE);
         let level = self.job_level(FISHERMAN_PROFILE);
         // (R) Same bag floor as quest turn-ins: never below what the player already holds.
-        let rewards = RewardState::new(
-            self.inventory.clone(),
-            self.reward_profiles(),
-            self.inventory.state().items.len().max(100),
-        );
+        let rewards = self.reward_snapshot();
         match self.fishing.enter(
             &spots,
             gate,
@@ -2936,21 +2940,7 @@ impl Gameplay {
             // The service paid on its staged copy of the player's inventory and profiles;
             // adopt it, then let the inventory diff raise the collect event.
             if let Some(next) = self.fishing.reward_state(character.guid).cloned() {
-                let before = self.inventory.state().clone();
-                if self
-                    .profiles
-                    .as_ref()
-                    .is_some_and(|p| *p.state() != next.profiles)
-                {
-                    let directory = self
-                        .profile_content_directory
-                        .as_deref()
-                        .ok_or_else(|| invalid("fishing XP needs profile content"))?;
-                    self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
-                }
-                self.inventory = next.inventory;
-                out.changed = true;
-                self.npc_inventory_events(&before, &mut out)?;
+                self.adopt_reward_state(next, &mut out)?;
                 // A level-up unlocks fish and refreshes the client's Fish Finder.
                 let level = self.job_level(crate::fishing_service::FISHERMAN_PROFILE);
                 if let Ok(update) = self.fishing.update_fisherman_level(character.guid, level) {
@@ -3738,11 +3728,7 @@ impl Gameplay {
                 return Ok(());
             }
         };
-        let rewards = RewardState::new(
-            self.inventory.clone(),
-            self.reward_profiles(),
-            self.inventory.state().items.len().max(100),
-        );
+        let rewards = self.reward_snapshot();
         match crate::soccer_entry::Session::begin(&content, activity, character, rewards) {
             Ok(session) => {
                 self.soccer = Some(session);
@@ -3927,11 +3913,7 @@ impl Gameplay {
             return Ok(None);
         }
         let mut staged = self.clone();
-        let rewards = RewardState::new(
-            staged.inventory.clone(),
-            staged.reward_profiles(),
-            staged.inventory.state().items.len().max(100),
-        );
+        let rewards = staged.reward_snapshot();
         let Some(change) =
             staged
                 .chess
@@ -3971,21 +3953,7 @@ impl Gameplay {
         out.changed |= change.changed;
         out.replies.extend(change.replies);
         if let Some(next) = change.reward_state {
-            let before = self.inventory.state().clone();
-            if self
-                .profiles
-                .as_ref()
-                .is_some_and(|profiles| *profiles.state() != next.profiles)
-            {
-                let directory = self
-                    .profile_content_directory
-                    .as_deref()
-                    .ok_or_else(|| invalid("chess reward XP needs profile content"))?;
-                self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
-            }
-            self.inventory = next.inventory;
-            out.changed = true;
-            self.npc_inventory_events(&before, out)?;
+            self.adopt_reward_state(next, out)?;
         }
         out.replies.extend(change.reward_packets);
         // Only the lifecycle result (39/18) advances quests. A checkmate movie
@@ -6642,3 +6610,6 @@ mod t013_objective_events;
 
 #[cfg(test)]
 mod t018_station_refresh;
+
+#[cfg(test)]
+mod reward_adoption;
