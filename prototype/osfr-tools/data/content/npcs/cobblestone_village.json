@@ -1296,8 +1296,8 @@
         9000000269
       ],
       "name": "Carlos Brazenfist",
+      "name_string_id": 20671,
       "name_reason": null,
-      "name_string_id": null,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1481,6 +1481,7 @@
         "Teaches the job and hands over \"some gear\" and \"a few potions\" (2441571970). The Ring gate is behind him: King of the Ring."
       ],
       "services_reason": null,
+      "model_id": 203,
       "position": [
         -1906.11908,
         -39.79,
@@ -1493,9 +1494,9 @@
         0.0,
         0.9559256184725605
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
+      "placement": "reconstructed_spawn",
+      "placement_source": "reconstructed_chapter_spawn",
+      "placement_confidence": "low",
       "placement_candidates": [
         {
           "poi_id": 7,
@@ -1517,6 +1518,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) F135: no captured AddNpc transform or model exists. Spawn this POI-anchored Brawler trainer with locale name 20671 and general Hooligan-brawler model 203 solely so the authored C3-C5 chapter is reachable; position and appearance remain reconstructed."
         }
       ],
       "field_sources": {
@@ -1610,6 +1615,12 @@
           {
             "kind": "wiki",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part B. Job trainers and job NPCs, row 46; source cell: [client] [wiki Brawler, King of the Ring!]"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F135: model 203 is a generic Hooligan-brawler appearance used for the reviewed playtest spawn; no Carlos AddNpc model was captured."
           }
         ],
         "zone": [

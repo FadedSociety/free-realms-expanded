@@ -674,15 +674,12 @@ pub struct QuestEngine {
     poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
 }
 
-/// 49/13 fields before the reward bundle: an 8-byte value (quest id, 0), then
-/// three dwords. `ShowQuestEndScreen` (`00a95420`) stores the first dword at
-/// `+0x1c`: it is the id the "Thanks!" button sends back in 49/14, and the id
-/// the Lua end screen looks up in `BaseClient.QuestData` for the card title.
-/// Zero there left the card blank and the reply unsent (native run 202934).
-/// The second dword is the NPC's end-text locale id: it goes through
-/// `ExpandTextWithRoleArrayToIString` (`0097c1e0`, `[*player*]` expansion) into
-/// the speech bubble. The third, when positive, is an animation the NPC plays
-/// (`PlayOrQueueActorAnimation` `0096c780`); none is known, so it stays 0.
+/// 49/13 fields before the reward bundle: an 8-byte turn-in actor, then three
+/// dwords. `ShowQuestEndScreen` (`00a95420`) receives the actor pair first,
+/// the quest id the "Thanks!" button sends back in 49/14 second, the NPC
+/// end-text locale id third, and an animation fourth. The live Talk and login
+/// recovery paths replace the compatibility placeholder in the actor pair with
+/// the saved turn-in NPC.
 fn put_end_screen_ids(bytes: &mut Vec<u8>, quest_id: i32, end_text_string_id: u32) {
     put_i32(bytes, quest_id);
     bytes.extend([0; 4]);
@@ -1429,6 +1426,15 @@ impl QuestEngine {
                 }
             }
         }
+        // The 49/13 end screen is otherwise connection-local. Re-send a saved pending turn-in
+        // with its actor handle so reconnecting cannot strand the completed quest. The client
+        // reader 0x00C7B990 decodes the first u64 as the actor and the third dword as the
+        // 49/14 reply id; the same packet shape is patched in the live Talk path.
+        if let Some(quest_id) = self.state.pending_turnin {
+            let mut packet = self.quest_end_packet(quest_id)?;
+            packet[6..14].copy_from_slice(&self.definitions[&quest_id].turnin_npc_id.to_le_bytes());
+            packets.push(packet);
+        }
         Ok(packets)
     }
 
@@ -1827,8 +1833,16 @@ impl QuestEngine {
     }
 
     fn begin_ready_turnin(&mut self, quest_id: u32) -> QuestOutcome {
-        if self.state.pending_turnin.is_some() {
-            return denied(QuestDenial::Unavailable);
+        if let Some(pending) = self.state.pending_turnin {
+            if pending != quest_id {
+                return denied(QuestDenial::Unavailable);
+            }
+            // Re-open the same saved/live end screen without changing state. This also covers
+            // clients that reconnect without restoring the window or close it by accident.
+            return QuestOutcome {
+                outbound: vec![OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id })],
+                ..QuestOutcome::default()
+            };
         }
         let Some(definition) = self.definitions.get(&quest_id) else {
             return denied(QuestDenial::Unavailable);

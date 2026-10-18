@@ -262,9 +262,12 @@ impl NpcVisibility {
                 // part of the shared open-world coordinate space.
                 .unwrap_or(OPEN_WORLD_ZONE);
             anchors.push((zone_id, position));
-            // Only data-backed placements spawn; reconstructed POI/zone-centre
-            // positions are build scaffolding, not NPC transforms.
-            if npc.placement.as_deref() != Some("legacy_data") {
+            // Only data-backed placements and explicitly reviewed playtest spawns
+            // are sent; unreviewed POI/zone-centre anchors remain build scaffolding.
+            if !matches!(
+                npc.placement.as_deref(),
+                Some("legacy_data" | "reconstructed_spawn")
+            ) {
                 continue;
             }
             // Content `rotation` is a Y-axis quaternion; AddNpc wants a facing

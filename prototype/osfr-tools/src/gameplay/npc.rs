@@ -408,6 +408,10 @@ impl Gameplay {
             let mut consume_menu = false;
             match selected {
                 Ok(NpcSelection::Talk(mut context)) => {
+                    let pending_before = self
+                        .npc_quests
+                        .as_ref()
+                        .and_then(|engine| engine.state().pending_turnin);
                     if let Some(engine) = &mut self.npc_quests {
                         let quest = engine
                             .on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;
@@ -418,17 +422,25 @@ impl Gameplay {
                         }
                         self.append_npc_quest_outcome(quest, &mut out)?;
                     }
-                    let target_quest = self
-                        .npc_quests
-                        .as_ref()
-                        .and_then(|engine| interaction.named_target_quest_for_talk(key, engine));
-                    if let Some(quest_id) = target_quest {
+                    if let Some(quest_id) = pending_before {
                         let result = self
                             .npc_quests
                             .as_mut()
-                            .unwrap()
-                            .begin_named_target_turnin(quest_id);
+                            .expect("pending turn-in requires the NPC quest engine")
+                            .begin_turnin(quest_id, key);
                         self.append_npc_quest_outcome(result, &mut out)?;
+                    } else {
+                        let target_quest = self.npc_quests.as_ref().and_then(|engine| {
+                            interaction.named_target_quest_for_talk(key, engine)
+                        });
+                        if let Some(quest_id) = target_quest {
+                            let result = self
+                                .npc_quests
+                                .as_mut()
+                                .unwrap()
+                                .begin_named_target_turnin(quest_id);
+                            self.append_npc_quest_outcome(result, &mut out)?;
+                        }
                     }
                     let already_offering = out
                         .replies

@@ -68,7 +68,11 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
             assert!(
                 matches!(
                     placement,
-                    "captured" | "legacy_data" | "poi_anchor" | "unanchored"
+                    "captured"
+                        | "legacy_data"
+                        | "poi_anchor"
+                        | "reconstructed_spawn"
+                        | "unanchored"
                 ),
                 "{owner}: unknown placement class {placement:?}"
             );
@@ -79,6 +83,12 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                         "reconstructed_zone_center" | "reconstructed_unanchored_default"
                     ),
                     "{owner}: unanchored placement has unexpected source {source:?}"
+                );
+            }
+            if placement == "reconstructed_spawn" {
+                assert_eq!(
+                    source, "reconstructed_chapter_spawn",
+                    "{owner}: reviewed playtest spawn has an unexpected source"
                 );
             }
 

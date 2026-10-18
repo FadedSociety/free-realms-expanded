@@ -1,36 +1,35 @@
 use osfr_tools::{
     character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState},
-    npc_interaction::{NpcInteractRequest, QUEST_CHOICE_RESPONSE, decode_quest_offer_49_1},
+    gameplay::Gameplay,
     quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestStatus},
-    startup_world::{NpcSpawn, parse_add_npc},
+    startup_world,
 };
 use serde_json::Value;
 use std::{
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeMap,
     fs,
     path::{Path, PathBuf},
 };
 
 const CHARACTER: u64 = 101;
-const CARLOS_KEY: u64 = 9_000_000_042;
+const CARLOS: u64 = 9_000_000_042;
 const JONES: u64 = 9_000_000_121;
 const SABASTIAN: u64 = 9_000_000_446;
 const REFERRAL_TO_JONES: u32 = 3_030_006;
 const HOOLIGAN_FIGHT: u32 = 3_030_007;
 const SEARCH_BLACKSPORE: u32 = 3_030_008;
 const HOOLIGAN_DEFINITION: u32 = 930_050;
-const CHAIN_REWARD_COINS: u32 = 5;
-const COMBAT_PROFILE: i32 = 43;
-const TALK_OPTION_STRING_ID: u32 = 3300;
+const QUEST_REWARD_COINS: u32 = 5;
+const ATTACK_CHOICE: i32 = 103;
+const QUEST_CHOICE: i32 = 301;
 
 fn content_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
 }
 
-fn reference() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/rust-opening-cooking-original-assets")
+fn gameplay_dir() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/opening-anvil-placement-v1/content")
 }
 
 fn character_at(position: [f32; 3]) -> CharacterState {
@@ -42,91 +41,281 @@ fn character_at(position: [f32; 3]) -> CharacterState {
     }
 }
 
-fn game() -> Gameplay {
-    let reference = reference();
-    assert!(
-        reference.join("opening.json").is_file(),
-        "brawler chapter requires the private opening fixture at {}",
-        reference.display()
-    );
-    let mut game = Gameplay::load(&reference, None).unwrap();
+fn load_game(saved: Option<osfr_tools::gameplay::GameplayState>) -> Gameplay {
+    let mut game = Gameplay::load(&gameplay_dir(), saved).expect("gameplay content loads");
     game.bind_npc_quest_catalogue(&content_dir(), CHARACTER)
-        .unwrap();
-    let switched = game
-        .handle_in_world(&select_job(COMBAT_PROFILE), &character_at([0.0; 3]), 100)
-        .unwrap();
-    assert!(switched.changed);
-    assert_eq!(game.active_profile(), Some(COMBAT_PROFILE));
+        .expect("split quest content loads");
     game
 }
 
-fn reload(game: Gameplay) -> Gameplay {
-    let encoded = serde_json::to_vec(&game.state()).unwrap();
-    let state: GameplayState = serde_json::from_slice(&encoded).unwrap();
-    let mut reloaded = Gameplay::load(&reference(), Some(state)).unwrap();
-    reloaded
-        .bind_npc_quest_catalogue(&content_dir(), CHARACTER)
-        .unwrap();
-    reloaded
-}
-
-fn carlos_spawn_record() -> Value {
-    let document: Value =
-        serde_json::from_slice(&fs::read(content_dir().join("npc_spawns_extra.json")).unwrap())
-            .unwrap();
-    document["records"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|record| record["content_key"].as_u64() == Some(CARLOS_KEY))
-        .expect("Carlos has a bound extra spawn")
-        .clone()
-}
-
-fn spawn_position(record: &Value) -> [f32; 3] {
-    serde_json::from_value(record["position"].clone()).unwrap()
+fn fresh_game() -> (Gameplay, CharacterState) {
+    let mut game = load_game(None);
+    let character = character_at([0.0; 3]);
+    let selected = game
+        .handle_in_world(&select_job(43), &character, 1)
+        .expect("Brawler job selection is valid");
+    assert!(
+        selected.changed,
+        "Brawler selection must change the profile"
+    );
+    (game, character)
 }
 
 fn npc_position(file: &str, npc_id: u64) -> [f32; 3] {
     let document: Value =
         serde_json::from_slice(&fs::read(content_dir().join("npcs").join(file)).unwrap()).unwrap();
-    let record = document["records"]
+    let npc = document["records"]
         .as_array()
         .unwrap()
         .iter()
         .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .expect("required NPC exists");
-    serde_json::from_value(record["position"].clone()).unwrap()
+        .expect("chapter NPC exists");
+    serde_json::from_value(npc["position"].clone()).expect("chapter NPC has a spawn position")
 }
 
-fn visible_add(game: &mut Gameplay, character: &CharacterState, actor: u64) -> NpcSpawn {
-    let packets = game.update_npc_visibility(character).unwrap();
-    packets
+fn field_hooligans() -> Vec<(u64, [f32; 3])> {
+    let document: Value =
+        serde_json::from_slice(&fs::read(content_dir().join("field_enemies.json")).unwrap())
+            .unwrap();
+    let enemies: Vec<_> = document["enemies"]
+        .as_array()
+        .unwrap()
         .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
-        .filter_map(|packet| parse_add_npc(packet).ok())
-        .find(|spawn| spawn.actor_id == actor)
-        .expect("actor sent through 35/2")
+        .filter(|enemy| {
+            enemy["definition_id"].as_u64() == Some(u64::from(HOOLIGAN_DEFINITION))
+                && enemy["quest_ids"].as_array().is_some_and(|ids| {
+                    ids.iter()
+                        .any(|id| id.as_u64() == Some(u64::from(HOOLIGAN_FIGHT)))
+                })
+        })
+        .map(|enemy| {
+            (
+                enemy["guid"].as_u64().unwrap(),
+                serde_json::from_value(enemy["position"].clone()).unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(enemies.len(), 4, "the chapter owns four quest-gated spawns");
+    enemies
 }
 
-fn interact_packet(actor: u64) -> Vec<u8> {
-    NpcInteractRequest {
-        target: actor,
-        trailing_flag: false,
+fn saved(game: &Gameplay) -> Vec<u8> {
+    serde_json::to_vec(&game.state()).unwrap()
+}
+
+fn assert_refusal_changes_nothing(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    packet: &[u8],
+    now: u64,
+    label: &str,
+) {
+    let before = saved(game);
+    let outcome = game
+        .handle_in_world(packet, character, now)
+        .unwrap_or_else(|error| panic!("{label} should be a clean refusal: {error}"));
+    assert!(!outcome.changed, "{label} changed gameplay");
+    assert_eq!(saved(game), before, "{label} changed the saved state");
+}
+
+fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool {
+    packet.len() >= 6
+        && packet[..2] == family.to_le_bytes()
+        && packet[2..4] == subtype.to_le_bytes()
+        && id.is_none_or(|id| {
+            (packet.len() >= 10 && u32::from_le_bytes(packet[6..10].try_into().unwrap()) == id)
+                || (packet.len() >= 18
+                    && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == id)
+        })
+}
+
+fn interact_npc(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) {
+    let menu = game
+        .handle_in_world(&npc_interact(npc_id), character, now)
+        .expect("NPC interaction is valid");
+    assert!(
+        menu.replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
+        "NPC {npc_id} did not open its menu"
+    );
+}
+
+fn talk(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) {
+    interact_npc(game, character, npc_id, now);
+    let dialogue = game
+        .handle_in_world(&npc_select(npc_id, 1), character, now + 1)
+        .expect("NPC Talk selection is valid");
+    assert!(
+        dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "NPC {npc_id} did not open dialogue"
+    );
+}
+
+fn choose_quest_row(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    now: u64,
+) -> osfr_tools::gameplay::Outcome {
+    game.handle_in_world(&dialogue_choice(QUEST_CHOICE), character, now)
+        .expect("quest dialogue choice is valid")
+}
+
+fn accept_quest(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    npc_id: u64,
+    position: [f32; 3],
+    quest_id: u32,
+    now: &mut u64,
+) {
+    let mut character = character.clone();
+    character.position = position;
+    *now += 100;
+    talk(game, &character, npc_id, *now);
+    *now += 100;
+    let offered = choose_quest_row(game, &character, *now);
+    assert!(
+        offered
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 1, 0])),
+        "quest {quest_id} was not offered"
+    );
+    *now += 100;
+    let accepted = game
+        .handle_in_world(&quest_reply(quest_id, true), &character, *now)
+        .expect("quest accept is valid");
+    assert!(
+        accepted
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 3, None)),
+        "quest {quest_id} did not send QuestAdd"
+    );
+    assert_eq!(
+        game.state().npc_quests.unwrap().quests[&quest_id].status,
+        QuestStatus::Active
+    );
+}
+
+fn open_end_screen(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    npc_id: u64,
+    quest_id: u32,
+    now: &mut u64,
+) -> Vec<u8> {
+    *now += 100;
+    talk(game, character, npc_id, *now);
+    *now += 100;
+    let chosen = choose_quest_row(game, character, *now);
+    let end = chosen
+        .replies
+        .into_iter()
+        .find(|packet| has_family(packet, 49, 13, Some(quest_id)))
+        .expect("the completed quest opens its end screen");
+    assert_eq!(
+        game.state().npc_quests.unwrap().pending_turnin,
+        Some(quest_id)
+    );
+    end
+}
+
+fn finish_turnin(game: &mut Gameplay, character: &CharacterState, quest_id: u32, now: &mut u64) {
+    let before = game.state().inventory.coins;
+    *now += 100;
+    let completed = game
+        .handle_in_world(&quest_end_reply(quest_id), character, *now)
+        .expect("quest turn-in is valid");
+    assert!(completed.changed);
+    assert!(
+        completed
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 4, Some(quest_id))),
+        "quest {quest_id} did not complete"
+    );
+    let state = game.state();
+    assert_eq!(
+        state.inventory.coins,
+        before + QUEST_REWARD_COINS,
+        "quest {quest_id} paid the wrong amount"
+    );
+    let quests = state.npc_quests.unwrap();
+    assert_eq!(quests.pending_turnin, None);
+    assert_eq!(quests.quests[&quest_id].status, QuestStatus::Completed);
+}
+
+fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
+    // A far-away location lets the production tick publish quest-gated spawns
+    // without advancing any actor before the test reaches it.
+    let mut character = character.clone();
+    character.position = [10_000.0, 0.0, 10_000.0];
+    *now += 100;
+    game.tick(&character, *now)
+        .expect("field quests synchronize");
+
+    for (guid, position) in field_hooligans() {
+        character.position = position;
+        *now += 100;
+        let menu = game
+            .handle_in_world(&npc_interact(guid), &character, *now)
+            .expect("field enemy interaction is valid");
+        assert!(
+            menu.replies
+                .iter()
+                .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
+            "field enemy {guid} did not expose its Attack menu"
+        );
+        let before = quest_count(game, HOOLIGAN_FIGHT);
+        for _ in 0..5 {
+            *now += 700;
+            game.handle_in_world(&npc_select(guid, ATTACK_CHOICE), &character, *now)
+                .expect("field basic attack is valid");
+            if quest_count(game, HOOLIGAN_FIGHT) > before {
+                break;
+            }
+        }
+        assert_eq!(
+            quest_count(game, HOOLIGAN_FIGHT),
+            before + 1,
+            "actual combat did not advance the kill objective for {guid}"
+        );
     }
-    .encode()
+    assert_eq!(quest_count(game, HOOLIGAN_FIGHT), 4);
 }
 
-fn select_packet(actor: u64, choice: i32) -> Vec<u8> {
+fn quest_count(game: &Gameplay, quest_id: u32) -> u32 {
+    game.state().npc_quests.unwrap().quests[&quest_id].counts[0]
+}
+
+fn select_job(profile_id: i32) -> Vec<u8> {
+    let mut packet = vec![26, 0, 13, 0];
+    packet.extend(profile_id.to_le_bytes());
+    packet
+}
+
+fn npc_interact(npc_id: u64) -> Vec<u8> {
+    let mut packet = vec![26, 0, 8, 0];
+    packet.extend(npc_id.to_le_bytes());
+    packet.push(0);
+    packet
+}
+
+fn npc_select(npc_id: u64, choice: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 10, 0];
-    packet.extend(actor.to_le_bytes());
+    packet.extend(npc_id.to_le_bytes());
     packet.extend(choice.to_le_bytes());
     packet
 }
 
-fn quest_choice_packet() -> Vec<u8> {
+fn dialogue_choice(row: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 6, 0];
-    packet.extend(QUEST_CHOICE_RESPONSE.to_le_bytes());
+    packet.extend(row.to_le_bytes());
     packet
 }
 
@@ -143,350 +332,150 @@ fn quest_end_reply(quest_id: u32) -> Vec<u8> {
     packet
 }
 
-fn select_job(profile: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 13, 0];
-    packet.extend(profile.to_le_bytes());
-    packet
-}
+#[test]
+fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
+    let (mut game, mut character) = fresh_game();
+    let mut now = 1_000;
+    let carlos = npc_position("cobblestone_village.json", CARLOS);
+    let jones = npc_position("cobblestone_village.json", JONES);
+    let sabastian = npc_position("blackspore_swamp.json", SABASTIAN);
+    let initial_coins = game.state().inventory.coins;
 
-fn targeted_basic_attack(target: u64) -> Vec<u8> {
-    [
-        vec![36, 0, 10, 0],
-        1_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        target.to_le_bytes().to_vec(),
-    ]
-    .concat()
-}
-
-fn open_menu(game: &mut Gameplay, character: &CharacterState, actor: u64, now: u64) -> Vec<u8> {
-    let opened = game
-        .handle_in_world(&interact_packet(actor), character, now)
-        .unwrap();
-    let menu = opened
-        .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
-        .expect("NPC interaction returns the native menu");
-    assert_eq!(
-        u64::from_le_bytes(menu[4..12].try_into().unwrap()),
-        actor,
-        "menu targets the runtime actor"
-    );
-    menu.clone()
-}
-
-fn talk_option(menu: &[u8]) -> i32 {
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    assert!(count > 0);
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
-            let string_id = u32::from_le_bytes(menu[offset + 8..offset + 12].try_into().unwrap());
-            (string_id == TALK_OPTION_STRING_ID).then_some(id)
-        })
-        .expect("native menu contains Talk")
-}
-
-fn select_talk(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    actor: u64,
-    now: u64,
-) -> Vec<Vec<u8>> {
-    let menu = open_menu(game, character, actor, now);
-    let talk = game
-        .handle_in_world(
-            &select_packet(actor, talk_option(&menu)),
-            character,
-            now + 1,
-        )
-        .unwrap();
+    character.position = carlos;
+    let spawned = game
+        .update_npc_visibility(&character)
+        .expect("Carlos visibility updates");
     assert!(
-        talk.replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "Talk opens the native dialogue"
-    );
-    talk.replies
-}
-
-fn offer_and_accept(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    actor: u64,
-    quest_id: u32,
-    now: u64,
-) {
-    select_talk(game, character, actor, now);
-    let offered = game
-        .handle_in_world(&quest_choice_packet(), character, now + 2)
-        .unwrap();
-    let packet = offered
-        .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[49, 0, 1, 0]))
-        .expect("quest choice opens 49/1");
-    assert_eq!(decode_quest_offer_49_1(packet).unwrap().quest_id, quest_id);
-
-    let accepted = game
-        .handle_in_world(&quest_reply(quest_id, true), character, now + 3)
-        .unwrap();
-    assert!(accepted.changed);
-    assert_eq!(
-        game.state().npc_quests.as_ref().unwrap().quests[&quest_id].status,
-        QuestStatus::Active
-    );
-}
-
-fn finish_turnin(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    actor: u64,
-    quest_id: u32,
-    now: u64,
-) {
-    select_talk(game, character, actor, now);
-    let ended = game
-        .handle_in_world(&quest_choice_packet(), character, now + 2)
-        .unwrap();
-    assert!(
-        ended.replies.iter().any(|packet| {
-            packet.starts_with(&[49, 0, 13, 0, 0, 0])
-                && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == quest_id
+        spawned.iter().any(|packet| {
+            packet.starts_with(&[35, 0, 2, 0])
+                && startup_world::parse_add_npc(packet).is_ok_and(|npc| npc.actor_id == CARLOS)
         }),
-        "completed objective opens the native quest end screen"
+        "the reconstructed chapter spawn must be sent to the client"
     );
-    let completed = game
-        .handle_in_world(&quest_end_reply(quest_id), character, now + 3)
-        .unwrap();
-    assert!(completed.changed);
+    accept_quest(
+        &mut game,
+        &character,
+        CARLOS,
+        carlos,
+        REFERRAL_TO_JONES,
+        &mut now,
+    );
+    character.position = jones;
+    let _ = open_end_screen(&mut game, &character, JONES, REFERRAL_TO_JONES, &mut now);
+    finish_turnin(&mut game, &character, REFERRAL_TO_JONES, &mut now);
+
+    accept_quest(
+        &mut game,
+        &character,
+        JONES,
+        jones,
+        HOOLIGAN_FIGHT,
+        &mut now,
+    );
+    kill_hooligans(&mut game, &character, &mut now);
+
+    character.position = jones;
+    let end = open_end_screen(&mut game, &character, JONES, HOOLIGAN_FIGHT, &mut now);
     assert_eq!(
-        game.state().npc_quests.as_ref().unwrap().quests[&quest_id].status,
+        u64::from_le_bytes(end[6..14].try_into().unwrap()),
+        JONES,
+        "the live end screen carries the Talk actor"
+    );
+    let before_reconnect = game.state().inventory.coins;
+    let before_reopen = saved(&game);
+    let reopened = open_end_screen(&mut game, &character, JONES, HOOLIGAN_FIGHT, &mut now);
+    assert_eq!(
+        u64::from_le_bytes(reopened[6..14].try_into().unwrap()),
+        JONES,
+        "talking again reopens the same end screen without another state change"
+    );
+    assert_eq!(game.state().inventory.coins, before_reconnect);
+    assert_eq!(saved(&game), before_reopen);
+    let restored_state = game.state();
+    drop(game);
+
+    // Disconnect after the end screen opened and before its 49/14 confirmation.
+    let mut game = load_game(Some(restored_state));
+    character.position = jones;
+    let initialized = game
+        .initialize_world(&character, now + 100)
+        .expect("reconnected gameplay initializes");
+    let restored_end = initialized
+        .replies
+        .iter()
+        .find(|packet| has_family(packet, 49, 13, Some(HOOLIGAN_FIGHT)))
+        .expect("reconnect must reopen the pending end screen");
+    assert_eq!(
+        u64::from_le_bytes(restored_end[6..14].try_into().unwrap()),
+        JONES,
+        "the recovered end screen carries the turn-in actor for client sub_C7B990"
+    );
+    assert_eq!(
+        u32::from_le_bytes(restored_end[14..18].try_into().unwrap()),
+        HOOLIGAN_FIGHT,
+        "the third dword remains the quest id that 49/14 sends back"
+    );
+    let before_refusal = saved(&game);
+    now += 200;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &character,
+        &quest_end_reply(SEARCH_BLACKSPORE),
+        now,
+        "wrong pending turn-in",
+    );
+    assert_eq!(saved(&game), before_refusal);
+    now += 100;
+    let paid = game
+        .handle_in_world(&quest_end_reply(HOOLIGAN_FIGHT), &character, now)
+        .expect("recovered turn-in is valid");
+    assert!(paid.changed);
+    assert_eq!(
+        game.state().inventory.coins,
+        before_reconnect + QUEST_REWARD_COINS
+    );
+    assert_eq!(
+        game.state().npc_quests.unwrap().quests[&HOOLIGAN_FIGHT].status,
         QuestStatus::Completed
     );
-}
-
-fn quest_count(game: &Gameplay, quest_id: u32) -> u32 {
-    game.state().npc_quests.as_ref().unwrap().quests[&quest_id].counts[0]
-}
-
-fn hooligan_guids() -> Vec<u64> {
-    let document: Value =
-        serde_json::from_slice(&fs::read(content_dir().join("field_enemies.json")).unwrap())
-            .unwrap();
-    let mut guids: Vec<u64> = document["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|enemy| {
-            enemy["definition_id"].as_u64() == Some(u64::from(HOOLIGAN_DEFINITION))
-                && enemy["quest_ids"].as_array().is_some_and(|ids| {
-                    ids.iter()
-                        .any(|id| id.as_u64() == Some(u64::from(HOOLIGAN_FIGHT)))
-                })
-        })
-        .filter_map(|enemy| enemy["guid"].as_u64())
-        .collect();
-    guids.sort_unstable();
-    assert_eq!(guids.len(), 4);
-    guids
-}
-
-fn known_hooligans(game: &Gameplay, character: &CharacterState, guids: &[u64]) -> BTreeSet<u64> {
-    let wanted: BTreeSet<_> = guids.iter().copied().collect();
-    game.known_actors(character)
-        .into_iter()
-        .map(|target| target.guid)
-        .filter(|guid| wanted.contains(guid))
-        .collect()
-}
-
-fn actor_position(game: &Gameplay, character: &CharacterState, actor: u64) -> [f32; 3] {
-    game.known_actors(character)
-        .into_iter()
-        .find(|target| target.guid == actor)
-        .expect("live actor is known")
-        .position
-}
-
-fn kill_hooligan(
-    game: &mut Gameplay,
-    guide: &CharacterState,
-    actor: u64,
-    now: &mut u64,
-    guids: &[u64],
-) {
-    let position = actor_position(game, guide, actor);
-    let attacker = character_at(position);
-    let mut killed = false;
-    for _ in 0..6 {
-        *now += 700;
-        game.handle_in_world(&targeted_basic_attack(actor), &attacker, *now)
-            .unwrap();
-        if !known_hooligans(game, guide, guids).contains(&actor) {
-            killed = true;
-            break;
-        }
-    }
-    assert!(killed, "server damage defeats Hooligan {actor}");
-}
-
-fn start_hooligan_quest(game: &mut Gameplay, now: &mut u64) {
-    let carlos = character_at(spawn_position(&carlos_spawn_record()));
-    visible_add(game, &carlos, CARLOS_KEY);
-    offer_and_accept(game, &carlos, CARLOS_KEY, REFERRAL_TO_JONES, *now);
-
-    let jones = character_at(npc_position("cobblestone_village.json", JONES));
-    game.update_npc_visibility(&jones).unwrap();
-    finish_turnin(game, &jones, JONES, REFERRAL_TO_JONES, *now + 10);
-    offer_and_accept(game, &jones, JONES, HOOLIGAN_FIGHT, *now + 20);
-    *now += 30;
-}
-
-#[test]
-fn carlos_spawns_and_offers_the_chapter_through_npc_interaction() {
-    let carlos = carlos_spawn_record();
-    let character = character_at(spawn_position(&carlos));
-    let mut game = game();
-    let spawn = visible_add(&mut game, &character, CARLOS_KEY);
-    assert_eq!(spawn.model_id, 964);
-    assert_eq!(spawn.name_string_id, 20_671);
-    assert_eq!(spawn.position[..3], spawn_position(&carlos));
-
-    let menu = open_menu(&mut game, &character, CARLOS_KEY, 1_000);
-    let before = serde_json::to_vec(&game.state()).unwrap();
-    assert!(
-        game.handle_in_world(&select_packet(CARLOS_KEY, i32::MAX), &character, 1_000)
-            .is_err(),
-        "an unoffered menu choice is refused"
-    );
-    assert_eq!(
-        serde_json::to_vec(&game.state()).unwrap(),
-        before,
-        "a refused menu choice changes nothing"
-    );
-    let option = talk_option(&menu);
-    let talked = game
-        .handle_in_world(&select_packet(CARLOS_KEY, option), &character, 1_001)
-        .unwrap();
-    assert!(
-        talked
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0]))
-    );
-    let offered = game
-        .handle_in_world(&quest_choice_packet(), &character, 1_002)
-        .unwrap();
-    let packet = offered
-        .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[49, 0, 1, 0]))
-        .expect("Carlos offers the chapter");
-    assert_eq!(
-        decode_quest_offer_49_1(packet).unwrap().quest_id,
-        REFERRAL_TO_JONES
-    );
-    let accepted = game
-        .handle_in_world(&quest_reply(REFERRAL_TO_JONES, true), &character, 1_003)
-        .unwrap();
-    assert!(accepted.changed);
-    assert_eq!(
-        game.state().npc_quests.as_ref().unwrap().quests[&REFERRAL_TO_JONES].status,
-        QuestStatus::Active
-    );
-}
-
-#[test]
-fn real_hooligan_defeats_progress_reload_and_pay_the_chapter_once() {
-    let mut now = 2_000;
-    let mut game = game();
-    start_hooligan_quest(&mut game, &mut now);
-
-    let jones = character_at(npc_position("cobblestone_village.json", JONES));
-    let guids = hooligan_guids();
-    assert!(
-        known_hooligans(&game, &jones, &guids).is_empty(),
-        "quest enemies stay hidden before the defeat objective is active"
-    );
+    assert_eq!(game.state().npc_quests.unwrap().pending_turnin, None);
     now += 100;
-    game.tick(&jones, now).unwrap();
-    assert_eq!(
-        known_hooligans(&game, &jones, &guids),
-        guids.iter().copied().collect(),
-        "the active defeat objective exposes exactly four Hooligans"
-    );
-    let mut last_position = [0.0; 3];
-    for (index, guid) in guids.iter().copied().enumerate() {
-        last_position = actor_position(&game, &jones, guid);
-        kill_hooligan(&mut game, &jones, guid, &mut now, &guids);
-        assert_eq!(quest_count(&game, HOOLIGAN_FIGHT), index as u32 + 1);
-    }
-
-    let last = guids.last().copied().unwrap();
-    let before = serde_json::to_vec(&game.state()).unwrap();
-    now += 700;
-    let replay = game
-        .handle_in_world(
-            &targeted_basic_attack(last),
-            &character_at(last_position),
-            now,
-        )
-        .unwrap();
-    assert!(!replay.changed);
-    assert_eq!(
-        serde_json::to_vec(&game.state()).unwrap(),
-        before,
-        "a replayed hit on a defeated enemy changes no quest state"
-    );
-    assert_eq!(quest_count(&game, HOOLIGAN_FIGHT), 4);
-
-    game.update_npc_visibility(&jones).unwrap();
-    let coins_before = game.state().inventory.coins;
-    finish_turnin(&mut game, &jones, JONES, HOOLIGAN_FIGHT, now + 10);
-    assert_eq!(
-        game.state().inventory.coins,
-        coins_before + CHAIN_REWARD_COINS
-    );
-    now += 20;
-    game.tick(&jones, now).unwrap();
-    assert!(
-        known_hooligans(&game, &jones, &guids).is_empty(),
-        "Hooligans leave after their quest completes"
-    );
-    offer_and_accept(&mut game, &jones, JONES, SEARCH_BLACKSPORE, now + 20);
-
-    let sabastian = character_at(npc_position("blackspore_swamp.json", SABASTIAN));
-    game.update_npc_visibility(&sabastian).unwrap();
-    let coins_before = game.state().inventory.coins;
-    finish_turnin(
+    assert_refusal_changes_nothing(
         &mut game,
-        &sabastian,
+        &character,
+        &quest_end_reply(HOOLIGAN_FIGHT),
+        now,
+        "duplicate recovered reward",
+    );
+
+    accept_quest(
+        &mut game,
+        &character,
+        JONES,
+        jones,
+        SEARCH_BLACKSPORE,
+        &mut now,
+    );
+    character.position = sabastian;
+    let _ = open_end_screen(
+        &mut game,
+        &character,
         SABASTIAN,
         SEARCH_BLACKSPORE,
-        now + 30,
+        &mut now,
     );
+    finish_turnin(&mut game, &character, SEARCH_BLACKSPORE, &mut now);
+
     assert_eq!(
         game.state().inventory.coins,
-        coins_before + CHAIN_REWARD_COINS
+        initial_coins + 3 * QUEST_REWARD_COINS
     );
-
+    let quests = game.state().npc_quests.unwrap();
     for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
         assert_eq!(
-            game.state().npc_quests.as_ref().unwrap().quests[&quest_id].status,
-            QuestStatus::Completed
-        );
-    }
-    let paid = game.state().inventory.coins;
-    let saved = reload(game);
-    assert_eq!(saved.state().inventory.coins, paid);
-    for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
-        assert_eq!(
-            saved.state().npc_quests.as_ref().unwrap().quests[&quest_id].status,
-            QuestStatus::Completed
+            quests.quests[&quest_id].status,
+            QuestStatus::Completed,
+            "quest {quest_id} did not reach the final outcome"
         );
     }
 }
@@ -508,7 +497,7 @@ fn disabled_starting_quests_refuse_without_changing_state() {
     .unwrap();
     let before = engine.state().clone();
     for quest_id in [3_030_004, 3_030_005] {
-        let refused = engine.offer(quest_id, CARLOS_KEY);
+        let refused = engine.offer(quest_id, CARLOS);
         assert_eq!(refused.denial, Some(QuestDenial::Unavailable));
         assert!(!refused.changed);
         assert!(refused.outbound.is_empty());
