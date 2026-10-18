@@ -68,6 +68,7 @@ The four hubs (`gameplay.rs`, `bin/osfr-gateway.rs`, `encounter.rs`, `gateway.rs
 ## Tests and gates
 
 - **Full suite:** `scripts/cargo.ps1 test --manifest-path prototype/osfr-tools/Cargo.toml --no-fail-fast`. About 10 minutes, about 2,400 tests. Lead reviews run it in a clean worktree (`CartoonMMO/review`) holding only the change under review, with the shared build dir `lab/build/review`.
+- **LAN gate (lead only):** `cargo test --test login_broker -- --ignored` for any change to login, login_auth, net_policy or osfr-login. It binds this PC's LAN address, which prompts Windows Firewall, so ordinary suites skip it.
 - **Coverage gate:** `tests/app_fuzz.rs`. Every newly routed family/subtype in `gateway.rs::application_handler` needs a seed, or the coverage test fails.
 - **Other gates:** `scripts/content_check.py --strict` (0 errors expected), and `rustfmt --edition 2024 --check` on touched files. Preserve each file's CRLF/LF style.
 - **Disk:** each full-suite build dir is about 28 GB. Build with `CARGO_PROFILE_DEV_DEBUG=0` and delete `debug/` when done.
