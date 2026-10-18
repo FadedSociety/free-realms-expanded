@@ -2537,12 +2537,10 @@ fn gate_claim_after_the_race_window_is_refused_before_the_tick_aborts() {
             limit_ms: 60_000,
         }
     );
-    let mut expected = before.clone();
-    expected.attempts += 1;
     assert_eq!(
         service.snapshot().expect("snapshot after the timed claim"),
-        expected,
-        "the timed claim must not finish, pay or move the race"
+        before,
+        "a timeout refusal must leave the complete race snapshot unchanged"
     );
     assert_eq!(service.phase(), RacePhase::Racing);
     assert!(!service.finish_flag());

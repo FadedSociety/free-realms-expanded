@@ -2447,18 +2447,18 @@ impl KartService {
                 phase: self.phase,
             }));
         }
-        // Every claim attempt counts against the bounded flood guard; a refusal changes nothing else.
+        // Every in-window claim attempt counts against the bounded flood guard.
         if self.attempts >= self.content.bounds.max_claims {
             return Ok(ServiceOutcome::Refused(ServiceRefusal::ClaimBudget {
                 claims: self.attempts,
             }));
         }
-        self.attempts += 1;
         // The packet path must enforce the same whole-race window as `tick`: a claim arriving just
         // after the limit but before the next 20 Hz tick must not reach the finish line.
         if let Err(refusal) = self.race_elapsed(now_ms) {
             return Ok(ServiceOutcome::Refused(refusal));
         }
+        self.attempts += 1;
         let charge = match self.check_movement(position, now_ms) {
             Ok(charge) => charge,
             Err(refusal) => return Ok(ServiceOutcome::Refused(refusal)),

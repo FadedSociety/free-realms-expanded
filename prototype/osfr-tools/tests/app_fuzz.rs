@@ -933,6 +933,87 @@ fn t3_active_movies_reject_hostile_headers_and_out_of_phase_rewards() {
 }
 
 #[test]
+fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.active("kart");
+    let active = gateway
+        .snapshot()
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .kart_entry
+        .as_ref()
+        .unwrap()
+        .active
+        .clone()
+        .unwrap();
+    let guid = gateway.state().guid;
+
+    assert!(
+        !gateway
+            .handle_at(
+                &wrap(&words(33, 9, &[guid as u32, (guid >> 32) as u32, 0, 0])),
+                NOW
+            )
+            .unwrap()
+            .replies
+            .is_empty()
+    );
+    let start_ms = NOW + 1_000;
+    let mut start = words(
+        41,
+        108,
+        &[active.context.encounter_id, active.context.instance_id],
+    );
+    start.extend(guid.to_le_bytes());
+    gateway.handle_at(&wrap(&start), start_ms).unwrap();
+    gateway.tick_at(start_ms + 20_000).unwrap();
+
+    let race = gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .kart_entry
+        .unwrap()
+        .race
+        .unwrap();
+    assert_eq!(race.phase, osfr_tools::kart_service::RacePhase::Racing);
+    let gate: [f32; 3] =
+        read_json(&fixture.content.join("kart_entry.json"))["race"]["gates"][0]["position"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| value.as_f64().unwrap() as f32)
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+    let mut claim = words(33, 7, &[guid as u32, (guid >> 32) as u32]);
+    for value in gate {
+        claim.extend(value.to_le_bytes());
+    }
+    claim.extend(1.0f32.to_le_bytes());
+
+    let before = gateway.snapshot();
+    let out = gateway
+        .handle_at(
+            &wrap(&claim),
+            race.race_started_ms + u64::from(race.bounds.max_race_ms) + 1,
+        )
+        .unwrap();
+    assert_eq!(out.applications, vec![claim]);
+    assert!(out.replies.is_empty());
+    assert!(
+        !out.state_changed && !out.gameplay_changed,
+        "a timeout refusal must not trigger a character save"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a timeout refusal must leave the complete gateway snapshot unchanged"
+    );
+}
+
+#[test]
 fn t3_application_requests_before_loaded_do_not_mutate_or_poison_entry() {
     let fixture = Fixture::new();
     let mut gateway = fixture.unloaded(true, false);
