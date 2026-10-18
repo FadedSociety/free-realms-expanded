@@ -113,6 +113,8 @@ pub struct GameplayState {
 const HARVESTING_GAME_ID: i32 = 111;
 /// (R) Minimum gap between answered activity-portal refreshes (167/1/4).
 const PORTAL_REFRESH_MS: u64 = 250;
+const UNAVAILABLE_BATTLE_PRIZE: &str =
+    "This battle is unavailable because one of its rewards is missing.";
 
 #[derive(Clone)]
 pub struct Gameplay {
@@ -4588,6 +4590,10 @@ impl Gameplay {
                     say(out, "Usage: realm battle <battle id>".into());
                     return Ok(true);
                 };
+                if !self.battle_prizes_available(battle) {
+                    say(out, UNAVAILABLE_BATTLE_PRIZE.into());
+                    return Ok(true);
+                }
                 let profile = self.profiles.as_ref().unwrap().active();
                 match self
                     .encounter
@@ -4777,6 +4783,9 @@ impl Gameplay {
         };
         if base.active() {
             return Ok(vec!["Finish or exit the current encounter first.".into()]);
+        }
+        if !self.battle_prizes_available(battle) {
+            return Ok(vec![UNAVAILABLE_BATTLE_PRIZE.into()]);
         }
         let mut lines = vec![format!("Battle {battle}, job {profile} (scripted bot):")];
         for level in [1_u32, 5, 10, 15, 20] {
@@ -5192,6 +5201,10 @@ impl Gameplay {
                         self.begin_soccer(soccer, character, &mut out)?;
                     }
                     Ok((battle, crate::activity_portal::Kind::Battle)) => {
+                        if !self.battle_prizes_available(battle) {
+                            out.replies.push(chat::system(UNAVAILABLE_BATTLE_PRIZE));
+                            return Ok(Some(out));
+                        }
                         let profile = self.profiles.as_ref().map_or(0, Profiles::active);
                         let begun = self
                             .encounter
@@ -6820,6 +6833,16 @@ impl Gameplay {
                 return Ok(out);
             }
             if let Some(battle) = self.encounter.as_mut().unwrap().take_pending_battle() {
+                if !self.battle_prizes_available(battle) {
+                    out.replies.push(chat::system(UNAVAILABLE_BATTLE_PRIZE));
+                    out.replies.extend(
+                        self.encounter
+                            .as_mut()
+                            .unwrap()
+                            .reopen_battle_screen(battle, active_profile),
+                    );
+                    return Ok(out);
+                }
                 if !self
                     .abilities
                     .as_ref()
@@ -7392,6 +7415,14 @@ impl Gameplay {
             });
         }
         Ok(())
+    }
+
+    /// Every production path that starts a field battle checks this before
+    /// mutating the encounter, inventory or open start screen.
+    fn battle_prizes_available(&self, id: u32) -> bool {
+        self.encounter.as_ref().is_some_and(|encounter| {
+            encounter.battle_prizes_available(id, |item| self.inventory.has_definition(item))
+        })
     }
 
     /// Follow the completed cave objective to the next story guide. Locale

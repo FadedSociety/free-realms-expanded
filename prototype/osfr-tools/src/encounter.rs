@@ -2037,6 +2037,15 @@ impl EncounterEngine {
             .collect()
     }
 
+    /// A field battle is playable only when every previewed prize resolves.
+    /// Cave encounters have no `battles` row and are not subject to this check.
+    pub fn battle_prizes_available(&self, id: u32, has_item: impl Fn(i32) -> bool) -> bool {
+        self.battles
+            .iter()
+            .find(|battle| battle.id == id)
+            .is_none_or(|battle| battle.prizes.iter().all(|prize| has_item(prize.item_id)))
+    }
+
     /// No weapon-specific refusal message is recovered. (R) The gameplay cast
     /// gate refuses silently and logs at most once per five seconds per session.
     pub(crate) fn refuse_weapon(&mut self, profile: i32, slot: i32, now_ms: u64) {
