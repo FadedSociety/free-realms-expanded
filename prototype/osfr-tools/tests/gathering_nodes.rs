@@ -18,7 +18,7 @@ use osfr_tools::{
     inventory::InventoryItem,
     mining::{
         self, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Goal, Type8Kind,
-        Type8Output, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
+        Type8Output, Type8Phase, Type8Run, lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
     },
     npc_interaction::NpcInteractRequest,
 };
@@ -246,6 +246,12 @@ impl Fixture {
     fn ready(&self) -> Gateway {
         self.near(self.state(true, true))
     }
+
+    fn with_shipped_mining(self) -> Self {
+        let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/mining.json");
+        fs::copy(source, self.directory.join(mining::CONTENT_FILE)).unwrap();
+        self
+    }
 }
 
 impl Drop for Fixture {
@@ -423,6 +429,182 @@ fn win(gateway: &mut Gateway, game: Game, id: i32, base_ms: u64) {
         send(gateway, &payload(id, &text), base_ms + 600 + slot as u64);
     }
     send(gateway, &payload(id, "OnNextLevelMsg"), base_ms + 700);
+}
+
+fn mining_run(gateway: &Gateway) -> Type8Run {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .mining
+        .unwrap()
+        .active
+        .unwrap()
+}
+
+fn extend_chain(run: &Type8Run, value: u16, path: &mut Vec<(usize, usize)>) -> bool {
+    if path.len() == 3 {
+        return true;
+    }
+    let (x, y) = *path.last().unwrap();
+    for (next_x, next_y) in [
+        (x.checked_sub(1), Some(y)),
+        (Some(x + 1), Some(y)),
+        (Some(x), y.checked_sub(1)),
+        (Some(x), Some(y + 1)),
+    ] {
+        let (Some(next_x), Some(next_y)) = (next_x, next_y) else {
+            continue;
+        };
+        let at = (next_x, next_y);
+        let index = next_y * SIDE + next_x;
+        if index >= run.board.len()
+            || !(run.board[index] == value || run.board[index] == 200)
+            || !run.idle[index]
+            || path.contains(&at)
+        {
+            continue;
+        }
+        path.push(at);
+        if extend_chain(run, value, path) {
+            return true;
+        }
+        path.pop();
+    }
+    false
+}
+
+fn chain_from(run: &Type8Run, start: (usize, usize)) -> Option<Vec<(usize, usize)>> {
+    let value = run.board[start.1 * SIDE + start.0];
+    if !(400..500).contains(&value) || !run.idle[start.1 * SIDE + start.0] {
+        return None;
+    }
+    let mut path = vec![start];
+    extend_chain(run, value, &mut path).then_some(path)
+}
+
+fn mining_chain(run: &Type8Run) -> Vec<(usize, usize)> {
+    let width = SIDE;
+    for y in TOP..TOP + PLAYABLE {
+        for x in LEFT..LEFT + PLAYABLE {
+            if !matches!(run.board[y * width + x], 601 | 602) {
+                continue;
+            }
+            for below in (y + 1)..TOP + PLAYABLE {
+                if let Some(path) = chain_from(run, (x, below)) {
+                    return path;
+                }
+            }
+        }
+    }
+    for y in TOP..TOP + PLAYABLE {
+        for x in LEFT..LEFT + PLAYABLE {
+            if let Some(path) = chain_from(run, (x, y)) {
+                return path;
+            }
+        }
+    }
+    panic!(
+        "shipped Mining18 board has no idle three-tile chain: {:?}",
+        run.board
+    );
+}
+
+/// Play the shipped Mining18 board through ordinary match/fall messages. The
+/// board is read only to choose legal client moves; the server still owns the
+/// quotas, drops and payout.
+fn finish_shipped_mining(gateway: &mut Gateway, id: i32, base_ms: u64) {
+    for step in 0..1000 {
+        let run = mining_run(gateway);
+        if run.phase == Type8Phase::LevelComplete {
+            return;
+        }
+        let idle: Vec<(usize, usize)> = run
+            .idle
+            .iter()
+            .enumerate()
+            .filter(|(_, idle)| !**idle)
+            .map(|(index, _)| (index % SIDE, index / SIDE))
+            .collect();
+        if !idle.is_empty() {
+            let list = idle
+                .iter()
+                .flat_map(|(x, y)| [x.to_string(), y.to_string()])
+                .collect::<Vec<_>>()
+                .join(",");
+            send(
+                gateway,
+                &payload(id, &format!("OnIdleMsg\t{list}")),
+                base_ms + step * 2,
+            );
+            continue;
+        }
+        if let Some(x) =
+            (LEFT..LEFT + PLAYABLE).find(|x| matches!(run.board[BOTTOM * SIDE + x], 601 | 602))
+        {
+            send(
+                gateway,
+                &payload(id, &format!("OnLevelEventMsg\t50\t{x}\t{BOTTOM}")),
+                base_ms + step * 2,
+            );
+            continue;
+        }
+        let chain = mining_chain(&run);
+        let list = chain
+            .iter()
+            .flat_map(|(x, y)| [x.to_string(), y.to_string()])
+            .collect::<Vec<_>>()
+            .join(",");
+        send(
+            gateway,
+            &payload(id, &format!("OnChainMsg\t{list}")),
+            base_ms + step * 2,
+        );
+    }
+    let run = mining_run(gateway);
+    panic!(
+        "shipped Mining18 board did not complete its quotas: phase={:?} collected={:?} board={:?}",
+        run.phase, run.collected, run.board
+    );
+}
+
+#[test]
+fn shipped_mining_board_pays_ore_and_xp_once_through_the_node() {
+    let fixture = Fixture::new(MINING).with_shipped_mining();
+    let mut gateway = fixture.ready();
+    tick(&mut gateway, 1_500);
+    click(&mut gateway, fixture.node.guid, 2_000);
+    let id = active(&gateway, MINING).expect("shipped Mining18 run offered") as i32;
+
+    for (step, packet) in [
+        frame(5, id, -1),
+        payload(id, "OnConnectMsg"),
+        payload(id, "OnStartGameMsg"),
+        payload(id, "OnStartLevelMsg"),
+    ]
+    .iter()
+    .enumerate()
+    {
+        send(&mut gateway, packet, 2_100 + 20 * step as u64);
+    }
+    finish_shipped_mining(&mut gateway, id, 2_200);
+    assert_eq!(mining_run(&gateway).phase, Type8Phase::LevelComplete);
+    assert_eq!(count(&gateway, 2739), 0);
+    assert_eq!(xp(&gateway, MINING), 0);
+
+    send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_000);
+    assert_eq!(mining_run(&gateway).phase, Type8Phase::Won);
+    assert_eq!(
+        count(&gateway, 2739),
+        12,
+        "six 601 drops plus six 602 drops"
+    );
+    assert_eq!(xp(&gateway, MINING), 25, "(R) Miner XP per win");
+    let paid = gateway.snapshot();
+
+    let replay = send(&mut gateway, &payload(id, "OnNextLevelMsg"), 5_100);
+    assert!(replay.replies.is_empty());
+    assert_eq!(gateway.snapshot(), paid, "a replayed win paid again");
 }
 
 /// The packets in `outcome` as inner family/sub pairs plus the raw bytes.

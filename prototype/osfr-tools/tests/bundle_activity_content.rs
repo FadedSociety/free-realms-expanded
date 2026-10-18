@@ -22,6 +22,7 @@ use std::{
     collections::BTreeMap,
     fs,
     path::{Path, PathBuf},
+    process::Command,
     sync::atomic::{AtomicU64, Ordering},
 };
 
@@ -40,7 +41,7 @@ const FILES: &[&str] = &[
     "harvest_nodes.json",
 ];
 
-/// The reviewed T017 playtest bytes copied into `data/content` on 2026-10-17.
+/// The reviewed activity bytes; F130 restored Mining18's serialized outputs.
 const FROZEN_SHA256: &[(&str, &str)] = &[
     (
         "encounters.json",
@@ -64,7 +65,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "mining.json",
-        "24568d64f7d32dcd7e9b025c963e85333bc0895ab4cc0207844d0549626358f8",
+        "498a4f006f1ace7f1c6cc7e6ad1e70146704b141e7e4a78ff1d276097a4c3553",
     ),
     (
         "harvesting.json",
@@ -157,6 +158,7 @@ fn bundled_activity_content_loads_without_lab() {
     )
     .expect("mining content loads");
     assert_eq!(mining.profile_id(), MINER_PROFILE_ID);
+    assert_eq!(&mining.spec().outputs, &mining::mining_spec().outputs);
 
     let harvest_content: HarvestContent =
         serde_json::from_slice(&fs::read(directory.join(harvesting::CONTENT_FILE)).unwrap())
@@ -250,4 +252,17 @@ fn activity_refusals_leave_the_content_directory_unchanged() {
         before_bad_gates,
         "a refused gate list changed the content"
     );
+}
+
+#[test]
+fn python_activity_gate_refuses_loader_invalid_bindings() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let python = std::env::var_os("PYTHON").unwrap_or_else(|| "python".into());
+    let status = Command::new(python)
+        .arg("-I")
+        .arg("tests/test_bundle_activity_content.py")
+        .current_dir(&root)
+        .status()
+        .expect("run the Python activity-gate regression");
+    assert!(status.success(), "the Python activity gate regressed");
 }

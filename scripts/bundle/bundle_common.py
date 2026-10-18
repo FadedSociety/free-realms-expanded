@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import stat
+import struct
 from pathlib import Path, PurePosixPath
 
 
@@ -299,6 +301,79 @@ def _is_int(value) -> bool:
     return type(value) is int
 
 
+def _is_i32(value) -> bool:
+    return _is_int(value) and -(1 << 31) <= value < (1 << 31)
+
+
+def _is_u32(value) -> bool:
+    return _is_int(value) and 0 <= value < (1 << 32)
+
+
+def _is_u16(value) -> bool:
+    return _is_int(value) and 0 <= value < (1 << 16)
+
+
+def _f32_bytes(value) -> bytes:
+    if type(value) not in (int, float) or not math.isfinite(value):
+        raise ValueError("non-finite kart scene position")
+    return struct.pack("<f", value)
+
+
+def _check_lobby(lobby) -> None:
+    if (
+        not isinstance(lobby, dict)
+        or set(lobby) != {"games", "options", "values", "display", "settings"}
+        or any(not isinstance(rows, list) or len(rows) > 4096 for rows in lobby.values())
+    ):
+        raise ValueError("content/kart_lobby.json is not a five-table lobby body")
+
+    def fail():
+        raise ValueError("content/kart_lobby.json has an invalid row")
+
+    for row in lobby["games"]:
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"key", "id", "game_type", "unknown", "name_id"}
+            or not _is_u32(row["key"])
+            or any(not _is_i32(row[name]) for name in ("id", "game_type", "unknown", "name_id"))
+        ):
+            fail()
+    for table in ("options", "values"):
+        for row in lobby[table]:
+            unknown = row.get("unknown") if isinstance(row, dict) else None
+            if (
+                not isinstance(row, dict)
+                or set(row) != {"key", "unknown"}
+                or not _is_u32(row["key"])
+                or not isinstance(unknown, list)
+                or len(unknown) != 3
+                or any(not _is_i32(value) for value in unknown)
+            ):
+                fail()
+    for row in lobby["display"]:
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"key", "unknown", "locale_id", "text"}
+            or not _is_u32(row["key"])
+            or not _is_i32(row["unknown"])
+            or not _is_i32(row["locale_id"])
+            or not isinstance(row["text"], list)
+            or any(not _is_int(byte) or not 0 <= byte <= 255 for byte in row["text"])
+        ):
+            fail()
+    for row in lobby["settings"]:
+        fields = row.get("fields") if isinstance(row, dict) else None
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"key", "fields"}
+            or not _is_u32(row["key"])
+            or not isinstance(fields, list)
+            or len(fields) != 5
+            or any(not _is_i32(value) for value in fields)
+        ):
+            fail()
+
+
 def _check_kart_gates(gates) -> list[int]:
     npcs = gates.get("npcs") if isinstance(gates, dict) else None
     cooldown = gates.get("reward_cooldown_s", 0) if isinstance(gates, dict) else None
@@ -336,14 +411,71 @@ def _check_board(
         raise ValueError(f"content/{name} has no board spec")
     width, height, shape = spec.get("width"), spec.get("height"), spec.get("shape")
     if (
-        not _is_int(width) or not _is_int(height) or width <= 0 or height <= 0
+        not _is_int(width) or not _is_int(height) or not 6 <= width <= 32 or not 6 <= height <= 32
+        or width * height > 14 * 32
         or not isinstance(shape, list) or len(shape) != width * height
         or any(not _is_int(cell) for cell in shape)
     ):
         raise ValueError(f"content/{name} has an invalid board shape")
-    for key in ("goals", "outputs", "selectable", "collectable", "tiles"):
-        if not isinstance(spec.get(key, []), list):
+    arrays = ("goals", "outputs", "selectable", "collectable", "tiles")
+    scalars = (
+        "duration_seconds", "seed", "wildcard_percent", "collectable_percent",
+        "blocker_percent", "powerup_percent", "meter_id", "reconstructed_rules",
+        "rule_notice",
+    )
+    for key in arrays + scalars:
+        if key not in spec:
+            raise ValueError(f"content/{name} spec.{key} is missing")
+    for key in arrays:
+        if not isinstance(spec[key], list):
             raise ValueError(f"content/{name} spec.{key} must be an array")
+    selectable, collectable = spec["selectable"], spec["collectable"]
+    if (
+        not selectable or len(selectable) > 16
+        or any(not _is_u16(value) or not 400 <= value < 500 for value in selectable)
+        or len(collectable) > 16
+        or any(not _is_u16(value) or not 600 <= value < 700 for value in collectable)
+    ):
+        raise ValueError(f"content/{name} has invalid tile kinds")
+    goals = spec["goals"]
+    if len(goals) > 8 or any(
+        not isinstance(goal, dict)
+        or not _is_i32(goal.get("index"))
+        or not _is_u16(goal.get("value"))
+        or not _is_u32(goal.get("quota"))
+        or not _is_u32(goal.get("per_reward"))
+        or not _is_i32(goal.get("icon_id"))
+        or goal["value"] not in selectable and goal["value"] not in collectable
+        or goal["per_reward"] == 0
+        or goal["quota"] % goal["per_reward"] != 0
+        for goal in goals
+    ):
+        raise ValueError(f"content/{name} has invalid goals")
+    outputs = spec["outputs"]
+    if len(outputs) > 16 or any(
+        not isinstance(output, dict)
+        or not _is_u16(output.get("value"))
+        or not _is_i32(output.get("definition_id"))
+        or not _is_u32(output.get("cluster_quantity"))
+        or output["value"] not in selectable and output["value"] not in collectable
+        or not any(goal["value"] == output["value"] for goal in goals)
+        or output["cluster_quantity"] == 0
+        or output["definition_id"] == 0
+        for output in outputs
+    ):
+        raise ValueError(f"content/{name} has invalid outputs")
+    if (
+        not _is_u32(spec["duration_seconds"]) or not 0 < spec["duration_seconds"] <= 600
+        or not _is_u32(spec["seed"]) or spec["seed"] == 0
+        or any(
+            not _is_u32(spec[key]) or not 0 <= spec[key] <= 100
+            for key in ("wildcard_percent", "collectable_percent", "blocker_percent", "powerup_percent")
+        )
+        or not _is_u32(spec["meter_id"])
+        or type(spec["reconstructed_rules"]) is not bool
+        or not isinstance(spec["rule_notice"], str)
+    ):
+        raise ValueError(f"content/{name} has invalid tuning")
 
 
 def check_activity_content(bundle: Path) -> str:
@@ -408,7 +540,9 @@ def check_activity_content(bundle: Path) -> str:
     offset = kart.get("vehicle_guid_offset")
     attribute_block = vehicles[0].get("attribute_block") if isinstance(vehicles[0], dict) else None
     if (
-        not _is_int(session) or session <= 0
+        not _is_int(context.get("encounter_id")) or context["encounter_id"] <= 0
+        or not _is_int(context.get("instance_id")) or context["instance_id"] <= 0
+        or not _is_int(session) or session <= 0
         or not _is_int(offset) or offset < 0
         or not isinstance(attribute_block, list)
         or len(attribute_block) < offset + 8
@@ -416,11 +550,35 @@ def check_activity_content(bundle: Path) -> str:
         or int.from_bytes(bytes(attribute_block[offset:offset + 8]), "little") != session
     ):
         raise ValueError("content/kart_entry.json has no owned-vehicle GUID proof")
-    for frame in (kart.get("details_loading"), kart.get("details_ready")):
+    scene = context.get("scene")
+    position = scene.get("position") if isinstance(scene, dict) else None
+    if (
+        not isinstance(scene, dict)
+        or not isinstance(scene.get("rotation"), list)
+        or len(scene["rotation"]) != 4
+        or any(
+            type(value) not in (int, float) or not math.isfinite(value)
+            for value in scene["rotation"]
+        )
+        or not isinstance(position, list)
+        or len(position) != 4
+    ):
+        raise ValueError("content/kart_entry.json has an invalid scene")
+    spawn = [_f32_bytes(value) for value in position]
+    # 41/114 entry FUN_00aa3430 -> FUN_00aa32d0; header reader FUN_008d6690
+    # consumes the op/sub/encounter/instance words. The remaining offsets mirror
+    # KartGateway::load's state/session/spawn bindings.
+    for frame, state in ((kart.get("details_loading"), 2), (kart.get("details_ready"), 4)):
         if (
             not isinstance(frame, list) or not 65 <= len(frame) <= 4096
             or frame[:4] != [41, 0, 114, 0]
             or any(not _is_int(byte) or not 0 <= byte <= 255 for byte in frame)
+            or int.from_bytes(bytes(frame[4:8]), "little") != context["encounter_id"]
+            or int.from_bytes(bytes(frame[8:12]), "little") != context["instance_id"]
+            or int.from_bytes(bytes(frame[12:16]), "little") != context["encounter_id"]
+            or int.from_bytes(bytes(frame[16:20]), "little") != state
+            or int.from_bytes(bytes(frame[32:40]), "little") != session
+            or any(bytes(frame[51 + index * 4:55 + index * 4]) != spawn[index] for index in range(3))
         ):
             raise ValueError("content/kart_entry.json has an invalid 41/114 frame")
     progress = entry.get("progress")
@@ -457,13 +615,7 @@ def check_activity_content(bundle: Path) -> str:
                 "content/kart_entry.json race schedule never reaches countdown zero"
             )
 
-    lobby = read_json(content / "kart_lobby.json")
-    if (
-        not isinstance(lobby, dict)
-        or set(lobby) != {"games", "options", "values", "display", "settings"}
-        or any(not isinstance(rows, list) or len(rows) > 4096 for rows in lobby.values())
-    ):
-        raise ValueError("content/kart_lobby.json is not a five-table lobby body")
+    _check_lobby(read_json(content / "kart_lobby.json"))
 
     gates = _check_kart_gates(read_json(content / "kart_gates.json"))
     _check_board("mining.json", read_json(content / "mining.json"), 18, 14)

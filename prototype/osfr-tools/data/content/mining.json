@@ -33,7 +33,18 @@
     ],
     "height": 14,
     "meter_id": 0,
-    "outputs": [],
+    "outputs": [
+      {
+        "cluster_quantity": 1,
+        "definition_id": 2739,
+        "value": 601
+      },
+      {
+        "cluster_quantity": 2,
+        "definition_id": 2739,
+        "value": 602
+      }
+    ],
     "powerup_percent": 0,
     "reconstructed_rules": true,
     "rule_notice": "Reconstructed Mining18 rules: board layout, quotas, spawn rates, seed and outputs are local tuning. The envelope, message names, shape codes, chain rules, queue discipline and cluster math are recovered from game_mining.gfx.",
