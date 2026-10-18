@@ -8,13 +8,14 @@
 //! Sibling requests (W172). Recovered from the client: 165/2 is `i32 count` then `count x u32`
 //! item ids (sender `00c76b10`, writers `00c75580`/`00c75620`) and is answered by 165/3, which the
 //! client reads (`00c74e40`, `008e8230`) as `u8 complete` then `i32 count` then `count x u32` ids;
-//! it carries no definition records, the client already holds them from 35/37. 165/12 is
-//! `u32 transaction id` then `u32 caller value` (`00c76600`, `00c759c0`), where the id is the
-//! dword after the first u64 of the sale's 165/6 record (`00c71f30`, record +0x10). The Marketplace
-//! list replies 66/17, 19, 21 and 23 all start `u32 status` and, on status 1, carry a counted
-//! list (readers `00b416c0`, `00b41800`, `00b41760`, `00b41620`); 17, 21 and 23 put a text
-//! between the status and the list. Station Cash, wallet funding and membership stay refused or
-//! empty (R).
+//! it carries no definition records, so an uncaptured catalogue row is delivered first in 35/37.
+//! 165/12 is `u32 transaction id` then `u32 quantity` (`00c76600`, `00c759c0`), where the id is
+//! the dword after the first u64 of the sale's 165/6 record (`00c71f30`, record +0x10). Native
+//! `00c78a10` passes the third 165/13 response word to `01087060`, which subtracts that quantity
+//! from client history; quantity zero clears the remainder. The Marketplace list replies 66/17,
+//! 19, 21 and 23 all start `u32 status` and, on status 1, carry a counted list (readers
+//! `00b416c0`, `00b41800`, `00b41760`, `00b41620`); 17, 21 and 23 put a text between the status
+//! and the list. Station Cash, wallet funding and membership stay refused or empty (R).
 
 use crate::inventory::Inventory;
 use serde::Deserialize;
@@ -31,10 +32,15 @@ const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
 const MAX_PACKET_BYTES: usize = 64 * 1024;
 const MAX_GIFT_ITEMS: usize = 256;
 const MAX_CLIENT_TRANSACTIONS: usize = 4096;
-/// (R) Only the ten most recent sales can be bought back; the client keeps its own longer list.
-const BUY_BACK_WINDOW: usize = 10;
+/// (R) Store data may keep more history, but a session never retains an unbounded sale list.
+const MAX_BUY_BACK_WINDOW: usize = 100;
+/// (R) The client keeps a longer list; ten is the deployed server policy when data omits a limit.
+const DEFAULT_BUY_BACK_WINDOW: usize = 10;
 /// (R) The client's static item map has 4096 buckets (`00c75fc0`); a longer id list is refused.
 const MAX_DEFINITION_IDS: usize = 4096;
+/// Keep each 35/37 batch below the inbound packet cap. A single decoded row is at most 65,536
+/// bytes, so an exceptionally large row is sent alone.
+const MAX_DEFINITION_BATCH_BYTES: usize = 60 * 1024;
 /// (R) Marketplace requests are tiny (4 bytes, or a 13-byte locale string); anything longer is refused.
 const MAX_MARKETPLACE_REQUEST: usize = 64;
 
@@ -58,8 +64,14 @@ pub const MARKETPLACE_RESULT_DISABLED: u32 = 0;
 #[derive(Clone, Deserialize)]
 pub struct StoreCatalogue {
     schema_version: u32,
+    #[serde(default = "default_buy_back_window")]
+    buy_back_window: usize,
     marketplace: MarketplaceConfig,
     items: Vec<StoreItem>,
+}
+
+fn default_buy_back_window() -> usize {
+    DEFAULT_BUY_BACK_WINDOW
 }
 
 #[derive(Clone, Deserialize)]
@@ -96,6 +108,7 @@ impl StoreCatalogue {
             .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
         if catalogue.schema_version != 1
             || catalogue.items.len() > 100_000
+            || !(1..=MAX_BUY_BACK_WINDOW).contains(&catalogue.buy_back_window)
             || catalogue.marketplace.orders_enabled
             || catalogue.marketplace.payment_sources_enabled
             || catalogue.marketplace.not_available_message.is_empty()
@@ -146,9 +159,8 @@ struct SaleRecord {
     transaction_id: u32,
     item_id: i32,
     tint: i32,
-    quantity: u32,
-    buy_back_price: u32,
-    available: bool,
+    unit_price: u32,
+    remaining: u32,
 }
 
 #[derive(Clone)]
@@ -282,7 +294,7 @@ impl CoinShop {
                 read_u32(inner, 16)?,
                 read_u64(inner, 4)?,
             ),
-            2 => Ok(self.item_definitions(inner)),
+            2 => self.item_definitions(inner),
             // (R) The dynamic list is always empty; the client clears and refills it from 165/9.
             8 if inner.len() == 4 => Ok(CoinShopOutcome {
                 replies: vec![counted_empty(COIN_FAMILY, 9)],
@@ -485,17 +497,19 @@ impl CoinShop {
         self.failure(2, result_code, transaction_id, item, quantity, 0, merchant)
     }
 
-    /// 165/2: answer with the requested ids the item catalogue defines, in request order and
-    /// without duplicates, and a complete flag that is true when every id was known. A malformed
-    /// or oversized list gets an empty incomplete answer, because the client waits for one reply
-    /// per request (its search stays pending otherwise, `00c76e70`). Read-only (R).
-    fn item_definitions(&self, inner: &[u8]) -> CoinShopOutcome {
+    /// 165/2: deliver uncaptured requested definitions in bounded 35/37 batches, then answer with
+    /// the requested ids the item catalogue defines, in request order and without duplicates. The
+    /// complete flag is true when every id was known. A malformed or oversized list gets an empty
+    /// incomplete answer, because the client waits for one reply per request (its search stays
+    /// pending otherwise, `00c76e70`). Read-only (R).
+    fn item_definitions(&self, inner: &[u8]) -> io::Result<CoinShopOutcome> {
         let requested = read_i32(inner, 4)
             .ok()
             .and_then(|count| usize::try_from(count).ok())
             .filter(|count| *count <= MAX_DEFINITION_IDS && inner.len() == 8 + 4 * count)
             .map(|_| inner[8..].chunks_exact(4));
         let (mut known, mut seen) = (Vec::new(), BTreeSet::new());
+        let mut definitions = Vec::new();
         let mut complete = requested.is_some();
         for chunk in requested.into_iter().flatten() {
             let id = u32::from_le_bytes(chunk.try_into().unwrap());
@@ -503,25 +517,57 @@ impl CoinShop {
             complete &= defined;
             if defined && seen.insert(id) {
                 known.push(id);
+                if !self.inventory.definition_was_captured(id as i32) {
+                    definitions.push(
+                        self.inventory
+                            .definition_record(id as i32)
+                            .expect("definition existence was checked")
+                            .to_vec(),
+                    );
+                }
             }
+        }
+        let mut replies = Vec::new();
+        let mut batch = Vec::new();
+        let mut batch_bytes = 0usize;
+        for record in definitions {
+            if !batch.is_empty()
+                && batch_bytes.saturating_add(record.len()) > MAX_DEFINITION_BATCH_BYTES
+            {
+                replies.push(
+                    crate::inventory_v2_fixes::encode_definition_batch_v2(&batch, &[])
+                        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?,
+                );
+                batch.clear();
+                batch_bytes = 0;
+            }
+            batch_bytes += record.len();
+            batch.push(record);
+        }
+        if !batch.is_empty() {
+            replies.push(
+                crate::inventory_v2_fixes::encode_definition_batch_v2(&batch, &[])
+                    .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?,
+            );
         }
         let mut reply = header(COIN_FAMILY, 3);
         reply.push(u8::from(complete));
         put_i32(&mut reply, known.len() as i32);
         known.into_iter().for_each(|id| put_u32(&mut reply, id));
-        CoinShopOutcome {
+        replies.push(reply);
+        Ok(CoinShopOutcome {
             result_code: if complete {
                 RESULT_SUCCESS
             } else {
                 RESULT_FAILURE
             },
-            replies: vec![reply],
+            replies,
             ..CoinShopOutcome::default()
-        }
+        })
     }
 
     /// Client-readable 165/13 refusal for a 165/12 the NPC layer rejected before the shop saw it
-    /// (closed shop, range). Echoes the request's id and caller value; changes nothing (R).
+    /// (closed shop, range). Echoes the request's id and quantity; changes nothing (R).
     pub fn refuse_buy_back(&self, inner: &[u8], result_code: u32) -> CoinShopOutcome {
         let (transaction, context) = match inner {
             [0xa5, 0, 12, 0, rest @ ..] if rest.len() == 8 => (
@@ -699,11 +745,10 @@ impl CoinShop {
             transaction_id,
             item_id: owned.definition_id,
             tint: owned.tint,
-            quantity,
-            buy_back_price: total_price,
-            available: true,
+            unit_price,
+            remaining: quantity,
         });
-        while self.sales.len() > BUY_BACK_WINDOW {
+        while self.sales.len() > self.catalogue.buy_back_window {
             self.sales.pop_front();
         }
 
@@ -740,7 +785,7 @@ impl CoinShop {
         let Some(index) = self
             .sales
             .iter()
-            .position(|sale| sale.transaction_id == sale_transaction_id && sale.available)
+            .position(|sale| sale.transaction_id == sale_transaction_id && sale.remaining > 0)
         else {
             return Ok(buy_back_result(
                 sale_transaction_id,
@@ -749,7 +794,25 @@ impl CoinShop {
             ));
         };
         let sale = self.sales[index].clone();
-        if self.inventory.state().coins < sale.buy_back_price {
+        let wanted = match client_context {
+            0 => sale.remaining,
+            quantity if quantity <= sale.remaining => quantity,
+            _ => {
+                return Ok(buy_back_result(
+                    sale_transaction_id,
+                    RESULT_FAILURE,
+                    client_context,
+                ));
+            }
+        };
+        let Some(total_price) = sale.unit_price.checked_mul(wanted) else {
+            return Ok(buy_back_result(
+                sale_transaction_id,
+                RESULT_FAILURE,
+                client_context,
+            ));
+        };
+        if self.inventory.state().coins < total_price {
             return Ok(buy_back_result(
                 sale_transaction_id,
                 RESULT_FAILURE,
@@ -757,9 +820,9 @@ impl CoinShop {
             ));
         }
         let mut next_state = self.inventory.state().clone();
-        next_state.coins -= sale.buy_back_price;
+        next_state.coins -= total_price;
         let mut staged = Inventory::load(&self.inventory_content, Some(next_state))?;
-        let restored = match staged.grant_with_tint(0, sale.item_id, sale.quantity, sale.tint) {
+        let restored = match staged.grant_with_tint(0, sale.item_id, wanted, sale.tint) {
             Ok(restored) => restored,
             Err(_) => {
                 return Ok(buy_back_result(
@@ -776,7 +839,7 @@ impl CoinShop {
                 client_context,
             ));
         }
-        self.sales[index].available = false;
+        self.sales[index].remaining -= wanted;
         let mut replies = vec![coin_balance_packet(staged.state().coins)];
         replies.extend(restored.replies);
         replies.push(buy_back_packet(

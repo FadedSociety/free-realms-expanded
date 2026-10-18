@@ -481,6 +481,13 @@ impl Inventory {
         self.content.definitions.contains_key(&definition_id)
     }
 
+    /// Whether the login 35/37 catalogue already carried this row to the client.
+    pub fn definition_was_captured(&self, definition_id: i32) -> bool {
+        self.content
+            .captured_definition_ids
+            .contains(&definition_id)
+    }
+
     /// The serialized `ClientItemDefinition` row, the same bytes a 35/37 batch carries.
     pub fn definition_record(&self, definition_id: i32) -> Option<&[u8]> {
         self.content

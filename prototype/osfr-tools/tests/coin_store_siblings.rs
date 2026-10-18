@@ -3,10 +3,10 @@
 //! content only; no player data, names or chat.
 //!
 //! Recovered client facts are cited at `coin_shop.rs`' module comment: 165/12 is the sale's
-//! transaction id plus a caller value, 165/3 is a flag plus an id set, and the Marketplace list
+//! transaction id plus a quantity, 165/3 is a flag plus an id set, and the Marketplace list
 //! replies all lead with a status dword. Everything else asserted here is server policy (R):
-//! ten buy-back sales, buy-back price equal to the sale price, gifts and orders refused,
-//! Station Cash and membership lists empty.
+//! a data-configured buy-back window, buy-back price equal to the sale price, gifts and orders
+//! refused, Station Cash and membership lists empty.
 //!
 //! The fixture and packet helpers are copied from `vendor_sell.rs`; some go unused here.
 #![allow(dead_code)]
@@ -20,6 +20,7 @@ use osfr_tools::{
     npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
 };
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
     fs,
@@ -33,10 +34,40 @@ const SELLABLE_INSTANCE: i32 = 14; // definition 75060, sell price 375, not equi
 const EQUIPPED_INSTANCE: i32 = 34; // definition 21683, sell price 5, equipped
 const UNCATALOGUED_INSTANCE: i32 = 4; // definition 19522, no store row
 const NO_SALE_DEFINITION: i32 = 1180; // store row flagged no_sale
+const CATALOGUE_ONLY_DEFINITION: i32 = 910_500;
 const RESULT_OK: u32 = coin_shop::RESULT_SUCCESS;
 
 fn content_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
+}
+
+fn definition_row(id: i32) -> Value {
+    let bytes = [id.to_le_bytes(), [0x5a, 0x5a, 0x5a, 0x5a]].concat();
+    json!({
+        "id": id,
+        "slot": 0,
+        "class_id": 1,
+        "default_tint": 0,
+        "max_stack": 10,
+        "model": "",
+        "texture": "",
+        "tint_alias": "",
+        "effect": 0,
+        "wield_type": 0,
+        "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
+        "sha256": format!("{:x}", Sha256::digest(&bytes))
+    })
+}
+
+fn store_row(id: i32, buy: Option<u32>, sell: Option<u32>, no_sale: bool) -> Value {
+    json!({
+        "item_id": id,
+        "purchase_price_coins": buy,
+        "member_discount_percent": null,
+        "member_price_coins": null,
+        "sell_price_coins": sell,
+        "no_sale": no_sale
+    })
 }
 
 fn inventory_content() -> PathBuf {
@@ -221,6 +252,16 @@ fn wrap(inner: &[u8]) -> Vec<u8> {
     bytes
 }
 
+fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for message in messages {
+        assert!(message.len() < 255);
+        bytes.push(message.len() as u8);
+        bytes.extend(message);
+    }
+    bytes
+}
+
 fn login() -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (i, text) in ["w172-synthetic-ticket", "1.910.1.530630", ""]
@@ -332,6 +373,13 @@ impl Fixture {
                 "max_level":20,"members_only":false,"trainer_npc_ids":[],"quest_ids":[701],"abilities":[],"source":provenance
             }]}),
         );
+        write_json(
+            &content.join("item-catalogue.json"),
+            &json!({
+                "schema_version": 1,
+                "definitions": [definition_row(CATALOGUE_ONLY_DEFINITION)]
+            }),
+        );
         // Pick an equipped item from the state the gameplay loader actually produces.
         let loaded = Gameplay::load(&content, None).unwrap().state().inventory;
         let (equipped, equipped_definition) = loaded
@@ -343,20 +391,17 @@ impl Fixture {
                 Some((item.id, item.definition_id))
             })
             .expect("the prepared state has an equipped item");
-        let row = |id: i32, buy: Option<u32>, sell: Option<u32>, no_sale: bool| {
-            json!({"item_id":id,"purchase_price_coins":buy,"member_discount_percent":null,
-                   "member_price_coins":null,"sell_price_coins":sell,"no_sale":no_sale})
-        };
         write_json(
             &content.join("stores.json"),
             &json!({"schema_version":1,"marketplace":{
             "enabled_on_handshake":false,"orders_enabled":false,
             "payment_sources_enabled":false,"not_available_message":"disabled"},
             "items":[
-                row(8, Some(15), Some(7), false),
-                row(75060, Some(750), Some(375), false),
-                row(equipped_definition, Some(10), Some(5), false),
-                row(NO_SALE_DEFINITION, Some(50), None, true),
+                store_row(8, Some(15), Some(7), false),
+                store_row(75060, Some(750), Some(375), false),
+                store_row(equipped_definition, Some(10), Some(5), false),
+                store_row(NO_SALE_DEFINITION, Some(50), None, true),
+                store_row(CATALOGUE_ONLY_DEFINITION, Some(20), Some(10), false),
             ]}),
         );
         Self {
@@ -493,6 +538,17 @@ fn parse_definitions(packet: &[u8]) -> (bool, Vec<u32>) {
     (packet[4] == 1, ids)
 }
 
+/// One-record 35/37 batch. Rows have no per-record length, so the test fixture retains the
+/// expected record separately and compares the concatenated payload.
+fn parse_definition_batch(packet: &[u8]) -> (i32, Vec<u8>) {
+    assert_eq!(&packet[..4], &[35, 0, 37, 0]);
+    let payload_len = i32::from_le_bytes(packet[4..8].try_into().unwrap());
+    let count = i32::from_le_bytes(packet[8..12].try_into().unwrap());
+    assert_eq!(payload_len as usize + 8, packet.len());
+    assert_eq!(count, 1);
+    (count, packet[12..].to_vec())
+}
+
 fn gift_packet() -> Vec<u8> {
     let mut packet = vec![165, 0, 14, 0];
     packet.extend(VENDOR_ID.to_le_bytes());
@@ -584,9 +640,9 @@ fn sell_then_buy_back_once_restores_the_stack_and_the_exact_coins() {
     assert_eq!(after_sale.coins, 100 + 375);
     assert_eq!(count_definition(&after_sale, 75060), stack_before - 1);
 
-    let back = counter.send(&buy_back_packet(id, 77)).unwrap();
+    let back = counter.send(&buy_back_packet(id, 0)).unwrap();
     assert!(back.changed);
-    assert_eq!(buy_backs(&back.replies), vec![(id, RESULT_OK, 77)]);
+    assert_eq!(buy_backs(&back.replies), vec![(id, RESULT_OK, 0)]);
     let restored = counter.state();
     // (R) The buy-back price is the sale price, so the round trip is exactly neutral.
     assert_eq!(restored.coins, 100);
@@ -602,6 +658,64 @@ fn sell_then_buy_back_once_restores_the_stack_and_the_exact_coins() {
         );
         assert_eq!(counter.state(), restored);
     }
+}
+
+#[test]
+fn partial_buy_back_consumes_only_the_requested_quantity() {
+    const STACK: i32 = 900_020;
+    let mut counter = Counter::new(0, |state| {
+        state.items.push(InventoryItem {
+            id: STACK,
+            definition_id: 75060,
+            tint: 0,
+            count: 10,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        state.next_instance_id = Some(900_100);
+    });
+    counter.open();
+    let start = counter.state();
+    let original = count_definition(&start, 75060);
+
+    let sold = counter.send(&sell_packet(0, STACK, 10)).unwrap();
+    let id = completions(&sold.replies)[0].transaction;
+    assert_eq!(counter.state().coins, 10 * 375);
+    assert_eq!(count_definition(&counter.state(), 75060), original - 10);
+
+    let partial = counter.send(&buy_back_packet(id, 3)).unwrap();
+    assert!(partial.changed);
+    assert_eq!(buy_backs(&partial.replies), vec![(id, RESULT_OK, 3)]);
+    assert_eq!(counter.state().coins, 7 * 375);
+    assert_eq!(count_definition(&counter.state(), 75060), original - 7);
+
+    // Eight exceeds the seven left on the sale. Nothing changes, including its remainder.
+    let after_partial = counter.state();
+    let excessive = counter.send(&buy_back_packet(id, 8)).unwrap();
+    assert!(!excessive.changed);
+    assert_eq!(
+        buy_backs(&excessive.replies),
+        vec![(id, coin_shop::RESULT_FAILURE, 8)]
+    );
+    assert_eq!(counter.state(), after_partial);
+
+    // Zero means the seven still outstanding, which proves the failed request kept the history.
+    let rest = counter.send(&buy_back_packet(id, 0)).unwrap();
+    assert!(rest.changed);
+    assert_eq!(buy_backs(&rest.replies), vec![(id, RESULT_OK, 0)]);
+    assert_eq!(counter.state().coins, 0);
+    assert_eq!(count_definition(&counter.state(), 75060), original);
+
+    let replay = counter.send(&buy_back_packet(id, 0)).unwrap();
+    assert!(!replay.changed);
+    assert_eq!(
+        buy_backs(&replay.replies),
+        vec![(id, coin_shop::RESULT_FAILURE, 0)]
+    );
 }
 
 #[test]
@@ -675,6 +789,80 @@ fn only_the_ten_most_recent_sales_can_be_bought_back() {
         assert_eq!(buy_backs(&back.replies), vec![(id, RESULT_OK, 0)]);
     }
     assert_eq!(counter.state().coins, paid - 2 * 375);
+}
+
+#[test]
+fn buy_back_window_is_bounded_store_data() {
+    fn store_file(window: Option<u32>) -> Value {
+        let mut document = json!({
+            "schema_version": 1,
+            "marketplace": {
+                "enabled_on_handshake": false,
+                "orders_enabled": false,
+                "payment_sources_enabled": false,
+                "not_available_message": "disabled"
+            },
+            "items": [store_row(75060, Some(750), Some(375), false)]
+        });
+        if let Some(window) = window {
+            document["buy_back_window"] = json!(window);
+        }
+        document
+    }
+
+    let directory =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/build/w172-fixtures");
+    fs::create_dir_all(&directory).unwrap();
+    let path = directory.join(format!(
+        "store-window-{}-{}.json",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+
+    // Omitting the policy keeps the ten-sale default; the existing window test covers it.
+    write_json(&path, &store_file(None));
+    StoreCatalogue::load(&path).expect("default window loads");
+
+    write_json(&path, &store_file(Some(3)));
+    let catalogue = StoreCatalogue::load(&path).expect("custom window loads");
+    let inventory_path = inventory_content();
+    let mut state = Inventory::load(&inventory_path, None)
+        .unwrap()
+        .state()
+        .clone();
+    state.coins = 0;
+    state.items.push(InventoryItem {
+        id: 900_030,
+        definition_id: 75060,
+        tint: 0,
+        count: 4,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    });
+    state.next_instance_id = Some(900_100);
+    let inventory = Inventory::load(&inventory_path, Some(state)).unwrap();
+    let mut shop = CoinShop::new(&inventory_path, inventory, catalogue, usize::MAX).unwrap();
+    let ids: Vec<u32> = (0..4)
+        .map(|_| shop.sell(900_030, 1).unwrap().transaction_id)
+        .collect();
+    assert!(
+        shop.buy_back(ids[0]).unwrap().result_code != RESULT_OK,
+        "the fourth-oldest sale falls out of a three-sale window"
+    );
+    assert_eq!(shop.buy_back(ids[3]).unwrap().result_code, RESULT_OK);
+
+    for invalid in [0, 101] {
+        write_json(&path, &store_file(Some(invalid)));
+        assert!(
+            StoreCatalogue::load(&path).is_err(),
+            "window {invalid} must be outside the validated range"
+        );
+    }
+    let _ = fs::remove_file(path);
 }
 
 #[test]
@@ -1043,8 +1231,8 @@ fn gateway_sell_then_buy_back_once_then_replays_pay_nothing() {
     assert_eq!(sold.coins, start.coins + 750);
     assert_eq!(stack(&sold), 1);
 
-    let replies = send(&mut gateway, &buy_back_packet(id, 5));
-    assert_eq!(buy_backs(&replies), vec![(id, RESULT_OK, 5)]);
+    let replies = send(&mut gateway, &buy_back_packet(id, 0));
+    assert_eq!(buy_backs(&replies), vec![(id, RESULT_OK, 0)]);
     let back = inventory_of(&gateway);
     assert_eq!(back.coins, start.coins);
     assert_eq!(
@@ -1071,6 +1259,32 @@ fn gateway_sell_then_buy_back_once_then_replays_pay_nothing() {
         vec![(id, coin_shop::RESULT_INVALID_MERCHANT, 0)]
     );
     assert_eq!(again.snapshot(), relogged);
+}
+
+#[test]
+fn gateway_bundle_failure_rolls_back_buy_back_history() {
+    let fixture = Fixture::new();
+    let (mut gateway, _) = fixture.at_open_shop();
+    let sold = completions(&send(&mut gateway, &sell_packet(0, STACK_MANY, 2)));
+    let id = sold[0].transaction;
+    let sold_state = gateway.snapshot();
+
+    // A malformed 66/16 follows the valid buy-back. The shared sale history must not escape the
+    // rejected bundle even though gameplay snapshots intentionally omit session-only shop state.
+    let buy_back = buy_back_packet(id, 0);
+    let failed = gateway.handle_at(&bundle(&[wrap(&buy_back), wrap(&marketplace(16))]), NOW);
+    assert!(
+        failed.is_err(),
+        "the malformed child must reject the bundle"
+    );
+    assert_eq!(gateway.snapshot(), sold_state);
+
+    let replies = send(&mut gateway, &buy_back);
+    assert_eq!(buy_backs(&replies), vec![(id, RESULT_OK, 0)]);
+    assert_eq!(
+        count_definition(&inventory_of(&gateway), 75060),
+        count_definition(&fixture.state().inventory, 75060)
+    );
 }
 
 #[test]
@@ -1124,4 +1338,32 @@ fn gateway_definitions_list_update_and_gifts_are_answered_without_state_change()
         coin_shop::RESULT_SERVICE_UNAVAILABLE
     );
     assert_eq!(gateway.snapshot(), before);
+}
+
+#[test]
+fn catalogue_only_definition_is_delivered_before_the_coin_store_ack() {
+    let fixture = Fixture::new();
+    let record = Inventory::load(&fixture.content, None)
+        .unwrap()
+        .definition_record(CATALOGUE_ONLY_DEFINITION)
+        .expect("generated catalogue row exists")
+        .to_vec();
+    let mut gateway = fixture.connect(fixture.state());
+    let before = gateway.snapshot();
+
+    let replies = send(
+        &mut gateway,
+        &definitions_packet(&[CATALOGUE_ONLY_DEFINITION as u32]),
+    );
+    assert_eq!(replies.len(), 2, "definition batch, then 165/3");
+    assert_eq!(
+        parse_definition_batch(&replies[0]),
+        (1, record),
+        "the uncaptured row precedes the acknowledgement"
+    );
+    assert_eq!(
+        parse_definitions(&replies[1]),
+        (true, vec![CATALOGUE_ONLY_DEFINITION as u32])
+    );
+    assert_eq!(gateway.snapshot(), before, "definition read changed state");
 }
