@@ -93,8 +93,8 @@ fn the_shipped_crosswalk_loads_and_points_at_real_quests() {
     }
     // The startup snapshot names 43 POIs carrying these 18 non-zero original quest ids.
     assert_eq!(points.len(), 43);
-    // Only title/activity matches are mapped; all four targets are currently hollow/disabled,
-    // so the regular offer path still refuses them until they are authored.
+    // Only title/activity matches are mapped. 1811 is authored below; the other three
+    // targets stay hollow/disabled, so the regular offer path still refuses them.
     assert_eq!(
         crosswalk,
         BTreeMap::from([
@@ -105,16 +105,26 @@ fn the_shipped_crosswalk_loads_and_points_at_real_quests() {
         ])
     );
     let mut catalogue = BTreeSet::new();
+    let mut offerable = BTreeMap::new();
+    let mut cooking_starter = None;
     for entry in fs::read_dir(content.join("quests")).unwrap() {
         let document: Value =
             serde_json::from_slice(&fs::read(entry.unwrap().path()).unwrap()).unwrap();
-        catalogue.extend(
-            document["records"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .filter_map(|quest| quest["id"].as_u64()),
-        );
+        for quest in document["records"].as_array().unwrap() {
+            if let Some(id) = quest["id"].as_u64() {
+                catalogue.insert(id);
+                offerable.insert(
+                    id,
+                    (
+                        quest["enabled"].as_bool().unwrap_or(true),
+                        quest["objectives"].as_array().map_or(0, Vec::len),
+                    ),
+                );
+                if id == 3_050_004 {
+                    cooking_starter = Some(quest.clone());
+                }
+            }
+        }
     }
     for (original, regional) in &crosswalk {
         assert!(*original > 0 && *original <= i32::MAX as u32);
@@ -124,6 +134,25 @@ fn the_shipped_crosswalk_loads_and_points_at_real_quests() {
         );
         // The two id spaces must not overlap, or a regional id could pass as an original one.
         assert!(!catalogue.contains(&u64::from(*original)));
+    }
+    // The Cooking Table starter is reachable, not merely a title-to-id mapping:
+    // it has an ordered journey to the trainer table and a content-defined 45/11 goal.
+    let starter = cooking_starter.expect("Cooking 101 exists");
+    assert_ne!(starter["enabled"], json!(false));
+    assert_eq!(starter["objectives"][0]["kind"], "visit_position");
+    assert_eq!(starter["objectives"][1]["kind"], "client_reported");
+    assert_eq!(
+        starter["objectives"][1]["trigger"],
+        json!({"type": "first_movement", "mouse": false})
+    );
+    for (original, regional) in &crosswalk {
+        if *original != 1811 {
+            let (enabled, objectives) = offerable[&u64::from(*regional)];
+            assert!(
+                !enabled || objectives == 0,
+                "unsupported mapping {original} -> {regional} must stay unavailable"
+            );
+        }
     }
 }
 

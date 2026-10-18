@@ -237,7 +237,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W175 crosswalk by activity/title match, not recovered from the original server: 3050004 'Cooking 101' ('Learn how to cook some supplies for your journey') is the quest that teaches the cooking table (Chef.md E4). Hollow and disabled today, so refused until authored and enabled."
+          "evidence": "(R) W175 crosswalk by activity/title match, not recovered from the original server: 3050004 'Cooking 101' ('Learn how to cook some supplies for your journey') is the quest that teaches the cooking table (Chef.md E4). It is enabled with a reachable Highroad Junction cooking-table step and one client-reported goal so this starter can be accepted and completed."
         }
       ]
     },

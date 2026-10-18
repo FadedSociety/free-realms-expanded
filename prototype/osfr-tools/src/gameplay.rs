@@ -2180,6 +2180,10 @@ impl Gameplay {
             let result = engine.on_event(event)?;
             self.append_npc_quest_outcome(result, out)?;
         }
+        // Quest events also arrive from movement, ticks and automatic outcomes, not only
+        // `handle_in_world`. Synchronize here so a goal opened on any of those paths is
+        // registered with the client in the same outcome.
+        self.sync_client_objectives(out);
         Ok(())
     }
 
@@ -7320,16 +7324,17 @@ impl Gameplay {
             self.apply_opening(result, out)?;
             // NPC quests count kills by enemy definition id ("defeat" goals author
             // that id as `model_id`; quest_engine maps it to KillActorKind).
-            if let (Some(engine), Ok(actor_kind_id)) =
-                (self.npc_quests.as_mut(), u32::try_from(definition))
-            {
+            if let Ok(actor_kind_id) = u32::try_from(definition) {
                 if actor_kind_id != 0 {
-                    let quest =
-                        engine.on_event(crate::quest_engine::QuestEvent::KillActorKind {
+                    // Ticks and requests both report kills here; register any goal
+                    // this defeat opened before the outcome is returned.
+                    self.npc_quest_event(
+                        crate::quest_engine::QuestEvent::KillActorKind {
                             actor_kind_id,
                             count: 1,
-                        })?;
-                    self.append_npc_quest_outcome(quest, out)?;
+                        },
+                        out,
+                    )?;
                 }
             }
         }
@@ -9320,6 +9325,32 @@ mod w64_regional_quest_tests {
                         angle_degrees: 45,
                     },
                 ),
+                {
+                    // Ordered: reach the table, then close the journal. The second goal only
+                    // opens after the first, so the movement event must register it.
+                    let mut ordered = quest(
+                        7004,
+                        88,
+                        ClientTrigger::UiEvent {
+                            event: "onCloseJournal".into(),
+                        },
+                    );
+                    ordered.objectives.insert(
+                        0,
+                        QuestObjective {
+                            id: 1,
+                            required: 1,
+                            description: "Visit the table (R)".into(),
+                            kind: ObjectiveKind::VisitPosition {
+                                zone_id: 0,
+                                position: [5.0, 0.0, 5.0],
+                                radius: 2.0,
+                            },
+                        },
+                    );
+                    ordered.objectives[1].id = 2;
+                    ordered
+                },
             ],
             CharacterEligibility {
                 member: true,
@@ -9466,6 +9497,39 @@ mod w64_regional_quest_tests {
             .unwrap();
         assert!(!replay.changed && replay.replies.is_empty());
         assert_eq!(quest_state(&game), state);
+    }
+
+    #[test]
+    fn movement_registers_the_ordered_goal_it_opens() {
+        let (mut game, mut character) = quest_game();
+        game.npc_quests = Some(client_goal_engine());
+        assert!(engine_mut(&mut game).offer(7004, 1).changed);
+        assert!(engine_mut(&mut game).accept(7004).changed);
+        character.position = [5.0, 0.0, 5.0];
+
+        // Walking onto the first goal opens the journal-close goal in the same response:
+        // 45/10 UIEvent, client id 88, length 14 and the exact event bytes.
+        let out = game.on_location(&character, 7_000).unwrap();
+        assert!(out.changed);
+        assert_eq!(quest_state(&game).quests[&7004].counts, vec![1, 0]);
+        let mut watch = vec![45, 0, 10];
+        watch.extend(88u32.to_le_bytes());
+        watch.extend(14u32.to_le_bytes());
+        watch.extend(b"onCloseJournal");
+        assert_eq!(watch.len(), 25);
+        assert!(
+            out.replies.iter().any(|reply| reply == &watch),
+            "movement did not register the opened 45/10 goal"
+        );
+
+        // Standing here again must not register it twice.
+        let replay = game.on_location(&character, 7_001).unwrap();
+        assert!(
+            !replay
+                .replies
+                .iter()
+                .any(|reply| reply.starts_with(&[45, 0, 10]))
+        );
     }
 
     #[test]

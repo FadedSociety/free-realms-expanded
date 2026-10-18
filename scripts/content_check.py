@@ -1183,6 +1183,7 @@ class Checker:
             "craft_recipe": ("recipe_id", "quantity"), "finish_minigame": ("minigame_id", "count"),
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
+            "client_reported": ("client_id", None),
         }
         seen = set()
         for index, goal in enumerate(goals):
@@ -1205,7 +1206,7 @@ class Checker:
                 valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
             elif key == "actor_guid":
                 valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
-            elif key in ("item_id", "definition_id"):
+            elif key in ("item_id", "definition_id", "client_id"):
                 valid_target = type(target) is int and 1 <= target <= 0x7fffffff
             if not valid_target:
                 error(field + "." + key, target, "invalid quest objective target")
@@ -1218,6 +1219,27 @@ class Checker:
                         and all(type(v) in (int, float) and -1_000_000 <= v <= 1_000_000 for v in position)
                         and type(radius) in (int, float) and 0.1 <= radius <= 1000):
                     error(field, goal, "invalid quest zone, position or radius")
+            if goal["kind"] == "client_reported":
+                trigger = goal.get("trigger")
+                trigger_type = trigger.get("type") if isinstance(trigger, dict) else None
+                if trigger_type == "first_movement":
+                    valid = type(trigger.get("mouse")) is bool
+                elif trigger_type == "ui_event":
+                    event = trigger.get("event")
+                    valid = (isinstance(event, str) and 0 < len(event.encode("utf-8")) <= 64
+                             and all(33 <= ord(c) <= 126 for c in event))
+                elif trigger_type == "look_at":
+                    valid = (type(trigger.get("guid")) is int and trigger["guid"] > 0
+                             and type(trigger.get("offset")) in (int, float)
+                             and -1_000_000 <= trigger["offset"] <= 1_000_000
+                             and type(trigger.get("range")) is int
+                             and 1 <= trigger["range"] <= 0x7fffffff
+                             and type(trigger.get("angle_degrees")) is int
+                             and 1 <= trigger["angle_degrees"] <= 360)
+                else:
+                    valid = False
+                if not valid:
+                    error(field + ".trigger", trigger, "invalid client objective trigger")
             if not isinstance(goal.get("source"), list) or not goal["source"]:
                 error(field + ".source", goal.get("source"), "quest objective requires provenance")
 

@@ -488,6 +488,30 @@ impl Rig {
         }
     }
 
+    /// Count one gateway event/outcome pair; used to prove a refusal reached the
+    /// handler without changing the character save.
+    fn log_outcomes(&self, event: &str, outcome: &str) -> usize {
+        fs::read_to_string(self.root.join("gateway.out.log"))
+            .map(|text| {
+                text.lines()
+                    .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+                    .filter(|value| value["event"] == event && value["outcome"] == outcome)
+                    .count()
+            })
+            .unwrap_or(0)
+    }
+
+    fn wait_log_outcomes(&self, what: &str, event: &str, outcome: &str, at_least: usize) {
+        let deadline = Instant::now() + T;
+        while self.log_outcomes(event, outcome) < at_least {
+            assert!(
+                Instant::now() < deadline,
+                "{what}: no gateway event/outcome"
+            );
+            std::thread::sleep(Duration::from_millis(50));
+        }
+    }
+
     fn ticket(&self, account: usize) -> String {
         let store = AccountStore::load(&self.root.join("accounts.json")).unwrap();
         let a = &self.accounts[account];
@@ -1236,6 +1260,168 @@ fn quest_journal_selection_persists_across_relog() {
         "relog lost the selected quest"
     );
     assert_eq!(status(&restored), "active");
+    disconnect(again);
+}
+
+/// W175/T003 review: the shipped Cooking Table breadcrumb advances an ordered
+/// visit goal, registers the newly opened 45/11 goal on that movement, accepts
+/// one 45/7 completion, refuses inactive/forged/duplicate claims, and persists
+/// the completed reward through the real gateway and bot sockets.
+#[test]
+fn client_objective_breadcrumb_is_reachable_once_and_persists() {
+    let _serial = serial();
+    const ORIGINAL: u32 = 1811;
+    const QUEST: u32 = 3_050_004;
+    const CLIENT_ID: u32 = 30_500_041;
+    const TRAINER: u64 = 9_000_000_019;
+    const TABLE: [f32; 3] = [-509.0114, -5.469004, 163.4705];
+
+    let rig = Rig::start_with(&[AccountRole::Builder], false, false);
+    let guid = rig.accounts[0].guid;
+    let claim = |id: u32| [&[45u8, 0, 7][..], &(id as i32).to_le_bytes()].concat();
+    let quest = |save: &Value| save["gameplay"]["npc_quests"]["quests"][QUEST.to_string()].clone();
+    let mut bot = rig.connect(0, "objective");
+
+    // Inactive: a valid-looking id before the quest exists reaches the handler and
+    // leaves the complete character state untouched.
+    let inactive = rig.log_outcomes("client_objective", "ignored");
+    let before_inactive = rig.save(0)["gameplay"]["npc_quests"].clone();
+    raw(&mut bot, &claim(CLIENT_ID));
+    rig.wait_log_outcomes(
+        "the inactive client objective",
+        "client_objective",
+        "ignored",
+        inactive + 1,
+    );
+    assert_eq!(rig.save(0)["gameplay"]["npc_quests"], before_inactive);
+
+    // 49/15 names the original Cooking Table id; the regional Cooking 101 offer is
+    // accepted through the normal 49/2 path.
+    raw(
+        &mut bot,
+        &[&[49u8, 0, 15, 0, 0, 0][..], &ORIGINAL.to_le_bytes()].concat(),
+    );
+    bot.wait_for(T, |message| {
+        message.starts_with(&[49, 0, 1, 0, 0, 0])
+            && message.get(6..10) == Some(&QUEST.to_le_bytes()[..])
+    })
+    .unwrap_or_else(|error| panic!("no Cooking 101 offer ({error}); got {}", tail(&bot)));
+    raw(
+        &mut bot,
+        &[&[49u8, 0, 2, 0, 0, 0][..], &QUEST.to_le_bytes(), &[1]].concat(),
+    );
+    rig.save_when(
+        Some(&mut bot),
+        0,
+        "the accepted Cooking 101 quest",
+        |save| quest(save)["status"] == "active",
+    );
+
+    // Arrive at the trainer table and send a real 125 pose. The server visit goal
+    // advances first; its newly opened 45/11 registration must arrive in that same
+    // movement response.
+    ask(
+        &mut bot,
+        &format!("realm goto {} {} {}", TABLE[0], TABLE[1], TABLE[2]),
+        "Developer teleport",
+    );
+    pose(&mut bot, guid, TABLE);
+    let mut watch = vec![45, 0, 11];
+    watch.extend(CLIENT_ID.to_le_bytes());
+    watch.push(0);
+    bot.wait_for(T, |message| message == watch)
+        .unwrap_or_else(|error| {
+            panic!(
+                "movement did not register the opened client goal ({error}); got {}",
+                tail(&bot)
+            )
+        });
+    rig.save_when(Some(&mut bot), 0, "the visit step", |save| {
+        quest(save)["counts"] == json!([1, 0])
+    });
+
+    // A forged id is handled and inert.
+    let ignored = rig.log_outcomes("client_objective", "ignored");
+    let before_forged = rig.save(0);
+    raw(&mut bot, &claim(CLIENT_ID + 1));
+    rig.wait_log_outcomes(
+        "the forged client objective",
+        "client_objective",
+        "ignored",
+        ignored + 1,
+    );
+    assert_eq!(
+        rig.save(0)["gameplay"]["npc_quests"],
+        before_forged["gameplay"]["npc_quests"]
+    );
+
+    // The real id completes exactly once.
+    raw(&mut bot, &claim(CLIENT_ID));
+    bot.wait_for(T, |message| {
+        message.starts_with(&[49, 0, 10, 0, 0, 0])
+            && message.get(6..10) == Some(&QUEST.to_le_bytes()[..])
+    })
+    .unwrap_or_else(|error| panic!("no objective complete ({error}); got {}", tail(&bot)));
+    let completed = rig.save_when(Some(&mut bot), 0, "the client objective", |save| {
+        quest(save)["counts"] == json!([1, 1])
+    });
+
+    // A duplicate is handled and inert.
+    let ignored = rig.log_outcomes("client_objective", "ignored");
+    raw(&mut bot, &claim(CLIENT_ID));
+    rig.wait_log_outcomes(
+        "the duplicate client objective",
+        "client_objective",
+        "ignored",
+        ignored + 1,
+    );
+    assert_eq!(
+        rig.save(0)["gameplay"]["npc_quests"],
+        completed["gameplay"]["npc_quests"]
+    );
+
+    // Turn in at the spawned Chef trainer. The five-coin data reward is the only
+    // reward, and it is paid once after the server sees the completed objective.
+    raw(&mut bot, &npc_packet(8, TRAINER, &[0]));
+    raw(&mut bot, &npc_packet(10, TRAINER, &1i32.to_le_bytes()));
+    raw(
+        &mut bot,
+        &[&[26u8, 0, 6, 0][..], &301i32.to_le_bytes()].concat(),
+    );
+    bot.wait_for(T, |message| {
+        message.starts_with(&[49, 0, 13, 0, 0, 0])
+            && message.get(14..18) == Some(&QUEST.to_le_bytes()[..])
+    })
+    .unwrap_or_else(|error| panic!("no quest end screen ({error}); got {}", tail(&bot)));
+    let coins = completed["gameplay"]["inventory"]["coins"]
+        .as_u64()
+        .unwrap();
+    raw(
+        &mut bot,
+        &[&[49u8, 0, 14, 0, 0, 0][..], &QUEST.to_le_bytes()].concat(),
+    );
+    bot.wait_for(T, |message| message.starts_with(&[49, 0, 4, 0, 0, 0]))
+        .unwrap_or_else(|error| panic!("no quest completion ({error}); got {}", tail(&bot)));
+    let paid = rig.save_when(Some(&mut bot), 0, "the Cooking 101 reward", |save| {
+        quest(save)["status"] == "completed"
+            && save["gameplay"]["inventory"]["coins"] == json!(coins + 5)
+    });
+
+    // The logout save is the state a new gateway login restores. Neither the
+    // completion nor the single payout may be replayed after reconnecting.
+    logout(&rig, bot, "the Cooking 101 logout");
+    let mut again = rig.connect(0, "objective2");
+    let restored = rig.save(0);
+    assert_eq!(quest(&restored), quest(&paid));
+    let ignored = rig.log_outcomes("client_objective", "ignored");
+    raw(&mut again, &claim(CLIENT_ID));
+    rig.wait_log_outcomes(
+        "the replayed client objective after relog",
+        "client_objective",
+        "ignored",
+        ignored + 1,
+    );
+    assert_eq!(rig.save(0)["gameplay"], paid["gameplay"]);
     disconnect(again);
 }
 

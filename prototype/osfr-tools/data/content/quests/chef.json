@@ -155,10 +155,63 @@
     {
       "id": 3050004,
       "title_string_id": 4420050,
-      "giver_npc_id": 9000000525,
+      "giver_npc_id": 9000000019,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -509.0114,
+            -5.469004,
+            163.4705
+          ],
+          "radius": 15.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md row E4: 'Use the Cooking Table'; notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md row 47 places Auguste Frydaze at this cooking-table trainer spot."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W175: POI 1811 'Cooking Table' is bound to this reachable trainer table for the first playable crosswalk; the original Cooking 101 geometry is not recovered."
+            }
+          ]
+        },
+        {
+          "kind": "client_reported",
+          "id": 2,
+          "client_id": 30500041,
+          "trigger": {
+            "type": "first_movement",
+            "mouse": false
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "FreeRealms.exe 0x00c43870 constructs 45/11 with the isMouse byte; 0x00cf39e0 completes only when the movement flag matches and 0x00cffba0 sends 45/7 before setting the client completed flag."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W175: client objective id 30500041 and the keyboard first-movement tutorial are local bindings, not recovered historical objective ids."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W175: five-coin fallback for an unknown quest payout, matching the existing small final-era quest reward policy."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -174,7 +227,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) W175: one reachable Cooking Table position followed by one client-reported first-movement goal; no original objective ids or geometry are asserted."
         },
         {
           "kind": "reconstructed",
@@ -182,7 +235,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+          "evidence": "(R) Cooking 101's original giver is unresolved; Auguste Frydaze is the existing spawned Highroad Junction Chef trainer at a Cooking Table."
         },
         {
           "kind": "reconstructed",
@@ -190,7 +243,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) W175: the original reward is unknown; five coins make the accepted starter a non-empty, single-payment reward."
         },
         {
           "kind": "reconstructed",
@@ -199,7 +252,7 @@
       ],
       "description_string_id": 4420051,
       "intro_text_string_id": 4420049,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050005,

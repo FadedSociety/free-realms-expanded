@@ -437,3 +437,68 @@ fn a_client_claim_never_awards_and_turn_in_still_needs_the_npc() {
     assert!(engine.state().pending_turnin.is_none());
     assert_no_award(&outcome);
 }
+
+#[test]
+fn another_quests_pending_turn_in_does_not_drop_a_client_completion() {
+    let mut engine = engine(vec![
+        quest(
+            504,
+            1,
+            vec![objective(
+                1,
+                ObjectiveKind::KillActorKind { actor_kind_id: 9 },
+            )],
+        ),
+        quest(
+            505,
+            1,
+            vec![objective(
+                1,
+                ObjectiveKind::ClientReported {
+                    client_id: 803,
+                    trigger: ClientTrigger::FirstMovement { mouse: false },
+                },
+            )],
+        ),
+    ]);
+    activate(&mut engine, 504);
+    activate(&mut engine, 505);
+
+    let finished = engine
+        .on_event(QuestEvent::KillActorKind {
+            actor_kind_id: 9,
+            count: 1,
+        })
+        .unwrap();
+    assert!(finished.changed);
+    let turn_in = engine
+        .on_event(QuestEvent::TalkToNpc { npc_id: 1 })
+        .unwrap();
+    assert!(turn_in.outbound.iter().any(|message| matches!(
+        message,
+        OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id: 504 })
+    )));
+    assert_eq!(engine.state().pending_turnin, Some(504));
+
+    // 0x00cffba0 sends 45/7 before setting the client's completed flag, so losing this
+    // packet would leave the client waiting forever. A different quest's end screen must
+    // not discard the completion.
+    let completion = engine
+        .on_event(QuestEvent::ClientReported { client_id: 803 })
+        .unwrap();
+    assert!(completion.changed);
+    assert!(completion.outbound.iter().any(|message| matches!(
+        message,
+        OutboundMessage::Quest(QuestMessage::ObjectiveComplete { quest_id: 505, .. })
+    )));
+    assert_eq!(engine.progress(505).unwrap().counts, [1]);
+    assert_eq!(engine.state().pending_turnin, Some(504));
+    assert_no_award(&completion);
+
+    let after = engine.state().clone();
+    let replay = engine
+        .on_event(QuestEvent::ClientReported { client_id: 803 })
+        .unwrap();
+    assert!(!replay.changed && replay.outbound.is_empty());
+    assert_eq!(engine.state(), &after);
+}

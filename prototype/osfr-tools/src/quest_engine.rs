@@ -338,7 +338,7 @@ pub enum ObjectiveKind {
 
 /// What the client is told to watch for: 45/6 LookAt, 45/10 UIEvent or 45/11 FirstMovement
 /// (piece 072, readers `00c436b0`, `00c437a0`, `00c43870`).
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ClientTrigger {
     /// Actor target. The world-position branch needs the client's private sentinel GUID,
@@ -1680,9 +1680,6 @@ impl QuestEngine {
     pub fn on_event(&mut self, event: QuestEvent) -> io::Result<QuestOutcome> {
         validate_event(&event)?;
         let mut outcome = QuestOutcome::default();
-        if self.state.pending_turnin.is_some() {
-            return Ok(outcome);
-        }
         let ids: Vec<u32> = self
             .state
             .quests
@@ -2130,6 +2127,20 @@ fn definition_from_content(
                     zone_id: *zone_id,
                     position: *position,
                     radius: *radius,
+                },
+            },
+            ContentGoal::ClientReported {
+                id,
+                client_id,
+                trigger,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::ClientReported {
+                    client_id: *client_id,
+                    trigger: trigger.clone(),
                 },
             },
             ContentGoal::InteractActor { id, actor_guid, .. } => QuestObjective {

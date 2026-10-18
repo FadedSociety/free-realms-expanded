@@ -229,6 +229,14 @@ pub enum ContentGoal {
         radius: f32,
         source: Vec<SourceTag>,
     },
+    // W175: a goal only the client judges (look, UI event, first movement). The
+    // client reports it with 45/7; `client_id` is that wire id.
+    ClientReported {
+        id: u32,
+        client_id: u32,
+        trigger: crate::quest_engine::ClientTrigger,
+        source: Vec<SourceTag>,
+    },
     /// (R) An accepted, non-talk interaction with one exact runtime actor.
     InteractActor {
         id: u32,
@@ -256,6 +264,7 @@ impl ContentGoal {
             | Self::FinishMinigame { id, .. }
             | Self::EquipItem { id, .. }
             | Self::VisitPosition { id, .. }
+            | Self::ClientReported { id, .. }
             | Self::InteractActor { id, .. }
             | Self::CompleteDungeon { id, .. } => *id,
         }
@@ -832,6 +841,7 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::FinishMinigame { id, source, .. }
         | ContentGoal::EquipItem { id, source, .. }
         | ContentGoal::VisitPosition { id, source, .. }
+        | ContentGoal::ClientReported { id, source, .. }
         | ContentGoal::InteractActor { id, source, .. }
         | ContentGoal::CompleteDungeon { id, source, .. } => (id, source),
     };
@@ -906,7 +916,8 @@ fn validate_goal(
         ContentGoal::GatherResource { .. }
         | ContentGoal::CraftRecipe { .. }
         | ContentGoal::FinishMinigame { .. }
-        | ContentGoal::VisitPosition { .. } => Ok(()),
+        | ContentGoal::VisitPosition { .. }
+        | ContentGoal::ClientReported { .. } => Ok(()),
         ContentGoal::InteractActor { actor_guid, .. } => {
             positive_goal_field(owner, "goal.actor_guid", *actor_guid)
         }
