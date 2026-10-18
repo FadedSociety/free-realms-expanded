@@ -10,7 +10,7 @@ use osfr_tools::gameplay::Gameplay;
 use osfr_tools::gateway::{Gateway, GatewayOutcome};
 use osfr_tools::login;
 use osfr_tools::mounts::{MountTail, RidePose, RideView};
-use osfr_tools::net_policy::{Bucket, IpLimiter};
+use osfr_tools::net_policy::{Bucket, IpLimiter, KeyedBuckets};
 use osfr_tools::pets::{PetPresence, pet_removal_packet};
 use osfr_tools::player_radial::{Chosen, MenuOffer, PlayerRadial, PublicLook};
 use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
@@ -478,11 +478,21 @@ struct SharedWorld {
 
 /// Security Model L6/L9 state. Every staged clone of the world shares it, so a
 /// rolled-back message neither duplicates nor refunds an account's budget.
-#[derive(Default)]
 struct Security {
     budgets: social_chat::ActionBudgets,
-    combat: BTreeMap<u64, Bucket>,
+    combat: KeyedBuckets<u64>,
     log: Option<SecurityLog>,
+}
+
+impl Default for Security {
+    fn default() -> Self {
+        Self {
+            budgets: social_chat::ActionBudgets::default(),
+            // (R) Shared, nonrefundable account budget, 10/s burst 20; bounded keys.
+            combat: KeyedBuckets::new(10., 20., MAX_SESSIONS),
+            log: None,
+        }
+    }
 }
 
 impl std::fmt::Debug for Security {
@@ -492,21 +502,8 @@ impl std::fmt::Debug for Security {
 }
 
 impl Security {
-    // (R) Shared, nonrefundable account budget, 10/s burst 20; bounded keys.
     fn allow_combat(&mut self, account: u64, now: Instant) -> bool {
-        if !self.combat.contains_key(&account) && self.combat.len() >= MAX_SESSIONS {
-            self.combat.retain(|_, bucket| {
-                let mut probe = *bucket;
-                !probe.take(20., 10., 20., now)
-            });
-            if self.combat.len() >= MAX_SESSIONS {
-                return false;
-            }
-        }
-        self.combat
-            .entry(account)
-            .or_insert_with(|| Bucket::full(20., now))
-            .take(1., 10., 20., now)
+        self.combat.allow(account, now)
     }
 
     /// The log batches and throttles its own I/O; a log error never drops a peer.
@@ -4600,6 +4597,38 @@ fn shared_combat_budget_cannot_be_refunded_by_staging() {
     drop(clone);
     assert!(!world.security.lock().unwrap().allow_combat(101, now));
     assert!(world.security.lock().unwrap().allow_combat(202, now));
+}
+
+/// Pins the shared combat budget's rate (10/s), burst (20) and key cap
+/// (`MAX_SESSIONS`): sixteen busy accounts refuse a seventeenth, 100 ms of idle
+/// time returns exactly one token, and two seconds of idle time lets the
+/// seventeenth in by evicting the refilled buckets.
+#[cfg(test)]
+#[test]
+fn shared_combat_budget_pins_rate_burst_and_session_cap() {
+    let world = SharedWorld::new();
+    let allow =
+        |account: u64, at: Instant| world.security.lock().unwrap().allow_combat(account, at);
+    let now = Instant::now();
+    for account in 1..=MAX_SESSIONS as u64 {
+        assert!(allow(account, now), "account {account}");
+    }
+    let seventeenth = MAX_SESSIONS as u64 + 1;
+    assert!(!allow(seventeenth, now));
+    assert_eq!(world.security.lock().unwrap().combat.len(), MAX_SESSIONS);
+
+    // Drain account 1, then 10/s returns exactly one token after 100 ms.
+    for _ in 1..20 {
+        assert!(allow(1, now));
+    }
+    let refilled = now + Duration::from_millis(100);
+    assert!(allow(1, refilled));
+    assert!(!allow(1, refilled));
+
+    // Every bucket that can pay a whole burst is idle and evicted.
+    let idle = now + Duration::from_secs(2);
+    assert!(allow(seventeenth, idle));
+    assert!(world.security.lock().unwrap().combat.len() <= MAX_SESSIONS);
 }
 
 /// W173: the chat channel switches and bubble colour (26/32, 26/33, 26/18) through

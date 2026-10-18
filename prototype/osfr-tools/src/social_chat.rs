@@ -11,7 +11,7 @@ use std::time::Instant;
 
 use serde::{Deserialize, Serialize};
 
-use crate::net_policy::Bucket;
+use crate::net_policy::KeyedBuckets;
 
 // Piece 093 is not registered in lib.rs (shared); include the one file here.
 #[path = "restoration/piece_093.rs"]
@@ -39,9 +39,17 @@ const MAX_ACTION_ACCOUNTS: usize = 1024;
 /// Do not remove keys on logout. Evict only buckets that could already pay a full
 /// burst: reconnect/key churn then grants no extra allowance. Process restart
 /// resets this in-memory policy (R).
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct ActionBudgets {
-    buckets: HashMap<u64, Bucket>,
+    buckets: KeyedBuckets<u64>,
+}
+
+impl Default for ActionBudgets {
+    fn default() -> Self {
+        Self {
+            buckets: KeyedBuckets::new(ACTION_RATE, ACTION_BURST, MAX_ACTION_ACCOUNTS),
+        }
+    }
 }
 
 impl ActionBudgets {
@@ -68,20 +76,7 @@ impl ActionBudgets {
         ) {
             return true;
         }
-        if !self.buckets.contains_key(&account_id) && self.buckets.len() >= MAX_ACTION_ACCOUNTS {
-            // ponytail: at most 1024 probes on new keys at capacity; no LRU/cache dependency.
-            self.buckets.retain(|_, bucket| {
-                let mut probe = *bucket;
-                !probe.take(ACTION_BURST, ACTION_RATE, ACTION_BURST, now)
-            });
-            if self.buckets.len() >= MAX_ACTION_ACCOUNTS {
-                return false;
-            }
-        }
-        self.buckets
-            .entry(account_id)
-            .or_insert_with(|| Bucket::full(ACTION_BURST, now))
-            .take(1.0, ACTION_RATE, ACTION_BURST, now)
+        self.buckets.allow(account_id, now)
     }
 }
 

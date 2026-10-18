@@ -2,7 +2,7 @@
 //! (Security Model L1). Loopback is always fine; `--allow-lan` additionally
 //! allows private networks and the VPN range, never wildcard or public.
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::net::IpAddr;
 use std::time::Instant;
 
@@ -52,30 +52,32 @@ impl Bucket {
     }
 }
 
-/// One bucket per source IP, with a bounded key set so a spray of addresses
-/// cannot grow memory: when full, idle (refilled) keys are evicted first and
-/// a new address is refused if none are idle.
-pub struct IpLimiter {
-    buckets: HashMap<IpAddr, Bucket>,
+/// One bucket per key, with a bounded key set so a spray of keys cannot grow
+/// memory: when full, idle (refilled) keys are evicted first and a new key is
+/// refused if none are idle.
+#[derive(Debug)]
+pub struct KeyedBuckets<K: Ord> {
+    buckets: BTreeMap<K, Bucket>,
     rate: f64,
     burst: f64,
     max_keys: usize,
 }
 
-impl IpLimiter {
+impl<K: Ord> KeyedBuckets<K> {
     pub fn new(rate: f64, burst: f64, max_keys: usize) -> Self {
         Self {
-            buckets: HashMap::new(),
+            buckets: BTreeMap::new(),
             rate,
             burst,
             max_keys,
         }
     }
 
-    pub fn allow(&mut self, ip: IpAddr, now: Instant) -> bool {
+    pub fn allow(&mut self, key: K, now: Instant) -> bool {
         let (rate, burst) = (self.rate, self.burst);
-        if !self.buckets.contains_key(&ip) && self.buckets.len() >= self.max_keys {
+        if !self.buckets.contains_key(&key) && self.buckets.len() >= self.max_keys {
             // A bucket that could pay a whole burst is idle.
+            // ponytail: at most `max_keys` probes on a new key at capacity; no LRU/cache dependency.
             self.buckets.retain(|_, b| {
                 let mut probe = *b;
                 !probe.take(burst, rate, burst, now)
@@ -85,11 +87,22 @@ impl IpLimiter {
             }
         }
         self.buckets
-            .entry(ip)
+            .entry(key)
             .or_insert_with(|| Bucket::full(burst, now))
             .take(1.0, rate, burst, now)
     }
+
+    pub fn len(&self) -> usize {
+        self.buckets.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.buckets.is_empty()
+    }
 }
+
+/// One bucket per source IP.
+pub type IpLimiter = KeyedBuckets<IpAddr>;
 
 #[cfg(test)]
 mod tests {
@@ -136,6 +149,6 @@ mod tests {
         assert!(!limiter.allow(ip(3), now)); // both keys busy: refused, not grown
         let idle = now + std::time::Duration::from_secs(3);
         assert!(limiter.allow(ip(3), idle)); // idle keys evicted
-        assert!(limiter.buckets.len() <= 2);
+        assert!(limiter.len() <= 2);
     }
 }
