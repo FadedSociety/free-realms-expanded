@@ -184,7 +184,8 @@ pub struct Player<'a> {
     pub learned: &'a BTreeSet<u32>,
     /// Owned, non-rental item totals.
     pub available: &'a [(i32, u32)],
-    pub in_encounter: bool,
+    /// Any live activity that owns the character, including chess and battles.
+    pub in_activity: bool,
 }
 
 /// The three crafting services; `None` when that movie is not loaded.
@@ -270,7 +271,7 @@ pub fn start(
     stations: &[Station],
     services: Services,
 ) -> Result<Started, Refusal> {
-    if player.in_encounter {
+    if player.in_activity {
         return Err(Refusal::Busy);
     }
     let recipe = u32::try_from(recipe_id)

@@ -7,14 +7,16 @@ use osfr_tools::{
     character_store::CharacterState,
     chess,
     gameplay::{Gameplay, Outcome},
+    inventory::InventoryItem,
+    opening::{OpeningEngine, OpeningTrigger},
 };
 use std::path::PathBuf;
 
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 /// Easy single-player row; the portal id is the client minigame row id.
 const CHESS_ROW: u32 = 20;
-/// `data/content/chess.json` (R): coins for a win on row 20.
-const SUCCESS_COINS: u32 = 10;
+const GUMBO: i32 = 70;
+const COOKING_INPUTS: [(i32, u32); 4] = [(2862, 4), (2875, 4), (2884, 4), (2900, 4)];
 
 fn content() -> PathBuf {
     std::env::var_os("OSFR_ACTIVITY_CONTENT")
@@ -36,6 +38,48 @@ fn character() -> CharacterState {
 
 fn game() -> Gameplay {
     Gameplay::load(&content(), None).unwrap()
+}
+
+/// A Chef at the stove with the starter stew learned and supplied.
+fn cooking_game() -> (Gameplay, CharacterState) {
+    let directory = content();
+    let base = Gameplay::load(&directory, None).unwrap();
+    let mut state = base.state();
+    state.learned_recipes.insert(GUMBO as u32);
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = 45;
+    profiles.unlocked.insert(45);
+    for (index, (definition_id, count)) in COOKING_INPUTS.into_iter().enumerate() {
+        state.inventory.items.push(InventoryItem {
+            definition_id,
+            tint: 0,
+            id: 7_000_001 + index as i32,
+            count,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: true,
+        });
+    }
+    let opening = OpeningEngine::load(&directory, state.opening.clone()).unwrap();
+    let station = opening
+        .actors()
+        .iter()
+        .find(|actor| {
+            matches!(
+                actor.action,
+                Some(OpeningTrigger::Craft { recipe_id: 2001 })
+            )
+        })
+        .unwrap()
+        .clone();
+    let mut who = character();
+    who.zone_id = station.zone_id;
+    who.position = station.position;
+    let game = Gameplay::load(&directory, Some(state)).unwrap();
+    (game, who)
 }
 
 fn play(activity: u32) -> Vec<u8> {
@@ -90,6 +134,12 @@ fn has_event(out: &Outcome, prefix: &str) -> bool {
     texts(out).iter().any(|text| text.starts_with(prefix))
 }
 
+fn paid_won(out: &Outcome) -> bool {
+    packets(out, &[39, 0, 18])
+        .into_iter()
+        .any(|packet| packet.get(15) == Some(&1))
+}
+
 fn coins(game: &Gameplay) -> u32 {
     game.state().inventory.coins
 }
@@ -114,12 +164,6 @@ fn offer_instance(out: &Outcome) -> i32 {
         "chess row id in the info header"
     );
     i32::from_le_bytes(header[0..4].try_into().unwrap())
-}
-
-fn paid_won(out: &Outcome) -> bool {
-    packets(out, &[39, 0, 18])
-        .into_iter()
-        .any(|packet| packet.get(15) == Some(&1))
 }
 
 /// `enter` publishes the portal list (167/1/1); return the row ids and join flags.
@@ -148,14 +192,17 @@ fn published_list(entry: &Outcome) -> (Vec<u32>, Vec<u8>) {
 
 /// Enter, start, connect and begin the game. Returns the instance id.
 fn running_game(game: &mut Gameplay) -> i32 {
-    let who = character();
-    game.initialize_world(&who, 500).unwrap();
-    let offered = game.handle_in_world(&play(CHESS_ROW), &who, 1_000).unwrap();
+    running_game_at(game, &character())
+}
+
+fn running_game_at(game: &mut Gameplay, who: &CharacterState) -> i32 {
+    game.initialize_world(who, 500).unwrap();
+    let offered = game.handle_in_world(&play(CHESS_ROW), who, 1_000).unwrap();
     let instance = offer_instance(&offered);
     assert!(offered.changed);
 
     let started = game
-        .handle_in_world(&lifecycle(5, instance), &who, 1_100)
+        .handle_in_world(&lifecycle(5, instance), who, 1_100)
         .unwrap();
     assert_eq!(packets(&started, &[39, 0, 17]).len(), 1, "39/17 ack");
     let launch = packets(&started, &[26, 0, 12]);
@@ -163,12 +210,12 @@ fn running_game(game: &mut Gameplay) -> i32 {
     assert!(launch[0].windows(15).any(|w| w == b"game_chess.gfx\0"));
 
     let connected = game
-        .handle_in_world(&movie(instance, "OnConnectMsg"), &who, 1_200)
+        .handle_in_world(&movie(instance, "OnConnectMsg"), who, 1_200)
         .unwrap();
     assert_eq!(texts(&connected), ["OnServerReadyMsg"]);
 
     let began = game
-        .handle_in_world(&movie(instance, "OnStartGameMsg\t0"), &who, 1_300)
+        .handle_in_world(&movie(instance, "OnStartGameMsg\t0"), who, 1_300)
         .unwrap();
     let began = texts(&began);
     assert!(
@@ -210,8 +257,21 @@ fn computer_move(game: &mut Gameplay, instance: i32, bytes: [u8; 4], now: u64) -
     .unwrap()
 }
 
+fn recipe_start(recipe: i32) -> Vec<u8> {
+    let mut inner = vec![26, 0, 24, 0];
+    inner.extend(recipe.to_le_bytes());
+    inner
+}
+
+fn cooking_active(game: &Gameplay) -> bool {
+    game.state()
+        .cooking
+        .as_ref()
+        .is_some_and(|cooking| cooking.active.is_some())
+}
+
 #[test]
-fn entry_request_to_payout_runs_once_through_the_minigame_lifecycle() {
+fn entry_request_uses_a_server_reply_and_ignores_client_opponent_moves() {
     let mut game = game();
     let who = character();
     let entry = game.initialize_world(&who, 500).unwrap();
@@ -224,65 +284,118 @@ fn entry_request_to_payout_runs_once_through_the_minigame_lifecycle() {
 
     let instance = running_game(&mut game);
 
-    // Scholar's mate: white e4, Bc4, Qh5, Qxf7; black answers with e5, Nc6, Nf6.
-    let e4 = human_move(&mut game, instance, 52, 36, 2_000);
-    assert!(
-        texts(&e4).contains(&"OnChessEventMsg\t30\t1\t20".to_owned()),
-        "MOVE_REQUEST"
-    );
-    let e5 = computer_move(&mut game, instance, [12, 28, 0, 0x80], 2_100);
-    assert!(
-        texts(&e5).contains(&"OnChessEventMsg\t10\t12\t28".to_owned()),
-        "black move"
-    );
-
-    human_move(&mut game, instance, 61, 34, 2_200);
-    computer_move(&mut game, instance, [1, 18, 0, 0], 2_300);
-    human_move(&mut game, instance, 59, 31, 2_400);
-    computer_move(&mut game, instance, [6, 21, 0, 0], 2_500);
-
+    // White e4. The server, not the client's local engine, answers for Black.
     let before = coins(&game);
-    let mate = human_move(&mut game, instance, 31, 13, 2_600);
-    let mate_text = texts(&mate);
+    let e4 = human_move(&mut game, instance, 52, 36, 2_000);
+    let events = texts(&e4);
     assert!(
-        mate_text.contains(&"OnChessEventMsg\t15".to_owned()),
-        "CHECKMATE"
+        !events
+            .iter()
+            .any(|event| event.starts_with("OnChessEventMsg\t30")),
+        "the client is not asked to choose the computer's move"
     );
-    assert!(mate_text.contains(&"OnGameWonMsg".to_owned()));
-    assert!(
-        !paid_won(&mate),
-        "the results sequence waits for the client ack"
-    );
-    assert_eq!(coins(&game), before, "no payout before the ack");
+    assert!(events.iter().any(|event| {
+        [
+            "OnChessEventMsg\t10",
+            "OnChessEventMsg\t11",
+            "OnChessEventMsg\t12",
+            "OnChessEventMsg\t13",
+        ]
+        .iter()
+        .any(|prefix| event.starts_with(prefix))
+    }));
+    assert!(events.contains(&"OnChessEventMsg\t1".to_owned()));
 
-    // The movie answers a result with FRServer_GameOver; that is the only payout trigger.
-    let ack = game
-        .handle_in_world(&movie(instance, "FRServer_GameOver"), &who, 2_700)
+    // A client-selected losing reply is inert. It cannot alter the server's
+    // position or turn the board into a payout. Repeating the old Scholar's
+    // mate black replies still leaves the game to the server.
+    for (now, bytes) in [
+        (2_100, [12, 28, 0, 0x80]),
+        (2_300, [1, 18, 0, 0]),
+        (2_500, [6, 21, 0, 0]),
+    ] {
+        let server_state = game.state();
+        let forged = computer_move(&mut game, instance, bytes, now);
+        assert!(!forged.changed && forged.replies.is_empty());
+        assert_eq!(game.state(), server_state);
+        assert_eq!(coins(&game), before);
+    }
+
+    // The original table still accepts the human's next moves.
+    let live = human_move(&mut game, instance, 61, 34, 2_200);
+    assert!(has_event(&live, "OnChessEventMsg\t31"), "MOVE_DATA");
+    let live = human_move(&mut game, instance, 59, 31, 2_400);
+    assert!(has_event(&live, "OnChessEventMsg\t31"), "MOVE_DATA");
+
+    // An unsolicited GameOver cannot cash a non-terminal run.
+    let early = game
+        .handle_in_world(&movie(instance, "FRServer_GameOver"), &who, 2_600)
         .unwrap();
-    assert!(paid_won(&ack), "39/18 won");
-    assert_eq!(packets(&ack, &[39, 0, 47]).len(), 1, "39/47 score rows");
-    assert_eq!(packets(&ack, &[39, 0, 19]).len(), 1, "39/19 state removal");
-    assert_eq!(coins(&game), before + SUCCESS_COINS, "one coin payout");
+    assert!(!early.changed && early.replies.is_empty());
+    assert_eq!(coins(&game), before);
 
-    // Replayed terminal packets cannot pay twice.
-    let replay = game
-        .handle_in_world(&movie(instance, "FRServer_GameOver"), &who, 2_800)
+    // Quit retires the run; a new Play publishes a fresh instance id.
+    let close = game
+        .handle_in_world(&lifecycle(6, instance), &who, 2_700)
         .unwrap();
-    assert!(!replay.changed && replay.replies.is_empty());
-    assert_eq!(coins(&game), before + SUCCESS_COINS);
-
-    // The results Close retires the run; a new Play publishes a new instance id.
-    let close = game.handle_in_world(&[26, 0, 42, 0], &who, 2_900).unwrap();
-    assert!(
-        close.changed && close.replies.is_empty(),
-        "Close retires silently"
-    );
-    let again = game.handle_in_world(&play(CHESS_ROW), &who, 3_000).unwrap();
+    assert!(close.changed, "quit retires the run");
+    let again = game.handle_in_world(&play(CHESS_ROW), &who, 2_800).unwrap();
     assert_ne!(
         offer_instance(&again),
         instance,
-        "fresh instance after Close"
+        "fresh instance after Quit"
     );
+}
+
+#[test]
+fn active_chess_blocks_recipe_start_and_preserves_both_activities() {
+    // Prove the fixture itself can start the learned recipe when idle.
+    let (mut idle, idle_who) = cooking_game();
+    idle.initialize_world(&idle_who, 500).unwrap();
+    let started = idle
+        .handle_in_world(&recipe_start(GUMBO), &idle_who, 1_000)
+        .unwrap();
+    assert!(started.changed, "the idle fixture starts cooking");
+    assert!(cooking_active(&idle));
+
+    // With chess open, the same request is admitted nowhere and changes
+    // neither the activity set nor the saved gameplay snapshot.
+    let (mut game, who) = cooking_game();
+    let instance = running_game_at(&mut game, &who);
+    let before = game.state();
+    let refused = game
+        .handle_in_world(&recipe_start(GUMBO), &who, 2_000)
+        .unwrap();
+    assert!(!refused.changed);
+    assert!(!cooking_active(&game));
+    assert_eq!(game.state(), before, "the refusal changed the saved state");
+    assert!(chat_text(&refused).contains("Finish what you are doing"));
+    assert!(packets(&refused, &[39, 0, 16]).is_empty());
+    assert!(packets(&refused, &[26, 0, 12]).is_empty());
+
+    // The refusal did not retire or freeze the original chess table.
+    let live = game
+        .handle_in_world(&movie(instance, "OnMoveMsg\t52\t36"), &who, 2_100)
+        .unwrap();
+    assert!(has_event(&live, "OnChessEventMsg\t31"), "MOVE_DATA");
+}
+
+#[test]
+fn active_chess_refuses_world_interaction_starts_and_remains_playable() {
+    let mut game = game();
+    let who = character();
+    let instance = running_game(&mut game);
+    let before = game.state();
+    let mut interaction = vec![26, 0, 10, 0];
+    interaction.extend(0u64.to_le_bytes());
+    interaction.extend(1i32.to_le_bytes());
+    let refused = game.handle_in_world(&interaction, &who, 2_000).unwrap();
+    assert!(!refused.changed);
+    assert_eq!(game.state(), before);
+    assert!(chat_text(&refused).contains("Finish the chess game before interacting"));
+    assert!(packets(&refused, &[39, 0, 16]).is_empty());
+    let live = human_move(&mut game, instance, 52, 36, 2_100);
+    assert!(has_event(&live, "OnChessEventMsg\t31"), "MOVE_DATA");
 }
 
 #[test]

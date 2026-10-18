@@ -258,7 +258,7 @@ fn discovered_queen_check_is_detected_and_black_must_answer_it() {
 }
 
 #[test]
-fn single_player_validates_engine_proposals_and_requests_each_computer_turn() {
+fn single_player_server_replies_without_client_move_authority() {
     let mut tables = ChessTables::default();
     tables
         .open_single(
@@ -287,24 +287,69 @@ fn single_player_validates_engine_proposals_and_requests_each_computer_turn() {
     let human_events = text(&human.messages, 71);
     assert!(human_events.contains(&"OnChessEventMsg\t31\t52\t36\t0\t128".into()));
     assert!(human_events.contains(&"OnChessEventMsg\t2".into()));
-    assert!(human_events.contains(&"OnChessEventMsg\t30\t1\t20".into()));
-    assert!(!human_events.contains(&"OnChessEventMsg\t1".into()));
+    assert!(
+        !human_events
+            .iter()
+            .any(|event| event.starts_with("OnChessEventMsg\t30"))
+    );
+    assert!(human_events.iter().any(|event| {
+        [
+            "OnChessEventMsg\t10",
+            "OnChessEventMsg\t11",
+            "OnChessEventMsg\t12",
+            "OnChessEventMsg\t13",
+        ]
+        .iter()
+        .any(|prefix| event.starts_with(prefix))
+    }));
+    assert!(human_events.contains(&"OnChessEventMsg\t1".into()));
 
     let before = tables.table(7).unwrap().position().to_fen();
-    let rejected = send(&mut tables, 7, 71, 701, "OnMoveComputerMsg\t12\t28\t0\t0");
-    assert!(!rejected.accepted);
+    let rejected = send(&mut tables, 7, 71, 701, "OnMoveComputerMsg\t12\t28\t0\t128");
+    assert!(!rejected.accepted && rejected.messages.is_empty());
     assert_eq!(tables.table(7).unwrap().position().to_fen(), before);
-    assert!(text(&rejected.messages, 71).contains(&"OnChessEventMsg\t30\t1\t20".into()));
-
-    let computer = send(&mut tables, 7, 71, 701, "OnMoveComputerMsg\t12\t28\t0\t128");
-    let events = text(&computer.messages, 71);
-    assert!(computer.accepted);
-    assert!(events.contains(&"OnChessEventMsg\t10\t12\t28".into()));
-    assert!(events.contains(&"OnChessEventMsg\t2".into()));
-    assert!(events.contains(&"OnChessEventMsg\t1".into()));
     assert_eq!(
         tables.table(7).unwrap().position().side_to_move(),
         Side::White
+    );
+}
+
+#[test]
+fn server_opens_for_white_when_the_human_plays_black() {
+    let mut tables = ChessTables::default();
+    tables
+        .open_single(
+            8,
+            67,
+            ChessParticipant {
+                player_id: 81,
+                instance_id: 801,
+            },
+            Side::Black,
+        )
+        .unwrap();
+    send(&mut tables, 8, 81, 801, "OnConnectMsg");
+    let started = send(&mut tables, 8, 81, 801, "OnStartGameMsg\t0");
+    let events = text(&started.messages, 81);
+    assert!(
+        !events
+            .iter()
+            .any(|event| event.starts_with("OnChessEventMsg\t30"))
+    );
+    assert!(events.iter().any(|event| {
+        [
+            "OnChessEventMsg\t10",
+            "OnChessEventMsg\t11",
+            "OnChessEventMsg\t12",
+            "OnChessEventMsg\t13",
+        ]
+        .iter()
+        .any(|prefix| event.starts_with(prefix))
+    }));
+    assert!(events.contains(&"OnChessEventMsg\t1".into()));
+    assert_eq!(
+        tables.table(8).unwrap().position().side_to_move(),
+        Side::Black
     );
 }
 
@@ -594,7 +639,7 @@ fn payload_header_and_difficulty_mapping_are_bounded_and_stable() {
 }
 
 #[test]
-fn content_skill_overrides_the_row_default_in_move_request() {
+fn content_skill_keeps_the_server_reply_path() {
     let mut tables = ChessTables::default();
     tables
         .open_single_with_skill(
@@ -617,7 +662,23 @@ fn content_skill_overrides_the_row_default_in_move_request() {
         901,
         &format!("OnMoveMsg\t{}\t{}", sq(4, 1), sq(4, 3)),
     );
-    assert!(text(&moved.messages, 41).contains(&"OnChessEventMsg\t30\t1\t77".into()));
+    let events = text(&moved.messages, 41);
+    assert!(
+        !events
+            .iter()
+            .any(|event| event.starts_with("OnChessEventMsg\t30"))
+    );
+    assert!(events.iter().any(|event| {
+        [
+            "OnChessEventMsg\t10",
+            "OnChessEventMsg\t11",
+            "OnChessEventMsg\t12",
+            "OnChessEventMsg\t13",
+        ]
+        .iter()
+        .any(|prefix| event.starts_with(prefix))
+    }));
+    assert!(events.contains(&"OnChessEventMsg\t1".into()));
 
     // The default opener keeps the row's own skill.
     let mut defaults = ChessTables::default();
@@ -641,7 +702,13 @@ fn content_skill_overrides_the_row_default_in_move_request() {
         902,
         &format!("OnMoveMsg\t{}\t{}", sq(4, 1), sq(4, 3)),
     );
-    assert!(text(&default_move.messages, 42).contains(&"OnChessEventMsg\t30\t1\t20".into()));
+    let events = text(&default_move.messages, 42);
+    assert!(
+        !events
+            .iter()
+            .any(|event| event.starts_with("OnChessEventMsg\t30"))
+    );
+    assert!(events.contains(&"OnChessEventMsg\t1".into()));
 }
 
 #[test]

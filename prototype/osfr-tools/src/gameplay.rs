@@ -3407,6 +3407,14 @@ impl Gameplay {
         if let Some(out) = self.handle_chess(inner, character, now_ms)? {
             return Ok(out);
         }
+        if self.chess.as_ref().is_some_and(ChessService::is_active)
+            && (inner.starts_with(&[26, 0, 8, 0]) || inner.starts_with(&[26, 0, 10, 0]))
+        {
+            return Ok(Outcome {
+                replies: vec![chat::system("Finish the chess game before interacting.")],
+                ..Outcome::default()
+            });
+        }
         if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
             return Ok(out);
         }
@@ -6123,7 +6131,7 @@ impl Gameplay {
                 job_rank: self.recipe_rank(profile),
                 learned: &self.learned_recipes,
                 available: &available,
-                in_encounter: self.encounter.as_ref().is_some_and(EncounterEngine::active),
+                in_activity: self.activity_busy(),
             };
             let crafting_stations = self.crafting_stations();
             let started = crate::recipe_book::start(

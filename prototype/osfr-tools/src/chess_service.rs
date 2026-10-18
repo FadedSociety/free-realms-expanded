@@ -72,7 +72,7 @@ pub struct ChessRow {
     pub row_id: u32,
     /// `MiniGameData` DIFFICULTY (1 to 5), sent in the 39/16 info record.
     pub difficulty: u32,
-    /// Client-engine skill passed to `MOVE_REQUEST` (0 to 100).
+    /// Server-reply skill used by the local computer move chooser (0 to 100).
     pub skill: u32,
     pub success_coins: u32,
 }

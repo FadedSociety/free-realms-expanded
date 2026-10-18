@@ -119,7 +119,7 @@ struct World {
     rank: u8,
     position: [f32; 3],
     zone: u32,
-    in_encounter: bool,
+    in_activity: bool,
 }
 impl World {
     fn new() -> Self {
@@ -147,7 +147,7 @@ impl World {
             rank: 1,
             position: HERE,
             zone: ZONE,
-            in_encounter: false,
+            in_activity: false,
         }
     }
     fn start(&mut self, recipe: i32) -> Result<Started, Refusal> {
@@ -158,7 +158,7 @@ impl World {
             job_rank: self.rank,
             learned: &self.learned,
             available: &self.available,
-            in_encounter: self.in_encounter,
+            in_activity: self.in_activity,
         };
         recipe_book::start(
             recipe,
@@ -377,9 +377,9 @@ fn one_missing_ingredient_is_refused() {
 }
 
 #[test]
-fn encounter_blocks_the_start() {
+fn any_live_activity_blocks_the_start() {
     let mut w = World::new();
-    w.in_encounter = true;
+    w.in_activity = true;
     w.refuse(GUMBO, Refusal::Busy);
 }
 
@@ -404,7 +404,7 @@ fn missing_service_is_unavailable_not_a_panic() {
         job_rank: 1,
         learned: &w.learned,
         available: &w.available,
-        in_encounter: false,
+        in_activity: false,
     };
     let result = recipe_book::start(
         GUMBO,

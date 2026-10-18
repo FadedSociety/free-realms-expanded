@@ -5,8 +5,8 @@
 //! (`00f49480`, `00c081a0`, `009be6b0`) and `notes/Build Guides/Gameplay/Chess.md`.
 //!
 //! Reconstructed policy (R): table pairing, `INIT` values, AI skill values, terminal ordering,
-//! resign/forfeit results, and the 100-ply draw rule. The client engine proposes computer moves;
-//! this service validates every proposal against its own legal move list before accepting it.
+//! resign/forfeit results, and the 100-ply draw rule. The server chooses and applies the
+//! computer side's moves; a client `OnMoveComputerMsg` is never trusted.
 
 use crate::{
     minigame::{Activity, ActivityFinish, MinigameRuns, RunOutcome},
@@ -950,7 +950,6 @@ pub struct ChessTable {
     phase: TablePhase,
     connected: HashSet<u64>,
     ready: HashSet<u64>,
-    awaiting_computer: bool,
     result: Option<ChessResult>,
     game_over: HashSet<u64>,
     settled: HashSet<u64>,
@@ -1007,7 +1006,6 @@ impl ChessTable {
             phase: TablePhase::Waiting,
             connected: HashSet::new(),
             ready: HashSet::new(),
-            awaiting_computer: false,
             result: None,
             game_over: HashSet::new(),
             settled: HashSet::new(),
@@ -1040,7 +1038,6 @@ impl ChessTable {
             phase: TablePhase::Waiting,
             connected: HashSet::new(),
             ready: HashSet::new(),
-            awaiting_computer: false,
             result: None,
             game_over: HashSet::new(),
             settled: HashSet::new(),
@@ -1139,7 +1136,7 @@ impl ChessTable {
             TableMode::Single {
                 human_side,
                 computer_side,
-                skill,
+                skill: _,
             } => {
                 let player = self.participant_for_side(human_side).unwrap();
                 // Equality selects white. The actual meaning of INIT values is unknown (R).
@@ -1156,8 +1153,8 @@ impl ChessTable {
                     &[computer_side.code().to_string()],
                 )?;
                 if computer_side == Side::White {
-                    self.awaiting_computer = true;
-                    self.request_computer(&mut out, player.player_id, computer_side, skill)?;
+                    let reply = self.play_computer_turn(player.player_id)?;
+                    append_outcome(&mut out, reply);
                 } else {
                     self.event(&mut out, player.player_id, EVENT_TURN_START, &[])?;
                 }
@@ -1178,19 +1175,68 @@ impl ChessTable {
         Ok(out)
     }
 
-    fn request_computer(
-        &self,
-        out: &mut ChessOutcome,
-        player_id: u64,
-        computer_side: Side,
-        skill: u8,
-    ) -> io::Result<()> {
-        self.event(
-            out,
-            player_id,
-            EVENT_MOVE_REQUEST,
-            &[computer_side.code().to_string(), skill.to_string()],
-        )
+    fn play_computer_turn(&mut self, player_id: u64) -> io::Result<ChessOutcome> {
+        let Some(mv) = self.server_move() else {
+            return Ok(ChessOutcome::default());
+        };
+        self.accept_move(player_id, mv, true)
+    }
+
+    /// (R) Pick a legal reply locally. The client engine's proposed move is
+    /// never an input here, so a modified client cannot choose the opponent's
+    /// move or its own loss.
+    fn server_move(&self) -> Option<ChessMove> {
+        let mut ranked: Vec<(i64, ChessMove)> = self
+            .position
+            .legal_moves()
+            .into_iter()
+            .map(|mv| (self.score_move(&mv), mv))
+            .collect();
+        ranked.sort_by(|(sa, a), (sb, b)| {
+            sb.cmp(sa)
+                .then_with(|| a.from.cmp(&b.from))
+                .then_with(|| a.to.cmp(&b.to))
+                .then_with(|| a.promote.map(Kind::code).cmp(&b.promote.map(Kind::code)))
+        });
+        let skill = match self.mode {
+            TableMode::Single { skill, .. } => skill,
+            TableMode::TwoPlayer => 100,
+        };
+        let seed = self.position.to_fen().bytes().fold(0u64, |hash, byte| {
+            hash.wrapping_mul(31).wrapping_add(u64::from(byte))
+        });
+        // Easy rows may take the second-best legal move; medium and hard take
+        // the best. This keeps the content skill meaningful without trusting
+        // the client's engine.
+        let index = usize::from(skill < 50 && ranked.len() > 1 && seed % 2 == 1);
+        ranked.get(index).map(|(_, mv)| *mv)
+    }
+
+    fn score_move(&self, mv: &ChessMove) -> i64 {
+        let Ok(outcome) = self.position.clone().apply(mv) else {
+            return i64::MIN;
+        };
+        let mut score = 0;
+        match outcome.status {
+            Status::WhiteMated | Status::BlackMated => score += 1_000_000,
+            Status::Draw => score -= 100_000,
+            Status::InProgress => {}
+        }
+        if outcome.check {
+            score += 5_000;
+        }
+        if let Some(kind) = outcome.captured {
+            score += piece_value(kind);
+        }
+        if let Some(kind) = mv.promote {
+            score += piece_value(kind);
+        }
+        let centre = |square: u8| {
+            7 - (i64::from(square % 8) - 3)
+                .abs()
+                .max((i64::from(square / 8) - 3).abs())
+        };
+        score + centre(mv.to) - centre(mv.from) / 2
     }
 
     fn handle_text(&mut self, player_id: u64, message: &str) -> io::Result<ChessOutcome> {
@@ -1239,7 +1285,9 @@ impl ChessTable {
             "OnMoveMsg" | "OnCastleMsg" | "OnPromoteMsg" | "OnEnPassantMsg" => {
                 self.handle_human_move(player_id, &fields)
             }
-            "OnMoveComputerMsg" => self.handle_computer_move(player_id, &fields),
+            // The computer is server-authoritative. Older/malicious clients may
+            // still send the native engine's reply; it is inert here.
+            "OnMoveComputerMsg" => Ok(ChessOutcome::default()),
             "FRServer_GameOver" if fields.len() == 1 => self.game_over(player_id),
             "FRServer_GameClose" if fields.len() == 1 => Ok(ChessOutcome::default()),
             _ => Ok(ChessOutcome::default()),
@@ -1251,9 +1299,7 @@ impl ChessTable {
             return Ok(ChessOutcome::default());
         }
         let side = self.side_for_player(player_id);
-        if side != Some(self.position.side_to_move())
-            || matches!(self.mode, TableMode::Single { .. }) && self.awaiting_computer
-        {
+        if side != Some(self.position.side_to_move()) {
             return self.invalid_move(player_id);
         }
         let Some(mv) = parse_human_move(&self.position, fields) else {
@@ -1270,71 +1316,6 @@ impl ChessTable {
             return Some(Side::Black);
         }
         None
-    }
-
-    fn handle_computer_move(
-        &mut self,
-        player_id: u64,
-        fields: &[&str],
-    ) -> io::Result<ChessOutcome> {
-        let TableMode::Single {
-            human_side,
-            computer_side,
-            skill,
-        } = self.mode
-        else {
-            return Ok(ChessOutcome::default());
-        };
-        if self.phase != TablePhase::Playing
-            || self.result.is_some()
-            || !self.awaiting_computer
-            || self.participant_for_side(human_side).map(|p| p.player_id) != Some(player_id)
-            || self.position.side_to_move() != computer_side
-        {
-            return Ok(ChessOutcome::default());
-        }
-        if fields.len() != 5 {
-            return self.invalid_move(player_id);
-        }
-        let Some(bytes) = fields[1..]
-            .iter()
-            .map(|v| v.parse::<u16>().ok().and_then(|n| u8::try_from(n).ok()))
-            .collect::<Option<Vec<_>>>()
-        else {
-            return self.invalid_move(player_id);
-        };
-        let bytes: [u8; 4] = bytes.try_into().unwrap();
-        if bytes == [0; 4] {
-            // A no-move claim is never trusted: the server has the rules. With a
-            // legal move on the board the reply is a silent refusal that changes
-            // nothing; a real no-move position would already have finished above.
-            if !self.position.legal_moves().is_empty() {
-                return Ok(ChessOutcome::default());
-            }
-            let mut out = ChessOutcome {
-                accepted: true,
-                changed: true,
-                ..Default::default()
-            };
-            let result = ChessResult {
-                winner: Some(player_id),
-                reason: EndReason::EngineNoMove,
-            };
-            self.emit_result_messages(&mut out, result, None)?;
-            self.finish(result, &mut out);
-            return Ok(out);
-        }
-        let Some(mv) = self.position.move_from_engine_bytes(bytes) else {
-            let mut out = ChessOutcome {
-                accepted: false,
-                changed: false,
-                ..Default::default()
-            };
-            self.request_computer(&mut out, player_id, computer_side, skill)?;
-            return Ok(out);
-        };
-        self.awaiting_computer = false;
-        self.accept_move(player_id, mv, true)
     }
 
     fn invalid_move(&self, player_id: u64) -> io::Result<ChessOutcome> {
@@ -1431,11 +1412,11 @@ impl ChessTable {
                     TableMode::Single {
                         human_side,
                         computer_side,
-                        skill,
+                        skill: _,
                     } if self.position.side_to_move() == computer_side => {
-                        self.awaiting_computer = true;
                         let player = self.participant_for_side(human_side).unwrap();
-                        self.request_computer(&mut out, player.player_id, computer_side, skill)?;
+                        let reply = self.play_computer_turn(player.player_id)?;
+                        append_outcome(&mut out, reply);
                     }
                     TableMode::Single { human_side, .. } => {
                         let player = self.participant_for_side(human_side).unwrap();
@@ -1490,7 +1471,6 @@ impl ChessTable {
 
     fn finish(&mut self, result: ChessResult, out: &mut ChessOutcome) {
         self.phase = TablePhase::Finished;
-        self.awaiting_computer = false;
         self.result = Some(result);
         out.terminal = Some(result);
     }
@@ -1902,6 +1882,26 @@ fn validate_participant(participant: ChessParticipant) -> io::Result<()> {
         return Err(invalid("invalid chess participant identity"));
     }
     Ok(())
+}
+
+fn piece_value(kind: Kind) -> i64 {
+    match kind {
+        Kind::Pawn => 100,
+        Kind::Knight => 300,
+        Kind::Bishop => 320,
+        Kind::Rook => 500,
+        Kind::Queen => 900,
+        Kind::King => 10_000,
+    }
+}
+
+fn append_outcome(out: &mut ChessOutcome, next: ChessOutcome) {
+    out.accepted |= next.accepted;
+    out.changed |= next.changed;
+    out.messages.extend(next.messages);
+    if next.terminal.is_some() {
+        out.terminal = next.terminal;
+    }
 }
 
 fn invalid(message: &'static str) -> io::Error {
