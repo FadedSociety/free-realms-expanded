@@ -1182,6 +1182,7 @@ class Checker:
             "visit_zone": ("zone_id", None), "gather_resource": ("resource_id", "quantity"),
             "craft_recipe": ("recipe_id", "quantity"), "finish_minigame": ("minigame_id", "count"),
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
+            "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
         }
         seen = set()
         for index, goal in enumerate(goals):
@@ -1201,6 +1202,8 @@ class Checker:
             if key == "zone_id":
                 valid_target = type(target) is int and 0 <= target <= 0xffffffff
             elif key == "npc_id":
+                valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
+            elif key == "actor_guid":
                 valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
             elif key in ("item_id", "definition_id"):
                 valid_target = type(target) is int and 1 <= target <= 0x7fffffff

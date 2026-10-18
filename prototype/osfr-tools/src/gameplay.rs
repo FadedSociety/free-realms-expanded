@@ -1560,6 +1560,7 @@ impl Gameplay {
                     self.npc_quests.as_ref(),
                 )
                 .map_err(|_| invalid("NPC interaction is unavailable"))?;
+            drop(interaction);
             let options: Vec<_> = menu
                 .options
                 .iter()
@@ -1590,10 +1591,16 @@ impl Gameplay {
             // (R) The client request target is treated as the runtime actor GUID; the content
             // service uses the stable regional NPC key internally.
             packet[4..12].copy_from_slice(&request.target.to_le_bytes());
-            return Ok(Some(Outcome {
-                replies: vec![packet],
-                ..Outcome::default()
-            }));
+            let mut out = Outcome::default();
+            // An accepted menu interaction is distinct from the Talk action selected by 26/10.
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::InteractNpc {
+                    npc_id: request.target,
+                },
+                &mut out,
+            )?;
+            out.replies.push(packet);
+            return Ok(Some(out));
         }
 
         if inner.starts_with(&[26, 0, 10, 0]) {
@@ -6386,6 +6393,16 @@ impl Gameplay {
                     let chef_before = chef_resource.map(|id| self.gather_count(id));
                     let result = self.opening.as_mut().unwrap().on_interaction(guid)?;
                     self.apply_opening(result, &mut out)?;
+                    if matches!(
+                        &actor.action,
+                        Some(crate::opening::OpeningTrigger::Interact { actor_guid })
+                            if *actor_guid == guid
+                    ) {
+                        self.npc_quest_event(
+                            crate::quest_engine::QuestEvent::InteractNpc { npc_id: guid },
+                            &mut out,
+                        )?;
+                    }
                     if let Some((resource_id, before)) = resource_before {
                         let quantity = self.gather_count(resource_id).saturating_sub(before);
                         if quantity > 0 {
@@ -7148,6 +7165,12 @@ impl Gameplay {
                 .unwrap()
                 .on_event(OpeningEvent::DungeonCompleted { encounter_id: id })?;
             self.apply_opening(result, out)?;
+            // `completed` is set by EncounterEngine only when a won run exits. Entry,
+            // losses, retries and duplicate result/close messages leave it empty.
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::CompleteDungeon { encounter_id: id },
+                out,
+            )?;
         }
         if let Some(zone) = result.zoning {
             out.zoning = Some(if result.completed.is_some() {

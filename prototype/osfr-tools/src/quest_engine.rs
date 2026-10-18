@@ -1994,6 +1994,31 @@ fn definition_from_content(
                 .ok_or_else(|| invalid("quest job must reference a known positive profile id"))
         })
         .transpose()?;
+    for goal in &quest.objectives {
+        match goal {
+            ContentGoal::InteractActor {
+                actor_guid, source, ..
+            } => {
+                if *actor_guid == 0 || source.is_empty() {
+                    return Err(invalid(
+                        "interact_actor objective requires a positive actor and provenance",
+                    ));
+                }
+            }
+            ContentGoal::CompleteDungeon {
+                encounter_id,
+                source,
+                ..
+            } => {
+                if *encounter_id == 0 || source.is_empty() {
+                    return Err(invalid(
+                        "complete_dungeon objective requires a positive encounter and provenance",
+                    ));
+                }
+            }
+            _ => {}
+        }
+    }
     let objectives = quest
         .objectives
         .iter()
@@ -2105,6 +2130,24 @@ fn definition_from_content(
                     zone_id: *zone_id,
                     position: *position,
                     radius: *radius,
+                },
+            },
+            ContentGoal::InteractActor { id, actor_guid, .. } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::InteractNpc {
+                    npc_id: *actor_guid,
+                },
+            },
+            ContentGoal::CompleteDungeon {
+                id, encounter_id, ..
+            } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::CompleteDungeon {
+                    encounter_id: *encounter_id,
                 },
             },
         })

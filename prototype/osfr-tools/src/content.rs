@@ -229,6 +229,18 @@ pub enum ContentGoal {
         radius: f32,
         source: Vec<SourceTag>,
     },
+    /// (R) An accepted, non-talk interaction with one exact runtime actor.
+    InteractActor {
+        id: u32,
+        actor_guid: u64,
+        source: Vec<SourceTag>,
+    },
+    /// (R) The authoritative terminal win of one encounter or field battle.
+    CompleteDungeon {
+        id: u32,
+        encounter_id: u32,
+        source: Vec<SourceTag>,
+    },
 }
 
 impl ContentGoal {
@@ -243,7 +255,9 @@ impl ContentGoal {
             | Self::CraftRecipe { id, .. }
             | Self::FinishMinigame { id, .. }
             | Self::EquipItem { id, .. }
-            | Self::VisitPosition { id, .. } => *id,
+            | Self::VisitPosition { id, .. }
+            | Self::InteractActor { id, .. }
+            | Self::CompleteDungeon { id, .. } => *id,
         }
     }
 }
@@ -817,7 +831,9 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::CraftRecipe { id, source, .. }
         | ContentGoal::FinishMinigame { id, source, .. }
         | ContentGoal::EquipItem { id, source, .. }
-        | ContentGoal::VisitPosition { id, source, .. } => (id, source),
+        | ContentGoal::VisitPosition { id, source, .. }
+        | ContentGoal::InteractActor { id, source, .. }
+        | ContentGoal::CompleteDungeon { id, source, .. } => (id, source),
     };
     check_sources(&format!("{owner} goal {id}"), source)
 }
@@ -891,7 +907,23 @@ fn validate_goal(
         | ContentGoal::CraftRecipe { .. }
         | ContentGoal::FinishMinigame { .. }
         | ContentGoal::VisitPosition { .. } => Ok(()),
+        ContentGoal::InteractActor { actor_guid, .. } => {
+            positive_goal_field(owner, "goal.actor_guid", *actor_guid)
+        }
+        ContentGoal::CompleteDungeon { encounter_id, .. } => {
+            positive_goal_field(owner, "goal.encounter_id", u64::from(*encounter_id))
+        }
     }
+}
+
+fn positive_goal_field(owner: &str, field: &str, value: u64) -> Result<(), ContentError> {
+    if value == 0 {
+        return Err(ContentError::InvalidRecord {
+            record: owner.to_owned(),
+            detail: format!("{field} must be positive"),
+        });
+    }
+    Ok(())
 }
 
 fn validate_reward(
