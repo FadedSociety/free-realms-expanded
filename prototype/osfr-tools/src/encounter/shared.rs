@@ -169,28 +169,6 @@ impl SharedFieldState {
             }))
             .collect()
     }
-    /// (R) Field-only view retained for the slice-2 oracle. Live delivery uses
-    /// NpcVisibility's combined passive/hostile budget.
-    pub fn visible(&self, position: [f32; 3]) -> BTreeSet<u64> {
-        let mut rows: Vec<_> = self
-            .enemies
-            .iter()
-            .filter(|f| f.present && f.state.health > 0)
-            .map(|f| (distance(position, f.state.position), f.actor.guid))
-            .chain(self.battles.iter().map(|b| {
-                (
-                    distance(
-                        position,
-                        self.position(b.spawner.guid).unwrap_or(b.spawner.position),
-                    ),
-                    b.spawner.guid,
-                )
-            }))
-            .filter(|(d, _)| *d <= 100.0)
-            .collect();
-        rows.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
-        rows.into_iter().take(64).map(|(_, guid)| guid).collect()
-    }
     pub fn initialization(&self, guid: u64) -> io::Result<Vec<Vec<u8>>> {
         if let Some(f) = self
             .enemies
@@ -487,18 +465,8 @@ impl EncounterEngine {
                 &mut hits,
             );
             // Canonical marker clock/transform; each marker considers the nearest observer.
-            engine.tick_wanderers_shared(players, now_ms, elapsed, &mut out);
+            engine.tick_wanderers_for(players, now_ms, elapsed, &mut out);
             Ok((out, hits))
         })
-    }
-
-    pub(super) fn tick_wanderers_shared(
-        &mut self,
-        players: &[FieldParticipant],
-        now_ms: u64,
-        elapsed: u64,
-        out: &mut EncounterOutcome,
-    ) {
-        self.tick_wanderers_for(players, now_ms, elapsed, out);
     }
 }

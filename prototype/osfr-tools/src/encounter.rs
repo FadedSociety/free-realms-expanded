@@ -2633,7 +2633,12 @@ impl EncounterEngine {
                 None,
                 &mut Vec::new(),
             );
-            self.tick_wanderers(position, now_ms, elapsed, &mut out);
+            self.tick_wanderers_for(
+                &[self.field_participant(1, position, true)],
+                now_ms,
+                elapsed,
+                &mut out,
+            );
         }
         if total_damage > 0 {
             self.log_fight(now_ms, "taken", "enemies", "you", i64::from(total_damage));

@@ -619,23 +619,6 @@ impl EncounterEngine {
         packets
     }
 
-    /// Battle markers walk their loop while the player is near enough to see
-    /// them; the client is never sent movement for an actor it has not spawned.
-    pub(super) fn tick_wanderers(
-        &mut self,
-        player: [f32; 3],
-        now_ms: u64,
-        elapsed: u64,
-        out: &mut EncounterOutcome,
-    ) {
-        self.tick_wanderers_for(
-            &[self.field_participant(1, player, true)],
-            now_ms,
-            elapsed,
-            out,
-        );
-    }
-
     pub(super) fn tick_wanderers_for(
         &mut self,
         players: &[FieldParticipant],
