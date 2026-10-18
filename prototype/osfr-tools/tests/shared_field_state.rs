@@ -316,6 +316,7 @@ use osfr_tools::{
     account_store::AccountStore,
     character_store::CharacterState,
     identity::{NativeCreation, Resources},
+    inventory::{EquippedItem, InventoryItem},
     login,
 };
 use serde_json::json;
@@ -677,6 +678,28 @@ fn create_content(root: &Path) -> PathBuf {
         .unwrap()
         .state();
     seed.profiles.as_mut().unwrap().unlocked.insert(2);
+    let weapon_instance = 760_000_001;
+    seed.inventory.items.push(InventoryItem {
+        definition_id: 7592,
+        tint: 0,
+        id: weapon_instance,
+        count: 1,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    });
+    seed.inventory
+        .equipment
+        .retain(|row| !(row.profile_id == 43 && row.slot == 7));
+    seed.inventory.equipment.push(EquippedItem {
+        profile_id: 43,
+        slot: 7,
+        item_id: weapon_instance,
+        category: 7,
+    });
     let mut game = osfr_tools::gameplay::Gameplay::load(&content, Some(seed)).unwrap();
     let at = CharacterState {
         guid: 1,

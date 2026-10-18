@@ -740,6 +740,8 @@ pub struct ZoneInstance {
 pub struct World {
     // (R) Single-writer combat state; never part of SharedWorld::clone.
     fields: BTreeMap<InstanceId, crate::encounter::SharedFieldState>,
+    // (R) Pristine per-zone populations used to initialize private instances.
+    field_seeds: BTreeMap<u32, crate::encounter::SharedFieldState>,
     // (R) Committed action deltas wait for the 20 Hz writer, bounded by the
     // admitted-session combat budgets and the 64-row field content limit.
     field_packets: BTreeMap<InstanceId, Vec<Vec<u8>>>,
@@ -817,6 +819,35 @@ impl World {
         field: crate::encounter::SharedFieldState,
     ) {
         self.fields.insert(instance, field);
+    }
+    /// (R) Keep a pristine field population for a scene zone. Public instances
+    /// receive one copy immediately; private instances receive their own copy
+    /// when they are committed, so sessions never share a mutable runtime.
+    pub fn install_field_seed(&mut self, zone_id: u32, field: crate::encounter::SharedFieldState) {
+        self.field_seeds.insert(zone_id, field);
+        if let Some(instance) = self.public_instances.get(&zone_id).copied() {
+            self.ensure_field_from_seed(instance);
+        }
+    }
+    /// (R) Lazily initialize this instance from its zone seed. Public and
+    /// private instances use the same path; an unknown or unseeded scene is a
+    /// no-op so arena/dungeon instances without field content stay untouched.
+    pub fn ensure_field_from_seed(&mut self, instance: InstanceId) -> bool {
+        if self.fields.contains_key(&instance) {
+            return false;
+        }
+        let Some(row) = self.instances.get(&instance) else {
+            return false;
+        };
+        let Some(seed) = self.field_seeds.get(&row.zone_id) else {
+            return false;
+        };
+        self.fields.insert(instance, seed.clone());
+        true
+    }
+    /// (R) Stable list for one simulation-writer pass over every field instance.
+    pub fn field_instances(&self) -> Vec<InstanceId> {
+        self.fields.keys().copied().collect()
     }
 
     /// (R) Live scene descriptors come from Gateway's validated scene route,
@@ -944,6 +975,7 @@ impl World {
             .expect("prepared instance remains owned by the single writer");
         row.members.insert(change.player);
         row.empty_since_ms = None;
+        self.ensure_field_from_seed(change.location.instance_id);
         let ready = change.location.ready;
         let target = change.location.instance_id;
         self.players.insert(
@@ -981,6 +1013,7 @@ impl World {
 
         Self {
             fields: BTreeMap::new(),
+            field_seeds: BTreeMap::new(),
             field_packets: BTreeMap::new(),
             zones,
             npcs_by_zone,

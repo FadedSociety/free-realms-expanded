@@ -1656,9 +1656,10 @@ impl Session {
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
         let current = staged_gateway.state().clone();
-        let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
+        let pending = staged_gateway.take_pending_transfer();
+        let transfer =
+            outcome.began_zoning || previous.zone_id != current.zone_id || pending.is_some();
         let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
-            let pending = staged_gateway.take_pending_transfer();
             let old_instance = membership
                 .player_location(self.character_guid)
                 .map(|row| row.instance_id);
@@ -2887,7 +2888,18 @@ pub struct Server {
 
 impl Server {
     fn tick_shared_fields(&mut self, now_ms: u64) -> Result<(), Box<dyn std::error::Error>> {
-        let Some(mut field) = self.membership.field(0).cloned() else {
+        for instance in self.membership.field_instances() {
+            self.tick_shared_instance(instance, now_ms)?;
+        }
+        Ok(())
+    }
+
+    fn tick_shared_instance(
+        &mut self,
+        instance: i32,
+        now_ms: u64,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let Some(mut field) = self.membership.field(instance).cloned() else {
             return Ok(());
         };
         let mut active = Vec::new();
@@ -2896,7 +2908,7 @@ impl Server {
             if self
                 .membership
                 .player_location(session.character_guid)
-                .is_some_and(|l| l.instance_id == 0 && l.ready)
+                .is_some_and(|l| l.instance_id == instance && l.ready)
                 && session.gateway.is_world_loaded()
             {
                 if let Some(player) = session.gateway.field_participant() {
@@ -2917,11 +2929,11 @@ impl Server {
             .values()
             .map(|s| (s.id, s.known_npcs.clone()))
             .collect();
-        self.sync_field_views(&field, true)?;
+        self.sync_field_views(instance, &field, true)?;
         for (key, player) in &mut active {
             player.known_npcs = Some(self.sessions[key].known_npcs.clone());
         }
-        let committed = self.membership.take_field_packets(0);
+        let committed = self.membership.take_field_packets(instance);
         // (R) Only a lethal committed HP update needs the held corpse removed.
         // Idle ticks already reconciled poses/readiness above; do not rank the
         // entire passive population twice when simulation changes nothing.
@@ -2942,7 +2954,7 @@ impl Server {
                     recipient,
                     &self.membership,
                     &self.world.players,
-                    0,
+                    instance,
                     &committed,
                     &retained,
                 )
@@ -2950,9 +2962,9 @@ impl Server {
             .collect::<Vec<_>>();
         self.queue_field_deliveries(deliveries)?;
         let Some(elapsed) = field.due(now_ms) else {
-            self.membership.install_field(0, field.clone());
+            self.membership.install_field(instance, field.clone());
             if resync {
-                self.sync_field_views(&field, false)?;
+                self.sync_field_views(instance, &field, false)?;
             }
             return Ok(());
         };
@@ -3008,7 +3020,7 @@ impl Server {
         for (key, gateway) in staged {
             self.sessions.get_mut(&key).unwrap().gateway = gateway;
         }
-        self.membership.install_field(0, field.clone());
+        self.membership.install_field(instance, field.clone());
         for (key, replies) in private {
             for reply in replies {
                 self.sessions
@@ -3025,7 +3037,7 @@ impl Server {
                     recipient,
                     &self.membership,
                     &self.world.players,
-                    0,
+                    instance,
                     &packets,
                     &recipient.known_npcs,
                 )
@@ -3033,7 +3045,7 @@ impl Server {
             .collect::<Vec<_>>();
         self.queue_field_deliveries(deliveries)?;
         if resync {
-            self.sync_field_views(&field, false)?;
+            self.sync_field_views(instance, &field, false)?;
         }
         Ok(())
     }
@@ -3057,11 +3069,15 @@ impl Server {
 
     fn sync_field_views(
         &mut self,
+        instance: i32,
         field: &osfr_tools::encounter::SharedFieldState,
         hold_deaths: bool,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let candidates = field.interest_candidates(hold_deaths);
-        let zone = ZoneInstance::from_world(self.membership.instance(0).unwrap().zone_id, 0)?;
+        let Some(row) = self.membership.instance(instance) else {
+            return Ok(());
+        };
+        let zone = ZoneInstance::from_world(row.zone_id, instance)?;
         // Reuse W96's grid for candidates, never the capped PC observer sets.
         let nearby: BTreeSet<_> = candidates
             .iter()
@@ -3071,8 +3087,11 @@ impl Server {
             let valid = self
                 .membership
                 .player_location(session.character_guid)
-                .is_some_and(|l| l.instance_id == 0 && l.ready)
+                .is_some_and(|l| l.instance_id == instance && l.ready)
                 && session.gateway.is_world_loaded();
+            if !valid {
+                continue;
+            }
             let fields: Vec<_> = candidates
                 .iter()
                 .copied()
@@ -3086,54 +3105,41 @@ impl Server {
                 .gateway
                 .gameplay()
                 .map_or(0, |game| game.npc_visibility_revision());
-            if valid
-                && session.npc_visibility_revision == Some(revision)
+            if session.npc_visibility_revision == Some(revision)
                 && session.npc_view_position == Some(session.gateway.state().position)
                 && session.npc_view_fields == fields
             {
                 continue;
             }
-            let (wanted, packets) = if valid {
-                session
-                    .gateway
-                    .gameplay()
-                    .map(|game| {
-                        let revision = game.npc_visibility_revision();
-                        let mut known = session.known_npcs.clone();
-                        let mut refreshed = Vec::new();
-                        if session
-                            .npc_visibility_revision
-                            .is_some_and(|old| old != revision)
-                        {
-                            // ponytail: admin placement edits resend at most 64
-                            // passive actors; no second per-actor revision cache.
-                            known.retain(|guid| {
-                                if field.position(*guid).is_some() {
-                                    return true;
-                                }
-                                refreshed
-                                    .push(osfr_tools::encounter::SharedFieldState::removal(*guid));
-                                false
-                            });
-                        }
-                        let (wanted, packets) =
-                            game.shared_npc_view(session.gateway.state(), &fields, &known)?;
-                        refreshed.extend(packets);
-                        session.npc_visibility_revision = Some(revision);
-                        Ok::<_, io::Error>((wanted, refreshed))
-                    })
-                    .transpose()?
-                    .unwrap_or_default()
-            } else {
-                (
-                    BTreeSet::new(),
-                    session
-                        .known_npcs
-                        .iter()
-                        .map(|guid| osfr_tools::encounter::SharedFieldState::removal(*guid))
-                        .collect(),
-                )
-            };
+            let (wanted, packets) = session
+                .gateway
+                .gameplay()
+                .map(|game| {
+                    let revision = game.npc_visibility_revision();
+                    let mut known = session.known_npcs.clone();
+                    let mut refreshed = Vec::new();
+                    if session
+                        .npc_visibility_revision
+                        .is_some_and(|old| old != revision)
+                    {
+                        // ponytail: admin placement edits resend at most 64
+                        // passive actors; no second per-actor revision cache.
+                        known.retain(|guid| {
+                            if field.position(*guid).is_some() {
+                                return true;
+                            }
+                            refreshed.push(osfr_tools::encounter::SharedFieldState::removal(*guid));
+                            false
+                        });
+                    }
+                    let (wanted, packets) =
+                        game.shared_npc_view(session.gateway.state(), &fields, &known)?;
+                    refreshed.extend(packets);
+                    session.npc_visibility_revision = Some(revision);
+                    Ok::<_, io::Error>((wanted, refreshed))
+                })
+                .transpose()?
+                .unwrap_or_default();
             for reply in packets {
                 session.queue_shared_message(&wrap_application(&reply))?;
             }
@@ -3147,7 +3153,7 @@ impl Server {
                 }
             }
             session.known_npcs = wanted;
-            session.npc_view_position = valid.then_some(session.gateway.state().position);
+            session.npc_view_position = Some(session.gateway.state().position);
             session.npc_view_fields = fields;
         }
         Ok(())
@@ -3219,7 +3225,7 @@ impl Server {
         let mut membership = World::runtime();
         let mut seed = load_gateway_template(&options)?;
         if let Some(fields) = seed.take_shared_fields() {
-            membership.install_field(0, fields);
+            membership.install_field_seed(0, fields);
         }
         let template = options.account_store.is_some().then_some(seed);
         Ok(Self {
@@ -3288,7 +3294,15 @@ impl Server {
     }
     #[cfg(test)]
     pub fn test_field_health(&self, guid: u64) -> Option<u32> {
-        self.membership.field(0)?.health(guid)
+        self.test_field_health_in(0, guid)
+    }
+    #[cfg(test)]
+    pub fn test_field_health_in(&self, instance: i32, guid: u64) -> Option<u32> {
+        self.membership.field(instance)?.health(guid)
+    }
+    #[cfg(test)]
+    pub fn test_field_instances(&self) -> Vec<i32> {
+        self.membership.field_instances()
     }
     #[cfg(test)]
     pub fn test_known_npcs(&self, guid: u64) -> BTreeSet<u64> {
@@ -3299,9 +3313,15 @@ impl Server {
     }
     #[cfg(test)]
     pub fn test_field_clock(&self, guid: u64) -> (u64, Option<u64>) {
+        self.test_field_clock_in(0, guid)
+    }
+    #[cfg(test)]
+    pub fn test_field_clock_in(&self, instance: i32, guid: u64) -> (u64, Option<u64>) {
         (
             self.start.elapsed().as_millis() as u64,
-            self.membership.field(0).and_then(|f| f.respawn_at(guid)),
+            self.membership
+                .field(instance)
+                .and_then(|f| f.respawn_at(guid)),
         )
     }
     #[cfg(test)]
@@ -3377,6 +3397,18 @@ impl Server {
             .create_child_instance(
                 0,
                 9600,
+                osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
+                self.start.elapsed().as_millis() as u64,
+            )
+            .unwrap()
+    }
+
+    #[cfg(test)]
+    pub fn test_field_child(&mut self) -> i32 {
+        self.membership
+            .create_child_instance(
+                0,
+                0,
                 osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
                 self.start.elapsed().as_millis() as u64,
             )

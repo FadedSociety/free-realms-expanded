@@ -25,7 +25,13 @@ fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
     }
     fs::write(
         content.join("npcs/0.json"),
-        json!({"records":[{"npc_id":930108,"zone_id":0,"position":[200,0,200]}]}).to_string(),
+        json!({"schema_version":1,"records":[{"npc_id":930108,"name":"930108","zone_id":0,"position":[200,0,200],"roles":["ambient"]}]})
+            .to_string(),
+    )
+    .unwrap();
+    fs::write(
+        content.join("vendors.json"),
+        json!({"schema_version":1,"vendors":[]}).to_string(),
     )
     .unwrap();
     let placements: Vec<_> = (0..passive).map(|i| json!({"guid":130000000000_u64+i as u64,"model_id":3,"position":[2,0,0],"heading":0,"scale":1})).collect();
@@ -234,6 +240,81 @@ fn w127_two_bot_observer_death_respawn_route() {
     );
 }
 
+#[test]
+#[ignore = "requires private OSFR_PLAY_PACKAGE; synthetic accounts/content only"]
+fn t032_two_bot_private_instance_shared_death() {
+    let f = interest_fixture(0, false);
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let _public_startup = interest_login(&f, &mut a, &mut b);
+    assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
+    let child = f.host(|s| s.test_field_child());
+    assert_ne!(child, 0);
+    let mut total_entered = [Vec::new(), Vec::new()];
+    for guid in [101, 202] {
+        f.host(move |s| s.test_transfer(guid, child, false))
+            .unwrap();
+        let mut entered = f.ready(guid, &mut a, &mut b);
+        assert_eq!(f.host(move |s| s.test_field_health_in(child, E)), Some(300));
+        let own = if guid == 101 { 0 } else { 1 };
+        settle(&mut a, &mut b, &mut entered, |messages| {
+            actor_packets(&messages[own], 2, E) == 1
+                && hp_values(&messages[own]) == vec![300]
+                && f.host(move |s| s.test_known_npcs(guid).contains(&E))
+        });
+        for i in 0..2 {
+            total_entered[i].extend(entered[i].clone());
+        }
+        assert_eq!(f.host(move |s| s.test_location(guid).unwrap().1), child);
+    }
+    for packets in &total_entered {
+        assert_eq!(actor_packets(packets, 2, E), 1);
+        assert_eq!(hp_values(packets), vec![300]);
+    }
+    let child_banks = interest_banks(&f);
+    interest_cast(&mut a);
+    let first = interest_committed_result_in(&f, child, &mut a, &mut b, 200, 0);
+    interest_cast(&mut b);
+    let second = interest_committed_result_in(&f, child, &mut a, &mut b, 100, 1);
+    let cooldown = collect(&mut a, &mut b, Duration::from_millis(500));
+    for packets in cooldown {
+        assert!(hp_values(&packets).is_empty());
+    }
+    interest_cast(&mut a);
+    let lethal = interest_committed_result_in(&f, child, &mut a, &mut b, 0, 0);
+    for (batch, hp, attacker) in [
+        (&first, 200, 101_u64),
+        (&second, 100, 202),
+        (&lethal, 0, 101),
+    ] {
+        for packets in batch {
+            assert_eq!(hp_values(packets), vec![hp]);
+            assert_eq!(hits_from(packets, attacker), 1);
+        }
+    }
+    for packets in &lethal {
+        assert_eq!(removals(packets, E), 1);
+    }
+    assert_eq!(
+        f.host(|s| s.test_field_instances()),
+        [0, child],
+        "public and child runtimes remain independently addressable"
+    );
+    assert_eq!(
+        f.host(|s| s.test_field_health(E)),
+        Some(300),
+        "the public population is a distinct runtime"
+    );
+    assert_eq!(
+        interest_banks(&f),
+        child_banks,
+        "shared deaths still pay no personal credit or items"
+    );
+    println!(
+        "T032 socket: two sessions in child {child} observed HP [200,100,0] and one death each; public field remained full"
+    );
+}
+
 fn removals(packets: &[Vec<u8>], guid: u64) -> usize {
     packets
         .iter()
@@ -328,6 +409,97 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
     }
     println!(
         "W127 exact-clock: death 600; 2599 no spawn; 2600 one AddNpc/full HP per observer; replay no death/credit"
+    );
+}
+
+#[test]
+fn t032_private_instance_field_is_one_shared_death_for_two_members() {
+    use osfr_tools::world::{InstanceKind, World, WorldPose};
+
+    let mut a = interest_engine();
+    let mut b = interest_engine();
+    let seed = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let mut world = World::runtime();
+    world.install_field_seed(0, seed);
+    let child = world
+        .create_child_instance(0, 0, InstanceKind::Encounter { encounter_id: 0 }, 0)
+        .unwrap();
+    assert_ne!(child, 0);
+    assert!(
+        world.field(child).is_none(),
+        "private field starts unseeded"
+    );
+    let first = world
+        .prepare_membership(101, 0, Some(child), WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    world.commit_membership(first);
+    let mut field = world.field(child).unwrap().clone();
+    let first_hit = a
+        .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 0)
+        .unwrap();
+    assert_eq!(hp_values(&first_hit.replies), vec![200]);
+    world.install_field(child, field.clone());
+    let second = world
+        .prepare_membership(202, 0, Some(child), WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    assert_eq!(
+        world.field(child).unwrap().health(E),
+        Some(200),
+        "a second member must not reset the private field"
+    );
+    world.commit_membership(second);
+    assert_eq!(
+        world.field_instances(),
+        [0, child],
+        "one runtime for public and one for the joined child"
+    );
+    let mut views = [
+        std::collections::BTreeSet::new(),
+        std::collections::BTreeSet::new(),
+    ];
+    let visibility = osfr_tools::world::NpcVisibility::default();
+    for (view, at) in views.iter_mut().zip([[1., 0., 0.], [-1., 0., 0.]]) {
+        let (next, _) = visibility
+            .shared_view(0, at, &field.interest_candidates(false), view)
+            .unwrap();
+        let init: Vec<_> = next
+            .difference(view)
+            .flat_map(|guid| field.initialization(*guid).unwrap())
+            .collect();
+        assert_eq!(actor_packets(&init, 2, E), 1);
+        assert_eq!(hp_values(&init), vec![200]);
+        *view = next;
+    }
+    for (who, now, hp) in [(202, 100, 100), (101, 600, 0)] {
+        let engine = if who == 101 { &mut a } else { &mut b };
+        let out = engine
+            .shared_attack(&mut field, who, E, [1., 0., 0.], 2, now)
+            .unwrap();
+        assert_eq!(hp_values(&out.replies), vec![hp]);
+        assert_eq!(hits_from(&out.replies, who), 1);
+        assert!(out.defeated.is_empty() && out.rewards.is_empty());
+        world.install_field(child, field.clone());
+        for member in [101, 202] {
+            let (instance, shared) = world.field_for_player(member, 0).unwrap();
+            assert_eq!(instance, child);
+            assert_eq!(shared.health(E), Some(hp));
+        }
+    }
+    for (view, at) in views.iter_mut().zip([[1., 0., 0.], [-1., 0., 0.]]) {
+        let (next, packets) = visibility
+            .shared_view(0, at, &field.interest_candidates(false), view)
+            .unwrap();
+        assert_eq!(removals(&packets, E), 1);
+        assert!(next.is_empty());
+    }
+    assert_eq!(
+        world.field(0).unwrap().health(E),
+        Some(300),
+        "private combat must not alter the public population"
+    );
+    println!(
+        "T032 private instance: HP [200,100,0] across two members, one death removal each, public field unchanged"
     );
 }
 
@@ -605,6 +777,17 @@ fn interest_committed_result(
     hp: u32,
     recipient: usize,
 ) -> [Vec<Vec<u8>>; 2] {
+    interest_committed_result_in(f, 0, a, b, hp, recipient)
+}
+
+fn interest_committed_result_in(
+    f: &Fixture,
+    instance: i32,
+    a: &mut bot::Bot,
+    b: &mut bot::Bot,
+    hp: u32,
+    recipient: usize,
+) -> [Vec<Vec<u8>>; 2] {
     let mut packets = [Vec::new(), Vec::new()];
     let deadline = Instant::now() + PATIENCE;
     loop {
@@ -612,7 +795,7 @@ fn interest_committed_result(
         for i in 0..2 {
             packets[i].extend(batch[i].clone());
         }
-        if f.host(|s| s.test_field_health(E)) == Some(hp) {
+        if f.host(move |s| s.test_field_health_in(instance, E)) == Some(hp) {
             break;
         }
         assert!(
