@@ -4638,7 +4638,29 @@ impl Gameplay {
     }
 
     /// Developer hot reload of authored content: battles, enemies, abilities.
+    /// The whole request is staged so a later failure cannot publish an earlier load.
     pub fn reload_content(&mut self, what: &str, out: &mut Outcome) -> io::Result<String> {
+        let mut staged = self.clone();
+        let mut staged_out = Outcome::default();
+        let done = staged.reload_content_in_place(what, &mut staged_out)?;
+        self.abilities = staged.abilities;
+        self.encounter = staged.encounter;
+        self.activities = staged.activities;
+        self.npc_visibility = staged.npc_visibility;
+        out.dev_command_denied |= staged_out.dev_command_denied;
+        out.shared_field = staged_out.shared_field.or(out.shared_field.take());
+        out.replies.extend(staged_out.replies);
+        out.changed |= staged_out.changed;
+        out.zoning = staged_out.zoning.or(out.zoning.take());
+        out.scene_zoning = staged_out.scene_zoning.or(out.scene_zoning.take());
+        out.relocation = staged_out.relocation.or(out.relocation.take());
+        out.group_heal = staged_out.group_heal.or(out.group_heal.take());
+        out.nearby.extend(staged_out.nearby);
+        out.pets_changed |= staged_out.pets_changed;
+        Ok(done)
+    }
+
+    fn reload_content_in_place(&mut self, what: &str, out: &mut Outcome) -> io::Result<String> {
         let dir = self.content_dir.clone();
         let mut done = Vec::new();
         let all = what == "all";
@@ -10541,6 +10563,101 @@ mod w64_regional_quest_tests {
         std::fs::write(dir.join("power_ups.json"), b"{ not json").unwrap();
         assert!(game.reload_content("power_ups", &mut out).is_err());
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    /// A later reload failure must not publish an earlier behaviour load.
+    #[test]
+    fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
+        const GROUPED_WOLF: u64 = 131_000_102_001;
+
+        let reference = reference();
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        game.set_dev_tools(true);
+        game.set_role(crate::account_store::AccountRole::Admin);
+        let shared = game.take_shared_fields().expect("shipped field enemies");
+        let actors = |shared: &crate::encounter::SharedFieldState| {
+            shared
+                .interest_candidates(false)
+                .into_iter()
+                .map(|npc| (npc.guid, npc.position, npc.engaged))
+                .collect::<Vec<_>>()
+        };
+        let before_actors = actors(&shared);
+        let before_guid_order = game
+            .encounter
+            .as_ref()
+            .unwrap()
+            .shared_field_guids()
+            .collect::<Vec<_>>();
+        let before_behaviour = game
+            .encounter
+            .as_ref()
+            .unwrap()
+            .behaviour(GROUPED_WOLF)
+            .cloned()
+            .expect("grouped wolf behaviour");
+
+        let dir = std::env::temp_dir().join(format!("osfr-reload-all-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::copy(
+            bundled_content().join("field_enemies.json"),
+            dir.join("field_enemies.json"),
+        )
+        .unwrap();
+        let mut behaviours: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(bundled_content().join("behaviours.json")).unwrap(),
+        )
+        .unwrap();
+        behaviours["presets"]["field_roamer"]["move_speed"] = serde_json::json!(9.0);
+        std::fs::write(
+            dir.join("behaviours.json"),
+            serde_json::to_vec(&behaviours).unwrap(),
+        )
+        .unwrap();
+        game.content_dir = dir.clone();
+
+        let mut queued = Outcome::default();
+        queued.replies.push(vec![0xde, 0xad]);
+        let queued_before = queued.replies.clone();
+        let error = game.reload_content("all", &mut queued).unwrap_err();
+        assert!(error.to_string().contains("shared field reload"), "{error}");
+        assert_eq!(queued.replies, queued_before);
+        assert!(!queued.changed);
+
+        let refused = game
+            .handle_in_world(
+                &offer_chat("realm reload all"),
+                &CharacterState {
+                    guid: 1,
+                    zone_id: 0,
+                    position: [-440.0, 0.8, 1292.0],
+                    rotation: [1.0, 0.0, 0.0],
+                },
+                1_000,
+            )
+            .unwrap();
+        assert_eq!(
+            refused.replies,
+            vec![chat::system(
+                "Reload failed: shared field reload requires an idle world reload. Nothing changed."
+            )]
+        );
+        assert!(!refused.changed);
+        assert_eq!(actors(&shared), before_actors);
+        assert_eq!(
+            game.encounter
+                .as_ref()
+                .unwrap()
+                .shared_field_guids()
+                .collect::<Vec<_>>(),
+            before_guid_order
+        );
+        assert_eq!(
+            game.encounter.as_ref().unwrap().behaviour(GROUPED_WOLF),
+            Some(&before_behaviour)
+        );
+        std::fs::remove_dir_all(dir).unwrap();
     }
 
     /// W158 slice 2b: a big heart's group heal leaves the engine, reaches the
