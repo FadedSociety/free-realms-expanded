@@ -488,7 +488,7 @@ fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
     let f = Fixture::sized(&[Some("boss")], 150);
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
-    let kill = hit(&mut s.b, &mut s.field, B, FIRST, 100);
+    hit(&mut s.b, &mut s.field, B, FIRST, 100);
     assert_eq!(s.field.health(FIRST), Some(0));
     let out = s.c.shared_effects(&mut s.field, C, 200).unwrap();
     assert!(spawned(&out).is_empty());

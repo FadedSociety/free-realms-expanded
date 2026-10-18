@@ -2147,7 +2147,8 @@
       "image_id": null,
       "image_set_id": null,
       "title_type": 1,
-      "legacy_icon_id": 3141,
+      "legacy_icon_id": null,
+      "legacy_icon_id_source_value": 3141,
       "legacy_source_tag": "FreeRealms-Legacy:PlayerTitles.json",
       "source_tags": {
         "client_id": "legacy_reference_candidate_unverified_by_family_152_capture",

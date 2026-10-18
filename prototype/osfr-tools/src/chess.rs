@@ -1083,13 +1083,6 @@ impl ChessTable {
         }
     }
 
-    fn human_side(&self) -> Option<Side> {
-        match self.mode {
-            TableMode::Single { human_side, .. } => Some(human_side),
-            TableMode::TwoPlayer => None,
-        }
-    }
-
     fn emit(&self, out: &mut ChessOutcome, player_id: u64, text: String) -> io::Result<()> {
         let Some(participant) = self.participant(player_id) else {
             return Err(invalid("chess message recipient is not seated at table"));

@@ -4,7 +4,7 @@
     {
       "record": {
         "id": "chugawump",
-        "name_string_id": 2898888135,
+        "name_string_id": 72862,
         "zone_id": null,
         "entry_requirements": [],
         "encounters": [
@@ -48,7 +48,7 @@
           ]
         },
         "name_string_id": {
-          "value": 2898888135,
+          "value": 72862,
           "reason": null,
           "source": [
             {

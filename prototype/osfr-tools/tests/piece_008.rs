@@ -8,6 +8,7 @@
 //! especially “Coordinates and conversion,” “Network,” and “Key functions.”
 
 #[path = "../src/restoration/piece_008.rs"]
+#[allow(dead_code)] // The full codec is included while this test target exercises a subset.
 mod piece_008;
 
 use piece_008::{

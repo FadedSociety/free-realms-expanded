@@ -1,4 +1,5 @@
 #[path = "../src/bin/osfr-gateway.rs"]
+#[allow(dead_code)] // The executable is included to exercise selected runtime paths.
 mod gateway_runtime;
 
 use osfr_tools::{

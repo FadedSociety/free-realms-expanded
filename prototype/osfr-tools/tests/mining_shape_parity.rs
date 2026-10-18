@@ -8,8 +8,8 @@
 //!
 //! Every fixture is synthetic and private: no user save, native client, gateway state or shared content is read or written.
 use osfr_tools::mining::{
-    self, Type8BoardSpec, Type8Engine, Type8Goal, Type8Outcome, Type8Phase, Type8Run, Type8State,
-    MINING_GAME_ID, SIDE,
+    self, MINING_GAME_ID, SIDE, Type8BoardSpec, Type8Engine, Type8Goal, Type8Outcome, Type8Phase,
+    Type8Run, Type8State,
 };
 use serde_json::json;
 use std::fs;
@@ -165,12 +165,6 @@ fn texts(outcome: &Type8Outcome) -> Vec<String> {
         .iter()
         .filter_map(|p| payload_text(p))
         .collect()
-}
-
-fn has_text(outcome: &Type8Outcome, prefix: &str) -> bool {
-    texts(outcome)
-        .iter()
-        .any(|t| t == prefix || t.starts_with(&format!("{prefix}\t")))
 }
 
 fn enter_playing(engine: &mut Type8Engine) {

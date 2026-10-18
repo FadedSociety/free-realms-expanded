@@ -33,16 +33,6 @@ use std::collections::BTreeSet;
 
 /// ORIGINAL: `CollectionCategories.txt` carries ten rows.
 pub const COLLECTION_CATEGORY_COUNT: usize = 10;
-/// ORIGINAL: `FUN_009fce20` returns 3, and `CollectionCategory_DS` lists three columns.
-pub const COLLECTION_CATEGORY_COLUMNS: usize = 3;
-/// ORIGINAL: `CollectionData_DS` ends at `EntryCollected8` = column 16, so a collection row has 17
-/// columns.
-pub const COLLECTION_ROW_COLUMNS: usize = 17;
-/// ORIGINAL: the client view exposes exactly eight per-entry collected flags.
-pub const COLLECTION_VIEW_ENTRY_FLAGS: usize = 8;
-/// ORIGINAL: `FUN_009fd050` indexes the category table with `param_2 % 10`.
-pub const COLLECTION_CATEGORY_HASH_BUCKETS: u32 = 10;
-
 /// RECONSTRUCTED schema version of the durable ledger document.
 pub const LEDGER_SCHEMA_VERSION: u32 = 1;
 /// RECONSTRUCTED document bound, in the spirit of the other restoration stores.
@@ -112,16 +102,6 @@ pub const COLLECTION_CATEGORIES: [CollectionCategory; COLLECTION_CATEGORY_COUNT]
         icon_id: 1_319,
     },
 ];
-
-/// ORIGINAL: the recovered category lookup. `FUN_009fd050` takes the remainder against the ten
-/// buckets, so category 10 lands in bucket 0 and category 11 in bucket 1. `None` means the id is not
-/// one of the ten recovered rows.
-pub fn category_bucket(category_id: i32) -> Option<u32> {
-    if category_id <= 0 {
-        return None;
-    }
-    Some((category_id as u32) % COLLECTION_CATEGORY_HASH_BUCKETS)
-}
 
 /// ORIGINAL: the category row for an id, if the id is one of the ten recovered rows.
 pub fn category(category_id: i32) -> Option<CollectionCategory> {

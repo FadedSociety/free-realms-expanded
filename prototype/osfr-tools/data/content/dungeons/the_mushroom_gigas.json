@@ -4,7 +4,7 @@
     {
       "record": {
         "id": "the_mushroom_gigas",
-        "name_string_id": 2901551770,
+        "name_string_id": 76497,
         "zone_id": null,
         "entry_requirements": [
           {
@@ -62,7 +62,7 @@
           ]
         },
         "name_string_id": {
-          "value": 2901551770,
+          "value": 76497,
           "reason": null,
           "source": [
             {

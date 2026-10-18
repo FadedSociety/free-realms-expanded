@@ -4,7 +4,7 @@
     {
       "record": {
         "id": "misty_mountain",
-        "name_string_id": 440183008,
+        "name_string_id": 71773,
         "zone_id": null,
         "entry_requirements": [],
         "encounters": [
@@ -48,7 +48,7 @@
           ]
         },
         "name_string_id": {
-          "value": 440183008,
+          "value": 71773,
           "reason": null,
           "source": [
             {

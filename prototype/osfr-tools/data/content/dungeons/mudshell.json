@@ -4,7 +4,7 @@
     {
       "record": {
         "id": "mudshell",
-        "name_string_id": 134101591,
+        "name_string_id": 78144,
         "zone_id": null,
         "entry_requirements": [],
         "encounters": [
@@ -48,7 +48,7 @@
           ]
         },
         "name_string_id": {
-          "value": 134101591,
+          "value": 78144,
           "reason": null,
           "source": [
             {

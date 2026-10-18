@@ -24,12 +24,10 @@ use std::io::ErrorKind;
 use mystery_chest::{Request, check_reply, item_reward, parse_request};
 
 const OPCODE_INVENTORY: u16 = 42;
-const OPCODE_CLIENT_UPDATE: u16 = 38;
 const OPCODE_REWARD: u16 = 50;
 
 const SUBUSE: u16 = 15;
 const SUBCHECK: u16 = 16;
-const SUBCHECK_REPLY: u16 = 30;
 const SUBREWARD_BUNDLE: u8 = 1;
 
 fn inventory_request(subtype: u16, item_id: i32) -> Vec<u8> {

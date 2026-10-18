@@ -1,9 +1,9 @@
 // Focused proof for the Harvesting (MatchThree "Farming") module.
 use harvesting::{
-    board_spec, chain_score, chain_time_bonus_seconds, collectable_score, content_json,
-    diamond_shape, evaluate, parse_caret, parse_grid_templates, produce, region, validate_content,
-    GoalProgress, HarvestContent, HarvestError, LevelRow, ProgressionRow, SpawnRow, TimerRow,
-    Type8Output, PRODUCE, REGIONS,
+    GoalProgress, HarvestContent, HarvestError, LevelRow, PRODUCE, ProgressionRow, REGIONS,
+    SpawnRow, TimerRow, Type8Output, board_spec, chain_score, chain_time_bonus_seconds,
+    collectable_score, content_json, diamond_shape, evaluate, parse_caret, parse_grid_templates,
+    produce, region, validate_content,
 };
 use osfr_tools::harvesting;
 use serde_json::Value;
@@ -495,6 +495,7 @@ fn emitted_spec_is_consumable_by_a_type8_engine_loader() {
     let json = content_json(109).unwrap();
     let c: ContentMirror = serde_json::from_str(&json).expect("contract mirror parses");
     assert_eq!(c.schema_version, 1);
+    assert_eq!(c.game_id, 109);
     assert_eq!(
         (c.name_id, c.description_id, c.icon_id),
         (100833, 94149, 908)

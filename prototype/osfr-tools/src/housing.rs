@@ -564,13 +564,6 @@ struct Lot {
 }
 
 impl Lot {
-    fn instance_index(&self) -> BTreeMap<u32, u64> {
-        self.fixtures
-            .iter()
-            .map(|(guid, fixture)| (fixture.item_instance_id, *guid))
-            .collect()
-    }
-
     fn snapshot(&self) -> LotSnapshot {
         LotSnapshot {
             owner_guid: self.owner_guid,

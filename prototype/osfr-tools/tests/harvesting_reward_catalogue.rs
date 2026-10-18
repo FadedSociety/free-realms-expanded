@@ -16,9 +16,6 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-/// Region 111's recovered bundle definitions in locale order; the frozen
-/// catalogue defines only 2887 and 2877.
-const BUNDLES: [i32; 4] = [2885, 2887, 2890, 2877];
 /// Four definitions the frozen catalogue does define.
 const PRESENT: [i32; 4] = [2739, 879, 65834, 2436];
 static NEXT: AtomicU64 = AtomicU64::new(0);

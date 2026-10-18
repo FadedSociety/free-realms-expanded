@@ -4,12 +4,12 @@
 //! `core/ServerGrid.as` `StartWildTiles`/`StartDestruction`/`StartShuffle` and
 //! `GameLevel.OnActionMsg`.
 #[path = "../src/mining.rs"]
+#[allow(dead_code)] // The full Type8 engine is included; this target exercises powerups.
 mod mining;
 use mining::{
-    Type8BoardSpec, Type8Engine, Type8Goal, Type8Outcome, Type8Phase, Type8PowerupDefinition,
-    Type8State, MINING_GAME_ID, SIDE, TILE_BLOCKER, TILE_EMPTY, TILE_POWERUP_DESTRUCT,
-    TILE_POWERUP_DYNAMITE, TILE_POWERUP_SHUFFLE, TILE_POWERUP_START, TILE_POWERUP_WILDTILE,
-    TILE_WILDCARD,
+    MINING_GAME_ID, SIDE, TILE_BLOCKER, TILE_EMPTY, TILE_POWERUP_DESTRUCT, TILE_POWERUP_DYNAMITE,
+    TILE_POWERUP_SHUFFLE, TILE_POWERUP_START, TILE_POWERUP_WILDTILE, TILE_WILDCARD, Type8BoardSpec,
+    Type8Engine, Type8Goal, Type8Outcome, Type8Phase, Type8PowerupDefinition, Type8State,
 };
 use serde_json::json;
 use std::fs;
@@ -197,12 +197,6 @@ fn texts(outcome: &Type8Outcome) -> Vec<String> {
         .collect()
 }
 
-fn text_with(outcome: &Type8Outcome, prefix: &str) -> Option<String> {
-    texts(outcome)
-        .into_iter()
-        .find(|t| t == prefix || t.starts_with(&format!("{prefix}\t")))
-}
-
 fn enter_playing(engine: &mut Type8Engine) -> Type8Outcome {
     let id = FIRST_INSTANCE;
     engine.begin(PROFILE).unwrap();
@@ -302,9 +296,11 @@ fn default_powerup_percent_matches_the_old_engine_byte_for_byte() {
 
     assert_eq!(started_a.replies, started_b.replies);
     assert_eq!(a.state(), b.state());
-    assert!(!texts(&started_a)
-        .iter()
-        .any(|t| t.starts_with("OnPowerupInitMsg")));
+    assert!(
+        !texts(&started_a)
+            .iter()
+            .any(|t| t.starts_with("OnPowerupInitMsg"))
+    );
 }
 
 #[test]
@@ -334,10 +330,12 @@ fn authored_powerups_advertise_and_replace_selectable_tiles() {
     assert!(active.board.iter().all(|v| *v == TILE_EMPTY
         || *v == mining::TILE_DROPZONE
         || (TILE_POWERUP_START..=TILE_POWERUP_SHUFFLE).contains(v)));
-    assert!(active
-        .tile_queue
-        .iter()
-        .all(|v| (TILE_POWERUP_START..=TILE_POWERUP_SHUFFLE).contains(v)));
+    assert!(
+        active
+            .tile_queue
+            .iter()
+            .all(|v| (TILE_POWERUP_START..=TILE_POWERUP_SHUFFLE).contains(v))
+    );
 
     // The old default spawns only selectables in the regular cells; the
     // difference proves the new branch produced the powerups.
@@ -345,9 +343,11 @@ fn authored_powerups_advertise_and_replace_selectable_tiles() {
     let mut engine = plain.load(None);
     let _ = enter_playing(&mut engine);
     let board = &engine.state().active.as_ref().unwrap().board;
-    assert!(!board
-        .iter()
-        .any(|v| (TILE_POWERUP_START..=TILE_POWERUP_SHUFFLE).contains(v)));
+    assert!(
+        !board
+            .iter()
+            .any(|v| (TILE_POWERUP_START..=TILE_POWERUP_SHUFFLE).contains(v))
+    );
     assert!(board.iter().any(|v| (400..500).contains(v)));
 }
 
@@ -437,12 +437,14 @@ fn dynamite_neighbour_order_is_down_up_right_left() {
         wide_action_engine(TILE_POWERUP_DYNAMITE, &pool, "3,4,4,4,3,4,3,5,4,4,", 5);
     engine.seed_random_queue(&vec![0_u16; 70]).unwrap();
     let before = engine.state().clone();
-    assert!(engine
-        .handle(&client_payload(
-            FIRST_INSTANCE,
-            "OnActionMsg\t950\t3,4,4,4,3,4,3,5,4,4,",
-        ))
-        .is_err());
+    assert!(
+        engine
+            .handle(&client_payload(
+                FIRST_INSTANCE,
+                "OnActionMsg\t950\t3,4,4,4,3,4,3,5,4,4,",
+            ))
+            .is_err()
+    );
     assert_eq!(engine.state(), &before);
 }
 
@@ -787,9 +789,11 @@ fn every_clickable_action_consumes_one_draw_per_named_tile() {
             1,
             "action {value} must consume exactly one queued draw"
         );
-        assert!(!texts(&out)
-            .iter()
-            .any(|t| t.starts_with("OnRandomQueueMsg")));
+        assert!(
+            !texts(&out)
+                .iter()
+                .any(|t| t.starts_with("OnRandomQueueMsg"))
+        );
     }
 }
 

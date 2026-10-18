@@ -4,7 +4,7 @@
     {
       "record": {
         "id": "stone_heart_s_hideaway",
-        "name_string_id": 567675672,
+        "name_string_id": 426971,
         "zone_id": null,
         "entry_requirements": [
           {
@@ -66,7 +66,7 @@
           ]
         },
         "name_string_id": {
-          "value": 567675672,
+          "value": 426971,
           "reason": null,
           "source": [
             {

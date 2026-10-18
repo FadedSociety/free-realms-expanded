@@ -427,7 +427,7 @@ impl Rig {
         ready: impl Fn(&Value) -> bool,
     ) -> Value {
         let deadline = Instant::now() + SAVE_WAIT;
-        let mut last = String::from("no read yet");
+        let mut last;
         loop {
             match fs::read(self.save_path(account)) {
                 Ok(bytes) => match serde_json::from_slice::<Value>(&bytes) {

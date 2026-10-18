@@ -1416,10 +1416,6 @@ impl<'a> WireCursor<'a> {
         Ok(bytes)
     }
 
-    fn u16(&mut self) -> Result<u16, NpcInteractionError> {
-        Ok(u16::from_le_bytes(self.take(2)?.try_into().unwrap()))
-    }
-
     fn u32(&mut self) -> Result<u32, NpcInteractionError> {
         Ok(u32::from_le_bytes(self.take(4)?.try_into().unwrap()))
     }

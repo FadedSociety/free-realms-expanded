@@ -40,11 +40,21 @@
 mod piece_074;
 
 use piece_074::{
-    COLLECTION_CATEGORIES, COLLECTION_CATEGORY_COLUMNS, COLLECTION_CATEGORY_COUNT,
-    COLLECTION_CATEGORY_HASH_BUCKETS, COLLECTION_ROW_COLUMNS, COLLECTION_VIEW_ENTRY_FLAGS,
-    CollectOutcome, CollectionCatalogue, CollectionDefinition, CollectionError, CollectionLedger,
-    category_bucket,
+    COLLECTION_CATEGORIES, COLLECTION_CATEGORY_COUNT, CollectOutcome, CollectionCatalogue,
+    CollectionDefinition, CollectionError, CollectionLedger,
 };
+
+const COLLECTION_CATEGORY_COLUMNS: usize = 3;
+const COLLECTION_ROW_COLUMNS: usize = 17;
+const COLLECTION_VIEW_ENTRY_FLAGS: usize = 8;
+const COLLECTION_CATEGORY_HASH_BUCKETS: u32 = 10;
+
+fn category_bucket(category_id: i32) -> Option<u32> {
+    if category_id <= 0 {
+        return None;
+    }
+    Some((category_id as u32) % COLLECTION_CATEGORY_HASH_BUCKETS)
+}
 
 /// COMMUNITY: the Toys category row, `CollectionCategories.txt` id 4.
 const CATEGORY_TOYS: i32 = 4;

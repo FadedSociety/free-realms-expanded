@@ -4,7 +4,7 @@
     {
       "record": {
         "id": "bergram_stumpfinger_s_ghost",
-        "name_string_id": 1090123129,
+        "name_string_id": 90419,
         "zone_id": null,
         "entry_requirements": [],
         "encounters": [
@@ -48,7 +48,7 @@
           ]
         },
         "name_string_id": {
-          "value": 1090123129,
+          "value": 90419,
           "reason": null,
           "source": [
             {
