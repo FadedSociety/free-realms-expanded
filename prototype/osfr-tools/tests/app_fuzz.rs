@@ -8,6 +8,7 @@ use osfr_tools::{
     account_store::AccountRole,
     chat,
     cooking::Cooking,
+    derby::{DerbyMessage, ParticipantKey, VehicleHitReport, VehiclePose, encode_inner},
     forging::Forging,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
@@ -41,6 +42,70 @@ fn wrap(inner: &[u8]) -> Vec<u8> {
     let mut bytes = vec![5, 0, 1];
     bytes.extend((inner.len() as u32).to_le_bytes());
     bytes.extend(inner);
+    bytes
+}
+
+fn unwrap_reply(packet: &[u8]) -> Option<&[u8]> {
+    if packet.starts_with(&[5, 0, 1]) {
+        let length = u32::from_le_bytes(packet.get(3..7)?.try_into().ok()?) as usize;
+        packet.get(7..7 + length)
+    } else {
+        None
+    }
+}
+
+fn derby_pose(guid: u64, position: [f32; 3]) -> Vec<u8> {
+    encode_inner(&DerbyMessage::VehiclePose(VehiclePose {
+        key: ParticipantKey(guid),
+        transform_bits: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            position[0],
+            position[1],
+            position[2],
+            1.0,
+        ]
+        .map(f32::to_bits),
+        vector_a_bits: [0; 4],
+        vector_b_bits: [0; 4],
+        controls_bits: [0; 3],
+        flags: [0; 4],
+        sequence: 1,
+    }))
+    .unwrap()
+}
+
+fn derby_start_request(instance: i32) -> Vec<u8> {
+    let mut bytes = vec![39, 0, 5];
+    bytes.extend(instance.to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes
+}
+
+fn derby_quit_request(instance: i32) -> Vec<u8> {
+    let mut bytes = vec![39, 0, 6];
+    bytes.extend(instance.to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes
+}
+
+fn derby_cancel_request(instance: i32) -> Vec<u8> {
+    let mut bytes = vec![39, 0, 7];
+    bytes.extend(instance.to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
     bytes
 }
 
@@ -190,7 +255,68 @@ impl Fixture {
                 "max_level":20,"members_only":false,"trainer_npc_ids":[],"quest_ids":[QUEST],"abilities":[],"source":provenance
             }]}),
         );
-        Self { content, reference }
+        let fixture = Self { content, reference };
+        fixture.write_derby_content();
+        fixture
+    }
+
+    fn write_derby_content(&self) {
+        let transform = [
+            1.0_f32, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+        ]
+        .map(f32::to_bits);
+        write_json(
+            &self.content.join("derby_entry.json"),
+            &json!({
+                "schema_version": 1,
+                "game_id": 39,
+                "vehicle": {
+                    "name": [],
+                    "definition": [1, 2, 3, 4],
+                    "start_transform_bits": transform,
+                    "unknown_flag": false,
+                    "unknown_value_bits": 0
+                },
+                "rules": {
+                    "max_drivers": 8,
+                    "start_health": 20,
+                    "contact_damage_per_unit": 1.0,
+                    "contact_cooldown_ms": 100,
+                    "contact_radius_m": 5.0,
+                    "max_impact": 50.0,
+                    "max_pose_age_ms": 5000,
+                    "max_damage_per_contact": 30,
+                    "lobby_timeout_ms": 1000,
+                    "pickup_radius": 3.0,
+                    "health_pickup": 5,
+                    "boost_pickup": 5.0,
+                    "shield_duration_ms": 1000,
+                    "attack_duration_ms": 1000,
+                    "ultimate_duration_ms": 1000,
+                    "attack_multiplier": 2.0,
+                    "ultimate_multiplier": 2.0,
+                    "respawn_delay_ms": 1000,
+                    "results_duration_ms": 1000,
+                    "knockout_points": 2,
+                    "leader_knockout_points": 3,
+                    "knockout_point_loss": 1,
+                    "score_target": 2,
+                    "time_limit_ms": null,
+                    "config": {"value_a_bits": 0, "value_b": 0}
+                },
+                "pickups": [],
+                "reward": {"coins": 5}
+            }),
+        );
+        write_json(
+            &self.content.join("derby_gates.json"),
+            &json!({
+                "schema_version": 1,
+                "menu_string_id": 3053,
+                "npcs": [NPC],
+                "reward_cooldown_s": 600
+            }),
+        );
     }
 
     fn state(&self) -> GameplayState {
@@ -346,6 +472,72 @@ impl Fixture {
         // Use real loaders, with server-authored fixture state; no cheat command is enabled.
         gateway.enable_gameplay(&self.content, Some(state)).unwrap();
         gateway
+    }
+
+    fn active_derby(&self) -> (Gateway, ParticipantKey, i32) {
+        let mut gateway = self.gateway(true, false);
+        let guid = gateway.state().guid;
+        let mut menu = vec![26, 0, 8, 0];
+        menu.extend(NPC.to_le_bytes());
+        menu.push(0);
+        gateway.handle_at(&wrap(&menu), 1_000).unwrap();
+        let mut choice = vec![26, 0, 10, 0];
+        choice.extend(NPC.to_le_bytes());
+        choice.extend(3_i32.to_le_bytes());
+        let entered = gateway.handle_at(&wrap(&choice), 1_100).unwrap();
+        let instance = entered
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .find(|packet| packet.starts_with(&[39, 0, 16]))
+            .map(|packet| i32::from_le_bytes(packet[3..7].try_into().unwrap()))
+            .expect("derby offer");
+        gateway
+            .handle_at(&wrap(&derby_start_request(instance)), 1_200)
+            .unwrap();
+        let register = encode_inner(&DerbyMessage::RegisterPlayer {
+            key: ParticipantKey(guid),
+            unknown_key: 0,
+        })
+        .unwrap();
+        let setup = gateway.handle_at(&wrap(&register), 1_300).unwrap();
+        let npc = setup
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .filter_map(|packet| osfr_tools::derby::decode_inner(packet).ok())
+            .find_map(|message| match message {
+                DerbyMessage::CreateVehicle(vehicle) if vehicle.key != ParticipantKey(guid) => {
+                    Some(vehicle.key)
+                }
+                _ => None,
+            })
+            .expect("NPC driver");
+        for value in 3..=8 {
+            let packet = encode_inner(&DerbyMessage::PlayerPhase {
+                key: ParticipantKey(guid),
+                phase: value,
+            })
+            .unwrap();
+            gateway
+                .handle_at(&wrap(&packet), 2_000 + value as u64)
+                .unwrap();
+        }
+        for value in (0..=4).rev() {
+            let packet = encode_inner(&DerbyMessage::CountdownStatus {
+                key: ParticipantKey(guid),
+                count: value,
+            })
+            .unwrap();
+            gateway
+                .handle_at(&wrap(&packet), 3_000 + (4 - value) as u64)
+                .unwrap();
+        }
+        assert_eq!(
+            gateway.gameplay().unwrap().derby_phase(),
+            Some(osfr_tools::derby::DerbyPhase::Running)
+        );
+        (gateway, npc, instance)
     }
 }
 
@@ -778,6 +970,393 @@ fn t3_routed_hostile_corpus_content_and_trace_on_off() {
         start.elapsed()
     );
     assert!(start.elapsed() < Duration::from_secs(60));
+}
+
+#[test]
+fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
+    let fixture = Fixture::new();
+    let (mut gateway, npc, instance) = fixture.active_derby();
+    let guid = gateway.state().guid;
+    let absent_pose_hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+        reporter: ParticipantKey(guid),
+        other: npc,
+        impact_bits: 1.0_f32.to_bits(),
+    }))
+    .unwrap();
+    for (mutation, input) in hostile(&absent_pose_hit) {
+        let before = gateway.snapshot();
+        let phase = gateway.gameplay().unwrap().derby_phase();
+        let result = catch_unwind(AssertUnwindSafe(|| gateway.handle_at(&wrap(&input), NOW)));
+        assert!(result.is_ok(), "panic: derby {mutation}");
+        if let Ok(out) = result.unwrap() {
+            bounded(&out);
+        }
+        assert_eq!(
+            gateway.snapshot(),
+            before,
+            "derby mutation changed persisted state: {mutation}"
+        );
+        assert_eq!(
+            gateway.gameplay().unwrap().derby_phase(),
+            phase,
+            "derby mutation changed the live phase: {mutation}"
+        );
+        follow_up(&mut gateway);
+    }
+
+    let before_stale = gateway.snapshot();
+    let before_quit_coins = before_stale.gameplay.as_ref().unwrap().inventory.coins;
+    let stale_phase = gateway.gameplay().unwrap().derby_phase();
+    gateway
+        .handle_at(&wrap(&derby_quit_request(instance + 1)), 4_100)
+        .unwrap();
+    assert_eq!(gateway.snapshot(), before_stale);
+    assert_eq!(gateway.gameplay().unwrap().derby_phase(), stale_phase);
+
+    let quit = gateway
+        .handle_at(&wrap(&derby_quit_request(instance)), 4_200)
+        .unwrap();
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert!(
+        quit.applications
+            .iter()
+            .any(|packet| packet.starts_with(&[39, 0, 6]))
+    );
+    assert!(
+        quit.replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[39, 0, 19]))
+    );
+    let after_quit = gateway.snapshot();
+    assert_eq!(
+        after_quit.gameplay.as_ref().unwrap().inventory.coins,
+        before_quit_coins
+    );
+    gateway
+        .handle_at(&wrap(&derby_quit_request(instance)), 4_300)
+        .unwrap();
+    assert_eq!(gateway.snapshot(), after_quit);
+
+    let (mut gateway, npc, _) = fixture.active_derby();
+    let guid = gateway.state().guid;
+    gateway
+        .handle_at(&wrap(&derby_pose(guid, [0.0, 0.0, 0.0])), 3_900)
+        .unwrap();
+    let before_limited = gateway.snapshot();
+    let limited = gateway
+        .handle_at(
+            &wrap(
+                &encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+                    reporter: ParticipantKey(guid),
+                    other: npc,
+                    impact_bits: 40.0_f32.to_bits(),
+                }))
+                .unwrap(),
+            ),
+            3_950,
+        )
+        .unwrap();
+    assert_eq!(gateway.snapshot(), before_limited);
+    assert!(
+        !limited
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| *packet == [34, 0, 1, 0, 10, 0, 0, 0])
+    );
+    let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+        reporter: ParticipantKey(guid),
+        other: npc,
+        impact_bits: 20.0_f32.to_bits(),
+    }))
+    .unwrap();
+    let results = gateway.handle_at(&wrap(&hit), 4_000).unwrap();
+    assert!(
+        results
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| *packet == [34, 0, 1, 0, 10, 0, 0, 0])
+    );
+    let close_ready = gateway.tick_at(5_000).unwrap();
+    assert!(
+        close_ready
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| *packet == [34, 0, 1, 0, 11, 0, 0, 0])
+    );
+    let before_coins = gateway
+        .snapshot()
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .inventory
+        .coins;
+    let paid = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 5_100).unwrap();
+    assert!(paid.gameplay_changed);
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .inventory
+            .coins,
+        before_coins + 5
+    );
+
+    let before_refusal = gateway.snapshot();
+    let mut menu = vec![26, 0, 8, 0];
+    menu.extend(NPC.to_le_bytes());
+    menu.push(0);
+    gateway.handle_at(&wrap(&menu), 5_200).unwrap();
+    let mut choice = vec![26, 0, 10, 0];
+    choice.extend(NPC.to_le_bytes());
+    choice.extend(3_i32.to_le_bytes());
+    let refused = gateway.handle_at(&wrap(&choice), 5_300).unwrap();
+    assert!(
+        refused
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[15, 0]))
+    );
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(gateway.snapshot(), before_refusal);
+    let retry = gateway.handle_at(&wrap(&choice), 5_400).unwrap();
+    assert!(
+        retry
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[15, 0]))
+    );
+    assert_eq!(gateway.snapshot(), before_refusal);
+    gateway.reset_session();
+    let after_reset = gateway.snapshot();
+    let after_reset_game = after_reset.gameplay.as_ref().unwrap();
+    assert_eq!(after_reset_game.inventory.coins, before_coins + 5);
+    assert_eq!(
+        after_reset_game
+            .derby
+            .as_ref()
+            .map(|state| state.last_paid_unix),
+        before_refusal
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .derby
+            .as_ref()
+            .map(|state| state.last_paid_unix)
+    );
+    assert!(!gateway.gameplay().unwrap().derby_active());
+}
+
+#[test]
+fn gateway_offer_cancel_restores_state_and_rejects_a_stale_quit() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(true, false);
+    let before = gateway.snapshot();
+    let before_coins = before.gameplay.as_ref().unwrap().inventory.coins;
+    let before_job = gateway.gameplay().unwrap().active_profile();
+    let mut menu = vec![26, 0, 8, 0];
+    menu.extend(NPC.to_le_bytes());
+    menu.push(0);
+    gateway.handle_at(&wrap(&menu), 1_000).unwrap();
+    let mut choice = vec![26, 0, 10, 0];
+    choice.extend(NPC.to_le_bytes());
+    choice.extend(3_i32.to_le_bytes());
+    let entered = gateway.handle_at(&wrap(&choice), 1_100).unwrap();
+    let instance = entered
+        .replies
+        .iter()
+        .filter_map(|packet| unwrap_reply(packet))
+        .find(|packet| packet.starts_with(&[39, 0, 16]))
+        .map(|packet| i32::from_le_bytes(packet[3..7].try_into().unwrap()))
+        .expect("derby offer");
+    assert!(gateway.gameplay().unwrap().derby_active());
+
+    let cancelled = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 1_200).unwrap();
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(gateway.gameplay().unwrap().active_profile(), before_job);
+    assert_eq!(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .inventory
+            .coins,
+        before_coins
+    );
+    assert!(
+        cancelled
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[39, 0, 19]))
+    );
+    assert!(
+        cancelled
+            .nearby
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+    );
+
+    let after = gateway.snapshot();
+    gateway
+        .handle_at(&wrap(&derby_quit_request(instance)), 1_300)
+        .unwrap();
+    assert_eq!(gateway.snapshot(), after);
+}
+
+#[test]
+fn gateway_pending_game_cancel_retires_without_rewards() {
+    let fixture = Fixture::new();
+    let (mut gateway, _npc, instance) = fixture.active_derby();
+    let before = gateway.snapshot();
+    let before_job = before
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .profiles
+        .as_ref()
+        .unwrap()
+        .active;
+    let phase = gateway.gameplay().unwrap().derby_phase();
+
+    gateway
+        .handle_at(&wrap(&derby_cancel_request(instance + 1)), 4_100)
+        .unwrap();
+    assert_eq!(gateway.snapshot(), before);
+    assert_eq!(gateway.gameplay().unwrap().derby_phase(), phase);
+
+    let cancelled = gateway
+        .handle_at(&wrap(&derby_cancel_request(instance)), 4_200)
+        .unwrap();
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(before_job)
+    );
+    assert_eq!(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .inventory
+            .coins,
+        before.gameplay.as_ref().unwrap().inventory.coins
+    );
+    assert!(
+        cancelled
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[39, 0, 19]))
+    );
+    assert!(
+        cancelled
+            .nearby
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+    );
+    let after = gateway.snapshot();
+    gateway
+        .handle_at(&wrap(&derby_cancel_request(instance)), 4_300)
+        .unwrap();
+    assert_eq!(gateway.snapshot(), after);
+}
+
+#[test]
+fn unstarted_derby_offer_times_out_without_rewards() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(true, false);
+    let before = gateway.snapshot();
+    let before_job = before
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .profiles
+        .as_ref()
+        .unwrap()
+        .active;
+    let before_coins = before.gameplay.as_ref().unwrap().inventory.coins;
+    let mut menu = vec![26, 0, 8, 0];
+    menu.extend(NPC.to_le_bytes());
+    menu.push(0);
+    gateway.handle_at(&wrap(&menu), 1_000).unwrap();
+    let mut choice = vec![26, 0, 10, 0];
+    choice.extend(NPC.to_le_bytes());
+    choice.extend(3_i32.to_le_bytes());
+    gateway.handle_at(&wrap(&choice), 1_100).unwrap();
+
+    gateway.tick_at(2_099).unwrap();
+    assert!(gateway.gameplay().unwrap().derby_active());
+    let timed_out = gateway.tick_at(2_100).unwrap();
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(before_job)
+    );
+    assert_eq!(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .inventory
+            .coins,
+        before_coins
+    );
+    assert!(
+        timed_out
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[39, 0, 19]))
+    );
+    assert!(
+        timed_out
+            .nearby
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+    );
+    let after = gateway.snapshot();
+    gateway.tick_at(2_200).unwrap();
+    assert_eq!(gateway.snapshot(), after);
+}
+
+#[test]
+fn active_activity_refuses_derby_without_consuming_the_npc_menu() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.active("mining");
+    let mut menu = vec![26, 0, 8, 0];
+    menu.extend(NPC.to_le_bytes());
+    menu.push(0);
+    gateway.handle_at(&wrap(&menu), 1_000).unwrap();
+    let choice = {
+        let mut packet = vec![26, 0, 10, 0];
+        packet.extend(NPC.to_le_bytes());
+        packet.extend(3_i32.to_le_bytes());
+        packet
+    };
+    let before = gateway.snapshot();
+    let first = gateway.handle_at(&wrap(&choice), 1_100).unwrap();
+    assert!(!first.replies.is_empty());
+    assert_eq!(gateway.snapshot(), before);
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    let retry = gateway.handle_at(&wrap(&choice), 1_200).unwrap();
+    assert!(
+        !retry.replies.is_empty(),
+        "the same offered Derby choice must remain retryable"
+    );
+    assert_eq!(gateway.snapshot(), before);
+    assert!(!gateway.gameplay().unwrap().derby_active());
 }
 
 #[test]

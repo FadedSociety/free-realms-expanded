@@ -47,6 +47,7 @@ impl Gameplay {
         &mut self,
         inner: &[u8],
         character: &CharacterState,
+        now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Overworld enemies answer interact/select with the encounter's Attack
@@ -659,10 +660,14 @@ impl Gameplay {
                 // (R) The NPC service proved range and that this exact option was offered;
                 // the derby service decides admission. Staging keeps the job switch atomic.
                 let busy = self.activity_busy();
-                match self.derby.as_ref().map(|derby| derby.admit(gate, busy)) {
+                match self
+                    .derby
+                    .as_ref()
+                    .map(|derby| derby.admit_at(gate, busy, current_unix_seconds()))
+                {
                     Some(Ok(())) => {
                         let mut staged = self.clone();
-                        out = staged.begin_derby(character)?;
+                        out = staged.begin_derby(character, now_ms)?;
                         *self = staged;
                     }
                     Some(Err(denied)) => out.replies.push(chat::system(denied.message())),

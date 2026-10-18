@@ -13,7 +13,9 @@ use osfr_tools::{
     },
     derby_gateway::{DerbyGates, DerbyGateway, DerbyGatewayContent, DerbyReward},
     gameplay::Gameplay,
+    harvesting,
     inventory::Inventory,
+    mining::Type8Engine,
     profiles::ProfileState,
     rewards::{RewardState, apply_grant},
 };
@@ -87,6 +89,7 @@ impl Fixture {
                 schema_version: 1,
                 menu_string_id: 3053,
                 npcs: vec![GATE],
+                reward_cooldown_s: 600,
             })
             .unwrap(),
         )
@@ -106,6 +109,14 @@ struct GameplayFixture {
 
 impl GameplayFixture {
     fn new() -> Self {
+        Self::build(false)
+    }
+
+    fn with_opening() -> Self {
+        Self::build(true)
+    }
+
+    fn build(with_opening: bool) -> Self {
         let source = std::env::var_os("OSFR_DERBY_ROUTE_CONTENT")
             .map(PathBuf::from)
             .unwrap_or_else(|| {
@@ -136,6 +147,19 @@ impl GameplayFixture {
             let source_file = source.join(file);
             if source_file.is_file() {
                 fs::copy(&source_file, path.join(file)).unwrap();
+            }
+        }
+        if with_opening {
+            for entry in fs::read_dir(&source).unwrap() {
+                let source_file = entry.unwrap().path();
+                let extension = source_file.extension().and_then(|value| value.to_str());
+                if source_file.is_file()
+                    && matches!(extension, Some("json" | "bin"))
+                    && source_file.file_name().and_then(|value| value.to_str())
+                        != Some("item-catalogue.json")
+                {
+                    fs::copy(&source_file, path.join(source_file.file_name().unwrap())).unwrap();
+                }
             }
         }
         fs::create_dir(path.join("npcs")).unwrap();
@@ -206,6 +230,7 @@ impl GameplayFixture {
                 schema_version: 1,
                 menu_string_id: 3053,
                 npcs: vec![GATE],
+                reward_cooldown_s: 600,
             })
             .unwrap(),
         )
@@ -244,6 +269,11 @@ fn content() -> DerbyGatewayContent {
             start_health: 20,
             contact_damage_per_unit: 1.0,
             contact_cooldown_ms: 100,
+            contact_radius_m: 5.0,
+            max_impact: 50.0,
+            max_pose_age_ms: 5_000,
+            max_damage_per_contact: 100,
+            lobby_timeout_ms: 120_000,
             pickup_radius: 3.0,
             health_pickup: 5,
             boost_pickup: 5.0,
@@ -293,11 +323,50 @@ fn start_request(instance: i32) -> Vec<u8> {
     bytes
 }
 
+fn quit_request(instance: i32) -> Vec<u8> {
+    let mut bytes = vec![39, 0, 6];
+    bytes.extend(instance.to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes.extend((-1_i32).to_le_bytes());
+    bytes
+}
+
 fn register() -> Vec<u8> {
     encode_inner(&DerbyMessage::RegisterPlayer {
         key: OWNER,
         unknown_key: 0,
     })
+    .unwrap()
+}
+
+fn pose(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
+    encode_inner(&DerbyMessage::VehiclePose(osfr_tools::derby::VehiclePose {
+        key,
+        transform_bits: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            position[0],
+            position[1],
+            position[2],
+            1.0,
+        ]
+        .map(f32::to_bits),
+        vector_a_bits: [0; 4],
+        vector_b_bits: [0; 4],
+        controls_bits: [0; 3],
+        flags: [0; 4],
+        sequence: 1,
+    }))
     .unwrap()
 }
 
@@ -410,6 +479,9 @@ fn npc_entry_reaches_running_results_and_one_payout() {
         Some(osfr_tools::derby::DerbyPhase::Running)
     );
 
+    gateway
+        .handle(&pose(OWNER, [0.0, 0.0, 0.0]), 3_900)
+        .unwrap();
     let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
         reporter: OWNER,
         other: npc,
@@ -475,6 +547,217 @@ fn reward_apply_is_atomic_and_an_inactive_close_is_inert() {
 }
 
 #[test]
+fn offer_cancel_and_running_quit_retire_without_rewards_and_stale_quit_is_inert() {
+    let fixture = Fixture::new();
+    let mut gateway = DerbyGateway::load(&fixture.path).unwrap().unwrap();
+    let rewards = reward_state(&fixture);
+    let before = serde_json::to_value(rewards.inventory.state()).unwrap();
+
+    gateway.begin(&character()).unwrap();
+    let cancelled = gateway.cancel(&[26, 0, 42, 0]).unwrap();
+    assert!(!gateway.active());
+    assert_eq!(&cancelled[0][..3], &[39, 0, 19]);
+    assert_eq!(
+        serde_json::to_value(rewards.inventory.state()).unwrap(),
+        before
+    );
+
+    gateway.begin(&character()).unwrap();
+    let instance = gateway.instance_id().unwrap();
+    gateway.start(&start_request(instance)).unwrap();
+    gateway.handle(&register(), 2_000).unwrap();
+    for phase_value in 3..=8 {
+        gateway
+            .handle(&phase(phase_value), 2_000 + phase_value as u64)
+            .unwrap();
+    }
+    for value in (0..=4).rev() {
+        gateway
+            .handle(&countdown(value), 3_000 + (4 - value) as u64)
+            .unwrap();
+    }
+    assert_eq!(
+        gateway.phase(),
+        Some(osfr_tools::derby::DerbyPhase::Running)
+    );
+    assert!(
+        gateway
+            .cancel(&quit_request(instance + 1))
+            .unwrap()
+            .is_empty()
+    );
+    let mut stale_ack = quit_request(instance + 1);
+    stale_ack[2] = 7;
+    assert!(gateway.cancel(&stale_ack).unwrap().is_empty());
+    assert_eq!(
+        gateway.phase(),
+        Some(osfr_tools::derby::DerbyPhase::Running)
+    );
+    assert!(gateway.cancel(&[39, 0, 6, 0]).unwrap().is_empty());
+    let quit = gateway.cancel(&quit_request(instance)).unwrap();
+    assert_eq!(&quit[0][..3], &[39, 0, 19]);
+    assert!(!gateway.active());
+    assert_eq!(
+        serde_json::to_value(rewards.inventory.state()).unwrap(),
+        before
+    );
+    assert!(!gateway.close(&[26, 0, 42, 0], &rewards).unwrap().accepted);
+}
+
+#[test]
+fn paid_derby_cooldown_survives_reload_and_blocks_immediate_reentry() {
+    let fixture = Fixture::new();
+    let mut gateway = DerbyGateway::load(&fixture.path).unwrap().unwrap();
+    let rewards = reward_state(&fixture);
+    gateway.begin(&character()).unwrap();
+    let instance = gateway.instance_id().unwrap();
+    gateway.start(&start_request(instance)).unwrap();
+    let setup = gateway.handle(&register(), 2_000).unwrap();
+    let npc = messages(&setup)
+        .into_iter()
+        .find_map(|message| match message {
+            DerbyMessage::CreateVehicle(vehicle) if vehicle.key != OWNER => Some(vehicle.key),
+            _ => None,
+        })
+        .unwrap();
+    for phase_value in 3..=8 {
+        gateway
+            .handle(&phase(phase_value), 2_000 + phase_value as u64)
+            .unwrap();
+    }
+    for value in (0..=4).rev() {
+        gateway
+            .handle(&countdown(value), 3_000 + (4 - value) as u64)
+            .unwrap();
+    }
+    gateway
+        .handle(&pose(OWNER, [0.0, 0.0, 0.0]), 3_900)
+        .unwrap();
+    let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+        reporter: OWNER,
+        other: npc,
+        impact_bits: 20.0_f32.to_bits(),
+    }))
+    .unwrap();
+    gateway.handle(&hit, 4_000).unwrap();
+    gateway.tick(5_000).unwrap();
+    let paid = gateway
+        .close_at(&[26, 0, 42, 0], &rewards, 1_000_000)
+        .unwrap();
+    assert!(paid.accepted);
+    gateway.exit();
+
+    assert_eq!(
+        gateway.admit_at(GATE, false, 1_000_599),
+        Err(osfr_tools::derby_gateway::DerbyEntryDenied::Cooldown)
+    );
+    assert_eq!(gateway.admit_at(GATE, false, 1_000_600), Ok(()));
+    let saved = gateway.snapshot().expect("paid run stores its epoch");
+    let restored = DerbyGateway::load_with_state(&fixture.path, Some(saved.clone()))
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        restored.admit_at(GATE, false, 1_000_599),
+        Err(osfr_tools::derby_gateway::DerbyEntryDenied::Cooldown)
+    );
+    assert_eq!(saved.last_paid_unix, 1_000_000);
+}
+
+#[test]
+fn busy_derby_refusal_keeps_the_exact_menu_for_a_retry() {
+    let fixture = GameplayFixture::with_opening();
+    let base = Gameplay::load(&fixture.path, None).unwrap();
+    let mut state = base.state();
+    let mut harvesting = Type8Engine::load(
+        &fixture.path,
+        harvesting::CONTENT_FILE,
+        111,
+        harvesting::FIRST_INSTANCE_ID,
+        None,
+    )
+    .unwrap();
+    harvesting.begin(45).unwrap();
+    state.harvesting = Some(harvesting.state().clone());
+    let mut game = Gameplay::load(&fixture.path, Some(state)).unwrap();
+    let character = CharacterState {
+        guid: OWNER.raw(),
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    };
+    let before = game.state();
+
+    game.handle_in_world(&npc_menu(), &character, 1_000)
+        .unwrap();
+    let first = game
+        .handle_in_world(&npc_choice(2), &character, 1_100)
+        .expect("Busy is a reported refusal, not a lost interaction");
+    assert!(!first.changed);
+    assert!(!game.derby_active());
+    assert_eq!(game.state(), before);
+
+    let second = game
+        .handle_in_world(&npc_choice(2), &character, 1_200)
+        .expect("the original menu remains retryable after refusal");
+    assert!(!second.changed);
+    assert!(!game.derby_active());
+    assert_eq!(game.state(), before);
+}
+
+#[test]
+fn offer_cancel_through_gameplay_restores_the_job_and_keeps_stale_quit_inert() {
+    let fixture = GameplayFixture::new();
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let character = CharacterState {
+        guid: OWNER.raw(),
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    };
+    let before_job = game.active_profile().unwrap();
+    let before_coins = game.state().inventory.coins;
+    game.handle_in_world(&npc_menu(), &character, 1_000)
+        .unwrap();
+    let entered = game
+        .handle_in_world(&npc_choice(2), &character, 1_100)
+        .unwrap();
+    let instance = entered
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[39, 0, 16]))
+        .map(|packet| i32::from_le_bytes(packet[3..7].try_into().unwrap()))
+        .unwrap();
+    assert!(game.derby_active());
+
+    let cancelled = game
+        .handle_in_world(&[26, 0, 42, 0], &character, 1_200)
+        .unwrap();
+    assert!(cancelled.changed);
+    assert!(!game.derby_active());
+    assert_eq!(game.active_profile(), Some(before_job));
+    assert_eq!(game.state().inventory.coins, before_coins);
+    assert!(
+        cancelled
+            .replies
+            .iter()
+            .any(|packet| packet[..3] == [39, 0, 19])
+    );
+    assert!(
+        cancelled
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 20]))
+    );
+
+    let after = game.state();
+    let stale = game
+        .handle_in_world(&quit_request(instance), &character, 1_300)
+        .unwrap();
+    assert!(!stale.changed);
+    assert_eq!(game.state(), after);
+}
+
+#[test]
 fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
     let fixture = GameplayFixture::new();
     let mut game = Gameplay::load(&fixture.path, None).unwrap();
@@ -509,8 +792,14 @@ fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
     assert!(entered.changed);
     assert!(game.derby_active());
     assert_eq!(
-        game.state().profiles.as_ref().unwrap().active,
-        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
+        game.active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+    );
+    assert!(
+        entered
+            .nearby
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
     );
     let offer = entered
         .replies
@@ -520,9 +809,11 @@ fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
     let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
     let saved = game.state();
     assert_eq!(
-        saved.derby.as_ref().map(|state| state.previous_job),
-        Some(before_job)
+        saved.profiles.as_ref().unwrap().active,
+        before_job,
+        "the temporary Derby Driver job is never persisted"
     );
+    assert!(saved.derby.is_none());
     let restored = Gameplay::load(&fixture.path, Some(saved)).unwrap();
     assert!(!restored.derby_active());
     assert_eq!(
@@ -569,7 +860,16 @@ fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
             .unwrap();
         assert!(!out.replies.is_empty(), "countdown {value}");
     }
+    let mid_match = game.state();
+    assert_eq!(mid_match.profiles.as_ref().unwrap().active, before_job);
+    assert!(mid_match.derby.is_none());
+    let restored = Gameplay::load(&fixture.path, Some(mid_match)).unwrap();
+    assert!(!restored.derby_active());
+    assert_eq!(restored.active_profile(), Some(before_job));
+    assert_eq!(restored.state().inventory.coins, before_coins);
 
+    game.handle_in_world(&pose(OWNER, [0.0, 0.0, 0.0]), &character, 3_900)
+        .unwrap();
     let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
         reporter: OWNER,
         other: npc,
@@ -608,10 +908,26 @@ fn gameplay_routes_the_npc_offer_and_commits_the_close_payout() {
             .iter()
             .any(|packet| packet.starts_with(&[35, 0, 20]))
     );
+    assert!(
+        paid.nearby
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
+    );
 
     let replay = game
         .handle_in_world(&[26, 0, 42, 0], &character, 5_200)
         .unwrap();
     assert!(!replay.changed);
     assert_eq!(game.state().inventory.coins, before_coins + 5);
+    let paid_state = game.state();
+    assert!(
+        paid_state
+            .derby
+            .as_ref()
+            .is_some_and(|derby| derby.last_paid_unix > 0)
+    );
+    let reloaded = Gameplay::load(&fixture.path, Some(paid_state)).unwrap();
+    assert!(!reloaded.derby_active());
+    assert_eq!(reloaded.active_profile(), Some(before_job));
+    assert_eq!(reloaded.state().inventory.coins, before_coins + 5);
 }

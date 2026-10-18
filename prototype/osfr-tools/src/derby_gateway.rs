@@ -31,6 +31,8 @@ pub const DEFAULT_MENU_STRING_ID: u32 = DEMO_DERBY_LOBBY_NAME_ID as u32;
 /// (R) Private instance ids start here, matching the kart entry convention.
 pub const FIRST_DERBY_INSTANCE: u32 = 49_000_001;
 pub const MAX_DERBY_GATES: usize = 16;
+/// (R) Ten minutes between paid runs unless the gate package tunes it.
+pub const DEFAULT_REWARD_COOLDOWN_S: u64 = 600;
 
 const MAX_CONTENT_BYTES: usize = 512 * 1024;
 const MAX_GATES_BYTES: usize = 16 * 1024;
@@ -73,17 +75,30 @@ pub struct DerbyGates {
     #[serde(default = "default_menu_string_id")]
     pub menu_string_id: u32,
     pub npcs: Vec<u64>,
+    /// (R) Seconds after a paid derby before a gate starts another; 0 is off.
+    #[serde(default = "default_reward_cooldown_s")]
+    pub reward_cooldown_s: u64,
 }
 
-/// The only derby data a save needs: the job to restore after dropping a connection-local match.
+/// The only derby data a save needs: the last paid-run epoch for the cross-session cooldown.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayState {
-    pub previous_job: i32,
+    pub last_paid_unix: u64,
 }
 
 fn default_menu_string_id() -> u32 {
     DEFAULT_MENU_STRING_ID
+}
+
+fn default_reward_cooldown_s() -> u64 {
+    DEFAULT_REWARD_COOLDOWN_S
+}
+
+fn now_unix() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |duration| duration.as_secs())
 }
 
 /// Why an ordinary derby entry was refused. The caller reports the message and changes nothing.
@@ -93,6 +108,7 @@ pub enum DerbyEntryDenied {
     Unavailable,
     AlreadyPlaying,
     Busy,
+    Cooldown,
 }
 
 impl DerbyEntryDenied {
@@ -102,6 +118,7 @@ impl DerbyEntryDenied {
             Self::Unavailable => "The derby isn't open yet.",
             Self::AlreadyPlaying => "You are already in a derby.",
             Self::Busy => "Finish the active activity before entering the derby.",
+            Self::Cooldown => "The arena is being reset. Come back for another derby soon.",
         }
     }
 }
@@ -114,6 +131,7 @@ pub struct DerbyGateway {
     owner: Option<ParticipantKey>,
     next_instance: u32,
     previous_job: Option<i32>,
+    last_paid_unix: Option<u64>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -150,6 +168,7 @@ fn load_gates(directory: &Path) -> io::Result<Option<DerbyGates>> {
     let gates: DerbyGates = serde_json::from_slice(&bytes).map_err(invalid)?;
     if gates.schema_version != 1
         || gates.menu_string_id == 0
+        || gates.reward_cooldown_s > crate::kart_gateway::MAX_REWARD_COOLDOWN_S
         || gates.npcs.len() > MAX_DERBY_GATES
         || gates
             .npcs
@@ -168,13 +187,27 @@ impl DerbyGateway {
     /// Load the content package and its optional NPC gate list. Absent content leaves the route
     /// disabled; malformed present content rejects the world load instead of degrading silently.
     pub fn load(directory: &Path) -> io::Result<Option<Self>> {
+        Self::load_with_state(directory, None)
+    }
+
+    pub fn load_with_state(
+        directory: &Path,
+        saved: Option<DerbyGatewayState>,
+    ) -> io::Result<Option<Self>> {
         let path = directory.join("derby_entry.json");
         let Some(bytes) = read_regular_limited(&path, MAX_CONTENT_BYTES, "derby content")? else {
             return Ok(None);
         };
         let content: DerbyGatewayContent =
             serde_json::from_slice(&bytes).map_err(|error| invalid(error.to_string()))?;
-        Ok(Some(Self::new(content, load_gates(directory)?)?))
+        let mut gateway = Self::new(content, load_gates(directory)?)?;
+        if let Some(saved) = saved {
+            if saved.last_paid_unix == 0 {
+                return Err(invalid("invalid saved derby cooldown"));
+            }
+            gateway.last_paid_unix = Some(saved.last_paid_unix);
+        }
+        Ok(Some(gateway))
     }
 
     /// Build a gateway from typed content. This is also the strict content validator used by tests
@@ -184,6 +217,7 @@ impl DerbyGateway {
         if let Some(gates) = &gates {
             if gates.schema_version != 1
                 || gates.menu_string_id == 0
+                || gates.reward_cooldown_s > crate::kart_gateway::MAX_REWARD_COOLDOWN_S
                 || gates.npcs.len() > MAX_DERBY_GATES
                 || gates.npcs.iter().any(|npc| *npc == 0)
                 || gates.npcs.iter().collect::<BTreeSet<_>>().len() != gates.npcs.len()
@@ -198,6 +232,7 @@ impl DerbyGateway {
             owner: None,
             next_instance: FIRST_DERBY_INSTANCE,
             previous_job: None,
+            last_paid_unix: None,
         })
     }
 
@@ -233,11 +268,8 @@ impl DerbyGateway {
     }
 
     pub fn snapshot(&self) -> Option<DerbyGatewayState> {
-        if !self.active() {
-            return None;
-        }
-        self.previous_job
-            .map(|previous_job| DerbyGatewayState { previous_job })
+        self.last_paid_unix
+            .map(|last_paid_unix| DerbyGatewayState { last_paid_unix })
     }
 
     pub fn set_previous_job(&mut self, job: i32) {
@@ -246,6 +278,10 @@ impl DerbyGateway {
 
     /// Ordinary-entry admission. `busy` is computed by gameplay before any state is staged.
     pub fn admit(&self, npc_id: u64, busy: bool) -> Result<(), DerbyEntryDenied> {
+        self.admit_at(npc_id, busy, now_unix())
+    }
+
+    pub fn admit_at(&self, npc_id: u64, busy: bool, now_unix: u64) -> Result<(), DerbyEntryDenied> {
         if !self
             .gates
             .as_ref()
@@ -259,11 +295,25 @@ impl DerbyGateway {
         if busy {
             return Err(DerbyEntryDenied::Busy);
         }
+        let cooldown = self
+            .gates
+            .as_ref()
+            .map_or(0, |gates| gates.reward_cooldown_s);
+        if self
+            .last_paid_unix
+            .is_some_and(|paid| now_unix < paid.saturating_add(cooldown))
+        {
+            return Err(DerbyEntryDenied::Cooldown);
+        }
         Ok(())
     }
 
     /// Start a fresh solo derby and return the native 39/16 offer. The client answers with 39/5.
     pub fn begin(&mut self, character: &CharacterState) -> io::Result<Vec<u8>> {
+        self.begin_at(character, 0)
+    }
+
+    pub fn begin_at(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Vec<u8>> {
         if self.active() {
             return Err(invalid("derby is already active"));
         }
@@ -275,7 +325,7 @@ impl DerbyGateway {
             return Err(invalid("derby instance overflow"));
         }
         let owner = ParticipantKey(character.guid);
-        let service = DerbyService::new(
+        let mut service = DerbyService::new(
             instance as i32,
             self.content.game_id,
             owner,
@@ -284,6 +334,7 @@ impl DerbyGateway {
             self.content.pickups.clone(),
         )
         .map_err(|error| invalid(error.to_string()))?;
+        service.set_lobby_deadline(now_ms);
         let offer = service
             .offer_packet()
             .map_err(|error| invalid(error.to_string()))?;
@@ -355,9 +406,41 @@ impl DerbyGateway {
         Ok(replies)
     }
 
+    /// Retire an offer or running match without a reward. Malformed, foreign and stale cancellation
+    /// requests return no packets and leave the live service untouched.
+    pub fn cancel(&mut self, packet: &[u8]) -> io::Result<Vec<Vec<u8>>> {
+        let Some(service) = &self.service else {
+            return Ok(Vec::new());
+        };
+        let owner = self
+            .owner
+            .ok_or_else(|| invalid("derby service has no authenticated owner"))?;
+        let mut staged = service.clone();
+        let Some(removal) = staged
+            .cancel(owner, packet)
+            .map_err(|error| invalid(error.to_string()))?
+        else {
+            return Ok(Vec::new());
+        };
+        self.service = Some(staged);
+        Ok(vec![removal])
+    }
+
     /// Apply the final Close payout to a staged reward state. The caller only commits the returned
     /// reward state when `accepted` is true, preserving the all-or-nothing inventory contract.
     pub fn close(&mut self, packet: &[u8], rewards: &RewardState) -> io::Result<DerbyCloseOutcome> {
+        self.close_at(packet, rewards, now_unix())
+    }
+
+    pub fn close_at(
+        &mut self,
+        packet: &[u8],
+        rewards: &RewardState,
+        now_unix: u64,
+    ) -> io::Result<DerbyCloseOutcome> {
+        if now_unix == 0 {
+            return Err(invalid("derby payout clock is unavailable"));
+        }
         let Some(service) = &self.service else {
             return Ok(refused_close(DerbyPhase::Closed));
         };
@@ -371,6 +454,7 @@ impl DerbyGateway {
             .map_err(|error| invalid(error.to_string()))?;
         if outcome.accepted {
             self.service = Some(staged);
+            self.last_paid_unix = Some(now_unix);
         }
         Ok(outcome)
     }

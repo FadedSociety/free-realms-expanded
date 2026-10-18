@@ -648,6 +648,21 @@ pub struct DerbyRules {
     pub start_health: u32,
     pub contact_damage_per_unit: f32,
     pub contact_cooldown_ms: u64,
+    /// Maximum centre-to-centre distance for a reported vehicle contact (R).
+    #[serde(default = "default_contact_radius_m")]
+    pub contact_radius_m: f32,
+    /// Largest reportable impact; larger values are not plausible contacts (R).
+    #[serde(default = "default_max_impact")]
+    pub max_impact: f32,
+    /// A contact needs both drivers' latest poses to be this recent (R).
+    #[serde(default = "default_max_pose_age_ms")]
+    pub max_pose_age_ms: u64,
+    /// Hard ceiling on one contact's resolved damage (R).
+    #[serde(default = "default_max_damage_per_contact")]
+    pub max_damage_per_contact: u32,
+    /// An offered game that the client never starts is retired after this delay (R).
+    #[serde(default = "default_lobby_timeout_ms")]
+    pub lobby_timeout_ms: u64,
     pub pickup_radius: f32,
     pub health_pickup: u32,
     pub boost_pickup: f32,
@@ -667,6 +682,26 @@ pub struct DerbyRules {
     pub config: DerbyConfig,
 }
 
+fn default_contact_radius_m() -> f32 {
+    5.0
+}
+
+fn default_max_impact() -> f32 {
+    100.0
+}
+
+fn default_max_pose_age_ms() -> u64 {
+    5_000
+}
+
+fn default_max_damage_per_contact() -> u32 {
+    100
+}
+
+fn default_lobby_timeout_ms() -> u64 {
+    120_000
+}
+
 impl Default for DerbyRules {
     fn default() -> Self {
         Self {
@@ -674,6 +709,11 @@ impl Default for DerbyRules {
             start_health: 100,
             contact_damage_per_unit: 1.0,
             contact_cooldown_ms: 500,
+            contact_radius_m: default_contact_radius_m(),
+            max_impact: default_max_impact(),
+            max_pose_age_ms: default_max_pose_age_ms(),
+            max_damage_per_contact: default_max_damage_per_contact(),
+            lobby_timeout_ms: default_lobby_timeout_ms(),
             pickup_radius: 3.0,
             health_pickup: 25,
             boost_pickup: 25.0,
@@ -737,6 +777,7 @@ struct Driver {
     state: DerbyDriverState,
     vehicle: DerbyVehicleTemplate,
     pose: Option<VehiclePose>,
+    pose_at_ms: Option<u64>,
     respawn_at_ms: Option<u64>,
 }
 
@@ -763,6 +804,7 @@ pub struct DerbyService {
     contact_times: BTreeMap<(ParticipantKey, ParticipantKey), u64>,
     started_at_ms: Option<u64>,
     results_until_ms: Option<u64>,
+    lobby_deadline_ms: Option<u64>,
     closed: BTreeSet<ParticipantKey>,
 }
 
@@ -782,6 +824,15 @@ impl DerbyService {
             || rules.start_health == 0
             || !rules.contact_damage_per_unit.is_finite()
             || rules.contact_damage_per_unit <= 0.0
+            || !rules.contact_radius_m.is_finite()
+            || rules.contact_radius_m <= 0.0
+            || rules.contact_radius_m > 1_000.0
+            || !rules.max_impact.is_finite()
+            || rules.max_impact <= 0.0
+            || rules.max_impact > 1_000_000.0
+            || !(1..=60_000).contains(&rules.max_pose_age_ms)
+            || !(1..=1_000_000).contains(&rules.max_damage_per_contact)
+            || !(1..=600_000).contains(&rules.lobby_timeout_ms)
             || !rules.pickup_radius.is_finite()
             || rules.pickup_radius <= 0.0
             || !rules.boost_pickup.is_finite()
@@ -793,7 +844,13 @@ impl DerbyService {
         {
             return Err(DerbyError::InvalidField("reconstructed rules"));
         }
-        if vehicle.definition.len() > MAX_OPAQUE_BYTES || vehicle.name.len() > MAX_OPAQUE_BYTES {
+        if vehicle.definition.len() > MAX_OPAQUE_BYTES
+            || vehicle.name.len() > MAX_OPAQUE_BYTES
+            || vehicle
+                .start_transform_bits
+                .iter()
+                .any(|bits| !f32::from_bits(*bits).is_finite())
+        {
             return Err(DerbyError::InvalidField("vehicle template"));
         }
         let mut pickup_map = BTreeMap::new();
@@ -836,6 +893,7 @@ impl DerbyService {
                 },
                 vehicle,
                 pose: None,
+                pose_at_ms: None,
                 respawn_at_ms: None,
             },
         );
@@ -854,6 +912,7 @@ impl DerbyService {
             contact_times: BTreeMap::new(),
             started_at_ms: None,
             results_until_ms: None,
+            lobby_deadline_ms: None,
             closed: BTreeSet::new(),
         })
     }
@@ -868,6 +927,11 @@ impl DerbyService {
 
     pub fn game_id(&self) -> i32 {
         self.game_id
+    }
+
+    pub fn set_lobby_deadline(&mut self, now_ms: u64) {
+        self.lobby_deadline_ms = (self.phase == DerbyPhase::Lobby)
+            .then(|| now_ms.saturating_add(self.rules.lobby_timeout_ms));
     }
 
     pub fn human_count(&self) -> usize {
@@ -926,6 +990,7 @@ impl DerbyService {
                 },
                 vehicle,
                 pose: None,
+                pose_at_ms: None,
                 respawn_at_ms: None,
             },
         );
@@ -979,11 +1044,51 @@ impl DerbyService {
             return Ok(Vec::new());
         }
         self.phase = DerbyPhase::Starting;
+        self.lobby_deadline_ms = None;
         let mut ack = vec![39, 0, 17];
         put_i32(&mut ack, self.instance_id);
         put_i32(&mut ack, -1);
         put_i32(&mut ack, self.game_id);
         Ok(ack)
+    }
+
+    /// Retire an unfinished match without a reward. `26/42` is the offer/results-panel close;
+    /// `39/6` is the native mid-game quit and `39/7` cancels a pending game. The 39 records must
+    /// name this live instance. Client CancelMiniGame `009bef50` calls `009bdc60`, which writes
+    /// subtype 7 through `008a4420` as `[39, u16, i32, i32, i32]`. `None` is inert.
+    pub fn cancel(
+        &mut self,
+        sender: ParticipantKey,
+        packet: &[u8],
+    ) -> Result<Option<Vec<u8>>, DerbyError> {
+        if !self.is_connected_human(sender)
+            || matches!(self.phase, DerbyPhase::Closed | DerbyPhase::Aborted)
+        {
+            return Ok(None);
+        }
+        let accepted = if packet == [26, 0, 42, 0] {
+            true
+        } else if packet.len() == 15
+            && packet[..2] == [39, 0]
+            && matches!(packet[2], 6 | 7)
+            && read_i32(packet, 3) == self.instance_id
+            && read_i32(packet, 7) == -1
+            && read_i32(packet, 11) == -1
+        {
+            true
+        } else {
+            false
+        };
+        if !accepted {
+            return Ok(None);
+        }
+        self.phase = DerbyPhase::Aborted;
+        self.pickups.clear();
+        let mut removal = vec![39, 0, 19];
+        put_i32(&mut removal, self.instance_id);
+        put_i32(&mut removal, -1);
+        put_i32(&mut removal, self.game_id);
+        Ok(Some(removal))
     }
 
     /// Client RegisterVehicleDemolitionDerbyPlayer (34/6, sender 009f1790) binds its first key to
@@ -1005,7 +1110,7 @@ impl DerbyService {
                 }
                 self.registered.insert(sender);
                 if self.registered.len() == self.human_count() {
-                    self.setup_match()
+                    self.setup_match(now_ms)
                 } else {
                     Ok(Vec::new())
                 }
@@ -1016,7 +1121,9 @@ impl DerbyService {
             DerbyMessage::CountdownStatus { key, count } if key == sender => {
                 self.countdown(sender, count, now_ms)
             }
-            DerbyMessage::VehiclePose(pose) if pose.key == sender => self.relay_pose(sender, pose),
+            DerbyMessage::VehiclePose(pose) if pose.key == sender => {
+                self.relay_pose(sender, pose, now_ms)
+            }
             DerbyMessage::PickupHitRequest { key, position_bits } if key == sender => {
                 self.pickup_hit(sender, position_bits, now_ms)
             }
@@ -1027,11 +1134,11 @@ impl DerbyService {
         }
     }
 
-    fn setup_match(&mut self) -> Result<Vec<DerbyAction>, DerbyError> {
+    fn setup_match(&mut self, now_ms: u64) -> Result<Vec<DerbyAction>, DerbyError> {
         if self.phase != DerbyPhase::Starting || self.human_count() == 0 {
             return Err(DerbyError::InvalidPhase);
         }
-        self.fill_npcs()?;
+        self.fill_npcs(now_ms)?;
         let mut actions = Vec::new();
         self.push_broadcast(&mut actions, DerbyMessage::SetConfig(self.rules.config))?;
         self.push_broadcast(
@@ -1071,7 +1178,7 @@ impl DerbyService {
         Ok(actions)
     }
 
-    fn fill_npcs(&mut self) -> Result<(), DerbyError> {
+    fn fill_npcs(&mut self, now_ms: u64) -> Result<(), DerbyError> {
         // (R) Solo and short lobbies fill to eight drivers. The retail NPC AI/key allocator is unknown.
         let template = self.drivers.values().next().unwrap().vehicle.clone();
         let mut slot = 1_u32;
@@ -1098,7 +1205,16 @@ impl DerbyService {
                         ultimate_until_ms: None,
                     },
                     vehicle: template.clone(),
-                    pose: None,
+                    pose: Some(VehiclePose {
+                        key,
+                        transform_bits: template.start_transform_bits,
+                        vector_a_bits: [0; 4],
+                        vector_b_bits: [0; 4],
+                        controls_bits: [0; 3],
+                        flags: [0; 4],
+                        sequence: 0,
+                    }),
+                    pose_at_ms: Some(now_ms),
                     respawn_at_ms: None,
                 },
             );
@@ -1182,11 +1298,17 @@ impl DerbyService {
         &mut self,
         sender: ParticipantKey,
         pose: VehiclePose,
+        now_ms: u64,
     ) -> Result<Vec<DerbyAction>, DerbyError> {
         if self.phase != DerbyPhase::Running || !self.is_connected_human(sender) {
             return Ok(Vec::new());
         }
-        self.drivers.get_mut(&sender).unwrap().pose = Some(pose);
+        if pose_position(&pose).is_none() {
+            return Ok(Vec::new());
+        }
+        let driver = self.drivers.get_mut(&sender).unwrap();
+        driver.pose = Some(pose);
+        driver.pose_at_ms = Some(now_ms);
         let recipients: Vec<_> = self
             .connected_humans()
             .into_iter()
@@ -1216,7 +1338,60 @@ impl DerbyService {
             return Ok(Vec::new());
         }
         let impact = f32::from_bits(report.impact_bits);
-        if !impact.is_finite() || impact <= 0.0 {
+        if !impact.is_finite() || impact <= 0.0 || impact > self.rules.max_impact {
+            return Ok(Vec::new());
+        }
+        let Some(attacker_position) = self.drivers[&sender].pose.as_ref().and_then(pose_position)
+        else {
+            return Ok(Vec::new());
+        };
+        let Some(victim_position) = self.drivers[&report.other]
+            .pose
+            .as_ref()
+            .and_then(pose_position)
+        else {
+            return Ok(Vec::new());
+        };
+        let pose_is_fresh = |driver: &Driver| {
+            driver.pose_at_ms.is_some_and(|at| {
+                at <= now_ms && now_ms.saturating_sub(at) <= self.rules.max_pose_age_ms
+            })
+        };
+        if !pose_is_fresh(&self.drivers[&sender]) || !pose_is_fresh(&self.drivers[&report.other]) {
+            return Ok(Vec::new());
+        }
+        let distance_squared = (attacker_position[0] - victim_position[0]).powi(2)
+            + (attacker_position[1] - victim_position[1]).powi(2)
+            + (attacker_position[2] - victim_position[2]).powi(2);
+        if !distance_squared.is_finite()
+            || distance_squared > self.rules.contact_radius_m * self.rules.contact_radius_m
+        {
+            return Ok(Vec::new());
+        }
+        let attacker = self.drivers.get(&sender).unwrap();
+        let multiplier = if attacker
+            .state
+            .ultimate_until_ms
+            .is_some_and(|until| until > now_ms)
+        {
+            self.rules.ultimate_multiplier
+        } else if attacker
+            .state
+            .attack_until_ms
+            .is_some_and(|until| until > now_ms)
+        {
+            self.rules.attack_multiplier
+        } else {
+            1.0
+        };
+        let damage = (impact * self.rules.contact_damage_per_unit * multiplier)
+            .ceil()
+            .clamp(1.0, u32::MAX as f32) as u32;
+        if damage > self.rules.max_damage_per_contact {
+            return Ok(Vec::new());
+        }
+        let victim_was_alive = self.drivers[&report.other].state.health > 0;
+        if !victim_was_alive {
             return Ok(Vec::new());
         }
         let pair = ordered_pair(sender, report.other);
@@ -1245,30 +1420,7 @@ impl DerbyService {
         {
             return Ok(actions);
         }
-        let attacker = self.drivers.get(&sender).unwrap();
-        let multiplier = if attacker
-            .state
-            .ultimate_until_ms
-            .is_some_and(|until| until > now_ms)
-        {
-            self.rules.ultimate_multiplier
-        } else if attacker
-            .state
-            .attack_until_ms
-            .is_some_and(|until| until > now_ms)
-        {
-            self.rules.attack_multiplier
-        } else {
-            1.0
-        };
-        let damage = (impact * self.rules.contact_damage_per_unit * multiplier)
-            .ceil()
-            .clamp(1.0, u32::MAX as f32) as u32;
         let was_leader = self.unique_leader();
-        let victim_was_alive = self.drivers[&report.other].state.health > 0;
-        if !victim_was_alive {
-            return Ok(Vec::new());
-        }
         {
             let attacker = self.drivers.get_mut(&sender).unwrap();
             attacker.state.damage_dealt = attacker.state.damage_dealt.saturating_add(damage);
@@ -1490,6 +1642,29 @@ impl DerbyService {
     /// Process elapsed reconstructed timers. Native duration, respawn point and power-up lifetimes
     /// are not recovered; configured timers are server policy (R).
     pub fn tick(&mut self, now_ms: u64) -> Result<Vec<DerbyAction>, DerbyError> {
+        if self.phase == DerbyPhase::Lobby {
+            if self
+                .lobby_deadline_ms
+                .is_some_and(|deadline| deadline <= now_ms)
+            {
+                self.phase = DerbyPhase::Aborted;
+                self.lobby_deadline_ms = None;
+                self.pickups.clear();
+                let mut removal = vec![39, 0, 19];
+                put_i32(&mut removal, self.instance_id);
+                put_i32(&mut removal, -1);
+                put_i32(&mut removal, self.game_id);
+                return Ok(self
+                    .connected_humans()
+                    .into_iter()
+                    .map(|key| DerbyAction {
+                        recipients: vec![key],
+                        packet: removal.clone(),
+                    })
+                    .collect());
+            }
+            return Ok(Vec::new());
+        }
         if self.phase == DerbyPhase::Results {
             if self
                 .results_until_ms
@@ -1521,6 +1696,17 @@ impl DerbyService {
             driver.respawn_at_ms = None;
             self.push_broadcast(&mut actions, DerbyMessage::ResetVehicle(key))?;
             self.push_broadcast(&mut actions, self.state_message(key))?;
+        }
+        // NPC poses are server-owned placeholders until the native AI is recovered. Refresh their
+        // observation age so a human contact can still be validated against the last known position.
+        for driver in self
+            .drivers
+            .values_mut()
+            .filter(|driver| !driver.state.human)
+        {
+            if driver.pose.is_some() {
+                driver.pose_at_ms = Some(now_ms);
+            }
         }
         let expired: Vec<_> = self
             .drivers
@@ -1682,6 +1868,23 @@ fn ordered_pair(left: ParticipantKey, right: ParticipantKey) -> (ParticipantKey,
     } else {
         (right, left)
     }
+}
+
+/// The derby pose carries a row-major 4x4; translation is in slots 12/13/14 (the same convention
+/// proven for the kart weapon matrices). Non-finite matrices are not relayable or contactable.
+fn pose_position(pose: &VehiclePose) -> Option<[f32; 3]> {
+    if pose
+        .transform_bits
+        .iter()
+        .any(|bits| !f32::from_bits(*bits).is_finite())
+    {
+        return None;
+    }
+    Some([
+        f32::from_bits(pose.transform_bits[12]),
+        f32::from_bits(pose.transform_bits[13]),
+        f32::from_bits(pose.transform_bits[14]),
+    ])
 }
 
 struct Reader<'a> {

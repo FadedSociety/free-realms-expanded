@@ -40,6 +40,11 @@ fn rules() -> DerbyRules {
         start_health: 20,
         contact_damage_per_unit: 1.0,
         contact_cooldown_ms: 500,
+        contact_radius_m: 5.0,
+        max_impact: 50.0,
+        max_pose_age_ms: 5_000,
+        max_damage_per_contact: 100,
+        lobby_timeout_ms: 120_000,
         pickup_radius: 3.0,
         health_pickup: 10,
         boost_pickup: 15.0,
@@ -74,12 +79,20 @@ fn pickup(id: u32, kind: PickupKind, x: f32) -> DerbyPickup {
 }
 
 fn service(driver_keys: &[ParticipantKey], pickups: Vec<DerbyPickup>) -> DerbyService {
+    service_with_rules(driver_keys, pickups, rules())
+}
+
+fn service_with_rules(
+    driver_keys: &[ParticipantKey],
+    pickups: Vec<DerbyPickup>,
+    rules: DerbyRules,
+) -> DerbyService {
     let mut service = DerbyService::new(
         INSTANCE,
         GAME_ROW,
         driver_keys[0],
         template(),
-        rules(),
+        rules,
         pickups,
     )
     .unwrap();
@@ -95,6 +108,37 @@ fn request_start(instance_id: i32) -> Vec<u8> {
     packet.extend((-1_i32).to_le_bytes());
     packet.extend((-1_i32).to_le_bytes());
     packet
+}
+
+fn pose(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
+    encode_inner(&DerbyMessage::VehiclePose(VehiclePose {
+        key,
+        transform_bits: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            position[0],
+            position[1],
+            position[2],
+            1.0,
+        ]
+        .map(f32::to_bits),
+        vector_a_bits: [0; 4],
+        vector_b_bits: [0; 4],
+        controls_bits: [0; 3],
+        flags: [0; 4],
+        sequence: 1,
+    }))
+    .unwrap()
 }
 
 fn messages(actions: &[DerbyAction]) -> Vec<DerbyMessage> {
@@ -344,6 +388,12 @@ fn solo_offer_registers_npcs_runs_client_gates_through_state_eleven_and_pays_onc
 fn contacts_apply_server_damage_knockout_scores_and_four_second_respawn() {
     let mut derby = service(&[OWNER, OTHER], Vec::new());
     run_to_live(&mut derby, &[OWNER, OTHER]);
+    derby
+        .handle_client(OWNER, &pose(OWNER, [0.0, 0.0, 0.0]), 5_000)
+        .unwrap();
+    derby
+        .handle_client(OTHER, &pose(OTHER, [1.0, 0.0, 0.0]), 5_000)
+        .unwrap();
     let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
         reporter: OWNER,
         other: OTHER,
@@ -383,6 +433,12 @@ fn each_powerup_type_applies_once_and_expiry_uses_client_categories() {
     ];
     let mut derby = service(&[OWNER, OTHER], pickups);
     run_to_live(&mut derby, &[OWNER, OTHER]);
+    derby
+        .handle_client(OTHER, &pose(OTHER, [0.0, 0.0, 0.0]), 5_000)
+        .unwrap();
+    derby
+        .handle_client(OWNER, &pose(OWNER, [1.0, 0.0, 0.0]), 5_000)
+        .unwrap();
 
     let damage = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
         reporter: OTHER,
@@ -426,6 +482,114 @@ fn each_powerup_type_applies_once_and_expiry_uses_client_categories() {
     assert!(expired_messages.contains(&DerbyMessage::ItemExpired(3)));
     assert!(expired_messages.contains(&DerbyMessage::ItemExpired(4)));
     assert!(expired_messages.contains(&DerbyMessage::ItemExpired(5)));
+}
+
+#[test]
+fn contacts_require_fresh_nearby_poses_and_a_bounded_impact() {
+    let mut derby = service(&[OWNER, OTHER], Vec::new());
+    run_to_live(&mut derby, &[OWNER, OTHER]);
+    let hit = |impact: f32| {
+        encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+            reporter: OWNER,
+            other: OTHER,
+            impact_bits: impact.to_bits(),
+        }))
+        .unwrap()
+    };
+
+    // Both live poses are required, not just the target from a creation record.
+    assert!(
+        derby
+            .handle_client(OWNER, &hit(5.0), 5_000)
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(derby.driver(OTHER).unwrap().health, 20);
+    derby
+        .handle_client(OWNER, &pose(OWNER, [0.0, 0.0, 0.0]), 5_000)
+        .unwrap();
+    assert!(
+        derby
+            .handle_client(OWNER, &hit(5.0), 5_001)
+            .unwrap()
+            .is_empty()
+    );
+
+    // A real pair of poses must still describe a plausible contact.
+    derby
+        .handle_client(OTHER, &pose(OTHER, [50.0, 0.0, 0.0]), 5_000)
+        .unwrap();
+    assert!(
+        derby
+            .handle_client(OWNER, &hit(5.0), 5_001)
+            .unwrap()
+            .is_empty()
+    );
+    derby
+        .handle_client(OTHER, &pose(OTHER, [1.0, 0.0, 0.0]), 5_001)
+        .unwrap();
+    assert!(
+        derby
+            .handle_client(OWNER, &hit(50.1), 5_002)
+            .unwrap()
+            .is_empty()
+    );
+    assert!(
+        derby
+            .handle_client(OWNER, &hit(5.0), 12_000)
+            .unwrap()
+            .is_empty()
+    );
+    derby
+        .handle_client(OWNER, &pose(OWNER, [0.0, 0.0, 0.0]), 12_001)
+        .unwrap();
+    derby
+        .handle_client(OTHER, &pose(OTHER, [1.0, 0.0, 0.0]), 12_001)
+        .unwrap();
+
+    let accepted = derby.handle_client(OWNER, &hit(5.0), 12_002).unwrap();
+    assert!(
+        messages(&accepted).iter().any(
+            |message| matches!(message, DerbyMessage::VehicleState(state) if state.key == OTHER && state.health == 15)
+        )
+    );
+}
+
+#[test]
+fn refused_contact_does_not_consume_the_pair_cooldown() {
+    let mut bounded = rules();
+    bounded.max_damage_per_contact = 5;
+    let mut derby = service_with_rules(&[OWNER, OTHER], Vec::new(), bounded);
+    run_to_live(&mut derby, &[OWNER, OTHER]);
+    derby
+        .handle_client(OWNER, &pose(OWNER, [0.0, 0.0, 0.0]), 5_000)
+        .unwrap();
+    derby
+        .handle_client(OTHER, &pose(OTHER, [1.0, 0.0, 0.0]), 5_000)
+        .unwrap();
+    let hit = |impact: f32| {
+        encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+            reporter: OWNER,
+            other: OTHER,
+            impact_bits: impact.to_bits(),
+        }))
+        .unwrap()
+    };
+
+    assert!(
+        derby
+            .handle_client(OWNER, &hit(10.0), 5_100)
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(derby.driver(OTHER).unwrap().health, 20);
+    let accepted = derby.handle_client(OWNER, &hit(5.0), 5_200).unwrap();
+    assert_eq!(derby.driver(OTHER).unwrap().health, 15);
+    assert!(
+        messages(&accepted).iter().any(
+            |message| matches!(message, DerbyMessage::VehicleState(state) if state.key == OTHER)
+        )
+    );
 }
 
 #[test]
