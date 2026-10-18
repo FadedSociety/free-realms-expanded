@@ -640,6 +640,282 @@
           "icon_id": 3955
         }
       ]
+    },
+    {
+      "id": 12310,
+      "title_id": 93274,
+      "description_id": 116757,
+      "objective_id": 116824,
+      "difficulty": 2,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100001231000,
+        "definition_id": 930073,
+        "model_id": 4547,
+        "name_id": 2245,
+        "name": "Yeti",
+        "texture_alias": "",
+        "position": [
+          364.0,
+          53.3,
+          572.0
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001231001,
+          "definition_id": 930073,
+          "model_id": 4547,
+          "name_id": 2245,
+          "name": "Yeti",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 180,
+          "damage": 15,
+          "boss": false
+        },
+        {
+          "guid": 100001231002,
+          "definition_id": 930073,
+          "model_id": 4547,
+          "name_id": 2245,
+          "name": "Yeti",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 180,
+          "damage": 15,
+          "boss": false
+        },
+        {
+          "guid": 100001231003,
+          "definition_id": 930073,
+          "model_id": 4547,
+          "name_id": 2245,
+          "name": "Yeti",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 180,
+          "damage": 15,
+          "boss": false
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text id 93274 resolves 'Petty Yetis!', 116757 resolves 'Yeti thieves are harassing the travelers of Snowhill! Find and defeat them!', and 116824 resolves 'Take down the yetis!' (lab/reports/locale-id-to-text.json; en_us_data.dat lines 110648, 83806 and 31209). Models.txt line 3529 maps 4547 to sh_standard_yeti_01.adr; catalog.tsv line 59605 contains pack_14/002627.adr."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/Petty Yetis.md gives difficulty 2, the Snowhill entrance and the goal; it does not recover the original count, scene, arena, health or reward wheel."
+        },
+        {
+          "kind": "client",
+          "evidence": "enemies.json: Yeti definition 930073 uses model 4547 and name 2245; the same row records the client locale and model-asset provenance. The resolved kind is used for the marker and all three melee bodies; Icy Yeti and the unresolved boss/variant labels are not invented."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Content-only playable slice: local battle id 12310 and GUIDs; three Yeti actors as the current schema's kill-all roster; arena zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml and arrival [136,-0.5,155] shared with battle 96; baseline 180 HP and 15 damage before the existing difficulty-2 scaling; no skirmish, summon or boss phase; 25 coins and the existing four-item prize pool. The original final-2014 roster, transforms, scene binding and reward wheel remain unknown."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Snowhill marker [364,53.3,572] uses the visible Yeti actor and overhead image 11970. lab/reports/ap-T103/check_placements.py sampled the full 5 m wander disc: 0.00 degree maximum slope, 40.2 m to the nearest NPC, 914.9 m to a W102 protected corridor, 859.4 m to a field enemy and 1004.5 m to another battle marker. Water, object collision and a walkable native route remain unverified."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": -1,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
+    },
+    {
+      "id": 12311,
+      "title_id": 141039,
+      "description_id": 382801,
+      "objective_id": 141394,
+      "difficulty": 2,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100001231100,
+        "definition_id": 930010,
+        "model_id": 500,
+        "name_id": 441992,
+        "name": "Fairy Cultist",
+        "texture_alias": "",
+        "position": [
+          -888.0,
+          -33.5,
+          -376.0
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001231101,
+          "definition_id": 930010,
+          "model_id": 500,
+          "name_id": 441992,
+          "name": "Fairy Cultist",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 11,
+          "boss": false
+        },
+        {
+          "guid": 100001231102,
+          "definition_id": 930056,
+          "model_id": 500,
+          "name_id": 141196,
+          "name": "Cruel Fairy Cultist",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 180,
+          "damage": 15,
+          "boss": false
+        },
+        {
+          "guid": 100001231103,
+          "definition_id": 930010,
+          "model_id": 500,
+          "name_id": 441992,
+          "name": "Fairy Cultist",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 11,
+          "boss": false
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text id 141039 resolves 'Pixie Hunters!' beside the battle-title cluster 141037-141040; description 382801 resolves 'Fairy Cultists have come out of the Den of Secrets to kidnap pixies!  Defeat them and their leader!' and goal 141394 resolves 'Find a way to defeat Macannis, the Cruelest Fairy!' (lab/reports/locale-id-to-text.json; en_us_data.dat lines 80338/91773/95700, 67468 and 44075). The duplicate title row 74497 belongs to a separate Snowhill/NPC text cluster."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/Pixie Hunters.md gives difficulty 2, the Merry Vale entrance and the goal; it does not recover the original cultist count, Macannis mechanics, arena or reward wheel."
+        },
+        {
+          "kind": "client",
+          "evidence": "enemies.json: Fairy Cultist 930010 uses model 500 and name 441992; Cruel Fairy Cultist 930056 uses model 500 and name 141196. Models.txt line 501 maps 500 to sprite_cultist_m.adr and catalog.tsv line 6781 contains pack_01/003351.adr. Macannis has no resolved enemy definition and is not represented by a generic body under the boss name."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Content-only playable slice: local battle id 12311 and GUIDs; two Fairy Cultists plus one Cruel Fairy Cultist as the current schema's kill-all roster; arena zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml and arrival [136,-0.5,155] shared with battle 96; baseline 140/11 and 180/15 HP/damage before the existing difficulty-2 scaling; plain default melee only; 25 coins and the existing four-item prize pool. The original roster, Macannis repel/pixie puzzle, final-2014 scene binding and reward wheel remain unknown."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Merry Vale marker [-888,-33.5,-376] uses the visible Fairy Cultist actor and overhead image 11970. lab/reports/ap-T103/check_placements.py sampled the full 5 m wander disc: 3.20 degree maximum slope, 49.4 m to the nearest NPC, 897.3 m to a W102 protected corridor, 627.7 m to a field enemy and 282.9 m to another battle marker. Water, object collision and a walkable native route remain unverified."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": -1,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
     }
   ]
 }
