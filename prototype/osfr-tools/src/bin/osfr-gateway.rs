@@ -1,7 +1,6 @@
 //! One local character and zone, using private reference initialization data.
 //! Rust owns the session, reliable transport, application dispatch and snapshot.
-#[path = "../trace.rs"]
-mod trace;
+use osfr_tools::trace;
 
 use osfr_tools::account_store::AccountStore;
 use osfr_tools::character_store::CharacterState;
@@ -42,6 +41,19 @@ fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
 }
 
 /// Percent-decoding for Studio query strings and paths.
+/// Parse separator-free hex. Anything that is not ASCII hex (including non-ASCII text) is
+/// refused before slicing: slicing a multi-byte character by byte index panics, and one bad
+/// Studio request must never take the server down.
+fn parse_hex(hex: &str) -> Option<Vec<u8>> {
+    if hex.is_empty() || hex.len() % 2 != 0 || !hex.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return None;
+    }
+    (0..hex.len())
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
+        .collect()
+}
+
 fn studio_decode(text: &str) -> String {
     let bytes = text.as_bytes();
     let mut out = Vec::with_capacity(bytes.len());
@@ -3858,15 +3870,7 @@ impl Server {
                     .chars()
                     .filter(|c| !c.is_whitespace())
                     .collect();
-                let bytes: Option<Vec<u8>> = (hex.len() % 2 == 0 && !hex.is_empty())
-                    .then(|| {
-                        (0..hex.len())
-                            .step_by(2)
-                            .map(|i| u8::from_str_radix(&hex[i..i + 2], 16).ok())
-                            .collect()
-                    })
-                    .flatten();
-                let Some(inner) = bytes.filter(|b| b.len() <= 64 * 1024) else {
+                let Some(inner) = parse_hex(&hex).filter(|b| b.len() <= 64 * 1024) else {
                     return json_reply(
                         400,
                         json!({"error": "expected {\"hex\": \"<inner message hex>\"}"}),

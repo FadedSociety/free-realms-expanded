@@ -91,6 +91,7 @@ pub mod startup_snapshot;
 pub mod startup_world;
 pub mod studio;
 pub mod terrain;
+pub mod trace;
 pub mod trade;
 pub mod world;
 pub mod world_text;

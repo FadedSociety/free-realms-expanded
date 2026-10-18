@@ -417,21 +417,6 @@ fn reject_bundled_role_changes(events: &[Event], guid: u64) -> io::Result<()> {
     Ok(())
 }
 
-fn trace_hex_prefix(bytes: &[u8], sensitive: bool) -> Option<String> {
-    let head = bytes.iter().take(32).copied().collect::<Vec<_>>();
-    let mut letters = 0;
-    let looks_like_text = head.iter().any(|byte| {
-        if byte.is_ascii_alphabetic() {
-            letters += 1;
-        } else if !byte.is_ascii_whitespace() {
-            letters = 0;
-        }
-        letters >= 3
-    });
-    (!sensitive && !looks_like_text)
-        .then(|| head.iter().map(|byte| format!("{byte:02x}")).collect())
-}
-
 fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceEvent {
     let top = message
         .get(..2)
@@ -448,11 +433,9 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
         .get(2..4)
         .map(|bytes| u16::from_le_bytes([bytes[0], bytes[1]]));
     let sensitive = top == Some(1)
-        || family.zip(subtype).is_some_and(|(family, subtype)| {
-            family == 1
-                || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 149 | 175)
-                || (family == 26 && matches!(subtype, 14 | 15 | 16 | 17 | 30))
-        });
+        || family
+            .zip(subtype)
+            .is_some_and(|(family, subtype)| crate::trace::sensitive_payload(family, subtype));
     let handler = match event {
         Event::Login => "gateway.login",
         Event::Ready => "gateway.ready",
@@ -472,7 +455,7 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
         family,
         subtype,
         body_len: body.len(),
-        body_head_hex: trace_hex_prefix(body, sensitive),
+        body_head_hex: crate::trace::hex_prefix(body, sensitive),
         combined,
         handler,
         outcome: "handled",

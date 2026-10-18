@@ -1,8 +1,6 @@
 //! Explicitly local native character creation/selection service. The fixed
 //! legacy client key is read from a private file, never embedded in this binary.
-#[path = "../trace.rs"]
-#[allow(dead_code)]
-mod trace;
+use osfr_tools::trace;
 
 use osfr_tools::{
     account_store::{AccountStore, AccountStoreLock},

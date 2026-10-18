@@ -119,10 +119,12 @@ pub fn family_subtype_name(family: u16, subtype: u16) -> Option<&'static str> {
     }
 }
 
+/// The one rule for which packet bodies a trace must never show as hex (credentials, chat,
+/// friends, mail and other player text). Every tracer uses it; do not copy it.
 pub fn sensitive_payload(family: u16, subtype: u16) -> bool {
     family == 1
-        || matches!(family, 15 | 22 | 40 | 68 | 74 | 112 | 149 | 175)
-        || (family == 26 && matches!(subtype, 14 | 16 | 30))
+        || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 149 | 175)
+        || (family == 26 && matches!(subtype, 14 | 15 | 16 | 17 | 30))
 }
 
 pub fn hex_prefix(bytes: &[u8], sensitive: bool) -> Option<String> {
@@ -203,5 +205,29 @@ mod tests {
         let login = protocol_summary(&[1, 0, b't', b'i', b'c', b'k', b'e', b't']);
         assert!(login.sensitive);
         assert!(hex_prefix(login.body, login.sensitive).is_none());
+    }
+
+    /// Lead (2026-10-18): gateway.rs redacted these while the binaries' tracer did not, so the
+    /// packet trace and the Studio inspector could show chat and friend payloads as hex.
+    #[test]
+    fn chat_friend_and_client_log_bodies_are_redacted_by_the_one_rule() {
+        for (family, subtype) in [
+            (109, 0),
+            (109, 7),
+            (26, 14),
+            (26, 15),
+            (26, 16),
+            (26, 17),
+            (26, 30),
+        ] {
+            assert!(
+                sensitive_payload(family, subtype),
+                "{family}/{subtype} must be redacted"
+            );
+        }
+        assert!(
+            !sensitive_payload(26, 8),
+            "ordinary NPC interaction stays visible"
+        );
     }
 }
