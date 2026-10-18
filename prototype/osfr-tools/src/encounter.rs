@@ -2671,6 +2671,15 @@ impl EncounterEngine {
         packets
     }
 
+    /// Combat level required by the battle whose start screen is open.
+    pub(crate) fn pending_battle_required_level(&self) -> Option<u32> {
+        let (id, _) = self.pending_battle?;
+        self.battles
+            .iter()
+            .find(|battle| battle.id == id)
+            .map(|battle| battle.required_combat_level)
+    }
+
     /// The battle whose start screen is open, consumed by Go (41/108).
     pub fn take_pending_battle(&mut self) -> Option<u32> {
         self.pending_battle.take().map(|(id, _)| id)
@@ -2878,6 +2887,15 @@ impl EncounterEngine {
             .iter()
             .find(|d| d.id == id)
             .ok_or_else(|| invalid("unknown encounter"))?;
+        if let Some(required) = self
+            .battles
+            .iter()
+            .find(|battle| battle.id == id)
+            .map(|battle| battle.required_combat_level)
+            && self.job_level < required
+        {
+            return Err(invalid(&format!("combat level {required} required")));
+        }
         let next = self
             .state
             .next_instance_id

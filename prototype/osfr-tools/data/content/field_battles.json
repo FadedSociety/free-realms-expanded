@@ -502,7 +502,7 @@
       "difficulty": 5,
       "required_combat_level": 13,
       "spawner": {
-        "guid": 100001230300,
+        "guid": 100000004750,
         "definition_id": 1230300,
         "model_id": 2056,
         "name_id": 426971,

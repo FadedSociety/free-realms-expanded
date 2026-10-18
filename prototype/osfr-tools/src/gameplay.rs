@@ -6579,6 +6579,18 @@ impl Gameplay {
         // arena through the same begin() as the opening cave.
         if inner.starts_with(&[41, 0, 108, 0]) {
             let active_profile = self.profiles.as_ref().unwrap().active();
+            if let Some(required) = self
+                .encounter
+                .as_ref()
+                .unwrap()
+                .pending_battle_required_level()
+                && self.job_level(active_profile) < required
+            {
+                out.replies.push(chat::system(&format!(
+                    "This activity needs level {required}."
+                )));
+                return Ok(out);
+            }
             if let Some(battle) = self.encounter.as_mut().unwrap().take_pending_battle() {
                 if !self
                     .abilities

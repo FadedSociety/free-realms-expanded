@@ -1,9 +1,22 @@
+//! T016: Stone Heart's Hideaway through the production gateway path.
+//!
+//! Client shapes checked in the supplied 2014 client:
+//! * `26/8`: family constructor `008b2820`, packet constructor `008b6bc0`
+//!   (target guid and one byte), sender `0092efe0`.
+//! * `36/10`: `ClientRequestStartAbility`, writer `00a342e0`; the basic slot
+//!   is bar 1, slot 0, target mode 0 and the target guid.
+//! * `41/108`: encounter entrance constructor `008b6e70`.
+//! * `26/42`: results Close constructor `008a2eb0`, sender `0092f300`.
+
 use osfr_tools::{
-    character_store::CharacterState,
-    encounter::{EncounterEngine, EncounterPhase},
+    account_store::AccountRole,
+    chat,
+    encounter::EncounterPhase,
+    game_store,
+    gateway::{Gateway, GatewayOutcome},
+    startup_world::parse_add_npc,
 };
-use serde_json::json;
-use sha2::{Digest, Sha256};
+use serde_json::Value;
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -11,231 +24,454 @@ use std::{
 };
 
 const BATTLE: u32 = 12303;
-const SPAWNER: u64 = 100_001_230_300;
-const STONE_HEART: u64 = 100_001_230_301;
-const HEARTBREAKERS: [u64; 3] = [100_001_230_302, 100_001_230_303, 100_001_230_304];
+/// The recovered Legacy entrance actor, reused by the field battle.
+const ENTRANCE: u64 = 100_000_004_750;
+const TITLE_ID: i32 = 426_971;
+const OBJECTIVE_ID: i32 = 426_977;
 const MATCH_MAKER_MALLET: i32 = 76_471;
 const BRAWLER: i32 = 43;
+const STONE_HEART: u64 = 100_001_230_301;
+const HEARTBREAKERS: [u64; 3] = [100_001_230_302, 100_001_230_303, 100_001_230_304];
+const PLAYER_POSITION: [f32; 3] = [-950.582, -34.42554, -648.0];
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
-struct Fixture(PathBuf);
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
+struct Fixture {
+    root: PathBuf,
+    reference: PathBuf,
+    content: PathBuf,
+    version: String,
 }
 
 impl Fixture {
     fn new() -> Self {
-        let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
+        let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
             "stone-heart-hideaway-{}-{}",
             std::process::id(),
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir_all(&dir).unwrap();
-
-        let mut template = vec![0; 334];
-        template[..4].copy_from_slice(&[35, 0, 2, 0]);
-        template[133..137].copy_from_slice(&100_i32.to_le_bytes());
-        template[224] = 1;
-        fs::write(dir.join("npc.bin"), &template).unwrap();
-
-        let actor = |guid: u64, definition_id: i32| {
-            json!({
-                "guid": guid,
-                "definition_id": definition_id,
-                "model_id": 3,
-                "name_id": 100,
-                "name": "Synthetic actor",
-                "texture_alias": "",
-                "position": [2.0, 0.0, 0.0],
-                "max_health": 100,
-                "damage": 10,
-                "boss": false
-            })
-        };
-        let zone = |id: u32, name: &str| {
-            json!({
-                "zone_id": id,
-                "name": name,
-                "sky": "",
-                "geometry_id": 214,
-                "position": [0.0, 0.0, 0.0],
-                "rotation": [0.0, 0.0, 0.0],
-                "tutorial": id != 0
-            })
-        };
-        let content = json!({
-            "schema_version": 1,
-            "template_file": "npc.bin",
-            "template_sha256": format!("{:x}", Sha256::digest(&template)),
-            "world": zone(0, "SyntheticWorld"),
-            "world_enemies": [],
-            "dungeons": [{
-                "id": 411,
-                "title_id": 12,
-                "description_id": 13,
-                "objective_id": 14,
-                "zone": zone(411, "SyntheticCave"),
-                "guide": null,
-                "enemies": [actor(900, 400)],
-                "reward_coins": 0,
-                "reward_items": []
-            }]
-        });
-        fs::write(
-            dir.join("encounters.json"),
-            serde_json::to_vec(&content).unwrap(),
-        )
-        .unwrap();
-        Self(dir)
+        fs::create_dir_all(&root).unwrap();
+        let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-gateway-reference");
+        let content = runtime_content(&root);
+        let manifest: Value =
+            serde_json::from_slice(&fs::read(reference.join("manifest.json")).unwrap()).unwrap();
+        let version = manifest["client_version"].as_str().unwrap().to_owned();
+        Self {
+            root,
+            reference,
+            content,
+            version,
+        }
     }
 
-    fn load(&self) -> EncounterEngine {
-        let mut engine = EncounterEngine::load(&self.0, None).unwrap();
-        let battles = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/field_battles.json");
-        engine.load_field_battles(&battles).unwrap();
-        engine
+    fn gateway(&self) -> Gateway {
+        let mut character = Gateway::reference_state(&self.reference).unwrap();
+        character.position = PLAYER_POSITION;
+        character.rotation = [0.0, 0.0, 1.0];
+        let mut gateway =
+            Gateway::load_gameplay(&self.reference, character, &self.content, None).unwrap();
+        gateway.set_dev_tools(true);
+        gateway.set_role(AccountRole::Admin);
+        self.login(&mut gateway);
+        gateway
+    }
+
+    fn login(&self, gateway: &mut Gateway) -> GatewayOutcome {
+        let mut login = 1_u16.to_le_bytes().to_vec();
+        for (index, value) in ["local-private-test", self.version.as_str(), ""]
+            .into_iter()
+            .enumerate()
+        {
+            login.extend((value.len() as u32).to_le_bytes());
+            login.extend(value.as_bytes());
+            if index == 0 {
+                login.extend(gateway.state().guid.to_le_bytes());
+            }
+        }
+        gateway.handle_at(&login, 0).unwrap()
+    }
+
+    fn save(&self, gateway: &Gateway, name: &str) -> PathBuf {
+        let path = self.root.join(name);
+        game_store::save(&path, &gateway.snapshot()).unwrap();
+        path
     }
 }
 
-fn world_location() -> CharacterState {
-    CharacterState {
-        guid: 1,
-        zone_id: 0,
-        position: [-940.0, -34.0, -645.0],
-        rotation: [0.0, 0.0, 1.0],
+fn runtime_content(root: &Path) -> PathBuf {
+    if let Some(path) = std::env::var_os("OSFR_ACTIVITY_CONTENT") {
+        return PathBuf::from(path);
     }
+    let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let base = manifest.join("../../../lab/references/opening-journal-text-v2/content");
+    let catalogue =
+        manifest.join("../../../lab/bundles/playtest-20261016T115811Z/content/item-catalogue.json");
+    let content = root.join("content");
+    let files = fs::read_dir(&base).unwrap();
+    fs::create_dir_all(&content).unwrap();
+    for entry in files {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_file() {
+            fs::copy(entry.path(), content.join(entry.file_name())).unwrap();
+        }
+    }
+    let target = content.join("item-catalogue.json");
+    if fs::hard_link(&catalogue, &target).is_err() {
+        fs::copy(&catalogue, &target).unwrap();
+    }
+    // Gameplay derives NPC and field-battle content from the bundled package
+    // when this directory has neither of these.
+    let _ = fs::remove_file(content.join("npc_spawns_extra.json"));
+    let _ = fs::remove_dir_all(content.join("npcs"));
+    content
+}
+
+fn reopen(fixture: &Fixture, gateway: &Gateway, name: &str) -> Gateway {
+    let path = fixture.save(gateway, name);
+    let saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
+    Gateway::load_gameplay(
+        &fixture.reference,
+        saved.character,
+        &fixture.content,
+        saved.gameplay,
+    )
+    .unwrap()
+}
+
+impl Drop for Fixture {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.root);
+    }
+}
+
+fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut bytes = vec![5, 0, 1];
+    bytes.extend((inner.len() as u32).to_le_bytes());
+    bytes.extend(inner);
+    bytes
+}
+
+fn unframe(reply: &[u8]) -> &[u8] {
+    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
+        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
+        if length == reply.len() - 7 {
+            return &reply[7..];
+        }
+    }
+    reply
+}
+
+fn send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome {
+    gateway
+        .handle_at(&wrap(inner), now_ms)
+        .expect("gateway frame")
 }
 
 fn interact(guid: u64) -> Vec<u8> {
     [vec![26, 0, 8, 0], guid.to_le_bytes().to_vec(), vec![0]].concat()
 }
 
-fn i32_at(packet: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
+fn switch_job(profile: i32) -> Vec<u8> {
+    [vec![26, 0, 13, 0], profile.to_le_bytes().to_vec()].concat()
+}
+
+fn go(details: &[u8]) -> Vec<u8> {
+    let mut packet = vec![41, 0, 108, 0];
+    packet.extend(&details[4..12]); // encounter and launch instance
+    packet.extend(0_u64.to_le_bytes()); // session, as in the native 41/108 frames
+    packet
+}
+
+fn melee(guid: u64) -> Vec<u8> {
+    [
+        vec![36, 0, 10, 0],
+        1_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        guid.to_le_bytes().to_vec(),
+    ]
+    .concat()
+}
+
+fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
+    let mut packet = 125_u16.to_le_bytes().to_vec();
+    packet.extend(guid.to_le_bytes());
+    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend([0, 0]);
+    packet
+}
+
+fn chat_text(outcome: &GatewayOutcome) -> String {
+    outcome
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8)
+        .map(|packet| {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+fn entrance_actors(outcome: &GatewayOutcome) -> Vec<u64> {
+    outcome
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+        .filter_map(|packet| parse_add_npc(packet).ok())
+        .filter(|npc| npc.name_string_id == TITLE_ID)
+        .map(|npc| npc.actor_id)
+        .collect()
+}
+
+fn details(outcome: &GatewayOutcome) -> Option<&[u8]> {
+    outcome
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
+}
+
+fn arena_spawned(gateway: &mut Gateway, now_ms: u64) -> GatewayOutcome {
+    let mut outcome = send(gateway, &13_u16.to_le_bytes(), now_ms);
+    outcome.replies.extend(
+        send(gateway, &10_u16.to_le_bytes(), now_ms + 100)
+            .replies
+            .into_iter(),
+    );
+    outcome
+}
+
+fn level(gateway: &Gateway, profile: i32) -> u32 {
+    let state = gateway.snapshot().gameplay.unwrap();
+    1 + state
+        .profiles
+        .unwrap()
+        .experience
+        .get(&profile)
+        .copied()
+        .unwrap_or(0)
+        / 100
+}
+
+fn economy(gateway: &Gateway) -> (u32, u32, u32) {
+    let state = gateway.snapshot().gameplay.unwrap();
+    let item_count = state
+        .inventory
+        .items
+        .iter()
+        .filter(|item| item.definition_id == MATCH_MAKER_MALLET && item.rental.is_none())
+        .map(|item| item.count)
+        .sum();
+    let experience = state
+        .profiles
+        .unwrap()
+        .experience
+        .get(&BRAWLER)
+        .copied()
+        .unwrap_or(0);
+    (state.inventory.coins, item_count, experience)
+}
+
+fn active_enemy(
+    gateway: &Gateway,
+    guid: Option<u64>,
+) -> Option<((u64, u32, [f32; 3]), EncounterPhase)> {
+    let state = gateway.snapshot().gameplay?.encounter?;
+    let active = state.active?;
+    let enemy = guid
+        .and_then(|guid| {
+            active
+                .enemies
+                .iter()
+                .find(|enemy| enemy.guid == guid && enemy.health > 0)
+        })
+        .or_else(|| {
+            active
+                .enemies
+                .iter()
+                .filter(|enemy| enemy.health > 0)
+                .min_by_key(|enemy| enemy.guid == STONE_HEART)
+        })?;
+    Some(((enemy.guid, enemy.health, enemy.position), active.phase))
+}
+
+fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
+    let from = gateway.state().position;
+    let distance = ((to[0] - from[0]).powi(2) + (to[2] - from[2]).powi(2)).sqrt();
+    let steps = (distance / 8.0).ceil().max(1.0) as usize;
+    for step in 1..=steps {
+        let amount = step as f32 / steps as f32;
+        let position = [0, 1, 2].map(|axis| from[axis] + (to[axis] - from[axis]) * amount);
+        *now_ms += 400;
+        let moved = send(gateway, &move_to(guid, position), *now_ms);
+        assert!(!moved.replies.iter().any(|reply| {
+            let packet = unframe(reply);
+            packet.starts_with(&[38, 0, 12, 0])
+        }));
+        assert_eq!(gateway.state().position, position);
+    }
 }
 
 #[test]
-fn stone_heart_hideaway_enters_clears_rewards_once_and_exits() {
+fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() {
     let fixture = Fixture::new();
-    let mut engine = fixture.load();
-    engine.set_player_job(BRAWLER, 13);
-
-    let spawner = engine
-        .battle_spawners()
-        .into_iter()
-        .find(|entry| entry.0 == SPAWNER)
-        .expect("the legacy Hideaway entrance is registered");
-    assert_eq!(spawner.1, "Stone Heart's Hideaway");
-    assert_eq!(spawner.2, 426_971);
-    assert_eq!(spawner.3, 2056);
-    assert_eq!(spawner.4, [-950.582, -34.42554, -651.9259]);
-
-    let screen = engine
-        .handle(&interact(SPAWNER), 1, spawner.4, BRAWLER, 0)
-        .unwrap();
-    let details = screen
+    let mut gateway = fixture.gateway();
+    let mut loaded = send(&mut gateway, &13_u16.to_le_bytes(), 100);
+    loaded
         .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
-        .expect("clicking the entrance opens 41/114");
-    assert_eq!(i32_at(details, 47), 426_971);
-    assert_eq!(i32_at(details, 51), -1);
-    assert_eq!(i32_at(details, 55), 426_974);
-    assert_eq!(i32_at(details, 59), 5);
-    assert_eq!(i32_at(details, 63), 2, "combat profile type");
-    assert_eq!(i32_at(details, 67), 4, "combat minigame type");
-    assert_eq!(engine.take_pending_battle(), Some(BATTLE));
+        .extend(send(&mut gateway, &10_u16.to_le_bytes(), 200).replies);
+    assert_eq!(
+        entrance_actors(&loaded),
+        vec![ENTRANCE],
+        "the field battle replaces the passive Legacy entrance instead of adding a second actor"
+    );
+    let switched = send(&mut gateway, &switch_job(BRAWLER), 300);
+    assert!(switched.state_changed);
+    let lowered = send(&mut gateway, &chat::local_request("realm level 12"), 400);
+    assert!(
+        chat_text(&lowered).contains("level 12"),
+        "{:?}",
+        lowered.replies
+    );
+    assert_eq!(level(&gateway, BRAWLER), 12);
 
-    let entered = engine.begin(BATTLE, world_location(), BRAWLER).unwrap();
-    let arena = entered.zoning.expect("Go zones into the arena");
-    assert_eq!(arena.zone_id, 9600);
-    assert_eq!(arena.name, "sg_random_encounter_clearing");
-    assert_eq!(arena.position, [136.0, -0.5, 155.0]);
+    let screen = send(&mut gateway, &interact(ENTRANCE), 500);
+    let details = details(&screen).expect("26/8 opens the recovered entrance screen");
+    assert_eq!(
+        i32::from_le_bytes(details[4..8].try_into().unwrap()),
+        BATTLE as i32
+    );
+    assert_eq!(
+        i32::from_le_bytes(details[47..51].try_into().unwrap()),
+        TITLE_ID
+    );
 
-    let ready = engine.on_zone_ready(BRAWLER, 1000).unwrap();
+    let before_refusal = gateway.snapshot();
+    let refused = send(&mut gateway, &go(details), 600);
+    assert!(!refused.began_zoning);
+    assert!(!refused.state_changed);
+    assert!(
+        chat_text(&refused).contains("level 13"),
+        "{:?}",
+        refused.replies
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before_refusal,
+        "a low-level Go changes nothing"
+    );
+
+    let raised = send(&mut gateway, &chat::local_request("realm level 13"), 700);
+    assert!(
+        chat_text(&raised).contains("level 13"),
+        "{:?}",
+        raised.replies
+    );
+    assert_eq!(level(&gateway, BRAWLER), 13);
+    let before_entry = economy(&gateway);
+    let go = send(&mut gateway, &go(details), 800);
+    assert!(go.began_zoning, "the pending entry survives the refusal");
+    assert_eq!(gateway.state().zone_id, 9600);
+
+    let arena = arena_spawned(&mut gateway, 900);
     for guid in std::iter::once(STONE_HEART).chain(HEARTBREAKERS) {
         assert!(
-            ready
+            arena
                 .replies
                 .iter()
+                .map(|packet| unframe(packet))
                 .any(|packet| packet.starts_with(&[35, 0, 2, 0])
                     && packet[4..12] == guid.to_le_bytes()),
-            "enemy {guid} spawned"
+            "arena enemy {guid} spawned"
         );
     }
     assert!(
-        ready.replies.iter().any(|packet| packet
-            .windows(4)
-            .any(|field| field == 426_977_i32.to_le_bytes())),
-        "the recovered Defeat Stone Heart objective reaches the client"
+        arena
+            .replies
+            .iter()
+            .map(|packet| unframe(packet))
+            .any(|packet| packet
+                .windows(4)
+                .any(|field| field == OBJECTIVE_ID.to_le_bytes())),
+        "the recovered objective reaches the client"
     );
+    let (_, phase) = active_enemy(&gateway, None).expect("arena enemies spawned");
+    assert_eq!(phase, EncounterPhase::Fighting);
 
-    let mut now = 2000;
-    let mut win = None;
-    for guid in HEARTBREAKERS.into_iter().chain([STONE_HEART]) {
-        loop {
-            let (health, position) = {
-                let active = engine.state().active.as_ref().unwrap();
-                let enemy = active
-                    .enemies
-                    .iter()
-                    .find(|enemy| enemy.guid == guid)
-                    .unwrap();
-                (enemy.health, enemy.position)
-            };
-            if health == 0 {
-                break;
-            }
-            now += 700;
-            let outcome = engine.attack(guid, position, BRAWLER, 0, now).unwrap();
-            if guid != STONE_HEART {
-                assert!(outcome.rewards.is_empty(), "reward only on the final goal");
-            }
-            if guid == STONE_HEART && outcome.defeated.contains(&930_022) {
-                win = Some(outcome);
-            }
+    let player_guid = gateway.state().guid;
+    let mut now = 1_000;
+    let mut target = None;
+    for _ in 0..200 {
+        let Some(((guid, _, position), phase)) = active_enemy(&gateway, target) else {
+            break;
+        };
+        if phase != EncounterPhase::Fighting {
+            break;
         }
+        target = Some(guid);
+        let approach = [position[0] + 1.5, position[1], position[2]];
+        walk(&mut gateway, player_guid, approach, &mut now);
+        now += 700;
+        send(&mut gateway, &melee(guid), now);
+        // Break contact before the next world tick; this is the reviewed melee
+        // reach (3 m) against the creatures' 2.5 m attack reach.
+        walk(&mut gateway, player_guid, [136.0, -0.5, 155.0], &mut now);
+        now += 100;
+        gateway.tick_at(now).unwrap();
     }
 
-    let win = win.expect("the Stone Heart killing blow completes the battle");
+    let won = gateway.snapshot().gameplay.unwrap().encounter.unwrap();
+    assert_eq!(won.active.as_ref().unwrap().phase, EncounterPhase::Won);
     assert_eq!(
-        engine.state().active.as_ref().unwrap().phase,
-        EncounterPhase::Won
+        economy(&gateway),
+        (before_entry.0, before_entry.1 + 1, before_entry.2 + 50),
+        "the server-owned win grants the item and Brawler XP exactly once"
     );
-    assert_eq!(win.rewards.len(), 1, "one reward bundle");
-    assert_eq!(win.rewards[0].coins, 0);
-    assert_eq!(win.rewards[0].job_xp, 50);
-    assert_eq!(win.rewards[0].items, vec![(MATCH_MAKER_MALLET, 1)]);
+    let paid = economy(&gateway);
+    let repeated_attack = send(&mut gateway, &melee(STONE_HEART), now.saturating_add(700));
+    assert!(!repeated_attack.state_changed);
+    assert_eq!(economy(&gateway), paid);
+
+    let reconnected = reopen(&fixture, &gateway, "won.json");
+    assert_eq!(
+        economy(&reconnected),
+        paid,
+        "the reward survives a save and reconnect"
+    );
     assert!(
-        win.replies
-            .iter()
-            .any(|packet| packet.starts_with(&[39, 0, 45])),
-        "the loot wheel lands on the granted prize"
+        reconnected
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .encounter
+            .unwrap()
+            .active
+            .is_none(),
+        "reconnect releases the connection-local encounter"
     );
 
-    let repeated = engine
-        .attack(STONE_HEART, [0.0; 3], BRAWLER, 0, now + 700)
-        .unwrap();
-    assert!(repeated.rewards.is_empty(), "a won fight cannot pay twice");
+    let closed = send(&mut gateway, &[26, 0, 42, 0], now + 800);
+    assert_eq!(gateway.state().zone_id, 0);
+    assert_eq!(economy(&gateway), paid);
+    assert!(closed.began_zoning);
+    let after_close = gateway.snapshot();
+    let duplicate = send(&mut gateway, &[26, 0, 42, 0], now + 900);
+    assert!(!duplicate.state_changed);
+    assert!(!duplicate.began_zoning);
+    assert_eq!(
+        gateway.snapshot(),
+        after_close,
+        "a duplicate results Close changes no saved state"
+    );
 
-    let exit = engine
-        .handle(&[26, 0, 42, 0], 1, [0.0; 3], BRAWLER, now + 1400)
-        .unwrap();
-    assert_eq!(exit.completed, Some(BATTLE));
-    assert!(exit.rewards.is_empty(), "closing results grants nothing");
-    let returned = exit.zoning.expect("results Close returns to the world");
-    assert_eq!(returned.zone_id, 0);
-    assert_eq!(returned.position, world_location().position);
-    assert!(!engine.active(), "the active encounter is cleared");
-
-    let duplicate = engine
-        .handle(&[26, 0, 42, 0], 1, [0.0; 3], BRAWLER, now + 2100)
-        .unwrap();
-    assert!(duplicate.rewards.is_empty());
-    assert!(duplicate.zoning.is_none());
-    assert!(!duplicate.changed);
+    let reloaded = reopen(&fixture, &gateway, "closed.json");
+    assert_eq!(economy(&reloaded), paid);
+    assert_eq!(reloaded.state().zone_id, 0);
 }
