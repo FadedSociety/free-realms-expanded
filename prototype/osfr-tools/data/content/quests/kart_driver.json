@@ -129,6 +129,9 @@
     {
       "id": 3080002,
       "title_string_id": 117323,
+      "intro_text_string_id": 117327,
+      "description_string_id": 117329,
+      "end_text_string_id": 117330,
       "giver_npc_id": 9500000759,
       "prerequisite_quest_ids": [
         3080001
@@ -197,6 +200,10 @@
           "evidence": "(R) quest id 3080002 is a stable batch key; the guide does not provide a numeric server quest id"
         },
         {
+          "kind": "client",
+          "evidence": "Client locale block: 117327 'Every driver should have his license. Take to the track to learn the basics of racing.'; 117329 'Get behind the wheel and earn your license.'; 117330 'Congrats! Now that you've completed the basics, you should race the advanced tutorial.' (R) Field-slot mapping from the adjacent Racing Tutorial title block."
+        },
+        {
           "kind": "reconstructed",
           "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
         },
@@ -222,7 +229,7 @@
         },
         {
           "kind": "legacy-data",
-          "evidence": "data/content/npcs/snowhill.json records Mustang Alli (9500000759) with placement=legacy_data at Frost Ridge; its quest relation now offers and accepts 3080002."
+          "evidence": "data/content/npcs/snowhill.json records Mustang Alli (9500000759) with placement=legacy_data at Frost Ridge and gives 3080002. data/content/kart_gates.json lists the same NPC so the race option is reachable at the quest giver; the return goal uses generic Talk."
         }
       ],
       "enabled": true

@@ -40,7 +40,7 @@ const FILES: &[&str] = &[
     "harvest_nodes.json",
 ];
 
-/// The reviewed round70 bytes copied into `data/content` on 2026-10-17.
+/// The reviewed T017 playtest bytes copied into `data/content` on 2026-10-17.
 const FROZEN_SHA256: &[(&str, &str)] = &[
     (
         "encounters.json",
@@ -60,7 +60,7 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "kart_gates.json",
-        "f8888928ed2f8d83dd10f6406cd34c93a7758eecc8148da10ec5db36c3d89e7a",
+        "478efd568ed52bff7f6a0cb46988656d18e2c59dc9f12178bd68bde1b2fd2cee",
     ),
     (
         "mining.json",
@@ -138,7 +138,10 @@ fn bundled_activity_content_loads_without_lab() {
     let kart = KartGateway::load(directory, None)
         .expect("kart content loads")
         .expect("kart content is present");
-    assert_eq!(kart.gate_npcs(), &[9000000273u64, 9000000039u64][..]);
+    assert_eq!(
+        kart.gate_npcs(),
+        &[9000000273u64, 9000000039u64, 9500000759u64][..]
+    );
 
     let lobby: LobbyNativeBody =
         serde_json::from_slice(&fs::read(directory.join("kart_lobby.json")).unwrap()).unwrap();

@@ -28691,22 +28691,8 @@
       "quests_given_text": [
         "Racing Tutorial (see Kart Driver page)."
       ],
-      "quests_accepted": [
-        {
-          "quest_id": 3080002,
-          "source": [
-            {
-              "kind": "video",
-              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md:49: Racing Tutorial's final goal is 'Return to Mustang Alli'."
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) Use the same authored Mustang Alli key for turn-in; the retail hand-in binding is not recovered."
-            }
-          ]
-        }
-      ],
-      "quests_accepted_reason": "(R) Racing Tutorial returns to Mustang Alli after the tutorial race.",
+      "quests_accepted": [],
+      "quests_accepted_reason": "(R) Racing Tutorial's return goal completes through the existing generic Talk path, which emits TalkToNpc before the end screen. No separate turn-in menu action is exposed.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
