@@ -27,6 +27,8 @@ pub const GROUP_FAMILY: u16 = 40;
 pub const MAX_MAP_COORD: i32 = 1_000_000;
 /// (R) One 74/5 update never carries more than this many friends (entries are 21 bytes).
 pub const MAX_POSITION_ENTRIES: usize = 512;
+/// (R) Unanswered group invites reserve capacity for at most one minute.
+pub const GROUP_INVITE_TTL_MS: u64 = 60_000;
 
 /// The original client has no recovered friend-list cap; this module adds no cap.
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
@@ -286,6 +288,7 @@ struct Group {
 struct PendingGroupInvite {
     group_id: u32,
     inviter_guid: u64,
+    created_ms: u64,
 }
 
 /// Presence is runtime-only. The caller sends login packets after self-data has initialized the UI.
@@ -665,7 +668,9 @@ impl SocialService {
         inviter_guid: u64,
         target_name: &SocialName,
         lookup: &L,
+        now_ms: u64,
     ) -> Result<Vec<SocialMessage>, SocialError> {
+        self.expire_group_invites(now_ms);
         let inviter = self
             .profiles
             .get(&inviter_guid)
@@ -735,6 +740,7 @@ impl SocialService {
             PendingGroupInvite {
                 group_id,
                 inviter_guid,
+                created_ms: now_ms,
             },
         );
         let invite = encode_group_invite(group_id, &inviter, &target)?;
@@ -755,7 +761,9 @@ impl SocialService {
         &mut self,
         target_guid: u64,
         accepted: bool,
+        now_ms: u64,
     ) -> Result<Vec<SocialMessage>, SocialError> {
+        self.expire_group_invites(now_ms);
         let Some(invite) = self.group_invites.get(&target_guid).copied() else {
             return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
         };
@@ -805,6 +813,15 @@ impl SocialService {
             out.push(message(recipient, update_packet.clone()));
         }
         Ok(out)
+    }
+
+    /// (R) Expire unanswered group invites on the host's monotonic clock.
+    ///
+    /// Recovered family 40 has no invite-timeout notice. A late accept therefore
+    /// receives the existing 40/5 "not invited" result instead of an invented packet.
+    pub fn expire_group_invites(&mut self, now_ms: u64) {
+        self.group_invites
+            .retain(|_, invite| now_ms.saturating_sub(invite.created_ms) < GROUP_INVITE_TTL_MS);
     }
 
     /// Leave, kick and disconnect update state before emitting family-40 member-list messages.

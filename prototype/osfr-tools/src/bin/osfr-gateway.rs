@@ -1828,6 +1828,7 @@ impl Session {
                     staged_world.refresh_group_ids();
                 }
             }
+            staged_world.social.expire_group_invites(now_ms);
             // W163: a trade ends when a player walks out of reach, changes zone instance (a
             // battle runs in its own), leaves, or lets it run out.
             deliveries.extend(trade_deliveries(staged_world.trades.maintain(
@@ -2123,12 +2124,14 @@ impl Session {
             SocialRequest::GroupInvite(name) => {
                 world
                     .social
-                    .invite_to_group(self.character_guid, &name, &lookup)
+                    .invite_to_group(self.character_guid, &name, &lookup, now_ms)
             }
             SocialRequest::GroupLeave => world.social.leave_group(self.character_guid),
-            SocialRequest::GroupResponse(accepted) => world
-                .social
-                .respond_group_invite(self.character_guid, accepted),
+            SocialRequest::GroupResponse(accepted) => {
+                world
+                    .social
+                    .respond_group_invite(self.character_guid, accepted, now_ms)
+            }
             SocialRequest::GroupKick(guid) => {
                 world.social.kick_from_group(self.character_guid, guid)
             }
@@ -5719,6 +5722,7 @@ mod t020_group_routing {
         sessions: [Session; 3],
         world: SharedWorld,
         scratch: PathBuf,
+        options: Options,
     }
 
     impl Drop for Rig {
@@ -5831,6 +5835,7 @@ mod t020_group_routing {
             sessions,
             world,
             scratch,
+            options,
         }
     }
 
@@ -6078,6 +6083,46 @@ mod t020_group_routing {
         assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
         assert_eq!(rig.world.social.group_of(GUIDS[b]), None);
         assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
+    }
+
+    #[test]
+    fn gateway_tick_expires_an_idle_invite() {
+        let mut rig = rig("tick-expiry");
+        send(&mut rig, 0, &invite(0, 1, 0));
+        let group_id = rig.world.social.group_of(GUIDS[0]).unwrap();
+        assert_eq!(
+            rig.world.social.group_invitee(GUIDS[1]),
+            Some((group_id, GUIDS[0]))
+        );
+
+        let mut membership = World::runtime();
+        membership
+            .register_runtime_zone(osfr_tools::content::Zone {
+                id: 1,
+                name: String::new(),
+                geometry_id: Some(1),
+                zone_type: Some(2),
+                tutorial: Some(false),
+                sky: Some(String::new()),
+                source: Vec::new(),
+            })
+            .unwrap();
+        let mut sessions = SessionMap::new();
+        rig.sessions[0]
+            .tick(
+                &rig.options,
+                61_000,
+                &mut rig.world,
+                &mut membership,
+                &mut sessions,
+            )
+            .unwrap();
+
+        assert_eq!(rig.world.social.group_invitee(GUIDS[1]), None);
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some([GUIDS[0]].as_slice())
+        );
     }
 
     #[test]

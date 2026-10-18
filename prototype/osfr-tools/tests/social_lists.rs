@@ -194,7 +194,7 @@ fn ignore_add_remove_and_target_ignore_blocks_group_invite() {
     assert_eq!((family(&ignored[0]), sub(&ignored[0])), (112, 2));
     let _: social_chat::IgnoreLists = social.chat_ignore_lists();
 
-    let invite = social.invite_to_group(202, &name_a, &directory).unwrap();
+    let invite = social.invite_to_group(202, &name_a, &directory, 0).unwrap();
     assert_eq!(invite.len(), 1);
     assert_eq!((family(&invite[0]), sub(&invite[0])), (40, 2));
     assert_eq!(
@@ -219,7 +219,7 @@ fn group_invite_accept_capacity_kick_leader_leave_and_disband() {
     let c_name = identity(30, 303, "FixtureC").name;
     let d_name = identity(40, 404, "FixtureD").name;
 
-    let invite_b = social.invite_to_group(101, &b_name, &directory).unwrap();
+    let invite_b = social.invite_to_group(101, &b_name, &directory, 0).unwrap();
     let group_id = social.group_of(101).unwrap();
     assert_eq!(
         invite_b
@@ -239,7 +239,7 @@ fn group_invite_accept_capacity_kick_leader_leave_and_disband() {
         u32::from_le_bytes(invite_result.bytes[4..8].try_into().unwrap()),
         0
     );
-    let accepted_b = social.respond_group_invite(202, true).unwrap();
+    let accepted_b = social.respond_group_invite(202, true, 0).unwrap();
     assert_eq!(social.group_members(group_id).unwrap(), &[101, 202]);
     assert!(
         accepted_b
@@ -257,10 +257,10 @@ fn group_invite_accept_capacity_kick_leader_leave_and_disband() {
             .any(|packet| family(packet) == 40 && sub(packet) == 9)
     );
 
-    social.invite_to_group(101, &c_name, &directory).unwrap();
-    social.respond_group_invite(303, true).unwrap();
+    social.invite_to_group(101, &c_name, &directory, 0).unwrap();
+    social.respond_group_invite(303, true, 0).unwrap();
     assert_eq!(social.group_members(group_id).unwrap(), &[101, 202, 303]);
-    let full = social.invite_to_group(101, &d_name, &directory).unwrap();
+    let full = social.invite_to_group(101, &d_name, &directory, 0).unwrap();
     let full_reply = full
         .iter()
         .find(|packet| packet.recipient_guid == 101)
@@ -310,14 +310,14 @@ fn client_autorefuse_group_answer_declines_and_disconnect_cleans_state() {
     let b_name = identity(20, 202, "FixtureB").name;
     let c_name = identity(30, 303, "FixtureC").name;
     let d_name = identity(40, 404, "FixtureD").name;
-    let invite = social.invite_to_group(101, &b_name, &directory).unwrap();
+    let invite = social.invite_to_group(101, &b_name, &directory, 0).unwrap();
     assert!(
         invite
             .iter()
             .any(|packet| packet.recipient_guid == 202 && family(packet) == 40 && sub(packet) == 1)
     );
     // The client checks AutoRefuse[GroupInvitation] at 00917b60 index 6, then sends 40/4 false.
-    let declined = social.respond_group_invite(202, false).unwrap();
+    let declined = social.respond_group_invite(202, false, 0).unwrap();
     assert!(
         declined
             .iter()
@@ -325,11 +325,11 @@ fn client_autorefuse_group_answer_declines_and_disconnect_cleans_state() {
     );
     assert!(social.group_invitee(202).is_none());
 
-    social.invite_to_group(101, &b_name, &directory).unwrap();
-    social.respond_group_invite(202, true).unwrap();
-    social.invite_to_group(101, &c_name, &directory).unwrap();
-    social.respond_group_invite(303, true).unwrap();
-    social.invite_to_group(101, &d_name, &directory).unwrap();
+    social.invite_to_group(101, &b_name, &directory, 0).unwrap();
+    social.respond_group_invite(202, true, 0).unwrap();
+    social.invite_to_group(101, &c_name, &directory, 0).unwrap();
+    social.respond_group_invite(303, true, 0).unwrap();
+    social.invite_to_group(101, &d_name, &directory, 0).unwrap();
     let group_id = social.group_of(101).unwrap();
     let disconnected = social.disconnect(101).unwrap();
     assert_eq!(social.group_of(101), None);
@@ -426,7 +426,7 @@ fn group_reader_builders_match_recovered_headers_and_member_order() {
 fn offline_group_invite_uses_not_found_result_without_creating_a_group() {
     let (mut social, directory) = service(3);
     let result = social
-        .invite_to_group(101, &identity(20, 202, "FixtureB").name, &directory)
+        .invite_to_group(101, &identity(20, 202, "FixtureB").name, &directory, 0)
         .unwrap();
     assert_eq!(result.len(), 1);
     assert_eq!((family(&result[0]), sub(&result[0])), (40, 2));
@@ -448,7 +448,7 @@ fn refused_group_invites_leave_membership_and_pending_invites_unchanged() {
     let c_name = identity(30, 303, "FixtureC").name;
 
     // (R) Self-invite is refused before a solo group can be created.
-    let self_without_group = social.invite_to_group(303, &c_name, &directory).unwrap();
+    let self_without_group = social.invite_to_group(303, &c_name, &directory, 0).unwrap();
     assert_eq!(
         (family(&self_without_group[0]), sub(&self_without_group[0])),
         (40, 2)
@@ -457,12 +457,12 @@ fn refused_group_invites_leave_membership_and_pending_invites_unchanged() {
     assert_eq!(social.group_of(303), None);
     assert_eq!(social.group_invitee(303), None);
 
-    social.invite_to_group(101, &b_name, &directory).unwrap();
+    social.invite_to_group(101, &b_name, &directory, 0).unwrap();
     let group_id = social.group_of(101).unwrap();
     let membership = [101, 202, 303].map(|guid| social.group_of(guid));
     let pending = social.group_invitee(202);
 
-    let repeated = social.invite_to_group(101, &b_name, &directory).unwrap();
+    let repeated = social.invite_to_group(101, &b_name, &directory, 0).unwrap();
     assert_eq!((family(&repeated[0]), sub(&repeated[0])), (40, 2));
     assert_eq!(result(&repeated[0]), 6);
     assert_eq!(social.group_of(101), Some(group_id));
@@ -470,7 +470,7 @@ fn refused_group_invites_leave_membership_and_pending_invites_unchanged() {
     assert_eq!(social.group_invitee(202), pending);
 
     // A failed invite from an ungrouped player must not leave that player in a phantom group.
-    let cross_invite = social.invite_to_group(303, &b_name, &directory).unwrap();
+    let cross_invite = social.invite_to_group(303, &b_name, &directory, 0).unwrap();
     assert_eq!((family(&cross_invite[0]), sub(&cross_invite[0])), (40, 2));
     assert_eq!(result(&cross_invite[0]), 4);
     assert_eq!(social.group_of(303), None);
@@ -480,7 +480,7 @@ fn refused_group_invites_leave_membership_and_pending_invites_unchanged() {
     );
     assert_eq!(social.group_invitee(202), pending);
 
-    let self_while_grouped = social.invite_to_group(101, &a_name, &directory).unwrap();
+    let self_while_grouped = social.invite_to_group(101, &a_name, &directory, 0).unwrap();
     assert_eq!(
         (family(&self_while_grouped[0]), sub(&self_while_grouped[0])),
         (40, 2)
