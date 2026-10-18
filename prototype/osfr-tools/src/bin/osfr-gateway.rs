@@ -92,6 +92,7 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     env, fs, io,
     net::{SocketAddr, TcpListener, UdpSocket},
+    panic::{AssertUnwindSafe, catch_unwind},
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
@@ -2397,6 +2398,10 @@ impl Session {
         membership: &mut World,
         sessions: &mut SessionMap,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        #[cfg(test)]
+        if isolation::PANIC_IN_TICK.get() == Some(self.id) {
+            panic!("isolation probe");
+        }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
         let outcome = staged_gateway.tick_at(now_ms)?;
@@ -2931,6 +2936,10 @@ pub struct Server {
     world: SharedWorld,
     // (R) Single writer, deliberately outside SharedWorld staging.
     membership: World,
+    /// Shared fields whose tick faulted: frozen until the instance empties and is collected.
+    faulted_fields: BTreeSet<i32>,
+    /// Shared fields with nobody in them that already settled: not ticked until someone enters.
+    dormant_fields: BTreeSet<i32>,
     start: Instant,
     generation: u32,
     trace: Option<trace::Trace>,
@@ -2940,11 +2949,41 @@ pub struct Server {
 }
 
 impl Server {
-    fn tick_shared_fields(&mut self, now_ms: u64) -> Result<(), Box<dyn std::error::Error>> {
-        for instance in self.membership.field_instances() {
-            self.tick_shared_instance(instance, now_ms)?;
+    /// A field whose tick panics or errors is frozen (logged once) until it empties and is
+    /// collected; the server and every other field keep running.
+    ///
+    /// Dormant by default: a field nobody is in (at any readiness) ticks once more, which drops
+    /// departed casters' DoTs and kill credits, then sleeps until someone enters. Its clocks are
+    /// absolute and motion clamps the first elapsed step, so waking needs no catch-up.
+    fn tick_shared_fields(&mut self, now_ms: u64) {
+        let instances = self.membership.field_instances();
+        self.faulted_fields
+            .retain(|instance| instances.contains(instance));
+        self.dormant_fields
+            .retain(|instance| instances.contains(instance));
+        for instance in instances {
+            if self.faulted_fields.contains(&instance) {
+                continue;
+            }
+            let occupied = self.sessions.values().any(|session| {
+                self.membership
+                    .player_location(session.character_guid)
+                    .is_some_and(|l| l.instance_id == instance)
+            });
+            if occupied {
+                self.dormant_fields.remove(&instance);
+            } else if !self.dormant_fields.insert(instance) {
+                // Already settled; drop stale deltas so a later arrival never replays them.
+                self.membership.take_field_packets(instance);
+                continue;
+            }
+            if let Err(error) = contain(|| self.tick_shared_instance(instance, now_ms)) {
+                self.faulted_fields.insert(instance);
+                event(
+                    json!({"event":"field_faulted","instance":instance,"reason":error.to_string()}),
+                );
+            }
         }
-        Ok(())
     }
 
     fn tick_shared_instance(
@@ -3316,6 +3355,8 @@ impl Server {
             trace: None,
             studio,
             studio_assets: BTreeMap::new(),
+            faulted_fields: BTreeSet::new(),
+            dormant_fields: BTreeSet::new(),
             handshakes: IpLimiter::new(HANDSHAKES_PER_IP.0, HANDSHAKES_PER_IP.1, 1024),
             refused: 0,
             refusal_logged: None,
@@ -3588,7 +3629,7 @@ impl Server {
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
             if let Some(session) = self.sessions.remove(&key) {
-                self.end_session(key, session, "server_shutdown")?;
+                self.end_session(key, session, "server_shutdown");
             }
         }
         self.flush_security();
@@ -3627,7 +3668,12 @@ impl Server {
                                     "body_len":wire.len(),"body_head_hex":null,"outcome":"accepted"
                                 }))?;
                                 }
-                                self.accept_handshake(peer, request)?;
+                                if let Err(error) = contain(|| self.accept_handshake(peer, request))
+                                {
+                                    event(
+                                        json!({"event":"handshake_failed","peer":peer.to_string(),"reason":error.to_string()}),
+                                    );
+                                }
                             }
                             Err(error) => {
                                 if let Some(trace) = &self.trace {
@@ -3657,24 +3703,24 @@ impl Server {
                                 self.sessions.insert(key, current);
                                 self.refuse("packet_budget");
                             } else {
-                                let result = current.handle(
-                                    &self.socket,
-                                    wire,
-                                    &self.options,
-                                    now_ms,
-                                    &mut self.world,
-                                    &mut self.membership,
-                                    &mut self.sessions,
-                                );
+                                let result = contain(|| {
+                                    current.handle(
+                                        &self.socket,
+                                        wire,
+                                        &self.options,
+                                        now_ms,
+                                        &mut self.world,
+                                        &mut self.membership,
+                                        &mut self.sessions,
+                                    )
+                                });
                                 match result {
                                     Ok(false) => {
                                         self.sessions.insert(key, current);
                                     }
-                                    Ok(true) => {
-                                        self.end_session(key, current, "client_disconnect")?
-                                    }
+                                    Ok(true) => self.end_session(key, current, "client_disconnect"),
                                     Err(error) => {
-                                        self.end_session(key, current, &error.to_string())?
+                                        self.end_session(key, current, &error.to_string())
                                     }
                                 }
                             }
@@ -3702,38 +3748,38 @@ impl Server {
         let tick_due = now_ms >= self.next_tick_ms;
         if tick_due {
             self.next_tick_ms = now_ms.saturating_add(50);
-            self.tick_shared_fields(now_ms)?;
+            self.tick_shared_fields(now_ms);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
             let Some(mut current) = self.sessions.remove(&key) else {
                 continue;
             };
-            let result = if tick_due {
-                current.tick(
-                    &self.options,
-                    now_ms,
-                    &mut self.world,
-                    &mut self.membership,
-                    &mut self.sessions,
-                )
-            } else {
-                Ok(())
-            }
-            .and_then(|_| current.flush(&self.socket, now_ms));
+            let result = contain(|| {
+                if tick_due {
+                    current.tick(
+                        &self.options,
+                        now_ms,
+                        &mut self.world,
+                        &mut self.membership,
+                        &mut self.sessions,
+                    )?;
+                }
+                current.flush(&self.socket, now_ms)
+            });
             if let Err(error) = result {
-                self.end_session(key, current, &error.to_string())?;
+                self.end_session(key, current, &error.to_string());
             } else if current.receiver.expire_reassembly(Instant::now()) {
                 // A fragmented message left incomplete past its fixed deadline
                 // (KeepAlive cannot extend it; Security Model L7).
-                self.end_session(key, current, "reassembly_timeout")?;
+                self.end_session(key, current, "reassembly_timeout");
             } else if !current.selected_character
                 && current.session_start.elapsed() > LOGIN_DEADLINE
             {
                 // Not logged in yet: KeepAlive does not extend this (Security Model L6).
-                self.end_session(key, current, "login_deadline")?;
+                self.end_session(key, current, "login_deadline");
             } else if current.last_activity.elapsed() > Duration::from_secs(60) {
-                self.end_session(key, current, "idle_timeout")?;
+                self.end_session(key, current, "idle_timeout");
             } else {
                 self.sessions.insert(key, current);
             }
@@ -3932,9 +3978,7 @@ impl Server {
                     // End the session (it saves first), then restore the file:
                     // the client reconnects into the saved state.
                     let session = self.sessions.remove(&key).unwrap();
-                    if let Err(error) = self.end_session(key, session, "studio_savestate_load") {
-                        return json_reply(400, json!({"error": error.to_string()}));
-                    }
+                    self.end_session(key, session, "studio_savestate_load");
                     return match fs::copy(&source, &state_path) {
                         Ok(_) => json_reply(
                             200,
@@ -4256,7 +4300,7 @@ impl Server {
         }
         if let Some(old_key) = self.session_key_for_peer(peer) {
             let old = self.sessions.remove(&old_key).unwrap();
-            self.end_session(old_key, old, "connection_replaced")?;
+            self.end_session(old_key, old, "connection_replaced");
         }
         let same_ip = self
             .sessions
@@ -4323,12 +4367,14 @@ impl Server {
         Ok(())
     }
 
-    fn end_session(
-        &mut self,
-        key: SessionKey,
-        mut session: Session,
-        reason: &str,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    /// Never fails: a stage that errors is logged and the rest still run, so a failed save
+    /// cannot leave a ghost player in the world or stop the server.
+    fn end_session(&mut self, key: SessionKey, mut session: Session, reason: &str) {
+        let fault = |stage: &str, error: String| {
+            event(
+                json!({"event":"session_end_fault","peer":key.peer.to_string(),"stage":stage,"reason":error}),
+            );
+        };
         if reason == "login_deadline" {
             if self.retired_handshakes.len() >= MAX_SESSIONS * 4 {
                 if let Some(oldest) = self
@@ -4351,13 +4397,19 @@ impl Server {
             .get(&session.character_guid)
             .is_some_and(|owner| *owner != session.id);
         if session.selected_character && !another_owns {
-            save(&session.state_path, &session.gateway.snapshot())?;
+            let saved = contain(|| Ok(save(&session.state_path, &session.gateway.snapshot())?));
+            if let Err(error) = saved {
+                fault("save", error.to_string());
+            }
         }
         let mut deliveries = self.world.leave_player(session.id);
         let owns_active =
             self.world.active_sessions.get(&session.character_guid) == Some(&session.id);
         if owns_active && self.world.social.profile(session.character_guid).is_some() {
-            deliveries.extend(self.world.social_disconnect(session.character_guid)?);
+            match self.world.social_disconnect(session.character_guid) {
+                Ok(more) => deliveries.extend(more),
+                Err(error) => fault("social", error.to_string()),
+            }
         }
         if owns_active {
             self.membership.leave(
@@ -4368,19 +4420,34 @@ impl Server {
         }
         self.world.session_keys.remove(&session.id);
         for delivery in deliveries {
-            if delivery.recipient != session.id {
-                queue_delivery(&mut session, &mut self.sessions, &self.world, delivery)?;
+            if delivery.recipient != session.id
+                && let Err(error) =
+                    queue_delivery(&mut session, &mut self.sessions, &self.world, delivery)
+            {
+                fault("delivery", error.to_string());
             }
         }
         event(json!({"event":"session_ended","peer":key.peer.to_string(),"reason":reason}));
-        if let Some(trace) = &session.trace {
-            trace.record(json!({
+        if let Some(trace) = &session.trace
+            && let Err(error) = trace.record(json!({
                 "event":"session_ended","session":session.id.0,"peer":key.peer.to_string(),
                 "direction":"local","outcome":"closed","reason":reason
-            }))?;
+            }))
+        {
+            fault("trace", error.to_string());
         }
-        Ok(())
     }
+}
+
+/// The isolation boundary: a panic in `work` becomes an "internal_error" for its caller, which
+/// ends that session (saved as it stands) or freezes that field. The panic text still reaches
+/// stderr through the default hook.
+// ponytail: a panic part-way through a cross-session handler (trade, group) can drop a partner
+// session it had taken out of the map; reconcile `world.session_keys` if that is ever seen.
+fn contain<T>(
+    work: impl FnOnce() -> Result<T, Box<dyn std::error::Error>>,
+) -> Result<T, Box<dyn std::error::Error>> {
+    catch_unwind(AssertUnwindSafe(work)).unwrap_or_else(|_| Err("internal_error".into()))
 }
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -4425,6 +4492,14 @@ mod tests;
 #[cfg(test)]
 #[path = "osfr_gateway/f120_fishing_hour_reconnect.rs"]
 mod f120_fishing_hour_reconnect;
+
+#[cfg(test)]
+#[path = "osfr_gateway/isolation.rs"]
+mod isolation;
+
+#[cfg(test)]
+#[path = "osfr_gateway/dormant_fields.rs"]
+mod dormant_fields;
 
 fn field_packet(packet: &[u8]) -> bool {
     packet.starts_with(&[125, 0])

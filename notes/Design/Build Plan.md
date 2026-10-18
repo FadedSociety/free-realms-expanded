@@ -6,7 +6,7 @@ updated: 2026-10-15
 
 # Build Plan
 
-The single living plan from **2026-10-15** onward. The verified current state of every system is in [[Build Ledger]], and this plan only schedules work against it.
+The single living plan from **2026-10-15** onward. The verified current state of every system is in [[Build Ledger]], and this plan only schedules work against it. *How* work gets built (the enforced rules, briefs, where new code goes, build order and dormancy) is in [[Build Playbook]].
 
 **Rules:**
 

@@ -145,7 +145,7 @@ fn rig(name: &str) -> Rig {
     }
 }
 
-fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
+pub(super) fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
     let scratch = std::env::temp_dir().join(format!("osfr-t020-{name}-{}", std::process::id()));
     fs::create_dir_all(&scratch).unwrap();
     let mut server = Server::new(options(&scratch)).unwrap();
@@ -557,9 +557,7 @@ fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
     );
 
     let session_b = server.sessions.remove(&keys[b]).unwrap();
-    server
-        .end_session(keys[b], session_b, "test_owner")
-        .unwrap();
+    server.end_session(keys[b], session_b, "test_owner");
 
     assert_eq!(server.world.social.group_of(GUIDS[a]), None);
     assert_eq!(server.world.social.group_of(GUIDS[b]), None);
@@ -615,9 +613,7 @@ fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
         [a, b].map(|index| server.world.chat_sessions[&server.sessions[&keys[index]].id].group_id);
 
     let stale = server.sessions.remove(&stale_key).unwrap();
-    server
-        .end_session(stale_key, stale, "duplicate_session")
-        .unwrap();
+    server.end_session(stale_key, stale, "duplicate_session");
 
     assert!(server.sessions.contains_key(&keys[b]));
     assert_eq!(server.world.active_sessions[&GUIDS[b]], live_b_id);

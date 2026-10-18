@@ -61,6 +61,9 @@ The four hubs (`gameplay.rs`, `bin/osfr-gateway.rs`, `encounter.rs`, `gateway.rs
 - **Busy rules:** `gameplay/occupation.rs`. A new activity adds an `Occupation` variant; the build fails until it decides every gate (start, warp, ride, pets, location) and its detection.
 - **Find the owner first:** the code graph (codebase-memory, project `C-Users-the owner-Documents-Projects-CartoonMMO-autopilot-int`, re-indexed after every integration) answers "who owns X" and "who calls X"; read the owning module and the hub's call site, not the whole hub.
 - **Proof for moves:** a pure move keeps `cargo test -- --list` identical; the integrator also refuses any change that loses a named passing test (`lab/autopilot/protected-pass.txt`).
+- **Isolation boundary:** `contain` in `bin/osfr-gateway.rs` turns a panic in one session's packet handling, tick or end-of-session save into an `internal_error` disconnect for that player alone; a faulted shared field freezes (`faulted_fields`). Test: `osfr_gateway/isolation.rs`.
+- **Spine ratchet:** `tests/spine_rules.rs` with ceilings in `tests/spine_rules.ceilings` (lead-only). It covers hub sizes, plain `fs::write`, hex outside `trace.rs`, and hand-read busy state outside `occupation.rs`. The ceilings only go down; the integrator lowers them and appends `lab/autopilot/logs/drift.log` after each green batch.
+- **Dormancy:** a shared field nobody is in settles once, then sleeps (`dormant_fields` in `Server::tick_shared_fields`; test `osfr_gateway/dormant_fields.rs`). For the next slices, see [[Build Playbook]] §4.
 
 ## Tests and gates
 
