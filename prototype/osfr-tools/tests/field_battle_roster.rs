@@ -970,10 +970,9 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
         "{}",
         chat_text(&refused)
     );
-    assert!(
-        details(&refused).is_some(),
-        "the refused start screen remains open"
-    );
+    let first_screen = details(&refused)
+        .expect("the refused start screen remains open")
+        .to_vec();
     assert_eq!(
         gateway.snapshot(),
         before_go,
@@ -989,4 +988,20 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
             .active
             .is_none()
     );
+
+    // The saved snapshot excludes `pending_battle`, so replay Go: a second
+    // refusal and an identical screen prove the pending state was restored.
+    let repeated = send(&mut gateway, &go(&start), 1_100);
+    assert!(!repeated.state_changed && !repeated.began_zoning);
+    assert!(
+        chat_text(&repeated).contains("one of its rewards is missing"),
+        "{}",
+        chat_text(&repeated)
+    );
+    assert_eq!(
+        details(&repeated).expect("a refused Go keeps the start screen pending"),
+        first_screen,
+        "the same start screen is shown again"
+    );
+    assert_eq!(gateway.snapshot(), before_go);
 }

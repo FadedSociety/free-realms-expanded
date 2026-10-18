@@ -39,6 +39,7 @@ use std::{
 };
 
 mod derby_session;
+mod field_battle;
 mod npc;
 mod npc_quests;
 mod occupation;
@@ -118,8 +119,6 @@ pub struct GameplayState {
 const HARVESTING_GAME_ID: i32 = 111;
 /// (R) Minimum gap between answered activity-portal refreshes (167/1/4).
 const PORTAL_REFRESH_MS: u64 = 250;
-const UNAVAILABLE_BATTLE_PRIZE: &str =
-    "This battle is unavailable because one of its rewards is missing.";
 
 #[derive(Clone)]
 pub struct Gameplay {
@@ -3304,19 +3303,14 @@ impl Gameplay {
                     say(out, "Usage: realm battle <battle id>".into());
                     return Ok(true);
                 };
-                if !self.battle_prizes_available(battle) {
-                    say(out, UNAVAILABLE_BATTLE_PRIZE.into());
-                    return Ok(true);
-                }
-                let profile = self.profiles.as_ref().unwrap().active();
-                match self
-                    .encounter
-                    .as_mut()
-                    .unwrap()
-                    .begin(battle, character.clone(), profile)
-                {
-                    Ok(result) => self.apply_encounter(result, out)?,
-                    Err(error) => say(out, format!("Cannot start battle {battle}: {error}")),
+                match self.begin_field_battle(battle, character, out)? {
+                    field_battle::BattleStart::Started => {}
+                    field_battle::BattleStart::Unavailable => {
+                        say(out, field_battle::UNAVAILABLE_BATTLE_PRIZE.into())
+                    }
+                    field_battle::BattleStart::Refused(error) => {
+                        say(out, format!("Cannot start battle {battle}: {error}"));
+                    }
                 }
             }
             ["win"] => {
@@ -3499,7 +3493,7 @@ impl Gameplay {
             return Ok(vec!["Finish or exit the current encounter first.".into()]);
         }
         if !self.battle_prizes_available(battle) {
-            return Ok(vec![UNAVAILABLE_BATTLE_PRIZE.into()]);
+            return Ok(vec![field_battle::UNAVAILABLE_BATTLE_PRIZE.into()]);
         }
         let mut lines = vec![format!("Battle {battle}, job {profile} (scripted bot):")];
         for level in [1_u32, 5, 10, 15, 20] {
@@ -3903,18 +3897,12 @@ impl Gameplay {
                         self.begin_soccer(soccer, character, &mut out)?;
                     }
                     Ok((battle, crate::activity_portal::Kind::Battle)) => {
-                        if !self.battle_prizes_available(battle) {
-                            out.replies.push(chat::system(UNAVAILABLE_BATTLE_PRIZE));
-                            return Ok(Some(out));
-                        }
-                        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
-                        let begun = self
-                            .encounter
-                            .as_mut()
-                            .map(|encounter| encounter.begin(battle, character.clone(), profile));
-                        match begun {
-                            Some(Ok(result)) => self.apply_encounter(result, &mut out)?,
-                            _ => out
+                        match self.begin_field_battle(battle, character, &mut out)? {
+                            field_battle::BattleStart::Started => {}
+                            field_battle::BattleStart::Unavailable => out
+                                .replies
+                                .push(chat::system(field_battle::UNAVAILABLE_BATTLE_PRIZE)),
+                            field_battle::BattleStart::Refused(_) => out
                                 .replies
                                 .push(chat::system("You cannot start that activity here.")),
                         }
@@ -5502,60 +5490,10 @@ impl Gameplay {
                 .refuse_weapon(active_profile, 0, now_ms);
             return Ok(out);
         }
-        // Go on a battle start screen (41/108): enter the battle's instanced
-        // arena through the same begin() as the opening cave.
-        if inner.starts_with(&[41, 0, 108, 0]) {
-            let active_profile = self.profiles.as_ref().unwrap().active();
-            if let Some(required) = self
-                .encounter
-                .as_ref()
-                .unwrap()
-                .pending_battle_required_level()
-                && self.job_level(active_profile) < required
-            {
-                out.replies.push(chat::system(&format!(
-                    "This activity needs level {required}."
-                )));
-                return Ok(out);
-            }
-            if let Some(battle) = self.encounter.as_mut().unwrap().take_pending_battle() {
-                if !self.battle_prizes_available(battle) {
-                    out.replies.push(chat::system(UNAVAILABLE_BATTLE_PRIZE));
-                    out.replies.extend(
-                        self.encounter
-                            .as_mut()
-                            .unwrap()
-                            .reopen_battle_screen(battle, active_profile),
-                    );
-                    return Ok(out);
-                }
-                if !self
-                    .abilities
-                    .as_ref()
-                    .unwrap()
-                    .supports_basic(active_profile)
-                {
-                    out.replies.push(chat::system(
-                        "Switch to a combat job before starting a battle.",
-                    ));
-                    // Keep the start screen up (it hides the HUD): Switch Jobs
-                    // is on it, then Go again or close.
-                    out.replies.extend(
-                        self.encounter
-                            .as_mut()
-                            .unwrap()
-                            .reopen_battle_screen(battle, active_profile),
-                    );
-                    return Ok(out);
-                }
-                let result = self.encounter.as_mut().unwrap().begin(
-                    battle,
-                    character.clone(),
-                    active_profile,
-                )?;
-                self.apply_encounter(result, &mut out)?;
-                return Ok(out);
-            }
+        // Go on a battle start screen (41/108): the owning module runs the
+        // prize gate and keeps the screen open on a refusal.
+        if inner.starts_with(&[41, 0, 108, 0]) && self.handle_battle_go(character, &mut out)? {
+            return Ok(out);
         }
         let result = self.encounter.as_mut().unwrap().handle(
             inner,
@@ -6101,14 +6039,6 @@ impl Gameplay {
             });
         }
         Ok(())
-    }
-
-    /// Every production path that starts a field battle checks this before
-    /// mutating the encounter, inventory or open start screen.
-    fn battle_prizes_available(&self, id: u32) -> bool {
-        self.encounter.as_ref().is_some_and(|encounter| {
-            encounter.battle_prizes_available(id, |item| self.inventory.has_definition(item))
-        })
     }
 
     /// Follow the completed cave objective to the next story guide. Locale
