@@ -169,6 +169,11 @@ fn gateway_sixteen_players() {
         .display()
         .to_string()
         .replace('\\', "/");
+    let bin_dir = crate_dir
+        .join("src/bin")
+        .display()
+        .to_string()
+        .replace('\\', "/");
     let studio = crate_dir
         .join("studio/index.html")
         .display()
@@ -184,7 +189,10 @@ fn gateway_sixteen_players() {
         .replace(
             "include_str!(\"../../studio/index.html\")",
             &format!("include_str!(\"{studio}\")"),
-        );
+        )
+        // The bin's test modules live in src/bin/osfr_gateway/ (#[path]); the splice moves the
+        // source, so make those paths absolute.
+        .replace("#[path = \"osfr_gateway/", &format!("#[path = \"{bin_dir}/osfr_gateway/"));
     let fixture = crate_dir
         .join("tests/common/startup_selfdata_fixture.rs")
         .display()
