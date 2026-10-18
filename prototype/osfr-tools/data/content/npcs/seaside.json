@@ -6813,7 +6813,7 @@
       "quests_given": [],
       "quest_ids_given": [],
       "quests_given_text": [
-        "Stealth-advice stop in Ninja: Silence is Golden... and Deadly (573579885); receives Ellie's lotion (644158232). See Ninja"
+        "Ninja: Silence is Golden... and Deadly (target): the E4 stealth lesson at Seaside (573579885); receives Ellie's lotion (644158232). See Ninja"
       ],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",

@@ -24010,7 +24010,7 @@
       "quests_given": [],
       "quest_ids_given": [],
       "quests_given_text": [
-        "A stop of Ninja: Silence is Golden... and Deadly (row E4, matched by wording on that page)."
+        "Ninja: Silence is Golden... and Deadly (target): the E4 stealth lesson in Shrouded Glade (row E4, matched by wording on that page)."
       ],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",

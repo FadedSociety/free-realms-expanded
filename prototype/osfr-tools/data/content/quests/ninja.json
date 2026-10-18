@@ -195,10 +195,83 @@
       "title_string_id": 78849,
       "giver_npc_id": 9000000223,
       "prerequisite_quest_ids": [
-        3110003
+        3110002
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000561,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E4; locale 573579885: 'Speak to Brendan in Seaside to learn secrets of stealth.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the E4 mentor stop is bound to the spawned Seaside NPC key 9500000561 named Brendan"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000697,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E4; locale 1664864679: 'Speak to Kosha in Shrouded Glade to learn secrets of stealth.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the E4 mentor stop is bound to the spawned Shrouded Glade NPC key 9500000697 named Kosha"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000047,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E4; locale 1346410582: 'Return to Chloe in Blackspore'"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Entry line (Ty, Lakeshore), row E4; description 3950551441 directs the player to find Chloe in Blackspore after the stealth lessons."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the E4 continuation stop is bound to the spawned Blackspore Swamp NPC key 9000000047 named Chloe"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9000000223,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T107 authors the return to giver Ty as the final ordered talk step so the existing quest engine opens the normal turn-in at Ty after the three mentor visits; the E4 client text does not expose a separate turn-in stop."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T107: five coins is a small referral fallback consistent with W110 referral payouts; the exact E4 payout is unknown and the retired Amateur Ninja Blade is not granted."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -214,11 +287,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) objectives are authored in E4 order: Brendan, Kosha, Chloe, then return to Ty; the split quest engine runs objectives in array order"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) the three E4 mentor stops use spawned regional NPC keys; Ty is the authored fourth talk step and turn-in giver; no Tanda T. Toes row is spawned or substituted"
         },
         {
           "kind": "reconstructed",
@@ -226,11 +299,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row E3; mapped that page label to the preceding batch content key"
+          "evidence": "(R) prerequisite is completed 3110002, skipping disabled 3110003 because its troll-fort encounter is unavailable; the recovered chapter occurs after E3 and 3110003 remains unchanged and disabled"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) exact E4 reward values are unknown; this chapter pays a five-coin referral fallback and does not grant the retired Amateur Ninja Blade or another substitute weapon"
         },
         {
           "kind": "reconstructed",
@@ -240,7 +313,7 @@
       "description_string_id": 78850,
       "intro_text_string_id": 78848,
       "end_text_string_id": 78851,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110005,
