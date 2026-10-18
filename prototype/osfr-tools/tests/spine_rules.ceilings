@@ -1,9 +1,9 @@
 # Spine ratchet ceilings (tests/spine_rules.rs). They only ever go down: integrate.sh lowers
 # them after every green batch (999999 = not measured yet). Builders may not edit this file.
-busy_outside_occupation 999999
-hex_outside_trace 999999
-hub:src/bin/osfr-gateway.rs 999999
-hub:src/encounter.rs 999999
-hub:src/gameplay.rs 999999
-hub:src/gateway.rs 999999
-plain_fs_write 999999
+busy_outside_occupation 39
+hex_outside_trace 3
+hub:src/bin/osfr-gateway.rs 4697
+hub:src/encounter.rs 3356
+hub:src/gameplay.rs 6655
+hub:src/gateway.rs 2396
+plain_fs_write 4
