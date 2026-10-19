@@ -1945,6 +1945,8 @@ impl Gameplay {
                 crate::kart_gateway::KartRewardClaim::default()
             };
             replies.extend(claim.replies);
+            // A racing tick that only re-stamped the session-local weapon clock is not a
+            // persisted change: WeaponState equality excludes that tick clock.
             let changed = before != *kart.state();
             staged.refresh_npc_quest_eligibility(current_unix_seconds());
             let mut out = Outcome {

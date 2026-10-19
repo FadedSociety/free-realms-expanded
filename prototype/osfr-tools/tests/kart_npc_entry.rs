@@ -11,6 +11,7 @@
 //! No game bytes, player names or chat appear here; all content is synthetic.
 use osfr_tools::{
     character_store::CharacterState,
+    gameplay::{Gameplay, GameplayState},
     inventory::Inventory,
     kart_entry::{ProxiedVehicle, RaceConfig, RaceEntryContent, RaceEntryContext},
     kart_gateway::{
@@ -18,7 +19,9 @@ use osfr_tools::{
     },
     kart_progress_native::ProgressPayload,
     kart_racing::RewardSchedule,
-    kart_service::{GateWaypoint, KartServiceContent, RaceBounds, RaceStep, ScheduledFrame},
+    kart_service::{
+        GateWaypoint, KartServiceContent, RaceBounds, RacePhase, RaceStep, ScheduledFrame,
+    },
     profiles::Profiles,
     zone_transition::ZoneTransition,
 };
@@ -788,6 +791,228 @@ fn a_disconnect_mid_race_survives_a_snapshot_with_the_prior_job() {
     assert_eq!(restored.exit(), Some(character()));
 }
 
+// ---- gameplay tick: a clock-only racing tick must not request a save -------------------------
+
+/// The complete gameplay content `tests/chess_route.rs` also loads (private lab input). The
+/// synthetic kart package is layered on a temp copy, so shared content is never modified.
+fn gameplay_content() -> PathBuf {
+    std::env::var_os("OSFR_KART_GAMEPLAY_CONTENT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../lab/references/opening-journal-text-v2/content")
+        })
+}
+
+fn copy_tree(from: &std::path::Path, to: &std::path::Path) {
+    fs::create_dir_all(to).unwrap();
+    for entry in fs::read_dir(from).unwrap() {
+        let entry = entry.unwrap();
+        let target = to.join(entry.file_name());
+        if entry.file_type().unwrap().is_dir() {
+            copy_tree(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).unwrap();
+        }
+    }
+}
+
+struct GameplayFixture(PathBuf);
+
+impl GameplayFixture {
+    fn new() -> Self {
+        let source = gameplay_content();
+        assert!(
+            source.join("inventory.json").is_file(),
+            "kart gameplay tick needs a prepared content directory: {}",
+            source.display()
+        );
+        let path = std::env::temp_dir().join(format!(
+            "kart-gameplay-tick-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        copy_tree(&source, &path);
+        let mut kart = content();
+        let mut race = race_content();
+        // Only a live weapon lifecycle stamps `WeaponState::last_tick_ms` on each racing tick.
+        race.weapon_effects = true;
+        kart.race = Some(race);
+        fs::write(
+            path.join("kart_entry.json"),
+            serde_json::to_vec(&kart).unwrap(),
+        )
+        .unwrap();
+        Self(path)
+    }
+
+    fn load(&self, saved: Option<GameplayState>) -> Gameplay {
+        Gameplay::load(&self.0, saved).unwrap()
+    }
+}
+
+impl Drop for GameplayFixture {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+/// The chat layout `tests/gameplay.rs` uses. The only text here is a developer command.
+fn chat_request(text: &str) -> Vec<u8> {
+    let mut packet = vec![15, 0, 1, 0, 0, 0];
+    packet.extend(PLAYER.to_le_bytes());
+    packet.extend(0u64.to_le_bytes());
+    for _ in 0..2 {
+        packet.extend([0; 12]);
+        packet.extend(0u32.to_le_bytes());
+        packet.extend(0u32.to_le_bytes());
+    }
+    packet.extend((text.len() as u32).to_le_bytes());
+    packet.extend(text.as_bytes());
+    packet.extend([0; 28]);
+    packet
+}
+
+fn race_clock(game: &Gameplay) -> u64 {
+    game.state()
+        .kart_entry
+        .unwrap()
+        .race
+        .unwrap()
+        .weapons
+        .last_tick_ms
+}
+
+fn race_phase(game: &Gameplay) -> RacePhase {
+    game.state().kart_entry.unwrap().race.unwrap().phase
+}
+
+/// Enters through the shipped `realm race` command and drives the real handler to green.
+fn enter_to_green(game: &mut Gameplay, character: &CharacterState) -> u64 {
+    let entered = game
+        .handle_in_world(&chat_request("realm race"), character, T0)
+        .unwrap();
+    assert!(entered.changed, "entering the race must be saved");
+    let active = game.state().kart_entry.unwrap().active.unwrap();
+    let (instance, encounter) = (active.context.instance_id, active.context.encounter_id);
+    assert!(
+        !game
+            .handle_in_world(&register(PLAYER), character, T0 + 100)
+            .unwrap()
+            .replies
+            .is_empty(),
+        "the grid register must be answered"
+    );
+    let go_at = T0 + 200;
+    assert!(
+        !game
+            .handle_in_world(&go(encounter, instance, PLAYER), character, go_at)
+            .unwrap()
+            .replies
+            .is_empty(),
+        "Go must start the countdown"
+    );
+    let green = go_at + 6_000;
+    let started = game.tick(character, green).unwrap();
+    assert!(
+        started.changed,
+        "the countdown-to-racing phase change must be saved"
+    );
+    green
+}
+
+#[test]
+fn clock_only_racing_ticks_do_not_request_a_character_save() {
+    let fixture = GameplayFixture::new();
+    let character = character();
+    let mut game = fixture.load(None);
+    game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
+    let prior_job = game.state().profiles.unwrap().active;
+    let green = enter_to_green(&mut game, &character);
+    assert_eq!(game.state().profiles.unwrap().active, KART_JOB);
+
+    // The green tick already settled the one-off node visibility; drain one more tick so the
+    // assertion below isolates the weapon lifecycle clock.
+    game.tick(&character, green + 50).unwrap();
+    let idle = game.tick(&character, green + 100).unwrap();
+    assert!(
+        !idle.changed,
+        "a clock-only racing tick must not request a character save"
+    );
+    assert!(idle.replies.is_empty(), "a clock-only tick sends nothing");
+    // The clock still advanced: the race was really ticking, not stalled.
+    assert_eq!(race_clock(&game), green + 100);
+
+    // The restore state is saved whenever it changes; a disconnect between two clock-only
+    // ticks still comes back in the racing phase.
+    let mut restored = fixture.load(Some(game.state()));
+    assert_eq!(race_phase(&restored), RacePhase::Racing);
+    assert_eq!(
+        restored
+            .state()
+            .kart_entry
+            .unwrap()
+            .active
+            .unwrap()
+            .previous_job,
+        Some(prior_job)
+    );
+    restored.tick(&character, green + 120).unwrap();
+    let resumed = restored.tick(&character, green + 150).unwrap();
+    assert!(
+        !resumed.changed,
+        "the restored racing tick is still clock-only"
+    );
+    assert_eq!(race_clock(&restored), green + 150);
+
+    // A finish still persists: the last gate pays the registered reward and reports a change.
+    let coins = game.state().inventory.coins;
+    let mut now = green + 1_000;
+    let mut last = None;
+    for _ in 0..2 {
+        for gate in 1..=4 {
+            last = Some(
+                game.handle_in_world(&gate_hit(PLAYER, gate as f32), &character, now)
+                    .unwrap(),
+            );
+            now += 1_000;
+        }
+    }
+    let finish = last.unwrap();
+    assert!(
+        finish.changed,
+        "a finish and its reward claim must request a save"
+    );
+    assert_eq!(game.state().inventory.coins, coins + 40);
+    assert_eq!(race_phase(&game), RacePhase::Finished);
+    let paid = game.tick(&character, now).unwrap();
+    assert!(!paid.changed, "a finished race pays and saves once");
+}
+
+#[test]
+fn a_timed_out_race_still_reports_the_abort_for_saving() {
+    let fixture = GameplayFixture::new();
+    let character = character();
+    let mut game = fixture.load(None);
+    game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
+    let prior_job = game.state().profiles.unwrap().active;
+    enter_to_green(&mut game, &character);
+    let snapshot = game.state().kart_entry.unwrap().race.unwrap();
+    let timeout = snapshot.race_started_ms + snapshot.bounds.max_race_ms + 1;
+    let out = game.tick(&character, timeout).unwrap();
+    assert!(out.changed, "an aborted race must request a save");
+    assert!(
+        out.scene_zoning.is_some(),
+        "the aborted racer returns to the world"
+    );
+    let entry = game.state().kart_entry.unwrap();
+    assert!(entry.active.is_none());
+    assert_eq!(entry.race.unwrap().phase, RacePhase::Aborted);
+    assert_eq!(game.state().profiles.unwrap().active, prior_job);
+}
+
 // ---- private gateway proof (needs a playtest bundle; fails until the shared patch lands) ----
 
 mod gateway_route {
@@ -821,16 +1046,6 @@ mod gateway_route {
         }
         b
     }
-    fn chat(text: &str) -> Vec<u8> {
-        let mut b = vec![15, 0, 1, 0, 0, 0];
-        b.extend(1u64.to_le_bytes());
-        b.extend(0u64.to_le_bytes());
-        b.extend([0; 40]);
-        b.extend((text.len() as u32).to_le_bytes());
-        b.extend(text.bytes());
-        b.extend([0; 28]);
-        b
-    }
     fn npc(sub: u16, target: u64, choice: Option<i32>) -> Vec<u8> {
         let mut b = [26u16.to_le_bytes(), sub.to_le_bytes()].concat();
         b.extend(target.to_le_bytes());
@@ -839,18 +1054,6 @@ mod gateway_route {
             None => b.push(0),
         }
         b
-    }
-    fn copy_tree(from: &std::path::Path, to: &std::path::Path) {
-        fs::create_dir_all(to).unwrap();
-        for entry in fs::read_dir(from).unwrap() {
-            let entry = entry.unwrap();
-            let target = to.join(entry.file_name());
-            if entry.file_type().unwrap().is_dir() {
-                copy_tree(&entry.path(), &target);
-            } else {
-                fs::copy(entry.path(), target).unwrap();
-            }
-        }
     }
     fn send(g: &mut Gateway, packet: &[u8]) -> Vec<Vec<u8>> {
         let out = g.handle_at(&wrap(packet), NOW).unwrap();
@@ -931,7 +1134,7 @@ mod gateway_route {
 
         // 3. Canaries: `realm race` stays developer-only; forged option ids and a choice that
         //    names an NPC other than the open menu start nothing.
-        send(&mut g, &chat("realm race"));
+        send(&mut g, &chat_request("realm race"));
         assert!(!active(&g), "an ordinary player must not reach realm race");
         menu(&mut g, GATE);
         for forged in [0, 9, 99, -1, i32::MAX] {

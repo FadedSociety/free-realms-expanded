@@ -543,6 +543,8 @@ fn serde_defaults_round_trip_and_validate_for_refuses_forged_saves() {
     let json = serde_json::to_string(&state).unwrap();
     let restored: WeaponState = serde_json::from_str(&json).unwrap();
     assert_eq!(restored, state);
+    // Equality now ignores the session-local tick clock (F166), so pin its round trip here.
+    assert_eq!(restored.last_tick_ms, state.last_tick_ms);
     restored.validate_for(OWNER, RACE_START, RACE_END).unwrap();
 
     // Forged owner, id, window, span, basis and clock are all refused.
