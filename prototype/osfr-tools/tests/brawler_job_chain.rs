@@ -2,10 +2,7 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
-    npc_interaction::NpcInteraction,
-    quest_engine::{
-        CharacterEligibility, QuestDenial, QuestEngine, QuestEvent, QuestProgress, QuestStatus,
-    },
+    quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestProgress, QuestStatus},
     startup_world,
 };
 use serde_json::Value;
@@ -117,18 +114,30 @@ fn eligibility() -> CharacterEligibility {
     }
 }
 
-fn different_enemy_definition() -> u32 {
+/// The first spawned field enemy whose defeat definition is not C4's `930050`.
+/// An empty `quest_ids` list is production's "always present" field rule
+/// (`EncounterEngine` load), so this actor is live without starting a quest.
+fn ungated_enemy_other_than_hooligans() -> (u64, [f32; 3], u32) {
     let document: Value =
         serde_json::from_slice(&fs::read(content_dir().join("field_enemies.json")).unwrap())
             .unwrap();
-    document["enemies"]
+    let enemy = document["enemies"]
         .as_array()
         .unwrap()
         .iter()
-        .filter_map(|enemy| enemy["definition_id"].as_u64())
-        .find(|definition| *definition != u64::from(HOOLIGAN_DEFINITION))
-        .and_then(|definition| u32::try_from(definition).ok())
-        .expect("content has another field enemy definition")
+        .find(|enemy| {
+            enemy["quest_ids"]
+                .as_array()
+                .is_some_and(|ids| ids.is_empty())
+                && enemy["definition_id"].as_u64() != Some(u64::from(HOOLIGAN_DEFINITION))
+        })
+        .expect("content has an always-present non-Hooligan field enemy");
+    (
+        enemy["guid"].as_u64().unwrap(),
+        serde_json::from_value(enemy["position"].clone()).expect("field enemy has a position"),
+        u32::try_from(enemy["definition_id"].as_u64().unwrap())
+            .expect("field enemy definition fits the quest event"),
+    )
 }
 
 fn assert_refusal_changes_nothing(
@@ -529,26 +538,66 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
             before + 1,
             "actual combat did not advance the kill objective for {guid}"
         );
+        // Replay the lethal request after the cooldown: the enemy is now dead, so the
+        // production request path must not double-credit or touch the saved state.
+        let after_kill = saved(game);
+        *now += 700;
+        let replayed = game
+            .handle_in_world(&npc_select(guid, ATTACK_CHOICE), &character, *now)
+            .expect("a replayed lethal attack is a clean refusal");
+        assert!(
+            !replayed.changed,
+            "a replayed lethal attack changed gameplay"
+        );
+        assert_eq!(
+            saved(game),
+            after_kill,
+            "a replayed lethal attack changed the saved state"
+        );
+        assert_eq!(quest_count(game, HOOLIGAN_FIGHT), before + 1);
     }
     assert_eq!(quest_count(game, HOOLIGAN_FIGHT), 4);
 
-    // A replayed hit against the last defeated enemy must not advance the objective.
-    let last = field_hooligans()
-        .last()
-        .expect("the chapter owns four field spawns")
-        .0;
-    let before_replay = saved(game);
-    *now += 700;
-    let replayed = game
-        .handle_in_world(&targeted_basic_attack(last), &character, *now)
-        .expect("a replayed attack is a clean refusal");
-    assert!(!replayed.changed);
+    // The authored 30 s respawn makes a fifth live 930050 kill possible. With C4's
+    // objective already full, that live kill must not raise the count or change the
+    // saved state; a double-credit or missing cap would fail here.
+    let mut observer = character.clone();
+    observer.position = [10_000.0, 0.0, 10_000.0];
+    *now += 30_100;
+    game.tick(&observer, *now)
+        .expect("the field respawn tick is valid");
+    let (respawned, position) = field_hooligans()
+        .into_iter()
+        .next()
+        .expect("the chapter owns four field spawns");
+    observer.position = position;
+    *now += 100;
+    interact_npc(game, &observer, respawned, *now);
+    let before_live_kill = saved(game);
+    let mut killed = false;
+    for _ in 0..5 {
+        *now += 700;
+        let out = game
+            .handle_in_world(&npc_select(respawned, ATTACK_CHOICE), &observer, *now)
+            .expect("the respawned Hooligan attack is valid");
+        if out.replies.iter().any(|packet| {
+            packet.starts_with(&[35, 0, 3, 0]) && packet[6..14] == respawned.to_le_bytes()
+        }) {
+            killed = true;
+            break;
+        }
+    }
+    assert!(killed, "the respawned Hooligan did not die");
+    assert_eq!(
+        quest_count(game, HOOLIGAN_FIGHT),
+        4,
+        "a live respawned kill exceeded C4's required count"
+    );
     assert_eq!(
         saved(game),
-        before_replay,
-        "a replayed hit on a defeated enemy changes no quest state"
+        before_live_kill,
+        "a live respawned kill changed the completed objective"
     );
-    assert_eq!(quest_count(game, HOOLIGAN_FIGHT), 4);
 }
 
 fn quest_count(game: &Gameplay, quest_id: u32) -> u32 {
@@ -564,9 +613,9 @@ fn select_job(profile_id: i32) -> Vec<u8> {
 // Client constructors/readers for the packets below (IDA native map):
 // 26/8 CommandPacketInteractRequest 0x008b6bc0; 26/10
 // CommandPacketInteractionSelect 0x00a36f80; 26/6 PacketDialogResponse 0x009f5890;
-// 36/10 AbilityPacketClientRequestStartAbility 0x00a2e0e0; 49/2 QuestReplyPacket
-// 0x00a86400; 49/13 QuestEndPacket::ReadFields 0x00c7b990 / Unserialize 0x00c7bbd0;
-// 49/14 QuestEndReplyPacket 0x00a864c0; 35/2 AddNpc reader 0x00921a10.
+// 49/2 QuestReplyPacket 0x00a86400; 49/13 QuestEndPacket::ReadFields 0x00c7b990 /
+// Unserialize 0x00c7bbd0; 49/14 QuestEndReplyPacket 0x00a864c0; 35/2 AddNpc
+// reader 0x00921a10.
 fn npc_interact(npc_id: u64) -> Vec<u8> {
     // 26/8 CommandPacketInteractRequest (ctor 0x008b6bc0).
     let mut packet = vec![26, 0, 8, 0];
@@ -581,18 +630,6 @@ fn npc_select(npc_id: u64, choice: i32) -> Vec<u8> {
     packet.extend(npc_id.to_le_bytes());
     packet.extend(choice.to_le_bytes());
     packet
-}
-
-fn targeted_basic_attack(target: u64) -> Vec<u8> {
-    // 36/10 AbilityPacketClientRequestStartAbility (ctor 0x00a2e0e0).
-    [
-        vec![36, 0, 10, 0],
-        1_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        target.to_le_bytes().to_vec(),
-    ]
-    .concat()
 }
 
 fn dialogue_choice(row: i32) -> Vec<u8> {
@@ -1047,31 +1084,54 @@ fn carlos_to_jones_to_blackspore_completes_in_order() {
 
 #[test]
 fn wrong_npc_and_wrong_enemy_do_not_advance() {
-    const OTHER_NPC: u64 = 9_000_000_189;
+    // Carlos gave C3 but is not its Jones turn-in step. With C1/C2 disabled and C3
+    // active he has nothing left to offer, so this is a genuine refusal rather than
+    // another NPC's legitimate quest choice.
     let (mut game, character) = fresh_game();
     let mut now = 6_000;
     let carlos = npc_position("cobblestone_village.json", CARLOS);
     let jones = npc_position("cobblestone_village.json", JONES);
-    let other = npc_position("cobblestone_village.json", OTHER_NPC);
     let mut at = character.clone();
 
     at.position = carlos;
     accept_quest(&mut game, &at, CARLOS, carlos, REFERRAL_TO_JONES, &mut now);
 
-    // A different NPC's Talk leaves the Jones referral step untouched.
-    at.position = other;
-    let counts = game.state().npc_quests.as_ref().unwrap().quests[&REFERRAL_TO_JONES]
-        .counts
-        .clone();
+    // The wrong NPC's menu, Talk and dialogue row must leave the whole saved state
+    // byte-identical, not merely leave C3's counts alone.
+    let before_wrong_npc = saved(&game);
     now += 100;
-    let _ = interact_npc(&mut game, &at, OTHER_NPC, now);
+    let _ = interact_npc(&mut game, &at, CARLOS, now);
+    assert_eq!(
+        saved(&game),
+        before_wrong_npc,
+        "opening the wrong NPC menu changed the saved state"
+    );
     now += 100;
-    game.handle_in_world(&npc_select(OTHER_NPC, 1), &at, now)
-        .expect("the wrong NPC Talk is a clean request");
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &npc_select(CARLOS, 1),
+        now,
+        "wrong NPC Talk",
+    );
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &dialogue_choice(QUEST_CHOICE),
+        now,
+        "wrong NPC dialogue row",
+    );
+    assert_eq!(
+        saved(&game),
+        before_wrong_npc,
+        "the wrong NPC exchange changed the saved state"
+    );
     let state = game.state();
     let quests = state.npc_quests.as_ref().unwrap();
     assert_eq!(
-        quests.quests[&REFERRAL_TO_JONES].counts, counts,
+        quests.quests[&REFERRAL_TO_JONES].counts,
+        vec![0],
         "another NPC advanced the Jones talk step"
     );
     assert_eq!(
@@ -1086,24 +1146,45 @@ fn wrong_npc_and_wrong_enemy_do_not_advance() {
     finish_turnin(&mut game, &at, REFERRAL_TO_JONES, &mut now);
     accept_quest(&mut game, &at, JONES, jones, HOOLIGAN_FIGHT, &mut now);
 
-    // A kill of another definition cannot satisfy the four 930050 Hooligans.
-    let mut engine = QuestEngine::from_split_content(
-        &content_dir(),
-        CHARACTER,
-        eligibility(),
-        Some(game.state().npc_quests.clone().unwrap()),
-    )
-    .expect("the active C4 state loads into the quest engine");
-    let before = engine.progress(HOOLIGAN_FIGHT).unwrap().clone();
-    let wrong = engine
-        .on_event(QuestEvent::KillActorKind {
-            actor_kind_id: different_enemy_definition(),
-            count: 1,
-        })
-        .unwrap();
-    assert!(!wrong.changed, "another enemy advanced the kill step");
-    assert_eq!(engine.progress(HOOLIGAN_FIGHT).unwrap(), &before);
-    assert_eq!(before.counts, vec![0]);
+    // A spawned enemy with another defeat definition dies through the same production
+    // menu/attack/defeat-forwarding path. Its kill must not advance C4, and the whole
+    // saved state must stay byte-identical.
+    let (wrong, position, definition) = ungated_enemy_other_than_hooligans();
+    at.position = position;
+    let before_wrong_enemy = saved(&game);
+    now += 100;
+    interact_npc(&mut game, &at, wrong, now);
+    let mut defeated = false;
+    for _ in 0..5 {
+        now += 700;
+        let killed = game
+            .handle_in_world(&npc_select(wrong, ATTACK_CHOICE), &at, now)
+            .expect("field basic attack is valid");
+        if killed.replies.iter().any(|packet| {
+            packet.starts_with(&[35, 0, 3, 0]) && packet[6..14] == wrong.to_le_bytes()
+        }) {
+            defeated = true;
+            break;
+        }
+    }
+    assert!(
+        defeated,
+        "the wrong enemy did not die, so no defeat reached the quest engine"
+    );
+    assert_eq!(
+        quest_count(&game, HOOLIGAN_FIGHT),
+        0,
+        "a {definition} kill advanced the 930050 objective"
+    );
+    let state = game.state();
+    let quests = state.npc_quests.as_ref().unwrap();
+    assert_eq!(quests.quests[&HOOLIGAN_FIGHT].status, QuestStatus::Active);
+    assert_eq!(quests.pending_turnin, None);
+    assert_eq!(
+        saved(&game),
+        before_wrong_enemy,
+        "killing another enemy changed the saved state"
+    );
 }
 
 #[test]
@@ -1131,20 +1212,6 @@ fn chapter_rewards_are_paid_once() {
         now + 1,
         "duplicate chapter accept",
     );
-    now += 2;
-    assert_eq!(game.state().inventory.coins, total);
-
-    // Replayed damage on a defeated Hooligan, from its own position, adds nothing.
-    let (last, position) = *field_hooligans().last().expect("four quest-gated spawns");
-    let mut at = character.clone();
-    at.position = position;
-    let before = saved(&game);
-    now += 700;
-    let replayed = game
-        .handle_in_world(&targeted_basic_attack(last), &at, now)
-        .expect("a replayed hit is a clean refusal");
-    assert!(!replayed.changed, "replayed damage advanced chapter state");
-    assert_eq!(saved(&game), before, "replayed damage changed the save");
     assert_eq!(game.state().inventory.coins, total);
 }
 
@@ -1154,7 +1221,7 @@ fn offer_gates_and_save_reload_survive() {
     let mut now = 8_000;
     let initial = complete_chapter(&mut game, &character, &mut now);
 
-    let reloaded = load_game(Some(game.state()));
+    let mut reloaded = load_game(Some(game.state()));
     let state = reloaded.state();
     assert_eq!(state.inventory.coins, initial + 3 * QUEST_REWARD_COINS);
     let quests = state
@@ -1170,33 +1237,35 @@ fn offer_gates_and_save_reload_survive() {
         );
     }
 
-    let mut engine = QuestEngine::from_split_content(
-        &content_dir(),
-        CHARACTER,
-        eligibility(),
-        Some(quests.clone()),
-    )
-    .expect("the completed chapter reloads into the quest engine");
-    let before = engine.state().clone();
+    // The disabled C1/C2 rows must stay unofferable through the real Carlos menu:
+    // Talk plus the dialogue row is the production path that would emit 49/1.
+    let carlos = npc_position("cobblestone_village.json", CARLOS);
+    let mut at = character.clone();
+    at.position = carlos;
+    let before_menu = saved(&reloaded);
+    now += 100;
+    let dialogue = talk(&mut reloaded, &at, CARLOS, now);
+    assert!(
+        !dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 1, 0])),
+        "the completed chapter reopened a quest offer"
+    );
+    now += 100;
+    let choice = choose_quest_row(&mut reloaded, &at, now);
     for quest_id in [3_030_004, 3_030_005] {
-        let refused = engine.offer(quest_id, CARLOS);
-        assert_eq!(
-            refused.denial,
-            Some(QuestDenial::Unavailable),
-            "disabled quest {quest_id} was offerable"
+        assert!(
+            !choice
+                .replies
+                .iter()
+                .any(|packet| has_family(packet, 49, 1, Some(quest_id))),
+            "disabled quest {quest_id} was offered through Carlos's menu"
         );
-        assert!(!refused.changed);
-        assert!(refused.outbound.is_empty());
-        assert_eq!(engine.state(), &before);
     }
-    let interaction = NpcInteraction::load(
-        &content_dir().join("npcs"),
-        &content_dir().join("stores.json"),
-    )
-    .expect("NPC content loads");
     assert_eq!(
-        interaction.offerable_quest_for_talk(CARLOS, &engine),
-        None,
-        "a disabled C1/C2 quest remains offerable after the chapter"
+        saved(&reloaded),
+        before_menu,
+        "an unofferable Carlos Talk changed the completed chapter"
     );
 }
