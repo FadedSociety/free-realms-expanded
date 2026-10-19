@@ -94,11 +94,8 @@ impl Gameplay {
             }
             self.pending_quest_choice = None;
             self.pending_choice_packets.clear();
-            if let Some(interaction) = &self.npc_interaction {
-                interaction
-                    .lock()
-                    .map_err(|_| invalid("NPC interaction state is unavailable"))?
-                    .close_dialogue();
+            if let Some(interaction) = &mut self.npc_interaction {
+                interaction.close_dialogue();
             }
             return Ok(Some(Outcome {
                 replies: vec![npc_interaction::encode_dialogue_close_26_4()],
@@ -110,11 +107,8 @@ impl Gameplay {
                 return Err(invalid("invalid dialogue close request"));
             }
             // (R) Also accept an inbound empty 26/4 if the client mirrors EndDialog.
-            if let Some(interaction) = &self.npc_interaction {
-                interaction
-                    .lock()
-                    .map_err(|_| invalid("NPC interaction state is unavailable"))?
-                    .close_dialogue();
+            if let Some(interaction) = &mut self.npc_interaction {
+                interaction.close_dialogue();
             }
             return Ok(Some(Outcome::default()));
         }
@@ -296,7 +290,7 @@ impl Gameplay {
                 "guid": request.target,
                 "content_key": key
             }));
-            let Some(interaction) = &self.npc_interaction else {
+            let Some(interaction) = &mut self.npc_interaction else {
                 npc_event(serde_json::json!({
                     "event": "npc_menu",
                     "guid": request.target,
@@ -307,9 +301,6 @@ impl Gameplay {
                 }));
                 return Ok(None);
             };
-            let mut interaction = interaction
-                .lock()
-                .map_err(|_| invalid("NPC interaction state is unavailable"))?;
             let menu = interaction
                 .interact(
                     key,
@@ -318,7 +309,6 @@ impl Gameplay {
                     self.npc_quests.as_ref(),
                 )
                 .map_err(|_| invalid("NPC interaction is unavailable"))?;
-            drop(interaction);
             let options: Vec<_> = menu
                 .options
                 .iter()
@@ -378,7 +368,11 @@ impl Gameplay {
                 }));
                 return Ok(None);
             };
-            let Some(interaction) = &self.npc_interaction else {
+            // Stage the menu/shop mutation on a cheap clone (shared content, owned
+            // active state), then commit it to this staged Gameplay once the choice is
+            // read. The gateway only keeps this clone when the whole request succeeds,
+            // so a later failed child cannot leave the shared menu consumed.
+            let Some(mut interaction) = self.npc_interaction.clone() else {
                 npc_event(serde_json::json!({
                     "event": "npc_select",
                     "guid": runtime_guid,
@@ -391,15 +385,13 @@ impl Gameplay {
             };
             let mut selection = inner.to_vec();
             selection[4..12].copy_from_slice(&key.to_le_bytes());
-            let mut interaction = interaction
-                .lock()
-                .map_err(|_| invalid("NPC interaction state is unavailable"))?;
             let selected = interaction.select(
                 &selection,
                 character.zone_id,
                 character.position,
                 self.npc_quests.as_mut(),
             );
+            self.npc_interaction = Some(interaction);
             let mut out = Outcome::default();
             let mut race_gate = None;
             let mut derby_gate = None;
@@ -431,7 +423,9 @@ impl Gameplay {
                         self.append_npc_quest_outcome(result, &mut out)?;
                     } else {
                         let target_quest = self.npc_quests.as_ref().and_then(|engine| {
-                            interaction.named_target_quest_for_talk(key, engine)
+                            self.npc_interaction
+                                .as_ref()?
+                                .named_target_quest_for_talk(key, engine)
                         });
                         if let Some(quest_id) = target_quest {
                             let result = self
@@ -488,10 +482,11 @@ impl Gameplay {
                     } else {
                         // (R) The client leaves the 26/10-to-quest action unresolved; W67 chooses
                         // Talk as the server action that starts the separate 49/1 quest window.
-                        let quest_id = self
-                            .npc_quests
-                            .as_ref()
-                            .and_then(|engine| interaction.offerable_quest_for_talk(key, engine));
+                        let quest_id = self.npc_quests.as_ref().and_then(|engine| {
+                            self.npc_interaction
+                                .as_ref()?
+                                .offerable_quest_for_talk(key, engine)
+                        });
                         // Native runs 200411/201127: the offer window must sit on an
                         // open NPC dialog, and the server's 26/4 EndDialog after the
                         // reply restores camera and HUD. The quest is therefore a
@@ -650,7 +645,6 @@ impl Gameplay {
                     return Err(invalid("NPC menu choice is unavailable"));
                 }
             }
-            drop(interaction);
             if let Some(gate) = race_gate {
                 // (R) Ordinary entry: the NPC service proved range and that this exact option
                 // was offered; the kart service decides admission. Staged, so a failure after
@@ -713,10 +707,8 @@ impl Gameplay {
                 }
             }
             if consume_menu && out.changed {
-                if let Some(interaction) = &self.npc_interaction
-                    && let Ok(mut service) = interaction.lock()
-                {
-                    service.consume_active();
+                if let Some(interaction) = &mut self.npc_interaction {
+                    interaction.consume_active();
                 }
             }
             return Ok(Some(out));
@@ -726,12 +718,9 @@ impl Gameplay {
         // 12 buy-back, 14 gift (always refused).
         if matches!(inner, [0xa5, 0, 2 | 4 | 5 | 8 | 12 | 14, 0, ..]) {
             if let Some(shop) = &mut self.npc_coin_shop {
-                let Some(interaction) = &self.npc_interaction else {
+                let Some(interaction) = &mut self.npc_interaction else {
                     return Ok(None);
                 };
-                let mut interaction = interaction
-                    .lock()
-                    .map_err(|_| invalid("NPC interaction state is unavailable"))?;
                 let Some(visibility) = &self.npc_visibility else {
                     return Ok(None);
                 };
@@ -825,12 +814,6 @@ impl Gameplay {
             let quantity = request.trailing_dwords[0];
             let transaction_id = request.trailing_dwords[2];
             let Some(interaction) = &self.npc_interaction else {
-                return Ok(Some(Outcome {
-                    replies: vec![crate::coin_shop::merchant_buy_result_packet(false)],
-                    ..Outcome::default()
-                }));
-            };
-            let Ok(interaction) = interaction.lock() else {
                 return Ok(Some(Outcome {
                     replies: vec![crate::coin_shop::merchant_buy_result_packet(false)],
                     ..Outcome::default()

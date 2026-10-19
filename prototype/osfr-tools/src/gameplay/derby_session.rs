@@ -69,10 +69,7 @@ impl Gameplay {
         let previous_job = profiles.active();
         let outfit_before = self.inventory.profile_attachments(previous_job)?;
         let first_time = profiles.unlock(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)?;
-        out.replies.push(profiles.select(
-            crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
-            &self.inventory,
-        )?);
+        profiles.activate(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)?;
         if first_time {
             self.give_starter_outfit(
                 crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
@@ -81,6 +78,13 @@ impl Gameplay {
             )?;
         }
         self.ensure_outfit(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE, &mut out)?;
+        // Last, after the outfit repair: the 38/21 attachment list comes from what
+        // the player wears now (client reader `0x0091b080`).
+        let activation = self.profiles.as_ref().unwrap().activation(
+            crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+            &self.inventory,
+        )?;
+        out.replies.insert(0, activation);
         self.announce_profile_outfit(
             character.guid,
             &outfit_before,

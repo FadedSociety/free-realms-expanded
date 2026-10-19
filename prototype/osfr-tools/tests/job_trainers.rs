@@ -7,7 +7,7 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
-    inventory::REQUIRED_PROFILE_SLOTS,
+    inventory::{InventoryItem, REQUIRED_PROFILE_SLOTS},
     mining,
     npc_interaction::{NpcAction, NpcInteraction, NpcSelection},
     profiles::{LearnDenied, ProfileState, Profiles, Trainer},
@@ -545,10 +545,24 @@ fn click_result(gateway: &mut Gateway, guid: u64, now: u64) -> io_result::R {
 }
 
 fn choose(gateway: &mut Gateway, guid: u64, choice: i32, now: u64) -> io_result::R {
+    send(gateway, &choose_inner(guid, choice), now)
+}
+
+fn choose_inner(guid: u64, choice: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 10, 0];
     packet.extend(guid.to_le_bytes());
     packet.extend(choice.to_le_bytes());
-    send(gateway, &packet, now)
+    packet
+}
+
+/// A client message bundle: a child is one wrapped application message.
+fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for message in messages {
+        bytes.push(message.len() as u8);
+        bytes.extend(message);
+    }
+    bytes
 }
 
 fn bodies(outcome: &GatewayOutcome) -> Vec<Vec<u8>> {
@@ -975,4 +989,160 @@ fn without_the_content_file_nobody_offers_a_job() {
     let mut absent = gateway_at(&content, state, near);
     let menu = click(&mut absent, smith.npc, 2_000);
     assert!(option_with_label(&menu, smith.label_string_id).is_none());
+}
+
+fn owned_count(gateway: &Gateway, definition: i32) -> u64 {
+    gameplay_json(gateway)["inventory"]["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|item| item["definition_id"].as_i64() == Some(i64::from(definition)))
+        .map(|item| item["count"].as_u64().unwrap())
+        .sum()
+}
+
+/// F155: the 38/21 activation must be serialized from the outfit after the starter
+/// repair. Selecting a bare but unlocked job used to emit the pre-repair list (zero
+/// attachments), which the client's ProcessProfileSwap rejects.
+#[test]
+fn selecting_a_bare_unlocked_job_emits_an_activation_from_the_repaired_outfit() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let miner = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 14)
+        .unwrap();
+    let position = trainer_position(&npcs, &miner);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut state = state_for(&content, &miner, false);
+    let profiles = state.profiles.as_mut().unwrap();
+    assert_ne!(
+        profiles.active, miner.profile,
+        "the test starts on another job"
+    );
+    profiles.unlocked.insert(miner.profile);
+    let mut gateway = gateway_at(&content, state, near);
+    assert_eq!(
+        equipped(&gateway, miner.profile),
+        0,
+        "the unlocked job starts bare"
+    );
+
+    let switched = switch(&mut gateway, miner.profile, 2_000).unwrap();
+    let bodies = bodies(&switched);
+    let activation = bodies
+        .iter()
+        .find(|body| body.starts_with(&[38, 0, 21, 0]))
+        .unwrap_or_else(|| {
+            panic!(
+                "{}: a repairable job switch emits its activation: {}",
+                miner.job,
+                String::from_utf8_lossy(&bodies.concat())
+            )
+        });
+    let slots = activation_attachment_slots(activation);
+    for required in REQUIRED_PROFILE_SLOTS {
+        assert!(
+            slots.contains(&required),
+            "{}: activation slot {required} missing after the starter repair: {slots:?}",
+            miner.job
+        );
+    }
+    assert_eq!(
+        gameplay_json(&gateway)["profiles"]["active"],
+        Value::from(miner.profile),
+        "{} selected",
+        miner.job
+    );
+}
+
+/// F155: learning a job must equip starter pieces the player already owns rather
+/// than granting another copy (no free re-grant).
+#[test]
+fn learning_does_not_increase_owned_starter_quantities() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let miner = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 14)
+        .unwrap();
+    // 21665 is the Miner starter hat; the player owns one already.
+    let starter = 21665;
+    let position = trainer_position(&npcs, &miner);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut state = state_for(&content, &miner, false);
+    let id = state
+        .inventory
+        .items
+        .iter()
+        .map(|item| item.id)
+        .max()
+        .unwrap_or(0)
+        + 1;
+    state.inventory.items.push(InventoryItem {
+        definition_id: starter,
+        tint: 0,
+        id,
+        count: 1,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    });
+    state.inventory.next_instance_id = Some(i64::from(id) + 1);
+    let mut gateway = gateway_at(&content, state, near);
+    assert_eq!(owned_count(&gateway, starter), 1);
+
+    let menu = click(&mut gateway, miner.npc, 2_000);
+    let choice = option_with_label(&menu, miner.label_string_id).unwrap();
+    let learned = choose(&mut gateway, miner.npc, choice, 2_100).unwrap();
+    assert!(said(&bodies(&learned), "You learned the"), "{}", miner.job);
+    assert!(unlocked(&gateway).contains(&i64::from(miner.profile)));
+    assert_eq!(
+        owned_count(&gateway, starter),
+        1,
+        "{}: training granted a second copy of an owned starter piece",
+        miner.job
+    );
+}
+
+/// F155: the menu a bundle consumes must roll back with the rest of the staged
+/// state when a later child fails.
+#[test]
+fn a_failed_bundle_keeps_the_trainer_menu_usable() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let miner = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 14)
+        .unwrap();
+    let position = trainer_position(&npcs, &miner);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut gateway = gateway_at(&content, state_for(&content, &miner, false), near);
+    let menu = click(&mut gateway, miner.npc, 2_000);
+    let choice = option_with_label(&menu, miner.label_string_id).unwrap();
+    let before = gameplay_json(&gateway);
+
+    // A successful Learn choice followed by a truncated 26/13 fails the whole
+    // bundle: the unlock, the starter items and the menu consumption must all
+    // roll back before the gateway commits anything.
+    let failed = gateway.handle_at(
+        &bundle(&[
+            wrap(&choose_inner(miner.npc, choice)),
+            wrap(&[26, 0, 13, 0]),
+        ]),
+        2_100,
+    );
+    assert!(failed.is_err(), "the truncated child rejects the bundle");
+    assert_eq!(gameplay_json(&gateway), before);
+    assert!(!unlocked(&gateway).contains(&i64::from(miner.profile)));
+
+    // The original menu is still open: its Talk choice (1) opens the dialog.
+    let talked = choose(&mut gateway, miner.npc, 1, 2_200).unwrap();
+    assert!(
+        !talked.replies.is_empty(),
+        "the failed bundle consumed the menu"
+    );
 }

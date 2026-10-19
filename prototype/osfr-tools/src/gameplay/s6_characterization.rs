@@ -1029,12 +1029,10 @@ fn first_regional_npc(game: &Gameplay) -> (u64, u32, [f32; 3]) {
             .as_ref()
             .and_then(|visibility| visibility.content_key(id))
             .is_some();
-        let interactable = game.npc_interaction.as_ref().is_some_and(|interaction| {
-            interaction
-                .lock()
-                .map(|interaction| interaction.location(id).is_some())
-                .unwrap_or(false)
-        });
+        let interactable = game
+            .npc_interaction
+            .as_ref()
+            .is_some_and(|interaction| interaction.location(id).is_some());
         if visible && interactable {
             return (
                 id,

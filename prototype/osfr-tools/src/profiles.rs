@@ -355,15 +355,22 @@ impl Profiles {
         Ok(bytes)
     }
 
-    /// Selection mutates only after the payload can be built. Gateway persists
-    /// the complete staged gameplay snapshot before releasing these replies.
-    pub fn select(&mut self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
+    /// Change the active job after validating it is unlocked. The 38/21 activation is a
+    /// separate [`Self::activation`] call so a caller can repair the outfit first.
+    pub fn activate(&mut self, id: i32) -> io::Result<()> {
         if !self.state.unlocked.contains(&id) {
             return Err(invalid("that class has not been unlocked"));
         }
-        let packet = self.activation(id, inventory)?;
         self.state.active = id;
-        Ok(packet)
+        Ok(())
+    }
+
+    /// Activate `id` and return the 38/21 activation for the current inventory.
+    /// Callers that repair the outfit first call [`Self::activate`], repair, then
+    /// [`Self::activation`], because the attachment list must match what is worn.
+    pub fn select(&mut self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
+        self.activate(id)?;
+        self.activation(id, inventory)
     }
 
     pub fn activation(&self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {

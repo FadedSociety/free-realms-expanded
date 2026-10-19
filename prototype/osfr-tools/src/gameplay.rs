@@ -34,12 +34,13 @@ use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
     io::{self, Read},
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
+    sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
 };
 
 mod derby_session;
 mod field_battle;
+mod jobs;
 mod npc;
 mod npc_quests;
 mod occupation;
@@ -192,7 +193,7 @@ pub struct Gameplay {
     mystery_chests: Option<Arc<MysteryChests>>,
     pending_chest: Option<i32>,
     npc_visibility: Option<crate::world::NpcVisibility>,
-    npc_interaction: Option<Arc<Mutex<NpcInteraction>>>,
+    npc_interaction: Option<NpcInteraction>,
     /// Last NPC Talk packet, retained only for the opt-in offer experiment.
     last_npc_dialogue: Option<(u32, u64, u64, Vec<u8>)>,
     /// Quest offered as a dialog choice: (runtime guid, content key, quest id).
@@ -889,14 +890,14 @@ impl Gameplay {
         if let Some(content) = &soccer_content {
             activities.add_soccer_rows(content.portal_rows())?;
         }
-        let npc_interaction = if npc_content.join("npcs").is_dir()
+        let mut npc_interaction = if npc_content.join("npcs").is_dir()
             && npc_content.join("stores.json").is_file()
             && npc_content.join("vendors.json").is_file()
         {
-            Some(Arc::new(Mutex::new(NpcInteraction::load(
+            Some(NpcInteraction::load(
                 &npc_content.join("npcs"),
                 &npc_content.join("stores.json"),
-            )?)))
+            )?)
         } else {
             None
         };
@@ -1003,11 +1004,8 @@ impl Gameplay {
         };
         let mystery_chests = MysteryChests::load(directory, &inventory)?.map(Arc::new);
         let kart_entry = crate::kart_gateway::KartGateway::load(directory, kart_entry)?;
-        if let (Some(kart), Some(interaction)) = (&kart_entry, &npc_interaction) {
-            let unknown = interaction
-                .lock()
-                .map_err(|_| invalid("NPC interaction state is unavailable"))?
-                .set_race_gates(kart.gate_npcs(), kart.menu_string_id());
+        if let (Some(kart), Some(interaction)) = (&kart_entry, &mut npc_interaction) {
+            let unknown = interaction.set_race_gates(kart.gate_npcs(), kart.menu_string_id());
             for npc in unknown {
                 npc_event(
                     serde_json::json!({"event": "kart_gate_unknown_npc", "content_key": npc}),
@@ -1015,11 +1013,8 @@ impl Gameplay {
             }
         }
         let derby = crate::derby_gateway::DerbyGateway::load_with_state(directory, saved_derby)?;
-        if let (Some(derby), Some(interaction)) = (&derby, &npc_interaction) {
-            let unknown = interaction
-                .lock()
-                .map_err(|_| invalid("NPC interaction state is unavailable"))?
-                .set_derby_gates(derby.gate_npcs(), derby.menu_string_id());
+        if let (Some(derby), Some(interaction)) = (&derby, &mut npc_interaction) {
+            let unknown = interaction.set_derby_gates(derby.gate_npcs(), derby.menu_string_id());
             for npc in unknown {
                 npc_event(
                     serde_json::json!({"event": "derby_gate_unknown_npc", "content_key": npc}),
@@ -1027,11 +1022,8 @@ impl Gameplay {
             }
         }
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
-        if let (Some(spots), Some(interaction)) = (&fishing_spots, &npc_interaction) {
-            let unknown = interaction
-                .lock()
-                .map_err(|_| invalid("NPC interaction state is unavailable"))?
-                .set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
+        if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
+            let unknown = interaction.set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
             for npc in unknown {
                 npc_event(
                     serde_json::json!({"event": "fishing_gate_unknown_npc", "content_key": npc}),
@@ -1049,12 +1041,9 @@ impl Gameplay {
             bundled_npc_content.as_path()
         };
         let world_station_rules = crate::recipe_book::load_world_station_rules(station_content)?;
-        if let (Some(profiles), Some(interaction)) = (&profiles, &npc_interaction) {
+        if let (Some(profiles), Some(interaction)) = (&profiles, &mut npc_interaction) {
             let trainers = profiles.load_trainers(directory)?;
-            let unknown = interaction
-                .lock()
-                .map_err(|_| invalid("NPC interaction state is unavailable"))?
-                .set_job_trainers(trainers);
+            let unknown = interaction.set_job_trainers(trainers);
             for npc in unknown {
                 npc_event(
                     serde_json::json!({"event": "job_trainer_unknown_npc", "content_key": npc}),
@@ -1588,178 +1577,9 @@ impl Gameplay {
         let location = kart.exit();
         if let (Some(job), Some(profiles)) = (previous, self.profiles.as_mut()) {
             // Self data at login carries the job, so the activation reply is not needed.
-            let _ = profiles.select(job, &self.inventory);
+            let _ = profiles.activate(job);
         }
         location
-    }
-
-    /// Grant and equip a job's starter outfit from the content's starter table.
-    /// With `reuse_owned`, a piece the player already owns is equipped instead
-    /// of granting a duplicate. (R) Pieces the catalogue lacks are skipped.
-    /// Inventory quest events are emitted once for the whole call.
-    fn give_starter_outfit(
-        &mut self,
-        job: i32,
-        reuse_owned: bool,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        let before = self.inventory.state().clone();
-        self.grant_starter_outfit(job, reuse_owned, out)?;
-        self.npc_inventory_events(&before, out)?;
-        Ok(())
-    }
-
-    /// The starter grant without inventory quest events. The caller emits them
-    /// once over its committed transaction (the trainer path already diffs the
-    /// whole request in `handle_in_world_inner`).
-    fn grant_starter_outfit(
-        &mut self,
-        job: i32,
-        reuse_owned: bool,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        let items = self.profiles.as_ref().unwrap().starter_items(job).to_vec();
-        let inactive = job != self.profiles.as_ref().unwrap().active();
-        for definition in items {
-            // The inherited Chef defaults include the same hat that
-            // this local story awards at Cooking101 turn-in. Defer only
-            // that cosmetic in the versioned Cooking campaign; older
-            // campaigns and original profile records stay compatible.
-            if job == 45 && definition == 14794 && self.cooking.is_some() {
-                continue;
-            }
-            if !self.inventory.has_definition(definition) {
-                continue;
-            }
-            let owned = if reuse_owned {
-                self.inventory.equip_owned_definition(definition, job).ok()
-            } else {
-                None
-            };
-            let result = match owned {
-                Some(result) => result,
-                None => {
-                    out.replies
-                        .extend(self.inventory.grant(0, definition, 1)?.replies);
-                    self.inventory.equip_owned_definition(definition, job)?
-                }
-            };
-            out.changed = true;
-            out.replies.extend(
-                result
-                    .replies
-                    .into_iter()
-                    .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
-            );
-        }
-        Ok(())
-    }
-
-    /// (R) A job never stays bare: when a job with a completely empty outfit
-    /// becomes active, it gets its starter outfit (the owner, 2026-10-15). Fixes
-    /// saves whose job was unlocked by a path that granted no clothes.
-    fn ensure_outfit(&mut self, job: i32, out: &mut Outcome) -> io::Result<()> {
-        if self
-            .inventory
-            .profile_attachments(job)?
-            .starts_with(&0i32.to_le_bytes())
-        {
-            self.give_starter_outfit(job, true, out)?;
-        }
-        let has_weapon = self
-            .inventory
-            .state()
-            .equipment
-            .iter()
-            .any(|entry| entry.profile_id == job && entry.slot == 7 && entry.item_id != 0);
-        let starter = self
-            .abilities
-            .as_ref()
-            .and_then(|abilities| abilities.starter_weapon(job));
-        if !has_weapon
-            && let Some(definition) = starter
-            && self.inventory.has_definition(definition)
-        {
-            if !self
-                .inventory
-                .state()
-                .items
-                .iter()
-                .any(|item| item.definition_id == definition)
-            {
-                out.replies
-                    .extend(self.inventory.grant(0, definition, 1)?.replies);
-            }
-            let equipped = self.inventory.equip_owned_definition(definition, job)?;
-            out.changed |= equipped.changed;
-            out.replies.extend(equipped.replies);
-        }
-        Ok(())
-    }
-
-    /// (R) Leaving a race puts the player back in the job they had before it;
-    /// Kart Driver stays only when chosen or required (the owner, 2026-10-15).
-    fn restore_job(&mut self, job: i32, guid: u64, out: &mut Outcome) -> io::Result<()> {
-        if self.profiles.as_ref().unwrap().active() == job {
-            return Ok(());
-        }
-        let outfit_before = self
-            .inventory
-            .profile_attachments(self.profiles.as_ref().unwrap().active())?;
-        let profiles = self.profiles.as_mut().unwrap();
-        out.replies.push(profiles.select(job, &self.inventory)?);
-        if let Some(abilities) = &self.abilities {
-            out.replies
-                .extend(abilities.activation(job, self.job_level(job))?);
-        }
-        self.sync_player_level(out);
-        self.ensure_outfit(job, out)?;
-        self.announce_profile_outfit(guid, &outfit_before, true, out)
-    }
-
-    /// Stage an ordinary 26/13 job switch. The candidate job is committed only
-    /// when its outfit carries the Chest and Legs attachments the client's
-    /// `ProcessProfileSwap` requires; otherwise the previous job stays active.
-    fn stage_job_selection(&mut self, id: i32, out: &mut Outcome) -> io::Result<Option<bool>> {
-        let Some(profiles) = &self.profiles else {
-            return Ok(None);
-        };
-        if !profiles.state().unlocked.contains(&id) {
-            out.replies.push(chat::system(
-                "Cannot switch classes: that class has not been unlocked",
-            ));
-            return Ok(None);
-        }
-        let mut staged = self.clone();
-        let mut selection = Outcome::default();
-        let changed = staged.profiles.as_ref().unwrap().active() != id;
-        match staged
-            .profiles
-            .as_mut()
-            .unwrap()
-            .select(id, &staged.inventory)
-        {
-            Ok(reply) => selection.replies.push(reply),
-            Err(error) => {
-                out.replies
-                    .push(chat::system(&format!("Cannot switch classes: {error}")));
-                return Ok(None);
-            }
-        }
-        staged.ensure_outfit(id, &mut selection)?;
-        // Client ProcessProfileSwap 0x00bfb620 rejects a group without these.
-        if !staged.inventory.has_required_profile_slots(id) {
-            out.replies.push(chat::system(
-                "Cannot switch classes: that job's outfit is missing a required Chest or Legs item.",
-            ));
-            return Ok(None);
-        }
-        selection.changed |= changed;
-        *self = staged;
-        out.changed |= selection.changed;
-        out.replies.extend(selection.replies);
-        out.nearby.extend(selection.nearby);
-        Ok(Some(changed))
     }
 
     /// A save taken inside a battle arena loads with the battle dropped (the
@@ -2426,7 +2246,7 @@ impl Gameplay {
             return;
         };
         let npc = |id: u64| {
-            let npcs = self.npc_interaction.as_ref()?.lock().ok()?;
+            let npcs = self.npc_interaction.as_ref()?;
             npcs.location(id).map(|(_, position)| position)
         };
         let enemy = |kind: u32| self.encounter.as_ref()?.field_enemy_site(kind);
@@ -2793,11 +2613,20 @@ impl Gameplay {
         // option is idempotent. W176 also offers the job from a trainer. The prior job is
         // restored on exit.
         let first_time = profiles.unlock(48)?;
-        out.replies.push(profiles.select(48, &self.inventory)?);
+        profiles.activate(48)?;
         if first_time {
             self.give_starter_outfit(48, false, &mut out)?;
         }
         self.ensure_outfit(48, &mut out)?;
+        // Last, after the outfit repair: the 38/21 attachment list comes from what
+        // the player wears now (client reader `0x0091b080`).
+        out.replies.insert(
+            0,
+            self.profiles
+                .as_ref()
+                .unwrap()
+                .activation(48, &self.inventory)?,
+        );
         self.announce_profile_outfit(character.guid, &outfit_before, previous_job != 48, &mut out)?;
         let kart = self.kart_entry.as_mut().unwrap();
         let (replies, scene) = kart.begin(character)?;
@@ -2853,42 +2682,6 @@ impl Gameplay {
         out.changed = true;
         self.npc_inventory_events(&before, out)?;
         Ok(())
-    }
-
-    /// W176 (R): teach the job the chosen trainer offers. The caller stages `self`, so a refusal
-    /// (a chat line, `changed` false) leaves the player exactly as they were.
-    fn learn_job(&mut self, trainer: &crate::profiles::Trainer) -> io::Result<Outcome> {
-        use crate::profiles::LearnDenied;
-        let mut out = Outcome::default();
-        let denied = if self.activity_busy() {
-            Some(LearnDenied::Busy)
-        } else {
-            match self.profiles.as_mut() {
-                Some(profiles) => profiles.learn(trainer).err(),
-                None => Some(LearnDenied::Unavailable),
-            }
-        };
-        if let Some(denied) = denied {
-            out.replies.push(chat::system(&denied.message()));
-            return Ok(out);
-        }
-        // The job is not made active; the player picks it in the job list (R).
-        // Inventory quest events are emitted once by the request boundary.
-        self.grant_starter_outfit(trainer.profile, false, &mut out)?;
-        out.changed = true;
-        let message = if self.inventory.has_required_profile_slots(trainer.profile) {
-            format!(
-                "You learned the {} job. Pick it in your job list to switch.",
-                trainer.job
-            )
-        } else {
-            format!(
-                "You learned the {} job. Its starter outfit is unavailable, so it cannot be selected yet.",
-                trainer.job
-            )
-        };
-        out.replies.push(chat::system(&message));
-        Ok(out)
     }
 
     /// W160 (R): start the fishing round the chosen guide offers. The caller stages `self`, so a

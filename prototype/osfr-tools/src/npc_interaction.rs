@@ -20,6 +20,7 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fs, io,
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
 #[cfg(not(test))]
@@ -155,7 +156,7 @@ struct NpcRegionFile {
     records: Vec<NpcRecord>,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 struct NpcRecord {
     npc_id: u64,
     name: String,
@@ -181,7 +182,7 @@ struct NpcRecord {
     greeting_string_id: Option<u32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 struct NpcQuest {
     #[serde(default)]
     quest_id: Option<u32>,
@@ -219,14 +220,17 @@ struct StorePrice {
     sell_price_coins: Option<u32>,
 }
 
+#[derive(Clone)]
 struct ActiveInteraction {
     npc_id: u64,
     options: Vec<InteractionOption>,
     shop_open: bool,
-    shop_items: BTreeSet<i32>,
 }
 
-pub struct NpcInteraction {
+/// The loaded NPC, price and vendor-stock tables. Immutable after [`NpcInteraction::load`];
+/// shared through an `Arc` so cloning a `Gameplay` per request stays cheap.
+#[derive(Clone)]
+struct NpcContent {
     npcs: BTreeMap<u64, NpcRecord>,
     prices: BTreeMap<i32, StorePrice>,
     vendor_items: BTreeMap<u64, BTreeSet<i32>>,
@@ -241,6 +245,14 @@ pub struct NpcInteraction {
     fish_string_id: u32,
     /// (R) Jobs each NPC teaches (W176).
     job_trainers: BTreeMap<u64, Vec<Trainer>>,
+}
+
+/// One player's NPC session: the shared content plus the menu or shop they have open.
+/// `Gameplay` owns this value so a refused request rolls the open menu back with the rest
+/// of the staged state instead of leaving it consumed.
+#[derive(Clone)]
+pub struct NpcInteraction {
+    content: Arc<NpcContent>,
     active: Option<ActiveInteraction>,
 }
 
@@ -340,16 +352,18 @@ impl NpcInteraction {
             }
         }
         Ok(Self {
-            npcs,
-            prices,
-            vendor_items,
-            race_gates: BTreeSet::new(),
-            race_string_id: 0,
-            derby_gates: BTreeSet::new(),
-            derby_string_id: 0,
-            fish_gates: BTreeSet::new(),
-            fish_string_id: 0,
-            job_trainers: BTreeMap::new(),
+            content: Arc::new(NpcContent {
+                npcs,
+                prices,
+                vendor_items,
+                race_gates: BTreeSet::new(),
+                race_string_id: 0,
+                derby_gates: BTreeSet::new(),
+                derby_string_id: 0,
+                fish_gates: BTreeSet::new(),
+                fish_string_id: 0,
+                job_trainers: BTreeMap::new(),
+            }),
             active: None,
         })
     }
@@ -357,41 +371,49 @@ impl NpcInteraction {
     /// (R) List the kart race in these NPCs' menus. Returns the ids that are not NPC content, so a
     /// stale gate list degrades to a logged no-op instead of failing the world load.
     pub fn set_race_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
-        let (known, unknown): (Vec<u64>, Vec<u64>) =
-            npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
-        self.race_gates = known.into_iter().collect();
-        self.race_string_id = string_id;
+        let (known, unknown): (Vec<u64>, Vec<u64>) = npcs
+            .iter()
+            .partition(|npc| self.content.npcs.contains_key(*npc));
+        let content = Arc::make_mut(&mut self.content);
+        content.race_gates = known.into_iter().collect();
+        content.race_string_id = string_id;
         unknown
     }
 
     /// (R) List the demolition derby in these NPCs' menus. Returns unknown content keys like
     /// [`Self::set_race_gates`].
     pub fn set_derby_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
-        let (known, unknown): (Vec<u64>, Vec<u64>) =
-            npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
-        self.derby_gates = known.into_iter().collect();
-        self.derby_string_id = string_id;
+        let (known, unknown): (Vec<u64>, Vec<u64>) = npcs
+            .iter()
+            .partition(|npc| self.content.npcs.contains_key(*npc));
+        let content = Arc::make_mut(&mut self.content);
+        content.derby_gates = known.into_iter().collect();
+        content.derby_string_id = string_id;
         unknown
     }
 
     /// (R) List a fishing trip in these NPCs' menus (W160). Returns the ids that are not NPC
     /// content, like [`Self::set_race_gates`].
     pub fn set_fish_gates(&mut self, npcs: &[u64], string_id: u32) -> Vec<u64> {
-        let (known, unknown): (Vec<u64>, Vec<u64>) =
-            npcs.iter().partition(|npc| self.npcs.contains_key(*npc));
-        self.fish_gates = known.into_iter().collect();
-        self.fish_string_id = string_id;
+        let (known, unknown): (Vec<u64>, Vec<u64>) = npcs
+            .iter()
+            .partition(|npc| self.content.npcs.contains_key(*npc));
+        let content = Arc::make_mut(&mut self.content);
+        content.fish_gates = known.into_iter().collect();
+        content.fish_string_id = string_id;
         unknown
     }
 
     /// (R) List "Learn <job>" in these trainers' menus (W176). Returns the NPC ids that are not NPC
     /// content, like [`Self::set_race_gates`].
     pub fn set_job_trainers(&mut self, trainers: Vec<Trainer>) -> Vec<u64> {
-        self.job_trainers.clear();
+        let content = Arc::make_mut(&mut self.content);
+        content.job_trainers.clear();
         let mut unknown = Vec::new();
         for trainer in trainers {
-            if self.npcs.contains_key(&trainer.npc) {
-                self.job_trainers
+            if content.npcs.contains_key(&trainer.npc) {
+                content
+                    .job_trainers
                     .entry(trainer.npc)
                     .or_default()
                     .push(trainer);
@@ -410,6 +432,7 @@ impl NpcInteraction {
         item_ids: &[i32],
     ) -> Result<(), NpcInteractionError> {
         let npc = self
+            .content
             .npcs
             .get(&npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
@@ -417,7 +440,7 @@ impl NpcInteraction {
             || item_ids.len() > MAX_STORE_ITEMS
             || item_ids
                 .iter()
-                .any(|item_id| *item_id <= 0 || !self.prices.contains_key(item_id))
+                .any(|item_id| *item_id <= 0 || !self.content.prices.contains_key(item_id))
         {
             return Err(NpcInteractionError::InvalidOption);
         }
@@ -425,12 +448,14 @@ impl NpcInteraction {
         if stock.len() != item_ids.len() {
             return Err(NpcInteractionError::InvalidOption);
         }
-        self.vendor_items.insert(npc_id, stock);
+        Arc::make_mut(&mut self.content)
+            .vendor_items
+            .insert(npc_id, stock);
         Ok(())
     }
 
     pub fn location(&self, npc_id: u64) -> Option<(u32, [f32; 3])> {
-        let npc = self.npcs.get(&npc_id)?;
+        let npc = self.content.npcs.get(&npc_id)?;
         Some((npc.zone_id.unwrap_or(OPEN_WORLD_ZONE), npc.position?))
     }
 
@@ -442,6 +467,7 @@ impl NpcInteraction {
         quests: Option<&QuestEngine>,
     ) -> Result<InteractionMenu, NpcInteractionError> {
         let npc = self
+            .content
             .npcs
             .get(&npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
@@ -453,7 +479,6 @@ impl NpcInteraction {
             npc_id,
             options: options.clone(),
             shop_open: false,
-            shop_items: BTreeSet::new(),
         });
         Ok(InteractionMenu {
             npc_id,
@@ -476,6 +501,7 @@ impl NpcInteraction {
         let npc_id = u64::from_le_bytes(packet[4..12].try_into().unwrap());
         let choice_id = i32::from_le_bytes(packet[12..16].try_into().unwrap());
         let npc = self
+            .content
             .npcs
             .get(&npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
@@ -497,7 +523,6 @@ impl NpcInteraction {
             NpcAction::Talk => Ok(NpcSelection::Talk(self.dialogue_context(npc))),
             NpcAction::Shop => {
                 active.shop_open = true;
-                active.shop_items = self.vendor_items.get(&npc_id).cloned().unwrap_or_default();
                 Ok(NpcSelection::Shop(self.merchant_window(npc)))
             }
             NpcAction::Race => Ok(NpcSelection::Race),
@@ -505,6 +530,7 @@ impl NpcInteraction {
             NpcAction::Fish => Ok(NpcSelection::Fish),
             NpcAction::Learn { profile } => {
                 let trainer = self
+                    .content
                     .job_trainers
                     .get(&npc_id)
                     .and_then(|list| list.iter().find(|t| t.profile == profile))
@@ -573,6 +599,7 @@ impl NpcInteraction {
             return Err(NpcInteractionError::NoOpenShop);
         }
         let npc = self
+            .content
             .npcs
             .get(&active.npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
@@ -612,7 +639,12 @@ impl NpcInteraction {
         }
         if subtype == COIN_STORE_BUY {
             let item_id = i32::from_le_bytes(packet[16..20].try_into().unwrap());
-            if !active.shop_items.contains(&item_id) {
+            if !self
+                .content
+                .vendor_items
+                .get(&active.npc_id)
+                .is_some_and(|stock| stock.contains(&item_id))
+            {
                 return Err(NpcInteractionError::InvalidOption);
             }
         }
@@ -647,10 +679,16 @@ impl NpcInteraction {
         if !active.shop_open {
             return Err(NpcInteractionError::NoOpenShop);
         }
-        if !active.shop_items.contains(&item_id) {
+        if !self
+            .content
+            .vendor_items
+            .get(&active.npc_id)
+            .is_some_and(|stock| stock.contains(&item_id))
+        {
             return Err(NpcInteractionError::InvalidOption);
         }
         let npc = self
+            .content
             .npcs
             .get(&active.npc_id)
             .ok_or(NpcInteractionError::UnknownNpc)?;
@@ -690,7 +728,7 @@ impl NpcInteraction {
     }
 
     pub fn quest_title_string_id(&self, npc_id: u64, quest_id: u32) -> Option<u32> {
-        let npc = self.npcs.get(&npc_id)?;
+        let npc = self.content.npcs.get(&npc_id)?;
         npc.quests_given
             .iter()
             .chain(&npc.quests_accepted)
@@ -701,7 +739,7 @@ impl NpcInteraction {
     /// Candidate for the reconstructed Talk-to-offer policy (R). The client
     /// proves a generic 26/9 option list, not which server choice starts 49/1.
     pub fn offerable_quest_for_talk(&self, npc_id: u64, quests: &QuestEngine) -> Option<u32> {
-        let npc = self.npcs.get(&npc_id)?;
+        let npc = self.content.npcs.get(&npc_id)?;
         if !has_role(npc, NpcRole::QuestGiver) {
             return None;
         }
@@ -714,9 +752,10 @@ impl NpcInteraction {
 
     /// Reconstructed target association (R): same-zone NPC notes mark a quest title as a target.
     pub fn named_target_quest_for_talk(&self, npc_id: u64, quests: &QuestEngine) -> Option<u32> {
-        let target = self.npcs.get(&npc_id)?;
+        let target = self.content.npcs.get(&npc_id)?;
         let zone_id = target.zone_id?;
         for giver in self
+            .content
             .npcs
             .values()
             .filter(|giver| giver.zone_id == Some(zone_id))
@@ -786,16 +825,22 @@ impl NpcInteraction {
         if has_role(npc, NpcRole::Vendor) {
             options.push((NpcAction::Shop, SHOP_STRING_ID));
         }
-        if self.race_gates.contains(&npc.npc_id) {
-            options.push((NpcAction::Race, self.race_string_id));
+        if self.content.race_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Race, self.content.race_string_id));
         }
-        if self.derby_gates.contains(&npc.npc_id) {
-            options.push((NpcAction::Derby, self.derby_string_id));
+        if self.content.derby_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Derby, self.content.derby_string_id));
         }
-        if self.fish_gates.contains(&npc.npc_id) {
-            options.push((NpcAction::Fish, self.fish_string_id));
+        if self.content.fish_gates.contains(&npc.npc_id) {
+            options.push((NpcAction::Fish, self.content.fish_string_id));
         }
-        for trainer in self.job_trainers.get(&npc.npc_id).into_iter().flatten() {
+        for trainer in self
+            .content
+            .job_trainers
+            .get(&npc.npc_id)
+            .into_iter()
+            .flatten()
+        {
             options.push((
                 NpcAction::Learn {
                     profile: trainer.profile,
@@ -838,12 +883,13 @@ impl NpcInteraction {
     fn merchant_window(&self, npc: &NpcRecord) -> MerchantWindow {
         // (R) Item IDs require an explicit vendor mapping; never show the global price catalogue.
         let items = self
+            .content
             .vendor_items
             .get(&npc.npc_id)
             .into_iter()
             .flatten()
             .filter_map(|item_id| {
-                let price = self.prices.get(item_id)?;
+                let price = self.content.prices.get(item_id)?;
                 Some(MerchantItem {
                     item_id: price.item_id,
                     purchase_price_coins: price.purchase_price_coins,

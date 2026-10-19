@@ -51,13 +51,7 @@ fn coin_store_and_vendor_buys_preserve_live_inventory_and_saved_state() {
     let mut selected = None;
     for vendor in vendors["vendors"].as_array().expect("vendors are an array") {
         let npc_id = vendor["npc_id"].as_u64().expect("NPC id is an integer");
-        let Some((zone_id, position)) = game
-            .npc_interaction
-            .as_ref()
-            .unwrap()
-            .lock()
-            .unwrap()
-            .location(npc_id)
+        let Some((zone_id, position)) = game.npc_interaction.as_ref().unwrap().location(npc_id)
         else {
             continue;
         };
@@ -87,7 +81,7 @@ fn coin_store_and_vendor_buys_preserve_live_inventory_and_saved_state() {
     let (npc_id, zone_id, position, item_id, price) =
         selected.expect("a priced, defined vendor item exists");
 
-    let mut interaction = game.npc_interaction.as_ref().unwrap().lock().unwrap();
+    let interaction = game.npc_interaction.as_mut().unwrap();
     let menu = interaction
         .interact(npc_id, zone_id, position, None)
         .expect("vendor interaction opens");
@@ -102,7 +96,6 @@ fn coin_store_and_vendor_buys_preserve_live_inventory_and_saved_state() {
     interaction
         .select(&select, zone_id, position, None)
         .expect("vendor shop opens");
-    drop(interaction);
 
     let coins_before = game.inventory.state().coins;
     let purchased_before = count_definition(&game, item_id);
