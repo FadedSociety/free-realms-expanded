@@ -222,6 +222,19 @@ impl NpcVisibility {
         Ok((next, packets))
     }
 
+    /// (R) A viewer that is not ready or whose world is not loaded keeps its
+    /// assigned instance but must forget every shared-field actor it knew. The
+    /// empty wanted set makes a later ready tick re-add current actors.
+    pub fn hidden_view(known: &BTreeSet<u64>) -> (BTreeSet<u64>, Vec<Vec<u8>>) {
+        (
+            BTreeSet::new(),
+            known
+                .iter()
+                .map(|guid| crate::encounter::SharedFieldState::removal(*guid))
+                .collect(),
+        )
+    }
+
     /// Loads regional NPC rows and the zone-less Legacy placement table.
     /// Extra spawn zones use nearest positioned regional NPC as local policy (R).
     pub fn load(content_dir: &Path) -> io::Result<Self> {

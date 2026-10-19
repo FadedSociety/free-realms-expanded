@@ -376,18 +376,19 @@ fn f132_not_ready_same_instance_removes_known_field_actor() {
     let before = f.host(|s| s.test_location(202).unwrap());
     assert!(before.2, "observer starts ready");
 
-    f.host(|s| s.test_mark_not_ready(202));
+    // Readiness alone: the session's world stays loaded, so its own commit
+    // re-derives readiness on the next tick and the actor then returns.
+    f.host(|s| s.test_set_ready(202, false));
     let after = f.host(|s| s.test_location(202).unwrap());
     assert_eq!(after.1, before.1, "readiness changed in the same instance");
-    assert!(!after.2, "observer is no longer ready");
 
-    let mut removed = [Vec::new(), Vec::new()];
-    settle(&mut a, &mut b, &mut removed, |messages| {
-        removals(&messages[1], E) >= 1
+    let mut cycle = [Vec::new(), Vec::new()];
+    settle(&mut a, &mut b, &mut cycle, |messages| {
+        removals(&messages[1], E) >= 1 && actor_packets(&messages[1], 2, E) >= 1
     });
-    assert_eq!(removals(&removed[1], E), 1);
-    assert_eq!(removals(&removed[0], E), 0);
-    let removal = removed[1]
+    assert_eq!(removals(&cycle[1], E), 1);
+    assert_eq!(removals(&cycle[0], E), 0);
+    let removal = cycle[1]
         .iter()
         .find(|packet| {
             is_sub(packet, 35, 3) && packet.get(6..14) == Some(E.to_le_bytes().as_slice())
@@ -398,11 +399,30 @@ fn f132_not_ready_same_instance_removes_known_field_actor() {
     expected.extend(E.to_le_bytes());
     expected.extend([0; 17]);
     assert_eq!(removal, &expected, "35/3 field layout");
-    assert!(!f.host(|s| s.test_known_npcs(202).contains(&E)));
+    // Readiness returned: the current actor was re-added at its current HP.
+    assert_eq!(actor_packets(&cycle[1], 2, E), 1);
+    assert_eq!(hp_values(&cycle[1]), vec![300]);
+    assert!(f.host(|s| s.test_location(202).unwrap()).2);
+    assert!(f.host(|s| s.test_known_npcs(202).contains(&E)));
     assert!(f.host(|s| s.test_known_npcs(101).contains(&E)));
+
+    // World-load loss alone: membership readiness stays true.
+    f.host(|s| s.test_lose_world(202));
+    let loaded_loss = f.host(|s| s.test_location(202).unwrap());
+    assert!(loaded_loss.2, "membership readiness is unchanged");
+    let mut lost = [Vec::new(), Vec::new()];
+    settle(&mut a, &mut b, &mut lost, |messages| {
+        removals(&messages[1], E) >= 1
+    });
+    assert_eq!(
+        removals(&lost[1], E),
+        1,
+        "losing the loaded world removes its ghost actors"
+    );
+    assert_eq!(removals(&lost[0], E), 0);
+    assert!(!f.host(|s| s.test_known_npcs(202).contains(&E)));
     println!(
-        "F132 socket: not-ready observer kept instance {} but received one 35/3 removal for the stale field actor; ready observer unchanged",
-        after.1
+        "F132 socket: readiness-only and world-load-only loss each removed the stale actor once; readiness restore re-added it; ready observer unchanged"
     );
 }
 
@@ -1101,4 +1121,24 @@ fn w127_staged_passive_content_edits_do_not_leak() {
     let (after, _) = staged.shared_view(0, [0., 0., 0.], &[], &empty).unwrap();
     assert_eq!(before, [130000000001].into());
     assert_eq!(after, [130000000002].into());
+}
+
+#[test]
+fn f160_hidden_view_forgets_every_known_actor_in_the_shared_field_layout() {
+    let known = std::collections::BTreeSet::from([E, E + 1]);
+    let (wanted, packets) = osfr_tools::world::NpcVisibility::hidden_view(&known);
+    assert!(wanted.is_empty(), "a hidden viewer keeps no actor");
+    let expected: Vec<_> = [E, E + 1]
+        .iter()
+        .map(|guid| {
+            let mut bytes = vec![35_u8, 0, 3, 0];
+            bytes.extend(1_u16.to_le_bytes());
+            bytes.extend(guid.to_le_bytes());
+            bytes.extend([0; 17]);
+            bytes
+        })
+        .collect();
+    assert_eq!(packets, expected, "one 35/3 removal per known actor");
+    let (wanted, packets) = osfr_tools::world::NpcVisibility::hidden_view(&Default::default());
+    assert!(wanted.is_empty() && packets.is_empty());
 }

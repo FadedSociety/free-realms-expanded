@@ -31,7 +31,7 @@ use osfr_tools::soe::{
 use osfr_tools::soe_send::{ReliableSender, SendError, SenderConfig};
 use osfr_tools::studio;
 use osfr_tools::trade::{TradeMessage, TradeService, TradeSettlement};
-use osfr_tools::world::{World, WorldPose};
+use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
 /// Studio savestates sit next to the character save.
 fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
@@ -413,9 +413,10 @@ struct Session {
     receiver: ReliableReceiver,
     sender: ReliableSender,
     gateway: Gateway,
+    // (R) Directed shared-field view cache (W106): unchanged inputs retain the
+    // known set; one update site writes all four after a successful delivery.
     known_npcs: BTreeSet<u64>,
     npc_visibility_revision: Option<u64>,
-    // (R) W106's directed-view approach: unchanged inputs retain the known set.
     npc_view_position: Option<[f32; 3]>,
     npc_view_fields: Vec<osfr_tools::world::NpcInterest>,
     state_path: PathBuf,
@@ -3059,7 +3060,7 @@ impl Server {
                 )
             })
             .collect::<Vec<_>>();
-        self.queue_field_deliveries(deliveries)?;
+        self.queue_field_deliveries(deliveries);
         let Some(elapsed) = field.due(now_ms) else {
             self.membership.install_field(instance, field.clone());
             if resync {
@@ -3121,11 +3122,14 @@ impl Server {
         }
         self.membership.install_field(instance, field.clone());
         for (key, replies) in private {
+            let Some(session) = self.sessions.get_mut(&key) else {
+                continue;
+            };
             for reply in replies {
-                self.sessions
-                    .get_mut(&key)
-                    .unwrap()
-                    .queue_shared_message(&wrap_application(&reply))?;
+                if let Err(error) = session.queue_shared_message(&wrap_application(&reply)) {
+                    Self::refuse_field_delivery(session, error);
+                    break;
+                }
             }
         }
         let deliveries = self
@@ -3142,17 +3146,24 @@ impl Server {
                 )
             })
             .collect::<Vec<_>>();
-        self.queue_field_deliveries(deliveries)?;
+        self.queue_field_deliveries(deliveries);
         if resync {
             self.sync_field_views(instance, &field, false)?;
         }
         Ok(())
     }
 
-    fn queue_field_deliveries(
-        &mut self,
-        deliveries: Vec<Delivery>,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    /// (R) A full reliable queue refuses that recipient only: the shared field
+    /// and every other viewer keep ticking, and the next tick retries.
+    fn refuse_field_delivery(session: &Session, error: Box<dyn std::error::Error>) {
+        event(json!({
+            "event":"field_delivery_refused",
+            "character":session.character_guid,
+            "reason":error.to_string()
+        }));
+    }
+
+    fn queue_field_deliveries(&mut self, deliveries: Vec<Delivery>) {
         for delivery in deliveries {
             if let Some(session) = self
                 .world
@@ -3160,10 +3171,11 @@ impl Server {
                 .get(&delivery.recipient)
                 .and_then(|key| self.sessions.get_mut(key))
             {
-                session.queue_shared_message(&delivery.bytes)?;
+                if let Err(error) = session.queue_shared_message(&delivery.bytes) {
+                    Self::refuse_field_delivery(session, error);
+                }
             }
         }
-        Ok(())
     }
 
     fn sync_field_views(
@@ -3193,7 +3205,13 @@ impl Server {
             if location_instance != instance {
                 continue;
             }
-            let valid = ready && session.gateway.is_world_loaded();
+            // Same tested predicate as field delivery: readiness and a loaded
+            // world must both hold before this viewer may keep actors.
+            let valid = field_recipient_matches(
+                session.gateway.is_world_loaded(),
+                Some((location_instance, ready)),
+                instance,
+            );
             let fields: Vec<_> = candidates
                 .iter()
                 .copied()
@@ -3224,7 +3242,6 @@ impl Server {
                     .gateway
                     .gameplay()
                     .map(|game| {
-                        let revision = game.npc_visibility_revision();
                         let mut known = session.known_npcs.clone();
                         let mut refreshed = Vec::new();
                         if session
@@ -3245,33 +3262,29 @@ impl Server {
                         let (wanted, packets) =
                             game.shared_npc_view(session.gateway.state(), &fields, &known)?;
                         refreshed.extend(packets);
-                        session.npc_visibility_revision = Some(revision);
                         Ok::<_, io::Error>((wanted, refreshed))
                     })
                     .transpose()?
                     .unwrap_or_default()
             } else {
-                (
-                    BTreeSet::new(),
-                    session
-                        .known_npcs
-                        .iter()
-                        .map(|guid| osfr_tools::encounter::SharedFieldState::removal(*guid))
-                        .collect(),
-                )
+                NpcVisibility::hidden_view(&session.known_npcs)
             };
-            for reply in packets {
-                session.queue_shared_message(&wrap_application(&reply))?;
-            }
+            let mut outgoing = packets;
             for guid in wanted
                 .difference(&session.known_npcs)
                 .copied()
                 .collect::<Vec<_>>()
             {
-                for reply in field.initialization(guid)? {
-                    session.queue_shared_message(&wrap_application(&reply))?;
-                }
+                outgoing.extend(field.initialization(guid)?);
             }
+            if let Err(error) = outgoing
+                .iter()
+                .try_for_each(|reply| session.queue_shared_message(&wrap_application(reply)))
+            {
+                Self::refuse_field_delivery(session, error);
+                continue;
+            }
+            session.npc_visibility_revision = Some(revision);
             session.known_npcs = wanted;
             session.npc_view_position = valid.then_some(session.gateway.state().position);
             session.npc_view_fields = fields;
@@ -3428,30 +3441,6 @@ impl Server {
     #[cfg(test)]
     pub fn test_field_instances(&self) -> Vec<i32> {
         self.membership.field_instances()
-    }
-    #[cfg(test)]
-    pub fn test_mark_not_ready(&mut self, guid: u64) {
-        let id = self.world.active_sessions[&guid];
-        let key = self.world.session_keys[&id];
-        self.sessions.get_mut(&key).unwrap().gateway.reset_session();
-        let location = self.membership.player_location(guid).unwrap().clone();
-        let zone_id = self
-            .membership
-            .instance(location.instance_id)
-            .map(|row| row.zone_id)
-            .unwrap();
-        let change = self
-            .membership
-            .prepare_membership(
-                guid,
-                zone_id,
-                Some(location.instance_id),
-                location.pose,
-                false,
-                self.start.elapsed().as_millis() as u64,
-            )
-            .unwrap();
-        self.membership.commit_membership(change);
     }
     #[cfg(test)]
     pub fn test_known_npcs(&self, guid: u64) -> BTreeSet<u64> {
@@ -4518,6 +4507,12 @@ mod f120_fishing_hour_reconnect;
 #[path = "osfr_gateway/isolation.rs"]
 mod isolation;
 
+/// F160: shared-field view reconciliation for readiness/load loss, and the
+/// per-recipient delivery isolation regression behind it.
+#[cfg(test)]
+#[path = "osfr_gateway/f160_field_views.rs"]
+mod f160_field_views;
+
 #[cfg(test)]
 #[path = "osfr_gateway/dormant_fields.rs"]
 mod dormant_fields;
@@ -4603,8 +4598,19 @@ fn w127_other_instance_recipient_canary() {
         !field_recipient_matches(true, Some((7, true)), 0),
         "recipient assertion: another instance received field deltas"
     );
-    assert!(!field_recipient_matches(true, Some((0, false)), 0));
-    assert!(!field_recipient_matches(false, Some((0, true)), 0));
+    // The field view path uses this same predicate: either signal alone hides it.
+    assert!(
+        !field_recipient_matches(true, Some((0, false)), 0),
+        "readiness loss alone"
+    );
+    assert!(
+        !field_recipient_matches(false, Some((0, true)), 0),
+        "world-load loss alone"
+    );
+    assert!(
+        field_recipient_matches(true, Some((0, true)), 0),
+        "readiness restored"
+    );
     assert!(!field_recipient_matches(true, None, 0));
 }
 
