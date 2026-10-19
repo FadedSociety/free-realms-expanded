@@ -560,8 +560,9 @@ fn native_boost_award_is_owned_persistent_and_queue_bounded() {
 }
 
 /// A frame whose clock predates Go must not refill, use or collect: `saturating_sub` alone would
-/// read it as elapsed zero. The refusal is the movement guard's `ClaimRate { delta_ms: 0 }`, and it
-/// leaves the queue, the legacy epoch, the anchor and the pickups untouched - fresh and restored.
+/// read it as elapsed zero. The refusal is the shared clock-regression edge (`ClaimRate`), and it
+/// leaves the queue, the legacy epoch, the anchor, the pickups and the observation budget
+/// untouched - fresh and restored.
 #[test]
 fn before_go_clock_cannot_refill_use_or_collect() {
     let (mut service, context) = started();
@@ -588,14 +589,11 @@ fn before_go_clock_cannot_refill_use_or_collect() {
         refusal(&service.handle_inner(&claim, start - 1).unwrap()),
         &ServiceRefusal::ClaimRate { delta_ms: 0 }
     );
-    let after_claim = service.snapshot().unwrap();
-    assert_eq!(after_claim.observations, before.observations + 1);
-    assert_eq!(after_claim.queued_items, before.queued_items);
-    assert_eq!(after_claim.last_boost_epoch, before.last_boost_epoch);
-    assert_eq!(after_claim.last_position, before.last_position);
-    assert_eq!(after_claim.last_claim_ms, before.last_claim_ms);
-    assert_eq!(after_claim.pickups_consumed, before.pickups_consumed);
-    assert_eq!(after_claim.session, before.session);
+    assert_eq!(
+        service.snapshot().unwrap(),
+        before,
+        "a pre-Go pickup claim moves nothing either"
+    );
     // The exact Go boundary is in-window: the refill works and its entry is immediately usable.
     assert_eq!(
         replies(&service.handle_inner(&award, start).unwrap()),
@@ -2906,10 +2904,16 @@ fn pickup_refusals_move_nothing() {
         PICKUP_HIT_SUBTYPE,
         &gate_hit_payload(owned, [0.0, 0.0, 0.0]),
     );
+    let before_timeout = service.snapshot().unwrap();
     assert!(matches!(
         service.handle_inner(&timed, start + 600_001).unwrap(),
         ServiceOutcome::Refused(ServiceRefusal::RaceTimeout { .. })
     ));
+    assert_eq!(
+        service.snapshot().unwrap(),
+        before_timeout,
+        "a timeout refusal must leave the complete race snapshot unchanged"
+    );
     let after = service.snapshot().unwrap();
     assert!(after.queued_items.is_empty());
     assert!(after.pickups_consumed.is_empty(), "no box was consumed");
@@ -2923,8 +2927,9 @@ fn pickup_refusals_move_nothing() {
         after.attempts, before.attempts,
         "the gate budget is untouched"
     );
-    // The four refused observation frames count against the observation budget only.
-    assert_eq!(after.observations, before.observations + 4);
+    // Only the three in-window refused pickup frames spend the observation budget; the timed
+    // refusal is a precondition refusal and spends nothing.
+    assert_eq!(after.observations, before.observations + 3);
 }
 
 #[test]

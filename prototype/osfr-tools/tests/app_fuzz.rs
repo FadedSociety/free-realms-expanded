@@ -1592,6 +1592,32 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
         before,
         "a timeout refusal must leave the complete gateway snapshot unchanged"
     );
+
+    // The sibling `33/17` pickup claim carries the same 24-byte block and the same race window.
+    // A post-window pickup must be just as pure, or it dirties the saved race through
+    // `observations` and re-triggers the save the gate fix closed.
+    let mut pickup = words(33, 17, &[guid as u32, (guid >> 32) as u32]);
+    for _ in 0..3 {
+        pickup.extend(0.0f32.to_le_bytes());
+    }
+    pickup.extend(1.0f32.to_le_bytes());
+    let out = gateway
+        .handle_at(
+            &wrap(&pickup),
+            race.race_started_ms + u64::from(race.bounds.max_race_ms) + 1,
+        )
+        .unwrap();
+    assert_eq!(out.applications, vec![pickup]);
+    assert!(out.replies.is_empty());
+    assert!(
+        !out.state_changed && !out.gameplay_changed,
+        "a timed pickup refusal must not trigger a character save"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a timed pickup refusal must leave the complete gateway snapshot unchanged"
+    );
 }
 
 #[test]

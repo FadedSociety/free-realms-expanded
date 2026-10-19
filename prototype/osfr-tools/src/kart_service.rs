@@ -172,7 +172,7 @@ pub const PLAYER_COUNT_SUBTYPE: u16 = 3;
 pub const NPC_COUNT_SUBTYPE: u16 = 4;
 /// ORIGINAL: 85-byte bulk block.
 pub const SERVER_DATA_PAYLOAD_LEN: usize = 85;
-/// ORIGINAL: `u64 guid | 3 x f32 | f32` claim block.
+/// ORIGINAL: `u64 guid | 3 x f32 | f32` claim block (client writer `sub_BA48A0` at 0x00ba557d).
 pub const GATE_HIT_PAYLOAD_LEN: usize = 24;
 /// ORIGINAL: `u64 guid | u32 value` countdown block.
 pub const COUNTDOWN_PAYLOAD_LEN: usize = 12;
@@ -787,8 +787,12 @@ pub struct ServiceSnapshot {
     pub last_position: [f32; 3],
     pub last_claim_ms: u64,
     pub race_started_ms: u64,
-    /// Every `33/7` claim attempt, accepted or refused: the bounded flood guard.
+    /// Every in-window `33/7` claim attempt, accepted or refused: the bounded flood guard. The
+    /// phase, budget-ceiling and race-window refusals are pure and spend nothing.
     pub attempts: u32,
+    /// An accepted `33/6` bulk frame, or an in-window `33/17` pickup attempt, accepted or refused:
+    /// the bounded observation guard. The phase, budget-ceiling and race-window refusals spend
+    /// nothing.
     pub observations: u32,
     pub countdown_sent: Option<u32>,
     /// LEGACY server-clock refill epoch. Retained so pre-repair saves keep loading and so the
@@ -1815,15 +1819,17 @@ impl KartService {
                         observations: self.observations,
                     }));
                 }
-                self.observations = self.observations.saturating_add(1);
-                if !self.pickups_spawned {
-                    return Ok(ServiceOutcome::Refused(ServiceRefusal::PickupsNotSpawned));
-                }
-                // Pickups share the race-window edges; the movement guard then bounds the leg.
+                // Pickups share the race-window edges; the movement guard then bounds the leg. The
+                // window is a precondition like the gate budget: a timeout or clock regression
+                // must not spend it, or the refusal would dirty the saved race (F148).
                 let _elapsed = match self.race_elapsed(now_ms) {
                     Ok(elapsed) => elapsed,
                     Err(refusal) => return Ok(ServiceOutcome::Refused(refusal)),
                 };
+                self.observations = self.observations.saturating_add(1);
+                if !self.pickups_spawned {
+                    return Ok(ServiceOutcome::Refused(ServiceRefusal::PickupsNotSpawned));
+                }
                 // Room for the grant before any box is consumed: a full mirror queue refuses and
                 // leaves the box, the credit and the anchor untouched.
                 if self.queued_items.len() >= ITEM_QUEUE_CAP {
