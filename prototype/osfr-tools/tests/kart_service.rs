@@ -56,6 +56,13 @@ fn at(offset_ms: u64) -> u64 {
     BEGIN_MS + offset_ms
 }
 
+/// `snapshot` with the observation flood budget set to `spent`. An evaluated observation persists
+/// that one saved field and nothing else, so refusals keep comparing every other field.
+fn spending(mut snapshot: ServiceSnapshot, spent: u32) -> ServiceSnapshot {
+    snapshot.observations = spent;
+    snapshot
+}
+
 fn synthetic_progress_template() -> ProgressPayload {
     ProgressPayload {
         racer_guid: 0,
@@ -586,7 +593,7 @@ fn native_boost_award_is_owned_persistent_and_queue_bounded() {
 /// A frame whose clock predates Go must not refill, use or collect: `saturating_sub` alone would
 /// read it as elapsed zero. The refusal is the shared clock-regression edge (`ClaimRate`), and it
 /// leaves the queue, the legacy epoch, the anchor, the pickups and the saved snapshot untouched -
-/// fresh and restored. The pre-Go pickup still spends one per-session observation slot.
+/// fresh and restored. The pre-Go pickup still spends one persisted observation slot.
 #[test]
 fn before_go_clock_cannot_refill_use_or_collect() {
     let (mut service, context) = started();
@@ -616,13 +623,13 @@ fn before_go_clock_cannot_refill_use_or_collect() {
     );
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "a pre-Go pickup claim moves no saved state either"
+        spending(before, 1),
+        "a pre-Go pickup claim moves nothing but the persisted observation slot"
     );
     assert_eq!(
         service.observations(),
         observed + 1,
-        "the per-session observation guard still spends one slot"
+        "the observation guard still spends one slot"
     );
     // The exact Go boundary is in-window: the refill works and its entry is immediately usable.
     assert_eq!(
@@ -1103,9 +1110,10 @@ fn captured_seventeen_use_requests_only_consume_awarded_items() {
     assert!(!service.finish_flag());
 }
 
-/// Without pickup content a `33/17` claim is a bounded observation: it spends one per-session
-/// observation slot, refuses `NoPickupInRange` and leaves the saved snapshot untouched. Foreign,
-/// malformed and over-budget claims refuse without touching the queue, the session or a save.
+/// Without pickup content a `33/17` claim is a bounded observation: it spends one persisted
+/// observation slot, refuses `NoPickupInRange` and moves nothing else in the saved snapshot.
+/// Foreign, malformed and over-budget claims refuse without touching the queue, the session or a
+/// save.
 #[test]
 fn pickup_claims_without_content_refuse_and_move_nothing() {
     let (mut service, context) = started();
@@ -1120,14 +1128,10 @@ fn pickup_claims_without_content_refuse_and_move_nothing() {
     assert!(!outcome.reward_ready());
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "an in-window observation refusal changes no saved state"
+        spending(before, 1),
+        "an in-window observation refusal moves only the persisted budget slot"
     );
-    assert_eq!(
-        service.observations(),
-        1,
-        "the per-session guard still counts it"
-    );
+    assert_eq!(service.observations(), 1, "the guard still counts it");
     assert!(matches!(
         service
             .handle_inner(
@@ -2422,8 +2426,8 @@ fn observation_budget_is_separate_from_the_gate_budget() {
     assert_eq!(service.observations(), 4);
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "accepted observations change no saved state"
+        spending(before.clone(), 4),
+        "accepted observations move only the persisted budget"
     );
     assert_eq!(
         refusal(
@@ -2435,8 +2439,8 @@ fn observation_budget_is_separate_from_the_gate_budget() {
     );
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "the budget refusal changes no saved state either"
+        spending(before, 4),
+        "the budget refusal changes no saved state"
     );
     // The high-rate bulk stream never consumed the gate budget: a real gate still advances.
     assert_eq!(service.snapshot().unwrap().attempts, 0);
@@ -2608,8 +2612,8 @@ fn bulk_observations_are_bounded_and_inert() {
     assert_eq!(service.observations(), 1);
     assert_eq!(
         service.snapshot().unwrap(),
-        saved,
-        "an accepted bulk observation changes no saved state"
+        spending(saved.clone(), 1),
+        "an accepted bulk observation moves only the persisted budget"
     );
     assert_eq!(
         service
@@ -2625,16 +2629,16 @@ fn bulk_observations_are_bounded_and_inert() {
         kart_service::PICKUP_HIT_SUBTYPE,
         &gate_hit_payload(context.player_guid, [1.0, 2.0, 3.0]),
     );
-    // With no pickup content the claim is a bounded observation that still changes nothing: the
-    // per-session observation guard counts it, and the refusal carries no replies.
+    // With no pickup content the claim is a bounded observation: the guard counts it, the refusal
+    // carries no replies, and the persisted budget is the only saved field that moves.
     let outcome = service.handle_inner(&pickup, at(15_200)).unwrap();
     assert!(outcome.replies().is_empty());
     assert_eq!(refusal(&outcome), &ServiceRefusal::NoPickupInRange);
     assert_eq!(service.observations(), 2);
     assert_eq!(
         service.snapshot().unwrap(),
-        saved,
-        "a refused pickup observation changes no saved state"
+        spending(saved, 2),
+        "a refused pickup observation moves only the persisted budget"
     );
     assert_eq!(
         refusal(
@@ -2806,8 +2810,8 @@ fn pickup_claim_awards_one_boost_and_never_moves_the_session() {
     );
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "a replayed pickup refusal moves no saved state"
+        spending(before, 2),
+        "a replayed pickup refusal moves only the persisted budget"
     );
     // The granted entry is a normal use-item request away from the boost.
     let use_item = inner(USE_ITEM_SUBTYPE, &context.player_guid.to_le_bytes());
@@ -2861,8 +2865,8 @@ fn a_full_item_queue_refuses_before_any_box_is_consumed() {
     );
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "a full queue leaves the box, the queue and the credit alone"
+        spending(before, 1),
+        "a full queue leaves the box, the queue and the credit alone; only the budget moves"
     );
     // Draining one slot frees the same box.
     let use_item = inner(USE_ITEM_SUBTYPE, &context.player_guid.to_le_bytes());
@@ -2958,17 +2962,17 @@ fn pickup_refusals_move_nothing_but_the_observation_budget() {
     ));
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "every pickup refusal leaves the complete saved race unchanged"
+        spending(before, 4),
+        "every pickup refusal leaves the saved race unchanged apart from the observation budget"
     );
-    // The per-session observation guard still spends one slot per evaluated frame: the three
-    // in-window refusals and the timed one. Foreign and malformed frames do not reach it.
+    // The observation guard still spends one slot per evaluated frame: the three in-window
+    // refusals and the timed one. Foreign and malformed frames do not reach it.
     assert_eq!(service.observations(), 4);
 }
 
-/// F181: the observation guard is per-session but a timed pickup frame still spends it, so a
-/// hostile client cannot dodge the budget by timing claims after the race window. The refusals
-/// leave the saved race unchanged because the guard is never persisted.
+/// A timed pickup frame still spends the persisted observation budget, so a hostile client cannot
+/// dodge the bound by timing claims after the race window; the refusal writes no character save
+/// (`KartGatewayState::changed_for_save`), so only the budget slot moves in the saved race.
 #[test]
 fn timed_pickup_frames_still_spend_the_observation_budget() {
     let mut content = synthetic_content();
@@ -2990,8 +2994,8 @@ fn timed_pickup_frames_still_spend_the_observation_budget() {
     );
     assert_eq!(
         service.snapshot().unwrap(),
-        before,
-        "spending the session guard never dirties the saved race"
+        spending(before, 1),
+        "spending the guard persists the budget slot and nothing else"
     );
 }
 
@@ -3266,8 +3270,9 @@ fn full_queue_refusal_schedules_no_respawn() {
     );
     let after = service.snapshot().unwrap();
     assert_eq!(
-        after, before,
-        "a refused claim leaves the box, the queue and the schedule alone"
+        after,
+        spending(before, 1),
+        "a refused claim leaves the box, the queue and the schedule alone; only the budget moves"
     );
 }
 
@@ -3655,16 +3660,14 @@ fn snapshot_restore_round_trips_and_preserves_the_one_shot() {
         KartService::restore(synthetic_content(), corrupt).unwrap_err(),
         ServiceError::CorruptSnapshot { field: "attempts" }
     );
-    // An old save still carries the legacy observation count; it loads but never persists again.
-    let mut legacy = snapshot.clone();
-    legacy.observations = 7;
-    let restored_legacy =
-        KartService::restore(synthetic_content(), legacy).expect("legacy save loads");
-    assert_eq!(
-        restored_legacy.snapshot().unwrap().observations,
-        0,
-        "the legacy observation count is not written back"
-    );
+    // The flood budget round-trips: a save written after a flood resumes its spent slots, so a
+    // reconnect cannot refresh the allowance (F207).
+    let mut saved_budget = snapshot.clone();
+    saved_budget.observations = 7;
+    let restored_budget =
+        KartService::restore(synthetic_content(), saved_budget).expect("budget save loads");
+    assert_eq!(restored_budget.observations(), 7);
+    assert_eq!(restored_budget.snapshot().unwrap().observations, 7);
 
     let taken = restored.take_finished_session();
     assert!(taken.is_some());
@@ -3675,6 +3678,40 @@ fn snapshot_restore_round_trips_and_preserves_the_one_shot() {
     restored.set_gate(EntryGate::Enabled);
     assert!(!restored.finish_flag());
     assert!(restored.take_finished_session().is_none());
+}
+
+/// F207: the observation flood guard is part of the saved race. A reconnect resumes the spent
+/// slots and still refuses once the content budget is gone, so a flood cannot reset by relogging.
+#[test]
+fn restored_race_resumes_the_observation_budget_and_still_refuses_a_flood() {
+    let mut content = synthetic_content();
+    content.bounds.max_observations = 1;
+    let (mut service, context) = racing(content.clone());
+    let claim = inner(
+        PICKUP_HIT_SUBTYPE,
+        &gate_hit_payload(context.player_guid, [1.0, 2.0, 3.0]),
+    );
+    assert_eq!(
+        refusal(&service.handle_inner(&claim, at(15_000)).unwrap()),
+        &ServiceRefusal::NoPickupInRange
+    );
+    assert_eq!(service.observations(), 1);
+    let snapshot = service.snapshot().unwrap();
+    assert_eq!(
+        snapshot.observations, 1,
+        "the spent slot is part of the saved race"
+    );
+    let mut restored = KartService::restore(content, snapshot).expect("restored race");
+    restored.set_gate(EntryGate::Enabled);
+    assert_eq!(
+        restored.observations(),
+        1,
+        "a restored race resumes the saved budget, not a fresh one"
+    );
+    assert_eq!(
+        refusal(&restored.handle_inner(&claim, at(15_100)).unwrap()),
+        &ServiceRefusal::ObservationBudget { observations: 1 }
+    );
 }
 
 #[test]

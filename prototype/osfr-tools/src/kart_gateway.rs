@@ -114,6 +114,30 @@ pub struct KartGatewayState {
     pub last_paid_unix: Option<u64>,
 }
 
+impl KartGatewayState {
+    /// Whether a committed kart frame must write the character save. The observation flood budget
+    /// (`ServiceSnapshot::observations`) and the last weapon pose are persisted, but neither is
+    /// gameplay progress on its own: both move on accepted `33/6`/`33/17` bulk frames, and
+    /// treating either as a change wrote one character save per frame. They ride the next real
+    /// change and the unconditional end-of-session save; the restored values still bound a flooded
+    /// client and place its next weapon observation.
+    pub fn changed_for_save(mut self, after: &Self) -> bool {
+        if self == *after {
+            return false;
+        }
+        let mask = |state: &mut Self| {
+            if let Some(race) = state.race.as_mut() {
+                race.observations = 0;
+                race.weapon_pose = None;
+            }
+        };
+        mask(&mut self);
+        let mut after = after.clone();
+        mask(&mut after);
+        self != after
+    }
+}
+
 /// A paid finish and the stable race identity a quest may credit.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct KartRewardClaim {

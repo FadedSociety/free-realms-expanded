@@ -805,9 +805,15 @@ struct GameplayFixture(PathBuf);
 
 impl GameplayFixture {
     fn new() -> Self {
+        Self::with_weapon_effects(true)
+    }
+
+    /// `weapon_effects` stamps `WeaponState::last_tick_ms` on each racing tick; tests that probe
+    /// non-weapon saved state turn the simulation off.
+    fn with_weapon_effects(weapon_effects: bool) -> Self {
         let path = Self::scratch();
         let fixture = Self(path);
-        fixture.write_content();
+        fixture.write_content(weapon_effects);
         fixture
     }
 
@@ -829,7 +835,7 @@ impl GameplayFixture {
         let path = Self::scratch();
         copy_tree(&source, &path);
         let fixture = Self(path);
-        fixture.write_kart();
+        fixture.write_kart(true);
         fixture
     }
 
@@ -843,7 +849,7 @@ impl GameplayFixture {
         path
     }
 
-    fn write_content(&self) {
+    fn write_content(&self, weapon_effects: bool) {
         let dir = &self.0;
         // A fresh save starts in the prior job with Kart Driver already unlocked.
         let economy = Economy::new(PRIOR_JOB);
@@ -925,14 +931,14 @@ impl GameplayFixture {
             .unwrap(),
         )
         .unwrap();
-        self.write_kart();
+        self.write_kart(weapon_effects);
     }
 
-    fn write_kart(&self) {
+    fn write_kart(&self, weapon_effects: bool) {
         // Only a live weapon lifecycle stamps `WeaponState::last_tick_ms` on each racing tick.
         let mut kart = content();
         let mut race = race_content();
-        race.weapon_effects = true;
+        race.weapon_effects = weapon_effects;
         kart.race = Some(race);
         fs::write(
             self.0.join("kart_entry.json"),
@@ -1014,6 +1020,68 @@ fn enter_to_green(game: &mut Gameplay, character: &CharacterState) -> u64 {
         "the countdown-to-racing phase change must be saved"
     );
     green
+}
+
+/// F207: an accepted observation commits its spent flood-budget slot (the saved race carries the
+/// bound across a reconnect) but requests no character save, and a reload resumes it.
+#[test]
+fn an_observation_commits_the_persisted_budget_without_a_save() {
+    let fixture = GameplayFixture::with_weapon_effects(false);
+    let character = character();
+    let mut game = fixture.load(None);
+    game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
+    let green = enter_to_green(&mut game, &character);
+    let before = game.state();
+
+    let mut bulk = vec![33, 0, 6, 0];
+    bulk.extend([0u8; 85]);
+    let out = game.handle_in_world(&bulk, &character, green + 1).unwrap();
+    assert!(out.replies.is_empty(), "33/6 is send-only");
+    assert!(
+        !out.changed,
+        "spending the observation budget must not request a character save"
+    );
+    let saved = game.state();
+    let before_kart = before.kart_entry.unwrap();
+    let saved_kart = saved.kart_entry.clone().unwrap();
+    assert!(
+        !before_kart.clone().changed_for_save(&saved_kart),
+        "a frame that only spends the budget and moves no other saved field must not save"
+    );
+    let mut real = saved_kart;
+    real.next_instance += 1;
+    assert!(
+        before_kart.changed_for_save(&real),
+        "a real saved change must still request a save"
+    );
+    assert_eq!(
+        saved
+            .kart_entry
+            .as_ref()
+            .unwrap()
+            .race
+            .as_ref()
+            .unwrap()
+            .observations,
+        1,
+        "the committed frame carries the spent slot"
+    );
+    // The same state is what a disconnect writes; loading it resumes the spent slot.
+    let restored = fixture.load(Some(saved));
+    assert_eq!(
+        restored
+            .state()
+            .kart_entry
+            .as_ref()
+            .unwrap()
+            .race
+            .as_ref()
+            .unwrap()
+            .observations,
+        1,
+        "a reconnect must not refresh the observation allowance"
+    );
 }
 
 #[test]

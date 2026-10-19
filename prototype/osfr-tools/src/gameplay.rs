@@ -2808,7 +2808,7 @@ impl Gameplay {
                 minigame_id = claim.minigame_id;
                 out.replies.extend(claim.replies);
             }
-            out.changed = before != *kart.state();
+            out.changed = before.changed_for_save(kart.state());
             self.refresh_npc_quest_eligibility(current_unix_seconds());
             if let Some(minigame_id) = minigame_id {
                 self.npc_quest_event(

@@ -10,6 +10,7 @@ use osfr_tools::{
     cooking::Cooking,
     derby::{DerbyMessage, ParticipantKey, VehicleHitReport, VehiclePose, encode_inner},
     forging::Forging,
+    game_store::Snapshot,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     harvesting,
@@ -1532,14 +1533,43 @@ fn t3_active_movies_reject_hostile_headers_and_out_of_phase_rewards() {
     assert!(start.elapsed() < Duration::from_secs(60));
 }
 
+fn race_observations(snapshot: &Snapshot) -> u32 {
+    snapshot
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .kart_entry
+        .as_ref()
+        .unwrap()
+        .race
+        .as_ref()
+        .unwrap()
+        .observations
+}
+
+/// The same complete gateway snapshot with the two bulk-frame saved fields pinned to their fresh
+/// values: the observation flood budget and the last weapon pose. A frame that only feeds those
+/// must move nothing else in the saved state.
+fn without_flood_state(snapshot: &Snapshot) -> Snapshot {
+    let mut snapshot = snapshot.clone();
+    let race = snapshot
+        .gameplay
+        .as_mut()
+        .unwrap()
+        .kart_entry
+        .as_mut()
+        .unwrap()
+        .race
+        .as_mut()
+        .unwrap();
+    race.observations = 0;
+    race.weapon_pose = None;
+    snapshot
+}
+
 #[test]
 fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
     let fixture = Fixture::new();
-    // Isolate the observation accounting: with the reconstructed weapon simulation on, an
-    // accepted `33/6` frame legitimately moves the saved weapon pose.
-    let mut content = read_json(&fixture.content.join("kart_entry.json"));
-    content["race"]["weapon_effects"] = json!(false);
-    write_json(&fixture.content.join("kart_entry.json"), &content);
     let mut gateway = fixture.active("kart");
     let active = gateway
         .snapshot()
@@ -1618,8 +1648,8 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
     );
 
     // The sibling `33/17` pickup claim carries the same 24-byte block and the same race window.
-    // A post-window pickup must be just as pure, or it dirties the saved race through the
-    // observation counter and re-triggers the save the gate fix closed.
+    // A post-window pickup still spends one persisted observation slot (F207: the guard is saved,
+    // so reconnecting cannot reset it) but must not trigger a character save.
     let mut pickup = words(33, 17, &[guid as u32, (guid >> 32) as u32]);
     for _ in 0..3 {
         pickup.extend(0.0f32.to_le_bytes());
@@ -1637,14 +1667,19 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
         !out.state_changed && !out.gameplay_changed,
         "a timed pickup refusal must not trigger a character save"
     );
+    let after = gateway.snapshot();
     assert_eq!(
-        gateway.snapshot(),
-        before,
-        "a timed pickup refusal must leave the complete gateway snapshot unchanged"
+        race_observations(&after),
+        1,
+        "the routed timed frame must commit the spent observation slot"
+    );
+    assert_eq!(
+        without_flood_state(&after),
+        without_flood_state(&before),
+        "a timed pickup refusal must move only the persisted observation budget"
     );
 
-    // F181: the observation guard is per-session, so an in-window observation refusal spends it
-    // without changing any saved state. This is the frame that used to persist the counter.
+    // An in-window observation refusal is save-inert even though it commits the next budget slot.
     let mut refused = words(33, 17, &[guid as u32, (guid >> 32) as u32]);
     for value in [f32::NAN, 0.0, 0.0, 1.0] {
         refused.extend(value.to_le_bytes());
@@ -1658,16 +1693,21 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
         !out.state_changed && !out.gameplay_changed,
         "an in-window observation refusal must not trigger a character save"
     );
+    let after = gateway.snapshot();
     assert_eq!(
-        gateway.snapshot(),
-        before,
-        "an in-window observation refusal must leave the gateway snapshot unchanged"
+        race_observations(&after),
+        2,
+        "the in-window refusal must commit its observation slot"
+    );
+    assert_eq!(
+        without_flood_state(&after),
+        without_flood_state(&before),
+        "an in-window observation refusal must move only the persisted observation budget"
     );
 
-    // An accepted `33/6` bulk observation is equally save-inert while it only spends that guard.
-    // The body is a valid weapon pose at the race anchor, so with the simulation on it would move
-    // the saved pose; the fixture above turns the simulation off to isolate the observation
-    // accounting.
+    // An accepted `33/6` bulk observation is equally save-inert. The fixture keeps production's
+    // weapon simulation on, so the frame also moves the saved pose: neither it nor the budget may
+    // request a save.
     let mut bulk = words(33, 6, &[]);
     let mut body = vec![0u8; 85];
     for (index, value) in [1.0f32, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
@@ -1690,10 +1730,31 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
         !out.state_changed && !out.gameplay_changed,
         "an accepted bulk observation must not trigger a character save"
     );
+    let after = gateway.snapshot();
     assert_eq!(
-        gateway.snapshot(),
-        before,
-        "an accepted bulk observation must leave the gateway snapshot unchanged"
+        race_observations(&after),
+        3,
+        "the accepted bulk frame must commit its observation slot"
+    );
+    assert!(
+        after
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .kart_entry
+            .as_ref()
+            .unwrap()
+            .race
+            .as_ref()
+            .unwrap()
+            .weapon_pose
+            .is_some(),
+        "the production weapon simulation must move the committed pose"
+    );
+    assert_eq!(
+        without_flood_state(&after),
+        without_flood_state(&before),
+        "an accepted bulk observation moves only the saved budget and weapon pose"
     );
 }
 
