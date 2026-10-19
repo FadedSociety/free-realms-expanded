@@ -956,3 +956,48 @@ fn header(family: u16, sub: u16) -> Vec<u8> {
 fn put_i32(bytes: &mut Vec<u8>, value: i32) {
     bytes.extend(value.to_le_bytes());
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Client writer `00a342e0`: header, i32 bar, i32 slot, i32 mode, then a
+    /// u64 target (mode 0, 24 bytes) or four f32 (other modes, 32 bytes).
+    fn cast(bar: i32, slot: i32, mode: i32, tail: usize) -> Vec<u8> {
+        let mut packet = vec![36, 0, 10, 0];
+        for value in [bar, slot, mode] {
+            packet.extend(value.to_le_bytes());
+        }
+        packet.extend(std::iter::repeat_n(0, tail));
+        packet
+    }
+
+    #[test]
+    fn unsupported_cast_rejects_the_malformed_20_byte_shape() {
+        // Mode 0 on the job bar is served by the combat path, not refused.
+        assert_eq!(unsupported_cast(&cast(1, 0, 0, 8)).unwrap(), None);
+        // Other bars and ground modes get the client failure string.
+        assert_eq!(
+            unsupported_cast(&cast(2, 0, 0, 8)).unwrap(),
+            Some(unsupported_cast_failure())
+        );
+        assert_eq!(
+            unsupported_cast(&cast(1, 0, 1, 16)).unwrap(),
+            Some(unsupported_cast_failure())
+        );
+        // 20 bytes is neither the 24- nor the 32-byte client shape.
+        assert_eq!(
+            unsupported_cast(&cast(1, 0, 0, 4)).unwrap_err().to_string(),
+            "malformed ability cast request"
+        );
+        // A truncated mode dword fails before the length check.
+        assert_eq!(
+            unsupported_cast(&[36, 0, 10, 0, 1, 0, 0, 0])
+                .unwrap_err()
+                .to_string(),
+            "truncated ability cast request"
+        );
+        // Another family/subtype is dispatched as before.
+        assert_eq!(unsupported_cast(&[36, 0, 12, 0]).unwrap(), None);
+    }
+}

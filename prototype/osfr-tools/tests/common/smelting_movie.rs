@@ -29,18 +29,17 @@ pub fn payload_packet(instance: i32, text: &str) -> std::io::Result<Vec<u8>> {
     native[11..15].copy_from_slice(&(-1i32).to_le_bytes());
     Ok(native)
 }
-pub fn start(g: &mut Gateway, now: u64) {
+pub fn start(g: &mut Gateway, now: u64) -> GatewayOutcome {
     let mut b = vec![39, 0, 5];
     for n in [instance(g), -1, -1] {
         b.extend(n.to_le_bytes());
     }
     assert_eq!(send(g, &b, now).replies.len(), 2); // Native start + real movie launch.
-    let out = send(
+    send(
         g,
         &payload_packet(instance(g), "FRServer_ReadyForGameData").unwrap(),
         now,
-    );
-    assert_eq!(out.replies.len(), 6);
+    )
 }
 pub fn rounds(g: &mut Gateway, now: u64) {
     for stage in 101..=104 {

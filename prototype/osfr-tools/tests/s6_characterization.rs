@@ -2,8 +2,8 @@
 //! gate, gathering bonuses and their negative cases.
 //!
 //! Requires the private lab content; every test is ignored by default. The
-//! movie drivers are the shared `tests/common/*_movie.rs` helpers, so a later
-//! protocol change updates one copy instead of a private duplicate.
+//! movie drivers and the S6 fixture are the shared `tests/common` helpers, so a
+//! later protocol change updates one copy instead of a private duplicate.
 //!
 //! Wire prefixes are the shipped client's request shapes: 26/8 builder
 //! 0x008b6bc0, 26/10 constructor 0x00a36f80, 26/13 sender 0x00938e10,
@@ -13,17 +13,21 @@
 mod cooking_movie;
 #[path = "common/forging_movie.rs"]
 mod forging_movie;
+#[path = "common/gateway_vendor.rs"]
+mod gateway_vendor;
+#[path = "common/s6.rs"]
+mod s6;
 #[path = "common/smelting_movie.rs"]
 mod smelting_movie;
 
+use gateway_vendor::count_definition;
 use osfr_tools::{
     account_store::AccountRole,
-    gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
-    inventory::InventoryItem,
-    opening::{OpeningEngine, OpeningTrigger},
 };
+use s6::{TutorialGoal, chat, chat_texts, interact, menu, reference};
 use serde_json::Value;
+use smelting_movie::{send, wrap};
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -89,45 +93,16 @@ const SMELTING: Station = Station {
     ),
 };
 
-fn references() -> PathBuf {
-    std::env::var_os("OSFR_S6_REFERENCE_ROOT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/references")
-        })
-}
-
-fn reference(content: &str) -> PathBuf {
-    let path = references().join(content);
-    assert!(
-        path.join("opening.json").is_file(),
-        "S6 requires the private content at {}",
-        path.display()
-    );
-    path
-}
-
 fn gateway_reference() -> PathBuf {
     let path = std::env::var_os("OSFR_GATEWAY_REFERENCE")
         .map(PathBuf::from)
-        .unwrap_or_else(|| references().join("rust-gateway-reference"));
+        .unwrap_or_else(|| s6::references().join("rust-gateway-reference"));
     assert!(
         path.is_dir(),
         "S6 requires the private gateway reference at {}",
         path.display()
     );
     path
-}
-
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut packet = vec![5, 0, 1];
-    packet.extend((inner.len() as u32).to_le_bytes());
-    packet.extend(inner);
-    packet
-}
-
-fn send(game: &mut Gateway, inner: &[u8], now: u64) -> GatewayOutcome {
-    game.handle_at(&wrap(inner), now).unwrap()
 }
 
 /// A bundled request commits or fails as one unit, so it surfaces the exact
@@ -144,18 +119,7 @@ fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
 }
 
 fn login(game: &mut Gateway) {
-    let mut packet = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["local-private-test", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        packet.extend((text.len() as u32).to_le_bytes());
-        packet.extend(text.as_bytes());
-        if index == 0 {
-            packet.extend(1u64.to_le_bytes());
-        }
-    }
-    game.handle_at(&packet, 0).unwrap();
+    game.handle_at(&gateway_vendor::login(), 0).unwrap();
     send(game, &13u16.to_le_bytes(), NOW);
     send(game, &10u16.to_le_bytes(), NOW);
 }
@@ -169,71 +133,6 @@ fn move_to(game: &mut Gateway, position: [f32; 3], now: &mut u64) {
     }
     packet.extend([0, 0]);
     send(game, &packet, *now);
-}
-
-fn chat(text: &str) -> Vec<u8> {
-    let mut packet = vec![15, 0, 1, 0, 0, 0];
-    packet.extend(1_u64.to_le_bytes());
-    packet.extend(0_u64.to_le_bytes());
-    for _ in 0..2 {
-        packet.extend([0; 12]);
-        packet.extend(0_u32.to_le_bytes());
-        packet.extend(0_u32.to_le_bytes());
-    }
-    packet.extend((text.len() as u32).to_le_bytes());
-    packet.extend(text.as_bytes());
-    packet.extend([0; 28]);
-    packet
-}
-
-fn interact(guid: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(guid.to_le_bytes());
-    packet.extend(1_i32.to_le_bytes());
-    packet
-}
-
-fn menu(guid: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(guid.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn inner(reply: &[u8]) -> &[u8] {
-    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
-        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
-        if length == reply.len() - 7 {
-            return &reply[7..];
-        }
-    }
-    reply
-}
-
-fn chat_texts(replies: &[Vec<u8>]) -> Vec<String> {
-    let mut texts = Vec::new();
-    for reply in replies {
-        let packet = inner(reply);
-        if packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8 {
-            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-            if let Some(body) = packet.get(8..8 + length)
-                && let Ok(text) = std::str::from_utf8(body)
-            {
-                texts.push(text.to_owned());
-            }
-        }
-    }
-    texts
-}
-
-fn item_count(state: &GameplayState, definition: i32) -> u32 {
-    state
-        .inventory
-        .items
-        .iter()
-        .filter(|item| item.definition_id == definition && item.rental.is_none())
-        .map(|item| item.count)
-        .sum()
 }
 
 fn requirements(case: Station, content: &Path) -> Vec<(i32, u32)> {
@@ -257,54 +156,6 @@ fn requirements(case: Station, content: &Path) -> Vec<(i32, u32)> {
         .collect()
 }
 
-fn add_items(state: &mut GameplayState, items: &[(i32, u32)]) {
-    let mut next = state.inventory.next_instance_id.unwrap_or_else(|| {
-        i64::from(
-            state
-                .inventory
-                .items
-                .iter()
-                .map(|item| item.id)
-                .max()
-                .unwrap_or(0),
-        ) + 1
-    });
-    for (definition, count) in items {
-        state.inventory.items.push(InventoryItem {
-            definition_id: *definition,
-            tint: 0,
-            id: i32::try_from(next).unwrap(),
-            count: *count,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: i64::from(i32::MAX),
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        });
-        next += 1;
-    }
-    state.inventory.next_instance_id = Some(next);
-}
-
-#[derive(Clone, Copy)]
-enum TutorialGoal {
-    Craft(u32),
-    Gather(u32),
-}
-
-impl TutorialGoal {
-    fn matches(self, trigger: &OpeningTrigger) -> bool {
-        match (self, trigger) {
-            (Self::Craft(recipe), OpeningTrigger::Craft { recipe_id }) => *recipe_id == recipe,
-            (Self::Gather(resource), OpeningTrigger::Gather { resource_id }) => {
-                *resource_id == resource
-            }
-            _ => false,
-        }
-    }
-}
-
 struct StationFixture {
     game: Gateway,
     actor: u64,
@@ -321,82 +172,13 @@ fn opening_fixture(
     active: i32,
     supplies: &[(i32, u32)],
 ) -> StationFixture {
-    let content = reference(content_name);
-    let base = Gameplay::load(&content, None).unwrap();
-    let engine = OpeningEngine::load(&content, base.state().opening.clone()).unwrap();
-    let (stage_id, objective_index) = engine
-        .stages()
-        .iter()
-        .find_map(|stage| {
-            stage
-                .objectives
-                .iter()
-                .position(|objective| goal.matches(&objective.trigger))
-                .map(|index| (stage.id, index))
-        })
-        .expect("tutorial opening objective");
-    let mut state = base.state();
-    for stage in engine.stages() {
-        let progress = state
-            .opening
-            .as_mut()
-            .unwrap()
-            .stages
-            .get_mut(&stage.id)
-            .unwrap();
-        if stage.id < stage_id {
-            progress.accepted = true;
-            progress.completed = true;
-            progress.rewarded = true;
-            progress.counts = stage
-                .objectives
-                .iter()
-                .map(|objective| objective.required)
-                .collect();
-        } else if stage.id == stage_id {
-            progress.accepted = accepted;
-            progress.completed = false;
-            progress.rewarded = false;
-            progress.counts = if accepted {
-                stage
-                    .objectives
-                    .iter()
-                    .enumerate()
-                    .map(|(index, objective)| {
-                        if index < objective_index {
-                            objective.required
-                        } else {
-                            0
-                        }
-                    })
-                    .collect()
-            } else {
-                vec![0; stage.objectives.len()]
-            };
-        }
-    }
-    {
-        let profiles = state.profiles.as_mut().unwrap();
-        for profile in unlocked {
-            profiles.unlocked.insert(*profile);
-        }
-        profiles.unlocked.insert(active);
-        profiles.active = active;
-    }
-    if !supplies.is_empty() {
-        add_items(&mut state, supplies);
-    }
-    let actor = engine
-        .actors()
-        .iter()
-        .find(|actor| {
-            actor
-                .action
-                .as_ref()
-                .is_some_and(|action| goal.matches(action))
-        })
-        .expect("tutorial opening actor")
-        .clone();
+    let s6::OpeningFixture {
+        content,
+        state,
+        actor,
+        stage_id,
+        objective_index,
+    } = s6::opening_fixture(content_name, goal, unlocked, accepted, active, supplies);
     let reference = gateway_reference();
     let mut character = Gateway::reference_state(&reference).unwrap();
     character.zone_id = actor.zone_id;
@@ -455,6 +237,25 @@ fn start_station(fixture: &mut StationFixture, case: Station) -> GatewayOutcome 
     out
 }
 
+/// A refused request may reply with the client-facing text, but it must not
+/// fan out or stage a commit. `Gateway::snapshot()` equality covers the saved
+/// state; this covers the side channels the gateway would otherwise publish to
+/// neighbours or the save writer.
+fn assert_gateway_refusal(out: &GatewayOutcome) {
+    assert!(out.nearby.is_empty(), "a refusal fanned out to neighbours");
+    assert!(
+        out.shared_field.is_none(),
+        "a refusal staged a shared field action"
+    );
+    assert!(out.group_heal.is_none(), "a refusal staged a group heal");
+    assert!(!out.pets_changed, "a refusal marked the pet roster changed");
+    assert!(!out.began_zoning, "a refusal began zoning");
+    assert!(!out.state_changed, "a refusal changed the character");
+    assert!(!out.gameplay_changed, "a refusal changed gameplay state");
+    assert!(!out.entered_world);
+    assert_eq!(out.dev_command_denials, 0);
+}
+
 fn assert_station_refusals(case: Station) {
     for (active, accepted, supplies, expected) in [
         (1, true, true, case.wrong_job),
@@ -465,6 +266,7 @@ fn assert_station_refusals(case: Station) {
         let before = fixture.game.snapshot();
         let out = send(&mut fixture.game, &interact(fixture.actor), NOW);
         assert_eq!(chat_texts(&out.replies), vec![expected.to_owned()]);
+        assert_gateway_refusal(&out);
         assert_eq!(fixture.game.snapshot(), before);
     }
 }
@@ -510,7 +312,10 @@ fn prepare_terminal(fixture: &mut StationFixture, case: Station) {
             cooking_movie::rounds(&mut fixture.game, NOW);
         }
         14 => {
-            smelting_movie::start(&mut fixture.game, NOW);
+            // ReadyForGameData publishes the native start followed by the five
+            // real movie messages; this caller knows the exact count.
+            let ready = smelting_movie::start(&mut fixture.game, NOW);
+            assert_eq!(ready.replies.len(), 6);
             smelting_movie::rounds(&mut fixture.game, NOW);
         }
         _ => unreachable!(),
@@ -565,6 +370,7 @@ fn assert_movie_gate(case: Station) {
         let before = fixture.game.snapshot();
         let out = send(&mut fixture.game, &packet, NOW);
         assert_eq!(chat_texts(&out.replies), vec![expected.clone()]);
+        assert_gateway_refusal(&out);
         assert_eq!(fixture.game.snapshot(), before);
     }
 
@@ -611,7 +417,7 @@ fn assert_completion_errors(case: Station) {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn ability_request_is_the_clients_24_byte_mode_zero_form() {
     let mut fixture = station_fixture(FORGING, true, FORGING.profile, true);
     // Client writer 0x00a342e0: i32 bar, i32 slot, i32 target mode, then the
@@ -633,7 +439,7 @@ fn ability_request_is_the_clients_24_byte_mode_zero_form() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn forging_characterization_pins_station_gate_and_completion_errors() {
     assert_station_refusals(FORGING);
     assert_station_success(FORGING);
@@ -642,7 +448,7 @@ fn forging_characterization_pins_station_gate_and_completion_errors() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn cooking_characterization_pins_station_gate_and_completion_errors() {
     assert_station_refusals(COOKING);
     assert_station_success(COOKING);
@@ -651,7 +457,7 @@ fn cooking_characterization_pins_station_gate_and_completion_errors() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn smelting_characterization_pins_station_gate_and_completion_errors() {
     assert_station_refusals(SMELTING);
     assert_station_success(SMELTING);
@@ -660,7 +466,7 @@ fn smelting_characterization_pins_station_gate_and_completion_errors() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn forging_chat_gate_refuses_other_realm_actions_and_exit_clears_the_movie() {
     let mut fixture = station_fixture(FORGING, true, FORGING.profile, true);
     start_station(&mut fixture, FORGING);
@@ -672,10 +478,12 @@ fn forging_chat_gate_refuses_other_realm_actions_and_exit_clears_the_movie() {
         chat_texts(&out.replies),
         vec!["Close the forging game before other opening actions.".to_owned()]
     );
+    assert_gateway_refusal(&out);
     assert_eq!(fixture.game.snapshot(), before);
 
     let out = send(&mut fixture.game, &chat(""), NOW);
     assert!(out.replies.is_empty());
+    assert_gateway_refusal(&out);
     assert_eq!(fixture.game.snapshot(), before);
 
     let out = send(&mut fixture.game, &chat("realm exit"), NOW);
@@ -686,7 +494,7 @@ fn forging_chat_gate_refuses_other_realm_actions_and_exit_clears_the_movie() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn smelting_completion_advances_opening_craft_and_grants_every_bar() {
     let mut fixture = station_fixture(SMELTING, true, SMELTING.profile, true);
     start_station(&mut fixture, SMELTING);
@@ -719,8 +527,8 @@ fn smelting_completion_advances_opening_craft_and_grants_every_bar() {
         expected
     );
     assert_eq!(
-        item_count(after.gameplay.as_ref().unwrap(), 21785),
-        item_count(before.gameplay.as_ref().unwrap(), 21785) + 5
+        count_definition(&after.gameplay.as_ref().unwrap().inventory, 21785),
+        count_definition(&before.gameplay.as_ref().unwrap().inventory, 21785) + 5
     );
     assert_eq!(
         after
@@ -779,8 +587,8 @@ fn assert_bonus_drop(
     let after = game.snapshot();
     for (definition, count) in expected {
         assert_eq!(
-            item_count(after.gameplay.as_ref().unwrap(), *definition),
-            item_count(before.gameplay.as_ref().unwrap(), *definition) + count,
+            count_definition(&after.gameplay.as_ref().unwrap().inventory, *definition),
+            count_definition(&before.gameplay.as_ref().unwrap().inventory, *definition) + count,
             "definition {definition}"
         );
     }
@@ -802,7 +610,8 @@ fn assert_no_bonus_drop(resource_id: u32, profile: i32, content: &'static str, a
     let (mut game, actor, stage_id, objective_index) =
         gather_fixture(resource_id, profile, content, accepted, profile);
     let before = game.snapshot();
-    send(&mut game, &interact(actor), NOW);
+    let out = send(&mut game, &interact(actor), NOW);
+    assert_gateway_refusal(&out);
     assert_eq!(game.snapshot(), before);
     assert_eq!(
         game.snapshot().gameplay.unwrap().opening.unwrap().stages[&stage_id].counts
@@ -812,7 +621,7 @@ fn assert_no_bonus_drop(resource_id: u32, profile: i32, content: &'static str, a
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging, cooking and smelting content"]
 fn opening_gather_bonus_drops_are_counted_only_with_valid_job_progress() {
     assert_bonus_drop(1003, 14, "rust-opening", &[(2739, 1), (879, 1)]);
     assert_bonus_drop(

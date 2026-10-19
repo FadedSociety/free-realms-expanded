@@ -6,6 +6,7 @@
 //! `00b3ab20`, 66/44 reader `00b32430` (status at wire offset 48), and the
 //! 165/5 sell body read by the Coin Store handler. The 7-byte tunnel prefix
 //! mirrors the captured client wrapper (`005`, subtype `1`, payload length).
+#![allow(dead_code)] // The vendor suites use every helper; the S6 net includes only two.
 
 use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},

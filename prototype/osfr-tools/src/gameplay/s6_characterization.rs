@@ -1,20 +1,25 @@
 //! Private fixture checks that need server-internal movie clocks or private
 //! appliers. The packet-path characterization (station refusals, the movie
 //! gate, completion errors, gathering bonuses) lives in
-//! `tests/s6_characterization.rs` and reuses the shared movie drivers.
+//! `tests/s6_characterization.rs` and reuses the shared movie drivers. The
+//! opening fixture, request bodies and content paths are the shared
+//! `tests/common/s6.rs` module so the two files cannot drift.
 //!
 //! Wire prefixes here are the shipped client's request shapes: 26/10
 //! constructor 0x00a36f80 and 26/8 builder 0x008b6bc0 for the NPC ordering
 //! check; the chat request reader is 0x00b11600.
 
 use super::*;
+#[path = "../../tests/common/s6.rs"]
+mod s6;
 use crate::{
     account_store::AccountRole,
     recipes::CraftingJob,
     smelting::{SmeltingOutcome, SmeltingTransaction},
 };
+use s6::{chat, chat_texts, interact, menu, w104_content};
 use serde_json::Value;
-use std::{fs, path::PathBuf};
+use std::fs;
 
 const NOW: u64 = 1_000;
 
@@ -45,83 +50,17 @@ struct Tutorial {
     objective_index: usize,
 }
 
-fn reference(content: &str) -> PathBuf {
-    let root = std::env::var_os("OSFR_S6_REFERENCE_ROOT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/references")
-        });
-    let path = root.join(content);
-    assert!(
-        path.join("opening.json").is_file(),
-        "S6 requires the private content at {}",
-        path.display()
-    );
-    path
-}
-
-fn w104_content() -> PathBuf {
-    let path = std::env::var_os("OSFR_S6_W104_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/build/w104/scratch/content")
-        });
-    assert!(
-        path.join("opening.json").is_file() && path.join("harvesting.json").is_file(),
-        "S6 requires the private W104 content at {}",
-        path.display()
-    );
-    path
-}
-
-fn chat(text: &str) -> Vec<u8> {
-    let mut packet = vec![15, 0, 1, 0, 0, 0];
-    packet.extend(1_u64.to_le_bytes());
-    packet.extend(0_u64.to_le_bytes());
-    for _ in 0..2 {
-        packet.extend([0; 12]);
-        packet.extend(0_u32.to_le_bytes());
-        packet.extend(0_u32.to_le_bytes());
-    }
-    packet.extend((text.len() as u32).to_le_bytes());
-    packet.extend(text.as_bytes());
-    packet.extend([0; 28]);
-    packet
-}
-
-fn interact(guid: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(guid.to_le_bytes());
-    packet.extend(1_i32.to_le_bytes());
-    packet
-}
-
-fn menu(guid: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(guid.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn chat_texts(replies: &[Vec<u8>]) -> Vec<String> {
-    let mut texts = Vec::new();
-    for packet in replies {
-        if packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8 {
-            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-            if let Some(body) = packet.get(8..8 + length)
-                && let Ok(text) = std::str::from_utf8(body)
-            {
-                texts.push(text.to_owned());
-            }
-        }
-    }
-    texts
-}
-
 fn assert_empty(out: &Outcome) {
-    assert!(!out.changed);
+    assert!(!out.dev_command_denied);
+    assert!(out.shared_field.is_none());
     assert!(out.replies.is_empty());
+    assert!(!out.changed);
+    assert!(out.zoning.is_none());
+    assert!(out.scene_zoning.is_none());
+    assert!(out.relocation.is_none());
+    assert!(out.group_heal.is_none());
+    assert!(out.nearby.is_empty());
+    assert!(!out.pets_changed);
 }
 
 fn send(tutorial: &mut Tutorial, inner: &[u8], now: u64) -> io::Result<Outcome> {
@@ -131,87 +70,21 @@ fn send(tutorial: &mut Tutorial, inner: &[u8], now: u64) -> io::Result<Outcome> 
 }
 
 fn tutorial(case: Station, accepted: bool) -> Tutorial {
-    let directory = reference(case.content);
-    let base = Gameplay::load(&directory, None).unwrap();
-    let engine = OpeningEngine::load(&directory, base.state().opening.clone()).unwrap();
-    let (stage_id, objective_index) = engine
-        .stages()
-        .iter()
-        .find_map(|stage| {
-            stage
-                .objectives
-                .iter()
-                .position(|goal| {
-                    matches!(
-                        goal.trigger,
-                        OpeningTrigger::Craft { recipe_id } if recipe_id == case.recipe
-                    )
-                })
-                .map(|index| (stage.id, index))
-        })
-        .expect("tutorial Craft objective");
-    let mut state = base.state();
-    for stage in engine.stages() {
-        let progress = state
-            .opening
-            .as_mut()
-            .unwrap()
-            .stages
-            .get_mut(&stage.id)
-            .unwrap();
-        if stage.id < stage_id {
-            progress.accepted = true;
-            progress.completed = true;
-            progress.rewarded = true;
-            progress.counts = stage.objectives.iter().map(|goal| goal.required).collect();
-        } else if stage.id == stage_id {
-            progress.accepted = accepted;
-            progress.completed = false;
-            progress.rewarded = false;
-            progress.counts = if accepted {
-                stage
-                    .objectives
-                    .iter()
-                    .enumerate()
-                    .map(|(index, goal)| {
-                        if index < objective_index {
-                            goal.required
-                        } else {
-                            0
-                        }
-                    })
-                    .collect()
-            } else {
-                vec![0; stage.objectives.len()]
-            };
-        }
-    }
-    state
-        .profiles
-        .as_mut()
-        .unwrap()
-        .unlocked
-        .insert(case.profile);
-    let mut game = Gameplay::load(&directory, Some(state)).unwrap();
-    game.profiles
-        .as_mut()
-        .unwrap()
-        .select(case.profile, &game.inventory)
-        .unwrap();
-    let actor = game
-        .opening
-        .as_ref()
-        .unwrap()
-        .actors()
-        .iter()
-        .find(|actor| {
-            matches!(
-                actor.action,
-                Some(OpeningTrigger::Craft { recipe_id }) if recipe_id == case.recipe
-            )
-        })
-        .expect("tutorial Craft actor")
-        .clone();
+    let s6::OpeningFixture {
+        content,
+        state,
+        actor,
+        stage_id,
+        objective_index,
+    } = s6::opening_fixture(
+        case.content,
+        s6::TutorialGoal::Craft(case.recipe),
+        &[case.profile],
+        accepted,
+        case.profile,
+        &[],
+    );
+    let mut game = Gameplay::load(&content, Some(state)).unwrap();
     let character = CharacterState {
         guid: 1,
         zone_id: actor.zone_id,
@@ -258,7 +131,57 @@ fn active_for_test(case: Station) -> Tutorial {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private smelting content"]
+fn miner_gather_bonus_requires_the_active_miner_job() {
+    // A wrong active job normally refuses before the opening engine counts, so
+    // that negative never reaches the drop guard's own job clause. Force the
+    // counted path instead: the opening engine still selects Miner (so the
+    // gather counts), while Gameplay's active job is Adventurer.
+    let fixture = s6::opening_fixture(
+        SMELTING.content,
+        s6::TutorialGoal::Gather(1003),
+        &[1, 14],
+        true,
+        14,
+        &[],
+    );
+    let mut game = Gameplay::load(&fixture.content, Some(fixture.state)).unwrap();
+    let character = CharacterState {
+        guid: 1,
+        zone_id: fixture.actor.zone_id,
+        position: fixture.actor.position,
+        rotation: [0.0, 0.0, 1.0],
+    };
+    // initialize_world feeds the Miner profile into the opening engine.
+    game.initialize_world(&character, NOW).unwrap();
+    game.profiles.as_mut().unwrap().activate(1).unwrap();
+    let ore = game.material_count(2739);
+    let coal = game.material_count(879);
+    let before = game.opening.as_ref().unwrap().state().stages[&fixture.stage_id].counts
+        [fixture.objective_index];
+    let out = game
+        .handle_in_world(&interact(fixture.actor.guid), &character, NOW)
+        .unwrap();
+    assert!(out.changed, "the gather must count for this fixture");
+    assert_eq!(
+        game.opening.as_ref().unwrap().state().stages[&fixture.stage_id].counts
+            [fixture.objective_index],
+        before + 1
+    );
+    assert_eq!(
+        game.material_count(2739),
+        ore,
+        "wrong job paid the ore bonus"
+    );
+    assert_eq!(
+        game.material_count(879),
+        coal,
+        "wrong job paid the coal bonus"
+    );
+}
+
+#[test]
+#[ignore = "requires private forging content and the W104 harvesting content"]
 fn movie_ticks_wait_for_250ms_and_stamp_their_own_clock() {
     let mut forging = active_for_test(FORGING);
     let before = forging.game.state();
@@ -307,7 +230,7 @@ fn movie_ticks_wait_for_250ms_and_stamp_their_own_clock() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private forging content"]
 fn forging_exit_clears_the_movie_tick_clock() {
     let mut forging = active_for_test(FORGING);
     assert_eq!(forging.game.forging_tick_ms, Some(NOW));
@@ -326,7 +249,7 @@ fn forging_exit_clears_the_movie_tick_clock() {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires private smelting content"]
 fn opening_craft_quantity_sums_every_copper_bar_grant_row() {
     // Smelting content models exactly one product row, so the packet path
     // cannot distinguish a sum from the first row. This calls the production
@@ -405,7 +328,7 @@ fn first_regional_npc(game: &Gameplay) -> (u64, u32, [f32; 3]) {
 }
 
 #[test]
-#[ignore = "requires private forging cooking smelting and W104 content"]
+#[ignore = "requires the private W104 content"]
 fn real_regional_npc_reaches_the_npc_router_before_the_movie_gate() {
     // This pins the current (pre-existing) ordering for the lead's production
     // decision: a real regional NPC answers 26/8 while a forging movie runs,
