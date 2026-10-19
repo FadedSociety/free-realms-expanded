@@ -159,7 +159,7 @@ fn send(
 }
 
 fn start_two_player(table_id: u64) -> (ChessTables, Vec<chess::ChessMessage>) {
-    let mut tables = ChessTables::default();
+    let mut tables = ChessTables::entropy().unwrap();
     tables
         .open_two_player(
             table_id,
@@ -214,7 +214,7 @@ fn standard_castling_en_passant_and_promotion_positions_match_perft() {
 
 #[test]
 fn illegal_move_is_rejected_and_does_not_change_the_board() {
-    let mut tables = ChessTables::default();
+    let mut tables = ChessTables::entropy().unwrap();
     tables
         .open_single(
             3,
@@ -264,7 +264,7 @@ fn discovered_queen_check_is_detected_and_black_must_answer_it() {
 
 #[test]
 fn single_player_server_replies_without_client_move_authority() {
-    let mut tables = ChessTables::default();
+    let mut tables = ChessTables::entropy().unwrap();
     tables
         .open_single(
             7,
@@ -321,7 +321,7 @@ fn single_player_server_replies_without_client_move_authority() {
 
 #[test]
 fn server_opens_for_white_when_the_human_plays_black() {
-    let mut tables = ChessTables::default();
+    let mut tables = ChessTables::entropy().unwrap();
     tables
         .open_single(
             8,
@@ -640,12 +640,12 @@ fn payload_header_and_difficulty_mapping_are_bounded_and_stable() {
     assert_eq!(chess::skill_for_row(66), Some(60));
     assert_eq!(chess::skill_for_row(67), Some(100));
     assert_eq!(chess::skill_for_row(65), None);
-    assert!(ChessTables::default().table(999).is_none());
+    assert!(ChessTables::entropy().unwrap().table(999).is_none());
 }
 
 #[test]
 fn content_skill_keeps_the_server_reply_path() {
-    let mut tables = ChessTables::default();
+    let mut tables = ChessTables::entropy().unwrap();
     tables
         .open_single_with_skill(
             9,
@@ -687,7 +687,7 @@ fn content_skill_keeps_the_server_reply_path() {
     assert!(events.contains(&"OnChessEventMsg\t1".into()));
 
     // The default opener keeps the row's own skill.
-    let mut defaults = ChessTables::default();
+    let mut defaults = ChessTables::entropy().unwrap();
     defaults
         .open_single(
             10,
@@ -887,7 +887,7 @@ fn replay(
 
 #[test]
 fn computer_replies_vary_between_fresh_tables() {
-    let mut tables = ChessTables::default();
+    let mut tables = ChessTables::entropy().unwrap();
     let mut replies = BTreeSet::new();
     for table in 1..=64u64 {
         let player = 1_000 + table;
@@ -928,6 +928,86 @@ fn computer_replies_vary_between_fresh_tables() {
     );
 }
 
+/// The production row's first computer reply for one seeded table.
+fn seeded_opening_reply(row: u32, seed: u64) -> String {
+    let mut tables = ChessTables::with_seed(seed);
+    let (table, player, instance) = (1, 71, 901);
+    tables
+        .open_single(
+            table,
+            row,
+            ChessParticipant {
+                player_id: player,
+                instance_id: instance,
+            },
+            Side::White,
+        )
+        .unwrap();
+    send(&mut tables, table, player, instance, "OnConnectMsg");
+    send(&mut tables, table, player, instance, "OnStartGameMsg\t0");
+    let moved = send(
+        &mut tables,
+        table,
+        player,
+        instance,
+        &format!("OnMoveMsg\t{}\t{}", sq(4, 1), sq(4, 3)),
+    );
+    text(&moved.messages, player)
+        .into_iter()
+        .find(|event| {
+            event.strip_prefix("OnChessEventMsg\t").is_some_and(|rest| {
+                matches!(rest.split('\t').next(), Some("10" | "11" | "12" | "13"))
+            })
+        })
+        .expect("the computer replied")
+}
+
+#[test]
+fn hard_rows_diverge_across_seeded_tables() {
+    // Production rows 66 (skill 60) and 67 (skill 100). Fixed seeds keep this
+    // deterministic; the easy row is covered by the fresh-table test above.
+    for row in [66u32, 67] {
+        let replies: BTreeSet<String> = (1..=16u64)
+            .map(|seed| seeded_opening_reply(row, seed))
+            .collect();
+        assert!(
+            replies.len() > 1,
+            "row {row} repeated one computer reply across seeded tables: {replies:?}"
+        );
+    }
+}
+
+#[test]
+fn a_zero_near_equal_window_is_refused() {
+    // A zero window always takes the single best move, which made the computer
+    // reply a function of the position and therefore replayable.
+    let mut content = service_content(1_000);
+    content.near_equal_margin = 0;
+    assert!(content.validate().is_err(), "a zero window was accepted");
+
+    let mut tables = ChessTables::with_seed(1);
+    assert!(
+        tables
+            .open_single_with_skill(
+                1,
+                SINGLE_ROW,
+                ChessParticipant {
+                    player_id: 71,
+                    instance_id: 901,
+                },
+                Side::White,
+                20,
+                0,
+            )
+            .is_err(),
+        "a zero window must not open a table"
+    );
+    assert!(
+        tables.table(1).is_none(),
+        "a refused table must not be inserted"
+    );
+}
+
 #[test]
 fn a_recorded_winning_game_does_not_replay_against_fresh_tables() {
     let fixture = RewardFixture::new(CHESS_PLAYER);
@@ -944,16 +1024,12 @@ fn a_recorded_winning_game_does_not_replay_against_fresh_tables() {
         Some(EndOfGame::Won)
     );
 
-    // Fresh entropy tables do not answer the same way, so the line stops being a win.
+    // Other seeded tables answer differently, so the line stops being a win.
+    // Fixed seeds keep the assertion deterministic instead of a dice roll.
     let mut outcomes = Vec::new();
-    for attempt in 0..8u64 {
-        let mut service = ChessService::new(service_content(1_000)).unwrap();
-        outcomes.push(replay(
-            &mut service,
-            &fixture.state(),
-            &line,
-            10_000 + attempt * 1_000,
-        ));
+    for seed in 1..=8u64 {
+        let mut service = ChessService::with_seed(service_content(1_000), seed).unwrap();
+        outcomes.push(replay(&mut service, &fixture.state(), &line, 10_000));
     }
     assert!(
         outcomes.iter().any(|end| *end != Some(EndOfGame::Won)),

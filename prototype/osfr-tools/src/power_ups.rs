@@ -250,10 +250,10 @@ impl Roll {
     }
 }
 
-/// Small seedable generator (SplitMix64); the crate has no shared RNG and the
-/// roll has to be reproducible in tests. Not for anything security-relevant:
-/// drops are not an economy secret, but the seed comes from the OS in
-/// production so players cannot predict them.
+/// Small seedable generator (SplitMix64) shared by drop rolls and the chess
+/// computer's move choice; both need a reproducible stream in tests. Not for
+/// anything security-relevant: drops are not an economy secret, but the seed
+/// comes from the OS in production so players cannot predict them.
 #[derive(Clone, Debug)]
 pub struct Rng(u64);
 
@@ -268,12 +268,17 @@ impl Rng {
         Ok(Self(u64::from_le_bytes(seed)))
     }
 
+    /// SplitMix64 finalizer. `next_u64` applies it to each draw; chess also
+    /// uses it to derive one table seed from the process seed.
+    pub fn mix(mut value: u64) -> u64 {
+        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+        value ^ (value >> 31)
+    }
+
     pub fn next_u64(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut z = self.0;
-        z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        z ^ (z >> 31)
+        Self::mix(self.0)
     }
 
     /// Uniform in `[0, 1)` with 53 bits.

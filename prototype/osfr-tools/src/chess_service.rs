@@ -105,7 +105,8 @@ pub struct ChessContent {
     #[serde(default = "default_daily_reward_coins")]
     pub daily_reward_coins: u32,
     /// (R) Score window, in `score_move` units, for the computer's near-equal
-    /// move choice. Larger values make the computer less predictable.
+    /// move choice. Larger values make the computer less predictable; zero is
+    /// refused because it collapses every reply to the single best move.
     #[serde(default = "default_near_equal_margin")]
     pub near_equal_margin: u32,
     /// (R) Required weights for the server's one-ply move chooser. The shipped
@@ -142,8 +143,10 @@ impl ChessContent {
         if self.daily_reward_coins > MAX_DAILY_REWARD_COINS {
             return Err(invalid("chess daily reward cap exceeds the local bound"));
         }
-        if i64::from(self.near_equal_margin) > chess::MAX_NEAR_EQUAL_MARGIN {
-            return Err(invalid("chess near-equal window exceeds the local bound"));
+        if !(1..=chess::MAX_NEAR_EQUAL_MARGIN).contains(&i64::from(self.near_equal_margin)) {
+            return Err(invalid(
+                "chess near-equal window must be 1 to the local bound",
+            ));
         }
         self.scoring.validate()?;
         let mut seen = BTreeSet::new();
@@ -239,17 +242,14 @@ pub struct ChessService {
 }
 
 impl ChessService {
-    pub fn new(content: ChessContent) -> io::Result<Self> {
-        Self::with_tables(content, ChessTables::default(), None)
-    }
-
-    /// Rebuild a character's service and restore the saved daily ledger.
+    /// Rebuild a character's service, restore the saved daily ledger, and seed
+    /// the computer from OS entropy.
     pub fn with_state(content: ChessContent, saved: Option<ChessRewardLedger>) -> io::Result<Self> {
-        Self::with_tables(content, ChessTables::default(), saved)
+        Self::with_tables(content, ChessTables::entropy()?, saved)
     }
 
     /// (R) Deterministic table seeds for tests and offline fixtures. The
-    /// gateway's [`Self::new`] uses OS entropy; no client value reaches either.
+    /// gateway's [`Self::with_state`] uses OS entropy; no client value reaches either.
     pub fn with_seed(content: ChessContent, seed: u64) -> io::Result<Self> {
         Self::with_tables(content, ChessTables::with_seed(seed), None)
     }
@@ -500,6 +500,9 @@ impl ChessService {
         let grant = won
             .then(|| row.win_grant(player_id))
             .filter(|grant| grant.coins <= remaining);
+        // The ledger counts what the grant actually pays, not the row's
+        // nominal award, so a future grant adjustment cannot skew the cap.
+        let paid_coins = grant.as_ref().map(|grant| grant.coins);
         let settlement = grant.as_ref().map(|grant| (rewards, grant));
         let settled = self.tables.settle_player(
             instance as u64,
@@ -516,7 +519,9 @@ impl ChessService {
         out.reward_packets.extend(settled.reward_packets);
         if settled.reward_state.is_some() {
             out.reward_state = settled.reward_state;
-            self.ledger.record(day, row.success_coins);
+            if let Some(coins) = paid_coins {
+                self.ledger.record(day, coins);
+            }
         }
         Ok(())
     }

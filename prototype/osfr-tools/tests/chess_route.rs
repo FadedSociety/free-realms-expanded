@@ -749,3 +749,91 @@ fn results_close_without_chess_is_inert_and_start_is_malformed_safe() {
         .unwrap();
     assert_eq!(packets(&started, &[39, 0, 17]).len(), 1);
 }
+
+/// Plays the deterministic greedy line through the real gameplay route,
+/// acknowledges the terminal message and closes the results screen.
+fn play_greedy_game(game: &mut Gameplay, instance: i32, now_ms: u64) -> (EndOfGame, Outcome) {
+    let mut human = Human::new();
+    for ply in 0..400u64 {
+        let movement = human.choose();
+        let message = human.move_text(&movement);
+        human.position.apply(&movement).unwrap();
+        human.remember();
+        let now = now_ms + ply * 10;
+        let out = game
+            .handle_in_world(&movie(instance, &message), &character(), now)
+            .unwrap();
+        if let Some(end) = human.apply_events(&texts(&out)) {
+            let ack = if end == EndOfGame::Stopped {
+                Outcome::default()
+            } else {
+                game.handle_in_world(&movie(instance, "FRServer_GameOver"), &character(), now + 5)
+                    .unwrap()
+            };
+            game.handle_in_world(&[26, 0, 42, 0], &character(), now + 6)
+                .unwrap();
+            return (end, ack);
+        }
+    }
+    panic!("the seeded game must finish within 400 plies");
+}
+
+#[test]
+fn the_daily_cap_applies_after_a_real_win_and_a_save_round_trip() {
+    let directory = content();
+    let mut game = Gameplay::load(&directory, None).unwrap();
+    game.seed_chess(22);
+    let instance = running_game(&mut game);
+    let start_coins = game.state().inventory.coins;
+    let (end, ack) = play_greedy_game(&mut game, instance, 2_000);
+    assert_eq!(end, EndOfGame::Won, "offline seed 22 must win");
+    assert_eq!(packets(&ack, &[39, 0, 18]).len(), 1, "the win settles once");
+    assert_eq!(
+        game.state().inventory.coins,
+        start_coins + 10,
+        "the content award is paid through the real route"
+    );
+    let today = game
+        .state()
+        .chess
+        .expect("the win records the daily ledger");
+    assert_eq!(
+        today,
+        ChessRewardLedger {
+            day: 0,
+            paid_coins: 10
+        }
+    );
+
+    // Reconnect: the character save carries the day's used allowance. A win
+    // that no longer fits settles without a grant and changes nothing.
+    let mut saved = game.state();
+    saved.chess = Some(ChessRewardLedger {
+        day: 0,
+        paid_coins: 995,
+    });
+    let reloaded: osfr_tools::gameplay::GameplayState =
+        serde_json::from_slice(&serde_json::to_vec(&saved).unwrap()).unwrap();
+    let mut game = Gameplay::load(&directory, Some(reloaded)).unwrap();
+    assert_eq!(game.state().chess, saved.chess, "the ledger survives load");
+    game.seed_chess(22);
+    let instance = running_game(&mut game);
+    let before = game.state().inventory.coins;
+    let (end, capped) = play_greedy_game(&mut game, instance, 30_000);
+    assert_eq!(end, EndOfGame::Won, "the same seeded line wins again");
+    assert_eq!(
+        packets(&capped, &[39, 0, 18]).len(),
+        1,
+        "the capped win still settles"
+    );
+    assert_eq!(
+        game.state().inventory.coins,
+        before,
+        "a capped win pays nothing"
+    );
+    assert_eq!(
+        game.state().chess,
+        saved.chess,
+        "the capped win changed the ledger"
+    );
+}

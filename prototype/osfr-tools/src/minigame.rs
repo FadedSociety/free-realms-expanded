@@ -502,15 +502,37 @@ impl MinigameRuns {
         })
     }
 
-    /// Settle one activity result. Win grants use a stable run-derived key;
-    /// losses cannot carry a grant, and a win may settle without one (a
-    /// content-defined zero award or a reached daily cap). Both returned
+    /// Settle one activity result. Win grants use a stable run-derived key and
+    /// losses cannot carry one. A win must carry its grant: an activity whose
+    /// win legitimately pays nothing (a content zero award or a reached daily
+    /// cap) calls [`Self::finish_win_without_reward`] instead. Both returned
     /// snapshots require one save.
     pub fn finish<A: Activity>(
         &mut self,
         instance_id: i32,
         activity: &A,
         settlement: Option<(&RewardState, &RewardGrant)>,
+    ) -> io::Result<RunOutcome> {
+        self.finish_inner(instance_id, activity, settlement, false)
+    }
+
+    /// Settle a won run that pays nothing. The named entry point keeps
+    /// [`Self::finish`] strict, so a caller cannot lose a win's grant by
+    /// forgetting it; `unpaid_win` records the explicit zero-award decision.
+    pub fn finish_win_without_reward<A: Activity>(
+        &mut self,
+        instance_id: i32,
+        activity: &A,
+    ) -> io::Result<RunOutcome> {
+        self.finish_inner(instance_id, activity, None, true)
+    }
+
+    fn finish_inner<A: Activity>(
+        &mut self,
+        instance_id: i32,
+        activity: &A,
+        settlement: Option<(&RewardState, &RewardGrant)>,
+        unpaid_win: bool,
     ) -> io::Result<RunOutcome> {
         let Some(run) = self.current.as_ref() else {
             return Ok(RunOutcome::default());
@@ -523,6 +545,9 @@ impl MinigameRuns {
         };
         if !result.won && settlement.is_some() {
             return Err(invalid("a loss cannot carry a minigame grant"));
+        }
+        if result.won && settlement.is_none() && !unpaid_win {
+            return Err(invalid("a won minigame must carry its grant"));
         }
         let score = activity.score();
         let score_i32 = i32::try_from(score).map_err(invalid)?;

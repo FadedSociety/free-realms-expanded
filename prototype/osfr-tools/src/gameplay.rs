@@ -176,8 +176,9 @@ pub struct Gameplay {
     /// a reconnect drops the match without a grant.
     soccer_content: Option<Arc<crate::soccer_entry::Content>>,
     soccer: Option<crate::soccer_entry::Session>,
-    /// T022 (R): single-player chess rows and this session's table. Not persisted;
-    /// a reconnect starts with no run, so no stale result can be replayed.
+    /// T022 (R): single-player chess rows and this session's table. The table
+    /// is session-only, but its daily reward ledger is restored from
+    /// `GameplayState::chess`, so a reconnect cannot reset the cap.
     chess: Option<ChessService>,
     /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).

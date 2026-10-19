@@ -363,7 +363,15 @@ fn a_win_may_settle_without_a_grant_and_a_loss_still_may_not() {
             elapsed_seconds: 12,
         }),
     };
-    let won = runs.finish(131, &won_activity, None).unwrap();
+    // A win through `finish` still needs its grant: a caller that forgets it is
+    // refused, not settled without a reward.
+    assert!(
+        runs.finish(131, &won_activity, None).is_err(),
+        "a won minigame must carry its grant"
+    );
+    assert_eq!(runs.state(131), Some(RunState::Playing));
+    // A capped or zero-award win says so explicitly.
+    let won = runs.finish_win_without_reward(131, &won_activity).unwrap();
     assert_eq!(won.replies, expected_finish(131, 46, true));
     assert_eq!(won.state, Some(RunState::Won));
     assert!(won.reward_packets.is_empty());

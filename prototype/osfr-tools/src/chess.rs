@@ -10,12 +10,12 @@
 
 use crate::{
     minigame::{Activity, ActivityFinish, MinigameRuns, RunOutcome},
+    power_ups::Rng,
     rewards::{RewardGrant, RewardState},
 };
 use serde::Deserialize;
 use std::{
     collections::{HashMap, HashSet},
-    hash::{BuildHasher, Hasher},
     io,
 };
 
@@ -132,7 +132,9 @@ pub const EVENT_LOCAL_AI: u8 = 42;
 const MAX_TEXT_BYTES: usize = 127;
 /// (R) Default window, in `score_move` units, for the computer's near-equal move choice.
 pub const DEFAULT_NEAR_EQUAL_MARGIN: i64 = 25;
-/// (R) Content sanity bound for [`DEFAULT_NEAR_EQUAL_MARGIN`].
+/// (R) Content sanity bound for [`DEFAULT_NEAR_EQUAL_MARGIN`]. A window must
+/// be positive: zero would always choose the single best move, which makes the
+/// computer reply a function of the position and replayable.
 pub const MAX_NEAR_EQUAL_MARGIN: i64 = 500;
 /// (R) Content sanity bounds for the reconstructed chooser weights.
 pub const MAX_SCORE_VALUE: i64 = 100_000_000;
@@ -1050,7 +1052,7 @@ pub struct ChessTable {
     game_over: HashSet<u64>,
     settled: HashSet<u64>,
     /// (R) Per-table random stream for the computer's near-equal move choice.
-    rng: u64,
+    rng: Rng,
     /// (R) Content-supplied chooser weights for this table.
     scoring: ChessScoring,
 }
@@ -1070,9 +1072,9 @@ impl ChessTable {
     ) -> io::Result<ChessTable> {
         if !matches!(Mode::for_row(row_id), Some(Mode::Single { .. }))
             || skill > 100
-            || !(0..=MAX_NEAR_EQUAL_MARGIN).contains(&near_equal_margin)
+            || !(1..=MAX_NEAR_EQUAL_MARGIN).contains(&near_equal_margin)
         {
-            return Err(invalid("invalid single-player chess row or skill"));
+            return Err(invalid("invalid single-player chess row, skill or window"));
         }
         validate_participant(player)?;
         let computer_side = human_side.opponent();
@@ -1105,7 +1107,7 @@ impl ChessTable {
             result: None,
             game_over: HashSet::new(),
             settled: HashSet::new(),
-            rng: seed,
+            rng: Rng::seeded(seed),
             scoring,
         })
     }
@@ -1141,7 +1143,7 @@ impl ChessTable {
             result: None,
             game_over: HashSet::new(),
             settled: HashSet::new(),
-            rng: seed,
+            rng: Rng::seeded(seed),
             scoring,
         })
     }
@@ -1322,15 +1324,8 @@ impl ChessTable {
             .iter()
             .take_while(|(score, _)| *score >= floor)
             .count();
-        let index = (self.next_random() % candidates.max(1) as u64) as usize;
+        let index = (self.rng.next_u64() % candidates.max(1) as u64) as usize;
         ranked.get(index).map(|(_, mv)| *mv)
-    }
-
-    /// SplitMix64 over the table's stream: deterministic for a seeded table,
-    /// unpredictable for one seeded from OS entropy.
-    fn next_random(&mut self) -> u64 {
-        self.rng = self.rng.wrapping_add(0x9E37_79B9_7F4A_7C15);
-        mix64(self.rng)
     }
 
     fn score_move(&self, mv: &ChessMove) -> i64 {
@@ -1724,11 +1719,15 @@ impl ChessTable {
                 elapsed_seconds,
             },
         };
-        let outcome = runs.finish(
-            participant.instance_id,
-            &activity,
-            if won { reward } else { None },
-        )?;
+        // A capped win pays nothing; the named settlement keeps the shared
+        // lifecycle's win/grant invariant for every other activity.
+        let outcome = match (won, reward) {
+            (true, Some((state, grant))) => {
+                runs.finish(participant.instance_id, &activity, Some((state, grant)))?
+            }
+            (true, None) => runs.finish_win_without_reward(participant.instance_id, &activity)?,
+            (false, _) => runs.finish(participant.instance_id, &activity, None)?,
+        };
         if outcome.accepted {
             self.settled.insert(player_id);
         }
@@ -1761,15 +1760,15 @@ pub struct ChessTables {
     scoring: ChessScoring,
 }
 
-impl Default for ChessTables {
-    fn default() -> Self {
-        Self::with_seed(entropy_seed())
-    }
-}
-
 impl ChessTables {
-    /// (R) Deterministic seed source for tests and offline fixtures. The
-    /// gateway's `Default` uses OS entropy; no client value reaches either.
+    /// (R) OS-entropy seed for the server's tables. Each open mixes it with the
+    /// table id and an open counter, so replaying cannot reproduce replies.
+    pub fn entropy() -> io::Result<Self> {
+        Ok(Self::with_seed(Rng::from_entropy()?.next_u64()))
+    }
+
+    /// (R) Deterministic seed source for tests and offline fixtures. No client
+    /// value reaches either constructor.
     pub fn with_seed(seed: u64) -> Self {
         Self {
             tables: HashMap::new(),
@@ -1796,7 +1795,7 @@ impl ChessTables {
 
     fn open_seed(&mut self, table_id: u64) -> u64 {
         self.opened = self.opened.wrapping_add(1);
-        mix64(self.seed ^ table_id.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ self.opened)
+        Rng::mix(self.seed ^ table_id.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ self.opened)
     }
 
     pub fn open_single(
@@ -1809,7 +1808,7 @@ impl ChessTables {
         if self.tables.contains_key(&table_id) {
             return Err(invalid("chess table already exists"));
         }
-        let Some(Mode::Single { skill }) = Mode::for_row(row_id) else {
+        let Some(skill) = skill_for_row(row_id) else {
             return Err(invalid("row is not a single-player chess row"));
         };
         let seed = self.open_seed(table_id);
@@ -2073,22 +2072,6 @@ fn validate_participant(participant: ChessParticipant) -> io::Result<()> {
     Ok(())
 }
 
-/// (R) OS-seeded SipHash keys plus a process counter: each call differs and
-/// a client cannot predict it from anything it sends.
-fn entropy_seed() -> u64 {
-    static CALLS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-    let mut hasher = std::collections::hash_map::RandomState::new().build_hasher();
-    hasher.write_u64(CALLS.fetch_add(1, std::sync::atomic::Ordering::Relaxed));
-    hasher.finish()
-}
-
-/// SplitMix64 finalizer shared by the table seed and its random stream.
-fn mix64(mut value: u64) -> u64 {
-    value = (value ^ (value >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-    value = (value ^ (value >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-    value ^ (value >> 31)
-}
-
 fn append_outcome(out: &mut ChessOutcome, next: ChessOutcome) {
     out.accepted |= next.accepted;
     out.changed |= next.changed;
@@ -2117,7 +2100,9 @@ mod tests {
             },
             Side::White,
             100,
-            0,
+            // A positive window is required; 1 still isolates the top move here
+            // because the two captures differ by more than 100 points.
+            1,
             scoring,
             7,
         )
@@ -2162,7 +2147,7 @@ mod tests {
 
     #[test]
     fn table_scoring_setter_refuses_out_of_bounds() {
-        let mut tables = ChessTables::default();
+        let mut tables = ChessTables::with_seed(7);
         assert!(
             tables
                 .set_scoring(ChessScoring {
