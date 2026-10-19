@@ -131,6 +131,53 @@ struct PaidCatches {
     hour: Vec<u64>,
 }
 
+/// The process-lifetime rolling-hour ledger shared by reconnects, keyed by character. The
+/// gateway keeps one of these beside the world; a fresh [`FishingService`] restores a
+/// character's history from it and publishes the committed history back. It is deliberately not
+/// saved: durable persistence across a server restart needs a save-schema decision (lead).
+#[derive(Clone, Debug, Default)]
+pub struct FishingHourLedger {
+    hours: BTreeMap<u64, Vec<u64>>,
+}
+
+impl FishingHourLedger {
+    /// The character's published timestamps, oldest first.
+    pub fn history(&self, guid: u64) -> Vec<u64> {
+        self.hours.get(&guid).cloned().unwrap_or_default()
+    }
+
+    /// Replace one character's history with the timestamps its committed session produced.
+    /// Entries outside the rolling window are dropped first, so an idle or reconnected session
+    /// cannot republish an expired timestamp. `None` (no loaded gameplay) leaves the ledger
+    /// alone. The hot path touches only this character; expired characters are swept when a new
+    /// character is first inserted.
+    pub fn publish(&mut self, guid: u64, history: Option<Vec<u64>>, now_ms: u64) {
+        let Some(mut history) = history.filter(|_| guid != 0) else {
+            return;
+        };
+        let cutoff = now_ms.saturating_sub(HOUR_WINDOW_MS);
+        history.retain(|at| *at > cutoff);
+        if history.is_empty() {
+            self.hours.remove(&guid);
+            return;
+        }
+        if !self.hours.contains_key(&guid) {
+            self.expire(now_ms);
+        }
+        self.hours.insert(guid, history);
+    }
+
+    /// Drop every timestamp outside the rolling window. Only a new character's first publish
+    /// calls this, so ordinary commits never scan other players' history.
+    fn expire(&mut self, now_ms: u64) {
+        let cutoff = now_ms.saturating_sub(HOUR_WINDOW_MS);
+        self.hours.retain(|_, hours| {
+            hours.retain(|at| *at > cutoff);
+            !hours.is_empty()
+        });
+    }
+}
+
 #[derive(Clone)]
 struct Attempt {
     stage: AttemptStage,

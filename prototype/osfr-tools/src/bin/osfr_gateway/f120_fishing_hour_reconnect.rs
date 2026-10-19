@@ -1,7 +1,11 @@
 use super::*;
+use fixtures::{copy_tree, fish_option, npc, wrap};
 use osfr_tools::game_store::Snapshot;
 use osfr_tools::gateway::Gateway;
 use serde_json::{Value, json};
+
+#[path = "fishing_fixtures.rs"]
+mod fixtures;
 
 const NOW: u64 = 10_000;
 const REED: u64 = 9_000_000_181;
@@ -19,49 +23,8 @@ impl Drop for Scratch {
     }
 }
 
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
-
-fn copy_tree(from: &Path, to: &Path) {
-    fs::create_dir_all(to).unwrap();
-    for entry in fs::read_dir(from).unwrap() {
-        let entry = entry.unwrap();
-        let target = to.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), target).unwrap();
-        }
-    }
-}
-
 fn login() -> Vec<u8> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for (index, value) in ["f120-fixture", "1.910.1.530630", ""]
-        .into_iter()
-        .enumerate()
-    {
-        bytes.extend((value.len() as u32).to_le_bytes());
-        bytes.extend(value.bytes());
-        if index == 0 {
-            bytes.extend(1u64.to_le_bytes());
-        }
-    }
-    bytes
-}
-
-fn npc(sub: u16, target: u64, choice: Option<i32>) -> Vec<u8> {
-    let mut bytes = [26u16.to_le_bytes(), sub.to_le_bytes()].concat();
-    bytes.extend(target.to_le_bytes());
-    match choice {
-        Some(choice) => bytes.extend(choice.to_le_bytes()),
-        None => bytes.push(0),
-    }
-    bytes
+    fixtures::login("f120-fixture")
 }
 
 fn lifecycle(instance: i32) -> Vec<u8> {
@@ -112,19 +75,6 @@ fn menu(gateway: &mut Gateway, target: u64, now: u64) -> Vec<Vec<u8>> {
         .into_iter()
         .map(|packet| packet[7..].to_vec())
         .collect()
-}
-
-fn fish_option(menu: &[Vec<u8>], string_id: u32) -> Option<i32> {
-    let packet = menu
-        .iter()
-        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))?;
-    let count = i32::from_le_bytes(packet[13..17].try_into().ok()?) as usize;
-    (0..count).find_map(|index| {
-        let at = 17 + index * 28;
-        let id = i32::from_le_bytes(packet[at..at + 4].try_into().ok()?);
-        let label = u32::from_le_bytes(packet[at + 8..at + 12].try_into().ok()?);
-        (label == string_id).then_some(id)
-    })
 }
 
 fn send(
@@ -379,10 +329,7 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     assert_eq!(fisherman_xp(&paid), 10);
     let history = first.gateway.fishing_hour_history().unwrap();
     assert_eq!(history, vec![caught_at]);
-    assert_eq!(
-        world.fishing_hours.get(&first.character_guid),
-        Some(&history)
-    );
+    assert_eq!(world.fishing_hours.history(first.character_guid), history);
     // Lead (security): a handshake session that never logged in still carries the template
     // guid, which equals this character's. Its tick must not erase the hour-cap ledger.
     let mut stranger = new_session(77);
@@ -402,8 +349,8 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         )
         .unwrap();
     assert_eq!(
-        world.fishing_hours.get(&first.character_guid),
-        Some(&history),
+        world.fishing_hours.history(first.character_guid),
+        history,
         "an unauthenticated tick erased the fishing-hour ledger"
     );
     let saved_after_payout = fs::read(&state_path).unwrap();
@@ -414,6 +361,18 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     drop(first);
 
     let mut second = new_session(42);
+    // The reconnect session ticks before its login message. That tick must not erase or replace
+    // the ledger the login will restore (finding 1's failing path).
+    second
+        .tick(
+            &options,
+            caught_at + 1_000,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+        )
+        .unwrap();
+    assert_eq!(world.fishing_hours.history(guid), history);
     send_raw(
         &mut second,
         &options,
@@ -496,7 +455,7 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     assert_eq!(fisherman_xp(&second.gateway.snapshot()), 10);
     assert_eq!(fs::read(&state_path).unwrap(), before_refusal_file);
     assert_eq!(second.gateway.fishing_hour_history().unwrap(), history);
-    assert_eq!(world.fishing_hours.get(&guid), Some(&history));
+    assert_eq!(world.fishing_hours.history(guid), history);
 
     let mut after_expiry = caught_at + 3_602_000;
     let paid_again = loop {
@@ -524,6 +483,21 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         second.gateway.fishing_hour_history().unwrap(),
         vec![paid_again]
     );
-    assert_eq!(world.fishing_hours.get(&guid), Some(&vec![paid_again]));
+    assert_eq!(world.fishing_hours.history(guid), vec![paid_again]);
+    // An idle owner's tick after the window closes must drop the expired timestamp rather than
+    // republish it from the session's in-memory history (finding 5).
+    second
+        .tick(
+            &options,
+            paid_again + osfr_tools::fishing_service::HOUR_WINDOW_MS + 1,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+        )
+        .unwrap();
+    assert!(
+        world.fishing_hours.history(guid).is_empty(),
+        "an expired history was republished"
+    );
     assert_ne!(fs::read(&state_path).unwrap(), before_refusal_file);
 }

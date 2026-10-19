@@ -33,6 +33,9 @@ const SPOT: [f32; 3] = [100.0, 5.0, -40.0];
 const T0: u64 = 1_000_000;
 static FIXTURE_ID: AtomicU64 = AtomicU64::new(0);
 
+#[path = "../src/bin/osfr_gateway/fishing_fixtures.rs"]
+mod fixtures;
+
 // ---- fixtures ---------------------------------------------------------------------------
 
 fn spots() -> FishingSpots {
@@ -1167,6 +1170,7 @@ fn the_bite_timers_run_from_supervise() {
 // ---- gateway proof (private bundle) -------------------------------------------------------
 
 mod gateway_route {
+    use super::fixtures::{copy_tree, fish_option, npc, wrap};
     use super::*;
     use osfr_tools::{account_store::AccountRole, gateway::Gateway};
 
@@ -1176,25 +1180,8 @@ mod gateway_route {
     const NOT_A_GATE: u64 = 9_000_000_010;
     const NOW: u64 = 10_000;
 
-    fn wrap(inner: &[u8]) -> Vec<u8> {
-        let mut b = vec![5, 0, 1];
-        b.extend((inner.len() as u32).to_le_bytes());
-        b.extend(inner);
-        b
-    }
     fn login() -> Vec<u8> {
-        let mut b = 1u16.to_le_bytes().to_vec();
-        for (i, s) in ["w160-private-test", "1.910.1.530630", ""]
-            .iter()
-            .enumerate()
-        {
-            b.extend((s.len() as u32).to_le_bytes());
-            b.extend(s.bytes());
-            if i == 0 {
-                b.extend(1u64.to_le_bytes());
-            }
-        }
-        b
+        super::fixtures::login("w160-private-test")
     }
     fn chat(text: &str) -> Vec<u8> {
         let mut b = vec![15, 0, 1, 0, 0, 0];
@@ -1206,27 +1193,6 @@ mod gateway_route {
         b.extend([0; 28]);
         b
     }
-    fn npc(sub: u16, target: u64, choice: Option<i32>) -> Vec<u8> {
-        let mut b = [26u16.to_le_bytes(), sub.to_le_bytes()].concat();
-        b.extend(target.to_le_bytes());
-        match choice {
-            Some(c) => b.extend(c.to_le_bytes()),
-            None => b.push(0),
-        }
-        b
-    }
-    fn copy_tree(from: &Path, to: &Path) {
-        fs::create_dir_all(to).unwrap();
-        for entry in fs::read_dir(from).unwrap() {
-            let entry = entry.unwrap();
-            let target = to.join(entry.file_name());
-            if entry.file_type().unwrap().is_dir() {
-                copy_tree(&entry.path(), &target);
-            } else {
-                fs::copy(entry.path(), target).unwrap();
-            }
-        }
-    }
     fn send_at(g: &mut Gateway, packet: &[u8], now: u64) -> Vec<Vec<u8>> {
         let out = g.handle_at(&wrap(packet), now).unwrap();
         out.replies.iter().map(|p| p[7..].to_vec()).collect()
@@ -1234,17 +1200,6 @@ mod gateway_route {
     fn tick(g: &mut Gateway, now: u64) -> Vec<Vec<u8>> {
         let out = g.tick_at(now).unwrap();
         out.replies.iter().map(|p| p[7..].to_vec()).collect()
-    }
-    /// The option ids of a 26/9 menu whose label is `string_id`.
-    fn fish_option(menu: &[Vec<u8>], string_id: u32) -> Option<i32> {
-        let packet = menu.iter().find(|p| p.starts_with(&[26, 0, 9, 0]))?;
-        let count = i32::from_le_bytes(packet[13..17].try_into().ok()?) as usize;
-        (0..count).find_map(|i| {
-            let at = 17 + i * 28;
-            let id = i32::from_le_bytes(packet[at..at + 4].try_into().ok()?);
-            let label = u32::from_le_bytes(packet[at + 8..at + 12].try_into().ok()?);
-            (label == string_id).then_some(id)
-        })
     }
     fn fish_items(g: &Gateway) -> u32 {
         let ids = bound_item_ids();
