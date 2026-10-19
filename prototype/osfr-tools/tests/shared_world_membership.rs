@@ -48,10 +48,17 @@ struct Fixture {
 
 impl Fixture {
     fn new() -> Self {
-        Self::with_gameplay(false)
+        Self::start(false)
     }
 
-    fn with_gameplay(content: bool) -> Self {
+    /// Real gameplay content. The chat-scope test moves the speaker with the `realm goto`
+    /// developer command, which only exists when gameplay content is loaded; the synthetic
+    /// reference the `new` path builds has none.
+    fn with_content() -> Self {
+        Self::start(true)
+    }
+
+    fn start(content: bool) -> Self {
         let version = if content { "1.910.1.530630" } else { VERSION };
         let root = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../..")
@@ -111,7 +118,9 @@ impl Fixture {
             server.shutdown().unwrap();
         });
         Self {
-            addr: addr_rx.recv_timeout(Duration::from_secs(10)).unwrap(),
+            // Loading real content on a loaded shared host can outlast a fixed 10 s; this is
+            // "the server gets to it", the same bound as every other wait in this file.
+            addr: addr_rx.recv_timeout(PATIENCE).unwrap(),
             tx: Some(tx),
             handle: Some(handle),
             root,
@@ -487,9 +496,10 @@ fn two_bot_socket_membership_and_transfer() {
 fn chat_scope_derives_zone_and_position_from_the_live_registry() {
     const FAR_SAY: u64 = 7;
     const NEAR_SAY: u64 = 800_000;
+    const CROSS_INSTANCE_YELL: u64 = 8_675_309;
     const OTHER_ZONE_YELL: u64 = 90_000_000_000;
     const REJOINED_SAY: u64 = 1_234_567_890_123;
-    let f = Fixture::with_gameplay(true);
+    let f = Fixture::with_content();
     let mut a = f.bot(101, 10801);
     let mut b = f.bot(202, 10802);
     let store = AccountStore::load(&f.accounts).unwrap();
@@ -548,6 +558,37 @@ fn chat_scope_derives_zone_and_position_from_the_live_registry() {
     });
     assert_eq!(chat_count(&near[0], NEAR_SAY), 1, "near say echo");
     assert_eq!(chat_count(&near[1], NEAR_SAY), 1, "near say listener");
+
+    // A second child of the same zone is a different instance: Yell must stay inside the
+    // sender's instance (R), the scope the pre-D003 filter used.
+    let sibling = f.host(|s| s.test_field_child());
+    assert_ne!(sibling, child);
+    f.host(move |s| s.test_transfer(101, sibling, false))
+        .unwrap();
+    f.ready(101, &mut a, &mut b);
+    let (state, instance, ..) = f.host(|s| s.test_location(101).unwrap());
+    assert_eq!(state.zone_id, 0);
+    assert_eq!(instance, sibling);
+    collect(&mut a, &mut b, Duration::from_millis(500));
+    a.send_message(
+        &bot::wrap(&chat(ChatChannel::Yell, CROSS_INSTANCE_YELL)),
+        "15/1",
+    )
+    .unwrap();
+    let mut cross_instance = Default::default();
+    settle(&mut a, &mut b, &mut cross_instance, |m| {
+        chat_count(&m[0], CROSS_INSTANCE_YELL) >= 1
+    });
+    assert_eq!(
+        chat_count(&cross_instance[0], CROSS_INSTANCE_YELL),
+        1,
+        "cross-instance yell echo"
+    );
+    assert_eq!(
+        chat_count(&cross_instance[1], CROSS_INSTANCE_YELL),
+        0,
+        "cross-instance yell listener"
+    );
 
     let other_zone = f.host(|s| s.test_child());
     f.host(move |s| s.test_transfer(101, other_zone, false))

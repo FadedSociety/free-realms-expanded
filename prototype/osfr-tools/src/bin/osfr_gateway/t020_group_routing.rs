@@ -105,6 +105,7 @@ fn seed_world(world: &mut SharedWorld, sessions: &[Session; 3]) {
             .register(SocialLists::new(identity).unwrap())
             .unwrap();
         world.social.login(guid).unwrap();
+        world.joined.insert(session.id);
         world.active_sessions.insert(guid, session.id);
         world.chat_sessions.insert(
             session.id,
@@ -160,8 +161,10 @@ fn route_server(server: &mut Server, key: SessionKey, packet: &[u8]) -> Vec<Deli
     deliveries
 }
 
+/// The social service is the resolver's own group source, so this assert stays independent of
+/// `SharedWorld::chat_session`.
 fn chat_group(world: &SharedWorld, session: &Session) -> Option<u64> {
-    world.chat_session(session.id).unwrap().group_id
+    world.social.group_of(session.character_guid).map(u64::from)
 }
 
 fn inner(delivery: &Delivery) -> &[u8] {
@@ -684,6 +687,54 @@ fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
     assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
     assert_eq!(chat_group(&rig.world, &rig.sessions[a]), None);
     assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
+}
+
+#[test]
+fn chat_identity_is_the_live_registry_row_through_join_leave_and_end_session() {
+    // `joined`, the chat member and the player row are seeded together (as `join_player`
+    // does); join/leave/end_session must keep all three in lockstep.
+    let mut rig = rig("chat-identity");
+    for (index, session) in rig.sessions.iter().enumerate() {
+        assert!(rig.world.joined.contains(&session.id));
+        assert!(rig.world.players.contains(session.id));
+        let chat = rig
+            .world
+            .chat_session(session.id)
+            .expect("a joined session has a chat identity");
+        assert_eq!(chat.character_guid, GUIDS[index]);
+        assert_eq!(chat.name.first, NAMES[index]);
+        assert!(chat.is_member);
+        let player = rig.world.players.get(session.id).unwrap();
+        assert_eq!(chat.position, player.position);
+        assert_eq!(chat.zone_id, player.zone.zone_id);
+    }
+    rig.world.leave_player(rig.sessions[1].id);
+    assert!(!rig.world.joined.contains(&rig.sessions[1].id));
+    assert!(!rig.world.players.contains(rig.sessions[1].id));
+    assert!(rig.world.chat_session(rig.sessions[1].id).is_none());
+    assert!(rig.world.chat_session(rig.sessions[0].id).is_some());
+    drop(rig);
+
+    // Full teardown through `Server::end_session`: the ended session leaves all three sets
+    // and the survivor keeps the derived chat identity.
+    let (mut server, keys, scratch) = server_rig("chat-identity-end");
+    let ended = server.sessions[&keys[1]].id;
+    let survivor = server.sessions[&keys[0]].id;
+    assert_eq!(
+        server.world.chat_session(survivor).unwrap().name.first,
+        NAMES[0]
+    );
+    let session = server.sessions.remove(&keys[1]).unwrap();
+    server.end_session(keys[1], session, "test_identity");
+    assert!(!server.world.joined.contains(&ended));
+    assert!(!server.world.players.contains(ended));
+    assert!(server.world.chat_session(ended).is_none());
+    assert_eq!(
+        server.world.chat_session(survivor).unwrap().name.first,
+        NAMES[0]
+    );
+    drop(server);
+    fs::remove_dir_all(scratch).unwrap();
 }
 
 #[test]

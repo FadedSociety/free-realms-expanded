@@ -87,6 +87,7 @@ fn rig(name: &str) -> Rig {
                 },
             )
             .unwrap();
+        world.joined.insert(session.id);
         world.chat_sessions.insert(
             session.id,
             ChatMember {

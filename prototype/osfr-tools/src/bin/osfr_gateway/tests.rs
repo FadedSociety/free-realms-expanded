@@ -539,6 +539,7 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
                 presentation,
             )
             .unwrap();
+        world.joined.insert(SessionId(session));
     }
     assert!(world.players.knows_character(SessionId(2), 101));
     assert!(!world.players.knows_character(SessionId(3), 101));

@@ -18,8 +18,8 @@ use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstanc
 use osfr_tools::security_log::{EventKind, SecurityEvent, SecurityLog};
 use osfr_tools::session::{CRC_SEED, SessionRequest, clock_reflect, decode_controls};
 use osfr_tools::social_chat::{
-    self, AccountChatPermissions, ChatHistory, ChatLine, ChatSession, NameData, QuickChatCatalog,
-    QuickChatRequest, SpamGate,
+    self, AccountChatPermissions, ChatChannel, ChatHistory, ChatLine, ChatSession, NameData,
+    QuickChatCatalog, QuickChatRequest, SpamGate,
 };
 use osfr_tools::social_lists::{
     CharacterIdentity as SocialIdentity, CharacterLookup, LocationRequest, MapSpot, SocialLists,
@@ -474,6 +474,7 @@ struct SharedWorld {
     social_paths: BTreeMap<u64, PathBuf>,
     session_keys: BTreeMap<SessionId, SessionKey>,
     active_sessions: BTreeMap<u64, SessionId>,
+    joined: BTreeSet<SessionId>,
     chat_sessions: BTreeMap<SessionId, ChatMember>,
     chat_history: ChatHistory,
     /// W173: each joined character's channel switches and bubble colour (26/32, 26/33, 26/18).
@@ -555,6 +556,7 @@ impl SharedWorld {
             social_paths: BTreeMap::new(),
             session_keys: BTreeMap::new(),
             active_sessions: BTreeMap::new(),
+            joined: BTreeSet::new(),
             chat_sessions: BTreeMap::new(),
             chat_history: ChatHistory::default(),
             chat_settings: social_chat::ChatSettingsBook::default(),
@@ -599,6 +601,7 @@ impl SharedWorld {
                 look,
             )
             .map_err(invalid_io)?;
+        self.joined.insert(session.id);
         self.active_sessions
             .insert(session.character_guid, session.id);
         let mut deliveries = messages
@@ -665,6 +668,7 @@ impl SharedWorld {
                 self.trades.unregister_player(player.character_guid),
             ));
         }
+        self.joined.remove(&session_id);
         self.chat_sessions.remove(&session_id);
         deliveries.extend(
             self.players
@@ -682,7 +686,8 @@ impl SharedWorld {
     /// also require the recipient's directed view to contain the actor. The registry position is
     /// read before a zone transfer removes the player.
     fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
-        let Some(player) = self.players.get(session) else {
+        let is_joined = self.joined.contains(&session);
+        let Some(player) = self.players.get(session).filter(|_| is_joined) else {
             return Vec::new();
         };
         let mut deliveries = Vec::new();
@@ -820,6 +825,7 @@ impl SharedWorld {
             name: member.name.clone(),
             zone_id: player.zone.zone_id,
             position: player.position,
+            // (R) No tracked area/guild id: the resolver refuses both channels.
             chat_area_id: None,
             group_id: self.social.group_of(player.character_guid).map(u64::from),
             guild_id: None,
@@ -832,16 +838,16 @@ impl SharedWorld {
         sender: SessionId,
         channel: social_chat::ChatChannel,
     ) -> Vec<ChatSession> {
-        // Say and Area stay inside the sender's instance; Yell is zone-wide (R).
-        let local_instance = matches!(
+        // (R) Spatial channels stay in the sender's instance; tells and party chat cross.
+        let local = matches!(
             channel,
-            social_chat::ChatChannel::Say | social_chat::ChatChannel::Area
+            ChatChannel::Say | ChatChannel::Yell | ChatChannel::Area
         );
         let zone = self.players.get(sender).map(|player| player.zone);
         self.chat_sessions
             .keys()
             .filter(|id| {
-                !local_instance
+                !local
                     || zone.is_some_and(|zone| {
                         self.players
                             .get(**id)
@@ -1771,7 +1777,7 @@ impl Session {
                 );
             }
             let mut deliveries = staged_world.ride_fanout(self.id, &outcome.nearby);
-            if transfer && staged_world.players.contains(self.id) {
+            if transfer && staged_world.joined.contains(&self.id) {
                 deliveries.extend(staged_world.leave_player(self.id));
             }
             // A state-only change (e.g. jump or crouch flags) is relayed like a move.
@@ -1784,7 +1790,7 @@ impl Session {
             // T027: the same snapshot feeds AddPc, so a viewer who arrives after
             // the change sees the new outfit and job. Current viewers were told
             // by the gameplay 35/6 or 35/7 fanout.
-            if outcome.gameplay_changed && staged_world.players.contains(self.id) {
+            if outcome.gameplay_changed && staged_world.joined.contains(&self.id) {
                 refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
                 let presentation = staged_gateway.player_presentation(self.is_member)?;
                 staged_world
@@ -1798,7 +1804,7 @@ impl Session {
             }
             if outcome.entered_world
                 && staged_gateway.is_world_loaded()
-                && !staged_world.players.contains(self.id)
+                && !staged_world.joined.contains(&self.id)
             {
                 let look = staged_gateway.player_presentation(self.is_member)?;
                 deliveries.extend(staged_world.join_player(self, &current, look, instance)?);
@@ -1808,7 +1814,7 @@ impl Session {
                     self.id,
                     &staged_gateway,
                 ));
-            } else if moved && staged_world.players.contains(self.id) {
+            } else if moved && staged_world.joined.contains(&self.id) {
                 let messages = staged_world
                     .players
                     .update_pose_with_state(
@@ -1826,7 +1832,7 @@ impl Session {
                 }));
             }
 
-            if staged_world.players.contains(self.id) {
+            if staged_world.joined.contains(&self.id) {
                 self.emote = staged_gateway.emote_context(now_ms);
                 match staged_gateway.ride_view() {
                     Some(view) => {

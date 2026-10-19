@@ -136,6 +136,7 @@ fn rig(name: &str) -> Rig {
             .register(SocialLists::new(identity).unwrap())
             .unwrap();
         world.social.login(guid).unwrap();
+        world.joined.insert(session.id);
         let player = world.players.get(session.id).unwrap().clone();
         world
             .trades
