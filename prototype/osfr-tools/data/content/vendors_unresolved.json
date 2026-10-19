@@ -10414,8 +10414,8 @@
           "Trading Card Game",
           "Treant",
           "Vere",
-          "Warriorâ€™s Double Axe of Berserking",
-          "Warriorâ€™s Warlord Axe of Berserking"
+          "Warrior’s Double Axe of Berserking",
+          "Warrior’s Warlord Axe of Berserking"
         ],
         "catalogue": "W84 58,835 definitions",
         "prior_reason": "Partial wiki stock only: 3 unique item ID(s) map into the startup catalogue; 7 named stock row(s) remain unresolved. No native family 66 merchant list was captured for this NPC, so completeness and runtime actor binding remain unverified."
