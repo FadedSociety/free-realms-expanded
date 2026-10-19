@@ -23,6 +23,7 @@ mod field;
 mod shared;
 mod skills;
 use self::field::Wander;
+pub(crate) use self::field::level_refusal;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot};
 
@@ -1407,15 +1408,7 @@ impl EncounterEngine {
             .iter()
             .find(|d| d.id == id)
             .ok_or_else(|| invalid("unknown encounter"))?;
-        if let Some(required) = self
-            .battles
-            .iter()
-            .find(|battle| battle.id == id)
-            .map(|battle| battle.required_combat_level)
-            && self.job_level < required
-        {
-            return Err(invalid(&format!("combat level {required} required")));
-        }
+        self.admit_battle(id)?;
         let next = self
             .state
             .next_instance_id

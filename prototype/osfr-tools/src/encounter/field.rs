@@ -23,6 +23,13 @@ pub(super) const WANDER_SEEN: f32 = 90.0;
 /// Closer than this it stops and faces the player (an easy click target).
 pub(super) const WANDER_NOTICE: f32 = 8.0;
 
+/// The one level rule for a published battle: the active job level must reach
+/// the row's configured floor. Portal admission, the battle marker and
+/// `EncounterEngine::begin` all call this; `Some(required)` means refused.
+pub(crate) fn level_refusal(level: u32, required: u32) -> Option<u32> {
+    (level < required).then_some(required)
+}
+
 impl EncounterEngine {
     /// Authored field level, for client presentation by the owning gameplay
     /// route once its wire carrier is verified. Never infer it from HP.
@@ -471,13 +478,28 @@ impl EncounterEngine {
         packets
     }
 
-    /// Combat level required by the battle whose start screen is open.
-    pub(crate) fn pending_battle_required_level(&self) -> Option<u32> {
-        let (id, _) = self.pending_battle?;
-        self.battles
+    /// `Some(required)` when `level` is below the battle's configured floor.
+    pub(crate) fn battle_level_refusal(&self, battle: u32, level: u32) -> Option<u32> {
+        let required = self
+            .battles
             .iter()
-            .find(|battle| battle.id == id)
-            .map(|battle| battle.required_combat_level)
+            .find(|row| row.id == battle)?
+            .required_combat_level;
+        level_refusal(level, required)
+    }
+
+    /// Level refusal for the battle whose start screen is open.
+    pub(crate) fn pending_battle_level_refusal(&self, level: u32) -> Option<u32> {
+        let (id, _) = self.pending_battle?;
+        self.battle_level_refusal(id, level)
+    }
+
+    /// Every production `begin` route asks this before the encounter changes.
+    pub(super) fn admit_battle(&self, battle: u32) -> io::Result<()> {
+        match self.battle_level_refusal(battle, self.job_level) {
+            Some(required) => Err(invalid(&format!("combat level {required} required"))),
+            None => Ok(()),
+        }
     }
 
     /// The battle whose start screen is open, consumed by Go (41/108).

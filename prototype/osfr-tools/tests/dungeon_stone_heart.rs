@@ -176,6 +176,13 @@ fn switch_job(profile: i32) -> Vec<u8> {
     [vec![26, 0, 13, 0], profile.to_le_bytes().to_vec()].concat()
 }
 
+fn play(activity: u32) -> Vec<u8> {
+    let mut packet = vec![167, 0, 1, 2];
+    packet.extend(activity.to_le_bytes());
+    packet.extend(0_u32.to_le_bytes());
+    packet
+}
+
 fn go(details: &[u8]) -> Vec<u8> {
     let mut packet = vec![41, 0, 108, 0];
     packet.extend(&details[4..12]); // encounter and launch instance
@@ -302,6 +309,23 @@ fn active_enemy(
     Some(((enemy.guid, enemy.health, enemy.position), active.phase))
 }
 
+/// Run the gateway's production 20 Hz world tick across `duration_ms`.
+fn tick_for(gateway: &mut Gateway, now_ms: &mut u64, duration_ms: u64) {
+    let end = *now_ms + duration_ms;
+    while *now_ms < end {
+        *now_ms = (*now_ms + 50).min(end);
+        gateway.tick_at(*now_ms).unwrap();
+    }
+}
+
+fn player_health(gateway: &Gateway) -> u32 {
+    gateway
+        .snapshot()
+        .gameplay
+        .and_then(|state| state.encounter)
+        .map_or(0, |state| state.player_health)
+}
+
 fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
     let from = gateway.state().position;
     let distance = ((to[0] - from[0]).powi(2) + (to[2] - from[2]).powi(2)).sqrt();
@@ -309,13 +333,15 @@ fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
     for step in 1..=steps {
         let amount = step as f32 / steps as f32;
         let position = [0, 1, 2].map(|axis| from[axis] + (to[axis] - from[axis]) * amount);
-        *now_ms += 400;
+        *now_ms += 50;
         let moved = send(gateway, &move_to(guid, position), *now_ms);
         assert!(!moved.replies.iter().any(|reply| {
             let packet = unframe(reply);
             packet.starts_with(&[38, 0, 12, 0])
         }));
         assert_eq!(gateway.state().position, position);
+        // The world keeps simulating between movement packets.
+        tick_for(gateway, now_ms, 350);
     }
 }
 
@@ -368,6 +394,37 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
         "a low-level Go changes nothing"
     );
 
+    // The same recovered battle is refused by the portal and the developer
+    // start route through the one shared eligibility rule.
+    let before_portal = gateway.snapshot();
+    let portal = send(&mut gateway, &play(BATTLE), 650);
+    assert!(
+        chat_text(&portal).contains("level 13"),
+        "the portal shares the marker's floor: {:?}",
+        portal.replies
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before_portal,
+        "a low-level portal Play changes nothing"
+    );
+    let before_developer = gateway.snapshot();
+    let developer = send(
+        &mut gateway,
+        &chat::local_request("realm battle 12303"),
+        660,
+    );
+    assert!(
+        chat_text(&developer).contains("level 13"),
+        "the developer start route shares the same floor: {:?}",
+        developer.replies
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before_developer,
+        "a low-level developer start changes nothing"
+    );
+
     let raised = send(&mut gateway, &chat::local_request("realm level 13"), 700);
     assert!(
         chat_text(&raised).contains("level 13"),
@@ -375,7 +432,30 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
         raised.replies
     );
     assert_eq!(level(&gateway, BRAWLER), 13);
-    let before_entry = economy(&gateway);
+
+    // The balance simulator starts every level at 1; it must skip the levels
+    // this battle does not admit and still evaluate 15 and 20.
+    let before_sim = gateway.snapshot();
+    let sim = send(&mut gateway, &chat::local_request("realm sim 12303"), 750);
+    let sim_text = chat_text(&sim);
+    assert!(
+        sim_text.contains("level 15") && sim_text.contains("level 20"),
+        "eligible simulator levels still run: {sim_text}"
+    );
+    assert!(
+        sim_text.contains("needs level 13"),
+        "ineligible simulator levels report the production floor: {sim_text}"
+    );
+    assert!(
+        !sim_text.contains("Cannot simulate"),
+        "one ineligible level must not end the whole simulation: {sim_text}"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before_sim,
+        "the balance simulator changes nothing"
+    );
+
     let go = send(&mut gateway, &go(details), 800);
     assert!(go.began_zoning, "the pending entry survives the refusal");
     assert_eq!(gateway.state().zone_id, 9600);
@@ -405,9 +485,22 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
     let (_, phase) = active_enemy(&gateway, None).expect("arena enemies spawned");
     assert_eq!(phase, EncounterPhase::Fighting);
 
+    // The level-13 gate above is what this test pins; fight as a max-level
+    // Brawler so the real enemy schedule is a survivable production fight
+    // rather than a scripted immune one.
+    let raised = send(&mut gateway, &chat::local_request("realm level 20"), 950);
+    assert!(
+        chat_text(&raised).contains("level 20"),
+        "{:?}",
+        raised.replies
+    );
+    assert_eq!(level(&gateway, BRAWLER), 20);
+    let before_fight = economy(&gateway);
+
     let player_guid = gateway.state().guid;
     let mut now = 1_000;
     let mut target = None;
+    let mut enemy_took_turns = false;
     for _ in 0..200 {
         let Some(((guid, _, position), phase)) = active_enemy(&gateway, target) else {
             break;
@@ -418,20 +511,33 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
         target = Some(guid);
         let approach = [position[0] + 1.5, position[1], position[2]];
         walk(&mut gateway, player_guid, approach, &mut now);
-        now += 700;
-        send(&mut gateway, &melee(guid), now);
-        // Break contact before the next world tick; this is the reviewed melee
-        // reach (3 m) against the creatures' 2.5 m attack reach.
-        walk(&mut gateway, player_guid, [136.0, -0.5, 155.0], &mut now);
-        now += 100;
-        gateway.tick_at(now).unwrap();
+        // Fight this target on the server's swing cooldown, running the
+        // production 20 Hz world tick between swings; the old scripted fight
+        // skipped every enemy turn.
+        while let Some(((current, _, _), phase)) = active_enemy(&gateway, target) {
+            if phase != EncounterPhase::Fighting || current != guid {
+                break;
+            }
+            send(&mut gateway, &melee(guid), now);
+            let before_swing = player_health(&gateway);
+            tick_for(&mut gateway, &mut now, 700);
+            enemy_took_turns |= player_health(&gateway) < before_swing;
+        }
     }
+    assert!(
+        enemy_took_turns,
+        "the world tick must run the enemies' turns, not only the scripted attacks"
+    );
 
     let won = gateway.snapshot().gameplay.unwrap().encounter.unwrap();
     assert_eq!(won.active.as_ref().unwrap().phase, EncounterPhase::Won);
+    assert!(
+        won.player_health > 0,
+        "the player survived the real schedule"
+    );
     assert_eq!(
         economy(&gateway),
-        (before_entry.0, before_entry.1 + 1, before_entry.2 + 50),
+        (before_fight.0, before_fight.1 + 1, before_fight.2 + 50),
         "the server-owned win grants the item and Brawler XP exactly once"
     );
     let paid = economy(&gateway);

@@ -277,8 +277,10 @@ impl Catalogue {
                 if !viewer.combat_job {
                     return Err(Refusal::NotCombatJob);
                 }
-                if viewer.level < activity.required_level {
-                    return Err(Refusal::LevelTooLow(activity.required_level));
+                if let Some(required) =
+                    crate::encounter::level_refusal(viewer.level, activity.required_level)
+                {
+                    return Err(Refusal::LevelTooLow(required));
                 }
             }
             // (R) Chess needs no job or level; the table is open to every player.

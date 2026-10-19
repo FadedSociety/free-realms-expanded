@@ -3314,6 +3314,14 @@ impl Gameplay {
             // The scripted bot must not be helped by power-up hearts.
             engine.unload_power_ups();
             engine.set_player_job(profile, level);
+            // Eligibility is per level; the eligible levels still run through
+            // the same production `begin` guard.
+            if let Some(required) = engine.battle_level_refusal(battle, level) {
+                lines.push(format!(
+                    "  level {level:>2}: needs level {required}; skipped"
+                ));
+                continue;
+            }
             if let Err(error) = engine.begin(battle, character.clone(), profile) {
                 return Ok(vec![format!("Cannot simulate battle {battle}: {error}")]);
             }

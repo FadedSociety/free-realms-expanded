@@ -65,12 +65,11 @@ impl Gameplay {
         if let Some(required) = self
             .encounter
             .as_ref()
-            .and_then(|encounter| encounter.pending_battle_required_level())
-            && self.job_level(profile) < required
+            .and_then(|encounter| encounter.pending_battle_level_refusal(self.job_level(profile)))
         {
-            out.replies.push(chat::system(&format!(
-                "This activity needs level {required}."
-            )));
+            out.replies.push(chat::system(
+                &crate::activity_portal::Refusal::LevelTooLow(required).message(),
+            ));
             return Ok(true);
         }
         let Some(battle) = self
