@@ -1,4 +1,5 @@
 use super::*;
+use crate::smelting::SmeltingOutcome;
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -97,7 +98,8 @@ fn start(game: &mut Gameplay, at: [f32; 3]) -> Outcome {
 }
 
 fn complete(game: &mut Gameplay, at: [f32; 3]) -> io::Result<()> {
-    game.apply_smelting(
+    game.apply_craft(
+        crate::recipes::CraftingJob::Miner,
         SmeltingOutcome {
             transaction: Some(crate::smelting::SmeltingTransaction {
                 consumes: Vec::new(),

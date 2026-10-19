@@ -35,6 +35,24 @@ impl CraftingJob {
             Self::Miner => 2002,
         }
     }
+
+    /// The job's name as the client's chat lines spell it.
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Chef => "Chef",
+            Self::Blacksmith => "Blacksmith",
+            Self::Miner => "Miner",
+        }
+    }
+
+    /// The activity's lowercase noun as the completion refusals spell it.
+    pub const fn noun(self) -> &'static str {
+        match self {
+            Self::Chef => "cooking",
+            Self::Blacksmith => "forging",
+            Self::Miner => "smelting",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

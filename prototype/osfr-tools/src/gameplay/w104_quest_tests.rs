@@ -1,9 +1,14 @@
 use super::*;
-use crate::quest_engine::{
-    CharacterEligibility, ObjectiveKind, QuestDefinition, QuestEngine, QuestObjective,
-    QuestRequirements,
+use crate::{
+    cooking::CookingOutcome,
+    forging::ForgingOutcome,
+    quest_engine::{
+        CharacterEligibility, ObjectiveKind, QuestDefinition, QuestEngine, QuestObjective,
+        QuestRequirements,
+    },
+    rewards::{RewardDisplay, RewardGrant},
+    smelting::SmeltingOutcome,
 };
-use crate::rewards::{RewardDisplay, RewardGrant};
 
 fn content() -> PathBuf {
     std::env::var_os("W104_CONTENT")
@@ -318,10 +323,16 @@ fn cooking_craft_hook() {
         },
     );
     let mut out = Outcome::default();
-    game.apply_cooking(CookingOutcome::default(), &character, &mut out)
-        .unwrap();
+    game.apply_craft(
+        crate::recipes::CraftingJob::Chef,
+        CookingOutcome::default(),
+        &character,
+        &mut out,
+    )
+    .unwrap();
     count(&game, 0);
-    game.apply_cooking(
+    game.apply_craft(
+        crate::recipes::CraftingJob::Chef,
         CookingOutcome {
             transaction: Some(crate::cooking::CookingTransaction {
                 consumes: vec![],
@@ -352,7 +363,8 @@ fn smelting_craft_hook() {
         },
     );
     let mut out = Outcome::default();
-    game.apply_smelting(
+    game.apply_craft(
+        crate::recipes::CraftingJob::Miner,
         SmeltingOutcome {
             transaction: Some(crate::smelting::SmeltingTransaction {
                 consumes: vec![],
@@ -383,7 +395,8 @@ fn forging_craft_hook() {
         },
     );
     let mut out = Outcome::default();
-    game.apply_forging(
+    game.apply_craft(
+        crate::recipes::CraftingJob::Blacksmith,
         ForgingOutcome {
             transaction: Some(crate::forging::ForgingTransaction {
                 consumes: vec![],

@@ -259,15 +259,20 @@ impl Refusal {
     }
 }
 
-fn near(station: &Station, player: &Player) -> bool {
-    let distance_squared: f32 = station
-        .position
-        .iter()
-        .zip(player.position)
-        .map(|(a, b)| (a - b).powi(2))
-        .sum();
-    // NaN or infinite coordinates make this false.
-    station.zone_id == player.zone_id && distance_squared <= station.radius.powi(2)
+/// (R) True when `position` is inside any station of `job` in `zone_id`.
+/// NaN or infinite coordinates make this false.
+pub fn near_any(stations: &[Station], job: CraftingJob, zone_id: u32, position: [f32; 3]) -> bool {
+    stations.iter().any(|station| {
+        station.job == job
+            && station.zone_id == zone_id
+            && station
+                .position
+                .iter()
+                .zip(position)
+                .map(|(a, b)| (a - b).powi(2))
+                .sum::<f32>()
+                <= station.radius.powi(2)
+    })
 }
 
 fn has_ingredients(required: &[(i32, u32)], available: &[(i32, u32)]) -> bool {
@@ -324,10 +329,7 @@ pub fn start(
     {
         return Err(Refusal::Busy);
     }
-    if !stations
-        .iter()
-        .any(|station| station.job == recipe.job && near(station, player))
-    {
+    if !near_any(stations, recipe.job, player.zone_id, player.position) {
         return Err(Refusal::NoStation(recipe.job));
     }
     if recipe

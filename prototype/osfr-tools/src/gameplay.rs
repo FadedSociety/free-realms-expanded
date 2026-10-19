@@ -5,10 +5,10 @@ use crate::{
     chat,
     chess_service::{ChessActivityOutcome, ChessService},
     combat::{Combat, CombatOutcome, CombatState},
-    cooking::{Cooking, CookingOutcome, CookingState},
+    cooking::{Cooking, CookingState},
     dev_teleport,
     encounter::{EncounterEngine, EncounterOutcome, EncounterState, ZoneTransition},
-    forging::{Forging, ForgingOutcome, ForgingState},
+    forging::{Forging, ForgingState},
     game_rules::GameRuleSet,
     harvest_nodes::Gather,
     harvesting,
@@ -26,8 +26,10 @@ use crate::{
     opening_world::OpeningWorld,
     profiles::{ProfileState, Profiles},
     quests::{QuestEngine, QuestOutcome, QuestState},
+    recipe_book::CraftOutcome,
+    recipes::CraftingJob,
     rewards::RewardState,
-    smelting::{Smelting, SmeltingOutcome, SmeltingState},
+    smelting::{Smelting, SmeltingState},
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -2006,7 +2008,7 @@ impl Gameplay {
                     .as_mut()
                     .unwrap()
                     .tick(elapsed.min(u32::MAX as u64) as u32)?;
-                self.apply_forging(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?;
                 self.forging_tick_ms = Some(now_ms);
             }
             return Ok(out);
@@ -4484,13 +4486,13 @@ impl Gameplay {
                     return Err(invalid("invalid forging leave request"));
                 }
                 let result = self.forging.as_mut().unwrap().cancel();
-                self.apply_forging(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?;
                 self.forging_tick_ms = None;
                 return Ok(out);
             }
             if inner.starts_with(&[39, 0]) {
                 let result = self.forging.as_mut().unwrap().handle(inner)?;
-                self.apply_forging(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[26, 0, 13, 0])
@@ -4507,7 +4509,7 @@ impl Gameplay {
             if let Some(text) = chat::request(inner, character.guid)? {
                 if text.trim().eq_ignore_ascii_case("realm exit") {
                     let result = self.forging.as_mut().unwrap().cancel();
-                    self.apply_forging(result, character, &mut out)?;
+                    self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?;
                     self.forging_tick_ms = None;
                 } else if text.trim().to_ascii_lowercase().starts_with("realm ") {
                     out.replies.push(chat::system(
@@ -4523,12 +4525,12 @@ impl Gameplay {
                     return Err(invalid("invalid cooking leave request"));
                 }
                 let result = self.cooking.as_mut().unwrap().cancel();
-                self.apply_cooking(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Chef, result, character, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[39, 0]) {
                 let result = self.cooking.as_mut().unwrap().handle(inner)?;
-                self.apply_cooking(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Chef, result, character, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[26, 0, 13, 0])
@@ -4545,7 +4547,7 @@ impl Gameplay {
             if let Some(text) = chat::request(inner, character.guid)? {
                 if text.trim().eq_ignore_ascii_case("realm exit") {
                     let result = self.cooking.as_mut().unwrap().cancel();
-                    self.apply_cooking(result, character, &mut out)?;
+                    self.apply_craft(CraftingJob::Chef, result, character, &mut out)?;
                 } else if text.trim().to_ascii_lowercase().starts_with("realm ") {
                     out.replies.push(chat::system(
                         "Close the cooking game before other opening actions.",
@@ -4560,12 +4562,12 @@ impl Gameplay {
                     return Err(invalid("invalid smelting leave request"));
                 }
                 let result = self.smelting.as_mut().unwrap().cancel();
-                self.apply_smelting(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Miner, result, character, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[39, 0]) {
                 let result = self.smelting.as_mut().unwrap().handle(inner)?;
-                self.apply_smelting(result, character, &mut out)?;
+                self.apply_craft(CraftingJob::Miner, result, character, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[26, 0, 13, 0])
@@ -4582,7 +4584,7 @@ impl Gameplay {
             if let Some(text) = chat::request(inner, character.guid)? {
                 if text.trim().eq_ignore_ascii_case("realm exit") {
                     let result = self.smelting.as_mut().unwrap().cancel();
-                    self.apply_smelting(result, character, &mut out)?;
+                    self.apply_craft(CraftingJob::Miner, result, character, &mut out)?;
                 } else if text.trim().to_ascii_lowercase().starts_with("realm ") {
                     out.replies.push(chat::system(
                         "Close the smelting game before other opening actions.",
@@ -4790,14 +4792,14 @@ impl Gameplay {
             );
             match started {
                 Ok(crate::recipe_book::Started::Cooking(result)) => {
-                    self.apply_cooking(result, character, &mut out)?
+                    self.apply_craft(CraftingJob::Chef, result, character, &mut out)?
                 }
                 Ok(crate::recipe_book::Started::Smelting(result)) => {
-                    self.apply_smelting(result, character, &mut out)?
+                    self.apply_craft(CraftingJob::Miner, result, character, &mut out)?
                 }
                 Ok(crate::recipe_book::Started::Forging(result)) => {
                     self.forging_tick_ms = Some(now_ms);
-                    self.apply_forging(result, character, &mut out)?
+                    self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?
                 }
                 Err(refusal) => out.replies.push(refusal.feedback()),
             }
@@ -4924,7 +4926,7 @@ impl Gameplay {
                                 .as_mut()
                                 .unwrap()
                                 .begin_recipe(45, &key, rank, learned, &available)?;
-                            self.apply_cooking(result, character, &mut out)?;
+                            self.apply_craft(CraftingJob::Chef, result, character, &mut out)?;
                         }
                         return Ok(out);
                     }
@@ -4960,7 +4962,7 @@ impl Gameplay {
                                 .unwrap()
                                 .begin_recipe(16, &key, rank, learned, &available)?;
                             self.forging_tick_ms = Some(now_ms);
-                            self.apply_forging(result, character, &mut out)?;
+                            self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?;
                             out.replies.push(chat::system("Original Spunky Scrapper Hammer controls; board tuning, consumption and tint choice are reconstructed."));
                         }
                         return Ok(out);
@@ -4996,7 +4998,7 @@ impl Gameplay {
                                 .as_mut()
                                 .unwrap()
                                 .begin_recipe(14, &key, rank, learned, &available)?;
-                            self.apply_smelting(result, character, &mut out)?;
+                            self.apply_craft(CraftingJob::Miner, result, character, &mut out)?;
                             out.replies.push(chat::system("Original four-stage smelting controls; phase tuning and this local recipe output are reconstructed."));
                         }
                         return Ok(out);
@@ -5250,22 +5252,13 @@ impl Gameplay {
         })
     }
 
-    fn near_craft_station(
-        &self,
-        character: &CharacterState,
-        job: crate::recipes::CraftingJob,
-    ) -> bool {
-        self.crafting_stations().iter().any(|station| {
-            station.job == job
-                && station.zone_id == character.zone_id
-                && station
-                    .position
-                    .iter()
-                    .zip(character.position)
-                    .map(|(a, b)| (a - b).powi(2))
-                    .sum::<f32>()
-                    <= station.radius.powi(2)
-        })
+    fn near_craft_station(&self, character: &CharacterState, job: CraftingJob) -> bool {
+        crate::recipe_book::near_any(
+            &self.crafting_stations(),
+            job,
+            character.zone_id,
+            character.position,
+        )
     }
 
     /// Resolve the opening stations and every currently placed station model.
@@ -5327,42 +5320,60 @@ impl Gameplay {
             .sum()
     }
 
-    fn apply_smelting(
+    /// One completion for the three crafting movies. The recipe key is read
+    /// only after a transaction arrives, and only the Miner tutorial counts the
+    /// bars it grants.
+    fn apply_craft(
         &mut self,
-        result: SmeltingOutcome,
+        job: CraftingJob,
+        result: CraftOutcome,
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
             // (R) A recipe-book run has no tutorial objective; the profile and
             // station checks still bind the completion.
-            if self.profiles.as_ref().unwrap().active() != 14
-                || !self.near_craft_station(character, crate::recipes::CraftingJob::Miner)
+            if self.profiles.as_ref().unwrap().active() != job.profile_id()
+                || !self.near_craft_station(character, job)
             {
-                return Err(invalid("smelting completion is outside a Miner station"));
+                return Err(invalid(format!(
+                    "{} completion is outside a {} station",
+                    job.noun(),
+                    job.name()
+                )));
             }
             if transaction
                 .consumes
                 .iter()
                 .any(|(id, n)| self.material_count(*id) < u64::from(*n))
             {
-                return Err(invalid("smelting ingredients changed before completion"));
+                return Err(invalid(format!(
+                    "{} ingredients changed before completion",
+                    job.noun()
+                )));
             }
             self.consume_materials(transaction.consumes, out)?;
             self.grant_reward(0, &transaction.grants, out)?;
-            let quantity = transaction
-                .grants
-                .iter()
-                .filter(|(id, _)| *id == 21785)
-                .map(|(_, n)| *n)
-                .sum();
-            if self.opening_craft_pending(2002) {
+            // (R) Only the Miner tutorial counts its Copper Bar (21785) grants;
+            // cooking and forging advance their objective by one completion.
+            let quantity: u32 = if job == CraftingJob::Miner {
+                transaction
+                    .grants
+                    .iter()
+                    .filter(|(id, _)| *id == 21785)
+                    .map(|(_, n)| *n)
+                    .sum()
+            } else {
+                1
+            };
+            let opening_recipe = job.opening_recipe_id();
+            if self.opening_craft_pending(opening_recipe) {
                 let progress = self
                     .opening
                     .as_mut()
                     .unwrap()
                     .on_event(OpeningEvent::Craft {
-                        recipe_id: 2002,
+                        recipe_id: opening_recipe,
                         quantity,
                     })?;
                 self.apply_opening(progress, out)?;
@@ -5370,9 +5381,13 @@ impl Gameplay {
             // (R) The opening binding is the fallback for the unnumbered sample.
             let recipe_id = self
                 .recipe_catalog
-                .by_key(self.smelting.as_ref().unwrap().recipe_key())
+                .by_key(match job {
+                    CraftingJob::Chef => self.cooking.as_ref().unwrap().recipe_key(),
+                    CraftingJob::Miner => self.smelting.as_ref().unwrap().recipe_key(),
+                    CraftingJob::Blacksmith => self.forging.as_ref().unwrap().recipe_key(),
+                })
                 .and_then(|r| r.recipe_id)
-                .unwrap_or(2002);
+                .unwrap_or(opening_recipe);
             self.npc_quest_event(
                 crate::quest_engine::QuestEvent::CraftRecipe {
                     recipe_id,
@@ -5488,116 +5503,6 @@ impl Gameplay {
                 return Err(invalid("crafting material consumption incomplete"));
             }
         }
-        Ok(())
-    }
-
-    fn apply_cooking(
-        &mut self,
-        result: CookingOutcome,
-        character: &CharacterState,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        if let Some(transaction) = result.transaction {
-            // (R) A recipe-book run has no tutorial objective; the profile and
-            // station checks still bind the completion.
-            if self.profiles.as_ref().unwrap().active() != 45
-                || !self.near_craft_station(character, crate::recipes::CraftingJob::Chef)
-            {
-                return Err(invalid("cooking completion is outside a Chef station"));
-            }
-            if transaction
-                .consumes
-                .iter()
-                .any(|(id, n)| self.material_count(*id) < u64::from(*n))
-            {
-                return Err(invalid("cooking ingredients changed before completion"));
-            }
-            self.consume_materials(transaction.consumes, out)?;
-            self.grant_reward(0, &transaction.grants, out)?;
-            if self.opening_craft_pending(2001) {
-                let progress = self
-                    .opening
-                    .as_mut()
-                    .unwrap()
-                    .on_event(OpeningEvent::Craft {
-                        recipe_id: 2001,
-                        quantity: 1,
-                    })?;
-                self.apply_opening(progress, out)?;
-            }
-            // (R) Reuse the opening's reconstructed recipe binding.
-            let recipe_id = self
-                .recipe_catalog
-                .by_key(self.cooking.as_ref().unwrap().recipe_key())
-                .and_then(|r| r.recipe_id)
-                .unwrap_or(2001);
-            self.npc_quest_event(
-                crate::quest_engine::QuestEvent::CraftRecipe {
-                    recipe_id,
-                    quantity: 1,
-                },
-                out,
-            )?;
-            self.npc_minigame_win(&result.replies, out)?;
-        }
-        out.changed |= result.changed;
-        out.replies.extend(result.replies);
-        Ok(())
-    }
-
-    fn apply_forging(
-        &mut self,
-        result: ForgingOutcome,
-        character: &CharacterState,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        if let Some(transaction) = result.transaction {
-            // (R) A recipe-book run has no tutorial objective; the profile and
-            // station checks still bind the completion.
-            if self.profiles.as_ref().unwrap().active() != 16
-                || !self.near_craft_station(character, crate::recipes::CraftingJob::Blacksmith)
-            {
-                return Err(invalid(
-                    "forging completion is outside a Blacksmith station",
-                ));
-            }
-            if transaction
-                .consumes
-                .iter()
-                .any(|(id, n)| self.material_count(*id) < u64::from(*n))
-            {
-                return Err(invalid("forging ingredients changed before completion"));
-            }
-            self.consume_materials(transaction.consumes, out)?;
-            self.grant_reward(0, &transaction.grants, out)?;
-            if self.opening_craft_pending(2003) {
-                let progress = self
-                    .opening
-                    .as_mut()
-                    .unwrap()
-                    .on_event(OpeningEvent::Craft {
-                        recipe_id: 2003,
-                        quantity: 1,
-                    })?;
-                self.apply_opening(progress, out)?;
-            }
-            // (R) Reuse the opening's reconstructed recipe binding.
-            let recipe_id = self
-                .recipe_catalog
-                .by_key(self.forging.as_ref().unwrap().recipe_key())
-                .and_then(|r| r.recipe_id)
-                .unwrap_or(2003);
-            self.npc_quest_event(
-                crate::quest_engine::QuestEvent::CraftRecipe {
-                    recipe_id,
-                    quantity: 1,
-                },
-                out,
-            )?;
-            self.npc_minigame_win(&result.replies, out)?;
-        }
-        out.changed |= result.changed;
-        out.replies.extend(result.replies);
         Ok(())
     }
 

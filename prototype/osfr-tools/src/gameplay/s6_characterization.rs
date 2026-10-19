@@ -10,6 +10,7 @@
 use super::*;
 use crate::{
     account_store::AccountRole,
+    recipes::CraftingJob,
     smelting::{SmeltingOutcome, SmeltingTransaction},
 };
 use serde_json::Value;
@@ -335,7 +336,8 @@ fn opening_craft_quantity_sums_every_copper_bar_grant_row() {
     let before = tutorial.game.state();
     tutorial
         .game
-        .apply_smelting(
+        .apply_craft(
+            CraftingJob::Miner,
             SmeltingOutcome {
                 transaction: Some(SmeltingTransaction {
                     consumes: Vec::new(),
