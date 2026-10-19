@@ -829,3 +829,48 @@ fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
     drop(server);
     fs::remove_dir_all(scratch).unwrap();
 }
+
+#[test]
+fn forged_body_identities_do_not_select_another_character_or_invite() {
+    let mut rig = rig("forged-body");
+    let (a, b, c) = (0, 1, 2);
+    let invited_b = send(&mut rig, a, &invite(a, b, 0));
+    let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
+    let invited_c = send(&mut rig, a, &invite(a, c, 0));
+    let invite_b = invited_id(&invited_b, b);
+    let invite_c = invited_id(&invited_c, c);
+    assert_ne!(invite_b, invite_c);
+    let pending_b = rig.world.social.group_invitee(GUIDS[b]);
+    let pending_c = rig.world.social.group_invitee(GUIDS[c]);
+    assert_eq!(pending_b, Some((group_id, GUIDS[a])));
+    assert_eq!(pending_c, Some((group_id, GUIDS[a])));
+
+    // A 40/4 body can name another character and quote that character's
+    // invitation token. The parser consumes the identity fields for the fixed
+    // shape; only the authenticated session GUID and its own token select the
+    // pending invite.
+    let refused = send(&mut rig, b, &response(a, c, invite_c, true));
+    assert_eq!(result_for(&refused, b, 5), Some(3));
+    assert!(!has(&refused, a, 40, 4));
+    assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending_b);
+    assert_eq!(rig.world.social.group_invitee(GUIDS[c]), pending_c);
+    assert_eq!(
+        rig.world.social.group_members(group_id),
+        Some([GUIDS[a]].as_slice())
+    );
+
+    // The same forged body with B's own token still acts on B, the
+    // authenticated session, not on the C named inside the body.
+    let accepted = send(&mut rig, b, &response(a, c, invite_b, true));
+    assert!(has(&accepted, a, 40, 4));
+    assert!(has(&accepted, b, 40, 4));
+    assert!(!has(&accepted, c, 40, 4));
+    assert_eq!(rig.world.social.group_invitee(GUIDS[b]), None);
+    assert_eq!(rig.world.social.group_invitee(GUIDS[c]), pending_c);
+    assert_eq!(rig.world.social.group_of(GUIDS[b]), Some(group_id));
+    assert_eq!(rig.world.social.group_of(GUIDS[c]), None);
+    assert_eq!(
+        rig.world.social.group_members(group_id),
+        Some([GUIDS[a], GUIDS[b]].as_slice())
+    );
+}

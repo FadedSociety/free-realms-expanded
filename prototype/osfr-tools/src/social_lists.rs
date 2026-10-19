@@ -830,6 +830,11 @@ impl SocialService {
             // "already grouped", so use the existing no-group refusal.
             return Ok(vec![message(target_guid, encode_group_result(5, 1))]);
         }
+        // (R) A full group refuses before consuming the invitation, so the refusal
+        // never destroys the invitee's pending row (F183 review finding 6).
+        if accepted && group.members.len() >= self.max_group_members {
+            return Ok(vec![message(target_guid, encode_group_result(5, 2))]);
+        }
         // The server-built 40/4 notice carries the group id in the shared record; the
         // per-invitation generation is only the client's echo token in 40/1.
         let group_data = encode_group_invite(invite.group_id, &inviter, &target.identity())?;
@@ -842,9 +847,6 @@ impl SocialService {
                 .copied()
                 .map(|recipient| message(recipient, body.clone()))
                 .collect());
-        }
-        if group.members.len() >= self.max_group_members {
-            return Ok(vec![message(target_guid, encode_group_result(5, 2))]);
         }
         self.groups
             .get_mut(&invite.group_id)
@@ -1604,4 +1606,54 @@ fn encode_group_kick(guid: u64, name: &SocialName) -> Result<Vec<u8>, SocialErro
     out.extend_from_slice(&guid.to_le_bytes());
     write_social_name(&mut out, name)?;
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn profile(account_id: u64, character_guid: u64, first: &str) -> SocialLists {
+        SocialLists::new(CharacterIdentity {
+            account_id,
+            character_guid,
+            name: SocialName::new(first, "Fixture").unwrap(),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn full_group_accept_refusal_keeps_the_pending_invite() {
+        // The public invite path reserves a slot per pending invite, so a full group with
+        // a pending invite is not constructible through the service API today. Seed the
+        // row directly to pin the refusal ordering: it must precede the invite removal.
+        let mut social = SocialService::new(2).unwrap();
+        social.register(profile(10, 101, "FixtureA")).unwrap();
+        social.register(profile(20, 202, "FixtureB")).unwrap();
+        social.register(profile(30, 303, "FixtureC")).unwrap();
+        social.login(101).unwrap();
+        social.login(303).unwrap();
+        let group_id = social.create_group(101).unwrap();
+        social.groups.get_mut(&group_id).unwrap().members.push(202);
+        social.member_group.insert(202, group_id);
+        let invite_id = 7;
+        social.group_invites.insert(
+            303,
+            PendingGroupInvite {
+                group_id,
+                invite_id,
+                inviter_guid: 101,
+                created_ms: 0,
+            },
+        );
+        let members = social.group_members(group_id).unwrap().to_vec();
+
+        let refused = social
+            .respond_group_invite(303, invite_id, true, 0)
+            .unwrap();
+
+        assert_eq!(refused[0].bytes, [40, 0, 5, 0, 2, 0, 0, 0]);
+        assert_eq!(social.group_invitee(303), Some((group_id, 101)));
+        assert_eq!(social.group_of(303), None);
+        assert_eq!(social.group_members(group_id), Some(members.as_slice()));
+    }
 }
