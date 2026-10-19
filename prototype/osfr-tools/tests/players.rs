@@ -257,6 +257,16 @@ fn two_sessions_spawn_move_and_disconnect_with_exact_wire_bytes() {
     );
 }
 
+#[test]
+fn contains_tracks_the_live_registry_membership() {
+    let mut registry = registry(30.0, 10);
+    assert!(!registry.contains(SessionId(1)));
+    join(&mut registry, 1, 101, 1001, zone(7, 11), [0.0; 3], 0.0);
+    assert!(registry.contains(SessionId(1)));
+    registry.leave(SessionId(1));
+    assert!(!registry.contains(SessionId(1)));
+}
+
 /// T027: a live outfit/job change updates the AddPc snapshot a later viewer
 /// gets; a snapshot bound to another character is refused.
 #[test]

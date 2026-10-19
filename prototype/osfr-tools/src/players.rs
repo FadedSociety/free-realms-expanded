@@ -209,6 +209,11 @@ impl PlayerRegistry {
         self.sessions.get(&session_id)
     }
 
+    /// Whether `session_id` is in the live registry; false immediately after `leave`.
+    pub fn contains(&self, session_id: SessionId) -> bool {
+        self.sessions.contains_key(&session_id)
+    }
+
     /// (R) Read-only grid query, independent of directed PC visibility caps.
     pub fn nearby_sessions(&self, zone: ZoneInstance, position: [f32; 3]) -> BTreeSet<SessionId> {
         if !position.iter().all(|v| v.is_finite()) {

@@ -468,12 +468,19 @@ struct SharedWorld {
     social_paths: BTreeMap<u64, PathBuf>,
     session_keys: BTreeMap<SessionId, SessionKey>,
     active_sessions: BTreeMap<u64, SessionId>,
-    joined: BTreeSet<SessionId>,
-    chat_sessions: BTreeMap<SessionId, ChatSession>,
+    chat_sessions: BTreeMap<SessionId, ChatMember>,
     chat_history: ChatHistory,
     /// W173: each joined character's channel switches and bubble colour (26/32, 26/33, 26/18).
     chat_settings: social_chat::ChatSettingsBook,
     security: Arc<Mutex<Security>>,
+}
+
+/// Live chat identity for one session. Zone, position and group are derived from the player
+/// registry and social at routing time and must never be cached here.
+#[derive(Clone, Debug)]
+struct ChatMember {
+    name: NameData,
+    is_member: bool,
 }
 
 /// Security Model L6/L9 state. Every staged clone of the world shares it, so a
@@ -542,7 +549,6 @@ impl SharedWorld {
             social_paths: BTreeMap::new(),
             session_keys: BTreeMap::new(),
             active_sessions: BTreeMap::new(),
-            joined: BTreeSet::new(),
             chat_sessions: BTreeMap::new(),
             chat_history: ChatHistory::default(),
             chat_settings: social_chat::ChatSettingsBook::default(),
@@ -587,7 +593,6 @@ impl SharedWorld {
                 look,
             )
             .map_err(invalid_io)?;
-        self.joined.insert(session.id);
         self.active_sessions
             .insert(session.character_guid, session.id);
         let mut deliveries = messages
@@ -606,18 +611,10 @@ impl SharedWorld {
                 last: identity.name.last.clone(),
             })
             .unwrap_or_default();
-        let group_id = self.social.group_of(session.character_guid).map(u64::from);
         self.chat_sessions.insert(
             session.id,
-            ChatSession {
-                session_id: session.id.0,
-                character_guid: session.character_guid,
+            ChatMember {
                 name: chat_name,
-                zone_id: state.zone_id,
-                position: state.position,
-                chat_area_id: None,
-                group_id,
-                guild_id: None,
                 is_member: session.is_member,
             },
         );
@@ -662,7 +659,6 @@ impl SharedWorld {
                 self.trades.unregister_player(player.character_guid),
             ));
         }
-        self.joined.remove(&session_id);
         self.chat_sessions.remove(&session_id);
         deliveries.extend(
             self.players
@@ -680,11 +676,7 @@ impl SharedWorld {
     /// also require the recipient's directed view to contain the actor. The registry position is
     /// read before a zone transfer removes the player.
     fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
-        let Some(player) = self
-            .players
-            .get(session)
-            .filter(|_| self.joined.contains(&session))
-        else {
+        let Some(player) = self.players.get(session) else {
             return Vec::new();
         };
         let mut deliveries = Vec::new();
@@ -780,17 +772,14 @@ impl SharedWorld {
         })
     }
 
-    /// Drop a disconnected character's volatile group state and refresh every survivor's chat
-    /// scope. Without the refresh, the last member of a dissolved group would keep its old party
-    /// channel and could still address itself on channel 4.
+    /// Drop a disconnected character's volatile group state. Chat scope is derived from the
+    /// current social service when a message is routed, so survivors need no refresh.
     fn social_disconnect(&mut self, guid: u64) -> io::Result<Vec<Delivery>> {
         let messages = self.social.disconnect(guid).map_err(invalid_io)?;
-        let deliveries = messages
+        Ok(messages
             .into_iter()
             .filter_map(|message| self.social_delivery(message))
-            .collect();
-        self.refresh_group_ids();
-        Ok(deliveries)
+            .collect())
     }
 
     /// (R) Where each joined character stands, read from the authenticated player registry.
@@ -814,10 +803,22 @@ impl SharedWorld {
             .collect()
     }
 
-    fn refresh_group_ids(&mut self) {
-        for chat in self.chat_sessions.values_mut() {
-            chat.group_id = self.social.group_of(chat.character_guid).map(u64::from);
-        }
+    /// Client PacketChat reader 0x00b140c0 -> 0x00b11600 consumes channel, sender/target
+    /// identity, message and position; the live player record owns the spatial fields.
+    fn chat_session(&self, session_id: SessionId) -> Option<ChatSession> {
+        let player = self.players.get(session_id)?;
+        let member = self.chat_sessions.get(&session_id)?;
+        Some(ChatSession {
+            session_id: session_id.0,
+            character_guid: player.character_guid,
+            name: member.name.clone(),
+            zone_id: player.zone.zone_id,
+            position: player.position,
+            chat_area_id: None,
+            group_id: self.social.group_of(player.character_guid).map(u64::from),
+            guild_id: None,
+            is_member: member.is_member,
+        })
     }
 
     fn chat_candidates(
@@ -825,25 +826,23 @@ impl SharedWorld {
         sender: SessionId,
         channel: social_chat::ChatChannel,
     ) -> Vec<ChatSession> {
-        // (R) Spatial channels share canonical membership; tells and party chat cross instances.
-        let local = matches!(
+        // Say and Area stay inside the sender's instance; Yell is zone-wide (R).
+        let local_instance = matches!(
             channel,
-            social_chat::ChatChannel::Say
-                | social_chat::ChatChannel::Yell
-                | social_chat::ChatChannel::Area
+            social_chat::ChatChannel::Say | social_chat::ChatChannel::Area
         );
         let zone = self.players.get(sender).map(|player| player.zone);
         self.chat_sessions
-            .iter()
-            .filter(|(id, _)| {
-                !local
+            .keys()
+            .filter(|id| {
+                !local_instance
                     || zone.is_some_and(|zone| {
                         self.players
                             .get(**id)
                             .is_some_and(|player| player.zone == zone)
                     })
             })
-            .map(|(_, chat)| chat.clone())
+            .filter_map(|id| self.chat_session(*id))
             .collect()
     }
 }
@@ -1779,7 +1778,7 @@ impl Session {
                     .insert(self.character_guid, hours);
             }
             let mut deliveries = staged_world.ride_fanout(self.id, &outcome.nearby);
-            if transfer && staged_world.joined.contains(&self.id) {
+            if transfer && staged_world.players.contains(self.id) {
                 deliveries.extend(staged_world.leave_player(self.id));
             }
             // A state-only change (e.g. jump or crouch flags) is relayed like a move.
@@ -1792,7 +1791,7 @@ impl Session {
             // T027: the same snapshot feeds AddPc, so a viewer who arrives after
             // the change sees the new outfit and job. Current viewers were told
             // by the gameplay 35/6 or 35/7 fanout.
-            if outcome.gameplay_changed && staged_world.joined.contains(&self.id) {
+            if outcome.gameplay_changed && staged_world.players.contains(self.id) {
                 refresh_public_look(&mut staged_world, current.guid, &staged_gateway);
                 let presentation = staged_gateway.player_presentation(self.is_member)?;
                 staged_world
@@ -1806,7 +1805,7 @@ impl Session {
             }
             if outcome.entered_world
                 && staged_gateway.is_world_loaded()
-                && !staged_world.joined.contains(&self.id)
+                && !staged_world.players.contains(self.id)
             {
                 let look = staged_gateway.player_presentation(self.is_member)?;
                 deliveries.extend(staged_world.join_player(self, &current, look, instance)?);
@@ -1816,7 +1815,7 @@ impl Session {
                     self.id,
                     &staged_gateway,
                 ));
-            } else if moved && staged_world.joined.contains(&self.id) {
+            } else if moved && staged_world.players.contains(self.id) {
                 let messages = staged_world
                     .players
                     .update_pose_with_state(
@@ -1832,13 +1831,9 @@ impl Session {
                     recipient: message.recipient,
                     bytes: message.bytes,
                 }));
-                if let Some(chat) = staged_world.chat_sessions.get_mut(&self.id) {
-                    chat.zone_id = current.zone_id;
-                    chat.position = current.position;
-                }
             }
 
-            if staged_world.joined.contains(&self.id) {
+            if staged_world.players.contains(self.id) {
                 self.emote = staged_gateway.emote_context(now_ms);
                 match staged_gateway.ride_view() {
                     Some(view) => {
@@ -1871,7 +1866,6 @@ impl Session {
                         &mut staged_world,
                         now_ms,
                     ));
-                    staged_world.refresh_group_ids();
                 }
             }
             staged_world.social.expire_group_invites(now_ms);
@@ -2228,7 +2222,7 @@ impl Session {
                 Ok(recipients) => recipients,
                 Err(error) => return chat_error_delivery(error, self.id),
             };
-        let Some(sender) = world.chat_sessions.get(&self.id).cloned() else {
+        let Some(sender) = world.chat_session(self.id) else {
             return Vec::new();
         };
         // W173: drop listeners that switched this channel off (never the sender's echo).
@@ -2291,7 +2285,7 @@ impl Session {
         let recipients = world
             .chat_settings
             .listeners(channel, self.id.0, &sessions, recipients);
-        let Some(sender) = world.chat_sessions.get(&self.id) else {
+        let Some(sender) = world.chat_session(self.id) else {
             return Vec::new();
         };
         let encoded = match &request {

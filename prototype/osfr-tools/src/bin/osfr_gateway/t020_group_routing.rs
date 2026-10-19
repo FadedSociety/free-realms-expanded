@@ -108,24 +108,16 @@ fn seed_world(world: &mut SharedWorld, sessions: &[Session; 3]) {
         world.active_sessions.insert(guid, session.id);
         world.chat_sessions.insert(
             session.id,
-            ChatSession {
-                session_id: session.id.0,
-                character_guid: guid,
+            ChatMember {
                 name: NameData {
                     fields: [0; 3],
                     first: first.to_owned(),
                     last: String::new(),
                 },
-                zone_id: 1,
-                position: [index as f32 * 5.0, 0.0, 0.0],
-                chat_area_id: None,
-                group_id: None,
-                guild_id: None,
                 is_member: true,
             },
         );
         world.chat_settings.join(guid, None);
-        world.joined.insert(session.id);
         world.session_keys.insert(session.id, session_key(session));
     }
 }
@@ -159,19 +151,18 @@ pub(super) fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
 }
 
 fn send(rig: &mut Rig, index: usize, packet: &[u8]) -> Vec<Delivery> {
-    let deliveries = rig.sessions[index].route_application(packet, &mut rig.world, 1_000);
-    // Production calls this after every routed application message; group chat reads the
-    // same canonical membership from the chat session.
-    rig.world.refresh_group_ids();
-    deliveries
+    rig.sessions[index].route_application(packet, &mut rig.world, 1_000)
 }
 
 fn route_server(server: &mut Server, key: SessionKey, packet: &[u8]) -> Vec<Delivery> {
     let mut session = server.sessions.remove(&key).unwrap();
     let deliveries = session.route_application(packet, &mut server.world, 1_000);
     server.sessions.insert(key, session);
-    server.world.refresh_group_ids();
     deliveries
+}
+
+fn chat_group(world: &SharedWorld, session: &Session) -> Option<u64> {
+    world.chat_session(session.id).unwrap().group_id
 }
 
 fn inner(delivery: &Delivery) -> &[u8] {
@@ -399,7 +390,7 @@ fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
         rig.world.social.group_members(group_id),
         Some([GUIDS[a], GUIDS[b]].as_slice())
     );
-    assert_eq!(rig.world.chat_sessions[&rig.sessions[c].id].group_id, None);
+    assert_eq!(chat_group(&rig.world, &rig.sessions[c]), None);
     rig.sessions[c].spam_gate = SpamGate::default();
     assert!(send(&mut rig, c, &chat(ChatChannel::Group)).is_empty());
 
@@ -467,11 +458,11 @@ fn interleaved_invites_cannot_overlap_membership_or_group_chat() {
         Some((a_group, GUIDS[a]))
     );
     assert_eq!(
-        rig.world.chat_sessions[&rig.sessions[a].id].group_id,
+        chat_group(&rig.world, &rig.sessions[a]),
         Some(u64::from(a_group))
     );
-    assert_eq!(rig.world.chat_sessions[&rig.sessions[b].id].group_id, None);
-    assert_eq!(rig.world.chat_sessions[&rig.sessions[c].id].group_id, None);
+    assert_eq!(chat_group(&rig.world, &rig.sessions[b]), None);
+    assert_eq!(chat_group(&rig.world, &rig.sessions[c]), None);
     rig.sessions[b].spam_gate = SpamGate::default();
     assert!(send(&mut rig, b, &chat(ChatChannel::Group)).is_empty());
 }
@@ -524,23 +515,25 @@ fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
     let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
     send(&mut rig, b, &response(a, b, group_id, true));
     assert_eq!(
-        rig.world.chat_sessions[&rig.sessions[a].id].group_id,
+        chat_group(&rig.world, &rig.sessions[a]),
         Some(u64::from(group_id))
     );
     assert_eq!(
-        rig.world.chat_sessions[&rig.sessions[b].id].group_id,
+        chat_group(&rig.world, &rig.sessions[b]),
         Some(u64::from(group_id))
     );
 
     // This is the same order as `Server::end_session`: remove the player/chat row, then
     // disconnect the social state. The survivor must lose the dissolved channel too.
     rig.world.leave_player(rig.sessions[b].id);
+    assert!(!rig.world.players.contains(rig.sessions[b].id));
+    assert!(rig.world.chat_session(rig.sessions[b].id).is_none());
     let delivered = rig.world.social_disconnect(GUIDS[b]).unwrap();
     assert!(delivered.iter().any(
         |delivery| delivery.recipient == rig.sessions[a].id && family_sub(delivery) == (40, 3)
     ));
     assert_eq!(rig.world.social.group_of(GUIDS[a]), None);
-    assert_eq!(rig.world.chat_sessions[&rig.sessions[a].id].group_id, None);
+    assert_eq!(chat_group(&rig.world, &rig.sessions[a]), None);
     assert!(send(&mut rig, a, &chat(ChatChannel::Group)).is_empty());
 }
 
@@ -552,7 +545,7 @@ fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
     let group_id = server.world.social.group_of(GUIDS[a]).unwrap();
     route_server(&mut server, keys[b], &response(a, b, group_id, true));
     assert_eq!(
-        server.world.chat_sessions[&server.sessions[&keys[a]].id].group_id,
+        chat_group(&server.world, &server.sessions[&keys[a]]),
         Some(u64::from(group_id))
     );
 
@@ -562,10 +555,7 @@ fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
     assert_eq!(server.world.social.group_of(GUIDS[a]), None);
     assert_eq!(server.world.social.group_of(GUIDS[b]), None);
     assert_eq!(server.world.social.group_members(group_id), None);
-    assert_eq!(
-        server.world.chat_sessions[&server.sessions[&keys[a]].id].group_id,
-        None
-    );
+    assert_eq!(chat_group(&server.world, &server.sessions[&keys[a]]), None);
     assert!(!server.world.active_sessions.contains_key(&GUIDS[b]));
     assert!(route_server(&mut server, keys[a], &chat(ChatChannel::Group)).is_empty());
 
@@ -609,8 +599,7 @@ fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
         .group_members(group_id)
         .unwrap()
         .to_vec();
-    let chat_groups =
-        [a, b].map(|index| server.world.chat_sessions[&server.sessions[&keys[index]].id].group_id);
+    let chat_groups = [a, b].map(|index| chat_group(&server.world, &server.sessions[&keys[index]]));
 
     let stale = server.sessions.remove(&stale_key).unwrap();
     server.end_session(stale_key, stale, "duplicate_session");
@@ -626,9 +615,7 @@ fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
         Some(roster.as_slice())
     );
     assert_eq!(
-        [a, b].map(|index| {
-            server.world.chat_sessions[&server.sessions[&keys[index]].id].group_id
-        }),
+        [a, b].map(|index| chat_group(&server.world, &server.sessions[&keys[index]])),
         chat_groups
     );
     let party_chat = route_server(&mut server, keys[a], &chat(ChatChannel::Group));

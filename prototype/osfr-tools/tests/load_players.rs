@@ -192,7 +192,10 @@ fn gateway_sixteen_players() {
         )
         // The bin's test modules live in src/bin/osfr_gateway/ (#[path]); the splice moves the
         // source, so make those paths absolute.
-        .replace("#[path = \"osfr_gateway/", &format!("#[path = \"{bin_dir}/osfr_gateway/"));
+        .replace(
+            "#[path = \"osfr_gateway/",
+            &format!("#[path = \"{bin_dir}/osfr_gateway/"),
+        );
     let fixture = crate_dir
         .join("tests/common/startup_selfdata_fixture.rs")
         .display()
@@ -272,7 +275,7 @@ fn gateway_sixteen_players() {
 #[cfg(not(w96_gateway_probe))]
 const CLONE_PROBE: &str = r#"
 pub(super) fn w96_clone_us(server: &Server) -> f64 {
-    assert_eq!(server.world.joined.len(), 16);
+    assert_eq!(server.world.chat_sessions.len(), 16);
     let start = std::time::Instant::now();
     for _ in 0..1000 { std::hint::black_box(server.world.clone()); }
     start.elapsed().as_secs_f64() * 1e6 / 1000.0
@@ -306,9 +309,11 @@ fn w96_step_and_clone() {
         let (client, messages) = log_in(&mut server, 500 + guid as u32, guid, &path);
         assert!(messages.iter().any(|m| is_opcode(m, 12)), "world entry missing for synthetic id {guid}");
         clients.push(client);
+        // Ack the spawn fanout for every live client; otherwise the earlier
+        // sessions hit the reliable retry limit while the later ones log in.
+        for client in &mut clients { client.drain(&mut server); }
     }
     assert_eq!(server.active_session_count(), 16);
-    for client in &mut clients { client.drain(&mut server); }
     let clone_us = gateway_runner::w96_clone_us(&server);
     // Flags-only movement avoids disk saves. 125 still traverses the real
     // decoder, gateway, commit_outcome world clone, registry and UDP fanout.

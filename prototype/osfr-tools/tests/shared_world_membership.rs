@@ -43,10 +43,16 @@ struct Fixture {
     handle: Option<thread::JoinHandle<()>>,
     root: PathBuf,
     accounts: PathBuf,
+    version: String,
 }
 
 impl Fixture {
     fn new() -> Self {
+        Self::with_gameplay(false)
+    }
+
+    fn with_gameplay(content: bool) -> Self {
+        let version = if content { "1.910.1.530630" } else { VERSION };
         let root = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../..")
             .join(format!(
@@ -59,13 +65,21 @@ impl Fixture {
             ));
         assert!(!root.exists(), "scratch fixture already exists");
         fs::create_dir_all(&root).unwrap();
-        let reference = create_reference(&root);
+        let reference = if content {
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../lab/references/rust-gateway-reference")
+        } else {
+            create_reference(&root)
+        };
         let accounts = create_account_store(&root);
         let options = Options {
             bind: "127.0.0.1:0".parse().unwrap(),
             reference,
             state: root.join("state.json"),
-            content: None,
+            content: content.then(|| {
+                Path::new(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../../lab/references/rust-opening-cooking-original-assets")
+            }),
             identity: None,
             account_store: Some(accounts.clone()),
             gateway_ticket: String::new(),
@@ -101,6 +115,7 @@ impl Fixture {
             handle: Some(handle),
             root,
             accounts,
+            version: version.to_owned(),
         }
     }
 
@@ -127,7 +142,7 @@ impl Fixture {
             connection_id,
             guid,
             ticket: login::gateway_binding_ticket(HANDOFF_KEY, account, guid),
-            version: VERSION.into(),
+            version: self.version.clone(),
             expect_timeout_ms: 3000,
             quiet: true,
         })
@@ -464,6 +479,107 @@ fn two_bot_socket_membership_and_transfer() {
     assert_chat(&local[1], 444444);
     println!(
         "public mutual AddPc; child isolation; movement/say/quick isolation; cross-instance party/tell; rollback; same-scene reunion: passed"
+    );
+}
+
+#[test]
+fn chat_scope_derives_zone_and_position_from_the_live_registry() {
+    const FAR_SAY: u64 = 7;
+    const NEAR_SAY: u64 = 800_000;
+    const OTHER_ZONE_YELL: u64 = 90_000_000_000;
+    const REJOINED_SAY: u64 = 1_234_567_890_123;
+    let f = Fixture::with_gameplay(true);
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let store = AccountStore::load(&f.accounts).unwrap();
+    for (guid, bot) in [(101, &mut a), (202, &mut b)] {
+        let account = store.account(guid).unwrap();
+        bot.send_message(
+            &bot::login_message(
+                guid,
+                &login::gateway_binding_ticket(HANDOFF_KEY, account, guid),
+                &f.version,
+            ),
+            "1",
+        )
+        .unwrap();
+    }
+    for bot in [&mut a, &mut b] {
+        bot.wait_for(PATIENCE, |_| true).unwrap();
+        bot.send_message(&packet(13, &[]), "13").unwrap();
+    }
+    for bot in [&mut a, &mut b] {
+        bot.wait_for(PATIENCE, |_| true).unwrap();
+    }
+    a.send_message(&packet(10, &[]), "10").unwrap();
+    f.ready(101, &mut a, &mut b);
+    b.send_message(&packet(10, &[]), "10").unwrap();
+    f.ready(202, &mut a, &mut b);
+
+    let child = f.host(|s| s.test_field_child());
+    f.host(move |s| s.test_transfer(101, child, false)).unwrap();
+    f.ready(101, &mut a, &mut b);
+    f.host(move |s| s.test_transfer(202, child, false)).unwrap();
+    f.ready(202, &mut a, &mut b);
+    let (state, instance, ..) = f.host(|s| s.test_location(101).unwrap());
+    assert_eq!(state.zone_id, 0);
+    assert_ne!(state.zone_id as u64, instance as u64);
+
+    f.host(|s| {
+        s.test_observer_position(101, [31., 0., 0.]);
+        s.test_observer_position(202, [0., 0., 0.]);
+    });
+    a.send_message(&bot::wrap(&chat(ChatChannel::Say, FAR_SAY)), "15/1")
+        .unwrap();
+    let mut far = Default::default();
+    settle(&mut a, &mut b, &mut far, |m| {
+        chat_count(&m[0], FAR_SAY) >= 1
+    });
+    assert_eq!(chat_count(&far[0], FAR_SAY), 1, "far say echo");
+    assert_eq!(chat_count(&far[1], FAR_SAY), 0, "far say listener");
+
+    f.host(|s| s.test_observer_position(101, [0., 0., 0.]));
+    a.send_message(&bot::wrap(&chat(ChatChannel::Say, NEAR_SAY)), "15/1")
+        .unwrap();
+    let mut near = Default::default();
+    settle(&mut a, &mut b, &mut near, |m| {
+        chat_count(&m[1], NEAR_SAY) >= 1
+    });
+    assert_eq!(chat_count(&near[0], NEAR_SAY), 1, "near say echo");
+    assert_eq!(chat_count(&near[1], NEAR_SAY), 1, "near say listener");
+
+    let other_zone = f.host(|s| s.test_child());
+    f.host(move |s| s.test_transfer(101, other_zone, false))
+        .unwrap();
+    f.ready(101, &mut a, &mut b);
+    assert_eq!(f.host(|s| s.test_location(101).unwrap().0.zone_id), 9600);
+    collect(&mut a, &mut b, Duration::from_millis(500));
+    a.send_message(
+        &bot::wrap(&chat(ChatChannel::Yell, OTHER_ZONE_YELL)),
+        "15/1",
+    )
+    .unwrap();
+    let mut yell = Default::default();
+    settle(&mut a, &mut b, &mut yell, |m| {
+        chat_count(&m[0], OTHER_ZONE_YELL) >= 1
+    });
+    assert_eq!(chat_count(&yell[0], OTHER_ZONE_YELL), 1, "yell echo");
+    assert_eq!(chat_count(&yell[1], OTHER_ZONE_YELL), 0, "yell other zone");
+
+    f.host(move |s| s.test_transfer(101, child, false)).unwrap();
+    f.ready(101, &mut a, &mut b);
+    collect(&mut a, &mut b, Duration::from_millis(500));
+    a.send_message(&bot::wrap(&chat(ChatChannel::Say, REJOINED_SAY)), "15/1")
+        .unwrap();
+    let mut rejoined = Default::default();
+    settle(&mut a, &mut b, &mut rejoined, |m| {
+        chat_count(&m[1], REJOINED_SAY) >= 1
+    });
+    assert_eq!(chat_count(&rejoined[0], REJOINED_SAY), 1, "rejoined echo");
+    assert_eq!(
+        chat_count(&rejoined[1], REJOINED_SAY),
+        1,
+        "rejoined listener"
     );
 }
 

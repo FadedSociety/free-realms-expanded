@@ -88,25 +88,17 @@ fn rig(name: &str) -> Rig {
             .unwrap();
         world.chat_sessions.insert(
             session.id,
-            ChatSession {
-                session_id: session.id.0,
-                character_guid: guid,
+            ChatMember {
                 // Synthetic fixture names, not recovered player names.
                 name: NameData {
                     fields: [0; 3],
                     first: format!("P{guid}"),
                     last: String::new(),
                 },
-                zone_id: 1,
-                position: [x, 0.0, 0.0],
-                chat_area_id: None,
-                group_id: None,
-                guild_id: None,
                 is_member: true,
             },
         );
         world.chat_settings.join(guid, None);
-        world.joined.insert(session.id);
     }
     Rig {
         sessions,
@@ -364,6 +356,9 @@ fn combat_bundle_children_are_budgeted_once() {
     }
     let mut membership = World::runtime();
     let mut sessions = SessionMap::new();
+    // Probe with an instant no later than the bundle's own charge, so wall-clock
+    // time cannot refill the 5/s action budget between dispatch and this check.
+    let before = Instant::now();
     session
         .dispatch_message(
             &bundle,
@@ -376,7 +371,7 @@ fn combat_bundle_children_are_budgeted_once() {
         )
         .unwrap();
 
-    let now = Instant::now();
+    let now = before;
     let mut security = rig.world.security.lock().unwrap_or_else(|e| e.into_inner());
     let allowed = (0..10)
         .filter(|_| {
