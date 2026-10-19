@@ -1014,6 +1014,12 @@ impl Gateway {
         // Reuse opcode-31 layout, native reader 008e4ae0 (zone_transition.rs).
         crate::zone_transition::decode(&packet)?;
         self.state = state;
+        // (R) A same-zone instance transfer still makes the client reload the
+        // scene, so the old instance's ground pickups are gone from it. Done on
+        // the staged clone: a refused transfer leaves the live pickups intact.
+        if let Some(gameplay) = self.gameplay.as_mut() {
+            gameplay.discard_ground_pickups();
+        }
         self.movement_state = MovementState::new(scene.zone_id, scene.position, scene.rotation);
         self.expected_discontinuity = Some(ExpectedDiscontinuity::zone_change(
             scene.zone_id,

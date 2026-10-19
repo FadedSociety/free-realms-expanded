@@ -3,6 +3,14 @@
 include!("shared_field_state.rs");
 
 fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
+    interest_fixture_with(passive, exclude_pc, |_| {})
+}
+
+fn interest_fixture_with(
+    passive: usize,
+    exclude_pc: bool,
+    edit_content: impl FnOnce(&Path),
+) -> Fixture {
     static SERIAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/reports/shared-world-w108/slice-3")
@@ -14,6 +22,7 @@ fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
     fs::create_dir_all(&root).unwrap();
     let accounts = create_account_store(&root);
     let content = create_content(&root);
+    edit_content(&content);
     // Empty passive world except the requested cap fixture. No campaign edits.
     fs::write(
         content.join("npc_spawns_extra.json"),
@@ -101,6 +110,25 @@ fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
     }
 }
 
+/// The same synthetic field, with one guaranteed big-heart drop whose 0.5 m
+/// pickup radius stays outside A's 1 m attack standoff.
+fn pickup_fixture() -> Fixture {
+    interest_fixture_with(0, false, |content| {
+        let path = content.join("field_enemies.json");
+        let mut rows: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        rows["enemies"][0]["power_up_table"] = serde_json::json!("boss");
+        fs::write(&path, rows.to_string()).unwrap();
+        let mut power_ups: serde_json::Value = serde_json::from_slice(
+            &fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/power_ups.json"))
+                .unwrap(),
+        )
+        .unwrap();
+        power_ups["pickup"]["radius"] = serde_json::json!(0.5);
+        fs::write(content.join("power_ups.json"), power_ups.to_string()).unwrap();
+    })
+}
+
 fn interest_login(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) -> [Vec<Vec<u8>>; 2] {
     let store = AccountStore::load(&f.accounts).unwrap();
     for (guid, client) in [(101, &mut *a), (202, &mut *b)] {
@@ -156,6 +184,18 @@ fn hits_from(packets: &[Vec<u8>], actor: u64) -> usize {
                 && p.get(20..28) == Some(E.to_le_bytes().as_slice())
         })
         .count()
+}
+
+/// Power-up actor GUIDs in a batch. `PICKUP_GUID_BASE` in `encounter.rs`.
+fn pickups(packets: &[Vec<u8>]) -> Vec<u64> {
+    packets
+        .iter()
+        .filter(|p| is_sub(p, 35, 2))
+        .filter_map(|p| {
+            let guid = u64::from_le_bytes(p.get(4..12)?.try_into().ok()?);
+            (guid & 0xffff_ffff_0000_0000 == 0x5057_5550_0000_0000).then_some(guid)
+        })
+        .collect()
 }
 
 #[test]
@@ -381,6 +421,18 @@ fn interest_engine() -> osfr_tools::encounter::EncounterEngine {
     engine
 }
 
+fn scene_zone(id: u32) -> osfr_tools::content::Zone {
+    osfr_tools::content::Zone {
+        id,
+        name: id.to_string(),
+        geometry_id: Some(id),
+        zone_type: Some(2),
+        tutorial: Some(false),
+        sky: Some(String::new()),
+        source: Vec::new(),
+    }
+}
+
 #[test]
 fn w127_exact_death_respawn_clock_and_no_personal_credit() {
     let mut a = interest_engine();
@@ -556,6 +608,159 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
     );
     println!(
         "T032 private instance: HP [200,100,0] across two members, one death removal each, public field unchanged"
+    );
+}
+
+#[test]
+fn t032_a_seeded_nonzero_zone_enters_one_shared_public_instance() {
+    use osfr_tools::world::{InstanceKind, World, WorldPose};
+
+    let mut a = interest_engine();
+    let seed = a.take_shared_fields().unwrap();
+    let mut world = World::runtime();
+    world.register_runtime_zone(scene_zone(9600)).unwrap();
+    world.install_field_seed(9600, seed);
+    let first = world
+        .prepare_membership(101, 9600, None, WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    let instance = first.instance_id();
+    assert_ne!(instance, 0, "a nonzero seeded zone keeps a distinct id");
+    world.commit_membership(first);
+    assert_eq!(
+        world.instance(instance).unwrap().kind,
+        InstanceKind::Public,
+        "every seeded zone's first entrant joins its shared public instance"
+    );
+    assert_eq!(world.public_instance(9600), Some(instance));
+    let mut field = world.field(instance).unwrap().clone();
+    let hit = a
+        .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 0)
+        .unwrap();
+    assert_eq!(hp_values(&hit.replies), vec![200]);
+    world.install_field(instance, field);
+    let second = world
+        .prepare_membership(202, 9600, None, WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    assert_eq!(
+        second.instance_id(),
+        instance,
+        "the second entrant must share the same public instance, not get a solo child"
+    );
+    world.commit_membership(second);
+    assert_eq!(
+        world.field(instance).unwrap().health(E),
+        Some(200),
+        "committing the second member must preserve the shared damaged HP"
+    );
+    assert_eq!(world.field_instances(), [instance]);
+    assert_eq!(world.instance(instance).unwrap().members, [101, 202].into());
+    println!("T032 nonzero seeded zone: one public instance, shared field, late join keeps HP 200");
+}
+
+#[test]
+fn t032_a_seeded_zone_is_seeded_by_public_entry() {
+    use osfr_tools::world::{World, WorldPose};
+
+    let mut a = interest_engine();
+    let seed = a.take_shared_fields().unwrap();
+    let mut world = World::runtime();
+    world.register_runtime_zone(scene_zone(9600)).unwrap();
+    world.install_field_seed(9600, seed);
+    let entered = world.enter_public(101, 9600, WorldPose::ORIGIN, 0).unwrap();
+    assert_eq!(
+        world.instance(entered.instance_id).unwrap().kind,
+        osfr_tools::world::InstanceKind::Public
+    );
+    assert!(
+        world.field(entered.instance_id).is_some(),
+        "entering a seeded public instance must install its field runtime, not only membership commit"
+    );
+}
+
+#[test]
+fn t032_a_private_child_never_aliases_a_seeded_public_instance() {
+    use osfr_tools::world::{InstanceKind, World, WorldError, WorldPose};
+
+    let mut a = interest_engine();
+    let seed = a.take_shared_fields().unwrap();
+    let mut world = World::runtime();
+    // A private child takes id 1 before zone 1 is registered, then a seed is
+    // installed for zone 1: its zone-derived public id is already occupied.
+    let child = world
+        .create_child_instance(0, 0, InstanceKind::Encounter { encounter_id: 0 }, 0)
+        .unwrap();
+    assert_eq!(child, 1);
+    world.register_runtime_zone(scene_zone(1)).unwrap();
+    world.install_field_seed(1, seed);
+    assert!(
+        matches!(
+            world.prepare_membership(101, 1, None, WorldPose::ORIGIN, true, 0),
+            Err(WorldError::PublicInstanceTaken(1))
+        ),
+        "the private child must never be accepted as the seeded public instance"
+    );
+    assert_eq!(world.public_instance(1), None);
+    assert_eq!(
+        world.instance(child).unwrap().kind,
+        InstanceKind::Encounter { encounter_id: 0 }
+    );
+}
+
+#[test]
+#[ignore = "requires private OSFR_PLAY_PACKAGE; synthetic accounts/content only"]
+fn t032_same_zone_transfer_discards_the_pickups_the_client_left_behind() {
+    let f = pickup_fixture();
+    let mut a = f.bot(101, 10801);
+    let mut b = f.bot(202, 10802);
+    let _startup = interest_login(&f, &mut a, &mut b);
+    let child = f.host(|s| s.test_field_child());
+    assert_ne!(child, 0);
+    // A kills E with the guaranteed big heart. A stands 1 m away and the drop
+    // radius is 0.5 m, so the pickup is still on the ground after commit.
+    let mut kill = [Vec::new(), Vec::new()];
+    for (index, hp) in [200, 100, 0].into_iter().enumerate() {
+        interest_cast(&mut a);
+        let batch = interest_committed_result(&f, &mut a, &mut b, hp, 0);
+        for i in 0..2 {
+            kill[i].extend(batch[i].clone());
+        }
+        if index < 2 {
+            // One player's basic-swing cooldown; the wait is not a pace, the
+            // server refuses a faster second swing.
+            let _ = collect(&mut a, &mut b, Duration::from_millis(700));
+        }
+    }
+    let dropped = pickups(&kill[0]);
+    assert_eq!(dropped.len(), 1, "the lethal kill spawns one pickup actor");
+    let pickup = dropped[0];
+    assert_eq!(f.host(|s| s.test_pickup_count(101)), Some(1));
+    // A refused transfer clears only its staged clone, so location, membership
+    // and the ground drop stay exactly as they were.
+    let before = f.host(|s| s.test_location(101).unwrap());
+    assert!(f.host(move |s| s.test_transfer(101, child, true)).is_err());
+    assert_eq!(f.host(|s| s.test_location(101).unwrap()), before);
+    assert_eq!(
+        f.host(|s| s.test_pickup_count(101)),
+        Some(1),
+        "a refused transfer changes nothing"
+    );
+    // The same-zone transfer is a client scene reload: the drop is not moved
+    // into the new instance and cannot pay out there.
+    f.host(move |s| s.test_transfer(101, child, false)).unwrap();
+    assert_eq!(f.host(|s| s.test_location(101).unwrap()).1, child);
+    assert_eq!(
+        f.host(|s| s.test_pickup_count(101)),
+        Some(0),
+        "the old instance's ground pickups are gone from the reloaded client"
+    );
+    let _entered = f.ready(101, &mut a, &mut b);
+    f.host(|s| s.test_observer_position(101, [0., 0., 0.]));
+    let after = collect(&mut a, &mut b, Duration::from_millis(500));
+    let ghost =
+        |p: &Vec<u8>| is_sub(p, 35, 3) && p.get(6..14) == Some(pickup.to_le_bytes().as_slice());
+    assert!(
+        !after.iter().flatten().any(ghost),
+        "the stale pickup must not be collected in the new instance"
     );
 }
 

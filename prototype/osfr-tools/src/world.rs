@@ -709,6 +709,7 @@ pub enum WorldError {
     DungeonHasNoZone(String),
     UnknownParent(InstanceId),
     PublicMustBeShared,
+    PublicInstanceTaken(InstanceId),
     PlayerNotInInstance(PlayerId),
     InvalidPose,
     NumericRange(&'static str),
@@ -725,6 +726,9 @@ impl std::fmt::Display for WorldError {
             Self::DungeonHasNoZone(id) => write!(out, "dungeon {id} has no zone mapping"),
             Self::UnknownParent(id) => write!(out, "unknown parent instance {id}"),
             Self::PublicMustBeShared => out.write_str("public instances are keyed by zone"),
+            Self::PublicInstanceTaken(id) => {
+                write!(out, "public instance id {id} is held by a private instance")
+            }
             Self::PlayerNotInInstance(id) => write!(out, "player {id} is not in that instance"),
             Self::InvalidPose => out.write_str("pose contains a non-finite component"),
             Self::NumericRange(field) => write!(out, "{field} is outside the wire range"),
@@ -768,7 +772,9 @@ pub struct World {
     // (R) Empty private instances use a local grace interval.
     empty_instance_grace_ms: u64,
     // (R) Kills whose big-heart group heal was already given (W158); bounded.
-    group_heals: std::collections::VecDeque<(u64, u64)>,
+    // The instance is part of the key because seeded instances reuse the same
+    // authored enemy GUID, so guid+ms alone can be two real kills.
+    group_heals: std::collections::VecDeque<(InstanceId, u64, u64)>,
 }
 
 /// (R) Only touched membership data is staged. No packets or world-wide clone.
@@ -794,17 +800,20 @@ impl World {
             .or_default()
             .extend(packets);
     }
-    /// True the first time a kill's big-heart group heal is claimed (R: one
-    /// group heal per kill, however many participants picked up a heart). The
-    /// last 256 kills are remembered.
-    pub fn claim_group_heal(&mut self, kill: (u64, u64)) -> bool {
-        if self.group_heals.contains(&kill) {
+    /// True the first time a kill's big-heart group heal is claimed in
+    /// `instance` (R: one group heal per kill, however many participants picked
+    /// up a heart). Seeded instances reuse authored enemy GUIDs, so the same
+    /// (guid, ms) can be two real kills; the instance is part of the identity.
+    /// The last 256 claims are remembered.
+    pub fn claim_group_heal(&mut self, instance: InstanceId, kill: (u64, u64)) -> bool {
+        let claim = (instance, kill.0, kill.1);
+        if self.group_heals.contains(&claim) {
             return false;
         }
         if self.group_heals.len() >= 256 {
             self.group_heals.pop_front();
         }
-        self.group_heals.push_back(kill);
+        self.group_heals.push_back(claim);
         true
     }
     pub fn take_field_packets(&mut self, instance: InstanceId) -> Vec<Vec<u8>> {
@@ -907,7 +916,9 @@ impl World {
     }
 
     /// (R) Existing targets are supplied only by server-authorized entry paths.
-    /// A scene change to nonzero allocates a solo child until group consent is wired.
+    /// A seeded scene is served by its one shared public instance, whatever its
+    /// zone id; an unseeded nonzero scene allocates a solo child (battle,
+    /// dungeon and minigame scenes keep their per-entry isolation).
     pub fn prepare_membership(
         &self,
         player: PlayerId,
@@ -934,11 +945,25 @@ impl World {
                 return Err(WorldError::UnknownZone(zone_id));
             }
             id
-        } else if zone_id == 0 {
-            let id = self.public_instance(zone_id).unwrap_or(0);
-            if !self.instances.contains_key(&id) {
-                instance =
-                    Some(self.make_instance(id, zone_id, InstanceKind::Public, None, now_ms)?);
+        } else if zone_id == 0 || self.field_seeds.contains_key(&zone_id) {
+            // (R) Public instance identity follows the zone id, as zone 0
+            // already does; private children skip registered zone ids.
+            let id = match self.public_instance(zone_id) {
+                Some(id) => id,
+                None => i32::try_from(zone_id).map_err(|_| WorldError::NumericRange("zone id"))?,
+            };
+            match self.instances.get(&id) {
+                // (R) A scene registered after child allocation can find its
+                // zone-derived id held by a private instance. Fail closed
+                // rather than alias that instance into public space.
+                Some(row) if row.kind != InstanceKind::Public || row.zone_id != zone_id => {
+                    return Err(WorldError::PublicInstanceTaken(id));
+                }
+                Some(_) => {}
+                None => {
+                    instance =
+                        Some(self.make_instance(id, zone_id, InstanceKind::Public, None, now_ms)?)
+                }
             }
             id
         } else {
@@ -1184,6 +1209,9 @@ impl World {
                 ready: false,
             },
         );
+        // (R) Every entry path into a seeded instance gets its own runtime, not
+        // just `commit_membership`; unseeded arena/dungeon instances stay inert.
+        self.ensure_field_from_seed(target);
         Ok(sequence)
     }
 

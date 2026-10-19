@@ -2361,7 +2361,16 @@ impl Session {
         let Some(group) = world.social.group_of(self.character_guid) else {
             return Ok(());
         };
-        if !membership.claim_group_heal(heal.kill) {
+        let zone = self.gateway.state().zone_id;
+        // A seeded field has the same kill id in every instance, so the claim is
+        // per instance; without a committed place there is nobody to heal.
+        let Some(instance) = membership
+            .player_location(self.character_guid)
+            .map(|l| l.instance_id)
+        else {
+            return Ok(());
+        };
+        if !membership.claim_group_heal(instance, heal.kill) {
             return Ok(());
         }
         let members = world
@@ -2369,10 +2378,6 @@ impl Session {
             .group_members(group)
             .map(<[u64]>::to_vec)
             .unwrap_or_default();
-        let zone = self.gateway.state().zone_id;
-        let instance = membership
-            .player_location(self.character_guid)
-            .map(|l| l.instance_id);
         for guid in members.into_iter().filter(|g| *g != self.character_guid) {
             let Some(session) = world
                 .active_sessions
@@ -2383,7 +2388,7 @@ impl Session {
                 continue;
             };
             let same_place = session.gateway.state().zone_id == zone
-                && membership.player_location(guid).map(|l| l.instance_id) == instance;
+                && membership.player_location(guid).map(|l| l.instance_id) == Some(instance);
             if !same_place {
                 continue;
             }
@@ -3459,6 +3464,17 @@ impl Server {
         self.sessions[&self.world.session_keys[&id]]
             .known_npcs
             .clone()
+    }
+    #[cfg(test)]
+    pub fn test_pickup_count(&self, guid: u64) -> Option<usize> {
+        let id = self.world.active_sessions.get(&guid)?;
+        Some(
+            self.sessions
+                .get(self.world.session_keys.get(id)?)?
+                .gateway
+                .gameplay()?
+                .pickup_count(),
+        )
     }
     #[cfg(test)]
     pub fn test_field_clock(&self, guid: u64) -> (u64, Option<u64>) {

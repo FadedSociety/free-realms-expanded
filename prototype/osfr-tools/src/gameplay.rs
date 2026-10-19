@@ -518,6 +518,20 @@ impl Gameplay {
         }
         Ok(out)
     }
+    /// (R) An instance transfer replaces this session's scene even when the
+    /// zone id is unchanged; old ground pickups are no longer in the client.
+    pub fn discard_ground_pickups(&mut self) {
+        if let Some(encounter) = &mut self.encounter {
+            encounter.discard_ground_pickups();
+        }
+    }
+    /// How many ground pickups this session still holds (tests and diagnostics).
+    pub fn pickup_count(&self) -> usize {
+        self.encounter
+            .as_ref()
+            .map_or(0, crate::encounter::EncounterEngine::pickup_count)
+    }
+
     /// W158: another group member picked up a big heart; heal this player too.
     pub fn receive_group_heal(&mut self, percent: u32) -> io::Result<Outcome> {
         let mut out = Outcome::default();

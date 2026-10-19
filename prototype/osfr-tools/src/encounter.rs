@@ -2254,6 +2254,19 @@ impl EncounterEngine {
         self.pickup_zone = Some(zone);
     }
 
+    /// (R) A transfer into another instance of the same scene makes the client
+    /// reload that scene (opcode 31 / client begin-zoning reader 0x008e4ae0),
+    /// so its ground pickups are gone. The held power-up is player state, not
+    /// scene state, and stays.
+    pub fn discard_ground_pickups(&mut self) {
+        self.pickups.clear();
+    }
+
+    /// How many ground pickups this session still holds (tests and diagnostics).
+    pub fn pickup_count(&self) -> usize {
+        self.pickups.len()
+    }
+
     /// Roll `table` for one participant of the kill and spawn each drop as a
     /// pickup actor. An unknown table, no loaded file or a full ground drops
     /// nothing. With several participants every chance is scaled by the file's
