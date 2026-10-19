@@ -6,15 +6,21 @@
 //! tests it against 1), and the V2 merchant window sells with the null session merchant GUID
 //! (`00c77030`). Everything else asserted here is server policy (R).
 
+#[path = "common/gateway_vendor.rs"]
+mod gateway_vendor;
+
+use gateway_vendor::{
+    NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
+    sell_packet, send, vendor_buy_packet, wrap,
+};
 use osfr_tools::{
     account_store::AccountRole,
     coin_shop::{self, CoinShop, CoinShopOutcome, StoreCatalogue},
     gameplay::{Gameplay, GameplayState},
-    gateway::{Gateway, GatewayOutcome},
+    gateway::Gateway,
     inventory::{Inventory, InventoryItem, InventoryState},
     npc_interaction::{
-        MerchantBuyRequestV2, NpcAction, NpcInteraction, NpcInteractionError, NpcSelection,
-        decode_merchant_list_66_42, encode_merchant_buy_66_43,
+        NpcAction, NpcInteraction, NpcInteractionError, NpcSelection, decode_merchant_list_66_42,
     },
 };
 use serde_json::{Value, json};
@@ -49,14 +55,6 @@ fn inventory_content() -> PathBuf {
         })
 }
 
-fn sell_packet(merchant: u64, instance: i32, quantity: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 5, 0];
-    packet.extend(merchant.to_le_bytes());
-    packet.extend(instance.to_le_bytes());
-    packet.extend(quantity.to_le_bytes());
-    packet
-}
-
 fn buy_packet(merchant: u64, transaction: u32, item: i32, quantity: u32) -> Vec<u8> {
     let mut packet = vec![165, 0, 4, 0];
     packet.extend(merchant.to_le_bytes());
@@ -65,22 +63,6 @@ fn buy_packet(merchant: u64, transaction: u32, item: i32, quantity: u32) -> Vec<
     packet.extend(quantity.to_le_bytes());
     packet.extend(0u32.to_le_bytes());
     packet
-}
-
-fn vendor_buy_packet(transaction: u32, item: i32, quantity: u32) -> Vec<u8> {
-    encode_merchant_buy_66_43(&MerchantBuyRequestV2 {
-        initial_dwords: [item as u32, 0],
-        context_dwords: [0; 3],
-        context_bytes: Vec::new(),
-        trailing_dwords: [quantity, 0, transaction],
-    })
-    .expect("66/43 request encodes")
-}
-
-fn merchant_status(packet: &[u8]) -> u32 {
-    assert_eq!(packet.len(), 56);
-    assert_eq!(&packet[..4], &[66, 0, 44, 0]);
-    u32::from_le_bytes(packet[48..52].try_into().unwrap())
 }
 
 fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
@@ -137,15 +119,6 @@ fn completions(replies: &[Vec<u8>]) -> Vec<Completion> {
         .filter(|packet| packet.starts_with(&[165, 0, 6, 0]))
         .map(|packet| parse_completion(packet))
         .collect()
-}
-
-fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
-    state
-        .items
-        .iter()
-        .filter(|item| item.definition_id == definition_id)
-        .map(|item| item.count)
-        .sum()
 }
 
 /// Instance ids whose stack differs between two states (added, removed or modified).
@@ -548,44 +521,11 @@ fn replay_and_reload_cannot_pay_twice() {
 // Routed through the gateway (the real gameplay.rs 165/5 path)
 // ---------------------------------------------------------------------------------------------
 
-const NOW: u64 = 10_000;
 const NPC: u64 = 700;
 const STACK_MANY: i32 = 900_001; // definition 75060 x3, sell 375 each
 const STACK_NO_SALE: i32 = 900_003; // definition 1180
 const STACK_ONE: i32 = 900_004; // definition 8 x1, sell 7
 static NEXT: AtomicU64 = AtomicU64::new(0);
-
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
-
-fn login() -> Vec<u8> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for (i, text) in ["w148-synthetic-ticket", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        bytes.extend((text.len() as u32).to_le_bytes());
-        bytes.extend(text.as_bytes());
-        if i == 0 {
-            bytes.extend(1u64.to_le_bytes());
-        }
-    }
-    bytes
-}
-
-fn npc_request(sub: u16, choice: Option<u32>) -> Vec<u8> {
-    let mut bytes = [26u16.to_le_bytes(), sub.to_le_bytes()].concat();
-    bytes.extend(NPC.to_le_bytes());
-    match choice {
-        Some(choice) => bytes.extend(choice.to_le_bytes()),
-        None => bytes.push(0),
-    }
-    bytes
-}
 
 fn write_json(path: &Path, value: &Value) {
     fs::write(path, serde_json::to_vec(value).unwrap()).unwrap();
@@ -758,12 +698,8 @@ impl Fixture {
 
     fn at_open_shop_with(&self, state: GameplayState) -> (Gateway, Vec<Vec<u8>>) {
         let mut gateway = self.connect(state);
-        gateway
-            .handle_at(&wrap(&npc_request(8, None)), NOW)
-            .unwrap();
-        let opened = gateway
-            .handle_at(&wrap(&npc_request(10, Some(2))), NOW)
-            .unwrap();
+        gateway.handle_at(&wrap(&interact(NPC)), NOW).unwrap();
+        let opened = gateway.handle_at(&wrap(&select(NPC, 2)), NOW).unwrap();
         let inner = inner_packets(&opened);
         assert!(
             inner.iter().any(|p| p.starts_with(&[66, 0, 42, 0])),
@@ -776,19 +712,6 @@ impl Fixture {
     fn at_open_shop(&self) -> (Gateway, Vec<Vec<u8>>) {
         self.at_open_shop_with(self.state())
     }
-}
-
-/// Tunnel payloads of every reply, with the 7-byte application wrapper removed.
-fn inner_packets(outcome: &GatewayOutcome) -> Vec<Vec<u8>> {
-    outcome.replies.iter().map(|p| p[7..].to_vec()).collect()
-}
-
-fn inventory_of(gateway: &Gateway) -> InventoryState {
-    gateway.snapshot().gameplay.unwrap().inventory
-}
-
-fn send(gateway: &mut Gateway, packet: &[u8]) -> Vec<Vec<u8>> {
-    inner_packets(&gateway.handle_at(&wrap(packet), NOW).unwrap())
 }
 
 #[test]
@@ -963,7 +886,7 @@ fn gateway_vendor_buy_debits_grants_and_replies() {
 fn gateway_vendor_buy_insufficient_coins_replies_and_changes_nothing() {
     let fixture = Fixture::new();
     let mut state = fixture.state();
-    state.inventory.coins = 5;
+    state.inventory.coins = 10;
     let (mut gateway, _) = fixture.at_open_shop_with(state);
     let before = gateway.snapshot();
 
@@ -971,6 +894,19 @@ fn gateway_vendor_buy_insufficient_coins_replies_and_changes_nothing() {
     assert_eq!(replies.len(), 1, "refusal has one client-visible reply");
     assert_eq!(merchant_status(&replies[0]), 0);
     assert_eq!(gateway.snapshot(), before);
+
+    // Canary: the refused buy must not consume the open shop. Selling the
+    // pre-seeded stack proves the shop is still open, and the next buy lands.
+    let sold = completions(&send(&mut gateway, &sell_packet(0, STACK_ONE, 1)));
+    assert_eq!(sold[0].result, RESULT_OK, "the refusal closed the shop");
+    let replies = send(&mut gateway, &vendor_buy_packet(91_020, 8, 1));
+    assert_eq!(
+        merchant_status(replies.last().expect("vendor buy reply")),
+        1
+    );
+    let after = inventory_of(&gateway);
+    assert_eq!(after.coins, 10 + 7 - 15);
+    assert_eq!(count_definition(&after, 8), 1);
 }
 
 #[test]
@@ -1003,6 +939,20 @@ fn gateway_vendor_buy_full_bag_replies_and_changes_nothing() {
     assert_eq!(replies.len(), 1, "full bag has one client-visible reply");
     assert_eq!(merchant_status(&replies[0]), 0);
     assert_eq!(gateway.snapshot(), before);
+
+    // Canary: free one slot through the real sell route, then the same buy
+    // must succeed, so the full-bag refusal did not consume the shop.
+    let sold = completions(&send(&mut gateway, &sell_packet(0, 100_000, 1)));
+    assert_eq!(sold[0].result, RESULT_OK, "the refusal closed the shop");
+    let replies = send(&mut gateway, &vendor_buy_packet(91_021, 8, 1));
+    assert_eq!(
+        merchant_status(replies.last().expect("vendor buy reply")),
+        1
+    );
+    let after = inventory_of(&gateway);
+    assert_eq!(after.coins, 100 + 375 - 15);
+    assert_eq!(after.items.len(), 100);
+    assert_eq!(count_definition(&after, 8), 1);
 }
 
 #[test]
