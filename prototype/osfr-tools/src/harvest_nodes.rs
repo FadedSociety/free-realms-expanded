@@ -7,6 +7,7 @@
 //! required job, the range, the per-player depletion and the respawn timers.
 
 use crate::{
+    harvesting::CHEF_PROFILE_ID,
     inventory::Inventory,
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
 };
@@ -18,8 +19,6 @@ use std::{
     sync::Arc,
 };
 
-/// Chef profile id (`harvesting::CHEF_PROFILE_ID`).
-const CHEF_PROFILE_ID: i32 = 45;
 const MAX_FILE_BYTES: u64 = 1 << 20;
 /// Node actor guids: "NODE" tag, game kind, content spawn id. Clear of NPC, placement and pickup ids.
 const NODE_GUID_BASE: u64 = 0x4e4f_4445_0000_0000;

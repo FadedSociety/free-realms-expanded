@@ -26,6 +26,15 @@ impl CraftingJob {
             Self::Miner => 14,
         }
     }
+
+    /// (R) The opening tutorial station's local craft id for this job.
+    pub const fn opening_recipe_id(self) -> u32 {
+        match self {
+            Self::Chef => 2001,
+            Self::Blacksmith => 2003,
+            Self::Miner => 2002,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

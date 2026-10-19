@@ -122,20 +122,11 @@ pub struct SmeltingRun {
     pub score: u32,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct SmeltingTransaction {
-    pub consumes: Vec<(i32, u32)>,
-    pub grants: Vec<(i32, u32)>,
-    pub experience_points: u32,
-}
+/// Per-job alias of the shared completion transaction (`recipe_book::CraftTransaction`).
+pub type SmeltingTransaction = crate::recipe_book::CraftTransaction;
 
-#[derive(Default, Debug)]
-pub struct SmeltingOutcome {
-    pub replies: Vec<Vec<u8>>,
-    pub transaction: Option<SmeltingTransaction>,
-    pub completed: bool,
-    pub changed: bool,
-}
+/// Per-job alias of the shared completion record (`recipe_book::CraftOutcome`).
+pub type SmeltingOutcome = crate::recipe_book::CraftOutcome;
 
 #[derive(Clone, Debug)]
 pub struct Smelting {

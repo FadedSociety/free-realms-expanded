@@ -124,20 +124,11 @@ pub struct ForgingRun {
     pub end_sent: bool,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ForgingTransaction {
-    pub consumes: Vec<(i32, u32)>,
-    pub grants: Vec<(i32, u32)>,
-    pub experience_points: u32,
-}
+/// Per-job alias of the shared completion transaction (`recipe_book::CraftTransaction`).
+pub type ForgingTransaction = crate::recipe_book::CraftTransaction;
 
-#[derive(Debug, Default)]
-pub struct ForgingOutcome {
-    pub replies: Vec<Vec<u8>>,
-    pub changed: bool,
-    pub completed: bool,
-    pub transaction: Option<ForgingTransaction>,
-}
+/// Per-job alias of the shared completion record (`recipe_book::CraftOutcome`).
+pub type ForgingOutcome = crate::recipe_book::CraftOutcome;
 
 #[derive(Clone, Debug)]
 pub struct Forging {

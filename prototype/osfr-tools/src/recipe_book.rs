@@ -17,11 +17,11 @@
 //! before any state changes and carries a chat line for the player.
 use crate::{
     chat,
-    cooking::{Cooking, CookingOutcome},
-    forging::{Forging, ForgingOutcome},
+    cooking::Cooking,
+    forging::Forging,
     opening::{OpeningActor, OpeningTrigger},
     recipes::{CraftingJob, RecipeCatalog},
-    smelting::{Smelting, SmeltingOutcome},
+    smelting::Smelting,
 };
 use serde::Deserialize;
 use std::{collections::BTreeSet, fs, io, path::Path};
@@ -158,12 +158,16 @@ pub fn stations(actors: &[OpeningActor]) -> Vec<Station> {
     actors
         .iter()
         .filter_map(|actor| {
-            let job = match actor.action {
-                Some(OpeningTrigger::Craft { recipe_id: 2001 }) => CraftingJob::Chef,
-                Some(OpeningTrigger::Craft { recipe_id: 2002 }) => CraftingJob::Miner,
-                Some(OpeningTrigger::Craft { recipe_id: 2003 }) => CraftingJob::Blacksmith,
-                _ => return None,
+            let Some(OpeningTrigger::Craft { recipe_id }) = &actor.action else {
+                return None;
             };
+            let job = [
+                CraftingJob::Chef,
+                CraftingJob::Blacksmith,
+                CraftingJob::Miner,
+            ]
+            .into_iter()
+            .find(|job| job.opening_recipe_id() == *recipe_id)?;
             Some(Station {
                 job,
                 zone_id: actor.zone_id,
@@ -195,11 +199,28 @@ pub struct Services<'a> {
     pub forging: Option<&'a mut Forging>,
 }
 
+/// Ingredients consumed and items, XP granted by one completed craft.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CraftTransaction {
+    pub consumes: Vec<(i32, u32)>,
+    pub grants: Vec<(i32, u32)>,
+    pub experience_points: u32,
+}
+
+/// The completion record shared by the three crafting movies.
+#[derive(Default, Debug)]
+pub struct CraftOutcome {
+    pub replies: Vec<Vec<u8>>,
+    pub transaction: Option<CraftTransaction>,
+    pub completed: bool,
+    pub changed: bool,
+}
+
 /// The started run. The caller applies it exactly like a tutorial start.
 pub enum Started {
-    Cooking(CookingOutcome),
-    Smelting(SmeltingOutcome),
-    Forging(ForgingOutcome),
+    Cooking(CraftOutcome),
+    Smelting(CraftOutcome),
+    Forging(CraftOutcome),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
