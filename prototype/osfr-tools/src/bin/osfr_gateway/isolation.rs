@@ -5,9 +5,6 @@ use std::cell::Cell;
 thread_local! {
     /// Test-only: the session whose next tick panics, standing in for any feature bug.
     pub(super) static PANIC_IN_TICK: Cell<Option<SessionId>> = const { Cell::new(None) };
-    /// Test-only: the session whose next tick returns this error, standing in
-    /// for a reward or inventory refusal raised inside a per-session tick.
-    pub(super) static ERROR_IN_TICK: Cell<Option<(SessionId, &'static str)>> = const { Cell::new(None) };
 }
 
 #[test]
@@ -39,16 +36,31 @@ fn a_panicking_session_ends_alone_and_the_server_keeps_running() {
 }
 
 #[test]
-fn a_failing_reward_tick_ends_alone_and_the_server_keeps_running() {
-    let (mut server, keys, scratch) = super::t020_group_routing::server_rig("tick-error");
-    let victim_id = server.sessions.get(&keys[0]).unwrap().id;
-    ERROR_IN_TICK.set(Some((victim_id, "unknown reward definition")));
+fn a_failing_tick_save_ends_alone_and_the_server_keeps_running() {
+    let (mut server, keys, scratch) = super::t020_group_routing::server_rig("tick-save-error");
+    let victim = server.sessions.get_mut(&keys[0]).unwrap();
+    let old_guid = victim.character_guid;
+    let victim_guid = victim.gateway.state().guid;
+    // A bare `Session` keeps the template guid until the first commit re-stamps
+    // it from the gateway; mirror that in the world so disconnect cleanup runs.
+    victim.character_guid = victim_guid;
+    server.world.active_sessions.remove(&old_guid);
+    server.world.active_sessions.insert(victim_guid, victim.id);
+    // The per-session tick writes a deferred pose; its parent is a file, so the
+    // production save fails and the tick returns Err. No test-only hook.
+    fs::write(scratch.join("blocker"), b"").unwrap();
+    victim.state_path = scratch.join("blocker/character.json");
+    victim.position_dirty = true;
+    victim.position_saved_ms = None;
     server.next_tick_ms = 0;
 
     server.step().unwrap();
 
-    ERROR_IN_TICK.set(None);
     assert!(!server.sessions.contains_key(&keys[0]));
+    assert!(
+        !server.world.active_sessions.contains_key(&victim_guid),
+        "no ghost left behind"
+    );
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
     server.next_tick_ms = 0;
     server.step().unwrap();

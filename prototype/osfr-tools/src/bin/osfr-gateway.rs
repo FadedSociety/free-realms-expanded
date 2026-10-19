@@ -2407,12 +2407,6 @@ impl Session {
         if isolation::PANIC_IN_TICK.get() == Some(self.id) {
             panic!("isolation probe");
         }
-        #[cfg(test)]
-        if let Some((id, reason)) = isolation::ERROR_IN_TICK.get()
-            && id == self.id
-        {
-            return Err(reason.to_string().into());
-        }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
         let outcome = staged_gateway.tick_at(now_ms)?;

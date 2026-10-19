@@ -491,6 +491,41 @@ fn runtime_inventory() -> &'static Inventory {
     })
 }
 
+#[derive(serde::Deserialize)]
+struct StackCatalogue {
+    definitions: Vec<StackRow>,
+}
+
+#[derive(serde::Deserialize)]
+struct StackRow {
+    id: i32,
+    max_stack: i32,
+}
+
+/// A real catalogue item with a bounded stack, and that bound. The shipped
+/// field-battle prizes are all uncapped, so the over-stack regression has to
+/// introduce a bounded item; deriving both values keeps no stack size pinned
+/// to a regenerated runtime package.
+fn bounded_stack_item() -> (i32, u32) {
+    let catalogue: StackCatalogue = serde_json::from_slice(
+        &fs::read(
+            manifest_dir()
+                .join(RUNTIME_CATALOGUE)
+                .join("item-catalogue.json"),
+        )
+        .unwrap(),
+    )
+    .expect("the runtime item catalogue must parse");
+    catalogue
+        .definitions
+        .iter()
+        .find_map(|row| {
+            let max_stack = u32::try_from(row.max_stack).ok()?;
+            (max_stack > 0 && max_stack < 100).then_some((row.id, max_stack))
+        })
+        .expect("the runtime catalogue has a bounded stack below the prize limit")
+}
+
 #[test]
 fn five_distinct_field_battles_load_with_the_existing_schema() {
     let fixture = Fixture::new();
@@ -688,6 +723,54 @@ fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u6
         "41/114 fields must agree byte-for-byte with the client reader"
     );
     details.to_vec()
+}
+
+/// Open the marker's start screen, refuse Go twice, and prove both refusals
+/// change no saved state and leave the same pending screen for a retry.
+fn refused_go_keeps_the_screen(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) {
+    let start = open_battle(gateway, spawner_guid, row, now_ms);
+    let before = gateway.snapshot();
+    let refused = send(gateway, &go(&start), now_ms + 100);
+    assert!(!refused.began_zoning && !refused.state_changed);
+    assert!(
+        chat_text(&refused).contains("one of its rewards cannot be granted"),
+        "{}",
+        chat_text(&refused)
+    );
+    let screen = details(&refused)
+        .expect("the refused start screen remains open")
+        .to_vec();
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a refused Go changes no saved state"
+    );
+    assert!(
+        gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .encounter
+            .unwrap()
+            .active
+            .is_none()
+    );
+
+    // The saved snapshot excludes `pending_battle`, so replay Go: a second
+    // refusal and an identical screen prove the pending state was restored.
+    let repeated = send(gateway, &go(&start), now_ms + 200);
+    assert!(!repeated.began_zoning && !repeated.state_changed);
+    assert!(
+        chat_text(&repeated).contains("one of its rewards cannot be granted"),
+        "{}",
+        chat_text(&repeated)
+    );
+    assert_eq!(
+        details(&repeated).expect("a refused Go keeps the start screen pending"),
+        screen,
+        "the same start screen is shown again"
+    );
+    assert_eq!(gateway.snapshot(), before);
 }
 
 fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: u64) -> Vec<u64> {
@@ -1053,50 +1136,7 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
     );
     assert_eq!(gateway.snapshot(), before_sim);
 
-    let start = open_battle(&mut gateway, spawner_guid, row, 900);
-    let before_go = gateway.snapshot();
-    let refused = send(&mut gateway, &go(&start), 1_000);
-    assert!(!refused.began_zoning);
-    assert!(!refused.state_changed);
-    assert!(
-        chat_text(&refused).contains("one of its rewards cannot be granted"),
-        "{}",
-        chat_text(&refused)
-    );
-    let first_screen = details(&refused)
-        .expect("the refused start screen remains open")
-        .to_vec();
-    assert_eq!(
-        gateway.snapshot(),
-        before_go,
-        "an unavailable prize changes no saved state"
-    );
-    assert!(
-        gateway
-            .snapshot()
-            .gameplay
-            .unwrap()
-            .encounter
-            .unwrap()
-            .active
-            .is_none()
-    );
-
-    // The saved snapshot excludes `pending_battle`, so replay Go: a second
-    // refusal and an identical screen prove the pending state was restored.
-    let repeated = send(&mut gateway, &go(&start), 1_100);
-    assert!(!repeated.state_changed && !repeated.began_zoning);
-    assert!(
-        chat_text(&repeated).contains("one of its rewards cannot be granted"),
-        "{}",
-        chat_text(&repeated)
-    );
-    assert_eq!(
-        details(&repeated).expect("a refused Go keeps the start screen pending"),
-        first_screen,
-        "the same start screen is shown again"
-    );
-    assert_eq!(gateway.snapshot(), before_go);
+    refused_go_keeps_the_screen(&mut gateway, spawner_guid, row, 900);
 }
 
 #[test]
@@ -1135,10 +1175,12 @@ fn a_reward_grant_failure_is_refused_without_changing_the_save() {
         bundle.push(u8::try_from(child.len()).unwrap());
         bundle.extend(child);
     }
-    let failed = gateway.handle_at(&bundle, 600);
+    let error = gateway
+        .handle_at(&bundle, 600)
+        .expect_err("the invalid reward must be an error, not a panic");
     assert!(
-        failed.is_err(),
-        "the invalid reward must be an error, not a panic"
+        error.to_string().contains("unknown reward definition"),
+        "the failure must be the invalid reward: {error}"
     );
     assert_eq!(
         gateway.snapshot(),
@@ -1167,11 +1209,16 @@ fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
     let row = battle(&valid, 12310);
     let marker = position(&row["spawner"]["position"]);
     let spawner_guid = u64_field(&row["spawner"], "guid");
-    let (_, max_stack) = runtime_inventory()
-        .trade_flags(1)
-        .expect("fixture item 1 is in the runtime catalogue");
-    assert_eq!(max_stack, Some(1), "item 1 must be a one-item stack");
-
+    let (item_id, max_stack) = bounded_stack_item();
+    let inventory = runtime_inventory();
+    assert!(
+        inventory.accepts_reward(item_id, max_stack),
+        "the chosen item must be grantable at its own stack size"
+    );
+    assert!(
+        !inventory.accepts_reward(item_id, max_stack + 1),
+        "the refusal must come from the quantity, not a missing definition"
+    );
     let mut invalid = valid.clone();
     let invalid_row = invalid["battles"]
         .as_array_mut()
@@ -1179,12 +1226,8 @@ fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
         .iter_mut()
         .find(|battle| battle["id"] == 12310)
         .unwrap();
-    invalid_row["prizes"][0] = json!({
-        "item_id": 1,
-        "quantity": 2,
-        "name_id": 6666,
-        "icon_id": 973
-    });
+    invalid_row["prizes"][0]["item_id"] = json!(item_id);
+    invalid_row["prizes"][0]["quantity"] = json!(max_stack + 1);
     let content = fixture.content_copy();
     fs::write(
         content.join("field_battles.json"),
@@ -1207,33 +1250,7 @@ fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
     );
     assert_eq!(gateway.snapshot(), before_dev);
 
-    let start = open_battle(&mut gateway, spawner_guid, row, 500);
-    let before_go = gateway.snapshot();
-    let refused = send(&mut gateway, &go(&start), 600);
-    assert!(!refused.began_zoning && !refused.state_changed);
-    assert!(
-        chat_text(&refused).contains("one of its rewards cannot be granted"),
-        "{}",
-        chat_text(&refused)
-    );
-    let first_screen = details(&refused)
-        .expect("the refused start screen remains open")
-        .to_vec();
-    assert_eq!(gateway.snapshot(), before_go);
-
-    let repeated = send(&mut gateway, &go(&start), 700);
-    assert!(!repeated.began_zoning && !repeated.state_changed);
-    assert!(
-        chat_text(&repeated).contains("one of its rewards cannot be granted"),
-        "{}",
-        chat_text(&repeated)
-    );
-    assert_eq!(
-        details(&repeated).expect("a refused Go keeps the start screen pending"),
-        first_screen,
-        "the same start screen is shown again"
-    );
-    assert_eq!(gateway.snapshot(), before_go);
+    refused_go_keeps_the_screen(&mut gateway, spawner_guid, row, 500);
 }
 
 /// Review F176 #2: the field-battle route must cover a mid-battle cancel
