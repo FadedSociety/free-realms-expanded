@@ -345,8 +345,9 @@ pub enum ClientTrigger {
     /// which is not recovered, so content must name an actor (R).
     LookAt {
         guid: u64,
-        /// Raw vertical offset; the client applies its recovered 0.1 scale.
-        offset: f32,
+        /// Vertical offset in tenths of a world unit: the client reads an i32 and
+        /// scales it by 0.1 (reader `009b2760`, dispatcher `009be130`).
+        offset_tenths: i32,
         range: u32,
         angle_degrees: u32,
     },
@@ -2423,13 +2424,12 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
                 && match trigger {
                     ClientTrigger::LookAt {
                         guid,
-                        offset,
+                        offset_tenths,
                         range,
                         angle_degrees,
                     } => {
                         *guid != 0
-                            && offset.is_finite()
-                            && offset.abs() <= 1_000_000.0
+                            && (-10_000_000..=10_000_000).contains(offset_tenths)
                             && (1..=i32::MAX as u32).contains(range)
                             && (1..=360).contains(angle_degrees)
                     }
@@ -2642,14 +2642,14 @@ impl ClientObjectives {
                 _ if !self.registered.insert(*client_id) => (9, Vec::new()),
                 ClientTrigger::LookAt {
                     guid,
-                    offset,
+                    offset_tenths,
                     range,
                     angle_degrees,
                 } => {
-                    // 45/6 actor form, consumed by 009b2760 -> 00c435c0: id, GUID,
-                    // vertical offset (f32), range (i32), angle in degrees (i32).
+                    // 45/6 actor form read by 009b2760 and dispatched by 009be130:
+                    // id, u64 GUID, i32 offset in tenths, i32 range, i32 degrees.
                     let mut tail = guid.to_le_bytes().to_vec();
-                    tail.extend(offset.to_le_bytes());
+                    tail.extend(offset_tenths.to_le_bytes());
                     tail.extend(range.to_le_bytes());
                     tail.extend(angle_degrees.to_le_bytes());
                     (6, tail)

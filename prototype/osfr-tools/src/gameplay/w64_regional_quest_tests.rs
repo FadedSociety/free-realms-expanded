@@ -623,7 +623,7 @@ fn client_goal_engine() -> crate::quest_engine::QuestEngine {
                 73,
                 ClientTrigger::LookAt {
                     guid: 0x1122_3344_5566_7788,
-                    offset: 1.5,
+                    offset_tenths: 15,
                     range: 12,
                     angle_degrees: 45,
                 },
@@ -762,15 +762,15 @@ fn a_look_goal_claim_advances_only_an_open_goal_of_an_active_quest() {
     assert!(engine_mut(&mut game).accept(7003).changed);
     let before = quest_state(&game);
 
-    // The client receives the recovered 45/6 actor form: id, GUID, raw vertical
-    // offset, range, and angle in degrees.
+    // The client receives the recovered 45/6 actor form: id, GUID, vertical
+    // offset in tenths, range, and angle in degrees.
     let out = game
         .handle_in_world(&claim_packet(99), &character, 5_000)
         .unwrap();
     let mut watch = vec![45, 0, 6];
     watch.extend(73u32.to_le_bytes());
     watch.extend(0x1122_3344_5566_7788u64.to_le_bytes());
-    watch.extend(1.5f32.to_le_bytes());
+    watch.extend(15i32.to_le_bytes()); // 009be130 scales the i32 offset by 0.1
     watch.extend(12u32.to_le_bytes());
     watch.extend(45u32.to_le_bytes());
     assert_eq!(watch.len(), 27);

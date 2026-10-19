@@ -612,6 +612,18 @@ fn ask(bot: &mut bot::Bot, text: &str, needle: &str) -> String {
     system_text(&reply).unwrap()
 }
 
+/// Processing barrier: a read-only builder request. The gateway handles datagrams
+/// in order on one thread, so its reply is queued only after every earlier
+/// request's transaction, including any save that request scheduled, finished.
+fn barrier(bot: &mut bot::Bot) {
+    let _ = ask(bot, "realm here", "Zone ");
+}
+
+/// A server `49/10 ObjectiveComplete`. The bot records only headers.
+fn is_objective_complete(message: &(u16, Option<u16>, usize)) -> bool {
+    message.0 == 49 && message.1 == Some(10)
+}
+
 /// `realm here` (builder/admin): the server's own idea of our position.
 fn here(bot: &mut bot::Bot) -> [f32; 3] {
     let text = ask(bot, "realm here", "Zone ");
@@ -1282,10 +1294,22 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     let quest = |save: &Value| save["gameplay"]["npc_quests"]["quests"][QUEST.to_string()].clone();
     let mut bot = rig.connect(0, "objective");
 
-    // Inactive: a valid-looking id before the quest exists reaches the handler and
-    // leaves the complete character state untouched.
+    // Leave the starting enemies before taking any refusal snapshot: the checks
+    // below compare the complete gameplay save, including combat state.
+    ask(
+        &mut bot,
+        &format!("realm goto {} {} {}", TABLE[0], TABLE[1], TABLE[2]),
+        "Developer teleport",
+    );
+    pose(&mut bot, guid, TABLE);
+
+    // Inactive: a valid-looking id before the quest exists reaches the handler,
+    // sends no completion, and leaves the complete gameplay save untouched. The
+    // barrier request is handled after the refusal, so its reply proves that any
+    // save the refusal scheduled (a bug) has been written before this read.
     let inactive = rig.log_outcomes("client_objective", "ignored");
-    let before_inactive = rig.save(0)["gameplay"]["npc_quests"].clone();
+    let before_inactive = rig.save(0)["gameplay"].clone();
+    let from = bot.received.len();
     raw(&mut bot, &claim(CLIENT_ID));
     rig.wait_log_outcomes(
         "the inactive client objective",
@@ -1293,7 +1317,16 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
         "ignored",
         inactive + 1,
     );
-    assert_eq!(rig.save(0)["gameplay"]["npc_quests"], before_inactive);
+    barrier(&mut bot);
+    assert_eq!(
+        rig.save(0)["gameplay"],
+        before_inactive,
+        "the inactive claim changed persisted gameplay"
+    );
+    assert!(
+        !bot.received[from..].iter().any(is_objective_complete),
+        "the inactive claim sent an objective completion"
+    );
 
     // 49/15 names the original Cooking Table id; the regional Cooking 101 offer is
     // accepted through the normal 49/2 path.
@@ -1317,14 +1350,9 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
         |save| quest(save)["status"] == "active",
     );
 
-    // Arrive at the trainer table and send a real 125 pose. The server visit goal
-    // advances first; its newly opened 45/11 registration must arrive in that same
-    // movement response.
-    ask(
-        &mut bot,
-        &format!("realm goto {} {} {}", TABLE[0], TABLE[1], TABLE[2]),
-        "Developer teleport",
-    );
+    // The character is already at the table; this accepted pose runs the location
+    // check. The visit goal advances first, and its newly opened 45/11
+    // registration must arrive in that same movement response.
     pose(&mut bot, guid, TABLE);
     let mut watch = vec![45, 0, 11];
     watch.extend(CLIENT_ID.to_le_bytes());
@@ -1342,7 +1370,8 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
 
     // A forged id is handled and inert.
     let ignored = rig.log_outcomes("client_objective", "ignored");
-    let before_forged = rig.save(0);
+    let before_forged = rig.save(0)["gameplay"].clone();
+    let from = bot.received.len();
     raw(&mut bot, &claim(CLIENT_ID + 1));
     rig.wait_log_outcomes(
         "the forged client objective",
@@ -1350,9 +1379,15 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
         "ignored",
         ignored + 1,
     );
+    barrier(&mut bot);
     assert_eq!(
-        rig.save(0)["gameplay"]["npc_quests"],
-        before_forged["gameplay"]["npc_quests"]
+        rig.save(0)["gameplay"],
+        before_forged,
+        "the forged claim changed persisted gameplay"
+    );
+    assert!(
+        !bot.received[from..].iter().any(is_objective_complete),
+        "the forged claim sent an objective completion"
     );
 
     // The real id completes exactly once.
@@ -1368,6 +1403,7 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
 
     // A duplicate is handled and inert.
     let ignored = rig.log_outcomes("client_objective", "ignored");
+    let from = bot.received.len();
     raw(&mut bot, &claim(CLIENT_ID));
     rig.wait_log_outcomes(
         "the duplicate client objective",
@@ -1375,9 +1411,15 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
         "ignored",
         ignored + 1,
     );
+    barrier(&mut bot);
     assert_eq!(
-        rig.save(0)["gameplay"]["npc_quests"],
-        completed["gameplay"]["npc_quests"]
+        rig.save(0)["gameplay"],
+        completed["gameplay"],
+        "the duplicate claim changed persisted gameplay"
+    );
+    assert!(
+        !bot.received[from..].iter().any(is_objective_complete),
+        "the duplicate claim sent a second objective completion"
     );
 
     // Turn in at the spawned Chef trainer. The five-coin data reward is the only
@@ -1414,6 +1456,7 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     let restored = rig.save(0);
     assert_eq!(quest(&restored), quest(&paid));
     let ignored = rig.log_outcomes("client_objective", "ignored");
+    let from = again.received.len();
     raw(&mut again, &claim(CLIENT_ID));
     rig.wait_log_outcomes(
         "the replayed client objective after relog",
@@ -1421,7 +1464,16 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
         "ignored",
         ignored + 1,
     );
-    assert_eq!(rig.save(0)["gameplay"], paid["gameplay"]);
+    barrier(&mut again);
+    assert_eq!(
+        rig.save(0)["gameplay"],
+        paid["gameplay"],
+        "the replayed claim changed persisted gameplay"
+    );
+    assert!(
+        !again.received[from..].iter().any(is_objective_complete),
+        "the replayed claim sent a second objective completion"
+    );
     disconnect(again);
 }
 

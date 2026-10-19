@@ -1230,8 +1230,8 @@ class Checker:
                              and all(33 <= ord(c) <= 126 for c in event))
                 elif trigger_type == "look_at":
                     valid = (type(trigger.get("guid")) is int and trigger["guid"] > 0
-                             and type(trigger.get("offset")) in (int, float)
-                             and -1_000_000 <= trigger["offset"] <= 1_000_000
+                             and type(trigger.get("offset_tenths")) is int
+                             and -10_000_000 <= trigger["offset_tenths"] <= 10_000_000
                              and type(trigger.get("range")) is int
                              and 1 <= trigger["range"] <= 0x7fffffff
                              and type(trigger.get("angle_degrees")) is int

@@ -5,8 +5,8 @@
 //!   `00cffa70` sends it.
 //! - `45/10 UIEvent` is `id, i32 byte length, event bytes` (`00c437a0`), `45/11`
 //!   FirstMovement is `id, u8 mouse` (`00c43870`), and the `45/6` actor LookAt
-//!   form is `id, u64 guid, f32 offset, i32 range, i32 angle` (`00c435c0` and
-//!   reader `009b2760`).
+//!   form is `id, u64 guid, i32 offset in tenths, i32 range, i32 angle`
+//!   (`00c435c0`; reader `009b2760`; `009be130` scales the offset by 0.1).
 //! - The client does not de-duplicate objective registrations (`00c43140`).
 //!
 //! Everything else here is reconstructed policy: only an open goal of the
@@ -275,7 +275,7 @@ fn look_at_registration_matches_the_actor_form() {
         703,
         ClientTrigger::LookAt {
             guid: 0x1122_3344_5566_7788,
-            offset: 1.5,
+            offset_tenths: -15,
             range: 12,
             angle_degrees: 45,
         },
@@ -285,7 +285,7 @@ fn look_at_registration_matches_the_actor_form() {
     let mut expected = vec![45, 0, 6];
     expected.extend(703u32.to_le_bytes());
     expected.extend(0x1122_3344_5566_7788u64.to_le_bytes());
-    expected.extend(1.5f32.to_le_bytes());
+    expected.extend((-15i32).to_le_bytes()); // -1.5 world units: 009be130 scales by 0.1
     expected.extend(12u32.to_le_bytes());
     expected.extend(45u32.to_le_bytes());
     assert_eq!(expected.len(), 27);
@@ -298,6 +298,30 @@ fn look_at_registration_matches_the_actor_form() {
     assert!(outcome.changed);
     assert_eq!(engine.progress(402).unwrap().counts, [1]);
     assert_no_award(&outcome);
+}
+
+#[test]
+fn content_look_at_offsets_are_integer_tenths() {
+    let trigger: ClientTrigger = serde_json::from_str(
+        r#"{"type":"look_at","guid":1,"offset_tenths":-15,"range":12,"angle_degrees":45}"#,
+    )
+    .unwrap();
+    assert_eq!(
+        trigger,
+        ClientTrigger::LookAt {
+            guid: 1,
+            offset_tenths: -15,
+            range: 12,
+            angle_degrees: 45,
+        }
+    );
+    // The old float spelling must fail loudly rather than reinterpret its bits.
+    assert!(
+        serde_json::from_str::<ClientTrigger>(
+            r#"{"type":"look_at","guid":1,"offset":1.5,"range":12,"angle_degrees":45}"#
+        )
+        .is_err()
+    );
 }
 
 #[test]
@@ -363,25 +387,31 @@ fn duplicate_and_invalid_client_goals_fail_catalogue_load() {
     for trigger in [
         ClientTrigger::LookAt {
             guid: 0,
-            offset: 0.0,
+            offset_tenths: 0,
             range: 1,
             angle_degrees: 1,
         },
         ClientTrigger::LookAt {
             guid: 1,
-            offset: f32::NAN,
+            offset_tenths: 10_000_001,
             range: 1,
             angle_degrees: 1,
         },
         ClientTrigger::LookAt {
             guid: 1,
-            offset: 0.0,
+            offset_tenths: -10_000_001,
+            range: 1,
+            angle_degrees: 1,
+        },
+        ClientTrigger::LookAt {
+            guid: 1,
+            offset_tenths: 0,
             range: 0,
             angle_degrees: 1,
         },
         ClientTrigger::LookAt {
             guid: 1,
-            offset: 0.0,
+            offset_tenths: 0,
             range: 1,
             angle_degrees: 0,
         },
