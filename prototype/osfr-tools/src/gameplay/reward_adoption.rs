@@ -1,30 +1,15 @@
+//! D004: minigame reward adoption regressions. The opening reference and the family-138 wire
+//! builders live in `t013_objective_events`; importing them keeps one fishing request path.
+
+use super::t013_objective_events::{
+    FISHING_T0, fishing_cast, fishing_reel, fishing_register, game,
+};
 use super::*;
 use crate::fishing_service::{FISHERMAN_PROFILE, FishingSpots};
 use serde_json::json;
-use std::path::PathBuf;
 
 const SPOTS_JSON: &str = include_str!("../../data/content/fishing_spots.json");
 const FISHING_GATE: u64 = 9_000_000_181;
-const FISHING_T0: u64 = 1_000_000;
-const FISHING_ACTOR: crate::fishing::Handle = crate::fishing::Handle {
-    id: 0x1122_3344,
-    seq: 0x5566_7788,
-};
-
-fn reference() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/rust-opening-cooking-original-assets")
-}
-
-fn game() -> Gameplay {
-    let path = reference();
-    assert!(
-        path.join("opening.json").is_file(),
-        "reward adoption requires the private opening reference at {}",
-        path.display()
-    );
-    Gameplay::load(&path, None).expect("opening reference loads")
-}
 
 fn character() -> CharacterState {
     CharacterState {
@@ -33,46 +18,6 @@ fn character() -> CharacterState {
         position: [0.; 3],
         rotation: [0., 0., 1.],
     }
-}
-
-fn request(sub: u16, body: &[u8]) -> Vec<u8> {
-    // Common header writer 0x00b69550 emits the family and subtype words.
-    let mut packet = vec![138, 0];
-    packet.extend(sub.to_le_bytes());
-    packet.extend(body);
-    packet
-}
-
-fn actor_bytes() -> Vec<u8> {
-    [
-        FISHING_ACTOR.id.to_le_bytes(),
-        FISHING_ACTOR.seq.to_le_bytes(),
-    ]
-    .concat()
-}
-
-fn register() -> Vec<u8> {
-    // Client writer 0x00b6a400: header, handle, boolean.
-    let mut body = actor_bytes();
-    body.push(0);
-    request(2, &body)
-}
-
-fn cast() -> Vec<u8> {
-    // Client writer 0x00b6a460: header, handle, vector, boolean.
-    let mut body = actor_bytes();
-    for coordinate in [10.0f32, 0.0, 0.0, 1.0] {
-        body.extend(coordinate.to_le_bytes());
-    }
-    body.push(0);
-    request(6, &body)
-}
-
-fn reel() -> Vec<u8> {
-    // Client writer 0x00b6a4d0: header, handle, boolean.
-    let mut body = actor_bytes();
-    body.push(1);
-    request(7, &body)
 }
 
 fn start(game: &mut Gameplay, at: u64) {
@@ -85,7 +30,7 @@ fn start(game: &mut Gameplay, at: u64) {
         .handle_in_world(&packet, &character(), at)
         .expect("fishing lifecycle starts");
     assert!(!outcome.replies.is_empty());
-    game.handle_in_world(&register(), &character(), at + 1)
+    game.handle_in_world(&fishing_register(), &character(), at + 1)
         .expect("fishing registration");
 }
 
@@ -117,10 +62,10 @@ fn begin(game: &mut Gameplay) {
 }
 
 fn catch(game: &mut Gameplay, at: u64) -> io::Result<Outcome> {
-    game.handle_in_world(&cast(), &character(), at + 10)?;
+    game.handle_in_world(&fishing_cast(), &character(), at + 10)?;
     game.tick(&character(), at + 1_510)?;
     game.tick(&character(), at + 2_410)?;
-    game.handle_in_world(&reel(), &character(), at + 2_420)
+    game.handle_in_world(&fishing_reel(), &character(), at + 2_420)
 }
 
 fn item_count(game: &Gameplay, definition_id: i32) -> u32 {

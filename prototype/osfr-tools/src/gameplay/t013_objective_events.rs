@@ -15,7 +15,7 @@ use std::{
 mod s6_characterization;
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
-const FISHING_T0: u64 = 1_000_000;
+pub(super) const FISHING_T0: u64 = 1_000_000;
 const FISHING_ACTOR: crate::fishing::Handle = crate::fishing::Handle {
     id: 0x1122_3344,
     seq: 0x5566_7788,
@@ -26,11 +26,11 @@ fn reference() -> PathBuf {
         .join("../../../lab/references/rust-opening-cooking-original-assets")
 }
 
-fn game() -> Gameplay {
+pub(super) fn game() -> Gameplay {
     let path = reference();
     assert!(
         path.join("opening.json").is_file(),
-        "T013 requires the private opening reference at {}",
+        "the opening reference is required at {}",
         path.display()
     );
     Gameplay::load(&path, None).expect("opening reference loads")
@@ -661,6 +661,8 @@ fn station(game: &Gameplay, recipe_id: u32) -> CharacterState {
 // caller's subtype; the envelope is `u16 138 | u16 sub | body` (reader/dispatcher 0x00b66830,
 // writer 0x00b69550). Register is 138/2 (writer 0x00b6a400: u64 handle + u8), cast is 138/6
 // (writer 0x00b6a460: u64 handle + vec4 + u8), reel is 138/7 (writer 0x00b6a4d0: u64 handle + u8).
+// The reward-adoption regressions import these builders via `pub(super)`, so the 138 wire shape
+// has one owner and a writer change updates both suites at once.
 fn fishing_request(sub: u16, body: &[u8]) -> Vec<u8> {
     let mut packet = vec![138, 0];
     packet.extend(sub.to_le_bytes());
@@ -676,13 +678,13 @@ fn fishing_actor_bytes() -> Vec<u8> {
     .concat()
 }
 
-fn fishing_register() -> Vec<u8> {
+pub(super) fn fishing_register() -> Vec<u8> {
     let mut body = fishing_actor_bytes();
     body.push(0);
     fishing_request(2, &body)
 }
 
-fn fishing_cast() -> Vec<u8> {
+pub(super) fn fishing_cast() -> Vec<u8> {
     let mut body = fishing_actor_bytes();
     for coordinate in [10.0f32, 0.0, 0.0, 1.0] {
         body.extend(coordinate.to_le_bytes());
@@ -691,7 +693,7 @@ fn fishing_cast() -> Vec<u8> {
     fishing_request(6, &body)
 }
 
-fn fishing_reel() -> Vec<u8> {
+pub(super) fn fishing_reel() -> Vec<u8> {
     let mut body = fishing_actor_bytes();
     body.push(1);
     fishing_request(7, &body)
