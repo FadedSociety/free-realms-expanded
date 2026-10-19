@@ -734,8 +734,9 @@ fn result_packets(
 }
 
 /// The client's `39/19` result-screen reader is `009bf190`; its automatic
-/// `39/7` acknowledgement is not the player's result Close.
-fn state_remove_packet(instance_id: i32, game_id: i32) -> Vec<u8> {
+/// `39/7` acknowledgement is not the player's result Close. Every minigame
+/// terminal path (results, cancel, lobby timeout) reuses this one header writer.
+pub(crate) fn state_remove_packet(instance_id: i32, game_id: i32) -> Vec<u8> {
     family39_header(19, instance_id, game_id)
 }
 

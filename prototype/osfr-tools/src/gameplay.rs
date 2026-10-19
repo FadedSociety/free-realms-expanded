@@ -106,7 +106,7 @@ pub struct GameplayState {
     pub harvesting: Option<Type8State>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kart_entry: Option<crate::kart_gateway::KartGatewayState>,
-    /// The last paid derby epoch, retained for the gate's cross-session reward cooldown.
+    /// Predecessor derby save shapes only (see `DerbyGatewayState`); never written now.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub derby: Option<crate::derby_gateway::DerbyGatewayState>,
     /// Chess's daily coin ledger; absent until the first paid win.
@@ -646,7 +646,7 @@ impl Gameplay {
                 BTreeSet::new(),
             ),
         };
-        let profiles = if directory.join("profiles.json").is_file() {
+        let mut profiles = if directory.join("profiles.json").is_file() {
             Some(Profiles::load(directory, profiles)?)
         } else if profiles.is_some() {
             return Err(invalid("class snapshot requires its opening content"));
@@ -830,6 +830,9 @@ impl Gameplay {
         // Load the item catalogue once here so content bindings can be checked
         // against the definitions this save actually has.
         let inventory = Inventory::load(directory, inventory)?;
+        if let Some(saved) = &saved_derby {
+            derby_session::restore_saved_derby_job(saved, &mut profiles, &inventory)?;
+        }
         let recipe_catalog = crate::recipes::RecipeCatalog::load_runtime(directory)?;
         // (R) The opening campaign historically has no recovered recipe-learn
         // packet sequence. Seed its two supplied starter patterns and the local
@@ -1048,7 +1051,7 @@ impl Gameplay {
                 );
             }
         }
-        let derby = crate::derby_gateway::DerbyGateway::load_with_state(directory, saved_derby)?;
+        let derby = crate::derby_gateway::DerbyGateway::load(directory)?;
         if let (Some(derby), Some(interaction)) = (&derby, &mut npc_interaction) {
             let unknown = interaction.set_derby_gates(derby.gate_npcs(), derby.menu_string_id());
             for npc in unknown {
@@ -1360,10 +1363,7 @@ impl Gameplay {
             mining: self.mining.as_ref().map(|m| m.state().clone()),
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
-            derby: self
-                .derby
-                .as_ref()
-                .and_then(crate::derby_gateway::DerbyGateway::snapshot),
+            derby: None,
             chess: self.chess.as_ref().and_then(ChessService::ledger),
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
             item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
@@ -1513,6 +1513,8 @@ impl Gameplay {
         if let Some(encounter) = &mut self.encounter {
             encounter.reset_session();
         }
+        // A derby match belongs to one connection (R): drop it and restore the job it replaced.
+        self.retire_derby_for_reset();
         // W160: a fishing round belongs to one connection. Paid catches are already saved;
         // only the cast in flight is dropped.
         self.fishing.reset_all();

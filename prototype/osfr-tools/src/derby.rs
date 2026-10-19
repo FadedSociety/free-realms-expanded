@@ -6,11 +6,11 @@
 //! 009eeba0, 009eec60 and 009eeeb0. No OSFR packet capture is used here.
 //!
 //! All game rules in DerbyRules, NPC fill/keys, combat, pickup selection, timers, result
-//! ordering, reward timing and generic minigame defaults are reconstructed policy (R).
-//! Unknown reader fields remain raw words/bytes. Native launch, gateway routing and reward
-//! persistence are external integration responsibilities.
+//! ordering and generic minigame defaults are reconstructed policy (R). F164 withholds rewards:
+//! every collision is a client `34/16` report, so there is no server-verified outcome to pay from.
+//! Unknown reader fields remain raw words/bytes. Native launch and gateway routing are external
+//! integration responsibilities.
 
-use crate::rewards::{RewardGrant, RewardState, apply_grant};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -197,7 +197,6 @@ pub enum DerbyError {
     InvalidField(&'static str),
     InvalidPhase,
     InvalidIdentity,
-    Reward(String),
 }
 
 impl fmt::Display for DerbyError {
@@ -215,7 +214,6 @@ impl fmt::Display for DerbyError {
             Self::InvalidField(field) => write!(f, "invalid Demo Derby field: {field}"),
             Self::InvalidPhase => f.write_str("Demo Derby operation is invalid in this phase"),
             Self::InvalidIdentity => f.write_str("Demo Derby identity does not match the session"),
-            Self::Reward(message) => write!(f, "Demo Derby reward failed: {message}"),
         }
     }
 }
@@ -781,13 +779,6 @@ struct Driver {
     respawn_at_ms: Option<u64>,
 }
 
-pub struct DerbyCloseOutcome {
-    pub accepted: bool,
-    pub phase: DerbyPhase,
-    pub reward_state: Option<RewardState>,
-    pub reward_packets: Vec<Vec<u8>>,
-}
-
 #[derive(Clone)]
 pub struct DerbyService {
     instance_id: i32,
@@ -1084,11 +1075,10 @@ impl DerbyService {
         }
         self.phase = DerbyPhase::Aborted;
         self.pickups.clear();
-        let mut removal = vec![39, 0, 19];
-        put_i32(&mut removal, self.instance_id);
-        put_i32(&mut removal, -1);
-        put_i32(&mut removal, self.game_id);
-        Ok(Some(removal))
+        Ok(Some(crate::minigame::state_remove_packet(
+            self.instance_id,
+            self.game_id,
+        )))
     }
 
     /// Client RegisterVehicleDemolitionDerbyPlayer (34/6, sender 009f1790) binds its first key to
@@ -1650,10 +1640,7 @@ impl DerbyService {
                 self.phase = DerbyPhase::Aborted;
                 self.lobby_deadline_ms = None;
                 self.pickups.clear();
-                let mut removal = vec![39, 0, 19];
-                put_i32(&mut removal, self.instance_id);
-                put_i32(&mut removal, -1);
-                put_i32(&mut removal, self.game_id);
+                let removal = crate::minigame::state_remove_packet(self.instance_id, self.game_id);
                 return Ok(self
                     .connected_humans()
                     .into_iter()
@@ -1774,38 +1761,25 @@ impl DerbyService {
 
     /// Called after the common minigame layer validates its Close packet (26/42 and, if enabled,
     /// the 41/109 encounter leave). The client click is enabled only after derby state 11.
+    /// F164 withholds derby payouts: every collision is a client `34/16` report, so no
+    /// server-verified outcome exists to pay from. The Close still retires the match once.
     pub fn handle_close(
         &mut self,
         sender: ParticipantKey,
         packet: &[u8],
-        state: &RewardState,
-        grant: &RewardGrant,
-    ) -> Result<DerbyCloseOutcome, DerbyError> {
+    ) -> Result<bool, DerbyError> {
         if self.phase != DerbyPhase::CloseEnabled
             || !self.is_connected_human(sender)
             || packet != [26, 0, 42, 0]
             || self.closed.contains(&sender)
         {
-            return Ok(DerbyCloseOutcome {
-                accepted: false,
-                phase: self.phase,
-                reward_state: None,
-                reward_packets: Vec::new(),
-            });
+            return Ok(false);
         }
-        let grant_key = format!("demo-derby:{}:{}", self.instance_id, sender.0);
-        let (next, reward_packets) = apply_grant(state, grant, &grant_key)
-            .map_err(|error| DerbyError::Reward(error.to_string()))?;
         self.closed.insert(sender);
         if self.closed.len() == self.human_count() {
             self.phase = DerbyPhase::Closed;
         }
-        Ok(DerbyCloseOutcome {
-            accepted: true,
-            phase: self.phase,
-            reward_state: Some(next),
-            reward_packets,
-        })
+        Ok(true)
     }
 
     fn is_connected_human(&self, key: ParticipantKey) -> bool {

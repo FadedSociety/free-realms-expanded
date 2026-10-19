@@ -698,11 +698,7 @@ impl Gameplay {
                 // (R) The NPC service proved range and that this exact option was offered;
                 // the derby service decides admission. Staging keeps the job switch atomic.
                 let busy = self.activity_busy();
-                match self
-                    .derby
-                    .as_ref()
-                    .map(|derby| derby.admit_at(gate, busy, current_unix_seconds()))
-                {
+                match self.derby.as_ref().map(|derby| derby.admit(gate, busy)) {
                     Some(Ok(())) => {
                         let mut staged = self.clone();
                         out = staged.begin_derby(character, now_ms)?;

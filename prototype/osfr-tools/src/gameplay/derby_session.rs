@@ -1,11 +1,41 @@
-//! Derby gameplay integration: job switching, cancellation, payout, and session ticking.
+//! Derby gameplay integration: job switching, cancellation, reportless close, and session ticking.
 use super::*;
+
+/// Predecessor saves recorded the job a connection-local match replaced. Current saves keep the
+/// profile itself on that job (`saved_profile_state`), so only an older save carries this marker.
+pub(super) fn restore_saved_derby_job(
+    saved: &crate::derby_gateway::DerbyGatewayState,
+    profiles: &mut Option<Profiles>,
+    inventory: &Inventory,
+) -> io::Result<()> {
+    let Some(job) = saved.previous_job else {
+        return Ok(());
+    };
+    if job <= 0 {
+        return Err(invalid("invalid saved derby previous job"));
+    }
+    if let Some(profiles) = profiles.as_mut() {
+        profiles.select(job, inventory)?;
+    }
+    Ok(())
+}
 
 impl Gameplay {
     pub fn derby_phase(&self) -> Option<crate::derby::DerbyPhase> {
         self.derby
             .as_ref()
             .and_then(crate::derby_gateway::DerbyGateway::phase)
+    }
+
+    /// Drop the connection-local match on session reset and restore the profile the derby
+    /// replaced. The client is gone, so no activation is sent; login self data carries the job.
+    pub(super) fn retire_derby_for_reset(&mut self) {
+        let Some(job) = self.derby.as_mut().and_then(|derby| derby.exit()) else {
+            return;
+        };
+        if let Some(profiles) = &mut self.profiles {
+            let _ = profiles.select(job, &self.inventory);
+        }
     }
 
     pub(super) fn saved_profile_state(&self) -> Option<ProfileState> {
@@ -100,8 +130,9 @@ impl Gameplay {
         Ok(out)
     }
 
-    /// Route the native derby records while this session owns a match. The final 26/42 Close is
-    /// the only payout point; an early, malformed or replayed Close leaves every bank untouched.
+    /// Route the native derby records while this session owns a match. The final 26/42 Close
+    /// retires the match and restores the job; it grants nothing (F164), and an early, malformed
+    /// or replayed Close changes nothing.
     pub(super) fn handle_derby(
         &mut self,
         inner: &[u8],
@@ -115,37 +146,10 @@ impl Gameplay {
             {
                 return self.cancel_derby(inner, character);
             }
-            let profiles_before = self.reward_profiles();
-            let rewards = RewardState::new(
-                self.inventory.clone(),
-                profiles_before.clone(),
-                self.inventory.state().items.len().max(100),
-            );
-            let outcome =
-                self.derby
-                    .as_mut()
-                    .unwrap()
-                    .close_at(inner, &rewards, current_unix_seconds())?;
-            if !outcome.accepted {
+            if !self.derby.as_mut().unwrap().close(inner)? {
                 return Ok(out);
             }
-            let next = outcome
-                .reward_state
-                .ok_or_else(|| invalid("accepted derby close has no reward state"))?;
             let previous_job = self.derby.as_mut().unwrap().exit();
-            self.inventory = next.inventory;
-            if next.profiles != profiles_before {
-                if self.profiles.is_some() {
-                    let directory = self
-                        .profile_content_directory
-                        .as_deref()
-                        .ok_or_else(|| invalid("derby XP needs profile content"))?;
-                    self.profiles = Some(Profiles::load(directory, Some(next.profiles.clone()))?);
-                } else {
-                    return Err(invalid("derby XP needs character profile state"));
-                }
-            }
-            out.replies = outcome.reward_packets;
             if let Some(job) = previous_job {
                 self.restore_job(job, character.guid, &mut out)?;
             }

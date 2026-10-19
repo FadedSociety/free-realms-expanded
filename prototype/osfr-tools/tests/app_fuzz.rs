@@ -305,7 +305,6 @@ impl Fixture {
                     "config": {"value_a_bits": 0, "value_b": 0}
                 },
                 "pickups": [],
-                "reward": {"coins": 5}
             }),
         );
         write_json(
@@ -313,8 +312,7 @@ impl Fixture {
             &json!({
                 "schema_version": 1,
                 "menu_string_id": 3053,
-                "npcs": [NPC],
-                "reward_cooldown_s": 600
+                "npcs": [NPC]
             }),
         );
     }
@@ -1094,9 +1092,17 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
         .unwrap()
         .inventory
         .coins;
-    let paid = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 5_100).unwrap();
-    assert!(paid.gameplay_changed);
+    let closed = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 5_100).unwrap();
+    assert!(closed.gameplay_changed);
     assert!(!gateway.gameplay().unwrap().derby_active());
+    assert!(
+        !closed
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[50, 0, 1])),
+        "a fabricated stationary contact must not send a reward bundle"
+    );
     assert_eq!(
         gateway
             .snapshot()
@@ -1105,10 +1111,11 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
             .unwrap()
             .inventory
             .coins,
-        before_coins + 5
+        before_coins,
+        "a fabricated stationary contact cannot mint coins"
     );
 
-    let before_refusal = gateway.snapshot();
+    // No reward means no cooldown: the gate offers another reportless match at once.
     let mut menu = vec![26, 0, 8, 0];
     menu.extend(NPC.to_le_bytes());
     menu.push(0);
@@ -1116,43 +1123,56 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
     let mut choice = vec![26, 0, 10, 0];
     choice.extend(NPC.to_le_bytes());
     choice.extend(3_i32.to_le_bytes());
-    let refused = gateway.handle_at(&wrap(&choice), 5_300).unwrap();
+    let reentered = gateway.handle_at(&wrap(&choice), 5_300).unwrap();
     assert!(
-        refused
+        reentered
             .replies
             .iter()
             .filter_map(|packet| unwrap_reply(packet))
-            .any(|packet| packet.starts_with(&[15, 0]))
+            .any(|packet| packet.starts_with(&[39, 0, 16]))
     );
+    assert!(gateway.gameplay().unwrap().derby_active());
+    let cancelled = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 5_400).unwrap();
+    assert!(cancelled.gameplay_changed);
     assert!(!gateway.gameplay().unwrap().derby_active());
-    assert_eq!(gateway.snapshot(), before_refusal);
-    let retry = gateway.handle_at(&wrap(&choice), 5_400).unwrap();
-    assert!(
-        retry
-            .replies
-            .iter()
-            .filter_map(|packet| unwrap_reply(packet))
-            .any(|packet| packet.starts_with(&[15, 0]))
-    );
-    assert_eq!(gateway.snapshot(), before_refusal);
     gateway.reset_session();
     let after_reset = gateway.snapshot();
     let after_reset_game = after_reset.gameplay.as_ref().unwrap();
-    assert_eq!(after_reset_game.inventory.coins, before_coins + 5);
-    assert_eq!(
-        after_reset_game
-            .derby
-            .as_ref()
-            .map(|state| state.last_paid_unix),
-        before_refusal
-            .gameplay
-            .as_ref()
-            .unwrap()
-            .derby
-            .as_ref()
-            .map(|state| state.last_paid_unix)
-    );
+    assert_eq!(after_reset_game.inventory.coins, before_coins);
+    assert!(after_reset_game.derby.is_none());
     assert!(!gateway.gameplay().unwrap().derby_active());
+}
+
+#[test]
+fn reset_during_a_running_derby_retires_it_and_restores_the_job() {
+    let fixture = Fixture::new();
+    let (mut gateway, _, _) = fixture.active_derby();
+    let before = gateway.snapshot();
+    let before_game = before.gameplay.as_ref().unwrap();
+    let prior_job = before_game.profiles.as_ref().unwrap().active;
+    assert_ne!(
+        prior_job,
+        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
+    );
+    assert!(gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        gateway.gameplay().unwrap().active_profile(),
+        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+    );
+
+    gateway.reset_session();
+    let after = gateway.snapshot();
+    let after_game = after.gameplay.as_ref().unwrap();
+    assert!(!gateway.gameplay().unwrap().derby_active());
+    assert_eq!(
+        after_game.profiles.as_ref().unwrap().active,
+        prior_job,
+        "reset restores the job the derby replaced"
+    );
+    assert_eq!(after_game.inventory.coins, before_game.inventory.coins);
+
+    // A fresh login does not resume the retired match; only a new gate choice starts one.
+    assert_eq!(gateway.gameplay().unwrap().derby_phase(), None);
 }
 
 #[test]

@@ -1,28 +1,14 @@
-use osfr_tools::{
-    derby::{
-        DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyMessage, DerbyPhase, DerbyPickup,
-        DerbyPickupBody, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
-        PickupKind, SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState,
-        decode_inner, encode_inner,
-    },
-    inventory::Inventory,
-    profiles::ProfileState,
-    rewards::{RewardDisplay, RewardGrant, RewardState},
-};
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    fs,
-    path::PathBuf,
-    sync::atomic::{AtomicU64, Ordering},
+use osfr_tools::derby::{
+    DEMO_DERBY_TYPE_ID, DerbyAction, DerbyConfig, DerbyMessage, DerbyPhase, DerbyPickup,
+    DerbyPickupBody, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey, PickupKind,
+    SUBTYPE_SPECS, VehicleCreate, VehicleHitReport, VehiclePose, VehicleState, decode_inner,
+    encode_inner,
 };
 
 const OWNER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0001);
 const OTHER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0002);
 const INSTANCE: i32 = 44;
 const GAME_ROW: i32 = 39;
-static FIXTURE_SEQ: AtomicU64 = AtomicU64::new(0);
 
 fn template() -> DerbyVehicleTemplate {
     DerbyVehicleTemplate {
@@ -321,7 +307,7 @@ fn all_twenty_client_records_roundtrip_with_reader_widths() {
 }
 
 #[test]
-fn solo_offer_registers_npcs_runs_client_gates_through_state_eleven_and_pays_once() {
+fn solo_offer_registers_npcs_runs_client_gates_through_state_eleven_and_closes_once() {
     let mut derby = service(&[OWNER], Vec::new());
     run_to_live(&mut derby, &[OWNER]);
     assert_eq!(derby.human_count(), 1);
@@ -354,34 +340,11 @@ fn solo_offer_registers_npcs_runs_client_gates_through_state_eleven_and_pays_onc
     assert_eq!(messages(&close_ready), vec![DerbyMessage::GameState(11)]);
     assert_eq!(derby.phase(), DerbyPhase::CloseEnabled);
 
-    let fixture = RewardFixture::new();
-    let reward_state = fixture.reward_state();
-    let grant = RewardGrant {
-        coins: 5,
-        items: Vec::new(),
-        job_xp: BTreeMap::new(),
-        display: RewardDisplay {
-            source_guid: 1,
-            player_guid: OWNER.raw(),
-            reward_kind: 2,
-            icon_id: 0,
-            name_id: 0,
-            rows: Vec::new(),
-        },
-    };
-    let close = derby
-        .handle_close(OWNER, &[26, 0, 42, 0], &reward_state, &grant)
-        .unwrap();
-    assert!(close.accepted);
-    let next_state = close.reward_state.unwrap();
-    assert_eq!(next_state.applied_grant_keys.len(), 1);
-    assert_eq!(next_state.inventory.state().coins, 15);
-    assert_eq!(close.reward_packets.len(), 2);
-    let duplicate = derby
-        .handle_close(OWNER, &[26, 0, 42, 0], &next_state, &grant)
-        .unwrap();
-    assert!(!duplicate.accepted);
-    assert!(duplicate.reward_packets.is_empty());
+    let close = derby.handle_close(OWNER, &[26, 0, 42, 0]).unwrap();
+    assert!(close);
+    assert_eq!(derby.phase(), DerbyPhase::Closed);
+    let duplicate = derby.handle_close(OWNER, &[26, 0, 42, 0]).unwrap();
+    assert!(!duplicate);
 }
 
 #[test]
@@ -617,74 +580,4 @@ fn pose_is_relayed_only_to_other_humans_and_disconnect_aborts_empty_match() {
     derby.disconnect(OTHER).unwrap();
     assert_eq!(derby.phase(), DerbyPhase::Aborted);
     assert!(derby.finish_match(9_000).unwrap().is_empty());
-}
-
-struct RewardFixture {
-    path: PathBuf,
-}
-
-impl RewardFixture {
-    fn new() -> Self {
-        let path = std::env::temp_dir().join(format!(
-            "osfr-derby-{}-{}",
-            std::process::id(),
-            FIXTURE_SEQ.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir(&path).unwrap();
-        let coins = 10_u32;
-        let coin_bytes = (coins as i32).to_le_bytes();
-        let empty_count = 0_i32.to_le_bytes();
-        let content = json!({
-            "schema_version": 1,
-            "player_guid": OWNER.raw(),
-            "default_state": {
-                "coins": coins,
-                "items": [],
-                "equipment": [],
-                "next_instance_id": null
-            },
-            "profiles": [],
-            "spans": [
-                span("coins", 13, 0, &coin_bytes),
-                span("items", 17, 0, &empty_count)
-            ],
-            "definitions": []
-        });
-        fs::write(
-            path.join("inventory.json"),
-            serde_json::to_vec(&content).unwrap(),
-        )
-        .unwrap();
-        Self { path }
-    }
-
-    fn reward_state(&self) -> RewardState {
-        RewardState::new(
-            Inventory::load(&self.path, None).unwrap(),
-            ProfileState {
-                version: 1,
-                active: 0,
-                unlocked: BTreeSet::new(),
-                experience: BTreeMap::new(),
-            },
-            4,
-        )
-    }
-}
-
-impl Drop for RewardFixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_file(self.path.join("inventory.json"));
-        let _ = fs::remove_dir(&self.path);
-    }
-}
-
-fn span(kind: &str, offset: usize, profile_id: i32, bytes: &[u8]) -> Value {
-    json!({
-        "kind": kind,
-        "offset": offset,
-        "length": bytes.len(),
-        "profile_id": profile_id,
-        "sha256": format!("{:x}", Sha256::digest(bytes))
-    })
 }

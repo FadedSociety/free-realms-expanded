@@ -2,17 +2,17 @@
 //!
 //! The packet and match rules stay in `derby.rs`; this module binds one authenticated character to
 //! one opt-in content package. The gate list is reconstructed policy (R), like the kart gates: an
-//! NPC lists the derby only when named in `derby_gates.json`. Entry, phase acknowledgements, the
-//! results hold and payout use the existing native type-11 lifecycle. No source-derived rule is
-//! invented here; all tunable numbers come from `derby_entry.json`.
+//! NPC lists the derby only when named in `derby_gates.json`. Entry, phase acknowledgements and the
+//! results hold use the existing native type-11 lifecycle. F164 withholds derby payouts: every
+//! collision is a client `34/16` report, so no server-verified outcome exists to pay from. No
+//! source-derived rule is invented here; all tunable numbers come from `derby_entry.json`.
 
 use crate::{
     character_store::CharacterState,
     derby::{
-        DEMO_DERBY_LOBBY_NAME_ID, DerbyAction, DerbyCloseOutcome, DerbyError, DerbyPhase,
-        DerbyPickup, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
+        DEMO_DERBY_LOBBY_NAME_ID, DerbyAction, DerbyError, DerbyPhase, DerbyPickup, DerbyRules,
+        DerbyService, DerbyVehicleTemplate, ParticipantKey,
     },
-    rewards::{RewardDisplay, RewardGrant, RewardState},
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -31,30 +31,14 @@ pub const DEFAULT_MENU_STRING_ID: u32 = DEMO_DERBY_LOBBY_NAME_ID as u32;
 /// (R) Private instance ids start here, matching the kart entry convention.
 pub const FIRST_DERBY_INSTANCE: u32 = 49_000_001;
 pub const MAX_DERBY_GATES: usize = 16;
-/// (R) Ten minutes between paid runs unless the gate package tunes it.
-pub const DEFAULT_REWARD_COOLDOWN_S: u64 = 600;
 
 const MAX_CONTENT_BYTES: usize = 512 * 1024;
 const MAX_GATES_BYTES: usize = 16 * 1024;
 const ACTIVE_STATUS_MASK: u32 = (1 << crate::derby::DERBY_ACTIVE_STATUS_BIT) | 1;
 
-/// One configured derby payout. The values are content, not save state.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct DerbyReward {
-    pub coins: u32,
-    #[serde(default)]
-    pub job_xp: std::collections::BTreeMap<i32, u32>,
-    #[serde(default)]
-    pub reward_kind: i32,
-    #[serde(default)]
-    pub icon_id: i32,
-    #[serde(default)]
-    pub name_id: i32,
-}
-
 /// One opt-in derby package. `vehicle`, `rules` and `pickups` are the service's existing typed
-/// content; this wrapper adds only the game id and payout row.
+/// content; this wrapper adds only the game id. Reward rows are absent: F164 withholds derby
+/// payouts because every collision is a client report, not a server-verified outcome.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayContent {
@@ -64,7 +48,6 @@ pub struct DerbyGatewayContent {
     pub rules: DerbyRules,
     #[serde(default)]
     pub pickups: Vec<DerbyPickup>,
-    pub reward: DerbyReward,
 }
 
 /// (R) NPCs whose menu offers the derby. NPC existence is checked by `NpcInteraction`.
@@ -75,30 +58,22 @@ pub struct DerbyGates {
     #[serde(default = "default_menu_string_id")]
     pub menu_string_id: u32,
     pub npcs: Vec<u64>,
-    /// (R) Seconds after a paid derby before a gate starts another; 0 is off.
-    #[serde(default = "default_reward_cooldown_s")]
-    pub reward_cooldown_s: u64,
 }
 
-/// The only derby data a save needs: the last paid-run epoch for the cross-session cooldown.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+/// Predecessor derby save shapes. T023 wrote the job a connection-local match replaced; F117
+/// wrote a paid-run epoch. F164 grants no derby reward, so neither is written again, but both
+/// must still load. `last_paid_unix` is accepted and ignored; `previous_job` is restored at load.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayState {
-    pub last_paid_unix: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub previous_job: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_paid_unix: Option<u64>,
 }
 
 fn default_menu_string_id() -> u32 {
     DEFAULT_MENU_STRING_ID
-}
-
-fn default_reward_cooldown_s() -> u64 {
-    DEFAULT_REWARD_COOLDOWN_S
-}
-
-fn now_unix() -> u64 {
-    std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |duration| duration.as_secs())
 }
 
 /// Why an ordinary derby entry was refused. The caller reports the message and changes nothing.
@@ -108,7 +83,6 @@ pub enum DerbyEntryDenied {
     Unavailable,
     AlreadyPlaying,
     Busy,
-    Cooldown,
 }
 
 impl DerbyEntryDenied {
@@ -118,7 +92,6 @@ impl DerbyEntryDenied {
             Self::Unavailable => "The derby isn't open yet.",
             Self::AlreadyPlaying => "You are already in a derby.",
             Self::Busy => "Finish the active activity before entering the derby.",
-            Self::Cooldown => "The arena is being reset. Come back for another derby soon.",
         }
     }
 }
@@ -131,7 +104,6 @@ pub struct DerbyGateway {
     owner: Option<ParticipantKey>,
     next_instance: u32,
     previous_job: Option<i32>,
-    last_paid_unix: Option<u64>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -168,7 +140,6 @@ fn load_gates(directory: &Path) -> io::Result<Option<DerbyGates>> {
     let gates: DerbyGates = serde_json::from_slice(&bytes).map_err(invalid)?;
     if gates.schema_version != 1
         || gates.menu_string_id == 0
-        || gates.reward_cooldown_s > crate::kart_gateway::MAX_REWARD_COOLDOWN_S
         || gates.npcs.len() > MAX_DERBY_GATES
         || gates
             .npcs
@@ -187,27 +158,13 @@ impl DerbyGateway {
     /// Load the content package and its optional NPC gate list. Absent content leaves the route
     /// disabled; malformed present content rejects the world load instead of degrading silently.
     pub fn load(directory: &Path) -> io::Result<Option<Self>> {
-        Self::load_with_state(directory, None)
-    }
-
-    pub fn load_with_state(
-        directory: &Path,
-        saved: Option<DerbyGatewayState>,
-    ) -> io::Result<Option<Self>> {
         let path = directory.join("derby_entry.json");
         let Some(bytes) = read_regular_limited(&path, MAX_CONTENT_BYTES, "derby content")? else {
             return Ok(None);
         };
         let content: DerbyGatewayContent =
             serde_json::from_slice(&bytes).map_err(|error| invalid(error.to_string()))?;
-        let mut gateway = Self::new(content, load_gates(directory)?)?;
-        if let Some(saved) = saved {
-            if saved.last_paid_unix == 0 {
-                return Err(invalid("invalid saved derby cooldown"));
-            }
-            gateway.last_paid_unix = Some(saved.last_paid_unix);
-        }
-        Ok(Some(gateway))
+        Ok(Some(Self::new(content, load_gates(directory)?)?))
     }
 
     /// Build a gateway from typed content. This is also the strict content validator used by tests
@@ -217,7 +174,6 @@ impl DerbyGateway {
         if let Some(gates) = &gates {
             if gates.schema_version != 1
                 || gates.menu_string_id == 0
-                || gates.reward_cooldown_s > crate::kart_gateway::MAX_REWARD_COOLDOWN_S
                 || gates.npcs.len() > MAX_DERBY_GATES
                 || gates.npcs.iter().any(|npc| *npc == 0)
                 || gates.npcs.iter().collect::<BTreeSet<_>>().len() != gates.npcs.len()
@@ -232,7 +188,6 @@ impl DerbyGateway {
             owner: None,
             next_instance: FIRST_DERBY_INSTANCE,
             previous_job: None,
-            last_paid_unix: None,
         })
     }
 
@@ -267,21 +222,12 @@ impl DerbyGateway {
         self.previous_job
     }
 
-    pub fn snapshot(&self) -> Option<DerbyGatewayState> {
-        self.last_paid_unix
-            .map(|last_paid_unix| DerbyGatewayState { last_paid_unix })
-    }
-
     pub fn set_previous_job(&mut self, job: i32) {
         self.previous_job = Some(job);
     }
 
     /// Ordinary-entry admission. `busy` is computed by gameplay before any state is staged.
     pub fn admit(&self, npc_id: u64, busy: bool) -> Result<(), DerbyEntryDenied> {
-        self.admit_at(npc_id, busy, now_unix())
-    }
-
-    pub fn admit_at(&self, npc_id: u64, busy: bool, now_unix: u64) -> Result<(), DerbyEntryDenied> {
         if !self
             .gates
             .as_ref()
@@ -294,16 +240,6 @@ impl DerbyGateway {
         }
         if busy {
             return Err(DerbyEntryDenied::Busy);
-        }
-        let cooldown = self
-            .gates
-            .as_ref()
-            .map_or(0, |gates| gates.reward_cooldown_s);
-        if self
-            .last_paid_unix
-            .is_some_and(|paid| now_unix < paid.saturating_add(cooldown))
-        {
-            return Err(DerbyEntryDenied::Cooldown);
         }
         Ok(())
     }
@@ -426,37 +362,23 @@ impl DerbyGateway {
         Ok(vec![removal])
     }
 
-    /// Apply the final Close payout to a staged reward state. The caller only commits the returned
-    /// reward state when `accepted` is true, preserving the all-or-nothing inventory contract.
-    pub fn close(&mut self, packet: &[u8], rewards: &RewardState) -> io::Result<DerbyCloseOutcome> {
-        self.close_at(packet, rewards, now_unix())
-    }
-
-    pub fn close_at(
-        &mut self,
-        packet: &[u8],
-        rewards: &RewardState,
-        now_unix: u64,
-    ) -> io::Result<DerbyCloseOutcome> {
-        if now_unix == 0 {
-            return Err(invalid("derby payout clock is unavailable"));
-        }
+    /// Accept the framework Close once the results screen has enabled it. The close retires the
+    /// match; F164 grants nothing, because every collision is a client `34/16` report.
+    pub fn close(&mut self, packet: &[u8]) -> io::Result<bool> {
         let Some(service) = &self.service else {
-            return Ok(refused_close(DerbyPhase::Closed));
+            return Ok(false);
         };
         let owner = self
             .owner
             .ok_or_else(|| invalid("derby service has no authenticated owner"))?;
         let mut staged = service.clone();
-        let grant = self.grant(owner);
-        let outcome = staged
-            .handle_close(owner, packet, rewards, &grant)
+        let accepted = staged
+            .handle_close(owner, packet)
             .map_err(|error| invalid(error.to_string()))?;
-        if outcome.accepted {
+        if accepted {
             self.service = Some(staged);
-            self.last_paid_unix = Some(now_unix);
         }
-        Ok(outcome)
+        Ok(accepted)
     }
 
     /// Retire the live match and return the job to restore.
@@ -464,22 +386,6 @@ impl DerbyGateway {
         self.service = None;
         self.owner = None;
         self.previous_job.take()
-    }
-
-    fn grant(&self, owner: ParticipantKey) -> RewardGrant {
-        RewardGrant {
-            coins: self.content.reward.coins,
-            items: Vec::new(),
-            job_xp: self.content.reward.job_xp.clone(),
-            display: RewardDisplay {
-                source_guid: owner.raw(),
-                player_guid: owner.raw(),
-                reward_kind: self.content.reward.reward_kind,
-                icon_id: self.content.reward.icon_id,
-                name_id: self.content.reward.name_id,
-                rows: Vec::new(),
-            },
-        }
     }
 }
 
@@ -501,15 +407,6 @@ fn packets_for_owner(actions: &[DerbyAction], owner: ParticipantKey) -> io::Resu
     Ok(replies)
 }
 
-fn refused_close(phase: DerbyPhase) -> DerbyCloseOutcome {
-    DerbyCloseOutcome {
-        accepted: false,
-        phase,
-        reward_state: None,
-        reward_packets: Vec::new(),
-    }
-}
-
 fn validate_content(content: &DerbyGatewayContent) -> io::Result<()> {
     if content.schema_version != 1
         || content.game_id <= 0
@@ -524,17 +421,6 @@ fn validate_content(content: &DerbyGatewayContent) -> io::Result<()> {
         || content.pickups.len() > 256
     {
         return Err(invalid("invalid derby content"));
-    }
-    if content.reward.coins > i32::MAX as u32
-        || content.reward.job_xp.keys().any(|profile| *profile <= 0)
-        || content
-            .reward
-            .job_xp
-            .values()
-            .any(|xp| *xp > i32::MAX as u32)
-        || (content.reward.coins == 0 && content.reward.job_xp.values().all(|xp| *xp == 0))
-    {
-        return Err(invalid("invalid derby reward"));
     }
     DerbyService::new(
         FIRST_DERBY_INSTANCE as i32,
