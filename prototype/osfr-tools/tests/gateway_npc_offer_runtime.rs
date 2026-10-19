@@ -212,6 +212,7 @@ fn account_store_gateway_talk_to_samantha_sends_quest_offer() {
         stock_text: None,
         allow_lan: false,
         security_log: None,
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
     })
     .unwrap();
     let socket = UdpSocket::bind("127.0.0.1:0").unwrap();

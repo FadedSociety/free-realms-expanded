@@ -75,7 +75,10 @@ fn group(social: &mut SocialService, directory: &Directory, leader: u64, members
         social
             .invite_to_group(leader, &name(*member), directory, 0)
             .unwrap();
-        social.respond_group_invite(*member, true, 0).unwrap();
+        let group_id = social.group_of(leader).unwrap();
+        social
+            .respond_group_invite(*member, group_id, true, 0)
+            .unwrap();
     }
 }
 
@@ -438,7 +441,8 @@ fn job_change_flag_survives_snapshots_and_dies_with_membership() {
     social.group_changing_job(B, true).unwrap();
     // C joins: the 40/8 snapshot still marks B as changing job.
     social.invite_to_group(A, &name(C), &directory, 0).unwrap();
-    let joined = social.respond_group_invite(C, true, 0).unwrap();
+    let group_id = social.group_of(A).unwrap();
+    let joined = social.respond_group_invite(C, group_id, true, 0).unwrap();
     let snapshot = joined
         .iter()
         .find(|m| m.recipient_guid == C && m.bytes.starts_with(&[40, 0, 8, 0]))
@@ -454,7 +458,8 @@ fn job_change_flag_survives_snapshots_and_dies_with_membership() {
     // B leaves while flagged, then rejoins: the flag was cleared.
     social.leave_group(B).unwrap();
     social.invite_to_group(A, &name(B), &directory, 0).unwrap();
-    let rejoined = social.respond_group_invite(B, true, 0).unwrap();
+    let group_id = social.group_of(A).unwrap();
+    let rejoined = social.respond_group_invite(B, group_id, true, 0).unwrap();
     let snapshot = rejoined
         .iter()
         .find(|m| m.recipient_guid == B && m.bytes.starts_with(&[40, 0, 8, 0]))
@@ -475,7 +480,8 @@ fn job_change_flag_survives_snapshots_and_dies_with_membership() {
     social.leave_group(B).unwrap();
     assert_eq!(social.group_of(A), None);
     social.invite_to_group(A, &name(C), &directory, 0).unwrap();
-    let again = social.respond_group_invite(C, true, 0).unwrap();
+    let group_id = social.group_of(A).unwrap();
+    let again = social.respond_group_invite(C, group_id, true, 0).unwrap();
     let snapshot = again
         .iter()
         .find(|m| m.recipient_guid == C && m.bytes.starts_with(&[40, 0, 8, 0]))

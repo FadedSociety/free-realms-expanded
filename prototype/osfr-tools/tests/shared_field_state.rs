@@ -495,6 +495,7 @@ impl Fixture {
             stock_text: None,
             allow_lan: false,
             security_log: None,
+            group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
         };
         let (tx, rx) = mpsc::channel::<HostAction>();
         let (addr_tx, addr_rx) = mpsc::channel();

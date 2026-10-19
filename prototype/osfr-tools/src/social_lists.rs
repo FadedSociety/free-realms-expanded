@@ -27,8 +27,10 @@ pub const GROUP_FAMILY: u16 = 40;
 pub const MAX_MAP_COORD: i32 = 1_000_000;
 /// (R) One 74/5 update never carries more than this many friends (entries are 21 bytes).
 pub const MAX_POSITION_ENTRIES: usize = 512;
-/// (R) Unanswered group invites reserve capacity for at most one minute.
-pub const GROUP_INVITE_TTL_MS: u64 = 60_000;
+/// (R) Default lifetime of an unanswered group invite, overridable by server configuration.
+pub const DEFAULT_GROUP_INVITE_TTL_MS: u64 = 60_000;
+const MIN_GROUP_INVITE_TTL_MS: u64 = 1_000;
+const MAX_GROUP_INVITE_TTL_MS: u64 = 600_000;
 
 /// The original client has no recovered friend-list cap; this module adds no cap.
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
@@ -245,6 +247,7 @@ pub enum SocialError {
     NotIgnored,
     NoPendingFriendRequest,
     InvalidGroupLimit,
+    InvalidInviteTtl,
     NotInGroup,
     InvalidPosition,
 }
@@ -264,6 +267,7 @@ impl std::fmt::Display for SocialError {
             Self::NotIgnored => "character is not ignored",
             Self::NoPendingFriendRequest => "friend request is not pending",
             Self::InvalidGroupLimit => "group limit must be at least two",
+            Self::InvalidInviteTtl => "group invite lifetime must be 1000..=600000 ms",
             Self::NotInGroup => "character is not in a group",
             Self::InvalidPosition => "map position is not finite or is out of bounds",
         })
@@ -298,6 +302,8 @@ pub struct SocialService {
     online: BTreeSet<u64>,
     friend_requests: BTreeMap<(u64, u64), PendingFriendRequest>,
     max_group_members: usize,
+    /// Host policy copied with the service; never persisted and not part of the saved profile.
+    group_invite_ttl_ms: u64,
     next_group_id: u32,
     groups: BTreeMap<u32, Group>,
     member_group: BTreeMap<u64, u32>,
@@ -317,12 +323,26 @@ impl SocialService {
             online: BTreeSet::new(),
             friend_requests: BTreeMap::new(),
             max_group_members,
+            group_invite_ttl_ms: DEFAULT_GROUP_INVITE_TTL_MS,
             next_group_id: 1,
             groups: BTreeMap::new(),
             member_group: BTreeMap::new(),
             group_invites: BTreeMap::new(),
             changing_job: BTreeSet::new(),
         })
+    }
+
+    pub fn group_invite_ttl_ms(&self) -> u64 {
+        self.group_invite_ttl_ms
+    }
+
+    /// Set the bounded server policy before the server accepts sessions.
+    pub fn set_group_invite_ttl(&mut self, ttl_ms: u64) -> Result<(), SocialError> {
+        if !(MIN_GROUP_INVITE_TTL_MS..=MAX_GROUP_INVITE_TTL_MS).contains(&ttl_ms) {
+            return Err(SocialError::InvalidInviteTtl);
+        }
+        self.group_invite_ttl_ms = ttl_ms;
+        Ok(())
     }
 
     pub fn register(&mut self, profile: SocialLists) -> Result<(), SocialError> {
@@ -760,13 +780,21 @@ impl SocialService {
     pub fn respond_group_invite(
         &mut self,
         target_guid: u64,
+        group_id: u32,
         accepted: bool,
         now_ms: u64,
     ) -> Result<Vec<SocialMessage>, SocialError> {
         self.expire_group_invites(now_ms);
+        // 40/5 body reader 00909090; dispatcher 0093daf0 case 5 maps 3 to
+        // GroupAcceptFailNotInvited.
         let Some(invite) = self.group_invites.get(&target_guid).copied() else {
             return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
         };
+        if invite.group_id != group_id {
+            // The client echoes the group id from the pop-up. Refuse a stale pop-up
+            // rather than consuming a replacement invitation from another group.
+            return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
+        }
         let Some(group) = self.groups.get(&invite.group_id) else {
             self.group_invites.remove(&target_guid);
             return Ok(vec![message(target_guid, encode_group_result(5, 1))]);
@@ -822,13 +850,12 @@ impl SocialService {
         Ok(out)
     }
 
-    /// (R) Expire unanswered group invites on the host's monotonic clock.
-    ///
-    /// Recovered family 40 has no invite-timeout notice. A late accept therefore
-    /// receives the existing 40/5 "not invited" result instead of an invented packet.
-    pub fn expire_group_invites(&mut self, now_ms: u64) {
-        self.group_invites
-            .retain(|_, invite| now_ms.saturating_sub(invite.created_ms) < GROUP_INVITE_TTL_MS);
+    /// (R) Drop expired invitations lazily before the next invite or response.
+    /// Family 40 has no timeout notice, and idle cleanup has no observable effect.
+    fn expire_group_invites(&mut self, now_ms: u64) {
+        self.group_invites.retain(|_, invite| {
+            now_ms.saturating_sub(invite.created_ms) < self.group_invite_ttl_ms
+        });
     }
 
     /// Leave, kick and disconnect update state before emitting family-40 member-list messages.

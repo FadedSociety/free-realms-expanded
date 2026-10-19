@@ -239,7 +239,7 @@ fn group_invite_accept_capacity_kick_leader_leave_and_disband() {
         u32::from_le_bytes(invite_result.bytes[4..8].try_into().unwrap()),
         0
     );
-    let accepted_b = social.respond_group_invite(202, true, 0).unwrap();
+    let accepted_b = social.respond_group_invite(202, group_id, true, 0).unwrap();
     assert_eq!(social.group_members(group_id).unwrap(), &[101, 202]);
     assert!(
         accepted_b
@@ -258,7 +258,7 @@ fn group_invite_accept_capacity_kick_leader_leave_and_disband() {
     );
 
     social.invite_to_group(101, &c_name, &directory, 0).unwrap();
-    social.respond_group_invite(303, true, 0).unwrap();
+    social.respond_group_invite(303, group_id, true, 0).unwrap();
     assert_eq!(social.group_members(group_id).unwrap(), &[101, 202, 303]);
     let full = social.invite_to_group(101, &d_name, &directory, 0).unwrap();
     let full_reply = full
@@ -311,13 +311,16 @@ fn client_autorefuse_group_answer_declines_and_disconnect_cleans_state() {
     let c_name = identity(30, 303, "FixtureC").name;
     let d_name = identity(40, 404, "FixtureD").name;
     let invite = social.invite_to_group(101, &b_name, &directory, 0).unwrap();
+    let group_id = social.group_of(101).unwrap();
     assert!(
         invite
             .iter()
             .any(|packet| packet.recipient_guid == 202 && family(packet) == 40 && sub(packet) == 1)
     );
     // The client checks AutoRefuse[GroupInvitation] at 00917b60 index 6, then sends 40/4 false.
-    let declined = social.respond_group_invite(202, false, 0).unwrap();
+    let declined = social
+        .respond_group_invite(202, group_id, false, 0)
+        .unwrap();
     assert!(
         declined
             .iter()
@@ -326,11 +329,10 @@ fn client_autorefuse_group_answer_declines_and_disconnect_cleans_state() {
     assert!(social.group_invitee(202).is_none());
 
     social.invite_to_group(101, &b_name, &directory, 0).unwrap();
-    social.respond_group_invite(202, true, 0).unwrap();
+    social.respond_group_invite(202, group_id, true, 0).unwrap();
     social.invite_to_group(101, &c_name, &directory, 0).unwrap();
-    social.respond_group_invite(303, true, 0).unwrap();
+    social.respond_group_invite(303, group_id, true, 0).unwrap();
     social.invite_to_group(101, &d_name, &directory, 0).unwrap();
-    let group_id = social.group_of(101).unwrap();
     let disconnected = social.disconnect(101).unwrap();
     assert_eq!(social.group_of(101), None);
     assert_eq!(social.group_leader(group_id), Some(202));
@@ -504,11 +506,11 @@ fn grouped_acceptance_is_refused_without_overlapping_party_membership() {
     social.invite_to_group(202, &c_name, &directory, 0).unwrap();
     let b_group = social.group_of(202).unwrap();
     assert_ne!(a_group, b_group);
-    social.respond_group_invite(303, true, 0).unwrap();
+    social.respond_group_invite(303, b_group, true, 0).unwrap();
 
     // B accepted C into B's party after A had invited B. A second acceptance
     // must not move B out of that party or append B to A's roster.
-    let refused = social.respond_group_invite(202, true, 0).unwrap();
+    let refused = social.respond_group_invite(202, a_group, true, 0).unwrap();
     assert_eq!((family(&refused[0]), sub(&refused[0])), (40, 5));
     assert_eq!(result(&refused[0]), 1);
     assert_eq!(social.group_of(101), Some(a_group));
@@ -527,7 +529,7 @@ fn grouped_acceptance_is_refused_without_overlapping_party_membership() {
     assert_eq!(social.group_invitee(202), Some((a_group, 101)));
 
     // With the conflicting party gone, B can still decline the older invitation.
-    let declined = social.respond_group_invite(202, false, 0).unwrap();
+    let declined = social.respond_group_invite(202, a_group, false, 0).unwrap();
     assert!(
         declined
             .iter()

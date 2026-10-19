@@ -30,6 +30,7 @@ fn party(scratch: &Path, id: u64, guid: u64) -> Session {
         stock_text: None,
         allow_lan: false,
         security_log: None,
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
     };
     let mut session = Session::new(
         SessionId(id),

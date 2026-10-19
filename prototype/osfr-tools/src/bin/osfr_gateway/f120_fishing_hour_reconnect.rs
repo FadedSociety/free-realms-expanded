@@ -229,6 +229,7 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         stock_text: None,
         allow_lan: false,
         security_log: None,
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
     };
     let new_session = |id: u64| {
         Session::new(

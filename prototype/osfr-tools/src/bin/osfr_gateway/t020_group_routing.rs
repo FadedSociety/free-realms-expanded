@@ -9,7 +9,6 @@ struct Rig {
     sessions: [Session; 3],
     world: SharedWorld,
     scratch: PathBuf,
-    options: Options,
 }
 
 impl Drop for Rig {
@@ -38,6 +37,7 @@ fn options(scratch: &Path) -> Options {
         stock_text: None,
         allow_lan: false,
         security_log: None,
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
     }
 }
 
@@ -133,7 +133,6 @@ fn rig(name: &str) -> Rig {
         sessions,
         world,
         scratch,
-        options,
     }
 }
 
@@ -283,6 +282,10 @@ fn recipients(deliveries: &[Delivery]) -> Vec<u64> {
     let mut ids: Vec<u64> = deliveries.iter().map(|d| d.recipient.0).collect();
     ids.sort();
     ids
+}
+
+fn send_at(rig: &mut Rig, index: usize, packet: &[u8], now_ms: u64) -> Vec<Delivery> {
+    rig.sessions[index].route_application(packet, &mut rig.world, now_ms)
 }
 
 #[test]
@@ -468,43 +471,95 @@ fn interleaved_invites_cannot_overlap_membership_or_group_chat() {
 }
 
 #[test]
-fn gateway_tick_expires_an_idle_invite() {
-    let mut rig = rig("tick-expiry");
-    send(&mut rig, 0, &invite(0, 1, 0));
-    let group_id = rig.world.social.group_of(GUIDS[0]).unwrap();
-    assert_eq!(
-        rig.world.social.group_invitee(GUIDS[1]),
-        Some((group_id, GUIDS[0]))
+fn late_accept_is_refused_by_the_request_without_a_cleanup_tick() {
+    let mut rig = rig("late-accept");
+    let member = 0;
+    let target = 1;
+    send_at(&mut rig, member, &invite(member, target, 0), 1_000);
+    let group_id = rig.world.social.group_of(GUIDS[member]).unwrap();
+    let members_before = rig.world.social.group_members(group_id).unwrap().to_vec();
+    let groups_before = GUIDS.map(|guid| rig.world.social.group_of(guid));
+    let profiles_before = GUIDS.map(|guid| rig.world.social.profile(guid).cloned());
+
+    let refused = send_at(
+        &mut rig,
+        target,
+        &response(member, target, group_id, true),
+        61_000,
     );
 
-    let mut membership = World::runtime();
-    membership
-        .register_runtime_zone(osfr_tools::content::Zone {
-            id: 1,
-            name: String::new(),
-            geometry_id: Some(1),
-            zone_type: Some(2),
-            tutorial: Some(false),
-            sky: Some(String::new()),
-            source: Vec::new(),
-        })
-        .unwrap();
-    let mut sessions = SessionMap::new();
-    rig.sessions[0]
-        .tick(
-            &rig.options,
-            61_000,
-            &mut rig.world,
-            &mut membership,
-            &mut sessions,
-        )
-        .unwrap();
-
-    assert_eq!(rig.world.social.group_invitee(GUIDS[1]), None);
+    assert_eq!(result_for(&refused, target, 5), Some(3));
+    assert!(!has(&refused, member, 40, 4));
+    assert!(!has(&refused, target, 40, 4));
+    assert_eq!(rig.world.social.group_invitee(GUIDS[target]), None);
     assert_eq!(
         rig.world.social.group_members(group_id),
-        Some([GUIDS[0]].as_slice())
+        Some(members_before.as_slice())
     );
+    assert_eq!(
+        GUIDS.map(|guid| rig.world.social.group_of(guid)),
+        groups_before
+    );
+    assert_eq!(
+        GUIDS.map(|guid| rig.world.social.profile(guid).cloned()),
+        profiles_before
+    );
+}
+
+#[test]
+fn replacement_invite_expires_the_previous_row_before_capacity_check() {
+    let mut rig = rig("replacement");
+    let (a, b, c) = (0, 1, 2);
+    send_at(&mut rig, a, &invite(a, b, 0), 1_000);
+    let old_group = rig.world.social.group_of(GUIDS[a]).unwrap();
+
+    let replacement = send_at(&mut rig, c, &invite(c, b, 0), 61_000);
+    assert_eq!(result_for(&replacement, c, 2), Some(0));
+    let replacement_group = rig.world.social.group_of(GUIDS[c]).unwrap();
+    assert_eq!(
+        rig.world.social.group_invitee(GUIDS[b]),
+        Some((replacement_group, GUIDS[c]))
+    );
+
+    let stale = send_at(&mut rig, b, &response(a, b, old_group, true), 61_001);
+    assert_eq!(result_for(&stale, b, 5), Some(3));
+    assert_eq!(
+        rig.world.social.group_invitee(GUIDS[b]),
+        Some((replacement_group, GUIDS[c]))
+    );
+    assert_eq!(
+        rig.world.social.group_members(old_group),
+        Some([GUIDS[a]].as_slice())
+    );
+    assert_eq!(
+        rig.world.social.group_members(replacement_group),
+        Some([GUIDS[c]].as_slice())
+    );
+
+    let stale_decline = send_at(&mut rig, b, &response(a, b, old_group, false), 61_002);
+    assert_eq!(result_for(&stale_decline, b, 5), Some(3));
+    assert!(!has(&stale_decline, a, 40, 4));
+    assert!(!has(&stale_decline, b, 40, 4));
+    assert_eq!(
+        rig.world.social.group_invitee(GUIDS[b]),
+        Some((replacement_group, GUIDS[c]))
+    );
+}
+
+#[test]
+fn server_configuration_applies_bounded_group_invite_lifetime() {
+    let scratch = std::env::temp_dir().join(format!("osfr-t020-config-{}", std::process::id()));
+    fs::create_dir_all(&scratch).unwrap();
+    let mut configured = options(&scratch);
+    configured.group_invite_ttl_ms = 1_000;
+    let server = Server::new(configured).unwrap();
+    assert_eq!(server.world.social.group_invite_ttl_ms(), 1_000);
+    drop(server);
+
+    let mut invalid = options(&scratch);
+    invalid.group_invite_ttl_ms = 999;
+    assert!(Server::new(invalid).is_err());
+    fs::remove_dir_all(scratch).unwrap();
 }
 
 #[test]

@@ -295,6 +295,8 @@ pub struct Options {
     pub allow_lan: bool,
     /// Bounded refusal log (Security Model L9) in a host-protected folder.
     pub security_log: Option<PathBuf>,
+    /// (R) Pending group invitations expire after this bounded monotonic duration.
+    pub group_invite_ttl_ms: u64,
 }
 
 impl Options {
@@ -302,7 +304,7 @@ impl Options {
         let mut args = env::args().skip(1);
         let bind: SocketAddr = args
             .next()
-            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--security-log FILE] [--dev-tools]")?
+            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--security-log FILE] [--group-invite-ttl-ms N] [--dev-tools]")?
             .parse()?;
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
@@ -316,6 +318,7 @@ impl Options {
         let mut world = None;
         let mut stock_text = None;
         let mut security_log = None;
+        let mut group_invite_ttl_ms = osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS;
         while let Some(key) = args.next() {
             if key == "--dev-tools" {
                 dev_tools = true;
@@ -339,6 +342,7 @@ impl Options {
                 "--client-logs" => client_logs = Some(PathBuf::from(value)),
                 "--world" => world = Some(PathBuf::from(value)),
                 "--security-log" => security_log = Some(PathBuf::from(value)),
+                "--group-invite-ttl-ms" => group_invite_ttl_ms = value.parse()?,
                 "--client-locale" => {
                     let dat = Path::new(&value).join("en_us_data.dat");
                     stock_text = Some(Arc::new(osfr_tools::world_text::stock_hashes(&dat)?));
@@ -387,6 +391,7 @@ impl Options {
             stock_text,
             allow_lan,
             security_log,
+            group_invite_ttl_ms,
         })
     }
 }
@@ -1855,7 +1860,6 @@ impl Session {
                     ));
                 }
             }
-            staged_world.social.expire_group_invites(now_ms);
             // W163: a trade ends when a player walks out of reach, changes zone instance (a
             // battle runs in its own), leaves, or lets it run out.
             deliveries.extend(trade_deliveries(staged_world.trades.maintain(
@@ -2144,11 +2148,9 @@ impl Session {
                     .invite_to_group(self.character_guid, &name, &lookup, now_ms)
             }
             SocialRequest::GroupLeave => world.social.leave_group(self.character_guid),
-            SocialRequest::GroupResponse(accepted) => {
-                world
-                    .social
-                    .respond_group_invite(self.character_guid, accepted, now_ms)
-            }
+            SocialRequest::GroupResponse { group_id, accepted } => world
+                .social
+                .respond_group_invite(self.character_guid, group_id, accepted, now_ms),
             SocialRequest::GroupKick(guid) => {
                 world.social.kick_from_group(self.character_guid, guid)
             }
@@ -2819,7 +2821,10 @@ enum SocialRequest {
     RemoveIgnore(SocialName),
     GroupInvite(SocialName),
     GroupLeave,
-    GroupResponse(bool),
+    GroupResponse {
+        group_id: u32,
+        accepted: bool,
+    },
     GroupKick(u64),
 }
 
@@ -2889,12 +2894,12 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
             r.social_name()?;
             r.u64()?;
             r.social_name()?;
-            r.u32()?;
+            let group_id = r.u32()?;
             let accepted = r.u8()? != 0;
             for _ in 0..5 {
                 r.u32()?;
             }
-            SocialRequest::GroupResponse(accepted)
+            SocialRequest::GroupResponse { group_id, accepted }
         }
         (40, 6) => {
             let guid = r.u64()?;
@@ -3321,7 +3326,10 @@ impl Server {
         } else {
             None
         };
-        let world = SharedWorld::new();
+        let mut world = SharedWorld::new();
+        world
+            .social
+            .set_group_invite_ttl(options.group_invite_ttl_ms)?;
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {

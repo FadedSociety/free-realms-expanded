@@ -490,6 +490,7 @@ fn start_server_with_content(temp: &TempDir, content: Option<PathBuf>) -> (Serve
         stock_text: None,
         allow_lan: false,
         security_log: Some(temp.0.join("security.jsonl")),
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
     })
     .unwrap();
     (server, account_store)
@@ -764,7 +765,7 @@ fn audit_two_bots_deliver_say_and_tell_with_content() {
             .arg(&store_path)
             .arg("--handoff-key-file")
             .arg(&key_path)
-        .args(["--studio-port", "0", "--seconds", "30"])
+            .args(["--studio-port", "0", "--seconds", "30"])
             .stdout(Stdio::from(log.try_clone().unwrap()))
             .stderr(Stdio::from(log))
             .spawn()
@@ -846,8 +847,11 @@ fn audit_two_bots_deliver_say_and_tell_with_content() {
             let deadline = Instant::now() + Duration::from_secs(12);
             let (receiver, log_path) = bots.last_mut().unwrap();
             while !fs::read_to_string(&log_path).unwrap().contains("in world") {
-                assert!(receiver.0.try_wait().unwrap().is_none(),
-                    "{}", fs::read_to_string(&log_path).unwrap());
+                assert!(
+                    receiver.0.try_wait().unwrap().is_none(),
+                    "{}",
+                    fs::read_to_string(&log_path).unwrap()
+                );
                 assert!(Instant::now() < deadline, "receiver did not finish login");
                 std::thread::sleep(Duration::from_millis(20));
             }
@@ -887,7 +891,10 @@ fn an_account_past_its_action_budget_is_dropped_and_logged() {
     let replies: Vec<usize> = (0..30)
         .map(|n| {
             first
-                .send(&mut server, &application(6, &ignore_request(n % 2 == 0, "Beryl", "Two")))
+                .send(
+                    &mut server,
+                    &application(6, &ignore_request(n % 2 == 0, "Beryl", "Two")),
+                )
                 .iter()
                 .filter(|m| is_family_byte_sub(m, 112, 2) || is_family_byte_sub(m, 112, 3))
                 .count()
@@ -901,7 +908,10 @@ fn an_account_past_its_action_budget_is_dropped_and_logged() {
     // The bucket refills 5/s: a run slowed by a loaded machine earns tokens
     // back, so the hard bound is burst + refill, and a refusal must show
     // only when the run was fast enough to exhaust the bucket.
-    assert!(accepted <= 10.0 + refill.ceil(), "{replies:?} refill {refill}");
+    assert!(
+        accepted <= 10.0 + refill.ceil(),
+        "{replies:?} refill {refill}"
+    );
     if refill < 15.0 {
         assert!(accepted < 30.0, "{replies:?}");
         assert!(log.contains(r#""kind":"budget_refusal""#), "{log}");
@@ -914,18 +924,27 @@ fn an_account_past_its_action_budget_is_dropped_and_logged() {
 fn the_seventeenth_connection_is_refused() {
     let temp = TempDir::new();
     let (mut server, _) = start_server(&temp);
-    let admitted: Vec<Client> = (0..16).map(|n| Client::connect(&mut server, 100 + n)).collect();
+    let admitted: Vec<Client> = (0..16)
+        .map(|n| Client::connect(&mut server, 100 + n))
+        .collect();
     assert_eq!(server.active_session_count(), 16);
     let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
-    socket.set_read_timeout(Some(Duration::from_millis(50))).unwrap();
+    socket
+        .set_read_timeout(Some(Duration::from_millis(50)))
+        .unwrap();
     let mut request = vec![0, 1];
     request.extend_from_slice(&3u32.to_be_bytes());
     request.extend_from_slice(&999u32.to_be_bytes());
     request.extend_from_slice(&512u32.to_be_bytes());
     request.extend_from_slice(b"CGAPI_527 ");
-    socket.send_to(&request, server.local_addr().unwrap()).unwrap();
+    socket
+        .send_to(&request, server.local_addr().unwrap())
+        .unwrap();
     server.step().unwrap();
-    assert!(socket.recv_from(&mut [0; 64]).is_err(), "no handshake reply past the cap");
+    assert!(
+        socket.recv_from(&mut [0; 64]).is_err(),
+        "no handshake reply past the cap"
+    );
     assert_eq!(server.active_session_count(), 16);
     drop(admitted);
 }
@@ -960,7 +979,10 @@ fn a_vanished_client_does_not_stop_the_server() {
     fields.extend_from_slice(&[0, 0]);
     first.send(&mut server, &packet(125, &fields)); // relayed to the closed port
     // Every step() here unwraps: the reset must not end the server loop.
-    first.send(&mut server, &application(6, &chat_request(0, "still here", None)));
+    first.send(
+        &mut server,
+        &application(6, &chat_request(0, "still here", None)),
+    );
     assert_eq!(server.active_session_count(), 2); // the quiet one times out later
 }
 
