@@ -4,7 +4,6 @@ use osfr_tools::trace;
 
 use osfr_tools::account_store::AccountStore;
 use osfr_tools::character_store::CharacterState;
-use osfr_tools::fishing_service::FishingHourLedger;
 use osfr_tools::game_rules::{GameRuleSet, MembershipState, RulePolicy};
 use osfr_tools::game_store::{load_or_create, save};
 use osfr_tools::gameplay::Gameplay;
@@ -468,7 +467,7 @@ struct SharedWorld {
     pets: BTreeMap<u64, PetPresence>,
     /// (R) Rolling-hour fishing payout timestamps keyed by character. Server-owned and shared
     /// across reconnects; durable persistence is a save-schema decision for the lead.
-    fishing_hours: FishingHourLedger,
+    fishing_hours: BTreeMap<u64, Vec<u64>>,
     social: SocialService,
     identities: BTreeMap<u64, SocialIdentity>,
     social_paths: BTreeMap<u64, PathBuf>,
@@ -550,7 +549,7 @@ impl SharedWorld {
             public_looks: BTreeMap::new(),
             rides: BTreeMap::new(),
             pets: BTreeMap::new(),
-            fishing_hours: FishingHourLedger::default(),
+            fishing_hours: BTreeMap::new(),
             social: SocialService::new(17).unwrap(),
             identities: BTreeMap::new(),
             social_paths: BTreeMap::new(),
@@ -1583,6 +1582,9 @@ impl Session {
             }
             drop(security);
         }
+        let hours = world.fishing_hours.get(&self.character_guid).cloned();
+        self.gateway
+            .restore_fishing_hours(hours.unwrap_or_default())?;
         let combat = children.iter().try_fold(false, |seen, child| {
             self.gateway
                 .is_combat_request(child)
@@ -1625,7 +1627,6 @@ impl Session {
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
-        staged_gateway.restore_fishing_hours(world.fishing_hours.history(self.character_guid))?;
         let outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
             Err(error) => {
@@ -1763,18 +1764,23 @@ impl Session {
             let bound = staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
             outcome.state_changed |= bound;
             let mut staged_world = world.clone();
-            // Lead (security): only the session that owns this character publishes its
-            // fishing history. A handshake session still carries the template guid, which
-            // equals the first account's, so an unauthenticated tick must not write the cap.
+            let cutoff = now_ms.saturating_sub(osfr_tools::fishing_service::HOUR_WINDOW_MS);
+            staged_world.fishing_hours.retain(|_, hours| {
+                hours.retain(|at| *at > cutoff);
+                !hours.is_empty()
+            });
+            // Lead (security): only an owning session publishes a non-empty history; the retain
+            // above expires it. A handshake session's template guid must not erase an hour cap.
             let owns_character = self.selected_character
                 && staged_gateway.state().guid == self.character_guid
                 && staged_world.active_sessions.get(&self.character_guid) == Some(&self.id);
-            if owns_character {
-                staged_world.fishing_hours.publish(
-                    self.character_guid,
-                    staged_gateway.fishing_hour_history(),
-                    now_ms,
-                );
+            if owns_character
+                && let Some(hours) = staged_gateway.fishing_hour_history()
+                && !hours.is_empty()
+            {
+                staged_world
+                    .fishing_hours
+                    .insert(self.character_guid, hours);
             }
             let mut deliveries = staged_world.ride_fanout(self.id, &outcome.nearby);
             if transfer && staged_world.joined.contains(&self.id) {

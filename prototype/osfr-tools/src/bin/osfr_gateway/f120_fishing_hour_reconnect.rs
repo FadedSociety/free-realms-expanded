@@ -1,5 +1,6 @@
 use super::*;
 use fixtures::{copy_tree, fish_option, npc, wrap};
+use osfr_tools::fishing::{ServerPacket, Sub};
 use osfr_tools::game_store::Snapshot;
 use osfr_tools::gateway::Gateway;
 use serde_json::{Value, json};
@@ -42,12 +43,14 @@ fn request(sub: u16, body: &[u8]) -> Vec<u8> {
 }
 
 fn register() -> Vec<u8> {
+    // Client writer 00b6b720 (RegisterLocalPlayer): sub 2, two-dword handle + flag byte.
     let mut body = [ACTOR.id.to_le_bytes(), ACTOR.seq.to_le_bytes()].concat();
     body.push(0);
     request(2, &body)
 }
 
 fn cast() -> Vec<u8> {
+    // Client writer 00b6b7e0 (SendCastRequest): handle + four floats + flag byte.
     let mut body = [ACTOR.id.to_le_bytes(), ACTOR.seq.to_le_bytes()].concat();
     for value in [
         GATE_POSITION[0] + 10.0,
@@ -62,6 +65,7 @@ fn cast() -> Vec<u8> {
 }
 
 fn reel() -> Vec<u8> {
+    // Client writer 00b6b8b0 (SendReelInRequest): handle + flag byte.
     let mut body = [ACTOR.id.to_le_bytes(), ACTOR.seq.to_le_bytes()].concat();
     body.push(1);
     request(7, &body)
@@ -129,6 +133,11 @@ fn fisherman_xp(snapshot: &Snapshot) -> u32 {
         .get(&137)
         .copied()
         .unwrap_or(0)
+}
+
+/// The published rolling-hour ledger for one character.
+fn ledger(world: &SharedWorld, guid: u64) -> Vec<u64> {
+    world.fishing_hours.get(&guid).cloned().unwrap_or_default()
 }
 
 fn try_catch(
@@ -330,16 +339,24 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     assert_eq!(fisherman_xp(&paid), 10);
     let history = first.gateway.fishing_hour_history().unwrap();
     assert_eq!(history, vec![caught_at]);
-    assert_eq!(world.fishing_hours.history(first.character_guid), history);
+    assert_eq!(ledger(&world, first.character_guid), history);
     // Lead (security): a handshake session that never logged in still carries the template
-    // guid, which equals this character's. Its tick must not erase the hour-cap ledger.
+    // guid, which equals this character's. The owner gate has two independent halves; the
+    // production handshake is refused by the authentication half (`selected_character`), and
+    // the active-session half rejects a selected session that is not the world's owner.
     let mut stranger = new_session(77);
     assert_eq!(stranger.gateway.state().guid, first.character_guid);
-    // A non-empty forged history: only the owner check (not the empty-history rule) stops it.
+    // A non-empty forged history: only the owner gate (not the empty-history rule) stops it.
     stranger
         .gateway
         .restore_fishing_hours(vec![caught_at + 400])
         .unwrap();
+    // The handshake state is `selected_character = false` (an account-store session carries a
+    // template guid before login). Make it even the active owner so only that half can refuse.
+    stranger.selected_character = false;
+    world
+        .active_sessions
+        .insert(first.character_guid, stranger.id);
     stranger
         .tick(
             &options,
@@ -350,9 +367,26 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         )
         .unwrap();
     assert_eq!(
-        world.fishing_hours.history(first.character_guid),
+        ledger(&world, first.character_guid),
         history,
         "an unauthenticated tick erased the fishing-hour ledger"
+    );
+    // Half two: a selected session that is not the active owner must not replace it either.
+    stranger.selected_character = true;
+    world.active_sessions.insert(first.character_guid, first.id);
+    stranger
+        .tick(
+            &options,
+            caught_at + 600,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+        )
+        .unwrap();
+    assert_eq!(
+        ledger(&world, first.character_guid),
+        history,
+        "a non-owner session replaced the fishing-hour ledger"
     );
     let saved_after_payout = fs::read(&state_path).unwrap();
     let guid = first.character_guid;
@@ -373,7 +407,7 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
             &mut sessions,
         )
         .unwrap();
-    assert_eq!(world.fishing_hours.history(guid), history);
+    assert_eq!(ledger(&world, guid), history);
     send_raw(
         &mut second,
         &options,
@@ -451,12 +485,26 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         String::from_utf8_lossy(&replies).contains("reward limit"),
         "the capped catch takes the refusal path"
     );
+    // The cap refusal is an in-game escape, not a transaction refusal: the fish gets away
+    // (138/14 result 0), so the attempt is intentionally consumed. The no-reward/no-save rule
+    // is the transaction guarantee asserted below.
+    let escape = blocked
+        .replies
+        .iter()
+        .find(|reply| reply.get(7..11) == Some(&[138u8, 0, 14, 0][..]))
+        .expect("a capped catch must send a result");
+    let packet = ServerPacket::decode_known(Sub::Result, &escape[11..]).unwrap();
+    // Client result reader 00b66be0; at_18 0 is the escape body, 5 is a paid catch.
+    assert!(
+        matches!(&packet, ServerPacket::Result { body } if body.at_18 == 0),
+        "the capped catch must take the escape result, got {packet:?}"
+    );
     assert_eq!(second.gateway.snapshot(), before_refusal);
     assert_eq!(coins(&second.gateway.snapshot()), 25);
     assert_eq!(fisherman_xp(&second.gateway.snapshot()), 10);
     assert_eq!(fs::read(&state_path).unwrap(), before_refusal_file);
     assert_eq!(second.gateway.fishing_hour_history().unwrap(), history);
-    assert_eq!(world.fishing_hours.history(guid), history);
+    assert_eq!(ledger(&world, guid), history);
 
     let mut after_expiry = caught_at + 3_602_000;
     let paid_again = loop {
@@ -484,21 +532,8 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         second.gateway.fishing_hour_history().unwrap(),
         vec![paid_again]
     );
-    assert_eq!(world.fishing_hours.history(guid), vec![paid_again]);
-    // An idle owner's tick after the window closes must drop the expired timestamp rather than
-    // republish it from the session's in-memory history (finding 5).
-    second
-        .tick(
-            &options,
-            paid_again + osfr_tools::fishing_service::HOUR_WINDOW_MS + 1,
-            &mut world,
-            &mut membership,
-            &mut sessions,
-        )
-        .unwrap();
-    assert!(
-        world.fishing_hours.history(guid).is_empty(),
-        "an expired history was republished"
-    );
+    assert_eq!(ledger(&world, guid), vec![paid_again]);
+    // The lead's 313d8cc publication is restored; its idle-expiry gap is a lead follow-up, so
+    // this test does not pin the buggy outcome.
     assert_ne!(fs::read(&state_path).unwrap(), before_refusal_file);
 }

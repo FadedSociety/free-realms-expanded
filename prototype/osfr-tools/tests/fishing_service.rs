@@ -1,6 +1,6 @@
 use osfr_tools::{
     fishing::{Handle, Phase, ServerPacket, Sub, Vec4},
-    fishing_service::{Change, FishingHourLedger, FishingService, HOUR_WINDOW_MS},
+    fishing_service::{Change, FishingService},
     inventory::Inventory,
     profiles::ProfileState,
     quest_engine::QuestEvent,
@@ -344,43 +344,4 @@ fn content_covers_six_areas_with_client_name_ids_and_reconstructed_tuning() {
     assert_eq!(json["sizes"].as_array().unwrap().len(), 4);
     assert_eq!(json["lures"].as_array().unwrap().len(), 13);
     assert!(json["timing"]["source"].as_str().unwrap().contains("R:"));
-}
-
-#[test]
-fn the_shared_hour_ledger_prunes_one_character_and_never_resurrects_an_expired_entry() {
-    let other = PLAYER + 1;
-    let new = PLAYER + 2;
-    let mut ledger = FishingHourLedger::default();
-    let old = T0;
-    let fresh = T0 + HOUR_WINDOW_MS / 2;
-    ledger.publish(PLAYER, Some(vec![old]), fresh);
-    ledger.publish(other, Some(vec![old]), fresh);
-    assert_eq!(ledger.history(PLAYER), vec![old]);
-    assert_eq!(ledger.history(other), vec![old]);
-    assert_eq!(ledger.history(new), Vec::<u64>::new());
-
-    // Publishing one character touches only that character: the other's stale entry stays
-    // until its own publish or the next new-character sweep.
-    ledger.publish(PLAYER, Some(vec![old, fresh]), fresh + 1);
-    assert_eq!(ledger.history(PLAYER), vec![old, fresh]);
-    assert_eq!(ledger.history(other), vec![old]);
-
-    // A session with no loaded gameplay (None) and guid 0 leave the ledger alone.
-    ledger.publish(PLAYER, None, fresh + 2);
-    ledger.publish(0, Some(vec![old]), fresh + 2);
-    assert_eq!(ledger.history(PLAYER), vec![old, fresh]);
-    assert_eq!(ledger.history(0), Vec::<u64>::new());
-
-    // A stale in-memory history cannot be republished after it leaves the window.
-    ledger.publish(PLAYER, Some(vec![old]), fresh + HOUR_WINDOW_MS);
-    assert_eq!(ledger.history(PLAYER), Vec::<u64>::new());
-
-    // The first publish for a new character sweeps everyone else's expired entries.
-    ledger.publish(
-        new,
-        Some(vec![fresh + HOUR_WINDOW_MS + 2]),
-        fresh + HOUR_WINDOW_MS + 2,
-    );
-    assert_eq!(ledger.history(other), Vec::<u64>::new());
-    assert_eq!(ledger.history(new), vec![fresh + HOUR_WINDOW_MS + 2]);
 }
