@@ -1845,7 +1845,8 @@ fn power_up_tables_reload_by_name() {
     std::fs::remove_dir_all(&dir).unwrap();
 }
 
-/// A later reload failure must not publish an earlier behaviour load.
+/// A later reload failure must not publish an earlier ability or behaviour
+/// load, and the activation packets it staged must not escape the refusal.
 #[test]
 fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     const GROUPED_WOLF: u64 = 131_000_102_001;
@@ -1854,6 +1855,20 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     let mut game = Gameplay::load(&reference, None).unwrap();
     game.set_dev_tools(true);
     game.set_role(crate::account_store::AccountRole::Admin);
+    let profile = game.profiles.as_ref().unwrap().active();
+    let level = game.job_level(profile);
+    let before_abilities = game
+        .abilities
+        .as_ref()
+        .unwrap()
+        .job_bar(profile, level)
+        .map(|slot| slot.map(|ability| ability.definition_id));
+    let before_activation = game
+        .abilities
+        .as_ref()
+        .unwrap()
+        .activation(profile, level)
+        .unwrap();
     let shared = game.take_shared_fields().expect("shipped field enemies");
     let actors = |shared: &crate::encounter::SharedFieldState| {
         shared
@@ -1892,6 +1907,26 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     std::fs::write(
         dir.join("behaviours.json"),
         serde_json::to_vec(&behaviours).unwrap(),
+    )
+    .unwrap();
+    std::fs::write(
+        dir.join("job_abilities.json"),
+        serde_json::to_vec(&serde_json::json!({
+            "schema_version": 1,
+            "jobs": [{
+                "profile_id": profile,
+                "slots": [{
+                    "slot": 1,
+                    "definition_id": 4901,
+                    "name_id": 3784,
+                    "icon_id": 260,
+                    "heal": 250,
+                    "cooldown_ms": 15000,
+                    "min_level": 1,
+                }]
+            }]
+        }))
+        .unwrap(),
     )
     .unwrap();
     game.content_dir = dir.clone();
@@ -1935,6 +1970,24 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     assert_eq!(
         game.encounter.as_ref().unwrap().behaviour(GROUPED_WOLF),
         Some(&before_behaviour)
+    );
+    assert_eq!(
+        game.abilities
+            .as_ref()
+            .unwrap()
+            .job_bar(profile, level)
+            .map(|slot| slot.map(|ability| ability.definition_id)),
+        before_abilities,
+        "a refused reload must not publish the staged job abilities"
+    );
+    assert_eq!(
+        game.abilities
+            .as_ref()
+            .unwrap()
+            .activation(profile, level)
+            .unwrap(),
+        before_activation,
+        "the live hotbar packets are unchanged"
     );
     std::fs::remove_dir_all(dir).unwrap();
 }
