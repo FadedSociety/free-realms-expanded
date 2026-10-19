@@ -63,6 +63,10 @@ impl Gameplay {
         Ok(())
     }
 
+    /// Canonical runtime-GUID -> content-key map. Opening-scene actors are excluded from
+    /// this mapping. The turn-in replay does not use it: `pending_turnin_actor` is already
+    /// a saved content key and may be a Talk target rather than the formal turn-in NPC, so
+    /// the replay matches its spawn and visibility map directly, without that filter.
     pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {
         if self.opening.as_ref().is_some_and(|opening| {
             opening
