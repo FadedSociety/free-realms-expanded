@@ -226,3 +226,96 @@ fn denied_accept_preserves_pending_offer_for_requirement_and_limit() {
         })]
     ));
 }
+
+#[test]
+fn limit_refusal_preserves_the_developer_offer_for_a_retry_after_the_cap_rises() {
+    let mut requirements = QuestRequirements::default();
+    requirements.player_level = Some(3);
+    // The character never reaches level 3: only the developer offer can bypass
+    // that gate, and this test proves the override outlives the limit refusal.
+    let mut engine = QuestEngine::new(
+        CHARACTER,
+        vec![definition(VALID_QUEST, valid_objective(), requirements)],
+        eligibility(2),
+        None,
+    )
+    .unwrap();
+    assert!(engine.dev_mark_offered(VALID_QUEST));
+
+    let mut at_cap = eligibility(2);
+    at_cap.member_quest_limit = 0;
+    engine.set_eligibility(at_cap);
+    let before = engine.state().clone();
+    let refused = engine.accept(VALID_QUEST);
+    assert_eq!(refused.denial, Some(QuestDenial::Limit));
+    assert!(!refused.changed);
+    assert_eq!(engine.state(), &before);
+    assert_eq!(
+        engine.progress(VALID_QUEST).unwrap().status,
+        QuestStatus::Offered
+    );
+    assert!(matches!(
+        refused.outbound.as_slice(),
+        [OutboundMessage::Quest(QuestMessage::QuestLimit {
+            member: true
+        })]
+    ));
+
+    // Raising the cap must be enough: the refusal preserved the override even
+    // though the character is still below the level requirement.
+    engine.set_eligibility(eligibility(2));
+    let accepted = engine.accept(VALID_QUEST);
+    assert!(
+        accepted.changed,
+        "the preserved developer offer must still accept after the cap rises"
+    );
+    assert_eq!(
+        engine.progress(VALID_QUEST).unwrap().status,
+        QuestStatus::Active
+    );
+    assert_eq!(engine.state().pending_offer, None);
+    assert!(matches!(
+        accepted.outbound.first(),
+        Some(OutboundMessage::Quest(QuestMessage::QuestAdd { quest_id }))
+            if *quest_id == VALID_QUEST
+    ));
+}
+
+#[test]
+fn a_declined_developer_offer_cannot_bypass_a_later_ordinary_offers_gate() {
+    let mut requirements = QuestRequirements::default();
+    requirements.player_level = Some(3);
+    let mut engine = QuestEngine::new(
+        CHARACTER,
+        vec![definition(VALID_QUEST, valid_objective(), requirements)],
+        eligibility(2),
+        None,
+    )
+    .unwrap();
+    assert!(engine.dev_mark_offered(VALID_QUEST));
+    assert!(engine.decline(VALID_QUEST).changed);
+    assert_eq!(engine.progress(VALID_QUEST), None);
+
+    // A normal offer at the qualifying level must not inherit the spent
+    // developer override: dropping back below level 3 refuses the accept.
+    engine.set_eligibility(eligibility(3));
+    assert!(engine.offer(VALID_QUEST, QUEST_GIVER).changed);
+    engine.set_eligibility(eligibility(2));
+    let before = engine.state().clone();
+    let refused = engine.accept(VALID_QUEST);
+    assert_eq!(refused.denial, Some(QuestDenial::Level));
+    assert!(!refused.changed);
+    assert_eq!(engine.state(), &before);
+    assert_eq!(
+        engine.progress(VALID_QUEST).unwrap().status,
+        QuestStatus::Offered
+    );
+
+    // Reaching the requirement still accepts the same pending offer.
+    engine.set_eligibility(eligibility(3));
+    assert!(engine.accept(VALID_QUEST).changed);
+    assert_eq!(
+        engine.progress(VALID_QUEST).unwrap().status,
+        QuestStatus::Active
+    );
+}

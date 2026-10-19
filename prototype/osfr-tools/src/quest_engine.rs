@@ -667,7 +667,9 @@ pub struct QuestEngine {
     state: QuestState,
     options: EngineOptions,
     /// Quest offered by the developer `realm offer` command; its accept skips
-    /// the prerequisite, level, job and membership checks.
+    /// the prerequisite, level, job and membership checks. It belongs to the
+    /// current `pending_offer` only: a successful accept, a decline or a later
+    /// ordinary offer clears it, so it can never bypass a later offer's gates.
     dev_offer: Option<u32>,
     disabled: BTreeSet<u32>,
     location_quests: BTreeMap<u32, BTreeSet<u32>>,
@@ -1493,6 +1495,7 @@ impl QuestEngine {
             },
         );
         self.state.pending_offer = Some(quest_id);
+        self.dev_offer = None;
         QuestOutcome {
             changed: true,
             outbound: vec![OutboundMessage::Quest(QuestMessage::QuestInfo { quest_id })],
@@ -1624,9 +1627,7 @@ impl QuestEngine {
                 }));
             return outcome;
         }
-        if developer_offer {
-            self.dev_offer = None;
-        }
+        self.dev_offer = None;
         self.state.pending_offer = None;
         let progress = self
             .state
@@ -1674,6 +1675,7 @@ impl QuestEngine {
             return denied(QuestDenial::Unavailable);
         }
         self.state.pending_offer = None;
+        self.dev_offer = None;
         self.state.quests.remove(&quest_id);
         QuestOutcome {
             changed: true,
