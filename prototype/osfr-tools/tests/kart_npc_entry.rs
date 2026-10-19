@@ -34,6 +34,11 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
+use content_copy::copy_tree;
+
 static NEXT: AtomicU64 = AtomicU64::new(0);
 const GATE_NPC: u64 = 9_000_000_273;
 const OTHER_NPC: u64 = 9_000_000_274;
@@ -793,57 +798,147 @@ fn a_disconnect_mid_race_survives_a_snapshot_with_the_prior_job() {
 
 // ---- gameplay tick: a clock-only racing tick must not request a save -------------------------
 
-/// The complete gameplay content `tests/chess_route.rs` also loads (private lab input). The
-/// synthetic kart package is layered on a temp copy, so shared content is never modified.
-fn gameplay_content() -> PathBuf {
-    std::env::var_os("OSFR_KART_GAMEPLAY_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/opening-journal-text-v2/content")
-        })
-}
-
-fn copy_tree(from: &std::path::Path, to: &std::path::Path) {
-    fs::create_dir_all(to).unwrap();
-    for entry in fs::read_dir(from).unwrap() {
-        let entry = entry.unwrap();
-        let target = to.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), target).unwrap();
-        }
-    }
-}
-
+/// A self-contained gameplay package: synthetic class/inventory content (the payout tests' shape),
+/// a minimal category catalogue, encounter template and quest journal, plus this file's synthetic
+/// kart package with weapon effects enabled. No private lab content is required.
 struct GameplayFixture(PathBuf);
 
 impl GameplayFixture {
     fn new() -> Self {
-        let source = gameplay_content();
+        let path = Self::scratch();
+        let fixture = Self(path);
+        fixture.write_content();
+        fixture
+    }
+
+    /// The full opening content the timeout test needs for its world return frame. Private lab
+    /// input; `OSFR_KART_GAMEPLAY_CONTENT` overrides the prepared gameplay directory.
+    fn private() -> Self {
+        let source = std::env::var_os("OSFR_KART_GAMEPLAY_CONTENT")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| {
+                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../../lab/references/opening-journal-text-v2/content")
+            });
         assert!(
-            source.join("inventory.json").is_file(),
-            "kart gameplay tick needs a prepared content directory: {}",
+            source.join("inventory.json").is_file() && source.join("opening.json").is_file(),
+            "the timeout test needs a prepared gameplay directory: {} \
+             (set OSFR_KART_GAMEPLAY_CONTENT)",
             source.display()
         );
+        let path = Self::scratch();
+        copy_tree(&source, &path);
+        let fixture = Self(path);
+        fixture.write_kart();
+        fixture
+    }
+
+    fn scratch() -> PathBuf {
         let path = std::env::temp_dir().join(format!(
             "kart-gameplay-tick-{}-{}",
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
-        copy_tree(&source, &path);
+        fs::create_dir(&path).unwrap();
+        path
+    }
+
+    fn write_content(&self) {
+        let dir = &self.0;
+        // A fresh save starts in the prior job with Kart Driver already unlocked.
+        let economy = Economy::new(PRIOR_JOB);
+        for file in ["profiles.json", "inventory.json"] {
+            fs::copy(economy.0.join(file), dir.join(file)).unwrap();
+        }
+        // The loader re-derives this one-row 44/2 packet and checks the prepared proof.
+        let mut packet = vec![44, 0, 2, 0];
+        for value in [1i32, 10, 10, 962, 1007, 1200] {
+            packet.extend(value.to_le_bytes());
+        }
+        packet.push(1);
+        packet.extend(1i32.to_le_bytes());
+        packet.extend(0i32.to_le_bytes());
+        fs::write(
+            dir.join("categories.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "categories": [{"id": 10, "name_id": 962, "icon_id": 1007, "unknown": 1200,
+                                "unknown2": true, "display": 1}],
+                "groups": [],
+                "packet_sha256": format!("{:x}", Sha256::digest(&packet)),
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        // The synthetic combat template and rules from `tests/combat.rs`.
+        let mut template = vec![0; 334];
+        template[..4].copy_from_slice(&[35, 0, 2, 0]);
+        template[33..37].copy_from_slice(&1_f32.to_le_bytes());
+        template[49..53].copy_from_slice(&1_f32.to_le_bytes());
+        template[61..65].copy_from_slice(&1_f32.to_le_bytes());
+        template[133..137].copy_from_slice(&100_i32.to_le_bytes());
+        template[224] = 1;
+        template[250] = 0x5a;
+        fs::write(dir.join("npc.bin"), &template).unwrap();
+        fs::write(
+            dir.join("combat.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "template_file": "npc.bin",
+                "template_sha256": format!("{:x}", Sha256::digest(&template)),
+                "npc": {"definition_id": 0, "model_id": 3311, "name": "Synthetic guide",
+                        "texture_alias": "", "position": [0.0, 0.0, 0.0]},
+                "enemy": {"definition_id": 1294, "model_id": 4, "name": "Synthetic enemy",
+                          "texture_alias": "", "position": [4.0, 0.0, 0.0]},
+                "max_health": 100, "hit_damage": 25, "range": 8.0, "cooldown_ms": 600,
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        // The gameplay loader requires one quest definition and its journal even though a kart
+        // tick never touches them.
+        let journal = [1u8, 0, 0, 0].repeat(8);
+        fs::write(dir.join("journal.bin"), &journal).unwrap();
+        fs::write(
+            dir.join("quests.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "definitions": [{
+                    "id": 1617, "title": "Synthetic quest", "description": "Synthetic quest",
+                    "original": true, "initially_accepted": false, "giver_guid": 0,
+                    "goals": [{"id": 14096, "text": "matching enemies", "required": 20,
+                               "enemy_definition": 777}],
+                    "coins": 0, "items": [],
+                }],
+                "journal": {
+                    "file": "journal.bin",
+                    "sha256": format!("{:x}", Sha256::digest(&journal)),
+                    "length": journal.len(), "offset": 29, "bindings": [],
+                },
+                "trial": {
+                    "start": [0.0, 0.0, 0.0],
+                    "checkpoints": [[24.0, 0.0, 0.0], [24.0, 0.0, 24.0], [0.0, 0.0, 0.0]],
+                    "radius": 3.0, "time_limit_ms": 90_000, "cooldown_ms": 30_000,
+                    "reward_coins": 10,
+                },
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        self.write_kart();
+    }
+
+    fn write_kart(&self) {
+        // Only a live weapon lifecycle stamps `WeaponState::last_tick_ms` on each racing tick.
         let mut kart = content();
         let mut race = race_content();
-        // Only a live weapon lifecycle stamps `WeaponState::last_tick_ms` on each racing tick.
         race.weapon_effects = true;
         kart.race = Some(race);
         fs::write(
-            path.join("kart_entry.json"),
+            self.0.join("kart_entry.json"),
             serde_json::to_vec(&kart).unwrap(),
         )
         .unwrap();
-        Self(path)
     }
 
     fn load(&self, saved: Option<GameplayState>) -> Gameplay {
@@ -992,7 +1087,7 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
 
 #[test]
 fn a_timed_out_race_still_reports_the_abort_for_saving() {
-    let fixture = GameplayFixture::new();
+    let fixture = GameplayFixture::private();
     let character = character();
     let mut game = fixture.load(None);
     game.set_dev_tools(true);

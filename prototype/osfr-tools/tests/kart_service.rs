@@ -318,6 +318,30 @@ fn mine_use_emits_original_create_and_restores_bounded_lifecycle() {
 }
 
 #[test]
+fn a_clock_only_weapon_state_is_refused_by_disabled_content() {
+    let content = weapon_test_content(1);
+    let (service, _) = racing(content.clone());
+    let mut snapshot = service.snapshot().unwrap();
+    // A racing tick stamped the session-local clock; no weapon, effect or id exists.
+    assert!(snapshot.weapons.is_empty());
+    assert_eq!(snapshot.weapons.next_id, 0);
+    assert_eq!(snapshot.weapons.last_tick_ms, at(14_505));
+    // A hand-edited save can clear the flag while keeping the clock. Structural equality keeps
+    // this shape a corrupt snapshot; a clock-free equality silently accepted it (F188).
+    snapshot.weapon_effects = false;
+    let mut disabled = content;
+    disabled.weapon_effects = false;
+    // Refusal is repeatable: restore is a pure constructor, so a refused save leaves nothing
+    // consumed or mutated for the next attempt.
+    for _ in 0..2 {
+        assert!(matches!(
+            KartService::restore(disabled.clone(), snapshot.clone()),
+            Err(ServiceError::CorruptSnapshot { field: "weapons" })
+        ));
+    }
+}
+
+#[test]
 fn weapon_state_is_content_bound_and_cannot_resume_foreign_actors() {
     let content = weapon_test_content(1);
     let (mut service, context) = racing(content.clone());

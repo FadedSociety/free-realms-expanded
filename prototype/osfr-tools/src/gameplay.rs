@@ -1878,7 +1878,7 @@ impl Gameplay {
         if self.kart_entry.as_ref().is_some_and(|k| k.active()) {
             let mut staged = self.clone();
             let kart = staged.kart_entry.as_mut().unwrap();
-            let before = kart.state().clone();
+            let mut before = kart.state().clone();
             let mut replies = kart.tick(now_ms)?;
             if kart
                 .state()
@@ -1900,8 +1900,13 @@ impl Gameplay {
                 crate::kart_gateway::KartRewardClaim::default()
             };
             replies.extend(claim.replies);
-            // A racing tick that only re-stamped the session-local weapon clock is not a
-            // persisted change: WeaponState equality excludes that tick clock.
+            // A racing tick re-stamps the session-local weapon clock every 50 ms. Copy the new
+            // clock into the old state before comparing, so only persisted changes request a
+            // save; every other field (including one added later) is compared structurally.
+            if let (Some(before), Some(after)) = (before.race.as_mut(), kart.state().race.as_ref())
+            {
+                before.weapons.last_tick_ms = after.weapons.last_tick_ms;
+            }
             let changed = before != *kart.state();
             staged.refresh_npc_quest_eligibility(current_unix_seconds());
             let mut out = Outcome {

@@ -2,6 +2,10 @@
 #[allow(dead_code)] // The executable is included to exercise selected runtime paths.
 mod gateway_runtime;
 
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
+use content_copy::copy_tree;
 use osfr_tools::{
     account_store::AccountStore,
     login,
@@ -11,7 +15,7 @@ use osfr_tools::{
 use std::{
     fs,
     net::{SocketAddr, UdpSocket},
-    path::{Path, PathBuf},
+    path::PathBuf,
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
@@ -36,19 +40,6 @@ impl TempDir {
 impl Drop for TempDir {
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
-fn copy_tree(source: &Path, target: &Path) {
-    fs::create_dir_all(target).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = target.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), target).unwrap();
-        }
     }
 }
 

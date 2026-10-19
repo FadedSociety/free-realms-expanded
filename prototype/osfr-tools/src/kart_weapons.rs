@@ -832,7 +832,7 @@ pub struct EffectRegistration {
 
 /// Persisted bounded weapon state. Every field defaults, so content/saves written before weapons
 /// restore as "nothing live". One entry per allocated id; ids are never reused within a race.
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct WeaponState {
     #[serde(default)]
@@ -842,23 +842,12 @@ pub struct WeaponState {
     /// Monotonic allocation counter (ids 1..=[`MAX_TOTAL_ALLOCATIONS`]).
     #[serde(default)]
     pub next_id: u32,
-    /// Last tick clock, so a regressed tick is harmless. Session-local: every racing tick
-    /// re-stamps it and `validate_for` bounds it on restore, so [`PartialEq`] deliberately ignores
-    /// it. A clock-only tick must never look like a persisted change (F166).
+    /// Last tick clock, so a regressed tick is harmless. Every racing tick re-stamps it and
+    /// `validate_for` bounds it on restore. Equality is structural like every other field; the
+    /// kart save decision copies the new clock into the old state it compares (see
+    /// `Gameplay::tick_world`), so a clock-only tick alone is not a persisted change (F188).
     #[serde(default)]
     pub last_tick_ms: u64,
-}
-
-/// Persisted progress only: the session-local tick clock is excluded on purpose (see
-/// [`WeaponState::last_tick_ms`]). `KartService::tick` stamps that clock on every racing tick, and
-/// the gameplay tick compares the whole state to decide whether the character save must be
-/// rewritten (F166).
-impl PartialEq for WeaponState {
-    fn eq(&self, other: &Self) -> bool {
-        self.weapons == other.weapons
-            && self.effects == other.effects
-            && self.next_id == other.next_id
-    }
 }
 
 impl WeaponState {
