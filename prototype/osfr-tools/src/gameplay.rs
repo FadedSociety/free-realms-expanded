@@ -834,7 +834,7 @@ impl Gameplay {
         // against the definitions this save actually has.
         let inventory = Inventory::load(directory, inventory)?;
         if let Some(saved) = &saved_derby {
-            derby_session::restore_saved_derby_job(saved, &mut profiles, &inventory)?;
+            derby_session::restore_saved_derby_job(saved, &mut profiles);
         }
         let recipe_catalog = crate::recipes::RecipeCatalog::load_runtime(directory)?;
         // (R) The opening campaign historically has no recovered recipe-learn

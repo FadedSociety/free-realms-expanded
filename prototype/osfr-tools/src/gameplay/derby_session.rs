@@ -3,21 +3,24 @@ use super::*;
 
 /// Predecessor saves recorded the job a connection-local match replaced. Current saves keep the
 /// profile itself on that job (`saved_profile_state`), so only an older save carries this marker.
+/// A marker the current profile content rejects is logged and skipped: a stale legacy field must
+/// not stop the character from loading (F206).
 pub(super) fn restore_saved_derby_job(
     saved: &crate::derby_gateway::DerbyGatewayState,
     profiles: &mut Option<Profiles>,
-    inventory: &Inventory,
-) -> io::Result<()> {
+) {
     let Some(job) = saved.previous_job else {
-        return Ok(());
+        return;
     };
     if job <= 0 {
-        return Err(invalid("invalid saved derby previous job"));
+        eprintln!("derby: ignoring invalid saved previous job {job}");
+        return;
     }
-    if let Some(profiles) = profiles.as_mut() {
-        profiles.select(job, inventory)?;
+    if let Some(profiles) = profiles.as_mut()
+        && let Err(error) = profiles.activate(job)
+    {
+        eprintln!("derby: keeping the saved job; previous job {job} is not available: {error}");
     }
-    Ok(())
 }
 
 impl Gameplay {
@@ -34,7 +37,8 @@ impl Gameplay {
             return;
         };
         if let Some(profiles) = &mut self.profiles {
-            let _ = profiles.select(job, &self.inventory);
+            // Self data at login carries the job, so the activation reply is not needed.
+            let _ = profiles.activate(job);
         }
     }
 

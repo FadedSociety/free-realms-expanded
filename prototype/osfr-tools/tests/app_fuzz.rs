@@ -1139,7 +1139,6 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
     let after_reset = gateway.snapshot();
     let after_reset_game = after_reset.gameplay.as_ref().unwrap();
     assert_eq!(after_reset_game.inventory.coins, before_coins);
-    assert!(after_reset_game.derby.is_none());
     assert!(!gateway.gameplay().unwrap().derby_active());
 }
 

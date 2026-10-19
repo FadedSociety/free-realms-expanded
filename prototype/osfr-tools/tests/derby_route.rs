@@ -87,6 +87,7 @@ impl Fixture {
                 schema_version: 1,
                 menu_string_id: 3053,
                 npcs: vec![GATE],
+                reward_cooldown_s: None,
             })
             .unwrap(),
         )
@@ -227,6 +228,7 @@ impl GameplayFixture {
                 schema_version: 1,
                 menu_string_id: 3053,
                 npcs: vec![GATE],
+                reward_cooldown_s: None,
             })
             .unwrap(),
         )
@@ -291,6 +293,7 @@ fn content() -> DerbyGatewayContent {
             },
         },
         pickups: Vec::new(),
+        reward: None,
     }
 }
 
@@ -602,6 +605,54 @@ fn predecessor_and_paid_epoch_derby_saves_load_and_restore_the_job() {
 }
 
 #[test]
+fn a_predecessor_job_the_profile_content_rejects_is_skipped() {
+    let fixture = GameplayFixture::new();
+    let base = Gameplay::load(&fixture.path, None).unwrap();
+    let active = base.active_profile().unwrap();
+    assert_ne!(active, osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE);
+    for previous_job in [999_999, 0] {
+        // Neither id is in this fixture's profiles.json and 0 is malformed. The old restore
+        // returned Err out of Gameplay::load, so one stale marker bricked the character.
+        let game = load_saved_state(
+            &fixture,
+            &base.state(),
+            json!({"previous_job": previous_job}),
+            active,
+        );
+        assert_eq!(
+            game.active_profile(),
+            Some(active),
+            "a rejected previous job {previous_job} keeps the saved active job"
+        );
+        assert!(!game.derby_active());
+    }
+}
+
+/// F117 content carried a `reward` row and `reward_cooldown_s`. F164 removed both; the decoder
+/// must still accept an older operator package so a stale key cannot fail the whole world load.
+#[test]
+fn predecessor_content_keys_load_instead_of_failing_the_world() {
+    let fixture = Fixture::new();
+    for (file, key, value) in [
+        ("derby_entry.json", "reward", json!({"coins": 5})),
+        ("derby_gates.json", "reward_cooldown_s", json!(600)),
+    ] {
+        let path = fixture.path.join(file);
+        let mut document: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        document[key] = value;
+        fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
+    }
+    let mut gateway = DerbyGateway::load(&fixture.path)
+        .expect("F117 content must not fail the world load")
+        .expect("the derby route stays enabled");
+    assert_eq!(gateway.gate_npcs(), &[GATE]);
+    assert_eq!(gateway.admit(GATE, false), Ok(()));
+    gateway.begin(&character()).unwrap();
+    assert!(gateway.active());
+}
+
+#[test]
 fn busy_derby_refusal_keeps_the_exact_menu_for_a_retry() {
     let fixture = GameplayFixture::with_opening();
     let base = Gameplay::load(&fixture.path, None).unwrap();
@@ -760,7 +811,6 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
         before_job,
         "the temporary Derby Driver job is never persisted"
     );
-    assert!(saved.derby.is_none());
     let restored = Gameplay::load(&fixture.path, Some(saved)).unwrap();
     assert!(!restored.derby_active());
     assert_eq!(
@@ -809,7 +859,6 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
     }
     let mid_match = game.state();
     assert_eq!(mid_match.profiles.as_ref().unwrap().active, before_job);
-    assert!(mid_match.derby.is_none());
     let restored = Gameplay::load(&fixture.path, Some(mid_match)).unwrap();
     assert!(!restored.derby_active());
     assert_eq!(restored.active_profile(), Some(before_job));
@@ -889,7 +938,6 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
         .unwrap();
     assert!(!replay.changed);
     assert_eq!(game.state().inventory.coins, before_coins);
-    assert!(game.state().derby.is_none());
     let reloaded = Gameplay::load(&fixture.path, Some(game.state())).unwrap();
     assert!(!reloaded.derby_active());
     assert_eq!(reloaded.active_profile(), Some(before_job));

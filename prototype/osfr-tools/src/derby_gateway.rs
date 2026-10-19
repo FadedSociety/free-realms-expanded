@@ -4,7 +4,9 @@
 //! one opt-in content package. The gate list is reconstructed policy (R), like the kart gates: an
 //! NPC lists the derby only when named in `derby_gates.json`. Entry, phase acknowledgements and the
 //! results hold use the existing native type-11 lifecycle. F164 withholds derby payouts: every
-//! collision is a client `34/16` report, so no server-verified outcome exists to pay from. No
+//! collision is a client `34/16` report, so no server-verified outcome exists to pay from. The
+//! F117 paid-run cooldown went with that payout; the older `reward` and `reward_cooldown_s` keys
+//! are still accepted and ignored so F117-era operator content loads (F206 migration). No
 //! source-derived rule is invented here; all tunable numbers come from `derby_entry.json`.
 
 use crate::{
@@ -37,8 +39,9 @@ const MAX_GATES_BYTES: usize = 16 * 1024;
 const ACTIVE_STATUS_MASK: u32 = (1 << crate::derby::DERBY_ACTIVE_STATUS_BIT) | 1;
 
 /// One opt-in derby package. `vehicle`, `rules` and `pickups` are the service's existing typed
-/// content; this wrapper adds only the game id. Reward rows are absent: F164 withholds derby
-/// payouts because every collision is a client report, not a server-verified outcome.
+/// content; this wrapper adds only the game id. New packages carry no reward row: F164 withholds
+/// derby payouts because every collision is a client report, not a server-verified outcome. The
+/// retired F117 row is accepted below only so an older package still loads.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayContent {
@@ -48,6 +51,10 @@ pub struct DerbyGatewayContent {
     pub rules: DerbyRules,
     #[serde(default)]
     pub pickups: Vec<DerbyPickup>,
+    /// Retired F117 payout row. Accepted and ignored only so an operator's F117-era
+    /// `derby_entry.json` still loads; nothing reads it and no derby payout exists (F206).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reward: Option<serde_json::Value>,
 }
 
 /// (R) NPCs whose menu offers the derby. NPC existence is checked by `NpcInteraction`.
@@ -58,6 +65,10 @@ pub struct DerbyGates {
     #[serde(default = "default_menu_string_id")]
     pub menu_string_id: u32,
     pub npcs: Vec<u64>,
+    /// Retired F117 paid-run cooldown. Accepted and ignored only so an operator's F117-era
+    /// `derby_gates.json` still loads; the payout it paced no longer exists (F206).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reward_cooldown_s: Option<u64>,
 }
 
 /// Predecessor derby save shapes. T023 wrote the job a connection-local match replaced; F117
