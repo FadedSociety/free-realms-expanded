@@ -1074,9 +1074,13 @@ fn gateway_bundle_failure_does_not_commit_a_vendor_buy() {
     let request = vendor_buy_packet(91_005, 8, 1);
 
     let failed = gateway.handle_at(&bundle(&[wrap(&request), wrap(&[26, 0, 8, 0])]), NOW);
-    assert!(
-        failed.is_err(),
-        "the malformed child must reject the bundle"
+    // The error must be the second child's gameplay refusal. A top-level parse
+    // failure ("unsupported top-level gateway message") would mean the wrapped
+    // first child never reached gameplay, so this test could not prove rollback.
+    assert_eq!(
+        failed.as_ref().unwrap_err().to_string(),
+        "invalid NPC interaction request",
+        "the malformed child must reject the bundle after the purchase ran"
     );
     assert_eq!(gateway.snapshot(), before, "failed bundle changed gameplay");
 
