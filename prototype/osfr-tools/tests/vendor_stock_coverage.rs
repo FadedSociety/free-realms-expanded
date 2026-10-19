@@ -11,31 +11,33 @@
 //! Every one is enumerated and either stocked or listed as an explicit,
 //! evidence-backed exception, so a new vendor or a newly empty window fails here
 //! instead of passing silently.
+//!
+//! This enumeration is **not** the T108 completion target. The brief asks for
+//! 20 additional fully grantable vendor records (or every reachable selected-hub
+//! vendor when fewer than 20 remain unresolved). Twenty-eight vendor rows are
+//! still unresolved, so the fallback cannot apply and the target is unmet; the
+//! ignored `at_least_twenty_more_selected_hub_vendors_are_fully_grantable` test
+//! keeps that target runnable. Neither an empty exception nor the one empty
+//! `vendors.json` record counts as a completed vendor. See
+//! `notes/Autopilot/F192.md` for the evidence search and the lead's accepted
+//! decision (2026-10-19): no stock is invented beyond retained evidence.
 
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
+#[path = "common/vendor_purchase.rs"]
+mod vendor_purchase;
 
-use gateway_vendor::{
-    NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
-    sell_packet, send, vendor_buy_packet, wrap,
-};
+use gateway_vendor::{select, vendor_buy_packet};
 use osfr_tools::{
-    account_store::AccountRole,
-    character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState},
-    gateway::Gateway,
-    inventory::{Inventory, InventoryItem},
-    npc_interaction::{
-        MerchantWindow, NpcAction, NpcInteraction, NpcSelection, decode_merchant_list_66_42,
-    },
+    inventory::Inventory,
+    npc_interaction::{MerchantWindow, NpcAction, NpcInteraction, NpcSelection},
     world::NpcVisibility,
 };
-use serde_json::{Value, json};
+use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
 };
 
 const SELECTED_HUB_FILES: &[&str] = &[
@@ -97,6 +99,31 @@ const SELECTED_HUB_UNRESOLVED_VENDOR_COUNT: usize = 28;
 const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 29;
 const SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT: usize = 19;
 const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 10;
+/// Stocked `vendors.json` records whose NPC placement is not `legacy_data`, so
+/// the production visibility loader never spawns them. They remain unreachable
+/// and must not be counted toward the T108 completion target.
+const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_COUNT: usize = 10;
+const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS: &[u64] = &[
+    9_500_000_032,
+    9_500_000_067,
+    9_500_000_339,
+    9_500_000_344,
+    9_500_000_348,
+    9_500_000_349,
+    9_500_000_354,
+    9_500_000_355,
+    9_500_000_482,
+    9_500_000_543,
+];
+/// The brief's 20-additional-vendor target leaves 49 of the 58 selected-hub
+/// vendor rows fully grantable. Nothing sources that yet; the ignored target
+/// test below records the real requirement instead of treating the current
+/// 29/1/28 split as completion. Reachability is checked separately: 20 more
+/// *spawned* fully grantable vendors than the current 19, so unspawned stock
+/// cannot make the target look complete.
+const T108_REQUIRED_STOCKED_VENDOR_COUNT: usize = 49;
+const T108_REQUIRED_SPAWNED_STOCKED_VENDOR_COUNT: usize =
+    SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT + 20;
 const REPRESENTATIVE_VENDOR: u64 = 9_500_000_045;
 const REPRESENTATIVE_ITEM: i32 = 76_427;
 
@@ -218,6 +245,13 @@ fn grantable(item: &Value, inventory: &Inventory, prices: &BTreeMap<i64, u64>) -
         && positive_purchase_price(prices, id)
 }
 
+fn fully_grantable(vendor: &Value, inventory: &Inventory, prices: &BTreeMap<i64, u64>) -> bool {
+    let items = vendor["items"]
+        .as_array()
+        .expect("vendor items are an array");
+    !items.is_empty() && items.iter().all(|item| grantable(item, inventory, prices))
+}
+
 fn vendor_items(vendors: &Value) -> BTreeMap<u64, &Value> {
     vendors["vendors"]
         .as_array()
@@ -295,8 +329,10 @@ fn exception(npc_id: u64) -> Option<&'static StockException> {
 
 /// Open one vendor's 66/42 window through the production interaction service.
 /// The 26/10 body is the u64 NPC GUID plus the i32 choice (client constructor
-/// `00a36f80`); the reply is the 66/42 list (client readers
-/// `00b48a10`/`00b40a60`/`00b3d5f0`/`00b33020`).
+/// `00a36f80`); the reply is the 66/42 list. Dispatcher `00b48a10` selects
+/// `00b40a60`; `00b3d5f0` reads the header and nested record, `00b33020` reads
+/// one scalar, two dword pairs and a final scalar (six dwords), and `00b2e620`
+/// then reads the entry count and rows through `00b29cd0`.
 fn open_shop(interaction: &mut NpcInteraction, npc_id: u64) -> MerchantWindow {
     let (zone, position) = interaction
         .location(npc_id)
@@ -319,6 +355,10 @@ fn open_shop(interaction: &mut NpcInteraction, npc_id: u64) -> MerchantWindow {
     window
 }
 
+/// Legacy protected name. It enumerates the 58 selected-hub vendor-role rows
+/// and pins the known 29 stocked / 1 resolved-empty / 28 unresolved split; it
+/// is a content-completeness audit, **not** evidence that the T108 20-vendor
+/// target is met. The ignored target test below states that requirement.
 #[test]
 fn the_selected_hub_vendors_have_nonempty_grantable_stock() {
     let content = content_dir();
@@ -499,6 +539,10 @@ fn the_selected_hub_vendors_have_nonempty_grantable_stock() {
         empty, expected_exceptions,
         "the selected-hub empty vendors changed; every exception needs a source and reason"
     );
+    // These are the known content-gap counts, not the brief's 49-vendor
+    // completion target: 28 vendor rows have no item-level final-era evidence
+    // and one resolved record exposes only an unbuyable Bait row. The ignored
+    // target test above keeps the real requirement visible.
     assert_eq!(stocked, SELECTED_HUB_STOCKED_VENDOR_COUNT);
     assert_eq!(resolved_empty, SELECTED_HUB_RESOLVED_EMPTY_VENDOR_COUNT);
     assert_eq!(unresolved_empty, SELECTED_HUB_UNRESOLVED_VENDOR_COUNT);
@@ -528,11 +572,13 @@ fn assert_exception(vendor: &VendorNpc, recorded: Option<&StockException>) {
     );
 }
 
-/// The production loader (`world::NpcVisibility::load`) sends only data-backed
-/// `legacy_data`/`reconstructed_spawn` rows; POI-anchor and unanchored rows are
-/// reconstruction scaffolding and stay off the wire. Pin both outcomes so a
-/// placement or anchor regression cannot silently drop a visible vendor, and
-/// confirm the 35/2 spawn list carries the content position.
+/// The production loader (`world::NpcVisibility::load`, `src/world.rs:280`)
+/// spawns only data-backed `legacy_data` rows; `reconstructed_spawn`, POI-anchor
+/// and unanchored rows are reconstruction scaffolding and stay off the wire.
+/// Pin both outcomes so a placement or anchor regression cannot silently drop a
+/// visible vendor, and confirm the 35/2 spawn list carries the content position.
+/// Also pin the stocked rows the loader cannot spawn: their stock is real but
+/// unreachable, so it must not count toward the T108 completion target.
 fn assert_selected_hub_vendor_spawns(
     content: &Path,
     vendors: &[VendorNpc],
@@ -548,12 +594,10 @@ fn assert_selected_hub_vendor_spawns(
     let mut data_backed = 0usize;
     let mut data_backed_stocked = 0usize;
     let mut data_backed_unstocked = 0usize;
+    let mut stocked_unspawned = BTreeSet::new();
     for vendor in vendors {
-        let data_backed_placement = matches!(
-            vendor.placement.as_str(),
-            "legacy_data" | "reconstructed_spawn"
-        );
-        if data_backed_placement {
+        let spawned_placement = vendor.placement == "legacy_data";
+        if spawned_placement {
             data_backed += 1;
             if stocked_ids.contains(&vendor.npc_id) {
                 data_backed_stocked += 1;
@@ -581,6 +625,9 @@ fn assert_selected_hub_vendor_spawns(
                 );
             }
         } else {
+            if stocked_ids.contains(&vendor.npc_id) {
+                stocked_unspawned.insert(vendor.npc_id);
+            }
             assert_eq!(
                 visibility.content_key(vendor.npc_id),
                 None,
@@ -603,15 +650,74 @@ fn assert_selected_hub_vendor_spawns(
         data_backed_unstocked, SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT,
         "the data-backed non-stocked vendor spawn set changed"
     );
+    assert_eq!(
+        stocked_unspawned.len(),
+        SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_COUNT,
+        "the stocked-but-unspawned vendor set changed; these rows are unreachable"
+    );
+    assert_eq!(
+        stocked_unspawned.iter().copied().collect::<Vec<_>>(),
+        SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS,
+        "a stocked vendor's placement changed; do not count an unreachable vendor as complete"
+    );
+}
+
+/// The brief's completion target, kept runnable but ignored: 20 additional
+/// fully grantable vendor records would leave 49 of 58 stocked, and 20 more
+/// spawned fully grantable vendors would leave 39 reachable. No retained source
+/// proves stock for 20 of the 28 unresolved rows (the wiki pages name no
+/// final-era items; the few item-level mentions are retired-2009 or
+/// variant/composite claims), so the lead accepted this unmet target on
+/// 2026-10-19 instead of invented content. See `notes/Autopilot/F192.md`.
+#[test]
+#[ignore = "T108 target unmet: 19 of 39 spawned (29 of 49 records) selected-hub vendors are stocked"]
+fn at_least_twenty_more_selected_hub_vendors_are_fully_grantable() {
+    let content = content_dir();
+    let vendors = read_json(&content.join("vendors.json"));
+    let stores = prices(&content);
+    let inventory = Inventory::load(&inventory_content_dir(), None)
+        .expect("the runtime inventory catalogue loads");
+    let placements: BTreeMap<u64, String> = selected_hub_vendors(&content)
+        .into_iter()
+        .map(|vendor| (vendor.npc_id, vendor.placement))
+        .collect();
+    let selected: Vec<(u64, &Value)> = vendor_items(&vendors)
+        .into_iter()
+        .filter(|(_, vendor)| {
+            vendor["npc_content_file"]
+                .as_str()
+                .is_some_and(|file| SELECTED_HUB_FILES.contains(&file))
+        })
+        .filter(|(_, vendor)| fully_grantable(vendor, &inventory, &stores))
+        .collect();
+    let fully_grantable_count = selected.len();
+    let spawned_count = selected
+        .iter()
+        .filter(|(npc_id, _)| {
+            placements
+                .get(npc_id)
+                .is_some_and(|placement| placement == "legacy_data")
+        })
+        .count();
+    assert!(
+        spawned_count >= T108_REQUIRED_SPAWNED_STOCKED_VENDOR_COUNT,
+        "expected {T108_REQUIRED_SPAWNED_STOCKED_VENDOR_COUNT} spawned fully grantable \
+         selected-hub vendors, got {spawned_count}; unspawned stock is not reachable completion"
+    );
+    assert!(
+        fully_grantable_count >= T108_REQUIRED_STOCKED_VENDOR_COUNT,
+        "expected {T108_REQUIRED_STOCKED_VENDOR_COUNT} fully grantable selected-hub vendors, \
+         got {fully_grantable_count}"
+    );
 }
 
 #[test]
 fn at_least_twenty_more_vendor_rows_are_fully_grantable() {
-    // Row-level content regression only. The completion target is enforced by
-    // `the_selected_hub_vendors_have_nonempty_grantable_stock`, which accounts
-    // for every reachable vendor in the selected hubs. T108 added 22 rows to
-    // existing records because the file already had 96 of 98 fully grantable
-    // records; rows alone cannot prove a new vendor was completed.
+    // Row-level content regression only. Neither this row count nor the
+    // 96-vendor baseline proves a newly completed vendor; the T108
+    // 20-vendor target is the ignored test above and remains unmet. T108 added
+    // 22 rows to existing records, which is exactly why rows alone cannot be
+    // the completion gate.
     let content = content_dir();
     let vendors = read_json(&content.join("vendors.json"));
     let stores = prices(&content);
@@ -627,10 +733,7 @@ fn at_least_twenty_more_vendor_rows_are_fully_grantable() {
         let items = vendor["items"]
             .as_array()
             .expect("vendor items are an array");
-        let all_grantable = !items.is_empty()
-            && items
-                .iter()
-                .all(|item| grantable(item, &inventory, &stores));
+        let all_grantable = fully_grantable(vendor, &inventory, &stores);
         if all_grantable {
             fully_grantable_vendors += 1;
         }
@@ -824,369 +927,9 @@ fn vendor_buy_wire_matches_the_client_reader_layout() {
     assert_eq!(u32::from_le_bytes(response[48..52].try_into().unwrap()), 1);
 }
 
-static NEXT: AtomicU64 = AtomicU64::new(0);
-
-/// A complete gameplay fixture built from the real vendor record and the
-/// captured catalogue. Only the NPC's zone/position is translated to zone 0
-/// because `Gateway::load_gameplay` without the opening campaign supports the
-/// open-world zone. The stock row, prices, item definition and transaction path
-/// are the shipped ones. The directory is removed on drop.
-struct GatewayFixture {
-    content: PathBuf,
-    reference: PathBuf,
-    zone: u32,
-    position: [f32; 3],
-    option: u32,
-    price: u32,
-}
-
-impl Drop for GatewayFixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.content);
-    }
-}
-
-impl GatewayFixture {
-    fn new() -> Self {
-        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let reference = lab.join("references/rust-gateway-reference");
-        let source = lab.join("reports/round70-native-20261016T061000Z/content");
-        let content = lab.join("build/w178-vendor-gateway").join(format!(
-            "f178-vendor-gateway-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(content.join("npcs")).expect("fixture content creates");
-        for file in [
-            "inventory.json",
-            "quests.json",
-            "quest-journal.bin",
-            "combat.json",
-            "combat-template.bin",
-            "categories.json",
-        ] {
-            fs::copy(source.join(file), content.join(file))
-                .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
-        }
-        let catalogue = content.join("item-catalogue.json");
-        if fs::hard_link(source.join("item-catalogue.json"), &catalogue).is_err() {
-            fs::copy(source.join("item-catalogue.json"), &catalogue)
-                .expect("item catalogue copies");
-        }
-        for file in ["stores.json", "zones.json"] {
-            fs::copy(content_dir().join(file), content.join(file))
-                .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
-        }
-
-        let vendors = read_json(&content_dir().join("vendors.json"));
-        let vendor = vendors["vendors"]
-            .as_array()
-            .expect("vendor records are an array")
-            .iter()
-            .find(|vendor| vendor["npc_id"].as_u64() == Some(REPRESENTATIVE_VENDOR))
-            .expect("the representative vendor exists")
-            .clone();
-        fs::write(
-            content.join("vendors.json"),
-            serde_json::to_vec(&json!({"schema_version": 1, "vendors": [vendor]}))
-                .expect("fixture vendors serialize"),
-        )
-        .expect("fixture vendors write");
-
-        let npcs = read_json(&content_dir().join("npcs/blackspore_swamp.json"));
-        let mut npc = npcs["records"]
-            .as_array()
-            .expect("NPC records are an array")
-            .iter()
-            .find(|npc| npc["npc_id"].as_u64() == Some(REPRESENTATIVE_VENDOR))
-            .expect("the representative NPC exists")
-            .clone();
-        npc["zone_id"] = json!(0);
-        npc["zone"] = json!("FabledRealms");
-        npc["position"] = json!([0.0, 0.0, 0.0]);
-        npc["heading"] = json!(0.0);
-        npc["placement"] = json!("legacy_data");
-        fs::write(
-            content.join("npcs/melninster.json"),
-            serde_json::to_vec(&json!({"schema_version": 1, "records": [npc]}))
-                .expect("fixture NPC serializes"),
-        )
-        .expect("fixture NPC writes");
-        fs::write(
-            content.join("npc_spawns_extra.json"),
-            br#"{"schema_version":1,"records":[]}"#,
-        )
-        .expect("fixture spawn overlay writes");
-
-        let mut service = NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
-            .expect("fixture NPC content loads");
-        let (zone, position) = service
-            .location(REPRESENTATIVE_VENDOR)
-            .expect("the representative vendor has a location");
-        let menu = service
-            .interact(REPRESENTATIVE_VENDOR, zone, position, None)
-            .expect("the representative vendor opens");
-        let option = u32::try_from(
-            menu.options
-                .iter()
-                .find(|option| option.action == NpcAction::Shop)
-                .expect("the representative vendor exposes a shop option")
-                .id,
-        )
-        .expect("the shop option id fits the client field");
-        let price = prices(&content_dir())
-            .get(&(REPRESENTATIVE_ITEM as i64))
-            .copied()
-            .expect("the representative item has a positive price") as u32;
-        Self {
-            content,
-            reference,
-            zone,
-            position,
-            option,
-            price,
-        }
-    }
-
-    fn state(&self, coins: u32, full_bag: bool) -> GameplayState {
-        let mut state = Gameplay::load(&self.content, None)
-            .expect("fixture gameplay content loads")
-            .state();
-        state.inventory.items.clear();
-        for entry in &mut state.inventory.equipment {
-            entry.item_id = 0;
-        }
-        state.inventory.coins = coins;
-        let item = |id: i32| InventoryItem {
-            definition_id: 75_060,
-            tint: 0,
-            id,
-            count: 1,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: 0,
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        };
-        if full_bag {
-            for id in 100_000..100_100 {
-                state.inventory.items.push(item(id));
-            }
-            state.inventory.next_instance_id = Some(100_100);
-        } else {
-            state.inventory.items.push(item(1));
-            state.inventory.next_instance_id = Some(2);
-        }
-        state
-    }
-
-    fn character(&self) -> CharacterState {
-        let mut character =
-            Gateway::reference_state(&self.reference).expect("reference character loads");
-        character.zone_id = self.zone;
-        character.position = self.position;
-        character.rotation = [0.0; 3];
-        character
-    }
-
-    fn connect(&self, state: GameplayState) -> Gateway {
-        self.connect_with(self.character(), state)
-    }
-
-    /// Reconnect through the saved character half of the save envelope, not a
-    /// fresh reference character.
-    fn connect_with(&self, character: CharacterState, state: GameplayState) -> Gateway {
-        let mut gateway =
-            Gateway::load_gameplay(&self.reference, character, &self.content, Some(state))
-                .expect("gateway loads the vendor content");
-        gateway.set_dev_tools(false);
-        gateway.set_role(AccountRole::Player);
-        for packet in [login(), wrap(&[13, 0]), wrap(&[10, 0])] {
-            gateway
-                .handle_at(&packet, NOW)
-                .expect("initialization message handles");
-        }
-        gateway
-    }
-
-    fn open_shop(&self, gateway: &mut Gateway) -> Vec<Vec<u8>> {
-        send(gateway, &interact(REPRESENTATIVE_VENDOR));
-        let replies = send(gateway, &select(REPRESENTATIVE_VENDOR, self.option));
-        assert!(
-            replies
-                .iter()
-                .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
-            "the gateway did not open the representative shop"
-        );
-        replies
-    }
-}
-
+/// Protected name. The real-content purchase/refusal proof lives in
+/// `common/vendor_purchase.rs` so this file stays the content-coverage suite.
 #[test]
 fn representative_new_stock_buys_once_and_refuses_atomically() {
-    let fixture = GatewayFixture::new();
-    let price = fixture.price;
-    let mut gateway = fixture.connect(fixture.state(price + 1_000, false));
-    let opened = fixture.open_shop(&mut gateway);
-    let list = opened
-        .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
-        .expect("shop list is present");
-    // 66/42 is decoded exactly as the client reads it: dispatcher `00b48a10`
-    // -> `00b40a60` -> `00b3d5f0` (header + nested record), group reader
-    // `00b33020` (seven dwords + counted rows), row reader `00b29cd0`.
-    let list = decode_merchant_list_66_42(list).expect("shop list matches the client reader");
-    let entry = list
-        .group
-        .entries
-        .iter()
-        .find(|entry| entry.first_six_dwords[0] == REPRESENTATIVE_ITEM as u32)
-        .expect("the gateway shop does not expose the new item");
-    // (R) Local convention for the opaque row: dword 1 is the purchase price.
-    assert_eq!(entry.first_six_dwords[1], price);
-
-    let before = gateway.snapshot();
-    let bought = gateway
-        .handle_at(
-            &wrap(&vendor_buy_packet(108_001, REPRESENTATIVE_ITEM, 1)),
-            NOW,
-        )
-        .expect("vendor buy handles");
-    assert!(bought.gameplay_changed, "a successful buy requests a save");
-    let replies = inner_packets(&bought);
-    assert_eq!(
-        merchant_status(replies.last().expect("vendor buy reply")),
-        1
-    );
-    let after = gateway.snapshot();
-    let before_inventory = before
-        .gameplay
-        .as_ref()
-        .expect("pre-buy gameplay exists")
-        .inventory
-        .clone();
-    let after_inventory = after
-        .gameplay
-        .as_ref()
-        .expect("post-buy gameplay exists")
-        .inventory
-        .clone();
-    assert_eq!(after_inventory.coins, before_inventory.coins - price);
-    assert_eq!(
-        count_definition(&after_inventory, REPRESENTATIVE_ITEM),
-        count_definition(&before_inventory, REPRESENTATIVE_ITEM) + 1
-    );
-    assert_eq!(
-        count_definition(&after_inventory, 75_060),
-        1,
-        "the pre-login item survived the purchase"
-    );
-    assert_eq!(
-        after.character, before.character,
-        "a vendor purchase moved the character"
-    );
-
-    // Reconnect through both saved halves, not a fresh reference character.
-    let saved_character: CharacterState = serde_json::from_slice(
-        &serde_json::to_vec(&after.character).expect("character state serializes"),
-    )
-    .expect("character state parses");
-    let saved: GameplayState = serde_json::from_slice(
-        &serde_json::to_vec(
-            &after
-                .gameplay
-                .clone()
-                .expect("successful gameplay state serializes"),
-        )
-        .expect("gameplay state serializes"),
-    )
-    .expect("gameplay state parses");
-    let reconnected = fixture.connect_with(saved_character.clone(), saved);
-    let reconnect_snapshot = reconnected.snapshot();
-    assert_eq!(
-        reconnect_snapshot.character, saved_character,
-        "the reconnect ignored the saved character half"
-    );
-    assert_eq!(inventory_of(&reconnected), after_inventory);
-
-    // Poor coins: the refusal changes nothing, and the shop survives it. Sell
-    // the seeded item to top up, then the same buy lands.
-    let mut poor = fixture.connect(fixture.state(price - 1, false));
-    fixture.open_shop(&mut poor);
-    let poor_before = poor.snapshot();
-    let replies = send(
-        &mut poor,
-        &vendor_buy_packet(108_006, REPRESENTATIVE_ITEM, 1),
-    );
-    assert_eq!(merchant_status(replies.last().expect("poor reply")), 0);
-    assert_eq!(
-        poor.snapshot(),
-        poor_before,
-        "insufficient-coins refusal changed the gateway state"
-    );
-    send(&mut poor, &sell_packet(0, 1, 1));
-    let topped_up = inventory_of(&poor).coins;
-    assert_eq!(
-        topped_up,
-        price - 1 + 375,
-        "the poor-coins refusal consumed the open shop"
-    );
-    let replies = send(
-        &mut poor,
-        &vendor_buy_packet(108_020, REPRESENTATIVE_ITEM, 1),
-    );
-    assert_eq!(
-        merchant_status(replies.last().expect("poor retry reply")),
-        1
-    );
-    assert_eq!(inventory_of(&poor).coins, topped_up - price);
-    assert_eq!(
-        count_definition(&inventory_of(&poor), REPRESENTATIVE_ITEM),
-        1
-    );
-
-    // Full bag: the refusal changes nothing, and freeing one slot through the
-    // real sell route lets the same buy land.
-    let mut full = fixture.connect(fixture.state(price + 1_000, true));
-    fixture.open_shop(&mut full);
-    assert_eq!(
-        inventory_of(&full)
-            .items
-            .iter()
-            .filter(|item| item.count > 0)
-            .count(),
-        100
-    );
-    let full_before = full.snapshot();
-    let replies = send(
-        &mut full,
-        &vendor_buy_packet(108_007, REPRESENTATIVE_ITEM, 1),
-    );
-    assert_eq!(merchant_status(replies.last().expect("full-bag reply")), 0);
-    assert_eq!(
-        full.snapshot(),
-        full_before,
-        "full-bag refusal changed the gateway state"
-    );
-    send(&mut full, &sell_packet(0, 100_000, 1));
-    let freed = inventory_of(&full);
-    assert_eq!(
-        freed.coins,
-        price + 1_000 + 375,
-        "the full-bag refusal consumed the open shop"
-    );
-    assert_eq!(freed.items.len(), 99);
-    let replies = send(
-        &mut full,
-        &vendor_buy_packet(108_021, REPRESENTATIVE_ITEM, 1),
-    );
-    assert_eq!(
-        merchant_status(replies.last().expect("full-bag retry reply")),
-        1
-    );
-    let purchased = inventory_of(&full);
-    assert_eq!(purchased.coins, freed.coins - price);
-    assert_eq!(purchased.items.len(), 100);
-    assert_eq!(count_definition(&purchased, REPRESENTATIVE_ITEM), 1);
+    vendor_purchase::representative_new_stock_buys_once_and_refuses_atomically();
 }

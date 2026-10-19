@@ -4,8 +4,9 @@
 //! Client-derived bodies: 26/8 constructor `008b6bc0` (u64 target + bool),
 //! 26/10 constructor `00a36f80` (u64 target + i32 choice), 66/43 serializer
 //! `00b3ab20`, 66/44 reader `00b32430` (status at wire offset 48), and the
-//! 165/5 sell body read by the Coin Store handler. The 7-byte tunnel prefix
-//! mirrors the captured client wrapper (`005`, subtype `1`, payload length).
+//! 165/5 sell body written by `00c75a70`/`00c76dd0` (Lua-facing `00c77030`).
+//! The 7-byte tunnel prefix mirrors the captured client wrapper (`005`, subtype
+//! `1`, payload length).
 #![allow(dead_code)] // The vendor suites use every helper; the S6 net includes only two.
 
 use osfr_tools::{
@@ -89,7 +90,9 @@ pub fn vendor_buy_packet(transaction: u32, item: i32, quantity: u32) -> Vec<u8> 
     .expect("66/43 request encodes")
 }
 
-/// 165/5: u64 merchant (0 = the open shop) + i32 item instance + u32 quantity.
+/// 165/5 body: u64 merchant (0 = the open shop) + u32 item instance + u32
+/// quantity, in `00c76dd0`'s field order and written by `00c75a70` (the Lua
+/// entry point is `00c77030`).
 pub fn sell_packet(merchant: u64, instance: i32, quantity: u32) -> Vec<u8> {
     let mut packet = vec![165, 0, 5, 0];
     packet.extend(merchant.to_le_bytes());
