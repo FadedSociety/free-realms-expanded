@@ -2,7 +2,10 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
-    quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestProgress, QuestStatus},
+    npc_interaction::NpcInteraction,
+    quest_engine::{
+        CharacterEligibility, QuestDenial, QuestEngine, QuestEvent, QuestProgress, QuestStatus,
+    },
     startup_world,
 };
 use serde_json::Value;
@@ -104,6 +107,30 @@ fn saved(game: &Gameplay) -> Vec<u8> {
     serde_json::to_vec(&game.state()).unwrap()
 }
 
+fn eligibility() -> CharacterEligibility {
+    CharacterEligibility {
+        player_level: 20,
+        job_levels: BTreeMap::from([("brawler".into(), 20)]),
+        member: true,
+        nonmember_quest_limit: 30,
+        member_quest_limit: 30,
+    }
+}
+
+fn different_enemy_definition() -> u32 {
+    let document: Value =
+        serde_json::from_slice(&fs::read(content_dir().join("field_enemies.json")).unwrap())
+            .unwrap();
+    document["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|enemy| enemy["definition_id"].as_u64())
+        .find(|definition| *definition != u64::from(HOOLIGAN_DEFINITION))
+        .and_then(|definition| u32::try_from(definition).ok())
+        .expect("content has another field enemy definition")
+}
+
 fn assert_refusal_changes_nothing(
     game: &mut Gameplay,
     character: &CharacterState,
@@ -128,7 +155,8 @@ fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool
     }
     let Some(id) = id else { return true };
     // 49/13 carries the turn-in actor at 6..14 and the reply quest id at 14..18;
-    // every other used family/subtype carries its id at 6..10.
+    // every other used family/subtype carries its id at 6..10. Client
+    // QuestEndPacket::ReadFields 0x00c7b990 / Unserialize 0x00c7bbd0.
     let offset = if (family, subtype) == (49, 13) { 14 } else { 6 };
     packet
         .get(offset..offset + 4)
@@ -528,7 +556,14 @@ fn select_job(profile_id: i32) -> Vec<u8> {
     packet
 }
 
+// Client constructors/readers for the packets below (IDA native map):
+// 26/8 CommandPacketInteractRequest 0x008b6bc0; 26/10
+// CommandPacketInteractionSelect 0x00a36f80; 26/6 PacketDialogResponse 0x009f5890;
+// 36/10 AbilityPacketClientRequestStartAbility 0x00a2e0e0; 49/2 QuestReplyPacket
+// 0x00a86400; 49/13 QuestEndPacket::ReadFields 0x00c7b990 / Unserialize 0x00c7bbd0;
+// 49/14 QuestEndReplyPacket 0x00a864c0; 35/2 AddNpc reader 0x00921a10.
 fn npc_interact(npc_id: u64) -> Vec<u8> {
+    // 26/8 CommandPacketInteractRequest (ctor 0x008b6bc0).
     let mut packet = vec![26, 0, 8, 0];
     packet.extend(npc_id.to_le_bytes());
     packet.push(0);
@@ -536,6 +571,7 @@ fn npc_interact(npc_id: u64) -> Vec<u8> {
 }
 
 fn npc_select(npc_id: u64, choice: i32) -> Vec<u8> {
+    // 26/10 CommandPacketInteractionSelect (ctor 0x00a36f80).
     let mut packet = vec![26, 0, 10, 0];
     packet.extend(npc_id.to_le_bytes());
     packet.extend(choice.to_le_bytes());
@@ -543,6 +579,7 @@ fn npc_select(npc_id: u64, choice: i32) -> Vec<u8> {
 }
 
 fn targeted_basic_attack(target: u64) -> Vec<u8> {
+    // 36/10 AbilityPacketClientRequestStartAbility (ctor 0x00a2e0e0).
     [
         vec![36, 0, 10, 0],
         1_i32.to_le_bytes().to_vec(),
@@ -554,12 +591,14 @@ fn targeted_basic_attack(target: u64) -> Vec<u8> {
 }
 
 fn dialogue_choice(row: i32) -> Vec<u8> {
+    // 26/6 PacketDialogResponse (ctor 0x009f5890), one i32 row.
     let mut packet = vec![26, 0, 6, 0];
     packet.extend(row.to_le_bytes());
     packet
 }
 
 fn quest_reply(quest_id: u32, accept: bool) -> Vec<u8> {
+    // 49/2 QuestReplyPacket (ctor 0x00a86400): quest id then the accept byte.
     let mut packet = vec![49, 0, 2, 0, 0, 0];
     packet.extend(quest_id.to_le_bytes());
     packet.push(u8::from(accept));
@@ -567,9 +606,38 @@ fn quest_reply(quest_id: u32, accept: bool) -> Vec<u8> {
 }
 
 fn quest_end_reply(quest_id: u32) -> Vec<u8> {
+    // 49/14 QuestEndReplyPacket (ctor 0x00a864c0): one quest id.
     let mut packet = vec![49, 0, 14, 0, 0, 0];
     packet.extend(quest_id.to_le_bytes());
     packet
+}
+
+/// Complete C3-C5 through the production NPC menu, dialogue, offer, field combat and
+/// 49/13-49/14 turn-in paths, returning the wallet before the chapter.
+fn complete_chapter(game: &mut Gameplay, character: &CharacterState, now: &mut u64) -> u32 {
+    let initial = game.state().inventory.coins;
+    let carlos = npc_position("cobblestone_village.json", CARLOS);
+    let jones = npc_position("cobblestone_village.json", JONES);
+    let sabastian = npc_position("blackspore_swamp.json", SABASTIAN);
+    let mut at = character.clone();
+
+    at.position = carlos;
+    accept_quest(game, &at, CARLOS, carlos, REFERRAL_TO_JONES, now);
+    at.position = jones;
+    let _ = open_end_screen(game, &at, JONES, REFERRAL_TO_JONES, now);
+    finish_turnin(game, &at, REFERRAL_TO_JONES, now);
+
+    accept_quest(game, &at, JONES, jones, HOOLIGAN_FIGHT, now);
+    kill_hooligans(game, &at, now);
+    at.position = jones;
+    let _ = open_end_screen(game, &at, JONES, HOOLIGAN_FIGHT, now);
+    finish_turnin(game, &at, HOOLIGAN_FIGHT, now);
+
+    accept_quest(game, &at, JONES, jones, SEARCH_BLACKSPORE, now);
+    at.position = sabastian;
+    let _ = open_end_screen(game, &at, SABASTIAN, SEARCH_BLACKSPORE, now);
+    finish_turnin(game, &at, SEARCH_BLACKSPORE, now);
+    initial
 }
 
 #[test]
@@ -936,19 +1004,8 @@ fn shared_npc_view_replays_pending_end_screen_after_the_actor_spawn() {
 
 #[test]
 fn disabled_starting_quests_refuse_without_changing_state() {
-    let mut engine = QuestEngine::from_split_content(
-        &content_dir(),
-        CHARACTER,
-        CharacterEligibility {
-            player_level: 20,
-            job_levels: BTreeMap::from([("brawler".into(), 20)]),
-            member: true,
-            nonmember_quest_limit: 30,
-            member_quest_limit: 30,
-        },
-        None,
-    )
-    .unwrap();
+    let mut engine =
+        QuestEngine::from_split_content(&content_dir(), CHARACTER, eligibility(), None).unwrap();
     let before = engine.state().clone();
     // C2 and the later Highroad records stay empty/disabled; their provenance must not
     // claim objectives the server does not run (F135 review finding 4).
@@ -959,4 +1016,182 @@ fn disabled_starting_quests_refuse_without_changing_state() {
         assert!(refused.outbound.is_empty());
         assert_eq!(engine.state(), &before);
     }
+}
+
+#[test]
+fn carlos_to_jones_to_blackspore_completes_in_order() {
+    let (mut game, character) = fresh_game();
+    let mut now = 5_000;
+    let initial = complete_chapter(&mut game, &character, &mut now);
+
+    let state = game.state();
+    assert_eq!(state.inventory.coins, initial + 3 * QUEST_REWARD_COINS);
+    let quests = state
+        .npc_quests
+        .as_ref()
+        .expect("chapter quest state exists");
+    for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
+        assert_eq!(
+            quests.quests[&quest_id].status,
+            QuestStatus::Completed,
+            "quest {quest_id} did not complete"
+        );
+    }
+    assert_eq!(quests.pending_turnin, None);
+}
+
+#[test]
+fn wrong_npc_and_wrong_enemy_do_not_advance() {
+    const OTHER_NPC: u64 = 9_000_000_189;
+    let (mut game, character) = fresh_game();
+    let mut now = 6_000;
+    let carlos = npc_position("cobblestone_village.json", CARLOS);
+    let jones = npc_position("cobblestone_village.json", JONES);
+    let other = npc_position("cobblestone_village.json", OTHER_NPC);
+    let mut at = character.clone();
+
+    at.position = carlos;
+    accept_quest(&mut game, &at, CARLOS, carlos, REFERRAL_TO_JONES, &mut now);
+
+    // A different NPC's Talk leaves the Jones referral step untouched.
+    at.position = other;
+    let counts = game.state().npc_quests.as_ref().unwrap().quests[&REFERRAL_TO_JONES]
+        .counts
+        .clone();
+    now += 100;
+    let _ = interact_npc(&mut game, &at, OTHER_NPC, now);
+    now += 100;
+    game.handle_in_world(&npc_select(OTHER_NPC, 1), &at, now)
+        .expect("the wrong NPC Talk is a clean request");
+    let state = game.state();
+    let quests = state.npc_quests.as_ref().unwrap();
+    assert_eq!(
+        quests.quests[&REFERRAL_TO_JONES].counts, counts,
+        "another NPC advanced the Jones talk step"
+    );
+    assert_eq!(
+        quests.quests[&REFERRAL_TO_JONES].status,
+        QuestStatus::Active
+    );
+    assert_eq!(quests.pending_turnin, None);
+
+    // Complete C3 and accept C4 so the four-kill step is active.
+    at.position = jones;
+    let _ = open_end_screen(&mut game, &at, JONES, REFERRAL_TO_JONES, &mut now);
+    finish_turnin(&mut game, &at, REFERRAL_TO_JONES, &mut now);
+    accept_quest(&mut game, &at, JONES, jones, HOOLIGAN_FIGHT, &mut now);
+
+    // A kill of another definition cannot satisfy the four 930050 Hooligans.
+    let mut engine = QuestEngine::from_split_content(
+        &content_dir(),
+        CHARACTER,
+        eligibility(),
+        Some(game.state().npc_quests.clone().unwrap()),
+    )
+    .expect("the active C4 state loads into the quest engine");
+    let before = engine.progress(HOOLIGAN_FIGHT).unwrap().clone();
+    let wrong = engine
+        .on_event(QuestEvent::KillActorKind {
+            actor_kind_id: different_enemy_definition(),
+            count: 1,
+        })
+        .unwrap();
+    assert!(!wrong.changed, "another enemy advanced the kill step");
+    assert_eq!(engine.progress(HOOLIGAN_FIGHT).unwrap(), &before);
+    assert_eq!(before.counts, vec![0]);
+}
+
+#[test]
+fn chapter_rewards_are_paid_once() {
+    let (mut game, character) = fresh_game();
+    let mut now = 7_000;
+    let initial = complete_chapter(&mut game, &character, &mut now);
+    let total = initial + 3 * QUEST_REWARD_COINS;
+    assert_eq!(game.state().inventory.coins, total);
+
+    for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
+        assert_refusal_changes_nothing(
+            &mut game,
+            &character,
+            &quest_end_reply(quest_id),
+            now + 1,
+            "duplicate chapter turn-in",
+        );
+        now += 2;
+    }
+    assert_refusal_changes_nothing(
+        &mut game,
+        &character,
+        &quest_reply(HOOLIGAN_FIGHT, true),
+        now + 1,
+        "duplicate chapter accept",
+    );
+    now += 2;
+    assert_eq!(game.state().inventory.coins, total);
+
+    // Replayed damage on a defeated Hooligan, from its own position, adds nothing.
+    let (last, position) = *field_hooligans().last().expect("four quest-gated spawns");
+    let mut at = character.clone();
+    at.position = position;
+    let before = saved(&game);
+    now += 700;
+    let replayed = game
+        .handle_in_world(&targeted_basic_attack(last), &at, now)
+        .expect("a replayed hit is a clean refusal");
+    assert!(!replayed.changed, "replayed damage advanced chapter state");
+    assert_eq!(saved(&game), before, "replayed damage changed the save");
+    assert_eq!(game.state().inventory.coins, total);
+}
+
+#[test]
+fn offer_gates_and_save_reload_survive() {
+    let (mut game, character) = fresh_game();
+    let mut now = 8_000;
+    let initial = complete_chapter(&mut game, &character, &mut now);
+
+    let reloaded = load_game(Some(game.state()));
+    let state = reloaded.state();
+    assert_eq!(state.inventory.coins, initial + 3 * QUEST_REWARD_COINS);
+    let quests = state
+        .npc_quests
+        .as_ref()
+        .expect("completed quest state persists");
+    assert_eq!(quests.pending_turnin, None);
+    for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
+        assert_eq!(
+            quests.quests[&quest_id].status,
+            QuestStatus::Completed,
+            "quest {quest_id} history did not survive the save"
+        );
+    }
+
+    let mut engine = QuestEngine::from_split_content(
+        &content_dir(),
+        CHARACTER,
+        eligibility(),
+        Some(quests.clone()),
+    )
+    .expect("the completed chapter reloads into the quest engine");
+    let before = engine.state().clone();
+    for quest_id in [3_030_004, 3_030_005] {
+        let refused = engine.offer(quest_id, CARLOS);
+        assert_eq!(
+            refused.denial,
+            Some(QuestDenial::Unavailable),
+            "disabled quest {quest_id} was offerable"
+        );
+        assert!(!refused.changed);
+        assert!(refused.outbound.is_empty());
+        assert_eq!(engine.state(), &before);
+    }
+    let interaction = NpcInteraction::load(
+        &content_dir().join("npcs"),
+        &content_dir().join("stores.json"),
+    )
+    .expect("NPC content loads");
+    assert_eq!(
+        interaction.offerable_quest_for_talk(CARLOS, &engine),
+        None,
+        "a disabled C1/C2 quest remains offerable after the chapter"
+    );
 }
