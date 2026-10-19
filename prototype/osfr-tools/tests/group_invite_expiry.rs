@@ -1,5 +1,5 @@
 use osfr_tools::social_lists::{
-    CharacterIdentity, CharacterLookup, SocialLists, SocialName, SocialService,
+    CharacterIdentity, CharacterLookup, SocialLists, SocialMessage, SocialName, SocialService,
 };
 use std::collections::BTreeMap;
 
@@ -63,17 +63,32 @@ fn group_result(messages: &[osfr_tools::social_lists::SocialMessage], sub: u16) 
         .map(|message| u32::from_le_bytes(message.bytes[4..8].try_into().unwrap()))
 }
 
+/// The 40/1 dword at +0x120 that the client copies from the pop-up and echoes in 40/4.
+fn invitation_id(messages: &[SocialMessage], target: u64) -> u32 {
+    let packet = messages
+        .iter()
+        .find(|message| {
+            message.recipient_guid == target
+                && u16::from_le_bytes([message.bytes[0], message.bytes[1]]) == 40
+                && u16::from_le_bytes([message.bytes[2], message.bytes[3]]) == 1
+        })
+        .expect("target received a 40/1 invite");
+    let at = packet.bytes.len() - 6 * 4;
+    u32::from_le_bytes(packet.bytes[at..at + 4].try_into().unwrap())
+}
+
 #[test]
 fn invite_remains_valid_at_fifty_nine_thousand_nine_hundred_ninety_nine_ms() {
     let (mut social, directory) = service(2);
     let target = identity(20, 202, "FixtureB").name;
-    social
+    let invited = social
         .invite_to_group(101, &target, &directory, 1_000)
         .unwrap();
+    let invite_id = invitation_id(&invited, 202);
     let group_id = social.group_of(101).unwrap();
 
     let accepted = social
-        .respond_group_invite(202, group_id, true, 60_999)
+        .respond_group_invite(202, invite_id, true, 60_999)
         .unwrap();
     assert_eq!(social.group_members(group_id).unwrap(), &[101, 202]);
     assert!(accepted.iter().any(|message| {
@@ -86,14 +101,15 @@ fn invite_remains_valid_at_fifty_nine_thousand_nine_hundred_ninety_nine_ms() {
 fn response_at_sixty_seconds_is_refused_without_membership_change() {
     let (mut social, directory) = service(2);
     let target = identity(20, 202, "FixtureB").name;
-    social
+    let invited = social
         .invite_to_group(101, &target, &directory, 1_000)
         .unwrap();
+    let invite_id = invitation_id(&invited, 202);
     let group_id = social.group_of(101).unwrap();
     let profiles_before = [social.profile(101).cloned(), social.profile(202).cloned()];
 
     let refused = social
-        .respond_group_invite(202, group_id, true, 61_000)
+        .respond_group_invite(202, invite_id, true, 61_000)
         .unwrap();
 
     assert_eq!(group_result(&refused, 5), Some(3));
@@ -111,20 +127,23 @@ fn replacement_invite_releases_expired_capacity_without_a_cleanup_call() {
     let (mut social, directory) = service(2);
     let member = identity(20, 202, "FixtureB").name;
     let replacement = identity(30, 303, "FixtureC").name;
-    social
+    let first = social
         .invite_to_group(101, &member, &directory, 1_000)
         .unwrap();
+    let old_invite = invitation_id(&first, 202);
     let group_id = social.group_of(101).unwrap();
 
     let renewed = social
         .invite_to_group(101, &replacement, &directory, 61_000)
         .unwrap();
     assert_eq!(group_result(&renewed, 2), Some(0));
+    let new_invite = invitation_id(&renewed, 303);
+    assert_ne!(old_invite, new_invite);
     assert_eq!(social.group_invitee(303), Some((group_id, 101)));
     assert_eq!(social.group_invitee(202), None);
 
     let stale = social
-        .respond_group_invite(202, group_id, true, 61_001)
+        .respond_group_invite(202, old_invite, true, 61_001)
         .unwrap();
     assert_eq!(group_result(&stale, 5), Some(3));
     assert_eq!(social.group_invitee(303), Some((group_id, 101)));
@@ -137,14 +156,14 @@ fn response_expiry_does_not_change_group_membership_or_persistence() {
     let (mut social, directory) = service(3);
     let member = identity(20, 202, "FixtureB").name;
     let invitee = identity(30, 303, "FixtureC").name;
-    social
+    let first = social
         .invite_to_group(101, &member, &directory, 1_000)
         .unwrap();
     let group_id = social.group_of(101).unwrap();
     social
-        .respond_group_invite(202, group_id, true, 1_001)
+        .respond_group_invite(202, invitation_id(&first, 202), true, 1_001)
         .unwrap();
-    social
+    let second = social
         .invite_to_group(101, &invitee, &directory, 2_000)
         .unwrap();
 
@@ -160,7 +179,7 @@ fn response_expiry_does_not_change_group_membership_or_persistence() {
     let saved_before = std::fs::read(&save).unwrap();
 
     let refused = social
-        .respond_group_invite(303, group_id, true, 62_000)
+        .respond_group_invite(303, invitation_id(&second, 303), true, 62_000)
         .unwrap();
 
     assert_eq!(group_result(&refused, 5), Some(3));
@@ -184,22 +203,68 @@ fn invite_lifetime_is_configurable_and_refuses_out_of_range_values() {
     social.set_group_invite_ttl(1_000).unwrap();
 
     let target = identity(20, 202, "FixtureB").name;
-    social
+    let invited = social
         .invite_to_group(101, &target, &directory, 5_000)
         .unwrap();
     let group_id = social.group_of(101).unwrap();
     social
-        .respond_group_invite(202, group_id, true, 5_999)
+        .respond_group_invite(202, invitation_id(&invited, 202), true, 5_999)
         .unwrap();
     assert_eq!(social.group_of(202), social.group_of(101));
 
     let invitee = identity(30, 303, "FixtureC").name;
-    social
+    let renewed = social
         .invite_to_group(101, &invitee, &directory, 6_000)
         .unwrap();
     let refused = social
-        .respond_group_invite(303, group_id, true, 7_000)
+        .respond_group_invite(303, invitation_id(&renewed, 303), true, 7_000)
         .unwrap();
     assert_eq!(group_result(&refused, 5), Some(3));
     assert_eq!(social.group_members(group_id).unwrap(), &[101, 202]);
+}
+
+#[test]
+fn same_group_reinvitation_gets_a_fresh_generation_and_refuses_the_old_one() {
+    let (mut social, directory) = service(3);
+    let target = identity(20, 202, "FixtureB").name;
+    let first = social
+        .invite_to_group(101, &target, &directory, 1_000)
+        .unwrap();
+    let group_id = social.group_of(101).unwrap();
+    let stale_id = invitation_id(&first, 202);
+
+    // The same leader re-invites the same target into the same live group: the group id
+    // is reused, so only a fresh generation can tell the new pop-up from the old one.
+    let second = social
+        .invite_to_group(101, &target, &directory, 61_000)
+        .unwrap();
+    assert_eq!(group_result(&second, 2), Some(0));
+    let fresh_id = invitation_id(&second, 202);
+    assert_ne!(stale_id, fresh_id);
+    let pending = social.group_invitee(202);
+    assert_eq!(pending, Some((group_id, 101)));
+
+    for (accepted, now_ms) in [(false, 61_001), (true, 61_002)] {
+        let stale = social
+            .respond_group_invite(202, stale_id, accepted, now_ms)
+            .unwrap();
+        assert_eq!(group_result(&stale, 5), Some(3));
+        assert!(!stale.iter().any(|message| {
+            u16::from_le_bytes([message.bytes[0], message.bytes[1]]) == 40
+                && u16::from_le_bytes([message.bytes[2], message.bytes[3]]) == 4
+        }));
+        assert_eq!(social.group_invitee(202), pending);
+        assert_eq!(social.group_members(group_id).unwrap(), &[101]);
+        assert_eq!(social.group_of(202), None);
+    }
+
+    let accepted = social
+        .respond_group_invite(202, fresh_id, true, 61_003)
+        .unwrap();
+    assert!(accepted.iter().any(|message| {
+        u16::from_le_bytes([message.bytes[0], message.bytes[1]]) == 40
+            && u16::from_le_bytes([message.bytes[2], message.bytes[3]]) == 4
+    }));
+    assert_eq!(social.group_members(group_id).unwrap(), &[101, 202]);
+    assert_eq!(social.group_invitee(202), None);
 }

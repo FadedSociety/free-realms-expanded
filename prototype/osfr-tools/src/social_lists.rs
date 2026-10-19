@@ -290,7 +290,12 @@ struct Group {
 
 #[derive(Clone, Copy, Debug)]
 struct PendingGroupInvite {
+    /// `(R)` Membership target for an accepted invite; not unique per invitation because a
+    /// leader re-invite into the same live group reuses it.
     group_id: u32,
+    /// `(R)` Per-invitation generation sent in the 40/1 dword the client echoes back through
+    /// the pop-up record (`00a8b640`). A response binds to this, never to `group_id`.
+    invite_id: u32,
     inviter_guid: u64,
     created_ms: u64,
 }
@@ -305,6 +310,8 @@ pub struct SocialService {
     /// Host policy copied with the service; never persisted and not part of the saved profile.
     group_invite_ttl_ms: u64,
     next_group_id: u32,
+    /// `(R)` Monotonic 40/1 generation; volatile and never persisted.
+    next_invite_id: u32,
     groups: BTreeMap<u32, Group>,
     member_group: BTreeMap<u64, u32>,
     group_invites: BTreeMap<u64, PendingGroupInvite>,
@@ -325,6 +332,7 @@ impl SocialService {
             max_group_members,
             group_invite_ttl_ms: DEFAULT_GROUP_INVITE_TTL_MS,
             next_group_id: 1,
+            next_invite_id: 1,
             groups: BTreeMap::new(),
             member_group: BTreeMap::new(),
             group_invites: BTreeMap::new(),
@@ -755,15 +763,20 @@ impl SocialService {
             Some(group_id) => (group_id, false),
             None => (self.create_group(inviter_guid)?, true),
         };
+        // `(R)` Each invitation gets a fresh generation for the echoed dword, so a stale
+        // pop-up is distinguishable from a same-group replacement (the group id is not).
+        let invite_id = self.next_invite_id;
+        self.next_invite_id = self.next_invite_id.wrapping_add(1).max(1);
         self.group_invites.insert(
             target.character_guid,
             PendingGroupInvite {
                 group_id,
+                invite_id,
                 inviter_guid,
                 created_ms: now_ms,
             },
         );
-        let invite = encode_group_invite(group_id, &inviter, &target)?;
+        let invite = encode_group_invite(invite_id, &inviter, &target)?;
         let mut out = Vec::new();
         if created {
             // (R) First invite creates a volatile group; the client treats its one-member row as Solo/leader.
@@ -780,7 +793,7 @@ impl SocialService {
     pub fn respond_group_invite(
         &mut self,
         target_guid: u64,
-        group_id: u32,
+        invite_id: u32,
         accepted: bool,
         now_ms: u64,
     ) -> Result<Vec<SocialMessage>, SocialError> {
@@ -790,9 +803,10 @@ impl SocialService {
         let Some(invite) = self.group_invites.get(&target_guid).copied() else {
             return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
         };
-        if invite.group_id != group_id {
-            // The client echoes the group id from the pop-up. Refuse a stale pop-up
-            // rather than consuming a replacement invitation from another group.
+        if invite.invite_id != invite_id {
+            // `(R)` `00a95c50` wrote the pop-up dword; the client copies it through `00a8b640`
+            // and echoes it here. Compare the per-invitation generation: a stale pop-up must
+            // not consume a same-group replacement invitation, which reuses the group id.
             return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
         }
         let Some(group) = self.groups.get(&invite.group_id) else {
@@ -816,6 +830,8 @@ impl SocialService {
             // "already grouped", so use the existing no-group refusal.
             return Ok(vec![message(target_guid, encode_group_result(5, 1))]);
         }
+        // The server-built 40/4 notice carries the group id in the shared record; the
+        // per-invitation generation is only the client's echo token in 40/1.
         let group_data = encode_group_invite(invite.group_id, &inviter, &target.identity())?;
         self.group_invites.remove(&target_guid);
         if !accepted {
@@ -1526,9 +1542,12 @@ fn write_group_name_data(out: &mut Vec<u8>, name: &SocialName) -> Result<(), Soc
 }
 
 /// 40/1 reader `0093daf0` case 1 / `00921640`; client writer `00c235c0` + `00a95c50`.
-/// Two short fields, two guid/NameData pairs, group id, then five opaque dwords.
+/// Two short fields, two guid/NameData pairs, the echoed dword at +0x120, then five opaque
+/// dwords. `(R)` 40/1 puts the per-invitation generation in that slot (the pop-up is copied
+/// through `00a8b640` into the client's 40/4 answer); the server-built 40/4 notice passes the
+/// group id there instead. The original server meaning of the slot remains reconstructed.
 fn encode_group_invite(
-    group_id: u32,
+    echoed_id: u32,
     inviter: &SocialLists,
     target: &CharacterIdentity,
 ) -> Result<Vec<u8>, SocialError> {
@@ -1540,7 +1559,7 @@ fn encode_group_invite(
     write_group_name_data(&mut out, &inviter.name)?;
     out.extend_from_slice(&target.character_guid.to_le_bytes());
     write_group_name_data(&mut out, &target.name)?;
-    out.extend_from_slice(&group_id.to_le_bytes());
+    out.extend_from_slice(&echoed_id.to_le_bytes());
     out.extend_from_slice(
         &[0u32; 5]
             .into_iter()

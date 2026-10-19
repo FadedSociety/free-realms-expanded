@@ -2829,6 +2829,8 @@ enum SocialRequest {
     GroupInvite(SocialName),
     GroupLeave,
     GroupResponse {
+        /// (R) The historical group-id slot now carries the fresh invitation generation the
+        /// client copies from the 40/1 pop-up (+0x120) and echoes here.
         group_id: u32,
         accepted: bool,
     },

@@ -150,7 +150,7 @@ pub(super) fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
 }
 
 fn send(rig: &mut Rig, index: usize, packet: &[u8]) -> Vec<Delivery> {
-    rig.sessions[index].route_application(packet, &mut rig.world, 1_000)
+    send_at(rig, index, packet, 1_000)
 }
 
 fn route_server(server: &mut Server, key: SessionKey, packet: &[u8]) -> Vec<Delivery> {
@@ -206,7 +206,7 @@ fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
     out
 }
 
-fn response(from: usize, to: usize, group_id: u32, accepted: bool) -> Vec<u8> {
+fn response(from: usize, to: usize, invite_id: u32, accepted: bool) -> Vec<u8> {
     let mut out = group_header(4);
     out.extend_from_slice(&0i16.to_le_bytes());
     out.extend_from_slice(&0i16.to_le_bytes());
@@ -214,7 +214,7 @@ fn response(from: usize, to: usize, group_id: u32, accepted: bool) -> Vec<u8> {
     put_name(&mut out, from);
     out.extend_from_slice(&GUIDS[to].to_le_bytes());
     put_name(&mut out, to);
-    out.extend_from_slice(&group_id.to_le_bytes());
+    out.extend_from_slice(&invite_id.to_le_bytes());
     out.push(u8::from(accepted));
     out.extend_from_slice(
         &[0u32; 5]
@@ -288,6 +288,19 @@ fn send_at(rig: &mut Rig, index: usize, packet: &[u8], now_ms: u64) -> Vec<Deliv
     rig.sessions[index].route_application(packet, &mut rig.world, now_ms)
 }
 
+/// The per-invitation id the client copies from the 40/1 pop-up record and echoes in 40/4.
+fn invited_id(deliveries: &[Delivery], index: usize) -> u32 {
+    let delivery = deliveries
+        .iter()
+        .find(|delivery| {
+            delivery.recipient == SessionId(17 + index as u64) && family_sub(delivery) == (40, 1)
+        })
+        .expect("target received a 40/1 invite");
+    let bytes = inner(delivery);
+    let at = bytes.len() - 6 * 4;
+    u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap())
+}
+
 #[test]
 fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
     let mut rig = rig("party");
@@ -306,6 +319,7 @@ fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
     assert!(has(&invited, a, 40, 8));
     assert_eq!(result_for(&invited, a, 2), Some(0));
     assert!(has(&invited, b, 40, 1));
+    let b_invite = invited_id(&invited, b);
     let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
     let pending = rig.world.social.group_invitee(GUIDS[b]);
     assert_eq!(pending, Some((group_id, GUIDS[a])));
@@ -337,7 +351,7 @@ fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
     assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending);
 
     // 40/4 accept fans out the invitation notice, member row and full roster.
-    let accepted = send(&mut rig, b, &response(a, b, group_id, true));
+    let accepted = send(&mut rig, b, &response(a, b, b_invite, true));
     assert!(has(&accepted, a, 40, 4));
     assert!(has(&accepted, a, 40, 9));
     assert!(has(&accepted, a, 40, 8));
@@ -368,8 +382,9 @@ fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
     assert!(send(&mut rig, c, &chat(ChatChannel::Group)).is_empty());
 
     // Add C, then prove a non-leader cannot kick and the leader can.
-    send(&mut rig, a, &invite(a, c, group_id));
-    let accepted_c = send(&mut rig, c, &response(a, c, group_id, true));
+    let invited_c = send(&mut rig, a, &invite(a, c, group_id));
+    let c_invite = invited_id(&invited_c, c);
+    let accepted_c = send(&mut rig, c, &response(a, c, c_invite, true));
     assert!(has(&accepted_c, a, 40, 8));
     assert_eq!(
         rig.world.social.group_members(group_id),
@@ -412,15 +427,17 @@ fn interleaved_invites_cannot_overlap_membership_or_group_chat() {
     let (a, b, c) = (0, 1, 2);
 
     // A invited B, but B created a different party and C joined it first.
-    send(&mut rig, a, &invite(a, b, 0));
+    let invited_b = send(&mut rig, a, &invite(a, b, 0));
+    let a_invite = invited_id(&invited_b, b);
     let a_group = rig.world.social.group_of(GUIDS[a]).unwrap();
-    send(&mut rig, b, &invite(b, c, 0));
+    let invited_c = send(&mut rig, b, &invite(b, c, 0));
+    let b_invite = invited_id(&invited_c, c);
     let b_group = rig.world.social.group_of(GUIDS[b]).unwrap();
     assert_ne!(a_group, b_group);
-    send(&mut rig, c, &response(b, c, b_group, true));
+    send(&mut rig, c, &response(b, c, b_invite, true));
 
     // B's stale acceptance of A's invite must leave both parties untouched.
-    let refused = send(&mut rig, b, &response(a, b, a_group, true));
+    let refused = send(&mut rig, b, &response(a, b, a_invite, true));
     assert_eq!(result_for(&refused, b, 5), Some(1));
     assert_eq!(rig.world.social.group_of(GUIDS[a]), Some(a_group));
     assert_eq!(rig.world.social.group_of(GUIDS[b]), Some(b_group));
@@ -475,16 +492,33 @@ fn late_accept_is_refused_by_the_request_without_a_cleanup_tick() {
     let mut rig = rig("late-accept");
     let member = 0;
     let target = 1;
-    send_at(&mut rig, member, &invite(member, target, 0), 1_000);
+    let invited = send_at(&mut rig, member, &invite(member, target, 0), 1_000);
+    let invite_id = invited_id(&invited, target);
     let group_id = rig.world.social.group_of(GUIDS[member]).unwrap();
     let members_before = rig.world.social.group_members(group_id).unwrap().to_vec();
     let groups_before = GUIDS.map(|guid| rig.world.social.group_of(guid));
     let profiles_before = GUIDS.map(|guid| rig.world.social.profile(guid).cloned());
 
+    // A forged generation is refused while the invite is still fresh and consumes nothing.
+    let pending = rig.world.social.group_invitee(GUIDS[target]);
+    let forged = send_at(
+        &mut rig,
+        target,
+        &response(member, target, invite_id.wrapping_add(1), true),
+        2_000,
+    );
+    assert_eq!(result_for(&forged, target, 5), Some(3));
+    assert!(!has(&forged, member, 40, 4));
+    assert_eq!(rig.world.social.group_invitee(GUIDS[target]), pending);
+    assert_eq!(
+        rig.world.social.group_members(group_id),
+        Some(members_before.as_slice())
+    );
+
     let refused = send_at(
         &mut rig,
         target,
-        &response(member, target, group_id, true),
+        &response(member, target, invite_id, true),
         61_000,
     );
 
@@ -510,18 +544,21 @@ fn late_accept_is_refused_by_the_request_without_a_cleanup_tick() {
 fn replacement_invite_expires_the_previous_row_before_capacity_check() {
     let mut rig = rig("replacement");
     let (a, b, c) = (0, 1, 2);
-    send_at(&mut rig, a, &invite(a, b, 0), 1_000);
+    let first = send_at(&mut rig, a, &invite(a, b, 0), 1_000);
+    let old_invite = invited_id(&first, b);
     let old_group = rig.world.social.group_of(GUIDS[a]).unwrap();
 
     let replacement = send_at(&mut rig, c, &invite(c, b, 0), 61_000);
     assert_eq!(result_for(&replacement, c, 2), Some(0));
+    let new_invite = invited_id(&replacement, b);
+    assert_ne!(old_invite, new_invite);
     let replacement_group = rig.world.social.group_of(GUIDS[c]).unwrap();
     assert_eq!(
         rig.world.social.group_invitee(GUIDS[b]),
         Some((replacement_group, GUIDS[c]))
     );
 
-    let stale = send_at(&mut rig, b, &response(a, b, old_group, true), 61_001);
+    let stale = send_at(&mut rig, b, &response(a, b, old_invite, true), 61_001);
     assert_eq!(result_for(&stale, b, 5), Some(3));
     assert_eq!(
         rig.world.social.group_invitee(GUIDS[b]),
@@ -536,7 +573,7 @@ fn replacement_invite_expires_the_previous_row_before_capacity_check() {
         Some([GUIDS[c]].as_slice())
     );
 
-    let stale_decline = send_at(&mut rig, b, &response(a, b, old_group, false), 61_002);
+    let stale_decline = send_at(&mut rig, b, &response(a, b, old_invite, false), 61_002);
     assert_eq!(result_for(&stale_decline, b, 5), Some(3));
     assert!(!has(&stale_decline, a, 40, 4));
     assert!(!has(&stale_decline, b, 40, 4));
@@ -544,6 +581,62 @@ fn replacement_invite_expires_the_previous_row_before_capacity_check() {
         rig.world.social.group_invitee(GUIDS[b]),
         Some((replacement_group, GUIDS[c]))
     );
+
+    let accepted = send_at(&mut rig, b, &response(c, b, new_invite, true), 61_003);
+    assert!(has(&accepted, c, 40, 4));
+    assert_eq!(
+        rig.world.social.group_members(replacement_group),
+        Some([GUIDS[c], GUIDS[b]].as_slice())
+    );
+}
+
+#[test]
+fn same_group_reinvitation_binds_responses_to_the_new_generation() {
+    let mut rig = rig("reinvite-generation");
+    let (a, b) = (0, 1);
+    let first = send_at(&mut rig, a, &invite(a, b, 0), 1_000);
+    let stale_id = invited_id(&first, b);
+    let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
+
+    // The invite-side sweep drops the expired row; the same leader then invites the
+    // same target into the same live group, so the group id is unchanged.
+    let replacement = send_at(&mut rig, a, &invite(a, b, group_id), 61_000);
+    assert_eq!(result_for(&replacement, a, 2), Some(0));
+    let fresh_id = invited_id(&replacement, b);
+    assert_ne!(stale_id, fresh_id);
+    let pending = rig.world.social.group_invitee(GUIDS[b]);
+    assert_eq!(pending, Some((group_id, GUIDS[a])));
+    let members = rig.world.social.group_members(group_id).unwrap().to_vec();
+    let groups = GUIDS.map(|guid| rig.world.social.group_of(guid));
+    let profiles = GUIDS.map(|guid| rig.world.social.profile(guid).cloned());
+
+    // Both answers to the expired pop-up are refused without consuming the replacement.
+    for (accepted, now_ms) in [(false, 62_000), (true, 62_001)] {
+        let stale = send_at(&mut rig, b, &response(a, b, stale_id, accepted), now_ms);
+        assert_eq!(result_for(&stale, b, 5), Some(3));
+        assert!(!has(&stale, a, 40, 4));
+        assert!(!has(&stale, b, 40, 4));
+        assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending);
+        assert_eq!(
+            rig.world.social.group_members(group_id),
+            Some(members.as_slice())
+        );
+        assert_eq!(GUIDS.map(|guid| rig.world.social.group_of(guid)), groups);
+        assert_eq!(
+            GUIDS.map(|guid| rig.world.social.profile(guid).cloned()),
+            profiles
+        );
+    }
+
+    // The new pop-up's generation succeeds and joins the existing group.
+    let accepted = send_at(&mut rig, b, &response(a, b, fresh_id, true), 62_002);
+    assert!(has(&accepted, a, 40, 4));
+    assert!(has(&accepted, b, 40, 4));
+    assert_eq!(
+        rig.world.social.group_members(group_id),
+        Some([GUIDS[a], GUIDS[b]].as_slice())
+    );
+    assert_eq!(rig.world.social.group_invitee(GUIDS[b]), None);
 }
 
 #[test]
@@ -566,9 +659,10 @@ fn server_configuration_applies_bounded_group_invite_lifetime() {
 fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
     let mut rig = rig("disconnect");
     let (a, b) = (0, 1);
-    send(&mut rig, a, &invite(a, b, 0));
+    let invited = send(&mut rig, a, &invite(a, b, 0));
+    let invite_id = invited_id(&invited, b);
     let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
-    send(&mut rig, b, &response(a, b, group_id, true));
+    send(&mut rig, b, &response(a, b, invite_id, true));
     assert_eq!(
         chat_group(&rig.world, &rig.sessions[a]),
         Some(u64::from(group_id))
@@ -596,9 +690,10 @@ fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
 fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
     let (mut server, keys, scratch) = server_rig("end-session-owner");
     let (a, b) = (0, 1);
-    route_server(&mut server, keys[a], &invite(a, b, 0));
+    let invited = route_server(&mut server, keys[a], &invite(a, b, 0));
+    let invite_id = invited_id(&invited, b);
     let group_id = server.world.social.group_of(GUIDS[a]).unwrap();
-    route_server(&mut server, keys[b], &response(a, b, group_id, true));
+    route_server(&mut server, keys[b], &response(a, b, invite_id, true));
     assert_eq!(
         chat_group(&server.world, &server.sessions[&keys[a]]),
         Some(u64::from(group_id))
@@ -622,9 +717,10 @@ fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
 fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
     let (mut server, keys, scratch) = server_rig("end-session-stale");
     let (a, b) = (0, 1);
-    route_server(&mut server, keys[a], &invite(a, b, 0));
+    let invited = route_server(&mut server, keys[a], &invite(a, b, 0));
+    let invite_id = invited_id(&invited, b);
     let group_id = server.world.social.group_of(GUIDS[a]).unwrap();
-    route_server(&mut server, keys[b], &response(a, b, group_id, true));
+    route_server(&mut server, keys[b], &response(a, b, invite_id, true));
 
     let live_b_id = server.sessions[&keys[b]].id;
     let mut stale = Session::new(

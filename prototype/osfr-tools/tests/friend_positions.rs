@@ -44,6 +44,18 @@ fn name(guid: u64) -> SocialName {
     SocialName::new(who(guid), "Fixture").unwrap()
 }
 
+/// The 40/1 dword at +0x120 that the client copies from the pop-up and echoes in 40/4.
+fn invitation_id(messages: &[SocialMessage], target: u64) -> u32 {
+    let packet = messages
+        .iter()
+        .find(|message| {
+            message.recipient_guid == target && message.bytes.starts_with(&[40, 0, 1, 0])
+        })
+        .expect("target received a 40/1 invite");
+    let at = packet.bytes.len() - 6 * 4;
+    u32::from_le_bytes(packet.bytes[at..at + 4].try_into().unwrap())
+}
+
 /// Four online characters; every pair of `friends` is a mutual friendship.
 fn world(friends: &[(u64, u64)]) -> (SocialService, Directory) {
     let mut social = SocialService::new(5).unwrap();
@@ -72,12 +84,11 @@ fn world(friends: &[(u64, u64)]) -> (SocialService, Directory) {
 
 fn group(social: &mut SocialService, directory: &Directory, leader: u64, members: &[u64]) {
     for member in members {
-        social
+        let invited = social
             .invite_to_group(leader, &name(*member), directory, 0)
             .unwrap();
-        let group_id = social.group_of(leader).unwrap();
         social
-            .respond_group_invite(*member, group_id, true, 0)
+            .respond_group_invite(*member, invitation_id(&invited, *member), true, 0)
             .unwrap();
     }
 }
@@ -440,9 +451,10 @@ fn job_change_flag_survives_snapshots_and_dies_with_membership() {
     group(&mut social, &directory, A, &[B]);
     social.group_changing_job(B, true).unwrap();
     // C joins: the 40/8 snapshot still marks B as changing job.
-    social.invite_to_group(A, &name(C), &directory, 0).unwrap();
-    let group_id = social.group_of(A).unwrap();
-    let joined = social.respond_group_invite(C, group_id, true, 0).unwrap();
+    let invited_c = social.invite_to_group(A, &name(C), &directory, 0).unwrap();
+    let joined = social
+        .respond_group_invite(C, invitation_id(&invited_c, C), true, 0)
+        .unwrap();
     let snapshot = joined
         .iter()
         .find(|m| m.recipient_guid == C && m.bytes.starts_with(&[40, 0, 8, 0]))
@@ -457,9 +469,10 @@ fn job_change_flag_survives_snapshots_and_dies_with_membership() {
 
     // B leaves while flagged, then rejoins: the flag was cleared.
     social.leave_group(B).unwrap();
-    social.invite_to_group(A, &name(B), &directory, 0).unwrap();
-    let group_id = social.group_of(A).unwrap();
-    let rejoined = social.respond_group_invite(B, group_id, true, 0).unwrap();
+    let invited_b = social.invite_to_group(A, &name(B), &directory, 0).unwrap();
+    let rejoined = social
+        .respond_group_invite(B, invitation_id(&invited_b, B), true, 0)
+        .unwrap();
     let snapshot = rejoined
         .iter()
         .find(|m| m.recipient_guid == B && m.bytes.starts_with(&[40, 0, 8, 0]))
@@ -479,9 +492,10 @@ fn job_change_flag_survives_snapshots_and_dies_with_membership() {
     social.login(C).unwrap();
     social.leave_group(B).unwrap();
     assert_eq!(social.group_of(A), None);
-    social.invite_to_group(A, &name(C), &directory, 0).unwrap();
-    let group_id = social.group_of(A).unwrap();
-    let again = social.respond_group_invite(C, group_id, true, 0).unwrap();
+    let third = social.invite_to_group(A, &name(C), &directory, 0).unwrap();
+    let again = social
+        .respond_group_invite(C, invitation_id(&third, C), true, 0)
+        .unwrap();
     let snapshot = again
         .iter()
         .find(|m| m.recipient_guid == C && m.bytes.starts_with(&[40, 0, 8, 0]))
