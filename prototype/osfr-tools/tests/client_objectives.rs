@@ -506,7 +506,7 @@ fn another_quests_pending_turn_in_does_not_drop_a_client_completion() {
         .unwrap();
     assert!(turn_in.outbound.iter().any(|message| matches!(
         message,
-        OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id: 504 })
+        OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id: 504, .. })
     )));
     assert_eq!(engine.state().pending_turnin, Some(504));
 

@@ -662,9 +662,15 @@ fn named_target_npc_matches_active_quest_content_and_starts_turnin() {
         message,
         osfr_tools::quest_engine::OutboundMessage::Quest(
             osfr_tools::quest_engine::QuestMessage::QuestEnd {
-                quest_id: 3_000_021
+                quest_id: 3_000_021,
+                ..
             }
         )
     )));
-    assert!(!engine.begin_named_target_turnin(3_000_021).changed);
+    let reopened = engine.begin_named_target_turnin(3_000_021, 9_500_000_254);
+    assert!(!reopened.changed);
+    assert!(
+        reopened.outbound.is_empty(),
+        "one Talk must not queue a second 49/13"
+    );
 }

@@ -248,7 +248,16 @@ fn content_db_definitions_drive_accept_progress_and_turnin_packets() {
         &end.outbound[0],
         OutboundMessage::Quest(message) if message.encode_exact().is_none()
     ));
-    assert!(engine.empty_reward_quest_end_packet(101).is_none());
+    // The menu turn-in path sends the same builder, so its 49/13 names the NPC actor
+    // instead of putting the quest id in the actor slot.
+    assert!(matches!(
+        &end.outbound[0],
+        OutboundMessage::Quest(QuestMessage::QuestEnd {
+            quest_id: 101,
+            actor_id,
+        }) if *actor_id == giver
+    ));
+    assert!(engine.empty_reward_quest_end_packet(101, giver).is_none());
     let inventory = InventoryFixture::new();
     let (settled, state) = engine
         .finish_turnin(101, &inventory.reward_state())
@@ -281,17 +290,16 @@ fn empty_objective_quest_cannot_be_offered_or_turned_in() {
             .changed
     );
     // Packet encoding remains independently testable for historical snapshots.
-    let packet = engine.empty_reward_quest_end_packet(3_000_021).unwrap();
+    let packet = engine
+        .empty_reward_quest_end_packet(3_000_021, giver)
+        .unwrap();
     assert_eq!(packet.len(), 99);
-    assert_eq!(&packet[..10], &[49, 0, 13, 0, 0, 0, 0xd5, 0xc6, 0x2d, 0]);
-    // Reply/end-screen id at offset 14; everything else after the header is zero.
+    assert_eq!(&packet[..6], &[49, 0, 13, 0, 0, 0]);
+    // Client reader 0x00c7b990 takes the actor as one 8-byte value, then the quest id
+    // that 49/14 sends back, the end text and an animation.
+    assert_eq!(&packet[6..14], &giver.to_le_bytes());
     assert_eq!(&packet[14..18], &3_000_021_i32.to_le_bytes());
-    assert!(
-        packet[10..14]
-            .iter()
-            .chain(&packet[18..])
-            .all(|byte| *byte == 0)
-    );
+    assert!(packet[18..].iter().all(|byte| *byte == 0));
 }
 
 #[test]
@@ -748,7 +756,10 @@ fn source_tagged_opening_fixture_matches_the_existing_seventeen_stage_engine() {
 fn protocol_message_builders_leave_contextual_quest_end_unencoded() {
     let offer = QuestMessage::QuestInfo { quest_id: 1 };
     let add = QuestMessage::QuestAdd { quest_id: 1 };
-    let end = QuestMessage::QuestEnd { quest_id: 1 };
+    let end = QuestMessage::QuestEnd {
+        quest_id: 1,
+        actor_id: 7,
+    };
     assert_eq!(offer.opcode(), (49, 1));
     assert_eq!(add.opcode(), (49, 3));
     assert_eq!(end.opcode(), (49, 13));

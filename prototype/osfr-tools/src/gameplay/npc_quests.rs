@@ -146,13 +146,13 @@ impl Gameplay {
                     out.replies.push(packet);
                 }
                 crate::quest_engine::OutboundMessage::Quest(
-                    crate::quest_engine::QuestMessage::QuestEnd { quest_id },
+                    crate::quest_engine::QuestMessage::QuestEnd { quest_id, actor_id },
                 ) => {
                     let packet = self
                         .npc_quests
                         .as_ref()
                         .ok_or_else(|| invalid("NPC quest engine is unavailable"))?
-                        .quest_end_packet(quest_id)?;
+                        .quest_end_packet(quest_id, actor_id)?;
                     out.replies.push(packet);
                 }
                 crate::quest_engine::OutboundMessage::Quest(message) => {
@@ -273,6 +273,17 @@ impl Gameplay {
             }
         }
         Ok(())
+    }
+
+    /// Shared-field path: the same saved end screen, but a packet failure is logged for this
+    /// viewer instead of faulting the shared tick.
+    pub(super) fn append_shared_pending_end_screen(&self, packets: &mut Vec<Vec<u8>>) {
+        if let Err(error) = self.append_pending_turnin_screen(packets) {
+            npc_event(serde_json::json!({
+                "event": "pending_end_screen_refused",
+                "reason": error.to_string()
+            }));
+        }
     }
 
     pub(super) fn append_npc_quest_login_sync(&mut self, out: &mut Outcome) -> io::Result<()> {

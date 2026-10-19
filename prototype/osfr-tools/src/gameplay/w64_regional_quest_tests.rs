@@ -1174,7 +1174,7 @@ fn native_save_samantha_uses_localized_quest_offer_and_reply_state() {
     assert!(direct_talk.outbound.iter().any(|message| matches!(
         message,
         crate::quest_engine::OutboundMessage::Quest(
-            crate::quest_engine::QuestMessage::QuestEnd { quest_id }
+            crate::quest_engine::QuestMessage::QuestEnd { quest_id, .. }
         ) if *quest_id == INTRODUCE_YOURSELF_ID
     )));
 
@@ -1204,14 +1204,54 @@ fn native_save_samantha_uses_localized_quest_offer_and_reply_state() {
     let chosen = game
         .handle_in_world(&choose_quest_row(), &character, 1_007)
         .unwrap();
+    let end_screens: Vec<_> = chosen
+        .replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[49, 0, 13, 0]))
+        .collect();
+    assert_eq!(
+        end_screens.len(),
+        1,
+        "3000021 is both a named target and a Talk completion; it must queue one end screen"
+    );
     assert!(
-        chosen
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[49, 0, 13, 0, 0, 0])
-                && packet.len() == 99
-                && u64::from_le_bytes(packet[6..14].try_into().unwrap()) == target_id
-                && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == INTRODUCE_YOURSELF_ID)
+        end_screens[0].len() == 99
+            && u64::from_le_bytes(end_screens[0][6..14].try_into().unwrap()) == target_id
+            && u32::from_le_bytes(end_screens[0][14..18].try_into().unwrap())
+                == INTRODUCE_YOURSELF_ID
+    );
+    // The saved opener is the referral target, not the quest's giver; a reconnect must
+    // replay the 49/13 naming the target so the client's actor lookup finds him.
+    assert_eq!(
+        game.state()
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .pending_turnin_actor,
+        Some(target_id)
+    );
+    let mut reconnected = Gameplay::load(&reference, Some(game.state())).unwrap();
+    reconnected
+        .bind_npc_quest_catalogue(&content, 1)
+        .expect("reconnected quest content binds");
+    reconnected
+        .initialize_world(&character, 1_007)
+        .expect("reconnected gameplay initializes");
+    let restored = reconnected
+        .update_npc_visibility(&character)
+        .expect("reconnected NPC visibility updates");
+    let restored_screen = restored
+        .iter()
+        .find(|packet| packet.starts_with(&[49, 0, 13, 0]))
+        .expect("reconnect must reopen the pending end screen at the target");
+    assert_eq!(
+        u64::from_le_bytes(restored_screen[6..14].try_into().unwrap()),
+        target_id,
+        "the recovered screen names the actor that opened it, not the giver"
+    );
+    assert_eq!(
+        u32::from_le_bytes(restored_screen[14..18].try_into().unwrap()),
+        INTRODUCE_YOURSELF_ID
     );
     let dialogue = talk
         .replies

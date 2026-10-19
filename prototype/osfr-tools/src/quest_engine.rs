@@ -408,8 +408,33 @@ pub struct QuestState {
     pub quests: BTreeMap<u32, QuestProgress>,
     pub pending_offer: Option<u32>,
     pub pending_turnin: Option<u32>,
+    /// Content NPC key that opened `pending_turnin`; it may be a Talk objective target
+    /// rather than the formal `turnin_npc_id`. Missing on older saves: the definition's
+    /// turn-in NPC is the fallback. Cleared with `pending_turnin`.
+    #[serde(default)]
+    pub pending_turnin_actor: Option<u64>,
     pub selected_quest_id: Option<u32>,
     pub auto_switch_selected: bool,
+}
+
+impl QuestState {
+    /// Open a completed quest's end-screen step, recording the actor that opened it so a
+    /// reconnect or a second Talk can name that actor in 49/13.
+    fn open_pending_turnin(&mut self, quest_id: u32, actor_id: u64) {
+        self.pending_turnin = Some(quest_id);
+        self.pending_turnin_actor = Some(actor_id);
+    }
+
+    fn clear_pending_turnin(&mut self) {
+        self.pending_turnin = None;
+        self.pending_turnin_actor = None;
+    }
+
+    /// The actor that opened the pending screen; older saves fall back to the definition's
+    /// formal turn-in NPC.
+    fn turnin_actor(&self, turnin_npc_id: u64) -> u64 {
+        self.pending_turnin_actor.unwrap_or(turnin_npc_id)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -459,6 +484,7 @@ pub enum QuestMessage {
     },
     QuestEnd {
         quest_id: u32,
+        actor_id: u64,
     },
     QuestComplete {
         quest_id: u32,
@@ -679,17 +705,15 @@ pub struct QuestEngine {
     poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
 }
 
-/// 49/13 fields before the reward bundle: an 8-byte turn-in actor, then three
-/// dwords. `ShowQuestEndScreen` (`00a95420`) receives the actor pair first,
-/// the quest id the "Thanks!" button sends back in 49/14 second, the NPC
-/// end-text locale id third, and an animation fourth. The live Talk and login
-/// recovery paths replace the compatibility placeholder in the actor pair with
-/// the saved turn-in NPC.
-fn put_end_screen_ids(bytes: &mut Vec<u8>, quest_id: i32, end_text_string_id: u32) {
+/// 49/13 fields before the reward bundle: the turn-in actor as an 8-byte value, then three
+/// dwords. `ShowQuestEndScreen` (`00a95420`) receives the actor pair first, the quest id
+/// the "Thanks!" button sends back in 49/14 second, the NPC end-text locale id third, and
+/// an animation fourth. The client resolves the actor through its actor table (`00984960`),
+/// so this server's spawned actor GUID is the content NPC key used here.
+fn put_end_screen_ids(bytes: &mut Vec<u8>, quest_id: i32, actor_id: u64, end_text: u32) {
+    bytes.extend(actor_id.to_le_bytes());
     put_i32(bytes, quest_id);
-    bytes.extend([0; 4]);
-    put_i32(bytes, quest_id);
-    bytes.extend(end_text_string_id.to_le_bytes());
+    bytes.extend(end_text.to_le_bytes());
     bytes.extend([0; 4]);
 }
 
@@ -1087,6 +1111,7 @@ impl QuestEngine {
             quests: BTreeMap::new(),
             pending_offer: None,
             pending_turnin: None,
+            pending_turnin_actor: None,
             selected_quest_id: None,
             auto_switch_selected: false,
         });
@@ -1160,7 +1185,7 @@ impl QuestEngine {
 
     /// Build only the empty-reward 49/13 case. The native reader consumes five dwords, the
     /// 69-byte empty bundle base, and a float; meanings/defaults beyond the quest ID are (R).
-    pub fn empty_reward_quest_end_packet(&self, quest_id: u32) -> Option<Vec<u8>> {
+    pub fn empty_reward_quest_end_packet(&self, quest_id: u32, actor_id: u64) -> Option<Vec<u8>> {
         let reward = &self.definitions.get(&quest_id)?.reward;
         if reward.coins != 0
             || !reward.items.is_empty()
@@ -1173,6 +1198,7 @@ impl QuestEngine {
         put_end_screen_ids(
             &mut bytes,
             quest_id.try_into().ok()?,
+            actor_id,
             self.end_text_string_id(quest_id).unwrap_or(0),
         );
         bytes.extend([0; 69]);
@@ -1181,13 +1207,13 @@ impl QuestEngine {
     }
 
     /// Build the populated quest end screen from the saved definition (R field defaults).
-    pub fn quest_end_packet(&self, quest_id: u32) -> io::Result<Vec<u8>> {
+    pub fn quest_end_packet(&self, quest_id: u32, actor_id: u64) -> io::Result<Vec<u8>> {
         let reward = &self
             .definitions
             .get(&quest_id)
             .ok_or_else(|| invalid("unknown quest end definition"))?
             .reward;
-        if let Some(packet) = self.empty_reward_quest_end_packet(quest_id) {
+        if let Some(packet) = self.empty_reward_quest_end_packet(quest_id, actor_id) {
             return Ok(packet);
         }
 
@@ -1197,6 +1223,7 @@ impl QuestEngine {
             quest_id
                 .try_into()
                 .map_err(|_| invalid("quest id exceeds i32"))?,
+            actor_id,
             self.end_text_string_id(quest_id).unwrap_or(0),
         );
         bytes.extend(encode_quest_reward_bundle(reward)?);
@@ -1432,6 +1459,13 @@ impl QuestEngine {
             }
         }
         Ok(packets)
+    }
+
+    /// The actor that must be visible before the pending 49/13 can open, if one is pending.
+    pub fn pending_turnin_actor(&self) -> Option<u64> {
+        let quest_id = self.state.pending_turnin?;
+        let fallback = self.definitions.get(&quest_id)?.turnin_npc_id;
+        Some(self.state.turnin_actor(fallback))
     }
 
     /// Persist the client-selected active quest after decoding 47/12 (R policy).
@@ -1808,16 +1842,24 @@ impl QuestEngine {
                 && self.state.pending_turnin.is_none()
                 && (event_is_talk_to(&event, definition.turnin_npc_id) || named_objective_target)
             {
-                self.state.pending_turnin = Some(quest_id);
-                outcome
-                    .outbound
-                    .push(OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id }));
+                // Both conditions are Talk-only, so this records the NPC the player talked to.
+                if let QuestEvent::TalkToNpc { npc_id: actor_id } = &event {
+                    self.state.open_pending_turnin(quest_id, *actor_id);
+                    outcome
+                        .outbound
+                        .push(OutboundMessage::Quest(QuestMessage::QuestEnd {
+                            quest_id,
+                            actor_id: *actor_id,
+                        }));
+                }
             }
         }
         Ok(outcome)
     }
 
     /// Start the 49/13 end-screen step. The 49/14 reply must call `finish_turnin`.
+    /// Repeating it at the actor that opened an already pending screen re-sends the
+    /// end screen without changing state (end-screen recovery).
     pub fn begin_turnin(&mut self, quest_id: u32, npc_id: u64) -> QuestOutcome {
         let Some(definition) = self.definitions.get(&quest_id) else {
             return denied(QuestDenial::Unavailable);
@@ -1825,25 +1867,46 @@ impl QuestEngine {
         if npc_id != definition.turnin_npc_id {
             return denied(QuestDenial::WrongTurnin);
         }
-        self.begin_ready_turnin(quest_id)
+        if self.state.pending_turnin.is_some() {
+            return self.reopen_turnin(quest_id, npc_id);
+        }
+        self.begin_ready_turnin(quest_id, npc_id)
     }
 
     /// Begin a completed quest turn-in after NPC content identifies the named target (R policy).
-    pub fn begin_named_target_turnin(&mut self, quest_id: u32) -> QuestOutcome {
-        self.begin_ready_turnin(quest_id)
+    /// A Talk that already opened the screen goes through [`Self::on_event`] alone; a second
+    /// explicit begin must not queue another 49/13.
+    pub fn begin_named_target_turnin(&mut self, quest_id: u32, npc_id: u64) -> QuestOutcome {
+        if self.state.pending_turnin.is_some() {
+            return denied(QuestDenial::Unavailable);
+        }
+        self.begin_ready_turnin(quest_id, npc_id)
     }
 
-    fn begin_ready_turnin(&mut self, quest_id: u32) -> QuestOutcome {
-        if let Some(pending) = self.state.pending_turnin {
-            if pending != quest_id {
-                return denied(QuestDenial::Unavailable);
-            }
-            // Re-open the same saved/live end screen without changing state. This also covers
-            // clients that reconnect without restoring the window or close it by accident.
-            return QuestOutcome {
-                outbound: vec![OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id })],
-                ..QuestOutcome::default()
-            };
+    /// Re-send the already pending screen for `quest_id` when `npc_id` is the actor that
+    /// opened it. A different actor or quest returns a denial with no outbound (recovery).
+    pub fn reopen_turnin(&self, quest_id: u32, npc_id: u64) -> QuestOutcome {
+        if self.state.pending_turnin != Some(quest_id) {
+            return denied(QuestDenial::Unavailable);
+        }
+        let Some(actor_id) = self.pending_turnin_actor() else {
+            return denied(QuestDenial::Unavailable);
+        };
+        if npc_id != actor_id {
+            return denied(QuestDenial::Unavailable);
+        }
+        QuestOutcome {
+            outbound: vec![OutboundMessage::Quest(QuestMessage::QuestEnd {
+                quest_id,
+                actor_id,
+            })],
+            ..QuestOutcome::default()
+        }
+    }
+
+    fn begin_ready_turnin(&mut self, quest_id: u32, npc_id: u64) -> QuestOutcome {
+        if self.state.pending_turnin.is_some() {
+            return denied(QuestDenial::Unavailable);
         }
         let Some(definition) = self.definitions.get(&quest_id) else {
             return denied(QuestDenial::Unavailable);
@@ -1857,10 +1920,13 @@ impl QuestEngine {
         {
             return denied(QuestDenial::Incomplete);
         }
-        self.state.pending_turnin = Some(quest_id);
+        self.state.open_pending_turnin(quest_id, npc_id);
         QuestOutcome {
             changed: true,
-            outbound: vec![OutboundMessage::Quest(QuestMessage::QuestEnd { quest_id })],
+            outbound: vec![OutboundMessage::Quest(QuestMessage::QuestEnd {
+                quest_id,
+                actor_id: npc_id,
+            })],
             ..QuestOutcome::default()
         }
     }
@@ -1881,7 +1947,7 @@ impl QuestEngine {
         let grant_key = format!("quest:{}:{}", self.character_id, quest_id);
         let (next_reward_state, reward_packets) =
             rewards::apply_grant(reward_state, &definition.reward, &grant_key)?;
-        self.state.pending_turnin = None;
+        self.state.clear_pending_turnin();
         self.state
             .quests
             .get_mut(&quest_id)
@@ -2337,6 +2403,9 @@ fn repair_counters(
         }
         available.is_some() || progress.status == QuestStatus::Completed
     });
+    if state.pending_turnin.is_none() {
+        state.pending_turnin_actor = None;
+    }
 }
 
 fn validate_state(

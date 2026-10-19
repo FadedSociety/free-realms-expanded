@@ -30,41 +30,36 @@ impl Gameplay {
         Ok(packets)
     }
 
-    /// Reopen a saved pending turn-in only after its speaker's 35/2 spawn is in the same
-    /// batch. `ShowQuestEndScreen` (0x00A95420) resolves the packet's actor through the
+    /// Reopen a saved pending turn-in only in a batch that also sends its speaker's 35/2
+    /// AddNpc. `ShowQuestEndScreen` (0x00A95420) resolves the packet's actor through the
     /// client actor table first and does not retry when it is absent; sending the 49/13
     /// from login synchronization put it before every visibility spawn.
-    fn append_pending_turnin_screen(&self, packets: &mut Vec<Vec<u8>>) -> io::Result<()> {
-        if packets.is_empty() {
-            return Ok(());
-        }
+    pub(super) fn append_pending_turnin_screen(
+        &self,
+        packets: &mut Vec<Vec<u8>>,
+    ) -> io::Result<()> {
         let Some(engine) = self.npc_quests.as_ref() else {
+            return Ok(());
+        };
+        let Some(actor_id) = engine.pending_turnin_actor() else {
             return Ok(());
         };
         let Some(quest_id) = engine.state().pending_turnin else {
             return Ok(());
         };
-        let Some(content_key) = engine.turnin_npc_id(quest_id) else {
-            return Ok(());
-        };
-        let Some(runtime_guid) = packets.iter().find_map(|packet| {
-            let spawn = crate::startup_world::parse_add_npc(packet).ok()?;
-            let same_npc = spawn.actor_id == content_key
+        let Some(runtime_actor) = packets.iter().find_map(|packet| {
+            let npc = crate::startup_world::parse_add_npc(packet).ok()?;
+            let same_npc = npc.actor_id == actor_id
                 || self
                     .npc_visibility
                     .as_ref()
-                    .and_then(|visibility| visibility.content_key(spawn.actor_id))
-                    == Some(content_key);
-            same_npc.then_some(spawn.actor_id)
+                    .and_then(|visibility| visibility.content_key(npc.actor_id))
+                    == Some(actor_id);
+            same_npc.then_some(npc.actor_id)
         }) else {
             return Ok(());
         };
-        let mut screen = engine.quest_end_packet(quest_id)?;
-        if screen.len() < 14 {
-            return Ok(());
-        }
-        screen[6..14].copy_from_slice(&runtime_guid.to_le_bytes());
-        packets.push(screen);
+        packets.push(engine.quest_end_packet(quest_id, runtime_actor)?);
         Ok(())
     }
 
@@ -453,14 +448,22 @@ impl Gameplay {
                         }
                         self.append_npc_quest_outcome(quest, &mut out)?;
                     }
+                    let pending_after = self
+                        .npc_quests
+                        .as_ref()
+                        .and_then(|engine| engine.state().pending_turnin);
                     if let Some(quest_id) = pending_before {
+                        // Reopening is allowed only at the actor that opened the screen; a
+                        // different actor gets no packet and the pending state is untouched.
                         let result = self
                             .npc_quests
-                            .as_mut()
+                            .as_ref()
                             .expect("pending turn-in requires the NPC quest engine")
-                            .begin_turnin(quest_id, key);
+                            .reopen_turnin(quest_id, key);
                         self.append_npc_quest_outcome(result, &mut out)?;
-                    } else {
+                    } else if pending_after.is_none() {
+                        // `on_event` opens the screen itself when this Talk completed the
+                        // quest; beginning the same turn-in again would queue a second 49/13.
                         let target_quest = self.npc_quests.as_ref().and_then(|engine| {
                             self.npc_interaction
                                 .as_ref()?
@@ -471,7 +474,7 @@ impl Gameplay {
                                 .npc_quests
                                 .as_mut()
                                 .unwrap()
-                                .begin_named_target_turnin(quest_id);
+                                .begin_named_target_turnin(quest_id, key);
                             self.append_npc_quest_outcome(result, &mut out)?;
                         }
                     }
@@ -497,8 +500,6 @@ impl Gameplay {
                             .first()
                             .and_then(|packet| packet.get(14..18))
                             .map(|id| u32::from_le_bytes(id.try_into().unwrap()));
-                        let mut held = held;
-                        set_end_screen_actor(&mut held, runtime_guid);
                         match quest_id {
                             Some(quest_id) => {
                                 self.pending_quest_choice = Some((runtime_guid, key, quest_id));
@@ -643,7 +644,6 @@ impl Gameplay {
                         )
                     });
                     self.append_npc_quest_outcome(quest, &mut out)?;
-                    set_end_screen_actor(&mut out.replies, runtime_guid);
                     npc_event(serde_json::json!({
                         "event": "npc_select",
                         "guid": runtime_guid,
@@ -1016,19 +1016,4 @@ pub(super) fn quest_offer_packet_with(
         trailing_float_bits: 0,
         trailing_flags: [false; 2],
     })
-}
-
-/// 49/13 offset 6 is the actor GUID, not the quest id: `ShowQuestEndScreen`
-/// (`00a95420`) looks it up in the actor table (`00984960`) to expand
-/// `[*player*]` in the end text and to play the NPC animation. With the quest
-/// id there, native run 224000 showed `[*player*]` literally. Both live NPC
-/// paths (Talk and the menu TurnInQuest choice) set the runtime actor here;
-/// the reconnect replay patches the same field in `append_pending_turnin_screen`.
-fn set_end_screen_actor(packets: &mut [Vec<u8>], actor_id: u64) {
-    for packet in packets
-        .iter_mut()
-        .filter(|packet| packet.starts_with(&[49, 0, 13, 0]) && packet.len() >= 14)
-    {
-        packet[6..14].copy_from_slice(&actor_id.to_le_bytes());
-    }
 }

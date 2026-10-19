@@ -65,9 +65,30 @@ fn state(id: u32, counts: Vec<u32>, status: QuestStatus) -> QuestState {
         quests: BTreeMap::from([(id, QuestProgress { status, counts })]),
         pending_offer: None,
         pending_turnin: None,
+        pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
     }
+}
+
+#[test]
+fn older_save_without_the_pending_actor_falls_back_to_the_turnin_npc() {
+    let mut saved = state(1, vec![2], QuestStatus::Active);
+    saved.pending_turnin = Some(1);
+    // A save written before F175 has no `pending_turnin_actor` key at all.
+    let mut older = serde_json::to_value(&saved).unwrap();
+    assert!(
+        older
+            .as_object_mut()
+            .unwrap()
+            .remove("pending_turnin_actor")
+            .is_some()
+    );
+    let older: QuestState = serde_json::from_value(older).unwrap();
+    assert_eq!(older.pending_turnin_actor, None);
+    let engine = QuestEngine::new(1, vec![definition(1, 1)], eligibility(1), Some(older)).unwrap();
+    assert_eq!(engine.state().pending_turnin, Some(1));
+    assert_eq!(engine.pending_turnin_actor(), Some(1));
 }
 
 #[test]

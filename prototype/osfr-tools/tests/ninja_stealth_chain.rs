@@ -60,6 +60,7 @@ fn completed_through_stolen_away(character_id: u64, stealth: Option<QuestProgres
         quests,
         pending_offer: None,
         pending_turnin: None,
+        pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
     }
@@ -336,6 +337,11 @@ fn return_to_ty_settles_once() {
         .iter()
         .find(|body| body.starts_with(&[49, 0, 13, 0]))
         .expect("Talk choice opens the 49/13 end screen");
+    assert_eq!(
+        u64::from_le_bytes(end[6..14].try_into().unwrap()),
+        TY,
+        "the 49/13 names the NPC that opened the screen, not the quest id"
+    );
     assert_eq!(
         u32::from_le_bytes(end[14..18].try_into().unwrap()),
         STEALTH_REFERRAL

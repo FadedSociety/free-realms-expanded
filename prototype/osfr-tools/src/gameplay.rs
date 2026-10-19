@@ -405,10 +405,13 @@ impl Gameplay {
         fields: &[crate::world::NpcInterest],
         known: &BTreeSet<u64>,
     ) -> io::Result<(BTreeSet<u64>, Vec<Vec<u8>>)> {
-        self.npc_visibility
+        let (visible, mut packets) = self
+            .npc_visibility
             .as_ref()
             .unwrap_or(&crate::world::NpcVisibility::default())
-            .shared_view(character.zone_id, character.position, fields, known)
+            .shared_view(character.zone_id, character.position, fields, known)?;
+        self.append_shared_pending_end_screen(&mut packets);
+        Ok((visible, packets))
     }
     pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
         self.encounter

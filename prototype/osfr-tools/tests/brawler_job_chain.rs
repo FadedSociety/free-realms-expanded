@@ -2,12 +2,12 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
-    quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestStatus},
+    quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestProgress, QuestStatus},
     startup_world,
 };
 use serde_json::Value;
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
 };
@@ -120,14 +120,19 @@ fn assert_refusal_changes_nothing(
 }
 
 fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool {
-    packet.len() >= 6
-        && packet[..2] == family.to_le_bytes()
-        && packet[2..4] == subtype.to_le_bytes()
-        && id.is_none_or(|id| {
-            (packet.len() >= 10 && u32::from_le_bytes(packet[6..10].try_into().unwrap()) == id)
-                || (packet.len() >= 18
-                    && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == id)
-        })
+    if packet.len() < 6
+        || packet[..2] != family.to_le_bytes()
+        || packet[2..4] != subtype.to_le_bytes()
+    {
+        return false;
+    }
+    let Some(id) = id else { return true };
+    // 49/13 carries the turn-in actor at 6..14 and the reply quest id at 14..18;
+    // every other used family/subtype carries its id at 6..10.
+    let offset = if (family, subtype) == (49, 13) { 14 } else { 6 };
+    packet
+        .get(offset..offset + 4)
+        .is_some_and(|bytes| u32::from_le_bytes(bytes.try_into().unwrap()) == id)
 }
 
 fn gateway_login() -> Vec<u8> {
@@ -231,7 +236,12 @@ fn interact_npc(game: &mut Gameplay, character: &CharacterState, npc_id: u64, no
         .unwrap_or_else(|| panic!("NPC {npc_id} did not open its menu"))
 }
 
-fn talk(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) {
+fn talk(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    npc_id: u64,
+    now: u64,
+) -> osfr_tools::gameplay::Outcome {
     let _ = interact_npc(game, character, npc_id, now);
     let dialogue = game
         .handle_in_world(&npc_select(npc_id, 1), character, now + 1)
@@ -243,6 +253,7 @@ fn talk(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) 
             .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
         "NPC {npc_id} did not open dialogue"
     );
+    dialogue
 }
 
 fn turn_in_option(menu: &[u8], title_string_id: u32) -> i32 {
@@ -316,14 +327,30 @@ fn open_end_screen(
     talk(game, character, npc_id, *now);
     *now += 100;
     let chosen = choose_quest_row(game, character, *now);
-    let end = chosen
+    let end_screens: Vec<_> = chosen
         .replies
         .into_iter()
-        .find(|packet| has_family(packet, 49, 13, Some(quest_id)))
-        .expect("the completed quest opens its end screen");
+        .filter(|packet| has_family(packet, 49, 13, Some(quest_id)))
+        .collect();
+    assert_eq!(
+        end_screens.len(),
+        1,
+        "one Talk must queue exactly one 49/13 end screen"
+    );
+    let end = end_screens.into_iter().next().unwrap();
     assert_eq!(
         game.state().npc_quests.unwrap().pending_turnin,
         Some(quest_id)
+    );
+    assert_eq!(
+        u64::from_le_bytes(end[6..14].try_into().unwrap()),
+        npc_id,
+        "the end screen names the NPC that opened it"
+    );
+    assert_eq!(
+        u32::from_le_bytes(end[14..18].try_into().unwrap()),
+        quest_id,
+        "the third dword is the quest id 49/14 sends back"
     );
     end
 }
@@ -594,6 +621,36 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
         94_295,
         &mut now,
     );
+    // Another NPC must neither reopen nor consume the pending screen. C3 is given by
+    // Carlos but completed at Jones; the saved opener is Jones, not the formal giver.
+    character.position = carlos;
+    let before_wrong_actor = saved(&game);
+    let wrong_actor = talk(&mut game, &character, CARLOS, now + 1);
+    assert!(!wrong_actor.changed);
+    assert!(
+        !wrong_actor
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 13, 0])),
+        "a different NPC must not reopen the pending end screen"
+    );
+    // The 49/13 rides the dialog choice, so the choice must not release it either.
+    let refused_choice = game
+        .handle_in_world(&dialogue_choice(QUEST_CHOICE), &character, now + 2)
+        .expect("the wrong actor's dialog choice is valid");
+    assert!(
+        !refused_choice
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 13, 0])),
+        "a different NPC must not queue the pending end screen"
+    );
+    assert_eq!(
+        saved(&game),
+        before_wrong_actor,
+        "a different NPC changed the pending turn-in"
+    );
+    character.position = jones;
     // C3's exact five-coin payout is asserted by `finish_turnin`; the review of
     // c65b2b2 found the old test only checked the chapter total.
     finish_turnin(&mut game, &character, REFERRAL_TO_JONES, &mut now);
@@ -815,6 +872,65 @@ fn unoffered_menu_choice_changes_nothing_and_keeps_the_menu_open() {
             .iter()
             .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
         "a refused choice must not consume the open menu"
+    );
+}
+
+#[test]
+fn shared_npc_view_replays_pending_end_screen_after_the_actor_spawn() {
+    // Production fans NPC AddNpc packets out from the shared tick, not from
+    // `update_npc_visibility`, so the replay must ride that same batch.
+    let (game, _) = fresh_game();
+    let mut state = game.state();
+    let quests = state.npc_quests.as_mut().unwrap();
+    quests.quests.insert(
+        REFERRAL_TO_JONES,
+        QuestProgress {
+            status: QuestStatus::Active,
+            counts: vec![1],
+        },
+    );
+    quests.pending_turnin = Some(REFERRAL_TO_JONES);
+    quests.pending_turnin_actor = Some(JONES);
+    let mut game = load_game(Some(state));
+    game.take_shared_fields()
+        .expect("the shared field runtime is available");
+    let character = character_at(npc_position("cobblestone_village.json", JONES));
+    let known = BTreeSet::new();
+    let (visible, packets) = game
+        .shared_npc_view(&character, &[], &known)
+        .expect("shared NPC view builds");
+    let actor_spawn = packets
+        .iter()
+        .position(|packet| {
+            packet.starts_with(&[35, 0, 2, 0])
+                && startup_world::parse_add_npc(packet).is_ok_and(|npc| npc.actor_id == JONES)
+        })
+        .expect("the turn-in actor is spawned");
+    let end_screen = packets
+        .iter()
+        .position(|packet| packet.starts_with(&[49, 0, 13, 0]))
+        .expect("the shared tick reopens the pending end screen");
+    assert!(
+        actor_spawn < end_screen,
+        "the shared replay must follow the actor AddNpc"
+    );
+    assert_eq!(
+        u64::from_le_bytes(packets[end_screen][6..14].try_into().unwrap()),
+        JONES,
+        "the shared replay names the actor that opened the screen"
+    );
+    assert_eq!(
+        u32::from_le_bytes(packets[end_screen][14..18].try_into().unwrap()),
+        REFERRAL_TO_JONES
+    );
+    let (_, again) = game
+        .shared_npc_view(&character, &[], &visible)
+        .expect("known actors do not replay");
+    assert!(
+        !again
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 13, 0])),
+        "the replay fires once per visibility transition"
     );
 }
 
