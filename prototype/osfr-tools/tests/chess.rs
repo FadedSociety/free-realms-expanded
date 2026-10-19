@@ -1,7 +1,8 @@
 use chess::{ChessMove, ChessParticipant, ChessTables, Kind, Mode, Side, Status, payload_packet};
 use inventory::Inventory;
 use minigame::{MinigameRuns, RunMode, RunSpec, RunState};
-use osfr_tools::{chess, inventory, minigame, profiles, rewards};
+use osfr_tools::chess_service::{ChessContent, ChessRewardLedger, ChessService};
+use osfr_tools::{chess, chess_service, inventory, minigame, profiles, rewards};
 use profiles::ProfileState;
 use rewards::{RewardDisplay, RewardGrant, RewardState};
 use serde_json::json;
@@ -651,6 +652,7 @@ fn content_skill_keeps_the_server_reply_path() {
             },
             Side::White,
             77,
+            chess::DEFAULT_NEAR_EQUAL_MARGIN,
         )
         .unwrap();
     send(&mut tables, 9, 41, 901, "OnConnectMsg");
@@ -729,4 +731,518 @@ fn chess_mode_and_move_encoding_cover_client_castling_events() {
             .unwrap()
             .status()
     );
+}
+
+const SINGLE_ROW: u32 = 20;
+const CHESS_PLAYER: u64 = 71;
+const DAY_MS: u64 = 86_400_000;
+
+fn service_content(daily_reward_coins: u32) -> ChessContent {
+    serde_json::from_value(json!({
+        "schema_version": 1,
+        "human_side": "white",
+        "daily_reward_coins": daily_reward_coins,
+        "near_equal_margin": 25,
+        "rows": [
+            {"row_id": SINGLE_ROW, "difficulty": 1, "skill": 20, "success_coins": 10}
+        ]
+    }))
+    .unwrap()
+}
+
+fn service_texts(outcome: &chess_service::ChessActivityOutcome) -> Vec<String> {
+    outcome
+        .replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[39, 0, 14]))
+        .map(|packet| {
+            let length = i32::from_le_bytes(packet[15..19].try_into().unwrap()) as usize;
+            String::from_utf8(packet[19..19 + length - 1].to_vec()).unwrap()
+        })
+        .collect()
+}
+
+fn offer_instance(outcome: &chess_service::ChessActivityOutcome) -> i32 {
+    let offer = outcome
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[39, 0, 16]))
+        .expect("39/16 offer");
+    i32::from_le_bytes(offer[3..7].try_into().unwrap())
+}
+
+fn route(
+    service: &mut ChessService,
+    instance: i32,
+    text: &str,
+    now_ms: u64,
+    rewards: &RewardState,
+) -> chess_service::ChessActivityOutcome {
+    service
+        .route(
+            CHESS_PLAYER,
+            &payload_packet(instance, text).unwrap(),
+            now_ms,
+            rewards,
+        )
+        .unwrap()
+        .expect("chess packet")
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum EndOfGame {
+    Won,
+    Lost,
+    Stopped,
+}
+
+/// Mirrors the shipped movie: user moves are applied locally by the drag, and
+/// the server's move events (10-13) are applied for the other side.
+struct Human {
+    position: chess::Position,
+    /// FEN identity without move counters, for the repetition penalty.
+    seen: BTreeSet<String>,
+}
+
+impl Human {
+    fn new() -> Self {
+        let position = chess::Position::start();
+        let mut human = Self {
+            position,
+            seen: BTreeSet::new(),
+        };
+        human.remember();
+        human
+    }
+
+    fn remember(&mut self) {
+        let key = self
+            .position
+            .to_fen()
+            .split(' ')
+            .take(4)
+            .collect::<Vec<_>>()
+            .join(" ");
+        self.seen.insert(key);
+    }
+
+    /// Deterministic greedy play: mate in one, then checks, captures, the
+    /// closest approach to the enemy king and pawn advances. Positions that
+    /// would repeat twice are demoted so the bot does not shuffle into a draw.
+    fn choose(&self) -> ChessMove {
+        let legal = self.position.legal_moves();
+        let enemy = self.position.side_to_move().opponent();
+        let enemy_king = (0..64)
+            .find(|square| {
+                self.position
+                    .piece_at(*square)
+                    .is_some_and(|piece| piece.kind == Kind::King && piece.side == enemy)
+            })
+            .expect("the enemy king is on the board");
+        let halfmove: i64 = self
+            .position
+            .to_fen()
+            .split(' ')
+            .nth(4)
+            .and_then(|field| field.parse().ok())
+            .unwrap_or(0);
+        let mut ranked = legal
+            .iter()
+            .map(|mv| {
+                let mut next = self.position.clone();
+                let outcome = next.apply(mv).expect("a legal move applies");
+                let mut score = 0;
+                if matches!(outcome.status, Status::WhiteMated | Status::BlackMated) {
+                    score += 1_000_000;
+                } else if outcome.status == Status::Draw {
+                    // Never trade into stalemate, repetition or a bare-king draw.
+                    score -= 1_000_000;
+                }
+                if outcome.check {
+                    score += 50_000;
+                }
+                if let Some(kind) = outcome.captured {
+                    score += 2_000 * piece_rank(kind);
+                }
+                if let Some(kind) = mv.promote {
+                    score += 800 * piece_rank(kind);
+                }
+                if let Some(piece) = self.position.piece_at(mv.from) {
+                    if piece.kind == Kind::Pawn {
+                        score += i64::from(6 - mv.to / 8) * 30;
+                        // Reset the halfmove clock before the 100-ply draw rule bites.
+                        if halfmove > 60 {
+                            score += 20_000;
+                        }
+                    }
+                }
+                let distance = (i64::from(mv.to % 8) - i64::from(enemy_king % 8))
+                    .abs()
+                    .max((i64::from(mv.to / 8) - i64::from(enemy_king / 8)).abs());
+                score += (14 - distance) * 50;
+                let key = next
+                    .to_fen()
+                    .split(' ')
+                    .take(4)
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                if self.seen.iter().filter(|seen| **seen == key).count() >= 2 {
+                    score -= 1_000_000;
+                }
+                (score, *mv)
+            })
+            .collect::<Vec<_>>();
+        ranked.sort_by(|(sa, a), (sb, b)| {
+            sb.cmp(sa)
+                .then_with(|| a.from.cmp(&b.from))
+                .then_with(|| a.to.cmp(&b.to))
+        });
+        ranked.first().expect("a legal human move").1
+    }
+
+    fn move_text(&self, mv: &ChessMove) -> String {
+        let piece = self.position.piece_at(mv.from).expect("mover");
+        if piece.kind == Kind::King && (i16::from(mv.from % 8) - i16::from(mv.to % 8)).abs() == 2 {
+            return format!("OnCastleMsg\t{}", mv.to);
+        }
+        if let Some(kind) = mv.promote {
+            return format!("OnPromoteMsg\t{}\t{}\t{}", mv.from, mv.to, kind.code());
+        }
+        if piece.kind == Kind::Pawn
+            && mv.from % 8 != mv.to % 8
+            && self.position.piece_at(mv.to).is_none()
+        {
+            let captured = (mv.from / 8) * 8 + mv.to % 8;
+            return format!("OnEnPassantMsg\t{}\t{}\t{}", mv.from, mv.to, captured);
+        }
+        format!("OnMoveMsg\t{}\t{}", mv.from, mv.to)
+    }
+
+    /// Applies the server's own move events and reports a terminal message.
+    fn apply_events(&mut self, texts: &[String]) -> Option<EndOfGame> {
+        for text in texts {
+            let Some(rest) = text.strip_prefix("OnChessEventMsg\t") else {
+                continue;
+            };
+            let fields: Vec<&str> = rest.split('\t').collect();
+            let mv = match fields.first().copied() {
+                Some("10") => ChessMove {
+                    from: fields[1].parse().unwrap(),
+                    to: fields[2].parse().unwrap(),
+                    promote: None,
+                },
+                Some("11") => {
+                    let to: u8 = fields[1].parse().unwrap();
+                    let from = match to {
+                        2 | 6 => 4,
+                        58 | 62 => 60,
+                        _ => panic!("unknown castle destination {to}"),
+                    };
+                    ChessMove {
+                        from,
+                        to,
+                        promote: None,
+                    }
+                }
+                Some("12") => ChessMove {
+                    from: fields[1].parse().unwrap(),
+                    to: fields[2].parse().unwrap(),
+                    promote: Kind::from_code(fields[3].parse().unwrap()),
+                },
+                Some("13") => ChessMove {
+                    from: fields[1].parse().unwrap(),
+                    to: fields[2].parse().unwrap(),
+                    promote: None,
+                },
+                _ => continue,
+            };
+            self.position
+                .apply(&mv)
+                .expect("server move is legal on the mirrored board");
+            self.remember();
+        }
+        terminal(texts)
+    }
+}
+
+fn piece_rank(kind: Kind) -> i64 {
+    match kind {
+        Kind::Queen => 9,
+        Kind::Rook => 5,
+        Kind::Bishop | Kind::Knight => 3,
+        Kind::Pawn => 1,
+        Kind::King => 0,
+    }
+}
+
+/// Begin, start and connect one offered chess run.
+fn open_service_game(service: &mut ChessService, rewards: &RewardState, now_ms: u64) -> i32 {
+    let offered = service.begin(SINGLE_ROW, CHESS_PLAYER).unwrap();
+    let instance = offer_instance(&offered);
+    service
+        .route(CHESS_PLAYER, &request(5, instance), now_ms + 1, rewards)
+        .unwrap()
+        .expect("start packet");
+    route(service, instance, "OnConnectMsg", now_ms + 2, rewards);
+    route(service, instance, "OnStartGameMsg\t0", now_ms + 3, rewards);
+    instance
+}
+
+/// Plays the greedy human to the end. The returned texts are the human's own
+/// move messages; the outcome is the client's `FRServer_GameOver` acknowledgement.
+fn play_to_end(
+    service: &mut ChessService,
+    rewards: &RewardState,
+    now_ms: u64,
+) -> (
+    Option<EndOfGame>,
+    chess_service::ChessActivityOutcome,
+    Vec<String>,
+) {
+    let instance = open_service_game(service, rewards, now_ms);
+    let mut human = Human::new();
+    let mut line = Vec::new();
+    for ply in 0..400u64 {
+        let mv = human.choose();
+        let text = human.move_text(&mv);
+        human.position.apply(&mv).unwrap();
+        human.remember();
+        line.push(text.clone());
+        let now = now_ms + 10 + ply * 10;
+        let outcome = route(service, instance, &text, now, rewards);
+        if let Some(end) = human.apply_events(&service_texts(&outcome)) {
+            let ack = if end == EndOfGame::Stopped {
+                chess_service::ChessActivityOutcome::default()
+            } else {
+                route(service, instance, "FRServer_GameOver", now + 5, rewards)
+            };
+            service
+                .route(CHESS_PLAYER, &[26, 0, 42, 0], now + 6, rewards)
+                .unwrap();
+            return (Some(end), ack, line);
+        }
+    }
+    (None, chess_service::ChessActivityOutcome::default(), line)
+}
+
+/// Replays recorded human move messages against a fresh service. `None` means
+/// the line diverged (a replayed move was illegal in the new game).
+fn replay(
+    service: &mut ChessService,
+    rewards: &RewardState,
+    line: &[String],
+    now_ms: u64,
+) -> Option<EndOfGame> {
+    let instance = open_service_game(service, rewards, now_ms);
+    for (ply, text) in line.iter().enumerate() {
+        let outcome = route(
+            service,
+            instance,
+            text,
+            now_ms + 10 + ply as u64 * 10,
+            rewards,
+        );
+        let texts = service_texts(&outcome);
+        if texts.iter().any(|event| event == "OnChessEventMsg\t20") {
+            return None;
+        }
+        if let Some(end) = terminal(&texts) {
+            if end != EndOfGame::Stopped {
+                route(
+                    service,
+                    instance,
+                    "FRServer_GameOver",
+                    now_ms + 20 + ply as u64 * 10,
+                    rewards,
+                );
+            }
+            service
+                .route(
+                    CHESS_PLAYER,
+                    &[26, 0, 42, 0],
+                    now_ms + 21 + ply as u64 * 10,
+                    rewards,
+                )
+                .unwrap();
+            return Some(end);
+        }
+    }
+    None
+}
+
+fn terminal(texts: &[String]) -> Option<EndOfGame> {
+    texts.iter().rev().find_map(|text| match text.as_str() {
+        "OnGameWonMsg" => Some(EndOfGame::Won),
+        "OnGameLostMsg" => Some(EndOfGame::Lost),
+        "OnGameStoppedMsg" => Some(EndOfGame::Stopped),
+        _ => None,
+    })
+}
+
+#[test]
+fn computer_replies_vary_between_fresh_tables() {
+    let mut tables = ChessTables::default();
+    let mut replies = BTreeSet::new();
+    for table in 1..=64u64 {
+        let player = 1_000 + table;
+        let instance = 100 + table as i32;
+        tables
+            .open_single(
+                table,
+                SINGLE_ROW,
+                ChessParticipant {
+                    player_id: player,
+                    instance_id: instance,
+                },
+                Side::White,
+            )
+            .unwrap();
+        send(&mut tables, table, player, instance, "OnConnectMsg");
+        send(&mut tables, table, player, instance, "OnStartGameMsg\t0");
+        let moved = send(
+            &mut tables,
+            table,
+            player,
+            instance,
+            &format!("OnMoveMsg\t{}\t{}", sq(4, 1), sq(4, 3)),
+        );
+        let reply = text(&moved.messages, player)
+            .into_iter()
+            .find(|event| {
+                event.strip_prefix("OnChessEventMsg\t").is_some_and(|rest| {
+                    matches!(rest.split('\t').next(), Some("10" | "11" | "12" | "13"))
+                })
+            })
+            .expect("the computer replied");
+        replies.insert(reply);
+    }
+    assert!(
+        replies.len() > 1,
+        "the computer repeated one reply in every game: {replies:?}"
+    );
+}
+
+#[test]
+fn a_recorded_winning_game_does_not_replay_against_fresh_tables() {
+    let fixture = RewardFixture::new(CHESS_PLAYER);
+    let mut original = ChessService::with_seed(service_content(1_000), 22).unwrap();
+    let (end, ack, line) = play_to_end(&mut original, &fixture.state(), 1_000);
+    assert_eq!(end, Some(EndOfGame::Won), "the seeded game must be a win");
+    assert!(ack.reward_state.is_some(), "the seeded win pays once");
+    assert!(line.len() > 2, "the recorded line is a real game");
+
+    // The same seed reproduces the same game, so the recorded line is a win there.
+    let mut same = ChessService::with_seed(service_content(1_000), 22).unwrap();
+    assert_eq!(
+        replay(&mut same, &fixture.state(), &line, 2_000),
+        Some(EndOfGame::Won)
+    );
+
+    // Fresh entropy tables do not answer the same way, so the line stops being a win.
+    let mut outcomes = Vec::new();
+    for attempt in 0..8u64 {
+        let mut service = ChessService::new(service_content(1_000)).unwrap();
+        outcomes.push(replay(
+            &mut service,
+            &fixture.state(),
+            &line,
+            10_000 + attempt * 1_000,
+        ));
+    }
+    assert!(
+        outcomes.iter().any(|end| *end != Some(EndOfGame::Won)),
+        "the recorded line still won every fresh game: {outcomes:?}"
+    );
+}
+
+#[test]
+fn the_daily_cap_stops_payouts_survives_restore_and_refusals_change_nothing() {
+    let fixture = RewardFixture::new(CHESS_PLAYER);
+    let content = service_content(10);
+    let mut service = ChessService::with_seed(content.clone(), 22).unwrap();
+    // Coins earned before the game stay, and the payout adds to them.
+    let mut live = fixture.state();
+    live.inventory.grant_coins(7).unwrap();
+    assert_eq!(live.inventory.state().coins, 7);
+    let (end, ack, _) = play_to_end(&mut service, &live, 1_000);
+    assert_eq!(end, Some(EndOfGame::Won));
+    assert_eq!(
+        ack.reward_state.as_ref().unwrap().inventory.state().coins,
+        17
+    );
+    let ledger = service.ledger().expect("the paid win is recorded");
+    assert_eq!(
+        ledger,
+        ChessRewardLedger {
+            day: 0,
+            paid_coins: 10
+        }
+    );
+
+    // Reconnect: the same game against the saved ledger pays nothing, but the
+    // result still settles and nothing about the ledger changes.
+    let mut restored = ChessService::with_seed(content.clone(), 22).unwrap();
+    restored.restore_ledger(Some(ledger)).unwrap();
+    let (end, capped, _) = play_to_end(&mut restored, &fixture.state(), 50_000);
+    assert_eq!(end, Some(EndOfGame::Won));
+    assert!(capped.reward_state.is_none(), "a capped win must not pay");
+    assert!(capped.reward_packets.is_empty());
+    assert!(
+        capped
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[39, 0, 18])),
+        "the capped result still settles through the lifecycle"
+    );
+    assert_eq!(
+        restored.ledger(),
+        Some(ledger),
+        "the cap changed the ledger"
+    );
+
+    // A refusal changes nothing: an unknown row starts nothing.
+    assert!(!restored.is_active());
+    assert!(restored.begin(999, CHESS_PLAYER).is_err());
+    assert_eq!(restored.ledger(), Some(ledger));
+    // A second Play while a run is open is refused and leaves the run alive.
+    let instance = open_service_game(&mut restored, &fixture.state(), 60_000);
+    let before = restored.ledger();
+    assert!(restored.begin(SINGLE_ROW, CHESS_PLAYER).is_err());
+    assert_eq!(restored.ledger(), before);
+    assert!(restored.is_active());
+    restored
+        .route(
+            CHESS_PLAYER,
+            &request(6, instance),
+            60_100,
+            &fixture.state(),
+        )
+        .unwrap();
+    assert!(!restored.is_active());
+
+    // The next UTC day starts a fresh allowance for the restored ledger.
+    let mut next_day = ChessService::with_seed(content.clone(), 22).unwrap();
+    next_day.restore_ledger(Some(ledger)).unwrap();
+    let (end, paid_again, _) = play_to_end(&mut next_day, &fixture.state(), DAY_MS + 10);
+    assert_eq!(end, Some(EndOfGame::Won));
+    assert!(paid_again.reward_state.is_some(), "a new day pays again");
+    assert_eq!(
+        next_day.ledger(),
+        Some(ChessRewardLedger {
+            day: 1,
+            paid_coins: 10
+        })
+    );
+
+    // Restoring a ledger beyond the content bound is refused, not clamped.
+    let mut corrupt = ChessService::with_seed(content, 22).unwrap();
+    assert!(
+        corrupt
+            .restore_ledger(Some(ChessRewardLedger {
+                day: 0,
+                paid_coins: chess_service::MAX_DAILY_REWARD_COINS + 1,
+            }))
+            .is_err()
+    );
+    assert_eq!(corrupt.ledger(), None);
 }

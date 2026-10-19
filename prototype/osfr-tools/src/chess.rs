@@ -14,6 +14,7 @@ use crate::{
 };
 use std::{
     collections::{HashMap, HashSet},
+    hash::{BuildHasher, Hasher},
     io,
 };
 
@@ -128,6 +129,10 @@ pub const EVENT_LOCAL_AI: u8 = 42;
 
 // Server-side bound (R); the reviewed guide asks for payload strings under 128 characters.
 const MAX_TEXT_BYTES: usize = 127;
+/// (R) Default window, in `score_move` units, for the computer's near-equal move choice.
+pub const DEFAULT_NEAR_EQUAL_MARGIN: i64 = 25;
+/// (R) Content sanity bound for [`DEFAULT_NEAR_EQUAL_MARGIN`].
+pub const MAX_NEAR_EQUAL_MARGIN: i64 = 500;
 const FLAG_EN_PASSANT: u8 = 0x64;
 const FLAG_DOUBLE_PUSH: u8 = 0x80;
 const FLAG_CAPTURE: u8 = 0x60;
@@ -935,6 +940,8 @@ enum TableMode {
         human_side: Side,
         computer_side: Side,
         skill: u8,
+        /// (R) Near-equal window handed down from content.
+        near_equal_margin: i64,
     },
     TwoPlayer,
 }
@@ -953,30 +960,26 @@ pub struct ChessTable {
     result: Option<ChessResult>,
     game_over: HashSet<u64>,
     settled: HashSet<u64>,
+    /// (R) Per-table random stream for the computer's near-equal move choice.
+    rng: u64,
 }
 
 impl ChessTable {
-    fn single(
-        table_id: u64,
-        row_id: u32,
-        player: ChessParticipant,
-        human_side: Side,
-    ) -> io::Result<ChessTable> {
-        let Some(Mode::Single { skill }) = Mode::for_row(row_id) else {
-            return Err(invalid("row is not a single-player chess row"));
-        };
-        ChessTable::single_with_skill(table_id, row_id, player, human_side, skill)
-    }
-
-    /// Same table with a content-supplied client-engine skill (0 to 100).
+    /// A content-supplied skill (0 to 100) and near-equal window. `seed`
+    /// starts the table's private random stream.
     fn single_with_skill(
         table_id: u64,
         row_id: u32,
         player: ChessParticipant,
         human_side: Side,
         skill: u8,
+        near_equal_margin: i64,
+        seed: u64,
     ) -> io::Result<ChessTable> {
-        if !matches!(Mode::for_row(row_id), Some(Mode::Single { .. })) || skill > 100 {
+        if !matches!(Mode::for_row(row_id), Some(Mode::Single { .. }))
+            || skill > 100
+            || !(0..=MAX_NEAR_EQUAL_MARGIN).contains(&near_equal_margin)
+        {
             return Err(invalid("invalid single-player chess row or skill"));
         }
         validate_participant(player)?;
@@ -999,6 +1002,7 @@ impl ChessTable {
                 human_side,
                 computer_side,
                 skill,
+                near_equal_margin,
             },
             white,
             black,
@@ -1009,6 +1013,7 @@ impl ChessTable {
             result: None,
             game_over: HashSet::new(),
             settled: HashSet::new(),
+            rng: seed,
         })
     }
 
@@ -1017,6 +1022,7 @@ impl ChessTable {
         row_id: u32,
         white: ChessParticipant,
         black: ChessParticipant,
+        seed: u64,
     ) -> io::Result<ChessTable> {
         if Mode::for_row(row_id) != Some(Mode::TwoPlayer) {
             return Err(invalid("row is not a two-player chess row"));
@@ -1041,6 +1047,7 @@ impl ChessTable {
             result: None,
             game_over: HashSet::new(),
             settled: HashSet::new(),
+            rng: seed,
         })
     }
 
@@ -1136,7 +1143,7 @@ impl ChessTable {
             TableMode::Single {
                 human_side,
                 computer_side,
-                skill: _,
+                ..
             } => {
                 let player = self.participant_for_side(human_side).unwrap();
                 // Equality selects white. The actual meaning of INIT values is unknown (R).
@@ -1175,6 +1182,11 @@ impl ChessTable {
         Ok(out)
     }
 
+    /// (R) Server-authoritative computer reply, pushed as a normal move event.
+    /// The shipped movie applies it in its network state (`game_chess`
+    /// `WaitingForNetwork.OnMoveMsg`); its native engine only moves on event
+    /// 30, whose binding (`ChessMoveRequest` 0x00c081a0) is the sole caller of
+    /// `Chess::make_computer_move` 0x00f507c0, and this server never sends it.
     fn play_computer_turn(&mut self, player_id: u64) -> io::Result<ChessOutcome> {
         let Some(mv) = self.server_move() else {
             return Ok(ChessOutcome::default());
@@ -1182,10 +1194,13 @@ impl ChessTable {
         self.accept_move(player_id, mv, true)
     }
 
-    /// (R) Pick a legal reply locally. The client engine's proposed move is
-    /// never an input here, so a modified client cannot choose the opponent's
-    /// move or its own loss.
-    fn server_move(&self) -> Option<ChessMove> {
+    /// (R) Pick a legal reply locally from every move within the near-equal
+    /// window of the best score. The choice comes from this table's
+    /// server-side random stream, so a recorded winning game cannot be
+    /// replayed against the same replies; `skill` widens the window for
+    /// easier rows. The client engine's proposed move is never an input here,
+    /// so a modified client cannot choose the opponent's move or its loss.
+    fn server_move(&mut self) -> Option<ChessMove> {
         let mut ranked: Vec<(i64, ChessMove)> = self
             .position
             .legal_moves()
@@ -1198,18 +1213,29 @@ impl ChessTable {
                 .then_with(|| a.to.cmp(&b.to))
                 .then_with(|| a.promote.map(Kind::code).cmp(&b.promote.map(Kind::code)))
         });
-        let skill = match self.mode {
-            TableMode::Single { skill, .. } => skill,
-            TableMode::TwoPlayer => 100,
+        let (skill, margin) = match self.mode {
+            TableMode::Single {
+                skill,
+                near_equal_margin,
+                ..
+            } => (skill, near_equal_margin),
+            TableMode::TwoPlayer => (100, DEFAULT_NEAR_EQUAL_MARGIN),
         };
-        let seed = self.position.to_fen().bytes().fold(0u64, |hash, byte| {
-            hash.wrapping_mul(31).wrapping_add(u64::from(byte))
-        });
-        // Easy rows may take the second-best legal move; medium and hard take
-        // the best. This keeps the content skill meaningful without trusting
-        // the client's engine.
-        let index = usize::from(skill < 50 && ranked.len() > 1 && seed % 2 == 1);
+        let window = margin + margin * i64::from(100u8.saturating_sub(skill)) / 100;
+        let floor = ranked.first()?.0.saturating_sub(window);
+        let candidates = ranked
+            .iter()
+            .take_while(|(score, _)| *score >= floor)
+            .count();
+        let index = (self.next_random() % candidates.max(1) as u64) as usize;
         ranked.get(index).map(|(_, mv)| *mv)
+    }
+
+    /// SplitMix64 over the table's stream: deterministic for a seeded table,
+    /// unpredictable for one seeded from OS entropy.
+    fn next_random(&mut self) -> u64 {
+        self.rng = self.rng.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        mix64(self.rng)
     }
 
     fn score_move(&self, mv: &ChessMove) -> i64 {
@@ -1412,7 +1438,7 @@ impl ChessTable {
                     TableMode::Single {
                         human_side,
                         computer_side,
-                        skill: _,
+                        ..
                     } if self.position.side_to_move() == computer_side => {
                         let player = self.participant_for_side(human_side).unwrap();
                         let reply = self.play_computer_turn(player.player_id)?;
@@ -1629,12 +1655,37 @@ impl Activity for ChessFinishActivity {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct ChessTables {
     tables: HashMap<u64, ChessTable>,
+    /// (R) Per-process seed from OS entropy. Each opened table mixes it with an
+    /// open counter, so replaying a game cannot reproduce the computer's moves.
+    seed: u64,
+    opened: u64,
+}
+
+impl Default for ChessTables {
+    fn default() -> Self {
+        Self::with_seed(entropy_seed())
+    }
 }
 
 impl ChessTables {
+    /// (R) Deterministic seed source for tests and offline fixtures. The
+    /// gateway's `Default` uses OS entropy; no client value reaches either.
+    pub fn with_seed(seed: u64) -> Self {
+        Self {
+            tables: HashMap::new(),
+            seed,
+            opened: 0,
+        }
+    }
+
+    fn open_seed(&mut self, table_id: u64) -> u64 {
+        self.opened = self.opened.wrapping_add(1);
+        mix64(self.seed ^ table_id.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ self.opened)
+    }
+
     pub fn open_single(
         &mut self,
         table_id: u64,
@@ -1645,15 +1696,27 @@ impl ChessTables {
         if self.tables.contains_key(&table_id) {
             return Err(invalid("chess table already exists"));
         }
+        let Some(Mode::Single { skill }) = Mode::for_row(row_id) else {
+            return Err(invalid("row is not a single-player chess row"));
+        };
+        let seed = self.open_seed(table_id);
         self.tables.insert(
             table_id,
-            ChessTable::single(table_id, row_id, player, human_side)?,
+            ChessTable::single_with_skill(
+                table_id,
+                row_id,
+                player,
+                human_side,
+                skill,
+                DEFAULT_NEAR_EQUAL_MARGIN,
+                seed,
+            )?,
         );
         Ok(())
     }
 
-    /// Open a single-player table with the content row's `skill` instead of
-    /// the default for that row id.
+    /// Open a single-player table with the content row's `skill` and
+    /// near-equal window instead of the defaults for that row id.
     pub fn open_single_with_skill(
         &mut self,
         table_id: u64,
@@ -1661,13 +1724,23 @@ impl ChessTables {
         player: ChessParticipant,
         human_side: Side,
         skill: u8,
+        near_equal_margin: i64,
     ) -> io::Result<()> {
         if self.tables.contains_key(&table_id) {
             return Err(invalid("chess table already exists"));
         }
+        let seed = self.open_seed(table_id);
         self.tables.insert(
             table_id,
-            ChessTable::single_with_skill(table_id, row_id, player, human_side, skill)?,
+            ChessTable::single_with_skill(
+                table_id,
+                row_id,
+                player,
+                human_side,
+                skill,
+                near_equal_margin,
+                seed,
+            )?,
         );
         Ok(())
     }
@@ -1682,9 +1755,10 @@ impl ChessTables {
         if self.tables.contains_key(&table_id) {
             return Err(invalid("chess table already exists"));
         }
+        let seed = self.open_seed(table_id);
         self.tables.insert(
             table_id,
-            ChessTable::two_player(table_id, row_id, white, black)?,
+            ChessTable::two_player(table_id, row_id, white, black, seed)?,
         );
         Ok(())
     }
@@ -1893,6 +1967,22 @@ fn piece_value(kind: Kind) -> i64 {
         Kind::Queen => 900,
         Kind::King => 10_000,
     }
+}
+
+/// (R) OS-seeded SipHash keys plus a process counter: each call differs and
+/// a client cannot predict it from anything it sends.
+fn entropy_seed() -> u64 {
+    static CALLS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let mut hasher = std::collections::hash_map::RandomState::new().build_hasher();
+    hasher.write_u64(CALLS.fetch_add(1, std::sync::atomic::Ordering::Relaxed));
+    hasher.finish()
+}
+
+/// SplitMix64 finalizer shared by the table seed and its random stream.
+fn mix64(mut value: u64) -> u64 {
+    value = (value ^ (value >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    value = (value ^ (value >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    value ^ (value >> 31)
 }
 
 fn append_outcome(out: &mut ChessOutcome, next: ChessOutcome) {

@@ -23,7 +23,7 @@ use crate::{
     minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, RunState},
     rewards::{RewardDisplay, RewardGrant, RewardState},
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
@@ -39,6 +39,18 @@ const MAX_FILE: u64 = 64 * 1024;
 const MAX_ROWS: usize = 12;
 /// (R) Upper bound on a reconstructed coin award, so content cannot mint unlimited coins.
 const MAX_COINS_PER_WIN: u32 = 10_000;
+/// (R) Upper bound on the daily chess coin cap, so content cannot mint unlimited coins.
+pub const MAX_DAILY_REWARD_COINS: u32 = 100_000;
+/// (R) UTC day length used by the persisted daily ledger.
+const DAY_MS: u64 = 86_400_000;
+
+fn default_daily_reward_coins() -> u32 {
+    1_000
+}
+
+fn default_near_equal_margin() -> u32 {
+    chess::DEFAULT_NEAR_EQUAL_MARGIN as u32
+}
 
 /// Why an ordinary entry was refused. Nothing changed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -88,6 +100,14 @@ pub struct ChessContent {
     /// "white" or "black". (R) One-player rows say "random order" in the
     /// locale; a fixed colour keeps the run deterministic and tunable.
     pub human_side: String,
+    /// (R) Coins one character may earn from chess per UTC day. Generous by
+    /// default; 0 disables chess rewards.
+    #[serde(default = "default_daily_reward_coins")]
+    pub daily_reward_coins: u32,
+    /// (R) Score window, in `score_move` units, for the computer's near-equal
+    /// move choice. Larger values make the computer less predictable.
+    #[serde(default = "default_near_equal_margin")]
+    pub near_equal_margin: u32,
     pub rows: Vec<ChessRow>,
 }
 
@@ -114,6 +134,12 @@ impl ChessContent {
         }
         if !matches!(self.human_side.as_str(), "white" | "black") {
             return Err(invalid("chess human_side must be white or black"));
+        }
+        if self.daily_reward_coins > MAX_DAILY_REWARD_COINS {
+            return Err(invalid("chess daily reward cap exceeds the local bound"));
+        }
+        if i64::from(self.near_equal_margin) > chess::MAX_NEAR_EQUAL_MARGIN {
+            return Err(invalid("chess near-equal window exceeds the local bound"));
         }
         let mut seen = BTreeSet::new();
         for row in &self.rows {
@@ -171,6 +197,30 @@ pub struct ChessActivityOutcome {
     pub reward_state: Option<RewardState>,
 }
 
+/// (R) One character's daily chess coin ledger, persisted with the character
+/// save as `GameplayState::chess` so a reconnect cannot reset the cap.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ChessRewardLedger {
+    /// UTC day index (`now_ms / 86_400_000`).
+    pub day: u64,
+    /// Coins already paid on `day`; a new day starts from zero.
+    pub paid_coins: u32,
+}
+
+impl ChessRewardLedger {
+    fn paid_on(&self, day: u64) -> u32 {
+        if self.day == day { self.paid_coins } else { 0 }
+    }
+
+    fn record(&mut self, day: u64, coins: u32) {
+        if self.day != day {
+            *self = Self { day, paid_coins: 0 };
+        }
+        self.paid_coins = self.paid_coins.saturating_add(coins);
+    }
+}
+
 /// One character's chess state. Cloneable so `Gameplay` can stage a packet and
 /// discard it on refusal, exactly like the other activity adapters.
 #[derive(Clone)]
@@ -180,18 +230,58 @@ pub struct ChessService {
     content: ChessContent,
     current: Option<ChessRow>,
     started_ms: Option<u64>,
+    ledger: ChessRewardLedger,
 }
 
 impl ChessService {
     pub fn new(content: ChessContent) -> io::Result<Self> {
+        Self::with_tables(content, ChessTables::default(), None)
+    }
+
+    /// Rebuild a character's service and restore the saved daily ledger.
+    pub fn with_state(content: ChessContent, saved: Option<ChessRewardLedger>) -> io::Result<Self> {
+        Self::with_tables(content, ChessTables::default(), saved)
+    }
+
+    /// (R) Deterministic table seeds for tests and offline fixtures. The
+    /// gateway's [`Self::new`] uses OS entropy; no client value reaches either.
+    pub fn with_seed(content: ChessContent, seed: u64) -> io::Result<Self> {
+        Self::with_tables(content, ChessTables::with_seed(seed), None)
+    }
+
+    fn with_tables(
+        content: ChessContent,
+        tables: ChessTables,
+        saved: Option<ChessRewardLedger>,
+    ) -> io::Result<Self> {
         content.validate()?;
-        Ok(Self {
-            tables: ChessTables::default(),
+        let mut service = Self {
+            tables,
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
             content,
             current: None,
             started_ms: None,
-        })
+            ledger: ChessRewardLedger::default(),
+        };
+        service.restore_ledger(saved)?;
+        Ok(service)
+    }
+
+    /// Restore the save's `chess` field. A malformed ledger is refused, never clamped.
+    pub fn restore_ledger(&mut self, saved: Option<ChessRewardLedger>) -> io::Result<()> {
+        match saved {
+            None => self.ledger = ChessRewardLedger::default(),
+            Some(ledger) if ledger.paid_coins > MAX_DAILY_REWARD_COINS => {
+                return Err(invalid("saved chess ledger exceeds the local bound"));
+            }
+            Some(ledger) => self.ledger = ledger,
+        }
+        Ok(())
+    }
+
+    /// The save's `chess` field: absent until the first paid win.
+    pub fn ledger(&self) -> Option<ChessRewardLedger> {
+        (self.ledger.paid_coins > 0).then_some(self.ledger)
     }
 
     /// A run exists from the offer until the results Close (26/42) or a quit.
@@ -358,6 +448,7 @@ impl ChessService {
             },
             self.content.side(),
             row.skill as u8,
+            i64::from(self.content.near_equal_margin),
         )?;
         self.started_ms = Some(now_ms);
         Ok(())
@@ -386,7 +477,16 @@ impl ChessService {
         let elapsed = u32::try_from(elapsed).unwrap_or(u32::MAX);
         // (R) Chess score and stars were never recovered; the results page
         // shows zero while the coin award comes from content.
-        let grant = won.then(|| row.win_grant(player_id));
+        // The daily cap is checked before the grant is staged: a capped win
+        // still settles the run but pays nothing.
+        let day = now_ms / DAY_MS;
+        let remaining = self
+            .content
+            .daily_reward_coins
+            .saturating_sub(self.ledger.paid_on(day));
+        let grant = won
+            .then(|| row.win_grant(player_id))
+            .filter(|grant| grant.coins <= remaining);
         let settlement = grant.as_ref().map(|grant| (rewards, grant));
         let settled = self.tables.settle_player(
             instance as u64,
@@ -403,6 +503,7 @@ impl ChessService {
         out.reward_packets.extend(settled.reward_packets);
         if settled.reward_state.is_some() {
             out.reward_state = settled.reward_state;
+            self.ledger.record(day, row.success_coins);
         }
         Ok(())
     }

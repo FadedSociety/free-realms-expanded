@@ -6,6 +6,7 @@
 use osfr_tools::{
     character_store::CharacterState,
     chess,
+    chess_service::ChessRewardLedger,
     gameplay::{Gameplay, Outcome},
     inventory::InventoryItem,
     opening::{OpeningEngine, OpeningTrigger},
@@ -132,6 +133,22 @@ fn chat_text(out: &Outcome) -> String {
 
 fn has_event(out: &Outcome, prefix: &str) -> bool {
     texts(out).iter().any(|text| text.starts_with(prefix))
+}
+
+#[test]
+fn the_daily_chess_ledger_round_trips_through_the_save_and_gameplay_load() {
+    let directory = content();
+    let mut state = Gameplay::load(&directory, None).unwrap().state();
+    let ledger = ChessRewardLedger {
+        day: 3,
+        paid_coins: 40,
+    };
+    state.chess = Some(ledger);
+    let bytes = serde_json::to_vec(&state).unwrap();
+    let restored: osfr_tools::gameplay::GameplayState = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(restored.chess, Some(ledger));
+    let game = Gameplay::load(&directory, Some(restored)).unwrap();
+    assert_eq!(game.state().chess, Some(ledger));
 }
 
 fn paid_won(out: &Outcome) -> bool {

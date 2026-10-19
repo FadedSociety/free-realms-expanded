@@ -348,6 +348,50 @@ fn loss_sends_results_without_settling_reward() {
 }
 
 #[test]
+fn a_win_may_settle_without_a_grant_and_a_loss_still_may_not() {
+    let fixture = Fixture::new(10);
+    let initial_reward = fixture.reward_state();
+    let mut runs = MinigameRuns::new(131).unwrap();
+    runs.offer(spec()).unwrap();
+    runs.handle_client(&request(5, 131)).unwrap();
+    runs.started(131);
+    let won_activity = TestActivity {
+        score: 900,
+        finish: Some(ActivityFinish {
+            won: true,
+            stars: 3,
+            elapsed_seconds: 12,
+        }),
+    };
+    let won = runs.finish(131, &won_activity, None).unwrap();
+    assert_eq!(won.replies, expected_finish(131, 46, true));
+    assert_eq!(won.state, Some(RunState::Won));
+    assert!(won.reward_packets.is_empty());
+    assert!(won.reward_state.is_none());
+    assert_eq!(initial_reward.inventory.state().coins, 10);
+
+    let mut lost = MinigameRuns::new(132).unwrap();
+    lost.offer(spec()).unwrap();
+    lost.handle_client(&request(5, 132)).unwrap();
+    lost.started(132);
+    let loss = TestActivity {
+        score: 0,
+        finish: Some(ActivityFinish {
+            won: false,
+            stars: 0,
+            elapsed_seconds: 1,
+        }),
+    };
+    let payout = grant();
+    assert!(
+        lost.finish(132, &loss, Some((&initial_reward, &payout)))
+            .is_err(),
+        "a loss must never carry a grant"
+    );
+    assert_eq!(lost.state(132), Some(RunState::Playing));
+}
+
+#[test]
 fn leave_and_disconnect_cancel_without_reward_or_activity_mutation() {
     let fixture = Fixture::new(10);
     let reward_state = fixture.reward_state_with_materials();

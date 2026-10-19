@@ -503,7 +503,9 @@ impl MinigameRuns {
     }
 
     /// Settle one activity result. Win grants use a stable run-derived key;
-    /// losses cannot carry a grant. Both returned snapshots require one save.
+    /// losses cannot carry a grant, and a win may settle without one (a
+    /// content-defined zero award or a reached daily cap). Both returned
+    /// snapshots require one save.
     pub fn finish<A: Activity>(
         &mut self,
         instance_id: i32,
@@ -519,8 +521,8 @@ impl MinigameRuns {
         let Some(result) = activity.finish() else {
             return Ok(RunOutcome::default());
         };
-        if result.won != settlement.is_some() {
-            return Err(invalid("minigame reward must match win outcome"));
+        if !result.won && settlement.is_some() {
+            return Err(invalid("a loss cannot carry a minigame grant"));
         }
         let score = activity.score();
         let score_i32 = i32::try_from(score).map_err(invalid)?;

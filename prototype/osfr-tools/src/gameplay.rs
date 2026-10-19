@@ -102,6 +102,9 @@ pub struct GameplayState {
     /// The last paid derby epoch, retained for the gate's cross-session reward cooldown.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub derby: Option<crate::derby_gateway::DerbyGatewayState>,
+    /// Chess's daily coin ledger; absent until the first paid win.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub chess: Option<crate::chess_service::ChessRewardLedger>,
     /// Attuned warpstones (W142). Absent until the first attunement.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub warpstones: Option<piece_077::WarpState>,
@@ -528,6 +531,7 @@ impl Gameplay {
     pub fn load(directory: &Path, state: Option<GameplayState>) -> io::Result<Self> {
         let mut warp = piece_077::WarpRegistry::curated();
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
+        let saved_chess = state.as_ref().and_then(|s| s.chess);
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
@@ -845,8 +849,9 @@ impl Gameplay {
         // T022: optional chess rows; an absent file publishes none.
         let chess_path = npc_content.join(crate::chess_service::CONTENT_FILE);
         let chess = if chess_path.is_file() {
-            Some(ChessService::new(
+            Some(ChessService::with_state(
                 crate::chess_service::ChessContent::load(&chess_path)?,
+                saved_chess,
             )?)
         } else {
             None
@@ -1407,6 +1412,7 @@ impl Gameplay {
                 .derby
                 .as_ref()
                 .and_then(crate::derby_gateway::DerbyGateway::snapshot),
+            chess: self.chess.as_ref().and_then(ChessService::ledger),
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
             item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
             progression_extras,
