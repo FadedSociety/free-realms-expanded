@@ -263,6 +263,36 @@ pub struct Outcome {
     pub pets_changed: bool,
 }
 
+impl Outcome {
+    /// Publish a staged outcome into this one. Every field is named in the
+    /// destructuring pattern, so adding an `Outcome` field fails to compile here
+    /// until its merge rule is decided.
+    fn absorb(&mut self, other: Outcome) {
+        let Outcome {
+            dev_command_denied,
+            shared_field,
+            replies,
+            changed,
+            zoning,
+            scene_zoning,
+            relocation,
+            group_heal,
+            nearby,
+            pets_changed,
+        } = other;
+        self.dev_command_denied |= dev_command_denied;
+        self.shared_field = shared_field.or(self.shared_field.take());
+        self.replies.extend(replies);
+        self.changed |= changed;
+        self.zoning = zoning.or(self.zoning.take());
+        self.scene_zoning = scene_zoning.or(self.scene_zoning.take());
+        self.relocation = relocation.or(self.relocation.take());
+        self.group_heal = group_heal.or(self.group_heal.take());
+        self.nearby.extend(nearby);
+        self.pets_changed |= pets_changed;
+    }
+}
+
 /// Horizontal distance in metres.
 fn flat_distance(a: [f32; 3], b: [f32; 3]) -> f32 {
     ((a[0] - b[0]).powi(2) + (a[2] - b[2]).powi(2)).sqrt()

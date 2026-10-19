@@ -29,6 +29,18 @@ impl Drop for Scratch {
     }
 }
 
+/// The guard also runs while a test unwinds, so a failing run leaves no content
+/// behind for the next one.
+#[test]
+fn scratch_content_is_removed_on_drop() {
+    let path = {
+        let scratch = Scratch::new("scratch-drop");
+        std::fs::write(scratch.join("leftover.json"), b"{}").unwrap();
+        scratch.to_path_buf()
+    };
+    assert!(!path.exists(), "scratch content was not removed on drop");
+}
+
 #[test]
 fn live_quest_offers_require_real_level_and_the_active_job() {
     let source = bundled_content();
@@ -1840,21 +1852,18 @@ fn job_skills_unlock_at_their_level() {
 fn power_up_tables_reload_by_name() {
     let reference = reference();
     let mut game = Gameplay::load(&reference, None).unwrap();
-    let dir = std::env::temp_dir().join(format!("osfr-power-reload-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).unwrap();
+    let dir = Scratch::new("osfr-power-reload");
     std::fs::copy(
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/power_ups.json"),
         dir.join("power_ups.json"),
     )
     .unwrap();
-    game.content_dir = dir.clone();
+    game.content_dir = dir.to_path_buf();
     let mut out = Outcome::default();
     let reply = game.reload_content("power_ups", &mut out).unwrap();
     assert!(reply.contains("power-ups"), "{reply}");
     std::fs::write(dir.join("power_ups.json"), b"{ not json").unwrap();
     assert!(game.reload_content("power_ups", &mut out).is_err());
-    std::fs::remove_dir_all(&dir).unwrap();
 }
 
 /// A later reload failure must not publish an earlier ability or behaviour
@@ -1904,9 +1913,7 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
         .cloned()
         .expect("grouped wolf behaviour");
 
-    let dir = std::env::temp_dir().join(format!("osfr-reload-all-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).unwrap();
+    let dir = Scratch::new("osfr-reload-all");
     std::fs::copy(
         bundled_content().join("field_enemies.json"),
         dir.join("field_enemies.json"),
@@ -1941,7 +1948,7 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
         .unwrap(),
     )
     .unwrap();
-    game.content_dir = dir.clone();
+    game.content_dir = dir.to_path_buf();
 
     let mut queued = Outcome::default();
     queued.replies.push(vec![0xde, 0xad]);
@@ -2001,7 +2008,6 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
         before_activation,
         "the live hotbar packets are unchanged"
     );
-    std::fs::remove_dir_all(dir).unwrap();
 }
 
 /// W158 slice 2b: a big heart's group heal leaves the engine, reaches the

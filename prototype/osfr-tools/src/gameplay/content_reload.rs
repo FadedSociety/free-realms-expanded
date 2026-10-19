@@ -1,8 +1,17 @@
 //! Developer hot reload of authored content: battles, enemies, abilities.
 //!
+//! (R) `realm reload` is a developer operation, not recovered client behavior;
+//! its all-or-nothing rule is local reconstruction.
+//!
 //! The whole request is staged on the `Gameplay` clone the gateway owns for the
-//! request. Only the four subsystems a reload owns commit, and only after every
+//! request. Only the four subsystems a reload owns commit -- `abilities`,
+//! `encounter`, `activities` and `npc_visibility` -- and only after every
 //! requested loader succeeds; a refusal publishes neither state nor packets.
+//! A new `Gameplay` field is not reload content until it is added to that list.
+//!
+//! The regression `refused_reload_all_keeps_behaviour_and_shared_field_state`
+//! is in `gameplay/w64_regional_quest_tests.rs`: `lab/autopilot/protected-pass.txt`
+//! pins its full path, so it cannot move here yet.
 use super::*;
 
 impl Gameplay {
@@ -14,16 +23,7 @@ impl Gameplay {
         self.encounter = staged.encounter;
         self.activities = staged.activities;
         self.npc_visibility = staged.npc_visibility;
-        out.dev_command_denied |= staged_out.dev_command_denied;
-        out.shared_field = staged_out.shared_field.or(out.shared_field.take());
-        out.replies.extend(staged_out.replies);
-        out.changed |= staged_out.changed;
-        out.zoning = staged_out.zoning.or(out.zoning.take());
-        out.scene_zoning = staged_out.scene_zoning.or(out.scene_zoning.take());
-        out.relocation = staged_out.relocation.or(out.relocation.take());
-        out.group_heal = staged_out.group_heal.or(out.group_heal.take());
-        out.nearby.extend(staged_out.nearby);
-        out.pets_changed |= staged_out.pets_changed;
+        out.absorb(staged_out);
         Ok(done)
     }
 
@@ -121,5 +121,76 @@ impl Gameplay {
             ));
         }
         Ok(done.join(", "))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A rehearsed staged outcome that names every `Outcome` field explicitly:
+    /// adding a field breaks this test until `Outcome::absorb` publishes it too.
+    fn staged_outcome() -> Outcome {
+        Outcome {
+            dev_command_denied: true,
+            shared_field: Some(crate::encounter::SharedFieldAction::Ability { slot: 3, target: 9 }),
+            replies: vec![vec![3]],
+            changed: true,
+            zoning: Some(crate::encounter::ZoneTransition {
+                zone_id: 7,
+                name: "Seven".into(),
+                sky: String::new(),
+                geometry_id: 0,
+                position: [0.0; 3],
+                rotation: [0.0; 3],
+                tutorial: false,
+            }),
+            scene_zoning: Some(crate::zone_transition::ZoneTransition {
+                scene: "Seven".into(),
+                ..Default::default()
+            }),
+            relocation: Some(crate::dev_teleport::Relocation {
+                position: [1.0, 2.0, 3.0],
+                rotation: [0.0; 3],
+            }),
+            group_heal: Some(crate::encounter::GroupHeal {
+                percent: 50,
+                kill: (7, 9),
+            }),
+            nearby: vec![vec![4]],
+            pets_changed: true,
+        }
+    }
+
+    #[test]
+    fn absorb_publishes_every_staged_outcome_field() {
+        let mut live = Outcome::default();
+        live.replies.push(vec![1]);
+        live.nearby.push(vec![2]);
+        live.absorb(staged_outcome());
+        assert!(live.dev_command_denied);
+        assert!(matches!(
+            live.shared_field,
+            Some(crate::encounter::SharedFieldAction::Ability { slot: 3, target: 9 })
+        ));
+        assert_eq!(live.replies, vec![vec![1], vec![3]]);
+        assert!(live.changed);
+        assert_eq!(live.zoning.as_ref().unwrap().zone_id, 7);
+        assert_eq!(live.scene_zoning.as_ref().unwrap().scene, "Seven");
+        assert_eq!(live.relocation.as_ref().unwrap().position, [1.0, 2.0, 3.0]);
+        assert_eq!(
+            live.group_heal,
+            Some(crate::encounter::GroupHeal {
+                percent: 50,
+                kill: (7, 9)
+            })
+        );
+        assert_eq!(live.nearby, vec![vec![2], vec![4]]);
+        assert!(live.pets_changed);
+        // Nothing staged never wipes the live state.
+        live.absorb(Outcome::default());
+        assert!(live.dev_command_denied && live.changed && live.pets_changed);
+        assert!(live.shared_field.is_some() && live.zoning.is_some());
+        assert_eq!(live.replies, vec![vec![1], vec![3]]);
     }
 }
