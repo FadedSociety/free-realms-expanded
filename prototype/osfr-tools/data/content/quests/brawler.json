@@ -231,7 +231,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 stores a typed objective without the client free text; objective id 1 and target 9000000121 are server bindings."
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
         },
         {
           "kind": "reconstructed",
@@ -524,7 +524,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 stores a typed objective without the client free text; objective id 1 and target 930050 are server bindings."
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
         },
         {
           "kind": "reconstructed",
@@ -578,7 +578,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 stores a typed objective without the client free text; objective id 1 and target 9000000446 are server bindings."
+          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
         },
         {
           "kind": "reconstructed",

@@ -68,11 +68,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
             assert!(
                 matches!(
                     placement,
-                    "captured"
-                        | "legacy_data"
-                        | "poi_anchor"
-                        | "reconstructed_spawn"
-                        | "unanchored"
+                    "captured" | "legacy_data" | "poi_anchor" | "unanchored"
                 ),
                 "{owner}: unknown placement class {placement:?}"
             );
@@ -85,13 +81,6 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                     "{owner}: unanchored placement has unexpected source {source:?}"
                 );
             }
-            if placement == "reconstructed_spawn" {
-                assert_eq!(
-                    source, "reconstructed_chapter_spawn",
-                    "{owner}: reviewed playtest spawn has an unexpected source"
-                );
-            }
-
             let confidence = npc["placement_confidence"].as_str().unwrap();
             let candidates = npc["placement_candidates"]
                 .as_array()

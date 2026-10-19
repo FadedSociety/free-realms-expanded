@@ -12,7 +12,7 @@ impl Gameplay {
         &mut self,
         character: &CharacterState,
     ) -> io::Result<Vec<Vec<u8>>> {
-        let packets = self
+        let mut packets = self
             .npc_visibility
             .as_mut()
             .map(|visibility| visibility.update(character.zone_id, character.position))
@@ -26,7 +26,46 @@ impl Gameplay {
                 "removed": packets.iter().filter(|p| p.starts_with(&[35, 0, 3, 0])).count(),
             }));
         }
+        self.append_pending_turnin_screen(&mut packets)?;
         Ok(packets)
+    }
+
+    /// Reopen a saved pending turn-in only after its speaker's 35/2 spawn is in the same
+    /// batch. `ShowQuestEndScreen` (0x00A95420) resolves the packet's actor through the
+    /// client actor table first and does not retry when it is absent; sending the 49/13
+    /// from login synchronization put it before every visibility spawn.
+    fn append_pending_turnin_screen(&self, packets: &mut Vec<Vec<u8>>) -> io::Result<()> {
+        if packets.is_empty() {
+            return Ok(());
+        }
+        let Some(engine) = self.npc_quests.as_ref() else {
+            return Ok(());
+        };
+        let Some(quest_id) = engine.state().pending_turnin else {
+            return Ok(());
+        };
+        let Some(content_key) = engine.turnin_npc_id(quest_id) else {
+            return Ok(());
+        };
+        let Some(runtime_guid) = packets.iter().find_map(|packet| {
+            let spawn = crate::startup_world::parse_add_npc(packet).ok()?;
+            let same_npc = spawn.actor_id == content_key
+                || self
+                    .npc_visibility
+                    .as_ref()
+                    .and_then(|visibility| visibility.content_key(spawn.actor_id))
+                    == Some(content_key);
+            same_npc.then_some(spawn.actor_id)
+        }) else {
+            return Ok(());
+        };
+        let mut screen = engine.quest_end_packet(quest_id)?;
+        if screen.len() < 14 {
+            return Ok(());
+        }
+        screen[6..14].copy_from_slice(&runtime_guid.to_le_bytes());
+        packets.push(screen);
+        Ok(())
     }
 
     pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {

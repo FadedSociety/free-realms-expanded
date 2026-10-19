@@ -1,6 +1,7 @@
 use osfr_tools::{
     character_store::CharacterState,
-    gameplay::Gameplay,
+    gameplay::{Gameplay, GameplayState},
+    gateway::Gateway,
     quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestStatus},
     startup_world,
 };
@@ -127,6 +128,97 @@ fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool
                 || (packet.len() >= 18
                     && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == id)
         })
+}
+
+fn gateway_login() -> Vec<u8> {
+    let mut bytes = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["f170-test-ticket", "1.910.1.530630", ""]
+        .iter()
+        .enumerate()
+    {
+        bytes.extend((text.len() as u32).to_le_bytes());
+        bytes.extend(text.as_bytes());
+        if index == 0 {
+            bytes.extend(CHARACTER.to_le_bytes());
+        }
+    }
+    bytes
+}
+
+fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut bytes = vec![5, 0, 1];
+    bytes.extend((inner.len() as u32).to_le_bytes());
+    bytes.extend(inner);
+    bytes
+}
+
+fn application_body(packet: &[u8]) -> Option<&[u8]> {
+    if packet.len() < 7 || packet[..3] != [5, 0, 1] {
+        return None;
+    }
+    let length = u32::from_le_bytes(packet[3..7].try_into().unwrap()) as usize;
+    (packet.len() == length + 7).then_some(&packet[7..])
+}
+
+/// Drive the real gateway world-entry sequence for a saved pending turn-in and prove the
+/// directed 35/2 spawn is queued before the 49/13 end screen that resolves its actor.
+fn gateway_reconnect_orders_spawn_before_screen(
+    saved: &GameplayState,
+    character: &CharacterState,
+    speaker: u64,
+    now: u64,
+) {
+    let reference = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/rust-gateway-reference");
+    assert!(
+        reference.join("manifest.json").is_file(),
+        "the gateway reconnect regression requires the private gateway reference at {}",
+        reference.display()
+    );
+    let mut gateway = Gateway::load_gameplay(
+        &reference,
+        character.clone(),
+        &gameplay_dir(),
+        Some(saved.clone()),
+    )
+    .expect("gateway loads the saved chapter");
+    gateway.handle_at(&gateway_login(), now).unwrap();
+    gateway.handle_at(&wrap(&[13, 0]), now + 1).unwrap();
+    let loaded = gateway
+        .handle_at(&wrap(&[10, 0]), now + 2)
+        .expect("reconnect reaches the loaded event");
+    let replies: Vec<_> = loaded
+        .replies
+        .iter()
+        .filter_map(|packet| application_body(packet))
+        .collect();
+    let spawn = replies
+        .iter()
+        .position(|packet| {
+            packet.starts_with(&[35, 0, 2, 0])
+                && packet.len() >= 12
+                && u64::from_le_bytes(packet[4..12].try_into().unwrap()) == speaker
+        })
+        .expect("reconnect spawns the turn-in speaker");
+    let screen = replies
+        .iter()
+        .position(|packet| has_family(packet, 49, 13, Some(HOOLIGAN_FIGHT)))
+        .expect("reconnect reopens the pending end screen");
+    assert!(
+        spawn < screen,
+        "the 49/13 screen must follow the speaker's 35/2 spawn"
+    );
+    let end = replies[screen];
+    assert_eq!(
+        u64::from_le_bytes(end[6..14].try_into().unwrap()),
+        speaker,
+        "the recovered end screen carries the runtime speaker"
+    );
+    assert_eq!(
+        u32::from_le_bytes(end[14..18].try_into().unwrap()),
+        HOOLIGAN_FIGHT,
+        "the third dword remains the quest id that 49/14 sends back"
+    );
 }
 
 fn interact_npc(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) {
@@ -287,6 +379,24 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
         );
     }
     assert_eq!(quest_count(game, HOOLIGAN_FIGHT), 4);
+
+    // A replayed hit against the last defeated enemy must not advance the objective.
+    let last = field_hooligans()
+        .last()
+        .expect("the chapter owns four field spawns")
+        .0;
+    let before_replay = saved(game);
+    *now += 700;
+    let replayed = game
+        .handle_in_world(&targeted_basic_attack(last), &character, *now)
+        .expect("a replayed attack is a clean refusal");
+    assert!(!replayed.changed);
+    assert_eq!(
+        saved(game),
+        before_replay,
+        "a replayed hit on a defeated enemy changes no quest state"
+    );
+    assert_eq!(quest_count(game, HOOLIGAN_FIGHT), 4);
 }
 
 fn quest_count(game: &Gameplay, quest_id: u32) -> u32 {
@@ -311,6 +421,17 @@ fn npc_select(npc_id: u64, choice: i32) -> Vec<u8> {
     packet.extend(npc_id.to_le_bytes());
     packet.extend(choice.to_le_bytes());
     packet
+}
+
+fn targeted_basic_attack(target: u64) -> Vec<u8> {
+    [
+        vec![36, 0, 10, 0],
+        1_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        target.to_le_bytes().to_vec(),
+    ]
+    .concat()
 }
 
 fn dialogue_choice(row: i32) -> Vec<u8> {
@@ -345,12 +466,23 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     let spawned = game
         .update_npc_visibility(&character)
         .expect("Carlos visibility updates");
-    assert!(
-        spawned.iter().any(|packet| {
-            packet.starts_with(&[35, 0, 2, 0])
-                && startup_world::parse_add_npc(packet).is_ok_and(|npc| npc.actor_id == CARLOS)
-        }),
-        "the reconstructed chapter spawn must be sent to the client"
+    let carlos_adds: Vec<_> = spawned
+        .iter()
+        .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+        .filter(|npc| npc.actor_id == CARLOS)
+        .collect();
+    assert_eq!(
+        carlos_adds.len(),
+        1,
+        "the bound extra spawn must be the only Carlos creation; a regional copy emits two 35/2s"
+    );
+    assert_eq!(
+        carlos_adds[0].model_id, 964,
+        "Carlos keeps the extra-spawn model"
+    );
+    assert_eq!(
+        carlos_adds[0].name_string_id, 20_671,
+        "Carlos keeps the recovered locale name id"
     );
     accept_quest(
         &mut game,
@@ -404,17 +536,42 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     let restored_state = game.state();
     drop(game);
 
+    // The real gateway must queue Jones's 35/2 before the 49/13 that resolves him.
+    gateway_reconnect_orders_spawn_before_screen(&restored_state, &character, JONES, now + 50);
+
     // Disconnect after the end screen opened and before its 49/14 confirmation.
     let mut game = load_game(Some(restored_state));
     character.position = jones;
     let initialized = game
         .initialize_world(&character, now + 100)
         .expect("reconnected gameplay initializes");
-    let restored_end = initialized
-        .replies
+    assert!(
+        !initialized
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, Some(HOOLIGAN_FIGHT))),
+        "login synchronization must not open the end screen before the speaker spawn"
+    );
+    let restored = game
+        .update_npc_visibility(&character)
+        .expect("reconnected NPC visibility updates");
+    let spawn = restored
         .iter()
-        .find(|packet| has_family(packet, 49, 13, Some(HOOLIGAN_FIGHT)))
+        .position(|packet| {
+            packet.starts_with(&[35, 0, 2, 0])
+                && packet.len() >= 12
+                && u64::from_le_bytes(packet[4..12].try_into().unwrap()) == JONES
+        })
+        .expect("reconnect must spawn the turn-in speaker");
+    let screen = restored
+        .iter()
+        .position(|packet| has_family(packet, 49, 13, Some(HOOLIGAN_FIGHT)))
         .expect("reconnect must reopen the pending end screen");
+    assert!(
+        spawn < screen,
+        "the recovered end screen must follow the speaker spawn"
+    );
+    let restored_end = &restored[screen];
     assert_eq!(
         u64::from_le_bytes(restored_end[6..14].try_into().unwrap()),
         JONES,
@@ -510,6 +667,33 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
 }
 
 #[test]
+fn unoffered_menu_choice_changes_nothing_and_keeps_the_menu_open() {
+    let (mut game, _) = fresh_game();
+    let character = character_at(npc_position("cobblestone_village.json", CARLOS));
+    game.update_npc_visibility(&character)
+        .expect("Carlos visibility updates");
+    interact_npc(&mut game, &character, CARLOS, 1_000);
+    let before = saved(&game);
+    let refused = game.handle_in_world(&npc_select(CARLOS, i32::MAX), &character, 1_001);
+    assert!(refused.is_err(), "an unoffered menu choice is refused");
+    assert_eq!(
+        saved(&game),
+        before,
+        "a refused menu choice changes nothing"
+    );
+    let talked = game
+        .handle_in_world(&npc_select(CARLOS, 1), &character, 1_002)
+        .expect("the open menu still accepts Talk");
+    assert!(
+        talked
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "a refused choice must not consume the open menu"
+    );
+}
+
+#[test]
 fn disabled_starting_quests_refuse_without_changing_state() {
     let mut engine = QuestEngine::from_split_content(
         &content_dir(),
@@ -525,7 +709,9 @@ fn disabled_starting_quests_refuse_without_changing_state() {
     )
     .unwrap();
     let before = engine.state().clone();
-    for quest_id in [3_030_004, 3_030_005] {
+    // C2 and the later Highroad records stay empty/disabled; their provenance must not
+    // claim objectives the server does not run (F135 review finding 4).
+    for quest_id in [3_030_004, 3_030_005, 3_030_009, 3_030_010] {
         let refused = engine.offer(quest_id, CARLOS);
         assert_eq!(refused.denial, Some(QuestDenial::Unavailable));
         assert!(!refused.changed);

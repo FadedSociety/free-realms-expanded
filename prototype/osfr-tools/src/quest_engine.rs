@@ -1429,15 +1429,6 @@ impl QuestEngine {
                 }
             }
         }
-        // The 49/13 end screen is otherwise connection-local. Re-send a saved pending turn-in
-        // with its actor handle so reconnecting cannot strand the completed quest. The client
-        // reader 0x00C7B990 decodes the first u64 as the actor and the third dword as the
-        // 49/14 reply id; the same packet shape is patched in the live Talk path.
-        if let Some(quest_id) = self.state.pending_turnin {
-            let mut packet = self.quest_end_packet(quest_id)?;
-            packet[6..14].copy_from_slice(&self.definitions[&quest_id].turnin_npc_id.to_le_bytes());
-            packets.push(packet);
-        }
         Ok(packets)
     }
 
@@ -1540,6 +1531,11 @@ impl QuestEngine {
     /// The NPC that gives `quest_id`; a breadcrumb start offers through this giver (R).
     pub fn giver_npc_id(&self, quest_id: u32) -> Option<u64> {
         self.definitions.get(&quest_id).map(|d| d.giver_npc_id)
+    }
+
+    /// The NPC that accepts `quest_id`'s completed turn-in.
+    pub fn turnin_npc_id(&self, quest_id: u32) -> Option<u64> {
+        self.definitions.get(&quest_id).map(|d| d.turnin_npc_id)
     }
 
     pub fn is_enabled(&self, quest_id: u32) -> bool {
