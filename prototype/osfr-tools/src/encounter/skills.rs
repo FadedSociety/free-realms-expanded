@@ -18,6 +18,81 @@ pub(super) struct SkillBuff {
     pub(super) crit_damage: f32,
 }
 
+/// (R) Session-only skill state: DoTs, stuns and buffs. Reapplication refreshes
+/// one entry per target/definition; caster buffs are private to the player,
+/// while stuns and target buffs are shared with the field.
+#[derive(Clone, Default)]
+pub(super) struct SkillEffects {
+    pub(super) dots: BTreeMap<(u64, i32), SkillDot>,
+    pub(super) stuns: BTreeMap<u64, u64>,
+    pub(super) caster_buffs: BTreeMap<i32, SkillBuff>,
+    pub(super) target_buffs: BTreeMap<(u64, i32), SkillBuff>,
+}
+
+impl SkillEffects {
+    pub(super) fn clear(&mut self) {
+        self.dots.clear();
+        self.stuns.clear();
+        self.caster_buffs.clear();
+        self.target_buffs.clear();
+    }
+
+    /// A defeated or evaded incarnation ends: drop every effect on it.
+    pub(super) fn forget_target(&mut self, guid: u64) {
+        self.dots.retain(|(target, _), _| *target != guid);
+        self.stuns.remove(&guid);
+        self.target_buffs.retain(|(target, _), _| *target != guid);
+    }
+
+    pub(super) fn expire(&mut self, now_ms: u64) {
+        self.stuns.retain(|_, until| now_ms < *until);
+        self.caster_buffs.retain(|_, buff| now_ms < buff.until_ms);
+        self.target_buffs.retain(|_, buff| now_ms < buff.until_ms);
+    }
+
+    pub(super) fn stunned(&self, guid: u64, now_ms: u64) -> bool {
+        self.stuns.get(&guid).is_some_and(|until| now_ms < *until)
+    }
+
+    /// (R) Strongest modifier wins; repeated casts refresh instead of stacking.
+    pub(super) fn damage(&self, target: u64, damage: u32) -> u32 {
+        let outgoing = self
+            .caster_buffs
+            .values()
+            .map(|buff| buff.damage)
+            .fold(1.0_f32, f32::max);
+        let taken = self
+            .target_buffs
+            .iter()
+            .filter(|((guid, _), _)| *guid == target)
+            .map(|(_, buff)| buff.taken)
+            .fold(1.0_f32, f32::max);
+        (damage as f32 * outgoing * taken).round() as u32
+    }
+
+    pub(super) fn mitigation(&self) -> f32 {
+        self.caster_buffs
+            .values()
+            .map(|buff| buff.taken)
+            .fold(1.0_f32, f32::min)
+    }
+
+    pub(super) fn crit_bonus(&self) -> u32 {
+        self.caster_buffs
+            .values()
+            .map(|buff| buff.crit)
+            .max()
+            .unwrap_or(0)
+    }
+
+    pub(super) fn crit_damage_bonus(&self) -> f32 {
+        self.caster_buffs
+            .values()
+            .map(|buff| buff.crit_damage)
+            .fold(0.0_f32, f32::max)
+    }
+}
+
 pub(super) fn merge_skill_outcome(out: &mut EncounterOutcome, other: EncounterOutcome) {
     out.changed |= other.changed;
     out.replies.extend(other.replies);
@@ -75,7 +150,7 @@ impl EncounterEngine {
         if self.energy < ability.energy_cost {
             return Ok(refuse(285));
         }
-        self.expire_skill_buffs(now_ms);
+        self.skills.expire(now_ms);
         let mut out = EncounterOutcome::default();
         let offensive =
             ability.damage_multiplier > 0.0 || ability.effects.iter().any(JobEffect::needs_target);
@@ -218,7 +293,7 @@ impl EncounterEngine {
                         if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
                             && !self.shielded(guid)
                         {
-                            self.skill_dots.insert(
+                            self.skills.dots.insert(
                                 (guid, ability.definition_id),
                                 SkillDot {
                                     damage: (base as f32 * multiplier).round() as u32,
@@ -235,7 +310,8 @@ impl EncounterEngine {
                         if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
                             && !self.shielded(guid)
                         {
-                            self.skill_stuns
+                            self.skills
+                                .stuns
                                 .entry(guid)
                                 .and_modify(|until| {
                                     *until = (*until).max(now_ms.saturating_add(duration_ms))
@@ -255,28 +331,25 @@ impl EncounterEngine {
                     crit_bonus,
                     crit_damage_bonus,
                 } => {
-                    let recipients = if recipient == EffectRecipient::Caster {
-                        vec![0]
-                    } else {
-                        targets.clone()
+                    let buff = SkillBuff {
+                        until_ms: now_ms.saturating_add(duration_ms),
+                        damage: damage_multiplier,
+                        taken: damage_taken_multiplier,
+                        crit: crit_bonus,
+                        crit_damage: crit_damage_bonus,
                     };
-                    for guid in recipients {
-                        if guid != 0
-                            && (!self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
-                                || self.shielded(guid))
-                        {
-                            continue;
+                    if recipient == EffectRecipient::Caster {
+                        self.skills.caster_buffs.insert(ability.definition_id, buff);
+                    } else {
+                        for &guid in &targets {
+                            if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
+                                && !self.shielded(guid)
+                            {
+                                self.skills
+                                    .target_buffs
+                                    .insert((guid, ability.definition_id), buff.clone());
+                            }
                         }
-                        self.skill_buffs.insert(
-                            (guid, ability.definition_id),
-                            SkillBuff {
-                                until_ms: now_ms.saturating_add(duration_ms),
-                                damage: damage_multiplier,
-                                taken: damage_taken_multiplier,
-                                crit: crit_bonus,
-                                crit_damage: crit_damage_bonus,
-                            },
-                        );
                     }
                 }
             }
@@ -310,46 +383,15 @@ impl EncounterEngine {
         Ok(out)
     }
 
-    /// Energy comes back over time; reported when it changes.
-    pub(super) fn expire_skill_buffs(&mut self, now_ms: u64) {
-        self.skill_buffs.retain(|_, b| now_ms < b.until_ms);
-        self.skill_stuns.retain(|_, until| now_ms < *until);
-    }
-
-    /// (R) Strongest modifier wins; repeated casts refresh instead of stacking.
-    pub(super) fn skill_damage(&self, target: u64, damage: u32) -> u32 {
-        let outgoing = self
-            .skill_buffs
-            .iter()
-            .filter(|((guid, _), _)| *guid == 0)
-            .map(|(_, b)| b.damage)
-            .fold(1.0_f32, f32::max);
-        let taken = self
-            .skill_buffs
-            .iter()
-            .filter(|((guid, _), _)| *guid == target)
-            .map(|(_, b)| b.taken)
-            .fold(1.0_f32, f32::max);
-        (damage as f32 * outgoing * taken).round() as u32
-    }
-
-    pub(super) fn skill_mitigation(&self) -> f32 {
-        self.skill_buffs
-            .iter()
-            .filter(|((guid, _), _)| *guid == 0)
-            .map(|(_, b)| b.taken)
-            .fold(1.0_f32, f32::min)
-    }
-
     pub(super) fn tick_job_effects(
         &mut self,
         now_ms: u64,
         out: &mut EncounterOutcome,
     ) -> io::Result<()> {
-        self.expire_skill_buffs(now_ms);
+        self.skills.expire(now_ms);
         // At most 60 ticks per definition/target (30 s / 500 ms); delayed
         // calls catch up only the authored window, never extend its lifetime.
-        let pending = std::mem::take(&mut self.skill_dots);
+        let pending = std::mem::take(&mut self.skills.dots);
         for (key, mut dot) in pending {
             let (guid, _) = key;
             while dot.next_ms <= now_ms && dot.next_ms <= dot.until_ms {
@@ -386,7 +428,7 @@ impl EncounterEngine {
                     .as_ref()
                     .is_none_or(|a| a.phase == EncounterPhase::Fighting)
             {
-                self.skill_dots.insert(key, dot);
+                self.skills.dots.insert(key, dot);
             }
         }
         Ok(())
@@ -420,13 +462,7 @@ impl EncounterEngine {
             .crit_seed
             .wrapping_mul(6_364_136_223_846_793_005)
             .wrapping_add(1_442_695_040_888_963_407);
-        let bonus = self
-            .skill_buffs
-            .iter()
-            .filter(|((guid, _), _)| *guid == 0)
-            .map(|(_, b)| b.crit)
-            .max()
-            .unwrap_or(0);
+        let bonus = self.skills.crit_bonus();
         ((self.crit_seed >> 33) % 100) < u64::from((self.crit_percent + bonus).min(100))
     }
 }

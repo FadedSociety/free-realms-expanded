@@ -1,4 +1,7 @@
-use osfr_tools::encounter::{EncounterEngine, EncounterOutcome};
+use osfr_tools::{
+    encounter::{EncounterEngine, EncounterOutcome},
+    opening_abilities::JobAbility,
+};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
@@ -61,6 +64,18 @@ fn at(e: &EncounterEngine) -> [f32; 3] {
         .find(|a| a.guid == GUID)
         .unwrap()
         .position
+}
+fn hits_from(out: &EncounterOutcome, attacker: u64) -> Vec<u32> {
+    out.replies
+        .iter()
+        .filter(|p| {
+            p.starts_with(&[32, 0, 7, 0]) && p.get(4..12) == Some(attacker.to_le_bytes().as_slice())
+        })
+        .map(|p| u32::from_le_bytes(p[28..32].try_into().unwrap()))
+        .collect()
+}
+fn timed_effect(effects: Value) -> JobAbility {
+    serde_json::from_value(json!({"slot":1,"definition_id":62001,"name_id":1,"icon_id":1,"min_level":1,"cooldown_ms":0,"damage_multiplier":0.0,"heal":0,"effects":effects})).unwrap()
 }
 fn hp(out: &EncounterOutcome) -> Option<(u32, u32)> {
     out.replies
@@ -133,6 +148,95 @@ fn lost_target_returns_at_run_speed_then_heals() {
         }
     }
     assert!(healed);
+}
+
+#[test]
+fn kill_then_respawn_forgets_skill_effects() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    let stun = timed_effect(json!([{"kind":"stun","duration_ms":30000}]));
+    let debuff = timed_effect(
+        json!([{"kind":"buff","recipient":"target","duration_ms":30000,"damage_multiplier":1.0,"damage_taken_multiplier":2.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let dot = timed_effect(
+        json!([{"kind":"damage_over_time","multiplier":0.5,"duration_ms":30000,"interval_ms":1000}]),
+    );
+    e.job_ability(&stun, GUID, [0.0; 3], 11, 0).unwrap();
+    e.job_ability(&debuff, GUID, [0.0; 3], 11, 700).unwrap();
+    e.job_ability(&dot, GUID, [0.0; 3], 11, 1400).unwrap();
+    let out = e.attack(GUID, [0.0; 3], 11, 0, 2100).unwrap();
+    assert_eq!(hp(&out), Some((0, 100)), "the debuff lands the killing hit");
+    let out = e.tick([100.0, 0.0, 0.0], 11, 3100).unwrap();
+    assert_eq!(hp(&out), Some((100, 100)), "the kill respawns");
+    let out = e.tick([100.0, 0.0, 0.0], 11, 4100).unwrap();
+    assert!(
+        hits_from(&out, 1).is_empty(),
+        "damage over time was cleared"
+    );
+    let out = e.tick([0.0; 3], 11, 4200).unwrap();
+    assert!(!hits_from(&out, GUID).is_empty(), "the stun was cleared");
+    let out = e.attack(GUID, [0.0; 3], 11, 0, 4300).unwrap();
+    assert_eq!(hp(&out), Some((25, 100)), "the target buff was cleared");
+}
+
+#[test]
+fn evade_completion_forgets_skill_effects() {
+    let f = Fixture::new(1, 0.0);
+    f.edit("max_health", json!(1000));
+    let mut e = f.load();
+    let stun = timed_effect(json!([{"kind":"stun","duration_ms":30000}]));
+    let debuff = timed_effect(
+        json!([{"kind":"buff","recipient":"target","duration_ms":30000,"damage_multiplier":1.0,"damage_taken_multiplier":2.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let dot = timed_effect(
+        json!([{"kind":"damage_over_time","multiplier":0.5,"duration_ms":30000,"interval_ms":1000}]),
+    );
+    e.job_ability(&stun, GUID, [0.0; 3], 11, 0).unwrap();
+    e.job_ability(&debuff, GUID, [0.0; 3], 11, 700).unwrap();
+    e.job_ability(&dot, GUID, [0.0; 3], 11, 1400).unwrap();
+    let out = e.attack(GUID, [0.0; 3], 11, 0, 2100).unwrap();
+    assert_eq!(hp(&out).unwrap().0, 850, "the debuff doubles the hit");
+    let out = e.tick([100.0, 0.0, 0.0], 11, 2200).unwrap();
+    assert!(hits_from(&out, 1).is_empty(), "the dot was not due yet");
+    assert_eq!(hp(&out), Some((1000, 1000)), "the evading actor heals home");
+    let out = e.tick([100.0, 0.0, 0.0], 11, 3500).unwrap();
+    assert!(
+        hits_from(&out, 1).is_empty(),
+        "damage over time was cleared"
+    );
+    let out = e.tick([0.0; 3], 11, 4200).unwrap();
+    assert!(!hits_from(&out, GUID).is_empty(), "the stun was cleared");
+    let out = e.attack(GUID, [0.0; 3], 11, 0, 4300).unwrap();
+    assert_eq!(hp(&out), Some((925, 1000)), "the target buff was cleared");
+}
+
+#[test]
+fn reload_field_enemies_forgets_skill_effects() {
+    let f = Fixture::new(1, 0.0);
+    let mut e = f.load();
+    let stun = timed_effect(json!([{"kind":"stun","duration_ms":30000}]));
+    let debuff = timed_effect(
+        json!([{"kind":"buff","recipient":"target","duration_ms":30000,"damage_multiplier":1.0,"damage_taken_multiplier":2.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let dot = timed_effect(
+        json!([{"kind":"damage_over_time","multiplier":0.5,"duration_ms":30000,"interval_ms":1000}]),
+    );
+    e.job_ability(&stun, GUID, [0.0; 3], 11, 0).unwrap();
+    e.job_ability(&debuff, GUID, [0.0; 3], 11, 700).unwrap();
+    e.job_ability(&dot, GUID, [0.0; 3], 11, 1400).unwrap();
+    e.reload_field_enemies(&f.0.join("field_enemies.json"))
+        .unwrap();
+    let out = e.tick([100.0, 0.0, 0.0], 11, 2200).unwrap();
+    assert!(hits_from(&out, 1).is_empty(), "the dot was not due yet");
+    let out = e.tick([100.0, 0.0, 0.0], 11, 3500).unwrap();
+    assert!(
+        hits_from(&out, 1).is_empty(),
+        "damage over time was cleared"
+    );
+    let out = e.tick([0.0; 3], 11, 4200).unwrap();
+    assert!(!hits_from(&out, GUID).is_empty(), "the stun was cleared");
+    let out = e.attack(GUID, [0.0; 3], 11, 0, 4300).unwrap();
+    assert_eq!(hp(&out), Some((25, 100)), "the target buff was cleared");
 }
 
 #[test]

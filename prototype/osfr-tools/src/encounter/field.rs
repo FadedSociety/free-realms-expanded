@@ -429,11 +429,7 @@ impl EncounterEngine {
         for f in &previous {
             self.moving.remove(&f.actor.guid);
             self.enemy_attacks.remove(&f.actor.guid);
-            self.skill_dots
-                .retain(|(target, _), _| *target != f.actor.guid);
-            self.skill_stuns.remove(&f.actor.guid);
-            self.skill_buffs
-                .retain(|(target, _), _| *target != f.actor.guid);
+            self.skills.forget_target(f.actor.guid);
         }
         packets.extend(self.field_initialization());
         Ok(packets)
@@ -811,12 +807,7 @@ impl EncounterEngine {
                 f.motion = FieldMotion::Chasing;
                 f.roam_goal = None;
             }
-            if self
-                .skill_stuns
-                .get(&guid)
-                .is_some_and(|until| now_ms < *until)
-                && f.motion != FieldMotion::Returning
-            {
+            if self.skills.stunned(guid, now_ms) && f.motion != FieldMotion::Returning {
                 engaged |= f.motion == FieldMotion::Chasing;
                 continue;
             }
@@ -901,9 +892,7 @@ impl EncounterEngine {
                             out.changed = true;
                         }
                         self.enemy_attacks.remove(&guid);
-                        self.skill_dots.retain(|(target, _), _| *target != guid);
-                        self.skill_stuns.remove(&guid);
-                        self.skill_buffs.retain(|(target, _), _| *target != guid);
+                        self.skills.forget_target(guid);
                         f.motion = FieldMotion::Idle;
                         f.target = None;
                         f.reset_serial = f.reset_serial.wrapping_add(1);

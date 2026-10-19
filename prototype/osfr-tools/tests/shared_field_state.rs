@@ -4,6 +4,7 @@ mod unit {
     // W116 synthetic shared-field oracle. All combat rules here are (R).
     use super::E;
     use osfr_tools::encounter::EncounterEngine;
+    use osfr_tools::opening_abilities::JobAbility;
     use serde_json::json;
     use sha2::{Digest, Sha256};
     use std::{fs, path::PathBuf};
@@ -53,6 +54,23 @@ mod unit {
             .find(|p| p.starts_with(&[35, 0, 5, 0]))
             .unwrap();
         u32::from_le_bytes(p[12..16].try_into().unwrap())
+    }
+    fn hit(out: &osfr_tools::encounter::EncounterOutcome, attacker: u64) -> u32 {
+        let p = out
+            .replies
+            .iter()
+            .find(|p| {
+                p.starts_with(&[32, 0, 7, 0])
+                    && p.get(4..12) == Some(attacker.to_le_bytes().as_slice())
+            })
+            .unwrap();
+        u32::from_le_bytes(p[28..32].try_into().unwrap())
+    }
+    fn caster_buff() -> JobAbility {
+        serde_json::from_value(json!({"slot":1,"definition_id":62010,"name_id":1,"icon_id":1,"min_level":1,"cooldown_ms":5000,"damage_multiplier":0,"heal":0,"effects":[{"kind":"buff","recipient":"caster","duration_ms":30000,"damage_multiplier":2.0,"damage_taken_multiplier":1.0,"crit_bonus":0,"crit_damage_bonus":0.0}]})).unwrap()
+    }
+    fn target_debuff(duration_ms: u64) -> JobAbility {
+        serde_json::from_value(json!({"slot":1,"definition_id":62011,"name_id":1,"icon_id":1,"min_level":1,"cooldown_ms":5000,"range":5,"damage_multiplier":0,"heal":0,"effects":[{"kind":"buff","recipient":"target","duration_ms":duration_ms,"damage_multiplier":1.0,"damage_taken_multiplier":2.0,"crit_bonus":0,"crit_damage_bonus":0.0}]})).unwrap()
     }
     #[test]
     fn two_players_share_hp_and_keep_independent_cooldowns() {
@@ -272,6 +290,105 @@ mod unit {
                 .is_empty()
         );
         assert_eq!(field.health(E), Some(0));
+    }
+    #[test]
+    fn caster_buff_is_personal_and_target_debuff_is_shared_until_expiry() {
+        let dir = fixture();
+        let path = dir.join("field_enemies.json");
+        let mut content: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        content["enemies"][0]["max_health"] = json!(2000);
+        fs::write(&path, content.to_string()).unwrap();
+        let mut a = load(&dir);
+        let mut b = load(&dir);
+        let mut field = a.take_shared_fields().unwrap();
+        b.take_shared_fields();
+        let caster = caster_buff();
+        let debuff = target_debuff(2000);
+        a.shared_job_ability(&mut field, 101, &caster, 0, [1., 0., 0.], 2, 0)
+            .unwrap();
+        a.shared_effects(&mut field, 101, 100).unwrap();
+        a.shared_motion(&mut field, &[], 200, 100).unwrap();
+        let out = a
+            .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 700)
+            .unwrap();
+        assert_eq!(hit(&out, 101), 200);
+        let out = b
+            .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 1300)
+            .unwrap();
+        assert_eq!(hit(&out, 202), 100, "B must not inherit A's caster buff");
+        a.shared_job_ability(&mut field, 101, &debuff, E, [1., 0., 0.], 2, 1400)
+            .unwrap();
+        a.shared_effects(&mut field, 101, 1500).unwrap();
+        let players = [
+            a.field_participant(101, [1., 0., 0.], true),
+            b.field_participant(202, [-1., 0., 0.], true),
+        ];
+        a.shared_motion(&mut field, &players, 1600, 100).unwrap();
+        let out = b
+            .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 2100)
+            .unwrap();
+        assert_eq!(hit(&out, 202), 200, "the debuff applies to either attacker");
+        let out = a
+            .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 2800)
+            .unwrap();
+        assert_eq!(
+            hit(&out, 101),
+            400,
+            "A keeps its caster buff after shared calls"
+        );
+        let out = b
+            .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 3500)
+            .unwrap();
+        assert_eq!(hit(&out, 202), 100, "the debuff expires at 3400");
+        let out = a
+            .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 4200)
+            .unwrap();
+        assert_eq!(hit(&out, 101), 200, "the caster buff outlives the debuff");
+    }
+    #[test]
+    fn refused_shared_ability_leaves_skill_effects_untouched() {
+        let dir = fixture();
+        let path = dir.join("field_enemies.json");
+        let mut content: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        content["enemies"][0]["max_health"] = json!(2000);
+        fs::write(&path, content.to_string()).unwrap();
+        let mut a = load(&dir);
+        let mut b = load(&dir);
+        let mut field = a.take_shared_fields().unwrap();
+        b.take_shared_fields();
+        let caster = caster_buff();
+        let debuff = target_debuff(30000);
+        a.shared_job_ability(&mut field, 101, &caster, 0, [1., 0., 0.], 2, 0)
+            .unwrap();
+        a.shared_job_ability(&mut field, 101, &debuff, E, [1., 0., 0.], 2, 700)
+            .unwrap();
+        // An invalid position errors inside the swap.
+        assert!(
+            b.shared_job_ability(&mut field, 202, &debuff, E, [f32::NAN, 0., 0.], 2, 1300)
+                .is_err()
+        );
+        // An unavailable ability returns the 286 refusal through the same swap.
+        let mut unavailable = target_debuff(30000);
+        unavailable.unavailable = true;
+        let out = b
+            .shared_job_ability(&mut field, 202, &unavailable, E, [-1., 0., 0.], 2, 1300)
+            .unwrap();
+        assert!(
+            out.replies
+                .iter()
+                .any(|p| p.as_slice() == [36u8, 0, 1, 0, 30, 1, 0, 0]),
+            "the unavailable cast returns the 286 failure"
+        );
+        let out = a
+            .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 2000)
+            .unwrap();
+        assert_eq!(
+            hit(&out, 101),
+            400,
+            "both skill maps survived the refused casts"
+        );
     }
     #[test]
     fn canonical_run_id_is_sent_and_survives_solo_validation() {

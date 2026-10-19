@@ -25,7 +25,7 @@ mod skills;
 use self::field::Wander;
 pub(crate) use self::field::level_refusal;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
-use self::skills::{SkillBuff, SkillDot};
+use self::skills::{SkillBuff, SkillDot, SkillEffects};
 
 /// Level-1 player health: the reconstructed baseline the opening was tuned
 /// on. Higher job levels scale from it like the final-era game (see
@@ -711,11 +711,7 @@ pub struct EncounterEngine {
     fight_log: Vec<FightEvent>,
     ability_ready: BTreeMap<i32, u64>,
     last_weapon_refusal: Option<u64>,
-    // (R) Session-only skill state. Reapplication refreshes one entry per
-    // target/definition; no unbounded stacks or persistent wall-clock timers.
-    skill_dots: BTreeMap<(u64, i32), SkillDot>,
-    skill_stuns: BTreeMap<u64, u64>,
-    skill_buffs: BTreeMap<(u64, i32), SkillBuff>,
+    skills: SkillEffects,
     player_profile: i32,
     job_level: u32,
     // Overworld battle markers walking their loop, by battle id.
@@ -887,7 +883,7 @@ impl EncounterEngine {
             mitigation: if self.god {
                 0.
             } else {
-                self.skill_mitigation()
+                self.skills.mitigation()
             },
             grace_until: self.field_grace_until,
             combat: combat && !self.active(),
@@ -1101,9 +1097,7 @@ impl EncounterEngine {
             fight_log: Vec::new(),
             ability_ready: BTreeMap::new(),
             last_weapon_refusal: None,
-            skill_dots: BTreeMap::new(),
-            skill_stuns: BTreeMap::new(),
-            skill_buffs: BTreeMap::new(),
+            skills: SkillEffects::default(),
             player_profile: 0,
             job_level: 1,
             armed: false,
@@ -1210,9 +1204,7 @@ impl EncounterEngine {
     /// player at full health stays full; health never exceeds the new max.
     pub fn set_player_job(&mut self, profile: i32, level: u32) -> Vec<Vec<u8>> {
         if profile != self.player_profile {
-            self.skill_dots.clear();
-            self.skill_stuns.clear();
-            self.skill_buffs.clear();
+            self.skills.clear();
         }
         self.player_profile = profile;
         self.job_level = level.clamp(1, 20);
@@ -1363,9 +1355,7 @@ impl EncounterEngine {
                     .map_or(self.content.world.zone_id, |d| d.zone.zone_id)
     }
     pub fn reset_session(&mut self) {
-        self.skill_dots.clear();
-        self.skill_stuns.clear();
-        self.skill_buffs.clear();
+        self.skills.clear();
         self.armed = false;
         self.results_presented = false;
         self.last_attack = None;
@@ -1927,7 +1917,7 @@ impl EncounterEngine {
         now_ms: u64,
         swing: bool,
     ) -> io::Result<EncounterOutcome> {
-        self.expire_skill_buffs(now_ms);
+        self.skills.expire(now_ms);
         if self.state.player_health == 0 {
             return Ok(EncounterOutcome::default());
         }
@@ -1961,19 +1951,13 @@ impl EncounterEngine {
         let damage = if self.shielded(guid) {
             0
         } else {
-            self.skill_damage(guid, damage)
+            self.skills.damage(guid, damage)
         };
         let critical = damage > 0 && self.roll_crit();
         let damage = if critical {
-            let bonus = self
-                .skill_buffs
-                .iter()
-                .filter(|((guid, _), _)| *guid == 0)
-                .map(|(_, b)| b.crit_damage)
-                .fold(0.0_f32, f32::max);
             (f64::from(damage)
-                * (f64::from(CRIT_NUMERATOR) / f64::from(CRIT_DENOMINATOR) + f64::from(bonus)))
-                as u32
+                * (f64::from(CRIT_NUMERATOR) / f64::from(CRIT_DENOMINATOR)
+                    + f64::from(self.skills.crit_damage_bonus()))) as u32
         } else {
             damage
         };
@@ -2046,9 +2030,7 @@ impl EncounterEngine {
             self.summon(guid, hp, max_health, &mut out);
         }
         if hp == 0 {
-            self.skill_dots.retain(|(target, _), _| *target != guid);
-            self.skill_buffs.retain(|(target, _), _| *target != guid);
-            self.skill_stuns.remove(&guid);
+            self.skills.forget_target(guid);
             if self.shared_sender.is_none() {
                 out.replies.push(remove(guid));
             }
@@ -2506,7 +2488,7 @@ impl EncounterEngine {
             return Ok(energy);
         }
         self.regenerate_energy(now_ms, &mut energy);
-        let mitigation = self.skill_mitigation();
+        let mitigation = self.skills.mitigation();
         let ground = self.ground();
         let actors: Vec<Actor> = if let Some(d) = self.dungeon() {
             d.enemies.clone()
@@ -2541,11 +2523,7 @@ impl EncounterEngine {
             if s.health == 0 || s.dormant {
                 continue;
             }
-            if self
-                .skill_stuns
-                .get(&actor.guid)
-                .is_some_and(|until| now_ms < *until)
-            {
+            if self.skills.stunned(actor.guid, now_ms) {
                 continue;
             }
             let b = self
@@ -2661,9 +2639,7 @@ impl EncounterEngine {
             out.replies
                 .push(player_hp(self.state.player_health, self.max_health));
             if self.state.player_health == 0 {
-                self.skill_dots.clear();
-                self.skill_stuns.clear();
-                self.skill_buffs.clear();
+                self.skills.clear();
                 if let Some(a) = &mut self.state.active {
                     a.phase = EncounterPhase::Lost;
                     out.replies

@@ -78,6 +78,18 @@ fn hit_damages(out: &osfr_tools::encounter::EncounterOutcome) -> Vec<u32> {
         .map(|p| u32::from_le_bytes(p[28..32].try_into().unwrap()))
         .collect()
 }
+fn hits_from(out: &osfr_tools::encounter::EncounterOutcome, attacker: u64) -> Vec<u32> {
+    out.replies
+        .iter()
+        .filter(|p| {
+            p.starts_with(&[32, 0, 7, 0]) && p.get(4..12) == Some(attacker.to_le_bytes().as_slice())
+        })
+        .map(|p| u32::from_le_bytes(p[28..32].try_into().unwrap()))
+        .collect()
+}
+fn timed_effect(effects: Value) -> JobAbility {
+    serde_json::from_value(json!({"slot":1,"definition_id":62001,"name_id":1,"icon_id":1,"min_level":1,"cooldown_ms":0,"damage_multiplier":0.0,"heal":0,"effects":effects})).unwrap()
+}
 #[test]
 fn self_heal_clamps_and_scales_with_the_existing_hp_curve() {
     let f = Fixture::new(10000, 100);
@@ -254,6 +266,84 @@ fn invalid_range_cooldown_and_unavailable_summon_do_not_spend_or_damage() {
     assert!(hit_damages(&e.job_ability(&a, 100, [0.0; 3], 2, 600).unwrap()).is_empty());
     a.unavailable = true;
     assert!(hit_damages(&e.job_ability(&a, 100, [0.0; 3], 2, 10000).unwrap()).is_empty());
+}
+
+#[test]
+fn knockout_clears_skill_effects() {
+    let f = Fixture::new(20000, 400);
+    let mut e = f.load(99, 20);
+    let caster_buff = timed_effect(
+        json!([{"kind":"buff","recipient":"caster","duration_ms":30000,"damage_multiplier":2.0,"damage_taken_multiplier":1.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let debuff = timed_effect(
+        json!([{"kind":"buff","recipient":"target","duration_ms":30000,"damage_multiplier":1.0,"damage_taken_multiplier":2.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let dot = timed_effect(
+        json!([{"kind":"damage_over_time","multiplier":0.5,"duration_ms":30000,"interval_ms":1000}]),
+    );
+    let stun = timed_effect(json!([{"kind":"stun","duration_ms":30000}]));
+    e.job_ability(&caster_buff, 0, [0.0; 3], 99, 0).unwrap();
+    e.job_ability(&dot, 100, [0.0; 3], 99, 700).unwrap();
+    e.job_ability(&stun, 101, [0.0; 3], 99, 1400).unwrap();
+    e.job_ability(&debuff, 100, [0.0; 3], 99, 2100).unwrap();
+    let mut now = 2200;
+    while e.player_health().0 > 0 {
+        e.tick([0.0; 3], 99, now).unwrap();
+        now += 1000;
+        assert!(now < 30_000, "field enemies must knock the player out");
+    }
+    let revive = [vec![41_u8, 0, 122, 0], vec![0; 9]].concat();
+    e.handle(&revive, 1, [0.0; 3], 99, now).unwrap();
+    assert_eq!(e.player_health().0, e.player_health().1);
+    // The safe-location grace is 8 s: wait it out so the nearby enemies stay
+    // engaged instead of evading home and clearing the same state via a second
+    // clear site.
+    now += 8_000;
+    let out = e.tick([0.0; 3], 99, now).unwrap();
+    assert!(
+        hits_from(&out, 1).is_empty(),
+        "damage over time was cleared"
+    );
+    assert!(!hits_from(&out, 101).is_empty(), "the stun was cleared");
+    let hit = e.attack(100, [2.0, 0.0, 0.0], 99, 0, now + 100).unwrap();
+    assert_eq!(
+        hit_damages(&hit),
+        vec![657],
+        "caster and target buffs were cleared"
+    );
+}
+
+#[test]
+fn reset_session_clears_skill_effects() {
+    let f = Fixture::new(10000, 10);
+    let mut e = f.load(99, 1);
+    let caster_buff = timed_effect(
+        json!([{"kind":"buff","recipient":"caster","duration_ms":30000,"damage_multiplier":2.0,"damage_taken_multiplier":1.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let debuff = timed_effect(
+        json!([{"kind":"buff","recipient":"target","duration_ms":30000,"damage_multiplier":1.0,"damage_taken_multiplier":2.0,"crit_bonus":0,"crit_damage_bonus":0.0}]),
+    );
+    let dot = timed_effect(
+        json!([{"kind":"damage_over_time","multiplier":0.5,"duration_ms":30000,"interval_ms":1000}]),
+    );
+    let stun = timed_effect(json!([{"kind":"stun","duration_ms":30000}]));
+    e.job_ability(&caster_buff, 0, [0.0; 3], 99, 0).unwrap();
+    e.job_ability(&dot, 100, [0.0; 3], 99, 700).unwrap();
+    e.job_ability(&stun, 101, [0.0; 3], 99, 1400).unwrap();
+    e.job_ability(&debuff, 100, [0.0; 3], 99, 2100).unwrap();
+    e.reset_session();
+    let out = e.tick([0.0; 3], 99, 2200).unwrap();
+    assert!(
+        hits_from(&out, 1).is_empty(),
+        "damage over time was cleared"
+    );
+    assert!(!hits_from(&out, 101).is_empty(), "the stun was cleared");
+    let hit = e.attack(100, [2.0, 0.0, 0.0], 99, 0, 2800).unwrap();
+    assert_eq!(
+        hit_damages(&hit),
+        vec![70],
+        "caster and target buffs were cleared"
+    );
 }
 
 fn job_wins(profile: i32) {

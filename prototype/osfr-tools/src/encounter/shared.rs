@@ -50,7 +50,7 @@ pub struct SharedFieldState {
     pub(super) moving: BTreeSet<u64>,
     pub(super) dots: BTreeMap<u64, BTreeMap<(u64, i32), SkillDot>>,
     pub(super) stuns: BTreeMap<u64, u64>,
-    pub(super) buffs: BTreeMap<(u64, i32), SkillBuff>,
+    pub(super) target_buffs: BTreeMap<(u64, i32), SkillBuff>,
     pub(super) last_tick: Option<u64>,
     pub(super) template: Arc<Content>,
     pub(super) battles: Arc<Vec<FieldBattle>>,
@@ -239,7 +239,7 @@ impl EncounterEngine {
             moving: BTreeSet::new(),
             dots: BTreeMap::new(),
             stuns: BTreeMap::new(),
-            buffs: BTreeMap::new(),
+            target_buffs: BTreeMap::new(),
             last_tick: None,
             template: self.content.clone(),
             battles: Arc::new(self.battles.clone()),
@@ -348,33 +348,24 @@ impl EncounterEngine {
         std::mem::swap(&mut self.moving, &mut runtime.moving);
         std::mem::swap(&mut self.ledger, &mut runtime.kills);
         let personal_dots = std::mem::replace(
-            &mut self.skill_dots,
+            &mut self.skills.dots,
             runtime.dots.remove(&sender).unwrap_or_default(),
         );
         let personal_stuns =
-            std::mem::replace(&mut self.skill_stuns, std::mem::take(&mut runtime.stuns));
-        let mut personal_buffs =
-            std::mem::replace(&mut self.skill_buffs, std::mem::take(&mut runtime.buffs));
-        for (&key, buff) in &personal_buffs {
-            if key.0 == 0 {
-                self.skill_buffs.insert(key, buff.clone());
-            }
-        }
+            std::mem::replace(&mut self.skills.stuns, std::mem::take(&mut runtime.stuns));
+        let personal_target_buffs = std::mem::replace(
+            &mut self.skills.target_buffs,
+            std::mem::take(&mut runtime.target_buffs),
+        );
         let result = action(self);
         runtime.dots.insert(
             sender,
-            std::mem::replace(&mut self.skill_dots, personal_dots),
+            std::mem::replace(&mut self.skills.dots, personal_dots),
         );
         runtime.dots.retain(|_, dots| !dots.is_empty());
-        runtime.stuns = std::mem::replace(&mut self.skill_stuns, personal_stuns);
-        personal_buffs.retain(|(guid, _), _| *guid != 0);
-        for (&key, buff) in &self.skill_buffs {
-            if key.0 == 0 {
-                personal_buffs.insert(key, buff.clone());
-            }
-        }
-        self.skill_buffs.retain(|(guid, _), _| *guid != 0);
-        runtime.buffs = std::mem::replace(&mut self.skill_buffs, personal_buffs);
+        runtime.stuns = std::mem::replace(&mut self.skills.stuns, personal_stuns);
+        runtime.target_buffs =
+            std::mem::replace(&mut self.skills.target_buffs, personal_target_buffs);
         std::mem::swap(&mut self.field, &mut runtime.enemies);
         std::mem::swap(&mut self.wander, &mut runtime.wander);
         std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
