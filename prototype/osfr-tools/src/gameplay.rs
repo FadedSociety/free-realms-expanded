@@ -52,6 +52,8 @@ mod occupation;
 #[path = "restoration/piece_077.rs"]
 #[allow(dead_code)]
 mod piece_077;
+/// Progress-driven achievement observation over authoritative gameplay state.
+mod progression;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
 
 #[derive(Clone)]
@@ -1181,93 +1183,6 @@ impl Gameplay {
         self.terrain.as_ref()?.height_at(zone, x, z)
     }
 
-    fn achievement_counters(&self) -> BTreeMap<String, u32> {
-        let mut counters = BTreeMap::<String, u32>::new();
-        if let Some(profiles) = &self.profiles {
-            for profile in profiles
-                .state()
-                .unlocked
-                .iter()
-                .copied()
-                .chain(profiles.state().experience.keys().copied())
-            {
-                if let Some(slug) = self.achievement_bindings.job_slug(profile) {
-                    counters.insert(
-                        format!("job_rank:{slug}"),
-                        profiles.rank(profile).saturating_sub(1),
-                    );
-                }
-            }
-        }
-        if let Some(quests) = &self.npc_quests {
-            counters.insert(
-                "quest_completed_count".into(),
-                u32::try_from(
-                    quests
-                        .state()
-                        .quests
-                        .values()
-                        .filter(|quest| quest.status == crate::quest_engine::QuestStatus::Completed)
-                        .count(),
-                )
-                .unwrap_or(1_000_000),
-            );
-        }
-        counters
-    }
-
-    /// Observe authoritative persisted progress on each gameplay stage. Job
-    /// promotions and completed regional quests feed the data-bound
-    /// achievement rules; only a newly completed rule emits packets, grants
-    /// its title or marks the character changed (R). Progress-only observation
-    /// stays session-local.
-    fn sync_achievement_progress(
-        &mut self,
-        out: &mut Outcome,
-        only: Option<&BTreeSet<String>>,
-    ) -> io::Result<()> {
-        if self.achievement_bindings.rules().is_empty() {
-            return Ok(());
-        }
-        let counters = self.achievement_counters();
-        let rewards = self.reward_snapshot();
-        let before = self.progression_extras.achievement_state();
-        let mut achievements = crate::progression_extras::AchievementProgression::new(
-            self.achievement_bindings.rules().to_vec(),
-            before.clone(),
-        )?;
-        let mut completed = Vec::new();
-        for (counter, value) in counters {
-            if only.is_some_and(|keys| !keys.contains(&counter)) {
-                continue;
-            }
-            let transition = achievements.observe(&counter, value, &rewards)?;
-            if !transition.newly_completed.is_empty() {
-                out.replies.extend(transition.packets);
-                out.replies.extend(transition.reward_packets);
-                completed.extend(transition.newly_completed);
-            }
-        }
-        let changed = !completed.is_empty();
-        let claim_bindings = self.achievement_bindings.claim_bindings().to_vec();
-        for binding in &claim_bindings {
-            if completed.contains(&binding.achievement_key) {
-                self.issue_claim(binding.claim_id, binding.grant.clone())?;
-            }
-        }
-        out.replies
-            .extend(self.progression_extras.award_completed_achievement_titles(
-                &completed,
-                self.achievement_bindings.title_bindings(),
-            )?);
-        let after = achievements.state().clone();
-        if changed {
-            self.progression_extras.set_achievement_state(after);
-            out.changed = true;
-        }
-        Ok(())
-    }
-
     /// The active job profile, when profiles are loaded (other players' AddPc).
     pub fn active_profile(&self) -> Option<i32> {
         self.profiles.as_ref().map(|p| p.state().active)
@@ -1910,6 +1825,7 @@ impl Gameplay {
     }
 
     pub fn tick(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
+        let counters_before = self.achievement_counters();
         // W160: bite timers and the leash run beside the world tick; nothing here is saved.
         let fishing = match self.fishing.supervise(
             character.guid,
@@ -1923,6 +1839,7 @@ impl Gameplay {
         let mut out = self.tick_world(character, now_ms)?;
         self.tick_gathering_nodes(now_ms, &mut out)?;
         out.replies.splice(0..0, fishing);
+        self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
     }
 
@@ -2254,15 +2171,7 @@ impl Gameplay {
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
         self.sync_tracked_target(character, &mut out);
         self.sync_client_objectives(&mut out);
-        let changed: BTreeSet<_> = self
-            .achievement_counters()
-            .into_iter()
-            .filter(|(key, value)| counters_before.get(key) != Some(value))
-            .map(|(key, _)| key)
-            .collect();
-        if !changed.is_empty() {
-            self.sync_achievement_progress(&mut out, Some(&changed))?;
-        }
+        self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
     }
 
@@ -5605,6 +5514,12 @@ impl Gameplay {
         if let Some(feedback) = result.feedback {
             out.replies.push(chat::system(&feedback));
         }
+        // Only job XP, a kill or a completed run can move the achievement
+        // counters; a plain hit or a coin-only reward skips the scan.
+        let counters_before = (result.rewards.iter().any(|reward| reward.job_xp > 0)
+            || !result.defeated.is_empty()
+            || result.completed.is_some())
+        .then(|| self.achievement_counters());
         for reward in result.rewards {
             self.grant_reward(reward.coins, &reward.items, out)?;
             if reward.job_xp > 0 {
@@ -5656,6 +5571,9 @@ impl Gameplay {
             } else {
                 zone
             });
+        }
+        if let Some(counters_before) = counters_before {
+            self.settle_achievement_counters(&counters_before, out)?;
         }
         Ok(())
     }

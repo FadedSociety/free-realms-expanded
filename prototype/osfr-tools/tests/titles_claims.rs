@@ -194,6 +194,51 @@ fn decode_claim_rows(packet: &[u8], count_offset: usize) -> Vec<WireClaimItem> {
     rows
 }
 
+/// Independently decode the complete `108/6` body: tracker echo, success byte,
+/// declared blob length, entry count, then one serialized `ClientItemDefinition`
+/// row per entry. Each row must be byte-identical to the catalogue row whose
+/// leading dword is its id, and the cursor must land exactly at the end. This
+/// proves the whole body, not only its header and first id.
+fn decode_definitions_response(packet: &[u8], tracker: u32, inventory: &Inventory) -> Vec<u32> {
+    assert_eq!(&packet[..4], &[108, 0, 6, 0]);
+    assert_eq!(
+        u32::from_le_bytes(packet[4..8].try_into().unwrap()),
+        tracker,
+        "tracker echo"
+    );
+    assert_eq!(packet[8], 1, "success byte");
+    let declared = i32::from_le_bytes(packet[9..13].try_into().unwrap());
+    let blob = &packet[13..];
+    assert_eq!(
+        declared as usize,
+        blob.len(),
+        "the declared blob length is the whole body"
+    );
+    let count = u32::from_le_bytes(blob[..4].try_into().unwrap()) as usize;
+    let mut cursor = 4;
+    let mut ids = Vec::with_capacity(count);
+    for _ in 0..count {
+        assert!(
+            cursor + 4 <= blob.len(),
+            "definition row has its leading id dword"
+        );
+        let id = i32::from_le_bytes(blob[cursor..cursor + 4].try_into().unwrap());
+        let record = inventory
+            .definition_record(id)
+            .expect("definition row exists in the catalogue");
+        let end = cursor + record.len();
+        assert_eq!(
+            &blob[cursor..end],
+            record,
+            "definition {id} body is the catalogue row"
+        );
+        ids.push(u32::try_from(id).unwrap());
+        cursor = end;
+    }
+    assert_eq!(cursor, blob.len(), "complete definitions blob consumed");
+    ids
+}
+
 fn item_grant() -> RewardGrant {
     let mut body = vec![0; 34];
     body[17..21].copy_from_slice(&8u32.to_le_bytes());
@@ -405,11 +450,12 @@ fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() 
     let definitions = definitions_request(0xBEEF, &[8]).unwrap();
     let definitions = send(&mut gateway, &definitions);
     let response = inner_packets(&definitions).pop().unwrap();
-    assert_eq!(&response[..9], &[108, 0, 6, 0, 0xef, 0xbe, 0, 0, 1]);
-    let blob_len = i32::from_le_bytes(response[9..13].try_into().unwrap());
-    assert_eq!(blob_len as usize, response.len() - 13);
-    assert_eq!(u32::from_le_bytes(response[13..17].try_into().unwrap()), 1);
-    assert_eq!(i32::from_le_bytes(response[17..21].try_into().unwrap()), 8);
+    let inventory = Inventory::load(&fixture.content, None).unwrap();
+    assert_eq!(
+        decode_definitions_response(&response, 0xBEEF, &inventory),
+        [8],
+        "the post-claim 108/6 body decodes completely"
+    );
 
     let before_replay = gateway.snapshot();
     let replay = send(&mut gateway, &request);
@@ -483,6 +529,61 @@ fn definitions_before_claim_use_pending_contents_without_consuming_them() {
             .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x33, 0x33, 0, 0, 1]))
     );
     assert_eq!(item_count(&gateway.snapshot(), 8), 1);
+}
+
+/// Native `00a04c10` appends the definition id of every claim entry and does
+/// not deduplicate entries that share one, so `[id, id]` is a valid `108/5`.
+/// The server must authorize both and describe the definition once.
+#[test]
+fn duplicate_definition_ids_are_authorized_and_described_once() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.gateway(None);
+    let mut grant = item_grant();
+    grant.items.push(ItemGrant {
+        definition_id: 8,
+        count: 2,
+    });
+    gateway.issue_claim(CLAIM, grant).unwrap();
+    let before = gateway.snapshot();
+
+    let listed = send(&mut gateway, &ClaimWindow::list_request());
+    let rows = decode_claim_rows(&inner_packets(&listed).pop().unwrap(), 5);
+    assert_eq!(rows.len(), 1);
+    let requested: Vec<u32> = rows[0].entries.iter().map(|entry| entry[1]).collect();
+    assert_eq!(
+        requested,
+        [8, 8],
+        "one pending row can repeat a shared item definition"
+    );
+
+    let response = inner_packets(&send(
+        &mut gateway,
+        &definitions_request(0x1234, &requested).unwrap(),
+    ))
+    .pop()
+    .expect("a duplicate id request must still receive 108/6");
+    let inventory = Inventory::load(&fixture.content, None).unwrap();
+    assert_eq!(
+        decode_definitions_response(&response, 0x1234, &inventory),
+        [8],
+        "each definition is described once"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a definitions response consumed no claim"
+    );
+
+    // Deduplication must not widen authorization: an id absent from every
+    // pending row is still refused without a reply or a state change. 25 is a
+    // catalogue definition, so only the ownership check can refuse it.
+    let after = gateway.snapshot();
+    let refused = send(
+        &mut gateway,
+        &definitions_request(0x5678, &[8, 25]).unwrap(),
+    );
+    assert!(inner_packets(&refused).is_empty());
+    assert_eq!(gateway.snapshot(), after);
 }
 
 #[test]

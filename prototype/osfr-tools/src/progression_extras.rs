@@ -619,6 +619,8 @@ impl AchievementProgression {
         &self.state
     }
 
+    /// Incremental event: add `amount` to every rule of this counter. A rule
+    /// that already completed is left untouched.
     pub fn on_event(
         &mut self,
         counter_key: &str,
@@ -628,17 +630,11 @@ impl AchievementProgression {
         if amount == 0 || amount > MAX_COUNTER {
             return Err(invalid("invalid achievement event amount"));
         }
-        let mut staged_state = self.state.clone();
-        let mut staged_rewards = reward_state.clone();
-        let mut packets = Vec::new();
-        let mut reward_packets = Vec::new();
-        let mut newly_completed = Vec::new();
-
-        for rule in self.rules.iter().filter(|r| r.counter_key == counter_key) {
-            if staged_state.completed.contains(&rule.key) {
-                continue;
+        self.advance(counter_key, reward_state, |state, rule| {
+            if state.completed.contains(&rule.key) {
+                return Ok(None);
             }
-            let current = staged_state
+            let current = state
                 .counters
                 .get(&rule.key)
                 .copied()
@@ -646,46 +642,13 @@ impl AchievementProgression {
                 .checked_add(amount)
                 .filter(|value| *value <= MAX_COUNTER)
                 .ok_or_else(|| invalid("achievement counter overflow"))?;
-            staged_state.counters.insert(rule.key.clone(), current);
-
-            if let Some(id) = rule.client_id {
-                packets.push(achievement_progress_packet(
-                    id,
-                    rule.objective_id,
-                    current,
-                    rule.threshold,
-                ));
-            }
-            if current >= rule.threshold {
-                staged_state.completed.insert(rule.key.clone());
-                if let Some(id) = rule.client_id {
-                    packets.push(achievement_complete_packet(id, rule.trophy_id.unwrap_or(0)));
-                }
-                if !grant_is_empty(&rule.reward) {
-                    let (next, mut emitted) = apply_award(
-                        &staged_rewards,
-                        &rule.reward,
-                        &format!("achievement:{}", rule.key),
-                    )?;
-                    staged_rewards = next;
-                    reward_packets.append(&mut emitted);
-                }
-                newly_completed.push(rule.key.clone());
-            }
-        }
-
-        self.state = staged_state.clone();
-        Ok(AchievementTransition {
-            state: staged_state,
-            packets,
-            reward_state: staged_rewards,
-            reward_packets,
-            newly_completed,
+            Ok(Some(current))
         })
     }
 
     /// Set a counter to an authoritative absolute value. This is used for
     /// values already stored by gameplay (job rank, completed quest count).
+    /// A completed rule keeps its stored counter current but emits nothing.
     pub fn observe(
         &mut self,
         counter_key: &str,
@@ -695,6 +658,26 @@ impl AchievementProgression {
         if value > MAX_COUNTER {
             return Err(invalid("invalid achievement counter"));
         }
+        self.advance(counter_key, reward_state, |state, rule| {
+            if state.counters.get(&rule.key).copied().unwrap_or(0) == value
+                && (value < rule.threshold || state.completed.contains(&rule.key))
+            {
+                return Ok(None);
+            }
+            Ok(Some(value))
+        })
+    }
+
+    /// The one transition engine behind `on_event` and `observe`. The caller
+    /// decides only how the next absolute counter value is derived (incremental
+    /// or absolute); staging, packet emission, completion and reward
+    /// application are shared, so a fix can never reach one path only.
+    fn advance(
+        &mut self,
+        counter_key: &str,
+        reward_state: &RewardState,
+        mut next: impl FnMut(&AchievementState, &AchievementRule) -> io::Result<Option<u32>>,
+    ) -> io::Result<AchievementTransition> {
         let mut staged_state = self.state.clone();
         let mut staged_rewards = reward_state.clone();
         let mut packets = Vec::new();
@@ -702,12 +685,9 @@ impl AchievementProgression {
         let mut newly_completed = Vec::new();
 
         for rule in self.rules.iter().filter(|r| r.counter_key == counter_key) {
-            let current = value.min(MAX_COUNTER);
-            if staged_state.counters.get(&rule.key).copied().unwrap_or(0) == current
-                && (current < rule.threshold || staged_state.completed.contains(&rule.key))
-            {
+            let Some(current) = next(&staged_state, rule)? else {
                 continue;
-            }
+            };
             staged_state.counters.insert(rule.key.clone(), current);
             if staged_state.completed.contains(&rule.key) {
                 continue;
@@ -1320,10 +1300,16 @@ impl ClaimWindow {
         if tracker_id == 0 {
             return Err(invalid("invalid claim tracker"));
         }
+        // Native `00a04c10` appends the definition id of every claim entry and
+        // does not deduplicate entries that share one (`Native Map/Shards/S0285`
+        // row `00a04c10`), so `[id, id]` is a valid definition request.
+        // Authorize every requested id, then describe each definition once.
+        let ids: Vec<u32> = ids
+            .into_iter()
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect();
         let requested: BTreeSet<_> = ids.iter().copied().collect();
-        if requested.len() != ids.len() {
-            return Err(invalid("claim tracker does not own requested definitions"));
-        }
         let pending_ids: BTreeSet<_> = self
             .pending
             .values()

@@ -123,6 +123,42 @@ fn wrap(inner: &[u8]) -> Vec<u8> {
     bytes
 }
 
+fn log_in(session: &mut Session, ticket: &str) {
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (index, text) in [ticket, "1.910.1.530630", ""].into_iter().enumerate() {
+        login.extend((text.len() as u32).to_le_bytes());
+        login.extend(text.as_bytes());
+        if index == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    session.gateway.handle(&login).unwrap();
+    session.gateway.handle(&wrap(&[13, 0])).unwrap();
+    session.gateway.handle(&wrap(&[10, 0])).unwrap();
+}
+
+fn out_rows(session: &Session) -> usize {
+    session
+        .recent
+        .iter()
+        .filter(|row| row["dir"] == "out")
+        .count()
+}
+
+fn dispatch(
+    session: &mut Session,
+    options: &Options,
+    message: &[u8],
+    now_ms: u64,
+    world: &mut SharedWorld,
+    membership: &mut World,
+    sessions: &mut SessionMap,
+) {
+    session
+        .dispatch_message(message, options, now_ms, world, membership, sessions, None)
+        .unwrap();
+}
+
 fn bubble_packet(fg: i32, bg: i32, size: i32, guid: u64) -> Vec<u8> {
     let mut bytes = vec![26, 0, 18, 0];
     for value in [fg, bg, size] {
@@ -237,20 +273,7 @@ fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
     const CLAIM: u64 = 0xA11C_E5;
     let mut rig = rig("claim-budget");
     let session = &mut rig.sessions[0];
-    let mut login = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["claim-budget", "1.910.1.530630", ""]
-        .into_iter()
-        .enumerate()
-    {
-        login.extend((text.len() as u32).to_le_bytes());
-        login.extend(text.as_bytes());
-        if index == 0 {
-            login.extend(1u64.to_le_bytes());
-        }
-    }
-    session.gateway.handle(&login).unwrap();
-    session.gateway.handle(&wrap(&[13, 0])).unwrap();
-    session.gateway.handle(&wrap(&[10, 0])).unwrap();
+    log_in(session, "claim-budget");
     session
         .gateway
         .issue_claim(
@@ -341,20 +364,7 @@ fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
 fn combat_bundle_children_are_budgeted_once() {
     let mut rig = rig("combat-budget");
     let session = &mut rig.sessions[0];
-    let mut login = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["combat-budget", "1.910.1.530630", ""]
-        .into_iter()
-        .enumerate()
-    {
-        login.extend((text.len() as u32).to_le_bytes());
-        login.extend(text.as_bytes());
-        if index == 0 {
-            login.extend(1u64.to_le_bytes());
-        }
-    }
-    session.gateway.handle(&login).unwrap();
-    session.gateway.handle(&wrap(&[13, 0])).unwrap();
-    session.gateway.handle(&wrap(&[10, 0])).unwrap();
+    log_in(session, "combat-budget");
 
     let mut bundle = vec![0, 25];
     for _ in 0..2 {
@@ -394,5 +404,155 @@ fn combat_bundle_children_are_budgeted_once() {
     assert_eq!(
         allowed, 8,
         "a combat bundle must charge each child once, not once per recursive dispatch"
+    );
+}
+
+/// A bundle that mixes a free (non-budgeted) child with a budgeted child is
+/// refused as a whole before staging: the free child must not run when its
+/// sibling has no budget left. The free child is proven effective on its own.
+#[test]
+fn mixed_bundle_is_dropped_whole_when_its_budgeted_child_is_refused() {
+    let mut rig = rig("mixed-budget");
+    let session = &mut rig.sessions[0];
+    log_in(session, "mixed-budget");
+    let mut membership = World::runtime();
+    let mut sessions = SessionMap::new();
+
+    // 167/1/4 is a portal refresh: not in the budget families, and it replies
+    // when it runs.
+    session.recent_on = true;
+    dispatch(
+        session,
+        &rig.options,
+        &wrap(&[167, 0, 1, 4]),
+        1_000,
+        &mut rig.world,
+        &mut membership,
+        &mut sessions,
+    );
+    assert!(
+        out_rows(session) >= 1,
+        "the free portal refresh is effective on its own"
+    );
+
+    // Exhaust the account bucket; the extra requests are silently refused.
+    for _ in 0..12 {
+        dispatch(
+            session,
+            &rig.options,
+            &wrap(&ClaimWindow::list_request()),
+            1_000,
+            &mut rig.world,
+            &mut membership,
+            &mut sessions,
+        );
+    }
+    assert_eq!(
+        out_rows(session),
+        11,
+        "the portal reply plus the allowed list burst"
+    );
+    session.recent.clear();
+
+    let before = session.gateway.snapshot();
+    let mut bundle = vec![0, 25];
+    for child in [wrap(&[167, 0, 1, 4]), wrap(&ClaimWindow::list_request())] {
+        bundle.push(child.len() as u8);
+        bundle.extend(child);
+    }
+    dispatch(
+        session,
+        &rig.options,
+        &bundle,
+        2_000,
+        &mut rig.world,
+        &mut membership,
+        &mut sessions,
+    );
+    assert_eq!(
+        session.gateway.snapshot(),
+        before,
+        "a refused budgeted child must not let the free sibling stage"
+    );
+    assert_eq!(out_rows(session), 0, "a refused bundle produces no replies");
+
+    // The same free child still replies after the refusal, so the empty result
+    // above came from the bundle drop, not from a stale portal throttle.
+    dispatch(
+        session,
+        &rig.options,
+        &wrap(&[167, 0, 1, 4]),
+        3_000,
+        &mut rig.world,
+        &mut membership,
+        &mut sessions,
+    );
+    assert!(out_rows(session) >= 1);
+}
+
+/// The action budget is one bucket per authenticated account, never per
+/// connection: a second session of the same account inherits the exhaustion,
+/// while another account still has its own allowance.
+#[test]
+fn account_budget_is_shared_across_sessions_and_not_across_accounts() {
+    let mut rig = rig("account-budget");
+    rig.sessions[1].account_guid = rig.sessions[0].account_guid;
+    for (index, ticket) in ["account-a", "account-a-second", "account-b"]
+        .into_iter()
+        .enumerate()
+    {
+        log_in(&mut rig.sessions[index], ticket);
+    }
+    let mut membership = World::runtime();
+    let mut sessions = SessionMap::new();
+
+    let first = &mut rig.sessions[0];
+    first.recent_on = true;
+    first.recent.clear();
+    for _ in 0..10 {
+        dispatch(
+            first,
+            &rig.options,
+            &wrap(&ClaimWindow::list_request()),
+            1_000,
+            &mut rig.world,
+            &mut membership,
+            &mut sessions,
+        );
+    }
+    assert_eq!(out_rows(first), 10, "the first session spends the burst");
+
+    let second = &mut rig.sessions[1];
+    second.recent_on = true;
+    dispatch(
+        second,
+        &rig.options,
+        &wrap(&ClaimWindow::list_request()),
+        1_000,
+        &mut rig.world,
+        &mut membership,
+        &mut sessions,
+    );
+    assert_eq!(
+        out_rows(second),
+        0,
+        "a second connection on the exhausted account is refused"
+    );
+
+    let other = &mut rig.sessions[2];
+    other.recent_on = true;
+    dispatch(
+        other,
+        &rig.options,
+        &wrap(&ClaimWindow::list_request()),
+        1_000,
+        &mut rig.world,
+        &mut membership,
+        &mut sessions,
+    );
+    assert_eq!(
+        out_rows(other),
+        1,
+        "another account keeps its own allowance"
     );
 }

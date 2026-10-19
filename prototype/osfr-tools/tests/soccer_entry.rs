@@ -6,8 +6,11 @@
 //! No player names or chat text are embedded.
 
 use osfr_tools::{
+    account_store::AccountRole,
     character_store::CharacterState,
     gameplay::Gameplay,
+    gateway::{Gateway, GatewayOutcome},
+    progression_extras,
     soccer::{self, SoccerPacket},
 };
 use serde_json::json;
@@ -86,6 +89,18 @@ fn copy_files(source: &Path, target: &Path) {
 }
 
 fn soccer_content() -> Vec<u8> {
+    soccer_content_with_reward(0)
+}
+
+/// The same short match with an optional one-win job XP reward. The reward
+/// reaches the bank from the tick payout (`soccer_entry::Session::tick`), not
+/// from a request handler, which is the path the achievement repair covers.
+fn soccer_content_with_reward(job_xp: u32) -> Vec<u8> {
+    let job_xp = if job_xp == 0 {
+        json!({})
+    } else {
+        json!({ "1": job_xp })
+    };
     serde_json::to_vec(&json!({
         "schema_version": 1,
         "source": "T021 synthetic short-match fixture; recovered ids and category only",
@@ -125,7 +140,7 @@ fn soccer_content() -> Vec<u8> {
             "entry_position": [0.0, 0.0, 0.0, 1.0],
             "entry_rotation": [0.0, 0.0, 1.0, 0.0]
         },
-        "reward": {"coins": 10, "job_xp": {}}
+        "reward": {"coins": 10, "job_xp": job_xp}
     }))
     .unwrap()
 }
@@ -399,4 +414,155 @@ fn text(out: &osfr_tools::gameplay::Outcome) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut bytes = vec![5, 0, 1];
+    bytes.extend((inner.len() as u32).to_le_bytes());
+    bytes.extend(inner);
+    bytes
+}
+
+fn gateway_send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome {
+    gateway
+        .handle_at(&wrap(inner), now_ms)
+        .expect("gateway frame")
+}
+
+fn gateway_inner(out: &GatewayOutcome) -> Vec<Vec<u8>> {
+    out.replies
+        .iter()
+        .map(|packet| {
+            if packet.starts_with(&[5, 0, 1]) && packet.len() >= 7 {
+                packet[7..].to_vec()
+            } else {
+                packet.clone()
+            }
+        })
+        .collect()
+}
+
+/// A paid match is a tick-only reward: the finish settlement reaches the bank
+/// from `Gameplay::tick`, outside every application request. Its rank crossing
+/// must award the bound title in that same tick, so the player can select it
+/// without reconnecting.
+#[test]
+fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
+    let fixture = Fixture::new();
+    fs::write(
+        fixture.0.join("soccer.json"),
+        soccer_content_with_reward(50),
+    )
+    .unwrap();
+    let titles = progression_extras::parse_title_content(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/titles.json"))
+            .unwrap(),
+    )
+    .unwrap();
+    let title_id = titles
+        .definitions
+        .iter()
+        .find(|title| title.name == "The Adventurer Enthusiast")
+        .and_then(|title| title.client_id)
+        .expect("the shipped level-20 Adventurer title");
+
+    let mut state = Gameplay::load(&fixture.0, None).unwrap().state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = 1;
+    profiles.unlocked.insert(1);
+    // Rank 19: the 50 XP tick payout crosses the level-20 threshold.
+    profiles.experience.insert(1, 1_850);
+
+    let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../lab/references/rust-gateway-reference")
+        });
+    let version = serde_json::from_slice::<serde_json::Value>(
+        &fs::read(reference.join("manifest.json")).unwrap(),
+    )
+    .unwrap()["client_version"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let character = fixture.character();
+    let mut gateway =
+        Gateway::load_gameplay(&reference, character.clone(), &fixture.0, Some(state)).unwrap();
+    gateway.set_dev_tools(false);
+    gateway.set_role(AccountRole::Player);
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["soccer-achievement", version.as_str(), ""]
+        .into_iter()
+        .enumerate()
+    {
+        login.extend((text.len() as u32).to_le_bytes());
+        login.extend(text.as_bytes());
+        if index == 0 {
+            login.extend(character.guid.to_le_bytes());
+        }
+    }
+    gateway.handle_at(&login, 0).unwrap();
+    gateway_send(&mut gateway, &13u16.to_le_bytes(), 100);
+    gateway_send(&mut gateway, &10u16.to_le_bytes(), 200);
+
+    let played = gateway_send(&mut gateway, &play(SOCCER_ACTIVITY), 1_000);
+    assert!(played.began_zoning, "Play zones into the soccer scene");
+    gateway_send(&mut gateway, &13u16.to_le_bytes(), 1_100);
+    let loaded = gateway_send(&mut gateway, &10u16.to_le_bytes(), 1_200);
+    let instance = offer_instance(&gateway_inner(&loaded));
+
+    gateway_send(&mut gateway, &lifecycle(5, instance), 1_300);
+    let guid = gateway.state().guid;
+    gateway_send(&mut gateway, &position(guid, [0.0, 0.0, 0.0]), 1_300);
+    gateway.tick_at(1_450).unwrap();
+    gateway_send(&mut gateway, &shot(guid), 1_450);
+
+    let mut now = 1_450;
+    let mut packets = Vec::new();
+    let mut won = false;
+    for _ in 0..80 {
+        now += 250;
+        let out = gateway.tick_at(now).unwrap();
+        let batch = gateway_inner(&out);
+        if batch
+            .iter()
+            .any(|reply| reply.starts_with(&[39, 0, 18]) && reply.get(15) == Some(&1))
+        {
+            won = true;
+        }
+        packets.extend(batch);
+        if won {
+            break;
+        }
+    }
+    assert!(won, "the server-scored goal settles as a win");
+    assert!(
+        packets.iter().any(|packet| {
+            packet.starts_with(&[152, 0, 1, 0])
+                && packet.get(6..10) == Some(&title_id.to_le_bytes())
+        }),
+        "the tick payout did not award the level-20 title: {packets:?}"
+    );
+
+    let selected = gateway_send(
+        &mut gateway,
+        &progression_extras::title_select_request(title_id),
+        now + 1_000,
+    );
+    let replies = gateway_inner(&selected);
+    assert!(
+        replies.iter().any(|reply| {
+            reply.starts_with(&[152, 0, 3, 0]) && reply.get(30..34) == Some(&title_id.to_le_bytes())
+        }),
+        "the tick-awarded title could not be selected without reconnecting: {replies:?}"
+    );
+    let titles = gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .progression_extras
+        .unwrap()
+        .titles;
+    assert_eq!(titles.active(), Some(title_id));
 }
