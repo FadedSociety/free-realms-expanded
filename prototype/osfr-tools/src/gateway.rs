@@ -31,6 +31,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 const MAX_MESSAGE: usize = 1_048_576;
 const MAX_REFERENCE: usize = 16_777_216;
 const MAX_BUNDLE_CHILDREN: usize = 128;
+/// (R) One bundled request may not stage more replies than a single outbound budget can carry;
+/// repeating a large read in all 128 children must not accumulate an unbounded payload.
+const MAX_BUNDLE_REPLY_BYTES: usize = 8 * 1024 * 1024;
 
 fn invalid(message: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
@@ -1496,6 +1499,13 @@ impl Gateway {
         let (mut logged_in, mut ready, mut loaded) = (self.logged_in, self.ready, self.loaded);
         let mut outcome = GatewayOutcome::default();
         for (event_index, event) in events.into_iter().enumerate() {
+            if combined
+                && outcome.replies.iter().map(Vec::len).sum::<usize>() > MAX_BUNDLE_REPLY_BYTES
+            {
+                return Err(invalid(
+                    "bundled application response exceeds the outbound budget",
+                ));
+            }
             match event {
                 Event::Login => {
                     if !logged_in {
@@ -1852,6 +1862,12 @@ impl Gateway {
                     }
                 }
             }
+        }
+        if combined && outcome.replies.iter().map(Vec::len).sum::<usize>() > MAX_BUNDLE_REPLY_BYTES
+        {
+            return Err(invalid(
+                "bundled application response exceeds the outbound budget",
+            ));
         }
         self.state = state;
         self.gameplay = gameplay;

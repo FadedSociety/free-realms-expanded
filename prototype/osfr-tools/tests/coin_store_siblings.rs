@@ -42,7 +42,14 @@ fn content_dir() -> PathBuf {
 }
 
 fn definition_row(id: i32) -> Value {
-    let bytes = [id.to_le_bytes(), [0x5a, 0x5a, 0x5a, 0x5a]].concat();
+    definition_row_sized(id, 8)
+}
+
+/// One synthetic row of exactly `size` wire bytes; `size` is bounded by the inventory decoder
+/// at 65,536 bytes.
+fn definition_row_sized(id: i32, size: usize) -> Value {
+    let mut bytes = id.to_le_bytes().to_vec();
+    bytes.resize(size.max(8), 0x5a);
     json!({
         "id": id,
         "slot": 0,
@@ -262,6 +269,29 @@ fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     bytes
 }
 
+/// A bundle that uses the client's 16-bit child length, needed once a 165/2 list passes 255 bytes.
+fn large_bundle(messages: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for message in messages {
+        assert!(message.len() <= u16::MAX as usize);
+        match message.len() {
+            len if len < 255 => bytes.push(len as u8),
+            // 255 is the escape itself, so that length needs the 32-bit form below.
+            255 => {
+                bytes.push(255);
+                bytes.extend(255u16.to_be_bytes());
+                bytes.extend(255u32.to_be_bytes());
+            }
+            len => {
+                bytes.push(255);
+                bytes.extend((len as u16).to_be_bytes());
+            }
+        }
+        bytes.extend(message);
+    }
+    bytes
+}
+
 fn login() -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (i, text) in ["w172-synthetic-ticket", "1.910.1.530630", ""]
@@ -306,6 +336,12 @@ impl Drop for Fixture {
 
 impl Fixture {
     fn new() -> Self {
+        Self::with_definitions(Vec::new())
+    }
+
+    /// A fixture whose unowned catalogue carries `definitions` in addition to the one store row.
+    fn with_definitions(mut definitions: Vec<Value>) -> Self {
+        definitions.push(definition_row(CATALOGUE_ONLY_DEFINITION));
         let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
         let source = std::env::var_os("OSFR_APP_FUZZ_CONTENT")
             .map(PathBuf::from)
@@ -377,7 +413,7 @@ impl Fixture {
             &content.join("item-catalogue.json"),
             &json!({
                 "schema_version": 1,
-                "definitions": [definition_row(CATALOGUE_ONLY_DEFINITION)]
+                "definitions": definitions
             }),
         );
         // Pick an equipped item from the state the gameplay loader actually produces.
@@ -1366,4 +1402,111 @@ fn catalogue_only_definition_is_delivered_before_the_coin_store_ack() {
         (true, vec![CATALOGUE_ONLY_DEFINITION as u32])
     );
     assert_eq!(gateway.snapshot(), before, "definition read changed state");
+}
+
+const LARGE_DEFINITION_BASE: i32 = 920_000;
+
+/// Synthetic unowned catalogue rows of a chosen wire size, plus their requested ids.
+fn large_definitions(count: usize, size: usize) -> (Vec<Value>, Vec<u32>) {
+    let ids: Vec<u32> = (0..count)
+        .map(|index| (LARGE_DEFINITION_BASE + index as i32) as u32)
+        .collect();
+    let rows = ids
+        .iter()
+        .map(|id| definition_row_sized(*id as i32, size))
+        .collect();
+    (rows, ids)
+}
+
+#[test]
+fn multiple_definition_batches_follow_request_order() {
+    let (rows, ids) = large_definitions(2, 40 * 1024);
+    let fixture = Fixture::with_definitions(rows);
+    let inventory = Inventory::load(&fixture.content, None).unwrap();
+    let mut gateway = fixture.connect(fixture.state());
+    let before = gateway.snapshot();
+
+    let replies = send(&mut gateway, &definitions_packet(&ids));
+    assert_eq!(
+        replies.len(),
+        3,
+        "two 40 KiB rows cannot share a 60 KiB batch"
+    );
+    for (index, reply) in replies[..2].iter().enumerate() {
+        let (_, payload) = parse_definition_batch(reply);
+        assert_eq!(
+            payload,
+            inventory.definition_record(ids[index] as i32).unwrap(),
+            "batch {index} must carry the requested row in order"
+        );
+    }
+    assert_eq!(parse_definitions(&replies[2]), (true, ids));
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "definition delivery is read-only"
+    );
+}
+
+#[test]
+fn definition_reply_over_budget_is_refused_before_records_are_copied() {
+    // Sixty-five maximum-size rows exceed the 4 MiB single-answer budget by construction.
+    let (rows, ids) = large_definitions(65, 65_536);
+    let fixture = Fixture::with_definitions(rows);
+    let mut gateway = fixture.connect(fixture.state());
+    let before = gateway.snapshot();
+
+    let replies = send(&mut gateway, &definitions_packet(&ids));
+    assert_eq!(
+        replies.len(),
+        1,
+        "an empty 165/3 answer and no 35/37 payloads"
+    );
+    assert_eq!(parse_definitions(&replies[0]), (false, vec![]));
+    assert_eq!(gateway.snapshot(), before, "the refusal changed state");
+
+    // Canary: sixty rows stay under the budget and are each delivered before the answer.
+    let under = &ids[..60];
+    let replies = send(&mut gateway, &definitions_packet(under));
+    assert_eq!(replies.len(), under.len() + 1);
+    assert_eq!(
+        parse_definitions(replies.last().unwrap()),
+        (true, under.to_vec())
+    );
+    assert_eq!(gateway.snapshot(), before);
+}
+
+#[test]
+fn gateway_rejects_a_bundle_that_repeats_large_definition_requests() {
+    // Three ~3.9 MiB answers fit the single-request budget but not the 8 MiB bundle budget.
+    let (rows, ids) = large_definitions(60, 65_536);
+    let fixture = Fixture::with_definitions(rows);
+    let mut gateway = fixture.connect(fixture.state());
+    let before = gateway.snapshot();
+
+    let request = wrap(&definitions_packet(&ids));
+    let refused = gateway.handle_at(
+        &large_bundle(&[request.clone(), request.clone(), request.clone()]),
+        NOW,
+    );
+    let error = match refused {
+        Ok(_) => panic!("the bundle must not stage twelve MiB of replies"),
+        Err(error) => error,
+    };
+    assert!(
+        error.to_string().contains("outbound budget"),
+        "expected the reply budget refusal, got {error}"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "the refused bundle changed state"
+    );
+
+    // Canary: two identical children stay inside the budget and are both answered.
+    let answered = gateway
+        .handle_at(&large_bundle(&[request.clone(), request]), NOW)
+        .unwrap();
+    assert_eq!(answered.replies.len(), 2 * (ids.len() + 1));
+    assert_eq!(gateway.snapshot(), before);
 }

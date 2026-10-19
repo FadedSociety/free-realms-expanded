@@ -41,6 +41,10 @@ const MAX_DEFINITION_IDS: usize = 4096;
 /// Keep each 35/37 batch below the inbound packet cap. A single decoded row is at most 65,536
 /// bytes, so an exceptionally large row is sent alone.
 const MAX_DEFINITION_BATCH_BYTES: usize = 60 * 1024;
+/// (R) Bound one 165/2 answer before any record is copied. The prepared catalogue's largest row is
+/// 319 bytes, so 4,096 ids are about 1.3 MiB; four MiB leaves threefold headroom without letting
+/// a hostile list of maximum-size rows (65,536 bytes each) allocate the whole 32 MiB catalogue.
+const MAX_DEFINITION_REPLY_BYTES: usize = 4 * 1024 * 1024;
 /// (R) Marketplace requests are tiny (4 bytes, or a 13-byte locale string); anything longer is refused.
 const MAX_MARKETPLACE_REQUEST: usize = 64;
 
@@ -499,42 +503,52 @@ impl CoinShop {
 
     /// 165/2: deliver uncaptured requested definitions in bounded 35/37 batches, then answer with
     /// the requested ids the item catalogue defines, in request order and without duplicates. The
-    /// complete flag is true when every id was known. A malformed or oversized list gets an empty
-    /// incomplete answer, because the client waits for one reply per request (its search stays
-    /// pending otherwise, `00c76e70`). Read-only (R).
+    /// complete flag is true when every id was known. A malformed, oversized or over-budget list
+    /// gets an empty incomplete answer, because the client waits for one reply per request (its
+    /// search stays pending otherwise, `00c76e70`). The record budget is decided before a single
+    /// row is copied, so a repeated bundled request cannot accumulate a definition payload.
+    /// Read-only (R).
     fn item_definitions(&self, inner: &[u8]) -> io::Result<CoinShopOutcome> {
-        let requested = read_i32(inner, 4)
+        let valid = read_i32(inner, 4)
             .ok()
             .and_then(|count| usize::try_from(count).ok())
-            .filter(|count| *count <= MAX_DEFINITION_IDS && inner.len() == 8 + 4 * count)
-            .map(|_| inner[8..].chunks_exact(4));
+            .is_some_and(|count| count <= MAX_DEFINITION_IDS && inner.len() == 8 + 4 * count);
+        if !valid {
+            return Ok(definition_outcome(false, &[]));
+        }
         let (mut known, mut seen) = (Vec::new(), BTreeSet::new());
-        let mut definitions = Vec::new();
-        let mut complete = requested.is_some();
-        for chunk in requested.into_iter().flatten() {
+        // References only: the request is refused before any record bytes are copied.
+        let mut pending = Vec::new();
+        let mut complete = true;
+        let mut deliver_bytes = 0usize;
+        for chunk in inner[8..].chunks_exact(4) {
             let id = u32::from_le_bytes(chunk.try_into().unwrap());
             let defined = i32::try_from(id).is_ok_and(|id| self.inventory.has_definition(id));
             complete &= defined;
             if defined && seen.insert(id) {
                 known.push(id);
                 if !self.inventory.definition_was_captured(id as i32) {
-                    definitions.push(
-                        self.inventory
-                            .definition_record(id as i32)
-                            .expect("definition existence was checked")
-                            .to_vec(),
-                    );
+                    let record = self
+                        .inventory
+                        .definition_record(id as i32)
+                        .expect("definition existence was checked");
+                    deliver_bytes = deliver_bytes.saturating_add(record.len());
+                    pending.push(record);
                 }
             }
         }
-        let mut replies = Vec::new();
+        // (R) Refuse before copying records; the client still gets its one 165/3 answer.
+        if deliver_bytes > MAX_DEFINITION_REPLY_BYTES {
+            return Ok(definition_outcome(false, &[]));
+        }
+        let mut batches = Vec::new();
         let mut batch = Vec::new();
         let mut batch_bytes = 0usize;
-        for record in definitions {
+        for record in pending {
             if !batch.is_empty()
                 && batch_bytes.saturating_add(record.len()) > MAX_DEFINITION_BATCH_BYTES
             {
-                replies.push(
+                batches.push(
                     crate::inventory_v2_fixes::encode_definition_batch_v2(&batch, &[])
                         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?,
                 );
@@ -542,28 +556,17 @@ impl CoinShop {
                 batch_bytes = 0;
             }
             batch_bytes += record.len();
-            batch.push(record);
+            batch.push(record.to_vec());
         }
         if !batch.is_empty() {
-            replies.push(
+            batches.push(
                 crate::inventory_v2_fixes::encode_definition_batch_v2(&batch, &[])
                     .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?,
             );
         }
-        let mut reply = header(COIN_FAMILY, 3);
-        reply.push(u8::from(complete));
-        put_i32(&mut reply, known.len() as i32);
-        known.into_iter().for_each(|id| put_u32(&mut reply, id));
-        replies.push(reply);
-        Ok(CoinShopOutcome {
-            result_code: if complete {
-                RESULT_SUCCESS
-            } else {
-                RESULT_FAILURE
-            },
-            replies,
-            ..CoinShopOutcome::default()
-        })
+        let mut outcome = definition_outcome(complete, &known);
+        outcome.replies.splice(0..0, batches);
+        Ok(outcome)
     }
 
     /// Client-readable 165/13 refusal for a 165/12 the NPC layer rejected before the shop saw it
@@ -1037,6 +1040,23 @@ fn coin_balance_packet(balance: u32) -> Vec<u8> {
     let mut bytes = header(38, 19);
     put_i32(&mut bytes, balance as i32);
     bytes
+}
+
+/// 165/3 as the client reads it (`00c74e40`, `008e8230`): flag, count, then the known ids.
+fn definition_outcome(complete: bool, known: &[u32]) -> CoinShopOutcome {
+    let mut reply = header(COIN_FAMILY, 3);
+    reply.push(u8::from(complete));
+    put_i32(&mut reply, known.len() as i32);
+    known.iter().for_each(|id| put_u32(&mut reply, *id));
+    CoinShopOutcome {
+        result_code: if complete {
+            RESULT_SUCCESS
+        } else {
+            RESULT_FAILURE
+        },
+        replies: vec![reply],
+        ..CoinShopOutcome::default()
+    }
 }
 
 fn counted_empty(family: u16, opcode: u16) -> Vec<u8> {
