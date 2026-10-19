@@ -742,16 +742,13 @@ const CHESS_PLAYER: u64 = 71;
 const DAY_MS: u64 = 86_400_000;
 
 fn service_content(daily_reward_coins: u32) -> ChessContent {
-    serde_json::from_value(json!({
-        "schema_version": 1,
-        "human_side": "white",
-        "daily_reward_coins": daily_reward_coins,
-        "near_equal_margin": 25,
-        "rows": [
-            {"row_id": SINGLE_ROW, "difficulty": 1, "skill": 20, "success_coins": 10}
-        ]
-    }))
-    .unwrap()
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/chess.json");
+    let mut value: serde_json::Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    value["daily_reward_coins"] = json!(daily_reward_coins);
+    value["rows"] = json!([
+        {"row_id": SINGLE_ROW, "difficulty": 1, "skill": 20, "success_coins": 10}
+    ]);
+    serde_json::from_value(value).unwrap()
 }
 
 fn service_texts(outcome: &chess_service::ChessActivityOutcome) -> Vec<String> {

@@ -142,11 +142,12 @@ const FLAG_DOUBLE_PUSH: u8 = 0x80;
 const FLAG_CAPTURE: u8 = 0x60;
 const FLAG_PROMOTION: u8 = 0x40;
 
-/// (R) Weights for the server's one-ply computer move chooser. The defaults are
-/// the reconstructed values reviewed in F116; content may tune them within
-/// [`MAX_SCORE_VALUE`] and [`MAX_CENTRALISATION`].
+/// (R) Weights for the server's one-ply computer move chooser, in score units
+/// compared only against each other. Content must supply every value, bounded
+/// by [`MAX_SCORE_VALUE`] and [`MAX_CENTRALISATION`]; the compiled [`Default`]
+/// only seeds a table catalogue until `ChessContent` applies its block.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
-#[serde(default, deny_unknown_fields)]
+#[serde(deny_unknown_fields)]
 pub struct ChessScoring {
     /// Score added for a move that mates the opponent.
     pub mate: i64,
@@ -154,11 +155,19 @@ pub struct ChessScoring {
     pub check: i64,
     /// Score added for a move that draws (a penalty).
     pub draw: i64,
+    /// Score added when the move captures a pawn.
     pub pawn: i64,
+    /// Score added when the move captures a rook; a promotion to rook scores
+    /// the same value.
     pub rook: i64,
+    /// Score added when the move captures a knight; a promotion scores the same.
     pub knight: i64,
+    /// Score added when the move captures a bishop; a promotion scores the same.
     pub bishop: i64,
+    /// Score added when the move captures a queen; a promotion scores the same.
     pub queen: i64,
+    /// Score added when the move captures a king (unreachable in a legal game);
+    /// kept so the block covers every kind.
     pub king: i64,
     /// Weight of the destination-centre term; the origin term is half.
     pub centralisation: i64,
@@ -1770,14 +1779,17 @@ impl ChessTables {
         }
     }
 
-    /// (R) The chooser weights every table opened after this call uses.
-    pub fn set_scoring(&mut self, scoring: ChessScoring) {
+    /// (R) The chooser weights every table opened after this call uses. The
+    /// block is validated here so no caller can bypass its bounds.
+    pub(crate) fn set_scoring(&mut self, scoring: ChessScoring) -> io::Result<()> {
+        scoring.validate()?;
         self.scoring = scoring;
+        Ok(())
     }
 
     /// (R) A deterministic stream for tests and offline fixtures. Only tables
     /// opened after this call use the new seed.
-    pub fn reseed(&mut self, seed: u64) {
+    pub(crate) fn reseed(&mut self, seed: u64) {
         self.seed = seed;
         self.opened = 0;
     }
@@ -2145,6 +2157,19 @@ mod tests {
                 promote: None
             }),
             "content piece values decide the capture"
+        );
+    }
+
+    #[test]
+    fn table_scoring_setter_refuses_out_of_bounds() {
+        let mut tables = ChessTables::default();
+        assert!(
+            tables
+                .set_scoring(ChessScoring {
+                    mate: -1,
+                    ..ChessScoring::default()
+                })
+                .is_err()
         );
     }
 

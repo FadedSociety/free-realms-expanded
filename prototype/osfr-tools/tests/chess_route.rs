@@ -11,7 +11,11 @@ use osfr_tools::{
     inventory::InventoryItem,
     opening::{OpeningEngine, OpeningTrigger},
 };
-use std::path::PathBuf;
+use std::{
+    fs,
+    path::PathBuf,
+    sync::atomic::{AtomicU64, Ordering},
+};
 
 #[path = "support/chess_bot.rs"]
 mod chess_bot;
@@ -22,6 +26,7 @@ const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 const CHESS_ROW: u32 = 20;
 const GUMBO: i32 = 70;
 const COOKING_INPUTS: [(i32, u32); 4] = [(2862, 4), (2875, 4), (2884, 4), (2900, 4)];
+static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
 fn content() -> PathBuf {
     std::env::var_os("OSFR_ACTIVITY_CONTENT")
@@ -199,6 +204,8 @@ fn the_daily_chess_ledger_round_trips_through_the_save_and_gameplay_load() {
     assert_eq!(game.state().chess, Some(ledger));
 }
 
+/// The 39/18 body is `u8 Won` plus three i32, read by client `0x009b7ec0`
+/// before the applier `0x009ad480` stores it; the won byte is offset 15.
 fn paid_won(out: &Outcome) -> bool {
     packets(out, &[39, 0, 18])
         .into_iter()
@@ -209,9 +216,19 @@ fn coins(game: &Gameplay) -> u32 {
     game.state().inventory.coins
 }
 
+/// The directory `Gameplay::load` reads its NPC and chess content from: the
+/// campaign itself when it ships the private NPC package, else the bundled one.
+fn npc_content() -> PathBuf {
+    let directory = content();
+    if directory.join("npc_spawns_extra.json").is_file() && directory.join("npcs").is_dir() {
+        directory
+    } else {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
+    }
+}
+
 fn chess_row_coins() -> u32 {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/chess.json");
-    osfr_tools::chess_service::ChessContent::load(&path)
+    osfr_tools::chess_service::ChessContent::load(&npc_content().join("chess.json"))
         .unwrap()
         .rows
         .into_iter()
@@ -344,6 +361,74 @@ fn cooking_active(game: &Gameplay) -> bool {
         .cooking
         .as_ref()
         .is_some_and(|cooking| cooking.active.is_some())
+}
+
+/// A supported content shape with no `profiles.json`: `Gameplay::load` accepts
+/// it, and the bundled `data/content` still ships `chess.json`.
+struct NoProfiles(PathBuf);
+
+impl NoProfiles {
+    fn new() -> Self {
+        let source = content();
+        let directory = std::env::temp_dir().join(format!(
+            "osfr-chess-no-profiles-{}-{}",
+            std::process::id(),
+            NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir(&directory).unwrap();
+        for file in [
+            "inventory.json",
+            "categories.json",
+            "quests.json",
+            "quest-journal.bin",
+            "combat.json",
+            "combat-template.bin",
+        ] {
+            fs::copy(source.join(file), directory.join(file)).unwrap();
+        }
+        Self(directory)
+    }
+}
+
+impl Drop for NoProfiles {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+#[test]
+fn a_no_profiles_pack_keeps_recipe_start_inert_and_chess_playable() {
+    let fixture = NoProfiles::new();
+    assert!(!fixture.0.join("profiles.json").exists());
+    let mut game = Gameplay::load(&fixture.0, None).unwrap();
+    let who = character();
+    game.initialize_world(&who, 500).unwrap();
+
+    // Without opening content `handle_in_world_inner` takes the no-opening
+    // dispatcher before the recipe route, so 26/24 is inert: no panic and no
+    // state change (the explicit profile guard inside the opening route covers
+    // the same shape if that ordering ever changes).
+    let before = game.state();
+    let idle = game
+        .handle_in_world(&recipe_start(GUMBO), &who, 700)
+        .unwrap();
+    assert!(!idle.changed);
+    assert_eq!(game.state(), before, "the idle request changed the state");
+
+    // A real chess run leaves the same request inert and the table playable.
+    let instance = running_game(&mut game);
+    let before = game.state();
+    let busy = game
+        .handle_in_world(&recipe_start(GUMBO), &who, 2_000)
+        .unwrap();
+    assert!(!busy.changed);
+    assert_eq!(
+        game.state(),
+        before,
+        "the chess-busy request changed the state"
+    );
+    let live = human_move(&mut game, instance, 52, 36, 2_100);
+    assert!(has_event(&live, "OnChessEventMsg\t31"), "MOVE_DATA");
 }
 
 #[test]

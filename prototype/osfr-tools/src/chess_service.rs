@@ -108,8 +108,9 @@ pub struct ChessContent {
     /// move choice. Larger values make the computer less predictable.
     #[serde(default = "default_near_equal_margin")]
     pub near_equal_margin: u32,
-    /// (R) Weights for the server's one-ply move chooser.
-    #[serde(default)]
+    /// (R) Required weights for the server's one-ply move chooser. The shipped
+    /// `chess.json` carries every value; an omitted block is refused, never
+    /// replaced with compiled tuning.
     pub scoring: ChessScoring,
     pub rows: Vec<ChessRow>,
 }
@@ -256,7 +257,7 @@ impl ChessService {
     /// (R) A deterministic table stream for tests and offline fixtures. Only
     /// tables opened after this call use it; the gateway's constructors seed
     /// from OS entropy and never call this.
-    pub fn reseed(&mut self, seed: u64) {
+    pub(crate) fn reseed(&mut self, seed: u64) {
         self.tables.reseed(seed);
     }
 
@@ -266,7 +267,7 @@ impl ChessService {
         saved: Option<ChessRewardLedger>,
     ) -> io::Result<Self> {
         content.validate()?;
-        tables.set_scoring(content.scoring);
+        tables.set_scoring(content.scoring)?;
         let mut service = Self {
             tables,
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
@@ -572,4 +573,38 @@ fn from_run(run: RunOutcome) -> ChessActivityOutcome {
 
 fn invalid(error: impl ToString) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    fn shipped_path() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/chess.json")
+    }
+
+    #[test]
+    fn chess_scoring_is_required_content() {
+        let path = shipped_path();
+        ChessContent::load(&path).unwrap();
+        let shipped: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+
+        // (R) A pack that omits the block must not silently use compiled tuning.
+        let mut missing = shipped.clone();
+        missing.as_object_mut().unwrap().remove("scoring");
+        assert!(
+            serde_json::from_value::<ChessContent>(missing).is_err(),
+            "an omitted scoring block is refused"
+        );
+
+        // A partial block must not mix shipped and compiled values either.
+        let mut partial = shipped;
+        partial["scoring"].as_object_mut().unwrap().remove("queen");
+        assert!(
+            serde_json::from_value::<ChessContent>(partial).is_err(),
+            "a partial scoring block is refused"
+        );
+    }
 }

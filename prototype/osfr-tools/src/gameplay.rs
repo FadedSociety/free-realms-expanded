@@ -4690,8 +4690,14 @@ impl Gameplay {
         // range, rank and exact inputs before the service's own `begin_recipe`.
         if let Some(recipe_id) = crate::recipe_book::decode(inner)? {
             // `recipe_book::start` owns the busy refusal, so there is no second
-            // check here that a canary could bypass or duplicate.
-            let profile = self.profiles.as_ref().unwrap().active();
+            // check here that a canary could bypass or duplicate. A pack with no
+            // class content (supported by `load`) has no recipe-book player at
+            // all, so refuse before building one.
+            let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
+                out.replies
+                    .push(crate::recipe_book::Refusal::Unavailable.feedback());
+                return Ok(out);
+            };
             let available = self.available_ingredients();
             let player = crate::recipe_book::Player {
                 zone_id: character.zone_id,
