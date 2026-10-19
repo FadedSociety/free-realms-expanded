@@ -1,15 +1,18 @@
 use super::*;
-use crate::world::{PLACEMENT_GUID_BASE, Placement, PlacementFile};
 use std::{
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
 };
 
+// The placement fixture is shared with `tests/crafting_stations_route.rs`
+// through `tests/common/station.rs`; `#[cfg(test)]` helpers are not importable
+// from integration tests, so the integration test includes that file directly.
+#[path = "../../tests/common/station.rs"]
+mod station;
+
 static NEXT: AtomicU64 = AtomicU64::new(0);
 const STATION: i32 = 990001;
-const FIRST: [f32; 3] = [321.0, 0.0, 654.0];
-const SECOND: [f32; 3] = [1_321.0, 0.0, 1_654.0];
 
 fn content_directory() -> PathBuf {
     std::env::var_os("OSFR_OPENING_REFERENCE")
@@ -35,32 +38,6 @@ fn character_at(position: [f32; 3]) -> CharacterState {
         position,
         rotation: [0.0, 0.0, 1.0],
     }
-}
-
-fn placement(position: [f32; 3]) -> Placement {
-    Placement {
-        guid: PLACEMENT_GUID_BASE + 1,
-        model_id: 1733,
-        name_string_id: 0,
-        name: None,
-        position,
-        heading: 0.0,
-        scale: 1.0,
-        extra: serde_json::Map::new(),
-    }
-}
-
-fn write_placements(dir: &Path, positions: &[[f32; 3]]) {
-    let records = positions.iter().copied().map(placement).collect();
-    fs::write(
-        dir.join("npc_placements.json"),
-        serde_json::to_vec(&PlacementFile {
-            schema_version: 1,
-            records,
-        })
-        .unwrap(),
-    )
-    .unwrap();
 }
 
 fn start_request() -> Vec<u8> {
@@ -139,32 +116,41 @@ fn complete(game: &mut Gameplay, at: [f32; 3]) -> io::Result<()> {
 fn moved_station_changes_recipe_start_and_completion_coordinates() {
     let dir = live_dir();
     fs::create_dir_all(&dir).unwrap();
-    write_placements(&dir, &[FIRST]);
+    station::write_placements(&dir, Some(station::NEAR));
 
     let mut game = station_game(&dir);
-    assert!(game.near_craft_station(&character_at(FIRST), crate::recipes::CraftingJob::Miner));
-    write_placements(&dir, &[SECOND]);
+    assert!(game.near_craft_station(
+        &character_at(station::NEAR),
+        crate::recipes::CraftingJob::Miner
+    ));
+    station::write_placements(&dir, Some(station::AWAY));
     reload(&mut game);
-    assert!(!game.near_craft_station(&character_at(FIRST), crate::recipes::CraftingJob::Miner));
-    assert!(game.near_craft_station(&character_at(SECOND), crate::recipes::CraftingJob::Miner));
+    assert!(!game.near_craft_station(
+        &character_at(station::NEAR),
+        crate::recipes::CraftingJob::Miner
+    ));
+    assert!(game.near_craft_station(
+        &character_at(station::AWAY),
+        crate::recipes::CraftingJob::Miner
+    ));
 
-    let refused = start(&mut game, FIRST);
+    let refused = start(&mut game, station::NEAR);
     assert!(String::from_utf8_lossy(&refused.replies.concat()).contains("Move closer"));
     assert!(
         game.smelting
             .as_ref()
             .is_none_or(|smelting| !smelting.active())
     );
-    start(&mut game, SECOND);
+    start(&mut game, station::AWAY);
     assert!(game.smelting.as_ref().is_some_and(Smelting::active));
 
     let mut completion_game = station_game(&dir);
-    write_placements(&dir, &[FIRST]);
+    station::write_placements(&dir, Some(station::NEAR));
     reload(&mut completion_game);
-    start(&mut completion_game, FIRST);
-    write_placements(&dir, &[SECOND]);
+    start(&mut completion_game, station::NEAR);
+    station::write_placements(&dir, Some(station::AWAY));
     reload(&mut completion_game);
-    let error = complete(&mut completion_game, FIRST).unwrap_err();
+    let error = complete(&mut completion_game, station::NEAR).unwrap_err();
     assert!(error.to_string().contains("outside a Miner station"));
 
     let _ = fs::remove_dir_all(dir);
@@ -174,14 +160,20 @@ fn moved_station_changes_recipe_start_and_completion_coordinates() {
 fn removed_station_changes_recipe_start_and_completion_coordinates() {
     let dir = live_dir();
     fs::create_dir_all(&dir).unwrap();
-    write_placements(&dir, &[FIRST]);
+    station::write_placements(&dir, Some(station::NEAR));
 
     let mut game = station_game(&dir);
-    assert!(game.near_craft_station(&character_at(FIRST), crate::recipes::CraftingJob::Miner));
-    write_placements(&dir, &[]);
+    assert!(game.near_craft_station(
+        &character_at(station::NEAR),
+        crate::recipes::CraftingJob::Miner
+    ));
+    station::write_placements(&dir, None);
     reload(&mut game);
-    assert!(!game.near_craft_station(&character_at(FIRST), crate::recipes::CraftingJob::Miner));
-    let refused = start(&mut game, FIRST);
+    assert!(!game.near_craft_station(
+        &character_at(station::NEAR),
+        crate::recipes::CraftingJob::Miner
+    ));
+    let refused = start(&mut game, station::NEAR);
     assert!(String::from_utf8_lossy(&refused.replies.concat()).contains("Move closer"));
     assert!(
         game.smelting
@@ -190,12 +182,12 @@ fn removed_station_changes_recipe_start_and_completion_coordinates() {
     );
 
     let mut completion_game = station_game(&dir);
-    write_placements(&dir, &[FIRST]);
+    station::write_placements(&dir, Some(station::NEAR));
     reload(&mut completion_game);
-    start(&mut completion_game, FIRST);
-    write_placements(&dir, &[]);
+    start(&mut completion_game, station::NEAR);
+    station::write_placements(&dir, None);
     reload(&mut completion_game);
-    let error = complete(&mut completion_game, FIRST).unwrap_err();
+    let error = complete(&mut completion_game, station::NEAR).unwrap_err();
     assert!(error.to_string().contains("outside a Miner station"));
 
     let _ = fs::remove_dir_all(dir);

@@ -8,18 +8,20 @@
 mod cooking_movie;
 #[path = "common/forging_movie.rs"]
 mod forging_movie;
+#[path = "common/station.rs"]
+mod station;
 
 use osfr_tools::{
+    game_store,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     inventory::InventoryItem,
     smelting,
-    world::{PLACEMENT_GUID_BASE, Placement, PlacementFile},
 };
 use serde_json::Value;
 use std::{
     fs,
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
 };
 
@@ -27,12 +29,6 @@ const COPPER_RECIPE: i32 = 990001;
 const WORLD_COOKING_TABLE: [f32; 3] = [-1244.241, -14.34194, 405.1309];
 const WORLD_FORGE: [f32; 3] = [-2631.933, 0.03999766, -216.5819];
 const WORLD_ANVIL: [f32; 3] = [354.3665, 48.24031, 316.3203];
-/// A live-world `sh_forge_02` placement (model 1733, `data/content/crafting_stations.json`)
-/// at a position no shipped station occupies.
-const STATION_NEAR: [f32; 3] = [321.0, 0.0, 654.0];
-const STATION_AWAY: [f32; 3] = [1_321.0, 0.0, 1_654.0];
-const STATION_MODEL: u32 = 1733;
-const STATION_GUID: u64 = PLACEMENT_GUID_BASE + 1;
 
 #[derive(Clone, Copy)]
 enum Craft {
@@ -212,36 +208,6 @@ fn play_smelting(gateway: &mut Gateway) {
     cooking_movie::send(gateway, &[26, 0, 42, 0], 2_000);
 }
 
-/// Write the live-world forge placement, or an empty placement file.
-fn write_station(dir: &Path, at: Option<[f32; 3]>) {
-    let records = at
-        .map(|position| Placement {
-            guid: STATION_GUID,
-            model_id: STATION_MODEL,
-            name_string_id: 0,
-            name: None,
-            position,
-            heading: 0.0,
-            scale: 1.0,
-            extra: serde_json::Map::new(),
-        })
-        .into_iter()
-        .collect();
-    fs::write(
-        dir.join("npc_placements.json"),
-        serde_json::to_vec(&PlacementFile {
-            schema_version: 1,
-            records,
-        })
-        .unwrap(),
-    )
-    .unwrap();
-}
-
-fn fixture(case: &Case) -> (Gateway, PathBuf, PathBuf) {
-    gateway_at(case, case.station)
-}
-
 fn gateway_at(case: &Case, position: [f32; 3]) -> (Gateway, PathBuf, PathBuf) {
     let (content, reference) = paths();
     assert!(content.join("opening.json").is_file());
@@ -324,7 +290,7 @@ fn gateway_at(case: &Case, position: [f32; 3]) -> (Gateway, PathBuf, PathBuf) {
 #[test]
 fn world_stations_start_and_finish_all_three_crafts_through_26_24() {
     for case in CASES {
-        let (mut gateway, _content, _reference) = fixture(&case);
+        let (mut gateway, _content, _reference) = gateway_at(&case, case.station);
         let before: Vec<_> = case
             .inputs
             .iter()
@@ -377,9 +343,9 @@ fn a_moved_or_removed_station_refuses_completion_without_changing_state() {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir_all(&dir).unwrap();
-        write_station(&dir, Some(STATION_NEAR));
+        station::write_placements(&dir, Some(station::NEAR));
 
-        let (mut gateway, content, reference) = gateway_at(&CASES[1], STATION_NEAR);
+        let (mut gateway, content, reference) = gateway_at(&CASES[1], station::NEAR);
         gateway.set_world_dir(Some(dir.clone())).unwrap();
         book_start(&mut gateway, COPPER_RECIPE);
         assert!(
@@ -388,7 +354,7 @@ fn a_moved_or_removed_station_refuses_completion_without_changing_state() {
         );
         smelting_rounds(&mut gateway);
 
-        write_station(&dir, moved.then_some(STATION_AWAY));
+        station::write_placements(&dir, moved.then_some(station::AWAY));
         gateway.set_world_dir(Some(dir.clone())).unwrap();
         let before = gateway.snapshot();
         let id = recipe_at(&gateway, Craft::Smelting).unwrap();
@@ -413,10 +379,19 @@ fn a_moved_or_removed_station_refuses_completion_without_changing_state() {
             "moved={moved}: the refused completion leaves the run open"
         );
 
-        // A disconnect and reconnect cancels the stored movie without paying.
+        // A disconnect and reconnect through the production save store cancels
+        // the stored movie without paying.
         let saved = gateway.snapshot();
+        let save_path = dir.join("character.json");
+        game_store::save(&save_path, &saved).unwrap();
+        let loaded = game_store::load_or_create(&save_path, saved.character.clone()).unwrap();
+        assert_eq!(
+            loaded, saved,
+            "moved={moved}: the refused run survives a save round trip"
+        );
         let mut reconnected =
-            Gateway::load_gameplay(&reference, saved.character, &content, saved.gameplay).unwrap();
+            Gateway::load_gameplay(&reference, loaded.character, &content, loaded.gameplay)
+                .unwrap();
         reconnected.set_world_dir(Some(dir.clone())).unwrap();
         login(&mut reconnected);
         assert!(
@@ -435,7 +410,7 @@ fn a_moved_or_removed_station_refuses_completion_without_changing_state() {
 #[test]
 fn a_refused_world_station_request_changes_nothing() {
     for case in CASES {
-        let (mut gateway, content, reference) = fixture(&case);
+        let (mut gateway, content, reference) = gateway_at(&case, case.station);
         let mut character = gateway.snapshot().character;
         character.position = [case.station[0] + 100.0, case.station[1], case.station[2]];
         let before = gateway.snapshot();

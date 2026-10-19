@@ -343,8 +343,9 @@ fn move_pose(gateway: &mut Gateway, position: [f32; 3], now_ms: u64) -> GatewayO
     send(gateway, &body, now_ms)
 }
 
-/// Client recipe start `0x00c14b30`; serializer `0x00c21290` calls header
-/// writer `0x0090ac70`: family 26, sub 24, then one i32 recipe id.
+/// Client `RequestRecipeStart 0x00c23970` builds the request via constructor
+/// `0x00c14b30`; serializer `0x00c21290` calls header writer `0x0090ac70`:
+/// family 26, sub 24, then one i32 recipe id.
 fn book_start(gateway: &mut Gateway, recipe: i32, now_ms: u64) -> GatewayOutcome {
     let mut body = vec![26, 0, 24, 0];
     body.extend(recipe.to_le_bytes());
