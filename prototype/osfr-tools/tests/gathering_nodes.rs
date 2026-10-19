@@ -330,6 +330,9 @@ fn click(gateway: &mut Gateway, guid: u64, now_ms: u64) -> GatewayOutcome {
     send(gateway, &request.encode(), now_ms)
 }
 
+/// The client's movement sender `sub_934A20` fills the opcode-125 object and
+/// serializer `sub_912A80` writes it as u16 125, the u64 guid, position and
+/// direction (six f32), then the state and unknown bytes.
 fn move_pose(gateway: &mut Gateway, position: [f32; 3], now_ms: u64) -> GatewayOutcome {
     let mut body = 125u16.to_le_bytes().to_vec();
     body.extend(1u64.to_le_bytes());
@@ -340,6 +343,8 @@ fn move_pose(gateway: &mut Gateway, position: [f32; 3], now_ms: u64) -> GatewayO
     send(gateway, &body, now_ms)
 }
 
+/// Client recipe start `0x00c14b30`; serializer `0x00c21290` calls header
+/// writer `0x0090ac70`: family 26, sub 24, then one i32 recipe id.
 fn book_start(gateway: &mut Gateway, recipe: i32, now_ms: u64) -> GatewayOutcome {
     let mut body = vec![26, 0, 24, 0];
     body.extend(recipe.to_le_bytes());

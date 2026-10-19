@@ -3,11 +3,11 @@
 //! Recovered client facts: the recipe window calls `Ui.RecipeStart(recipe)`
 //! (`ScriptsBase.lua:29430,29543,43142`), native `RequestRecipeStart 00c23970`
 //! builds `CommandPacketRecipeStart` via `00c14b30` (command sub-opcode 0x18,
-//! recipe dword at +0x10) and sends it through `00c22460`. The serializer
-//! `00c21290` writes the u16 at +4 (family 26), the u16 at +8 (sub 24) and the
-//! dword at +0x10, and nothing else: the body is exactly
-//! `26,0, 24,0, recipe:i32`. The client sends only the recipe id; job,
-//! station, ingredients and rank are never client-supplied.
+//! recipe dword at +0x10) and sends it through `00c22460`. Serializer
+//! `00c21290` calls the command-header writer `0090ac70` for the family u16
+//! (26) and sub u16 (24), then writes the dword at +0x10, and nothing else:
+//! the body is exactly `26,0, 24,0, recipe:i32`. The client sends only the
+//! recipe id; job, station, ingredients and rank are never client-supplied.
 //!
 //! Everything below the decode is reconstructed server policy (R): the
 //! original station and learned-recipe rules were not recovered, so a start
