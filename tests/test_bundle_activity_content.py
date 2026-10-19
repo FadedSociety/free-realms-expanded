@@ -99,6 +99,40 @@ class ActivityContentGateTest(unittest.TestCase):
             "invalid goals",
         )
 
+    def test_reviewed_scene_and_board_mutations_are_refused(self):
+        bundle_common.check_activity_content(self.bundle)
+
+        def replace_scene_float(value, index, replacement):
+            value["context"]["scene"]["rotation"][index] = replacement
+
+        def replace_shape_cell(value, index, replacement):
+            value["spec"]["shape"][index] = replacement
+
+        def flatten_shape(value):
+            value["spec"]["shape"] = [0] * len(value["spec"]["shape"])
+
+        self.refuse(
+            "kart_entry.json",
+            lambda value: replace_scene_float(value, 0, 1e100),
+            "finite f32",
+        )
+        self.refuse(
+            "mining.json",
+            lambda value: replace_shape_cell(value, 0, 7),
+            "invalid board shape code",
+        )
+        self.refuse("mining.json", flatten_shape, "no playable tiles")
+        self.refuse(
+            "mining.json",
+            lambda value: replace_shape_cell(value, 11 * 14 + 3, 1),
+            "complete dropzone row",
+        )
+        self.refuse(
+            "mining.json",
+            lambda value: value["spec"].update(tiles=[{}]),
+            "invalid tile rows",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

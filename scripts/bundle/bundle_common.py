@@ -314,9 +314,16 @@ def _is_u16(value) -> bool:
 
 
 def _f32_bytes(value) -> bytes:
-    if type(value) not in (int, float) or not math.isfinite(value):
-        raise ValueError("non-finite kart scene position")
-    return struct.pack("<f", value)
+    # The loader stores scene floats as f32 and zone_transition::encode refuses
+    # a non-finite one. An out-of-f32-range value is finite as a Python float but
+    # overflows the pack (or `isfinite` for a huge int), so normalize both to
+    # ValueError; either would otherwise be approved and stop the server.
+    try:
+        if type(value) in (int, float) and math.isfinite(value):
+            return struct.pack("<f", value)
+    except (OverflowError, struct.error):
+        pass
+    raise ValueError("kart scene value is not a finite f32")
 
 
 def _check_lobby(lobby) -> None:
@@ -394,6 +401,65 @@ def _check_kart_gates(gates) -> list[int]:
     return npcs
 
 
+def _is_shape_code(code: int) -> bool:
+    """The shared engine's recovered `ServerGrid.buildMap` grammar.
+
+    Mirrors `mining::validate_spec`, which the startup path applies to both
+    boards through `Type8Engine::load`: markers `0..=4`, a positive category
+    code in the 400/600 block, or a negated specific value the engine can spawn.
+    """
+    if 0 <= code <= 4 or 400 <= code < 500 or 600 <= code < 700:
+        return True
+    if -1002 <= code <= -100:
+        value = -code
+        return (
+            value in (100, 200, 800)
+            or 400 <= value < 500
+            or 600 <= value < 700
+            or 900 <= value <= 953
+        )
+    return False
+
+
+def _check_board_shape(name: str, width: int, height: int, shape: list) -> None:
+    """Mirror `mining::validate_spec`'s shape code and playable-area checks."""
+    if any(not _is_shape_code(code) for code in shape):
+        raise ValueError(f"content/{name} has an invalid board shape code")
+    playable = [
+        (index % width, index // width)
+        for index, code in enumerate(shape)
+        if code not in (0, 4)
+    ]
+    if not playable:
+        raise ValueError(f"content/{name} has no playable tiles")
+    left = min(x for x, _ in playable)
+    right = max(x for x, _ in playable)
+    top = min(y for _, y in playable)
+    bottom = max(y for _, y in playable)
+    if right - left + 1 < 6 or bottom - top + 1 < 6:
+        raise ValueError(f"content/{name} has a playable area smaller than 6x6")
+    if any(
+        shape[y * width + x] == 0
+        for y in range(top, bottom + 1)
+        for x in range(left, right + 1)
+    ):
+        raise ValueError(f"content/{name} has a playable area that is not rectangular")
+    dropzone = bottom + 1
+    if dropzone >= height or any(
+        shape[dropzone * width + x] != 4 for x in range(left, right + 1)
+    ):
+        raise ValueError(f"content/{name} has no complete dropzone row")
+    if any(
+        y != dropzone or not left <= x <= right
+        for x, y in (
+            (index % width, index // width)
+            for index, code in enumerate(shape)
+            if code == 4
+        )
+    ):
+        raise ValueError(f"content/{name} has a dropzone outside the playable area")
+
+
 def _check_board(
     name: str, value, game_id: int, profile_id: int, preload: str | None = None,
     launch: str | None = None,
@@ -429,6 +495,7 @@ def _check_board(
     for key in arrays:
         if not isinstance(spec[key], list):
             raise ValueError(f"content/{name} spec.{key} must be an array")
+    _check_board_shape(name, width, height, shape)
     selectable, collectable = spec["selectable"], spec["collectable"]
     if (
         not selectable or len(selectable) > 16
@@ -437,6 +504,16 @@ def _check_board(
         or any(not _is_u16(value) or not 600 <= value < 700 for value in collectable)
     ):
         raise ValueError(f"content/{name} has invalid tile kinds")
+    # `Type8Kind` deserialization requires all three fields with these widths;
+    # a missing one refuses startup before any validator sees the board.
+    if any(
+        not isinstance(row, dict)
+        or not _is_u16(row.get("value"))
+        or not _is_u16(row.get("category"))
+        or not _is_i32(row.get("icon_id"))
+        for row in spec["tiles"]
+    ):
+        raise ValueError(f"content/{name} has invalid tile rows")
     goals = spec["goals"]
     if len(goals) > 8 or any(
         not isinstance(goal, dict)
@@ -552,19 +629,21 @@ def check_activity_content(bundle: Path) -> str:
         raise ValueError("content/kart_entry.json has no owned-vehicle GUID proof")
     scene = context.get("scene")
     position = scene.get("position") if isinstance(scene, dict) else None
+    rotation = scene.get("rotation") if isinstance(scene, dict) else None
     if (
         not isinstance(scene, dict)
-        or not isinstance(scene.get("rotation"), list)
-        or len(scene["rotation"]) != 4
-        or any(
-            type(value) not in (int, float) or not math.isfinite(value)
-            for value in scene["rotation"]
-        )
+        or not isinstance(rotation, list)
+        or len(rotation) != 4
         or not isinstance(position, list)
         or len(position) != 4
     ):
         raise ValueError("content/kart_entry.json has an invalid scene")
     spawn = [_f32_bytes(value) for value in position]
+    # zone_transition::encode, called by KartGateway::load, refuses a non-finite
+    # rotation or update radius, so convert every scene float as it does.
+    for value in rotation:
+        _f32_bytes(value)
+    _f32_bytes(scene.get("update_radius"))
     # 41/114 entry FUN_00aa3430 -> FUN_00aa32d0; header reader FUN_008d6690
     # consumes the op/sub/encounter/instance words. The remaining offsets mirror
     # KartGateway::load's state/session/spawn bindings.
