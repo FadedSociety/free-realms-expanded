@@ -1,18 +1,18 @@
 //! Private native-packet integration; no client process or game assets in Git.
+#[path = "common/smelting_movie.rs"]
+mod smelting_movie;
 use osfr_tools::{
     game_store,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
     opening::{OpeningEngine, OpeningTrigger},
-    smelting::payload_packet as authored_payload_packet,
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
+use smelting_movie::{instance, payload_packet, wrap};
 use std::{fs, path::PathBuf};
 
-fn payload_packet(instance: i32, text: &str) -> std::io::Result<Vec<u8>> {
-    let mut native = authored_payload_packet(instance, text)?;
-    native[11..15].copy_from_slice(&(-1i32).to_le_bytes());
-    Ok(native)
+fn send(g: &mut Gateway, inner: &[u8]) -> osfr_tools::gateway::GatewayOutcome {
+    smelting_movie::send(g, inner, 1_000)
 }
 
 #[test]
@@ -25,15 +25,6 @@ fn older_gameplay_snapshot_defaults_absent_smelting_state() {
     assert_eq!(serde_json::to_value(state).unwrap(), old);
 }
 
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut b = vec![5, 0, 1];
-    b.extend((inner.len() as u32).to_le_bytes());
-    b.extend(inner);
-    b
-}
-fn send(g: &mut Gateway, inner: &[u8]) -> osfr_tools::gateway::GatewayOutcome {
-    g.handle_at(&wrap(inner), 1000).unwrap()
-}
 fn login(g: &mut Gateway) {
     let mut b = 1u16.to_le_bytes().to_vec();
     for (i, s) in ["local-private-test", "1.910.1.530630", ""]
@@ -80,43 +71,6 @@ fn count(g: &Gateway, definition: i32) -> u32 {
         .filter(|i| i.definition_id == definition && i.rental.is_none())
         .map(|i| i.count)
         .sum()
-}
-fn instance(g: &Gateway) -> i32 {
-    g.snapshot()
-        .gameplay
-        .unwrap()
-        .smelting
-        .unwrap()
-        .active
-        .unwrap()
-        .instance_id
-}
-fn start(g: &mut Gateway) {
-    let mut b = vec![39, 0, 5];
-    for n in [instance(g), -1, -1] {
-        b.extend(n.to_le_bytes());
-    }
-    let out = send(g, &b);
-    assert_eq!(out.replies.len(), 2); // Native start + real movie launch.
-    let out = send(
-        g,
-        &payload_packet(instance(g), "FRServer_ReadyForGameData").unwrap(),
-    );
-    assert_eq!(out.replies.len(), 6);
-}
-fn rounds(g: &mut Gateway) {
-    for stage in 101..=104 {
-        for kind in 0..=3 {
-            send(
-                g,
-                &payload_packet(
-                    instance(g),
-                    &format!("FRServer_StatUpdate\t{stage}\t{kind}\t1)"),
-                )
-                .unwrap(),
-            );
-        }
-    }
 }
 
 #[test]
@@ -250,16 +204,17 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
 
     position(&mut g, forge.position);
     interact(&mut g, forge.guid);
-    assert!(g
-        .snapshot()
-        .gameplay
-        .as_ref()
-        .unwrap()
-        .smelting
-        .as_ref()
-        .unwrap()
-        .active
-        .is_some());
+    assert!(
+        g.snapshot()
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .smelting
+            .as_ref()
+            .unwrap()
+            .active
+            .is_some()
+    );
     assert_eq!(
         g.snapshot()
             .gameplay
@@ -275,8 +230,8 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
     let before = g.snapshot();
     select(&mut g, 1);
     assert_eq!(g.snapshot(), before); // Movie keeps Miner job.
-    start(&mut g);
-    rounds(&mut g);
+    smelting_movie::start(&mut g, 1_000);
+    smelting_movie::rounds(&mut g, 1_000);
     let win = payload_packet(instance(&g), "FRServer_GameWon\t900\t1").unwrap();
     // A malformed later child must roll back inventory, quest and victory.
     let before = g.snapshot();
@@ -317,15 +272,17 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
     login(&mut restored); // New movie session cancels stale data_sent, never awards.
     assert_eq!((count(&restored, 879), count(&restored, 21785)), (2, 5));
     let saved = restored.snapshot();
-    assert!(saved
-        .gameplay
-        .as_ref()
-        .unwrap()
-        .smelting
-        .as_ref()
-        .unwrap()
-        .active
-        .is_none());
+    assert!(
+        saved
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .smelting
+            .as_ref()
+            .unwrap()
+            .active
+            .is_none()
+    );
     assert_eq!(
         saved
             .gameplay
@@ -366,14 +323,15 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
     assert!(closed.state_changed && closed.replies.is_empty());
     assert_eq!(g.state().zone_id, won.character.zone_id); // Close does not dungeon-zone.
     assert_eq!(count(&g, 21785), 5);
-    assert!(g
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .smelting
-        .unwrap()
-        .active
-        .is_none());
+    assert!(
+        g.snapshot()
+            .gameplay
+            .unwrap()
+            .smelting
+            .unwrap()
+            .active
+            .is_none()
+    );
 
     // Restart while still playing cancels without consumption or victory.
     let mut retry =
@@ -381,7 +339,7 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
     login(&mut retry);
     position(&mut retry, forge.position);
     interact(&mut retry, forge.guid);
-    start(&mut retry);
+    smelting_movie::start(&mut retry, 1_000);
     let active = retry.snapshot();
     let old_id = instance(&retry);
     let mut disconnected =

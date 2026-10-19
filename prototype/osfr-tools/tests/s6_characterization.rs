@@ -1,0 +1,834 @@
+//! Packet-path characterization for S6: crafting station refusals, the movie
+//! gate, gathering bonuses and their negative cases.
+//!
+//! Requires the private lab content; every test is ignored by default. The
+//! movie drivers are the shared `tests/common/*_movie.rs` helpers, so a later
+//! protocol change updates one copy instead of a private duplicate.
+//!
+//! Wire prefixes are the shipped client's request shapes: 26/8 builder
+//! 0x008b6bc0, 26/10 constructor 0x00a36f80, 26/13 sender 0x00938e10,
+//! 36/10 writer 0x00a342e0 and 42/3 writer 0x00bdb450. Results Close is the
+//! four-byte writer 0x0092f300. The chat request reader is 0x00b11600.
+#[path = "common/cooking_movie.rs"]
+mod cooking_movie;
+#[path = "common/forging_movie.rs"]
+mod forging_movie;
+#[path = "common/smelting_movie.rs"]
+mod smelting_movie;
+
+use osfr_tools::{
+    account_store::AccountRole,
+    gameplay::{Gameplay, GameplayState},
+    gateway::{Gateway, GatewayOutcome},
+    inventory::InventoryItem,
+    opening::{OpeningEngine, OpeningTrigger},
+};
+use serde_json::Value;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
+
+const NOW: u64 = 1_000;
+const UNKNOWN_ACTOR: u64 = u64::MAX - 1;
+
+#[derive(Clone, Copy)]
+struct Station {
+    content: &'static str,
+    profile: i32,
+    recipe: u32,
+    noun: &'static str,
+    wrong_job: &'static str,
+    pending: &'static str,
+    shortage: &'static str,
+    outside: &'static str,
+    changed: &'static str,
+    success: Option<&'static str>,
+}
+
+const FORGING: Station = Station {
+    content: "rust-opening-forging",
+    profile: 16,
+    recipe: 2003,
+    noun: "forging",
+    wrong_job: "Switch to Blacksmith before forging.",
+    pending: "Accept the forging objective and finish its earlier steps first.",
+    shortage: "Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners.",
+    outside: "forging completion is outside a Blacksmith station",
+    changed: "forging ingredients changed before completion",
+    success: Some(
+        "Original Spunky Scrapper Hammer controls; board tuning, consumption and tint choice are reconstructed.",
+    ),
+};
+
+const COOKING: Station = Station {
+    content: "rust-opening-cooking-original-assets",
+    profile: 45,
+    recipe: 2001,
+    noun: "cooking",
+    wrong_job: "Switch to Chef before cooking.",
+    pending: "Accept the cooking objective and finish its earlier steps first.",
+    shortage: "StrongArm Stew requires 4 Bat Meat, 4 Gummyfruit, 4 Rainleaf and 4 Spice.",
+    outside: "cooking completion is outside a Chef station",
+    changed: "cooking ingredients changed before completion",
+    success: None,
+};
+
+const SMELTING: Station = Station {
+    content: "rust-opening",
+    profile: 14,
+    recipe: 2002,
+    noun: "smelting",
+    wrong_job: "Switch to Miner before smelting.",
+    pending: "Accept the smelting objective and finish its earlier steps first.",
+    shortage: "Smelting requires 5 Copper Ore and 3 Singing Coal. Mine the accepted nearby ore objective first.",
+    outside: "smelting completion is outside a Miner station",
+    changed: "smelting ingredients changed before completion",
+    success: Some(
+        "Original four-stage smelting controls; phase tuning and this local recipe output are reconstructed.",
+    ),
+};
+
+fn references() -> PathBuf {
+    std::env::var_os("OSFR_S6_REFERENCE_ROOT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/references")
+        })
+}
+
+fn reference(content: &str) -> PathBuf {
+    let path = references().join(content);
+    assert!(
+        path.join("opening.json").is_file(),
+        "S6 requires the private content at {}",
+        path.display()
+    );
+    path
+}
+
+fn gateway_reference() -> PathBuf {
+    let path = std::env::var_os("OSFR_GATEWAY_REFERENCE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| references().join("rust-gateway-reference"));
+    assert!(
+        path.is_dir(),
+        "S6 requires the private gateway reference at {}",
+        path.display()
+    );
+    path
+}
+
+fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut packet = vec![5, 0, 1];
+    packet.extend((inner.len() as u32).to_le_bytes());
+    packet.extend(inner);
+    packet
+}
+
+fn send(game: &mut Gateway, inner: &[u8], now: u64) -> GatewayOutcome {
+    game.handle_at(&wrap(inner), now).unwrap()
+}
+
+/// A bundled request commits or fails as one unit, so it surfaces the exact
+/// handler error a single application would hide in the gateway trace.
+fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
+    let mut message = vec![0, 25];
+    for child in children {
+        let child = wrap(child);
+        assert!(child.len() < 255, "bundle child exceeds one-byte length");
+        message.push(child.len() as u8);
+        message.extend(child);
+    }
+    message
+}
+
+fn login(game: &mut Gateway) {
+    let mut packet = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["local-private-test", "1.910.1.530630", ""]
+        .iter()
+        .enumerate()
+    {
+        packet.extend((text.len() as u32).to_le_bytes());
+        packet.extend(text.as_bytes());
+        if index == 0 {
+            packet.extend(1u64.to_le_bytes());
+        }
+    }
+    game.handle_at(&packet, 0).unwrap();
+    send(game, &13u16.to_le_bytes(), NOW);
+    send(game, &10u16.to_le_bytes(), NOW);
+}
+
+fn move_to(game: &mut Gateway, position: [f32; 3], now: &mut u64) {
+    *now += 800;
+    let mut packet = 125u16.to_le_bytes().to_vec();
+    packet.extend(1u64.to_le_bytes());
+    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend([0, 0]);
+    send(game, &packet, *now);
+}
+
+fn chat(text: &str) -> Vec<u8> {
+    let mut packet = vec![15, 0, 1, 0, 0, 0];
+    packet.extend(1_u64.to_le_bytes());
+    packet.extend(0_u64.to_le_bytes());
+    for _ in 0..2 {
+        packet.extend([0; 12]);
+        packet.extend(0_u32.to_le_bytes());
+        packet.extend(0_u32.to_le_bytes());
+    }
+    packet.extend((text.len() as u32).to_le_bytes());
+    packet.extend(text.as_bytes());
+    packet.extend([0; 28]);
+    packet
+}
+
+fn interact(guid: u64) -> Vec<u8> {
+    let mut packet = vec![26, 0, 10, 0];
+    packet.extend(guid.to_le_bytes());
+    packet.extend(1_i32.to_le_bytes());
+    packet
+}
+
+fn menu(guid: u64) -> Vec<u8> {
+    let mut packet = vec![26, 0, 8, 0];
+    packet.extend(guid.to_le_bytes());
+    packet.push(0);
+    packet
+}
+
+fn inner(reply: &[u8]) -> &[u8] {
+    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
+        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
+        if length == reply.len() - 7 {
+            return &reply[7..];
+        }
+    }
+    reply
+}
+
+fn chat_texts(replies: &[Vec<u8>]) -> Vec<String> {
+    let mut texts = Vec::new();
+    for reply in replies {
+        let packet = inner(reply);
+        if packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8 {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            if let Some(body) = packet.get(8..8 + length)
+                && let Ok(text) = std::str::from_utf8(body)
+            {
+                texts.push(text.to_owned());
+            }
+        }
+    }
+    texts
+}
+
+fn item_count(state: &GameplayState, definition: i32) -> u32 {
+    state
+        .inventory
+        .items
+        .iter()
+        .filter(|item| item.definition_id == definition && item.rental.is_none())
+        .map(|item| item.count)
+        .sum()
+}
+
+fn requirements(case: Station, content: &Path) -> Vec<(i32, u32)> {
+    let file = match case.profile {
+        16 => "forging.json",
+        45 => "cooking.json",
+        14 => "smelting.json",
+        _ => unreachable!(),
+    };
+    let content: Value = serde_json::from_slice(&fs::read(content.join(file)).unwrap()).unwrap();
+    content["recipe"]["consumes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| {
+            (
+                row[0].as_i64().unwrap() as i32,
+                row[1].as_u64().unwrap() as u32,
+            )
+        })
+        .collect()
+}
+
+fn add_items(state: &mut GameplayState, items: &[(i32, u32)]) {
+    let mut next = state.inventory.next_instance_id.unwrap_or_else(|| {
+        i64::from(
+            state
+                .inventory
+                .items
+                .iter()
+                .map(|item| item.id)
+                .max()
+                .unwrap_or(0),
+        ) + 1
+    });
+    for (definition, count) in items {
+        state.inventory.items.push(InventoryItem {
+            definition_id: *definition,
+            tint: 0,
+            id: i32::try_from(next).unwrap(),
+            count: *count,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        next += 1;
+    }
+    state.inventory.next_instance_id = Some(next);
+}
+
+#[derive(Clone, Copy)]
+enum TutorialGoal {
+    Craft(u32),
+    Gather(u32),
+}
+
+impl TutorialGoal {
+    fn matches(self, trigger: &OpeningTrigger) -> bool {
+        match (self, trigger) {
+            (Self::Craft(recipe), OpeningTrigger::Craft { recipe_id }) => *recipe_id == recipe,
+            (Self::Gather(resource), OpeningTrigger::Gather { resource_id }) => {
+                *resource_id == resource
+            }
+            _ => false,
+        }
+    }
+}
+
+struct StationFixture {
+    game: Gateway,
+    actor: u64,
+    position: [f32; 3],
+    stage_id: u32,
+    objective_index: usize,
+}
+
+fn opening_fixture(
+    content_name: &str,
+    goal: TutorialGoal,
+    unlocked: &[i32],
+    accepted: bool,
+    active: i32,
+    supplies: &[(i32, u32)],
+) -> StationFixture {
+    let content = reference(content_name);
+    let base = Gameplay::load(&content, None).unwrap();
+    let engine = OpeningEngine::load(&content, base.state().opening.clone()).unwrap();
+    let (stage_id, objective_index) = engine
+        .stages()
+        .iter()
+        .find_map(|stage| {
+            stage
+                .objectives
+                .iter()
+                .position(|objective| goal.matches(&objective.trigger))
+                .map(|index| (stage.id, index))
+        })
+        .expect("tutorial opening objective");
+    let mut state = base.state();
+    for stage in engine.stages() {
+        let progress = state
+            .opening
+            .as_mut()
+            .unwrap()
+            .stages
+            .get_mut(&stage.id)
+            .unwrap();
+        if stage.id < stage_id {
+            progress.accepted = true;
+            progress.completed = true;
+            progress.rewarded = true;
+            progress.counts = stage
+                .objectives
+                .iter()
+                .map(|objective| objective.required)
+                .collect();
+        } else if stage.id == stage_id {
+            progress.accepted = accepted;
+            progress.completed = false;
+            progress.rewarded = false;
+            progress.counts = if accepted {
+                stage
+                    .objectives
+                    .iter()
+                    .enumerate()
+                    .map(|(index, objective)| {
+                        if index < objective_index {
+                            objective.required
+                        } else {
+                            0
+                        }
+                    })
+                    .collect()
+            } else {
+                vec![0; stage.objectives.len()]
+            };
+        }
+    }
+    {
+        let profiles = state.profiles.as_mut().unwrap();
+        for profile in unlocked {
+            profiles.unlocked.insert(*profile);
+        }
+        profiles.unlocked.insert(active);
+        profiles.active = active;
+    }
+    if !supplies.is_empty() {
+        add_items(&mut state, supplies);
+    }
+    let actor = engine
+        .actors()
+        .iter()
+        .find(|actor| {
+            actor
+                .action
+                .as_ref()
+                .is_some_and(|action| goal.matches(action))
+        })
+        .expect("tutorial opening actor")
+        .clone();
+    let reference = gateway_reference();
+    let mut character = Gateway::reference_state(&reference).unwrap();
+    character.zone_id = actor.zone_id;
+    character.position = actor.position;
+    let mut game = Gateway::load_gameplay(&reference, character, &content, Some(state)).unwrap();
+    login(&mut game);
+    StationFixture {
+        game,
+        actor: actor.guid,
+        position: actor.position,
+        stage_id,
+        objective_index,
+    }
+}
+
+fn station_fixture(case: Station, accepted: bool, active: i32, supplies: bool) -> StationFixture {
+    let content = reference(case.content);
+    let required = if supplies {
+        requirements(case, &content)
+    } else {
+        Vec::new()
+    };
+    opening_fixture(
+        case.content,
+        TutorialGoal::Craft(case.recipe),
+        &[case.profile],
+        accepted,
+        active,
+        &required,
+    )
+}
+
+fn movie_active(game: &Gateway, case: Station) -> bool {
+    let state = game.snapshot().gameplay.unwrap();
+    match case.profile {
+        16 => state
+            .forging
+            .is_some_and(|forging| forging.active.is_some()),
+        45 => state
+            .cooking
+            .is_some_and(|cooking| cooking.active.is_some()),
+        14 => state
+            .smelting
+            .is_some_and(|smelting| smelting.active.is_some()),
+        _ => unreachable!(),
+    }
+}
+
+fn start_station(fixture: &mut StationFixture, case: Station) -> GatewayOutcome {
+    let out = send(&mut fixture.game, &interact(fixture.actor), NOW);
+    assert!(
+        movie_active(&fixture.game, case),
+        "the {} station did not start its movie",
+        case.noun
+    );
+    out
+}
+
+fn assert_station_refusals(case: Station) {
+    for (active, accepted, supplies, expected) in [
+        (1, true, true, case.wrong_job),
+        (case.profile, false, true, case.pending),
+        (case.profile, true, false, case.shortage),
+    ] {
+        let mut fixture = station_fixture(case, accepted, active, supplies);
+        let before = fixture.game.snapshot();
+        let out = send(&mut fixture.game, &interact(fixture.actor), NOW);
+        assert_eq!(chat_texts(&out.replies), vec![expected.to_owned()]);
+        assert_eq!(fixture.game.snapshot(), before);
+    }
+}
+
+fn assert_station_success(case: Station) {
+    let mut fixture = station_fixture(case, true, case.profile, true);
+    let out = start_station(&mut fixture, case);
+    assert_eq!(
+        chat_texts(&out.replies),
+        case.success
+            .map(|text| vec![text.to_owned()])
+            .unwrap_or_default()
+    );
+}
+
+fn terminal_payload(fixture: &StationFixture, case: Station) -> Vec<u8> {
+    let state = fixture.game.snapshot().gameplay.unwrap();
+    let instance = match case.profile {
+        16 => state.forging.unwrap().active.unwrap().instance_id,
+        45 => state.cooking.unwrap().active.unwrap().instance_id,
+        14 => state.smelting.unwrap().active.unwrap().instance_id,
+        _ => unreachable!(),
+    };
+    let mut packet = match case.profile {
+        16 => osfr_tools::forging::payload_packet(instance, "OnNextLevelMsg"),
+        45 => osfr_tools::cooking::payload_packet(instance, "FRServer_GameWon\t900\t0"),
+        14 => osfr_tools::smelting::payload_packet(instance, "FRServer_GameWon\t900\t1"),
+        _ => unreachable!(),
+    }
+    .unwrap();
+    packet[11..15].copy_from_slice(&(-1_i32).to_le_bytes());
+    packet
+}
+
+fn prepare_terminal(fixture: &mut StationFixture, case: Station) {
+    match case.profile {
+        16 => {
+            forging_movie::start(&mut fixture.game, NOW);
+            forging_movie::reach_quota(&mut fixture.game, NOW);
+        }
+        45 => {
+            cooking_movie::start(&mut fixture.game, NOW);
+            cooking_movie::rounds(&mut fixture.game, NOW);
+        }
+        14 => {
+            smelting_movie::start(&mut fixture.game, NOW);
+            smelting_movie::rounds(&mut fixture.game, NOW);
+        }
+        _ => unreachable!(),
+    }
+}
+
+fn assert_terminal_error(fixture: &mut StationFixture, case: Station, expected: &str) {
+    let payload = terminal_payload(fixture, case);
+    let error = fixture
+        .game
+        .handle_at(&bundle(&[payload]), NOW)
+        .err()
+        .expect("the terminal must be refused");
+    assert_eq!(error.to_string(), expected);
+}
+
+fn assert_movie_gate(case: Station) {
+    let mut fixture = station_fixture(case, true, case.profile, true);
+    start_station(&mut fixture, case);
+    let expected = format!(
+        "Close the {} game before changing jobs, equipment or interacting.",
+        case.noun
+    );
+    // Client ability writer 0x00a342e0: i32 bar, i32 slot, i32 target mode,
+    // then a u64 target id when the mode is 0. The 24-byte form is the one a
+    // real attack request sends; a 20-byte packet would be rejected by the
+    // combat parser instead of proving the movie gate handled it.
+    let attack = [
+        vec![36, 0, 10, 0],
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        UNKNOWN_ACTOR.to_le_bytes().to_vec(),
+    ]
+    .concat();
+    let equip = [
+        vec![42, 0, 3, 0],
+        i32::MAX.to_le_bytes().to_vec(), // unowned item id
+        1_i32.to_le_bytes().to_vec(),    // profile id
+        0_i32.to_le_bytes().to_vec(),    // equip slot
+    ]
+    .concat();
+    let mut job = vec![26, 0, 13, 0];
+    job.extend(1_i32.to_le_bytes());
+    for packet in [
+        job,
+        menu(UNKNOWN_ACTOR),
+        interact(UNKNOWN_ACTOR),
+        attack,
+        equip,
+    ] {
+        let before = fixture.game.snapshot();
+        let out = send(&mut fixture.game, &packet, NOW);
+        assert_eq!(chat_texts(&out.replies), vec![expected.clone()]);
+        assert_eq!(fixture.game.snapshot(), before);
+    }
+
+    let before = fixture.game.snapshot();
+    let error = fixture
+        .game
+        .handle_at(&bundle(&[vec![26, 0, 42, 0, 0]]), NOW)
+        .err()
+        .expect("malformed leave must fail");
+    assert_eq!(
+        error.to_string(),
+        format!("invalid {} leave request", case.noun)
+    );
+    assert_eq!(fixture.game.snapshot(), before);
+}
+
+fn assert_completion_errors(case: Station) {
+    let mut fixture = station_fixture(case, true, case.profile, true);
+    start_station(&mut fixture, case);
+    prepare_terminal(&mut fixture, case);
+    let mut now = NOW;
+
+    let outside = [
+        fixture.position[0] + 20.0,
+        fixture.position[1],
+        fixture.position[2],
+    ];
+    move_to(&mut fixture.game, outside, &mut now);
+    let before = fixture.game.snapshot();
+    assert_terminal_error(&mut fixture, case, case.outside);
+    assert_eq!(fixture.game.snapshot(), before);
+
+    move_to(&mut fixture.game, fixture.position, &mut now);
+    let mut inventory = fixture.game.inventory_state().unwrap().clone();
+    for (definition, _) in requirements(case, &reference(case.content)) {
+        inventory
+            .items
+            .retain(|item| item.definition_id != definition || item.rental.is_some());
+    }
+    fixture.game.adopt_trade_inventory(inventory).unwrap();
+    let before = fixture.game.snapshot();
+    assert_terminal_error(&mut fixture, case, case.changed);
+    assert_eq!(fixture.game.snapshot(), before);
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn ability_request_is_the_clients_24_byte_mode_zero_form() {
+    let mut fixture = station_fixture(FORGING, true, FORGING.profile, true);
+    // Client writer 0x00a342e0: i32 bar, i32 slot, i32 target mode, then the
+    // u64 target id when the mode is 0. A bundled request surfaces handler
+    // errors, so a malformed cast shape fails here instead of hiding.
+    let attack = [
+        vec![36, 0, 10, 0],
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        UNKNOWN_ACTOR.to_le_bytes().to_vec(),
+    ]
+    .concat();
+    assert_eq!(attack.len(), 24);
+    fixture
+        .game
+        .handle_at(&bundle(&[attack]), NOW)
+        .expect("the client's 24-byte mode-0 ability request must parse");
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn forging_characterization_pins_station_gate_and_completion_errors() {
+    assert_station_refusals(FORGING);
+    assert_station_success(FORGING);
+    assert_movie_gate(FORGING);
+    assert_completion_errors(FORGING);
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn cooking_characterization_pins_station_gate_and_completion_errors() {
+    assert_station_refusals(COOKING);
+    assert_station_success(COOKING);
+    assert_movie_gate(COOKING);
+    assert_completion_errors(COOKING);
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn smelting_characterization_pins_station_gate_and_completion_errors() {
+    assert_station_refusals(SMELTING);
+    assert_station_success(SMELTING);
+    assert_movie_gate(SMELTING);
+    assert_completion_errors(SMELTING);
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn forging_chat_gate_refuses_other_realm_actions_and_exit_clears_the_movie() {
+    let mut fixture = station_fixture(FORGING, true, FORGING.profile, true);
+    start_station(&mut fixture, FORGING);
+    fixture.game.set_dev_tools(true);
+    fixture.game.set_role(AccountRole::Admin);
+    let before = fixture.game.snapshot();
+    let out = send(&mut fixture.game, &chat("realm x"), NOW);
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec!["Close the forging game before other opening actions.".to_owned()]
+    );
+    assert_eq!(fixture.game.snapshot(), before);
+
+    let out = send(&mut fixture.game, &chat(""), NOW);
+    assert!(out.replies.is_empty());
+    assert_eq!(fixture.game.snapshot(), before);
+
+    let out = send(&mut fixture.game, &chat("realm exit"), NOW);
+    assert!(out.state_changed);
+    let after = fixture.game.snapshot().gameplay.unwrap();
+    assert!(after.forging.is_none_or(|forging| forging.active.is_none()));
+    assert_eq!(after.inventory, before.gameplay.unwrap().inventory);
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn smelting_completion_advances_opening_craft_and_grants_every_bar() {
+    let mut fixture = station_fixture(SMELTING, true, SMELTING.profile, true);
+    start_station(&mut fixture, SMELTING);
+    prepare_terminal(&mut fixture, SMELTING);
+    let before = fixture.game.snapshot();
+    let payload = terminal_payload(&fixture, SMELTING);
+    send(&mut fixture.game, &payload, NOW);
+    let after = fixture.game.snapshot();
+    let mut expected = before
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .opening
+        .as_ref()
+        .unwrap()
+        .stages[&fixture.stage_id]
+        .counts
+        .clone();
+    expected[fixture.objective_index] += 5;
+    assert_eq!(
+        after
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .opening
+            .as_ref()
+            .unwrap()
+            .stages[&fixture.stage_id]
+            .counts,
+        expected
+    );
+    assert_eq!(
+        item_count(after.gameplay.as_ref().unwrap(), 21785),
+        item_count(before.gameplay.as_ref().unwrap(), 21785) + 5
+    );
+    assert_eq!(
+        after
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .smelting
+            .as_ref()
+            .unwrap()
+            .completed,
+        before
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .smelting
+            .as_ref()
+            .unwrap()
+            .completed
+            + 1
+    );
+}
+
+fn gather_fixture(
+    resource_id: u32,
+    profile: i32,
+    content: &str,
+    accepted: bool,
+    active: i32,
+) -> (Gateway, u64, u32, usize) {
+    let fixture = opening_fixture(
+        content,
+        TutorialGoal::Gather(resource_id),
+        &[profile],
+        accepted,
+        active,
+        &[],
+    );
+    (
+        fixture.game,
+        fixture.actor,
+        fixture.stage_id,
+        fixture.objective_index,
+    )
+}
+
+fn assert_bonus_drop(
+    resource_id: u32,
+    profile: i32,
+    content: &'static str,
+    expected: &[(i32, u32)],
+) {
+    let (mut game, actor, stage_id, objective_index) =
+        gather_fixture(resource_id, profile, content, true, profile);
+    let before = game.snapshot();
+    send(&mut game, &interact(actor), NOW);
+    let after = game.snapshot();
+    for (definition, count) in expected {
+        assert_eq!(
+            item_count(after.gameplay.as_ref().unwrap(), *definition),
+            item_count(before.gameplay.as_ref().unwrap(), *definition) + count,
+            "definition {definition}"
+        );
+    }
+    assert_eq!(
+        after
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .opening
+            .as_ref()
+            .unwrap()
+            .stages[&stage_id]
+            .counts[objective_index],
+        1
+    );
+}
+
+fn assert_no_bonus_drop(resource_id: u32, profile: i32, content: &'static str, accepted: bool) {
+    let (mut game, actor, stage_id, objective_index) =
+        gather_fixture(resource_id, profile, content, accepted, profile);
+    let before = game.snapshot();
+    send(&mut game, &interact(actor), NOW);
+    assert_eq!(game.snapshot(), before);
+    assert_eq!(
+        game.snapshot().gameplay.unwrap().opening.unwrap().stages[&stage_id].counts
+            [objective_index],
+        0
+    );
+}
+
+#[test]
+#[ignore = "requires private forging cooking smelting and W104 content"]
+fn opening_gather_bonus_drops_are_counted_only_with_valid_job_progress() {
+    assert_bonus_drop(1003, 14, "rust-opening", &[(2739, 1), (879, 1)]);
+    assert_bonus_drop(
+        1001,
+        45,
+        "rust-opening-cooking-original-assets",
+        &[(2884, 1)],
+    );
+    assert_bonus_drop(
+        1002,
+        45,
+        "rust-opening-cooking-original-assets",
+        &[(2875, 1)],
+    );
+    // Wrong job: the same accepted step must not pay an item or a count.
+    assert_no_bonus_drop(1003, 1, "rust-opening", true);
+    // Stage not accepted: the correct job alone must not pay either.
+    assert_no_bonus_drop(1003, 14, "rust-opening", false);
+}

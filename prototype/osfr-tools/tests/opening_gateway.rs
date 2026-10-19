@@ -3,7 +3,6 @@ use osfr_tools::{
     gameplay::Gameplay,
     gateway::Gateway,
     opening::{OpeningEngine, OpeningTrigger},
-    smelting::payload_packet as authored_payload_packet,
 };
 use serde_json::Value;
 use std::{
@@ -14,12 +13,8 @@ use std::{
 mod cooking_movie;
 #[path = "common/forging_movie.rs"]
 mod forging_movie;
-
-fn payload_packet(instance: i32, text: &str) -> std::io::Result<Vec<u8>> {
-    let mut native = authored_payload_packet(instance, text)?;
-    native[11..15].copy_from_slice(&(-1i32).to_le_bytes());
-    Ok(native)
-}
+#[path = "common/smelting_movie.rs"]
+mod smelting_movie;
 
 fn wrap(inner: &[u8]) -> Vec<u8> {
     let mut p = vec![5, 0, 1];
@@ -110,60 +105,6 @@ fn kill(g: &mut Gateway, guid: u64, pos: [f32; 3], now: &mut u64) {
         g.handle_at(&wrap(&attack), *now).unwrap();
     }
     panic!("enemy did not die");
-}
-
-fn play_smelting(g: &mut Gateway, now: &mut u64) {
-    let previous = g.snapshot().gameplay.unwrap().smelting.unwrap();
-    let id = previous.active.as_ref().unwrap().instance_id;
-    let mut start = vec![39, 0, 5];
-    for n in [id, -1, -1] {
-        start.extend(n.to_le_bytes());
-    }
-    let launched = g.handle_at(&wrap(&start), *now).unwrap();
-    assert_eq!(launched.replies.len(), 2);
-    g.handle_at(
-        &wrap(&payload_packet(id, "FRServer_ReadyForGameData").unwrap()),
-        *now,
-    )
-    .unwrap();
-    for stage in 101..=104 {
-        for kind in 0..=3 {
-            g.handle_at(
-                &wrap(
-                    &payload_packet(id, &format!("FRServer_StatUpdate\t{stage}\t{kind}\t1)"))
-                        .unwrap(),
-                ),
-                *now,
-            )
-            .unwrap();
-        }
-    }
-    g.handle_at(
-        &wrap(&payload_packet(id, "FRServer_GameWon\t900\t10").unwrap()),
-        *now,
-    )
-    .unwrap();
-    assert_eq!(
-        g.snapshot()
-            .gameplay
-            .as_ref()
-            .unwrap()
-            .smelting
-            .as_ref()
-            .unwrap()
-            .completed,
-        previous.completed + 1
-    );
-    g.handle_at(&wrap(&[26, 0, 42, 0]), *now).unwrap();
-    assert!(
-        g.snapshot()
-            .gameplay
-            .unwrap()
-            .smelting
-            .unwrap()
-            .active
-            .is_none()
-    );
 }
 
 #[test]
@@ -341,7 +282,7 @@ fn private_all_opening_actions_dungeon_return_and_restarts() {
                             .as_ref()
                             .is_some_and(|s| s.active.is_some())
                     {
-                        play_smelting(&mut g, &mut now);
+                        smelting_movie::play(&mut g, now);
                     }
                     if matches!(goal.trigger, OpeningTrigger::Craft { recipe_id: 2003 })
                         && g.snapshot()
