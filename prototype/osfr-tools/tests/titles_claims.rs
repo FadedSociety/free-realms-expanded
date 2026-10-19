@@ -194,11 +194,63 @@ fn decode_claim_rows(packet: &[u8], count_offset: usize) -> Vec<WireClaimItem> {
     rows
 }
 
+/// Exact serialized definition row for catalogue item 8 from the prepared
+/// content fixture (`inventory.json`, definition 8). The leading fields are
+/// decoded in the client's order below; the rest is pinned so a catalogue
+/// layout change cannot pass the production row and the test together.
+const DEFINITION_8_ROW: [u8; 178] = [
+    0x08, 0x00, 0x00, 0x00, 0xcc, 0x08, 0x00, 0x00, 0x9c, 0xb3, 0x00, 0x00, 0xe4, 0x06, 0x00, 0x00,
+    0xe4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
+    0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xcc, 0x00, 0x00, 0x00, 0x01, 0x00, 0x0e, 0x00,
+    0x00, 0x00, 0x62, 0x6f, 0x77, 0x6c, 0x5f, 0x62, 0x61, 0x73, 0x69, 0x63, 0x2e, 0x61, 0x64, 0x72,
+    0x0a, 0x00, 0x00, 0x00, 0x62, 0x6f, 0x77, 0x6c, 0x2d, 0x62, 0x6f, 0x6e, 0x65, 0x73, 0x00, 0x00,
+    0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00,
+    0x00, 0x00, 0x64, 0x79, 0x65, 0x74, 0x69, 0x6e, 0x74, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00,
+];
+
+fn read_i32(bytes: &[u8], offset: usize) -> i32 {
+    i32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap())
+}
+
+/// The client reads a definition as an id, name/description ids, the icon
+/// pair, eleven leading words plus two flag bytes (`+0x2c`), two
+/// length-prefixed strings, then gender usage and item type
+/// (`notes/Build Guides/Gameplay/Items and Inventory.md`, runtime definition
+/// record; readers `008e3760`/`00919e10`).
+fn decode_definition_header(row: &[u8]) -> (i32, i32, i32, i32, i32, &str, &str, i32, i32) {
+    let mut at = 46;
+    let string = |at: &mut usize| {
+        let len = usize::try_from(read_i32(row, *at)).unwrap();
+        let text = std::str::from_utf8(&row[*at + 4..*at + 4 + len]).unwrap();
+        *at += 4 + len;
+        text
+    };
+    let model = string(&mut at);
+    let texture = string(&mut at);
+    (
+        read_i32(row, 0),
+        read_i32(row, 4),
+        read_i32(row, 8),
+        read_i32(row, 12),
+        read_i32(row, 16),
+        model,
+        texture,
+        read_i32(row, at),
+        read_i32(row, at + 4),
+    )
+}
+
 /// Independently decode the complete `108/6` body: tracker echo, success byte,
 /// declared blob length, entry count, then one serialized `ClientItemDefinition`
-/// row per entry. Each row must be byte-identical to the catalogue row whose
-/// leading dword is its id, and the cursor must land exactly at the end. This
-/// proves the whole body, not only its header and first id.
+/// row per entry. Each row must be byte-identical to the reader-derived fixture
+/// (or the catalogue row for an id without one), and the cursor must land
+/// exactly at the end. This proves the whole body, not only its header and
+/// first id.
 fn decode_definitions_response(packet: &[u8], tracker: u32, inventory: &Inventory) -> Vec<u32> {
     assert_eq!(&packet[..4], &[108, 0, 6, 0]);
     assert_eq!(
@@ -226,11 +278,12 @@ fn decode_definitions_response(packet: &[u8], tracker: u32, inventory: &Inventor
         let record = inventory
             .definition_record(id)
             .expect("definition row exists in the catalogue");
+        let expected: &[u8] = if id == 8 { &DEFINITION_8_ROW } else { record };
         let end = cursor + record.len();
         assert_eq!(
             &blob[cursor..end],
-            record,
-            "definition {id} body is the catalogue row"
+            expected,
+            "definition {id} body is the reader-derived row"
         );
         ids.push(u32::try_from(id).unwrap());
         cursor = end;
@@ -288,6 +341,19 @@ fn item_count(snapshot: &game_store::Snapshot, definition_id: i32) -> u32 {
         .filter(|item| item.definition_id == definition_id)
         .map(|item| item.count)
         .sum()
+}
+
+fn adventurer_title_id() -> u32 {
+    progression_extras::parse_title_content(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/titles.json"))
+            .unwrap(),
+    )
+    .unwrap()
+    .definitions
+    .iter()
+    .find(|title| title.name == "The Adventurer Enthusiast")
+    .and_then(|title| title.client_id)
+    .expect("the shipped level-20 Adventurer title")
 }
 
 fn enable_adventurer_claim_reward(fixture: &Fixture) {
@@ -663,17 +729,7 @@ fn job_rank_completion_awards_a_data_bound_title_and_select_request_equips_it() 
     gateway.set_dev_tools(true);
     gateway.set_role(AccountRole::Admin);
 
-    let titles = progression_extras::parse_title_content(
-        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/titles.json"))
-            .unwrap(),
-    )
-    .unwrap();
-    let title_id = titles
-        .definitions
-        .iter()
-        .find(|title| title.name == "The Adventurer Enthusiast")
-        .and_then(|title| title.client_id)
-        .unwrap();
+    let title_id = adventurer_title_id();
 
     let earned = send(&mut gateway, &chat::local_request("realm level 20"));
     let earned_packets = inner_packets(&earned);
@@ -694,6 +750,37 @@ fn job_rank_completion_awards_a_data_bound_title_and_select_request_equips_it() 
     assert_eq!(
         u32::from_le_bytes(replies[0][30..34].try_into().unwrap()),
         title_id
+    );
+}
+
+/// The claim reply copies catalogue definition bytes, so the test must not
+/// derive its expectation from that same function. This fixture was taken from
+/// the prepared catalogue row and its leading fields are decoded in the
+/// client's order; the client reader would reject a different layout.
+#[test]
+fn definition_row_matches_the_client_reader_and_the_pinned_fixture() {
+    let fixture = Fixture::new();
+    let inventory = Inventory::load(&fixture.content, None).unwrap();
+    let row = inventory
+        .definition_record(8)
+        .expect("definition 8 exists in the catalogue");
+    assert_eq!(
+        row,
+        &DEFINITION_8_ROW[..],
+        "the catalogue row for item 8 changed; re-derive the fixture from the client layout"
+    );
+    let (id, name, description, icon, tint, model, texture, gender, kind) =
+        decode_definition_header(row);
+    assert_eq!(
+        (id, name, description, icon, tint),
+        (8, 2252, 45980, 1764, 228)
+    );
+    assert_eq!((model, texture), ("bowl_basic.adr", "bowl-bones"));
+    assert_eq!((gender, kind), (0, 4));
+    assert_eq!(
+        (row[44], row[45]),
+        (1, 0),
+        "two flag bytes close the 46-byte prefix"
     );
 }
 
@@ -727,6 +814,120 @@ fn achievement_item_reward_is_issued_to_the_claim_window_by_gameplay() {
             .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x77, 0x77, 0, 0, 1]))
     );
     assert_eq!(item_count(&gateway.snapshot(), 8), 1);
+}
+
+/// A full claim inbox must defer the achievement award, never fail the reward
+/// transaction that moved the counter: the same settlement runs inside the
+/// shared-field tick, where an `Err` would freeze every player in the instance.
+/// The moved counter is re-observed by the next authoritative transaction.
+#[test]
+fn settlement_capacity_failure_defers_the_award_without_failing_the_transaction() {
+    let fixture = Fixture::new();
+    enable_adventurer_claim_reward(&fixture);
+    let mut state = fixture.state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = 1;
+    profiles.unlocked.insert(1);
+    profiles.experience.insert(1, 1_800);
+    let mut gateway = fixture.gateway(Some(state));
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+
+    let title_id = adventurer_title_id();
+
+    // MAX_CLAIM_ITEMS pending rows: the level-20 item grant cannot be queued.
+    for index in 0..256_u64 {
+        gateway
+            .issue_claim(CLAIM + 1 + index, item_grant())
+            .unwrap();
+    }
+    assert_eq!(pending_claim_count(&mut gateway), 256);
+
+    // The request commits the job XP; only the achievement award is deferred.
+    let earned = send(&mut gateway, &chat::local_request("realm level 20"));
+    assert!(
+        !inner_packets(&earned).is_empty(),
+        "the request still answers"
+    );
+    let deferred = gateway.snapshot();
+    assert_eq!(
+        deferred
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .profiles
+            .as_ref()
+            .unwrap()
+            .experience
+            .get(&1),
+        Some(&1_900),
+        "the refused settlement must not roll back the reward transaction"
+    );
+    let extras = deferred
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .progression_extras
+        .as_ref()
+        .unwrap();
+    assert!(
+        !extras.titles.contains(title_id),
+        "a deferred award must not add the title"
+    );
+    assert_eq!(
+        pending_claim_count(&mut gateway),
+        256,
+        "a deferred award must not queue a claim"
+    );
+
+    // Claim one row so the retry has capacity; a reconnect's login sync is the
+    // later authoritative transaction that observes the moved counter again.
+    let rows = decode_claim_rows(
+        &inner_packets(&send(&mut gateway, &ClaimWindow::list_request()))
+            .pop()
+            .unwrap(),
+        5,
+    );
+    let paid = send(
+        &mut gateway,
+        &progression_extras::claim_request(0x9999, &rows[0].ids).unwrap(),
+    );
+    assert!(
+        inner_packets(&paid)
+            .iter()
+            .any(|packet| packet.starts_with(&[108, 0, 4, 0, 0x99, 0x99, 0, 0, 1]))
+    );
+    assert_eq!(pending_claim_count(&mut gateway), 255);
+    let saved = gateway.snapshot();
+
+    let path = fixture.content.join("deferred-award-save.json");
+    gateway.save_with_pet_roster(&path).unwrap();
+    let reloaded = game_store::load_or_create(&path, saved.character.clone()).unwrap();
+    let mut fresh = fixture.gateway(reloaded.gameplay.clone());
+    let titles = fresh
+        .snapshot()
+        .gameplay
+        .and_then(|state| state.progression_extras.map(|extras| extras.titles))
+        .unwrap();
+    assert!(
+        titles.contains(title_id),
+        "the reconnect did not award the deferred level-20 title"
+    );
+    assert_eq!(
+        pending_claim_count(&mut fresh),
+        256,
+        "the reconnect queued the deferred achievement claim"
+    );
+}
+
+fn pending_claim_count(gateway: &mut Gateway) -> usize {
+    decode_claim_rows(
+        &inner_packets(&send(gateway, &ClaimWindow::list_request()))
+            .pop()
+            .expect("claim list response"),
+        5,
+    )
+    .len()
 }
 
 fn gateway_claim_history_contains(

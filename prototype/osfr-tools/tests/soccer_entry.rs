@@ -8,6 +8,7 @@
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
+    game_store,
     gameplay::Gameplay,
     gateway::{Gateway, GatewayOutcome},
     progression_extras,
@@ -442,36 +443,20 @@ fn gateway_inner(out: &GatewayOutcome) -> Vec<Vec<u8>> {
         .collect()
 }
 
-/// A paid match is a tick-only reward: the finish settlement reaches the bank
-/// from `Gameplay::tick`, outside every application request. Its rank crossing
-/// must award the bound title in that same tick, so the player can select it
-/// without reconnecting.
-#[test]
-fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
-    let fixture = Fixture::new();
+/// Login, play the short paid match through the activity portal and shoot until
+/// the server settles a win. The win pays 50 job XP from `Gameplay::tick`, the
+/// tick-only path the achievement repair covers.
+fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Vec<u8>>, u64) {
     fs::write(
         fixture.0.join("soccer.json"),
         soccer_content_with_reward(50),
     )
     .unwrap();
-    let titles = progression_extras::parse_title_content(
-        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/titles.json"))
-            .unwrap(),
-    )
-    .unwrap();
-    let title_id = titles
-        .definitions
-        .iter()
-        .find(|title| title.name == "The Adventurer Enthusiast")
-        .and_then(|title| title.client_id)
-        .expect("the shipped level-20 Adventurer title");
-
     let mut state = Gameplay::load(&fixture.0, None).unwrap().state();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.active = 1;
     profiles.unlocked.insert(1);
-    // Rank 19: the 50 XP tick payout crosses the level-20 threshold.
-    profiles.experience.insert(1, 1_850);
+    profiles.experience.insert(1, xp);
 
     let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
         .map(PathBuf::from)
@@ -492,10 +477,7 @@ fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
     gateway.set_dev_tools(false);
     gateway.set_role(AccountRole::Player);
     let mut login = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["soccer-achievement", version.as_str(), ""]
-        .into_iter()
-        .enumerate()
-    {
+    for (index, text) in [ticket, version.as_str(), ""].into_iter().enumerate() {
         login.extend((text.len() as u32).to_le_bytes());
         login.extend(text.as_bytes());
         if index == 0 {
@@ -537,6 +519,32 @@ fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
         }
     }
     assert!(won, "the server-scored goal settles as a win");
+    (gateway, packets, now)
+}
+
+fn adventurer_title_id() -> u32 {
+    progression_extras::parse_title_content(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/titles.json"))
+            .unwrap(),
+    )
+    .unwrap()
+    .definitions
+    .iter()
+    .find(|title| title.name == "The Adventurer Enthusiast")
+    .and_then(|title| title.client_id)
+    .expect("the shipped level-20 Adventurer title")
+}
+
+/// A paid match is a tick-only reward: the finish settlement reaches the bank
+/// from `Gameplay::tick`, outside every application request. Its rank crossing
+/// must award the bound title in that same tick, so the player can select it
+/// without reconnecting.
+#[test]
+fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
+    let fixture = Fixture::new();
+    let title_id = adventurer_title_id();
+    // Rank 19: the 50 XP tick payout crosses the level-20 threshold.
+    let (mut gateway, packets, now) = play_a_paid_win(&fixture, 1_850, "soccer-achievement");
     assert!(
         packets.iter().any(|packet| {
             packet.starts_with(&[152, 0, 1, 0])
@@ -557,12 +565,71 @@ fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
         }),
         "the tick-awarded title could not be selected without reconnecting: {replies:?}"
     );
-    let titles = gateway
+    let snapshot = gateway.snapshot();
+    let titles = snapshot
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .progression_extras
+        .as_ref()
+        .unwrap()
+        .titles
+        .clone();
+    assert_eq!(titles.active(), Some(title_id));
+
+    // The tick marks the character changed, so the gateway saves the staged
+    // state; prove the title and the active selection survive the same
+    // `save_with_pet_roster` path the session uses and a real reload.
+    let path = fixture.0.join("tick-title-save.json");
+    gateway.save_with_pet_roster(&path).unwrap();
+    let reloaded = game_store::load_or_create(&path, snapshot.character.clone()).unwrap();
+    let saved = &reloaded
+        .gameplay
+        .as_ref()
+        .and_then(|state| state.progression_extras.as_ref())
+        .expect("the tick-awarded title was saved")
+        .titles;
+    assert!(saved.contains(title_id), "the title was lost on reload");
+    assert_eq!(
+        saved.active(),
+        Some(title_id),
+        "the active title selection was lost on reload"
+    );
+}
+
+/// A progress-only counter move stays session-local (F121): the tick settle
+/// observes the moved counter, but no `150/7` packet is sent and a later tick
+/// must not add one.
+#[test]
+fn progress_only_tick_reward_does_not_emit_achievement_progress() {
+    let fixture = Fixture::new();
+    // Rank 18 before the win: the payout moves the achievement counter from 17
+    // to 18, still below the level-20 threshold of 19.
+    let (mut gateway, packets, now) = play_a_paid_win(&fixture, 1_750, "soccer-progress");
+    assert!(
+        packets
+            .iter()
+            .all(|packet| !packet.starts_with(&[150, 0, 7, 0])),
+        "a progress-only gain emitted an achievement progress packet: {packets:?}"
+    );
+    let next = gateway_inner(&gateway.tick_at(now + 250).unwrap());
+    assert!(
+        next.iter()
+            .all(|packet| !packet.starts_with(&[150, 0, 7, 0])),
+        "a later tick re-emitted the achievement progress packet: {next:?}"
+    );
+    let xp = gateway
         .snapshot()
         .gameplay
         .unwrap()
-        .progression_extras
+        .profiles
         .unwrap()
-        .titles;
-    assert_eq!(titles.active(), Some(title_id));
+        .experience
+        .get(&1)
+        .copied()
+        .unwrap();
+    assert!(
+        (1_800..1_900).contains(&xp),
+        "the win must move the rank counter without crossing level 20: {xp}"
+    );
 }
