@@ -2155,9 +2155,9 @@ impl Session {
                     .invite_to_group(self.character_guid, &name, &lookup, now_ms)
             }
             SocialRequest::GroupLeave => world.social.leave_group(self.character_guid),
-            SocialRequest::GroupResponse { group_id, accepted } => world
+            SocialRequest::GroupResponse { token_id, accepted } => world
                 .social
-                .respond_group_invite(self.character_guid, group_id, accepted, now_ms),
+                .respond_group_invite(self.character_guid, token_id, accepted, now_ms),
             SocialRequest::GroupKick(guid) => {
                 world.social.kick_from_group(self.character_guid, guid)
             }
@@ -2829,9 +2829,10 @@ enum SocialRequest {
     GroupInvite(SocialName),
     GroupLeave,
     GroupResponse {
-        /// (R) The historical group-id slot now carries the fresh invitation generation the
-        /// client copies from the 40/1 pop-up (+0x120) and echoes here.
-        group_id: u32,
+        /// (R) The historical group-id slot carries the per-invitation generation the client
+        /// stores from the 40/1 pop-up (+0x120, `0093dc0b`) and echoes here (`00a8b640`).
+        /// Only the service may compare it; it is not a live group id.
+        token_id: u32,
         accepted: bool,
     },
     GroupKick(u64),
@@ -2903,12 +2904,12 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
             r.social_name()?;
             r.u64()?;
             r.social_name()?;
-            let group_id = r.u32()?;
+            let token_id = r.u32()?;
             let accepted = r.u8()? != 0;
             for _ in 0..5 {
                 r.u32()?;
             }
-            SocialRequest::GroupResponse { group_id, accepted }
+            SocialRequest::GroupResponse { token_id, accepted }
         }
         (40, 6) => {
             let guid = r.u64()?;
