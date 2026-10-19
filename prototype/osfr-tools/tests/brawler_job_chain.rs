@@ -362,7 +362,17 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     );
     character.position = jones;
     let _ = open_end_screen(&mut game, &character, JONES, REFERRAL_TO_JONES, &mut now);
+    // C3's exact five-coin payout is asserted by `finish_turnin`; the review of
+    // c65b2b2 found the old test only checked the chapter total.
     finish_turnin(&mut game, &character, REFERRAL_TO_JONES, &mut now);
+    assert_refusal_changes_nothing(
+        &mut game,
+        &character,
+        &quest_end_reply(REFERRAL_TO_JONES),
+        now + 1,
+        "duplicate C3 turn-in",
+    );
+    now += 1;
 
     accept_quest(
         &mut game,
@@ -440,12 +450,31 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     );
     assert_eq!(game.state().npc_quests.unwrap().pending_turnin, None);
     now += 100;
+    let coins_after_c4 = game.state().inventory.coins;
     assert_refusal_changes_nothing(
         &mut game,
         &character,
         &quest_end_reply(HOOLIGAN_FIGHT),
         now,
-        "duplicate recovered reward",
+        "duplicate reward before reload",
+    );
+    game = load_game(Some(game.state()));
+    character.position = jones;
+    now += 100;
+    game.initialize_world(&character, now)
+        .expect("completed chapter reload initializes");
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &character,
+        &quest_end_reply(HOOLIGAN_FIGHT),
+        now,
+        "duplicate reward after reload",
+    );
+    assert_eq!(
+        game.state().inventory.coins,
+        coins_after_c4,
+        "a replayed turn-in after reload paid again"
     );
 
     accept_quest(
