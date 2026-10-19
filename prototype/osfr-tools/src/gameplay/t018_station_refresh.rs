@@ -13,7 +13,7 @@ use std::{
 mod station;
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
-const STATION: i32 = 990001;
+const RECIPE: i32 = 4;
 
 fn content_directory() -> PathBuf {
     std::env::var_os("OSFR_OPENING_REFERENCE")
@@ -43,7 +43,7 @@ fn character_at(position: [f32; 3]) -> CharacterState {
 
 fn start_request() -> Vec<u8> {
     let mut packet = vec![26, 0, 24, 0];
-    packet.extend(STATION.to_le_bytes());
+    packet.extend(RECIPE.to_le_bytes());
     packet
 }
 

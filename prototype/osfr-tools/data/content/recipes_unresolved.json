@@ -415,7 +415,8 @@
         "ingredient definitions and counts",
         "recipe-to-minigame binding",
         "required job rank",
-        "output item definition selection"
+        "output item definition selection",
+        "candidate recipe id 46 is also the live client recipe row for Starnut Sundae (output 21820); pattern item 856's Param1 is stale and this row is not safe to load under id 46"
       ],
       "source": [
         {
@@ -446,7 +447,7 @@
         },
         "candidate_recipe_id": {
           "kind": "client",
-          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 46 from pattern item 856; association still candidate."
+          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Pattern item 856 ('Pepper Punkin Recipe') has Param1=46, but the preserved client recipe table uses row 46 for Starnut Sundae (PacketSendSelfToClient.json Recipes[Unknown=46], output 21820). The candidate id collides with a live row and must not be loaded as-is."
         },
         "candidate_recipe_item_definition_id": {
           "kind": "legacy",
@@ -602,70 +603,6 @@
         "minigame_type_id": {
           "kind": "client",
           "evidence": "MiniGameData/job guide: crafting type 9."
-        }
-      }
-    },
-    {
-      "key": "chef.seared_stainberry",
-      "job": "chef",
-      "name": "Seared Stainberry",
-      "candidate_recipe_id": 51,
-      "candidate_recipe_item_definition_id": 861,
-      "candidate_output_definition_id": 21825,
-      "candidate_required_job_rank": 1,
-      "minigame_type_id": 9,
-      "minigame_id": null,
-      "missing_fields": [
-        "native recipe row payload/components unavailable",
-        "ingredient definitions and counts",
-        "recipe-to-minigame binding"
-      ],
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Chef.md: catalogue row or client-only recipe note (chef_recipe_list); MiniGameData TYPE 9"
-        },
-        {
-          "kind": "legacy",
-          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (pinned revision 9e082025391177d5a33ee18c714ddd06b457a695; candidate ids only, not direct client recipe rows)"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Chef.md:206-238; wiki ingredients are not promoted here unless independently tied to client definition ids"
-        }
-      ],
-      "field_sources": {
-        "key": {
-          "kind": "reconstructed",
-          "evidence": "(R) Stable local candidate slug; original server recipe keys were not captured."
-        },
-        "name": {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate title."
-        },
-        "job": {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: candidate job."
-        },
-        "minigame_type_id": {
-          "kind": "client",
-          "evidence": "MiniGameData/job guide: crafting type 9."
-        },
-        "candidate_recipe_id": {
-          "kind": "client",
-          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 51 from pattern item 861; association still candidate."
-        },
-        "candidate_recipe_item_definition_id": {
-          "kind": "legacy",
-          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate pattern item definition 861; Comment='Seared Stainberry Recipe'."
-        },
-        "candidate_output_definition_id": {
-          "kind": "legacy",
-          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: candidate output item definition 21825; Comment='Seared Stainberry'."
-        },
-        "candidate_required_job_rank": {
-          "kind": "legacy",
-          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: MinProfileRank 1."
         }
       }
     },
@@ -1735,7 +1672,7 @@
       "minigame_id": null,
       "missing_fields": [
         "native recipe row payload/components unavailable",
-        "ingredient definitions and counts",
+        "client row ingredients recovered: 53x5, 54x3, 13016x10, 21785x5; output 38829 and Sunstone 13016 have no runtime item definition",
         "recipe-to-minigame binding",
         "required job rank",
         "output item definition selection"
@@ -1743,7 +1680,7 @@
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=155]: Unknown2=33966, Unknown7=38829, components 53x5, 54x3, 13016x10, 21785x5; locale 33966 is Dust Storm Flair Shard. The row cannot load because 38829 and 13016 have no runtime item definition."
         },
         {
           "kind": "legacy",
@@ -1769,7 +1706,7 @@
         },
         "candidate_recipe_id": {
           "kind": "client",
-          "evidence": "Native reward-entry reader 0103cc80 reads one u32 into RewardBundleEntryRecipe +0x44; getter 0103ace0 returns it; formatter 0103bbf0 prints RecipeID. Research Piece 040 records Type 5 Class 58/59 Param1 as each pattern item's own unique recipe index. This proves Param1 semantics, not that an original recipe row payload was captured. Candidate index 155 from pattern item 23872; association still candidate."
+          "evidence": "PacketSendSelfToClient.json Recipes[Unknown=155] carries the Dust Storm Flair Shard row; legacy pattern item 23872 has Param1=155. The client table confirms the association, but the output item id 38829 is missing from the runtime catalogue."
         },
         "candidate_recipe_item_definition_id": {
           "kind": "legacy",
@@ -2281,24 +2218,30 @@
       "key": "blacksmith.manguana_statue",
       "job": "blacksmith",
       "name": "Manguana Statue",
-      "candidate_recipe_id": null,
-      "candidate_recipe_item_definition_id": null,
+      "candidate_recipe_id": 165,
+      "candidate_recipe_item_definition_id": 23882,
       "candidate_output_definition_id": null,
-      "candidate_required_job_rank": null,
+      "candidate_required_job_rank": 4,
       "minigame_type_id": 8,
       "minigame_id": null,
       "missing_fields": [
         "native recipe row payload/components unavailable",
-        "ingredient definitions and counts",
+        "client row ingredients recovered: 54x12, 55x6, 13016x15, 18172x10, 21786x12; output 38864 and Sunstone 13016 have no runtime item definition",
         "recipe-to-minigame binding",
-        "required job rank",
-        "recipe item definition link",
         "output item definition selection"
       ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: catalogue row or client-only recipe note (blacksmith_forging_list); MiniGameData TYPE 8"
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=165]: Unknown2=34045, Unknown7=38864, components 54x12, 55x6, 13016x15, 18172x10, 21786x12; locale 34045 is Manguana Statue. The row cannot load because 38864 and 13016 have no runtime item definition."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 23882 Comment='Manguana Sunstone Recipe', Param1=165, MinProfileRank=4."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/freerealms-wiki/wikitext/9295-44624-f83befb70afe.wiki lists the same five ingredient quantities."
         }
       ],
       "field_sources": {
@@ -2317,6 +2260,18 @@
         "minigame_type_id": {
           "kind": "client",
           "evidence": "MiniGameData/job guide: crafting type 8."
+        },
+        "candidate_recipe_id": {
+          "kind": "client",
+          "evidence": "PacketSendSelfToClient.json Recipes[Unknown=165] carries the Manguana Statue row; legacy pattern item 23882 ('Manguana Sunstone Recipe') has Param1=165."
+        },
+        "candidate_recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 23882; Comment='Manguana Sunstone Recipe'."
+        },
+        "candidate_required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern 23882 MinProfileRank=4."
         }
       }
     },

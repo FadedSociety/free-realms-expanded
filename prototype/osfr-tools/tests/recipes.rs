@@ -1,8 +1,10 @@
 use osfr_tools::recipes::{self, CraftingJob, RecipeCatalog, UnresolvedRecipeCatalog};
 use serde_json::Value;
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashMap, HashSet},
     fs,
+    fs::File,
+    io::BufReader,
     path::PathBuf,
 };
 
@@ -19,6 +21,49 @@ fn shipped() -> RecipeCatalog {
         &item_definition_ids(),
     )
     .unwrap()
+}
+
+#[derive(serde::Deserialize)]
+struct DefinitionFile {
+    definitions: Vec<DefinitionRow>,
+}
+
+#[derive(serde::Deserialize)]
+struct DefinitionRow {
+    id: i32,
+}
+
+fn definition_ids(path: &std::path::Path) -> HashSet<i32> {
+    let file = File::open(path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+    let document: DefinitionFile = serde_json::from_reader(BufReader::new(file))
+        .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+    document.definitions.into_iter().map(|row| row.id).collect()
+}
+
+#[derive(serde::Deserialize)]
+struct ClientSelfPacket {
+    #[serde(rename = "Recipes")]
+    recipes: Vec<ClientRecipeRow>,
+}
+
+#[derive(serde::Deserialize)]
+struct ClientRecipeRow {
+    #[serde(rename = "Unknown")]
+    id: u32,
+    #[serde(rename = "Unknown6")]
+    family: u32,
+    #[serde(rename = "Unknown7")]
+    output_definition_id: i32,
+    #[serde(rename = "ComponentData")]
+    components: Vec<ClientRecipeComponent>,
+}
+
+#[derive(serde::Deserialize)]
+struct ClientRecipeComponent {
+    #[serde(rename = "Unknown3")]
+    count: u32,
+    #[serde(rename = "Unknown6")]
+    definition_id: i32,
 }
 
 fn recipe_object(source: &str) -> Value {
@@ -64,7 +109,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
         &ids,
     )
     .unwrap();
-    assert_eq!(catalog.records.len(), 31);
+    assert_eq!(catalog.records.len(), 32);
 
     for recipe in &catalog.records {
         assert!(ids.contains(&recipe.output.definition_id));
@@ -84,7 +129,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
         &ids,
     )
     .unwrap();
-    assert_eq!(unresolved.records.len(), 83);
+    assert_eq!(unresolved.records.len(), 82);
     assert!(
         unresolved
             .records
@@ -98,7 +143,7 @@ fn shipped_recipes_load_and_all_item_references_exist() {
             .iter()
             .filter(|row| row.job == CraftingJob::Chef)
             .count(),
-        19
+        18
     );
     assert_eq!(
         unresolved
@@ -119,12 +164,126 @@ fn shipped_recipes_load_and_all_item_references_exist() {
 }
 
 #[test]
+fn every_loaded_recipe_item_exists_in_runtime_item_catalogue() {
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/reports/round70-native-20261016T061000Z/content");
+    let mut ids = definition_ids(&content.join("inventory.json"));
+    ids.extend(definition_ids(&content.join("item-catalogue.json")));
+    assert!(
+        ids.len() >= 58_000,
+        "runtime item catalogue unexpectedly small: {}",
+        ids.len()
+    );
+
+    let catalog = RecipeCatalog::load(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/recipes.json"),
+        &ids,
+    )
+    .expect("every loaded recipe item must have a runtime definition");
+    assert_eq!(catalog.records.len(), 32);
+}
+
+#[test]
+fn client_cooking_and_smelting_rows_match_loaded_recipes() {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json");
+    let file = File::open(&path).expect("preserved client self packet");
+    let packet: ClientSelfPacket =
+        serde_json::from_reader(BufReader::new(file)).expect("client self packet JSON");
+    let catalog = shipped();
+    let mut matched = HashSet::new();
+
+    for row in packet
+        .recipes
+        .iter()
+        .filter(|row| matches!(row.family, 9 | 10))
+    {
+        let recipe = catalog
+            .records
+            .iter()
+            .find(|recipe| recipe.recipe_id == Some(row.id))
+            .unwrap_or_else(|| panic!("client recipe row {} is not loaded", row.id));
+        assert_eq!(
+            recipe.output.definition_id, row.output_definition_id,
+            "client recipe row {} output",
+            row.id
+        );
+        let expected: BTreeMap<i32, u32> = row
+            .components
+            .iter()
+            .map(|component| (component.definition_id, component.count))
+            .collect();
+        let actual: BTreeMap<i32, u32> = recipe
+            .ingredients
+            .iter()
+            .map(|ingredient| (ingredient.definition_id, ingredient.count))
+            .collect();
+        assert_eq!(actual, expected, "client recipe row {} ingredients", row.id);
+        matched.insert(row.id);
+    }
+
+    assert_eq!(
+        matched,
+        HashSet::from([4, 5, 33, 34, 43, 46, 50, 51, 56, 59]),
+        "every cooking and smelting row in the client recipe table must be loaded"
+    );
+}
+
+#[test]
+fn unresolved_candidate_ids_do_not_silently_shadow_loaded_rows() {
+    let catalog = shipped();
+    let unresolved = UnresolvedRecipeCatalog::load(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/recipes_unresolved.json"),
+        &item_definition_ids(),
+    )
+    .unwrap();
+    let collisions: Vec<(String, u32)> = unresolved
+        .records
+        .iter()
+        .filter_map(|row| {
+            let id = row.candidate_recipe_id?;
+            catalog
+                .records
+                .iter()
+                .find(|recipe| recipe.recipe_id == Some(id))
+                .map(|_| (row.key.clone(), id))
+        })
+        .collect();
+    assert_eq!(
+        collisions,
+        vec![("chef.pepper_punkin".to_owned(), 46)],
+        "only the documented stale Pepper Punkin candidate may collide; see its missing_fields"
+    );
+}
+
+#[test]
 fn lookups_cover_job_rank_and_output() {
     let catalog = shipped();
-    assert_eq!(catalog.by_job(CraftingJob::Chef).count(), 25);
+    assert_eq!(catalog.by_job(CraftingJob::Chef).count(), 26);
     assert_eq!(catalog.by_job(CraftingJob::Blacksmith).count(), 1);
     assert_eq!(catalog.by_job(CraftingJob::Miner).count(), 5);
     assert_eq!(catalog.by_output(21785).next().unwrap().name, "Copper Bar");
+    assert_eq!(
+        catalog.by_key("miner.tin_bar").unwrap().output.count,
+        5,
+        "client locale 451207523 states five tin bars in one session"
+    );
+    let copper = catalog.by_key("miner.copper_bar.sample").unwrap();
+    assert_eq!(copper.recipe_id, Some(4));
+    assert_eq!(copper.recipe_item_definition_id, Some(381));
+    assert_eq!(copper.required_job_rank, Some(1));
+    let seared = catalog.by_key("chef.seared_stainberry").unwrap();
+    assert_eq!(seared.recipe_id, Some(51));
+    assert_eq!(seared.recipe_item_definition_id, Some(861));
+    assert_eq!(seared.output.definition_id, 21825);
+    assert_eq!(
+        seared
+            .ingredients
+            .iter()
+            .map(|ingredient| (ingredient.definition_id, ingredient.count))
+            .collect::<Vec<_>>(),
+        vec![(2880, 3), (2884, 3), (2887, 3), (2906, 7)]
+    );
     assert_eq!(
         catalog
             .by_key("blacksmith.spunky_scrapper_hammer.sample")

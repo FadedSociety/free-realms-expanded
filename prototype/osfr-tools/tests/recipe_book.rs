@@ -249,8 +249,8 @@ fn blacksmith_recipe_starts_at_the_anvil() {
 
 #[test]
 fn miner_recipe_with_an_id_starts_through_smelting() {
-    // The shipped miner rows have no recipe id yet (client cannot name them),
-    // so give the copper-bar sample one to prove the smelting arm.
+    // Give the copper-bar sample a fresh id to prove the smelting arm selects
+    // by recipe id, not by key.
     let mut w = World::new();
     let sample = w
         .catalog

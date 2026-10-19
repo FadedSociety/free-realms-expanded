@@ -37,7 +37,7 @@ const BOTTOM: usize = TOP + PLAYABLE - 1;
 const OUTPUTS: [i32; 4] = [2739, 879, 65834, 2436];
 const VALUES: [u16; 4] = [601, 602, 603, 604];
 const FILLER: i32 = 1195;
-const COPPER_RECIPE: i32 = 990001;
+const COPPER_RECIPE: i32 = 4;
 const WORLD_FORGE: [f32; 3] = [-2631.933, 0.03999766, -216.5819];
 static NEXT: AtomicU64 = AtomicU64::new(0);
 

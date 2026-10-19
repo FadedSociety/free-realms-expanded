@@ -2340,6 +2340,133 @@
       ]
     },
     {
+      "key": "chef.seared_stainberry",
+      "name": "Seared Stainberry",
+      "recipe_id": 51,
+      "candidate_recipe_id": null,
+      "recipe_item_definition_id": 861,
+      "job": "chef",
+      "job_profile_id": 45,
+      "required_job_rank": 1,
+      "minigame_type_id": 9,
+      "minigame_id": null,
+      "ingredients": [
+        {
+          "definition_id": 2880,
+          "count": 3
+        },
+        {
+          "definition_id": 2884,
+          "count": 3
+        },
+        {
+          "definition_id": 2887,
+          "count": 3
+        },
+        {
+          "definition_id": 2906,
+          "count": 7
+        }
+      ],
+      "output": {
+        "definition_id": 21825,
+        "count": 1
+      },
+      "experience_points": 0,
+      "field_sources": {
+        "key": {
+          "kind": "reconstructed",
+          "evidence": "(R) Local stable key; the client row exposes numeric ids, not this slug."
+        },
+        "name": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json row Recipes[Unknown=51], Unknown2=38663; the pinned output definition 21825 stores NameId 38663, which the client locale renders as Seared Stainberry."
+        },
+        "job": {
+          "kind": "client",
+          "evidence": "Client recipe row 51 has Unknown6=10 (cooking recipe family); legacy pattern item 861 is class 59 (Chef) and its Param1 is 51."
+        },
+        "job_profile_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: job/profile mapping; profile 45."
+        },
+        "minigame_type_id": {
+          "kind": "client",
+          "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
+        },
+        "experience_points": {
+          "kind": "reconstructed",
+          "evidence": "(R) Default 0 XP because the native recipe row has no XP field and no per-recipe XP was recovered."
+        },
+        "output.definition_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].Unknown7=21825; pinned definition 21825 is Comment='Seared Stainberry'."
+        },
+        "output.count": {
+          "kind": "reconstructed",
+          "evidence": "(R) The client recipe row carries no output quantity; default one."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51]; legacy pattern item 861 has Param1=51."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 861; Comment='Seared Stainberry Recipe'."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern 861 MinProfileRank=1."
+        },
+        "ingredients[0].definition_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[0].Unknown6=2880; pinned definition 2880 is Comment='Bundle of Sunleaf'."
+        },
+        "ingredients[0].count": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[0].Unknown3=3."
+        },
+        "ingredients[1].definition_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[1].Unknown6=2884; pinned definition 2884 is Comment='Bundle of Rainleaf'."
+        },
+        "ingredients[1].count": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[1].Unknown3=3."
+        },
+        "ingredients[2].definition_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[2].Unknown6=2887; pinned definition 2887 is Comment='Bundle of Stainberry'."
+        },
+        "ingredients[2].count": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[2].Unknown3=3."
+        },
+        "ingredients[3].definition_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[3].Unknown6=2906; pinned definition 2906 is Comment='Sugar'."
+        },
+        "ingredients[3].count": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51].ComponentData[3].Unknown3=7."
+        }
+      },
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=51]: output 21825 and components 2880x3, 2884x3, 2887x3, 2906x7."
+        },
+        {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; pattern 861, output 21825 and ingredient names."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Output quantity one and XP zero; the client recipe row has neither field."
+        }
+      ]
+    },
+    {
       "key": "chef.sizzling_snowberry_saute",
       "name": "Sizzling Snowberry Saute",
       "recipe_id": 44,
@@ -3402,12 +3529,12 @@
     {
       "key": "miner.copper_bar.sample",
       "name": "Copper Bar",
-      "recipe_id": 990001,
+      "recipe_id": 4,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": 21785,
+      "recipe_item_definition_id": 381,
       "job": "miner",
       "job_profile_id": 14,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 77,
       "ingredients": [
@@ -3427,7 +3554,7 @@
       "source": [
         {
           "kind": "client",
-          "evidence": "MiniGameData row 77 is TYPE 9; tutorial locale 1772250646 says five Copper Ore creates five bars."
+          "evidence": "Client recipe row 4 (PacketSendSelfToClient.json) has output 21785 and components 2739x5, 879x3; MiniGameData row 77 is TYPE 9; tutorial locale 1772250646 says five Copper Ore creates five bars."
         },
         {
           "kind": "wiki",
@@ -3439,7 +3566,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The original recipe row id and pattern item are unrecovered. Local recipe id 990001 and the output item as a display fallback make the learned row selectable; XP remains unknown."
+          "evidence": "(R) XP remains unknown; the client recipe row has no XP field."
         }
       ],
       "experience_points": 0,
@@ -3476,45 +3603,49 @@
           "kind": "client",
           "evidence": "Miner.md tutorial locale 1772250646: ?Smelt 5 copper ore to create 5 copper bars.?"
         },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=4] is the Copper Bar row (Unknown2=104, Unknown7=21785); legacy pattern item 381 Comment='Smelt Copper' has Param1=4."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 381; Comment='Smelt Copper'."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern 381 MinProfileRank=1."
+        },
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 77 is the Copper Bar smelting game, TYPE 9 (Miner.md:194)."
-        },
-        "recipe_id": {
-          "kind": "reconstructed",
-          "evidence": "(R) Local client recipe id 990001; the original pattern-item Param1 was not recovered."
-        },
-        "recipe_item_definition_id": {
-          "kind": "reconstructed",
-          "evidence": "(R) Display fallback uses Copper Bar 21785 because the original pattern item is unavailable."
         },
         "ingredients[0].definition_id": {
           "kind": "legacy",
           "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 2739; Comment='Copper Ore'."
         },
         "ingredients[0].count": {
-          "kind": "wiki",
-          "evidence": "local freerealms-wiki Miner, oldid=46068; ore recipes are five ore plus three flux per bar; Copper Ore count 5."
+          "kind": "client",
+          "evidence": "Client recipe row 4 ComponentData has 2739x5; wiki oldid=46068 agrees (five ore per bar)."
         },
         "ingredients[1].definition_id": {
           "kind": "legacy",
           "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: ingredient item definition 879; Comment='Singing Coal'."
         },
         "ingredients[1].count": {
-          "kind": "wiki",
-          "evidence": "local freerealms-wiki Miner, oldid=46068; ore recipes are five ore plus three flux per bar; Singing Coal count 3."
+          "kind": "client",
+          "evidence": "Client recipe row 4 ComponentData has 879x3; wiki oldid=46068 agrees (three flux per bar)."
         }
       }
     },
     {
       "key": "miner.gold_bar",
       "name": "Gold Bar",
-      "recipe_id": null,
+      "recipe_id": 8,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 385,
       "job": "miner",
       "job_profile_id": 14,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 137,
       "ingredients": [
@@ -3565,6 +3696,18 @@
           "kind": "wiki",
           "evidence": "local freerealms-wiki Miner, oldid=46068; ore recipes are five ore plus three flux per bar; Gold Bar: Ore x5 plus flux x3 per bar. Product is one singular named Bar."
         },
+        "recipe_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 385 Comment='Smelt Gold' has Param1=8. The preserved self-packet recipe table lists only Copper and Tin, so this id is not corroborated by a client row payload."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 385; Comment='Smelt Gold'."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern 385 MinProfileRank=1."
+        },
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 137 is the Gold Bar smelting game, TYPE 9 (Miner.md:194)."
@@ -3608,12 +3751,12 @@
     {
       "key": "miner.iron_bar",
       "name": "Iron Bar",
-      "recipe_id": null,
+      "recipe_id": 6,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 383,
       "job": "miner",
       "job_profile_id": 14,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 135,
       "ingredients": [
@@ -3664,6 +3807,18 @@
           "kind": "wiki",
           "evidence": "local freerealms-wiki Miner, oldid=46068; ore recipes are five ore plus three flux per bar; Iron Bar: Ore x5 plus flux x3 per bar. Product is one singular named Bar."
         },
+        "recipe_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 383 Comment='Smelt Iron' has Param1=6. The preserved self-packet recipe table lists only Copper and Tin, so this id is not corroborated by a client row payload."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 383; Comment='Smelt Iron'."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern 383 MinProfileRank=1."
+        },
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 135 is the Iron Bar smelting game, TYPE 9 (Miner.md:194)."
@@ -3707,12 +3862,12 @@
     {
       "key": "miner.silver_bar",
       "name": "Silver Bar",
-      "recipe_id": null,
+      "recipe_id": 7,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 384,
       "job": "miner",
       "job_profile_id": 14,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 136,
       "ingredients": [
@@ -3763,6 +3918,18 @@
           "kind": "wiki",
           "evidence": "local freerealms-wiki Miner, oldid=46068; ore recipes are five ore plus three flux per bar; Silver Bar: Ore x5 plus flux x3 per bar. Product is one singular named Bar."
         },
+        "recipe_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: pattern item 384 Comment='Smelt Silver' has Param1=7. The preserved self-packet recipe table lists only Copper and Tin, so this id is not corroborated by a client row payload."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 384; Comment='Smelt Silver'."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern 384 MinProfileRank=1."
+        },
         "minigame_id": {
           "kind": "client",
           "evidence": "MiniGameData row 136 is the Silver Bar smelting game, TYPE 9 (Miner.md:194)."
@@ -3806,12 +3973,12 @@
     {
       "key": "miner.tin_bar",
       "name": "Tin Bar",
-      "recipe_id": null,
+      "recipe_id": 5,
       "candidate_recipe_id": null,
-      "recipe_item_definition_id": null,
+      "recipe_item_definition_id": 382,
       "job": "miner",
       "job_profile_id": 14,
-      "required_job_rank": null,
+      "required_job_rank": 1,
       "minigame_type_id": 9,
       "minigame_id": 134,
       "ingredients": [
@@ -3826,7 +3993,7 @@
       ],
       "output": {
         "definition_id": 21786,
-        "count": 1
+        "count": 5
       },
       "experience_points": 0,
       "field_sources": {
@@ -3859,8 +4026,20 @@
           "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: output item definition 21786; Comment='Tin Bar'."
         },
         "output.count": {
-          "kind": "wiki",
-          "evidence": "local freerealms-wiki Miner, oldid=46068; ore recipes are five ore plus three flux per bar; Tin Bar: Ore x5 plus flux x3 per bar. Product is one singular named Bar."
+          "kind": "client",
+          "evidence": "Client locale 451207523: 'Perfectly create five tin bars at the smelting furnace in a single session without spilling any ore.' Locale 740309274 and 2947743611 repeat five tin bars in a single session."
+        },
+        "recipe_id": {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json Recipes[Unknown=5] is the Tin Bar row (Unknown2=105, Unknown7=21786); legacy pattern item 382 Comment='Smelt Tin' has Param1=5."
+        },
+        "recipe_item_definition_id": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern item definition 382; Comment='Smelt Tin'."
+        },
+        "required_job_rank": {
+          "kind": "legacy",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json; revision 9e082025391177d5a33ee18c714ddd06b457a695; SHA-256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025: recipe pattern 382 MinProfileRank=1."
         },
         "minigame_id": {
           "kind": "client",
@@ -3886,7 +4065,7 @@
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/{Chef,Blacksmith,Miner}.md and client locale inventory: client-facing title/type and job."
+          "evidence": "Client recipe row 5 (PacketSendSelfToClient.json) matches the Tin Bar output and ingredients; locale 451207523 says five tin bars in a single smelting session."
         },
         {
           "kind": "legacy",

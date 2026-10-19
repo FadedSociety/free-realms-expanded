@@ -1,7 +1,7 @@
 #[path = "common/crafting_results.rs"]
 mod crafting_results;
-use osfr_tools::cooking::{self, payload_packet, Cooking, CookingPhase, CookingState};
-use serde_json::{json, Value};
+use osfr_tools::cooking::{self, Cooking, CookingPhase, CookingState, payload_packet};
+use serde_json::{Value, json};
 use std::{
     fs,
     path::PathBuf,
@@ -211,9 +211,10 @@ fn actual_native_stat_suffix_is_numeric_only_and_preserves_order_and_economy() {
     assert_eq!(g.state().active.as_ref().unwrap().score, 800);
     assert_eq!(g.state().completed, 0);
     let before = g.state().clone();
-    assert!(g
-        .handle(&payload_packet(id(&g), "FRServer_GameWon\t800\t0").unwrap())
-        .is_err());
+    assert!(
+        g.handle(&payload_packet(id(&g), "FRServer_GameWon\t800\t0").unwrap())
+            .is_err()
+    );
     assert_eq!(g.state(), &before);
 }
 fn rounds(g: &mut Cooking) {
@@ -317,9 +318,11 @@ fn six_ordered_rounds_create_fixed_recipe_intent_once_and_restore() {
         serde_json::from_slice(&serde_json::to_vec(g.state()).unwrap()).unwrap();
     let mut restored = f.load(Some(saved));
     assert_eq!(restored.state().completed, 1);
-    assert!(send(&mut restored, "FRServer_GameWon\t900\t0")
-        .transaction
-        .is_none());
+    assert!(
+        send(&mut restored, "FRServer_GameWon\t900\t0")
+            .transaction
+            .is_none()
+    );
     let old = id(&restored);
     restored.cancel();
     restored.begin(45).unwrap();
@@ -353,15 +356,17 @@ fn malformed_unordered_early_or_forged_reports_do_not_commit() {
     assert!(g.handle(&stale).is_err());
     rounds(&mut g);
     let before = g.state().clone();
-    assert!(g
-        .handle(&payload_packet(id(&g), "FRServer_StatUpdate\t1\t0\t2").unwrap())
-        .is_err());
+    assert!(
+        g.handle(&payload_packet(id(&g), "FRServer_StatUpdate\t1\t0\t2").unwrap())
+            .is_err()
+    );
     assert_eq!(&before, g.state());
     assert!(!send(&mut g, "FRServer_StatUpdate\t1\t0\t1").changed);
     totals(&mut g); // Mutating even a completed statistic cannot alter the totals.
-    assert!(g
-        .handle(&payload_packet(id(&g), "FRServer_StatUpdate\t-1\t5\t999").unwrap())
-        .is_err());
+    assert!(
+        g.handle(&payload_packet(id(&g), "FRServer_StatUpdate\t-1\t5\t999").unwrap())
+            .is_err()
+    );
 }
 
 #[test]
@@ -370,16 +375,18 @@ fn final_totals_and_all_six_rounds_are_required_for_reward() {
     let mut g = f.load(None);
     ready(&mut g);
     rounds(&mut g);
-    assert!(g
-        .handle(&payload_packet(id(&g), "FRServer_GameWon\t900\t0").unwrap())
-        .is_err());
+    assert!(
+        g.handle(&payload_packet(id(&g), "FRServer_GameWon\t900\t0").unwrap())
+            .is_err()
+    );
     for kind in 4..8 {
         send(&mut g, &format!("FRServer_StatUpdate\t-1\t{kind}\t7"));
     }
     let before = g.state().clone();
-    assert!(g
-        .handle(&payload_packet(id(&g), "FRServer_GameWon\t900\t0").unwrap())
-        .is_err());
+    assert!(
+        g.handle(&payload_packet(id(&g), "FRServer_GameWon\t900\t0").unwrap())
+            .is_err()
+    );
     assert_eq!(&before, g.state());
     assert_eq!(g.state().completed, 0);
 }
@@ -393,9 +400,10 @@ fn loss_close_and_stale_attempt_never_grant() {
     let lost = send(&mut g, "FRServer_GameLost\tundefined");
     assert!(lost.transaction.is_none());
     assert_eq!(g.state().active.as_ref().unwrap().phase, CookingPhase::Lost);
-    assert!(g
-        .handle(&payload_packet(old, "FRServer_GameWon\t900\t0").unwrap())
-        .is_err());
+    assert!(
+        g.handle(&payload_packet(old, "FRServer_GameWon\t900\t0").unwrap())
+            .is_err()
+    );
     assert!(send(&mut g, "FRServer_GameClose").changed);
     assert!(!g.active());
     assert_eq!(g.state().completed, 0);
@@ -446,9 +454,11 @@ fn native_results_wait_for_actual_close_ack_and_replays_preserve_recipe() {
     }
     let mut restored = f.load(Some(terminal));
     assert!(!restored.handle(&ack).unwrap().changed);
-    assert!(send(&mut restored, "FRServer_GameWon\t5199\t0")
-        .transaction
-        .is_none());
+    assert!(
+        send(&mut restored, "FRServer_GameWon\t5199\t0")
+            .transaction
+            .is_none()
+    );
     let close = send(&mut g, "FRServer_GameClose");
     assert!(close.changed && close.replies.is_empty() && close.transaction.is_none());
     assert!(!g.active());
@@ -562,7 +572,7 @@ fn every_cooking_catalog_recipe_uses_exact_transaction_once() {
         assert_eq!(game.state().completed, 1, "{key}");
         tested += 1;
     }
-    assert_eq!(tested, 25);
+    assert_eq!(tested, 26);
 }
 
 #[test]
@@ -580,8 +590,9 @@ fn cooking_recipe_rejections_leave_state_unchanged() {
     assert_eq!(game.state(), &state);
     assert!(game.begin_recipe(45, key, 1, false, &available).is_err());
     assert_eq!(game.state(), &state);
-    assert!(game
-        .begin_recipe(45, "chef.unknown", 20, true, &available)
-        .is_err());
+    assert!(
+        game.begin_recipe(45, "chef.unknown", 20, true, &available)
+            .is_err()
+    );
     assert_eq!(game.state(), &state);
 }

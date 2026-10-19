@@ -25,7 +25,7 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-const COPPER_RECIPE: i32 = 990001;
+const COPPER_RECIPE: i32 = 4;
 const WORLD_COOKING_TABLE: [f32; 3] = [-1244.241, -14.34194, 405.1309];
 const WORLD_FORGE: [f32; 3] = [-2631.933, 0.03999766, -216.5819];
 const WORLD_ANVIL: [f32; 3] = [354.3665, 48.24031, 316.3203];

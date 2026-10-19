@@ -838,10 +838,11 @@ impl Gameplay {
         }
         let recipe_catalog = crate::recipes::RecipeCatalog::load_runtime(directory)?;
         // (R) The opening campaign historically has no recovered recipe-learn
-        // packet sequence. Seed its two supplied starter patterns and the local
-        // Copper Bar recipe so W61's cooking/smelting/forging flow remains usable.
+        // packet sequence. Seed its two supplied starter patterns, the client
+        // Copper Bar recipe (row 4) and the opening station's synthetic smelting
+        // id so W61's cooking/smelting/forging flow remains usable.
         if opening.is_some() {
-            learned_recipes.extend([11, 70, 990001, 2002]);
+            learned_recipes.extend([11, 70, 4, 2002]);
         }
         let bundled_npc_content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
         let npc_content = if directory.join("npc_spawns_extra.json").is_file()
@@ -1450,7 +1451,7 @@ impl Gameplay {
             .by_key(key)
             .and_then(|recipe| recipe.recipe_id)
             .is_some_and(|id| self.learned_recipes.contains(&id))
-            // (R) The tutorial Copper Bar sample has no recovered recipe row/id.
+            // (R) The opening tutorial's synthetic smelting id also unlocks the Copper Bar sample.
             || (key == "miner.copper_bar.sample" && self.learned_recipes.contains(&2002))
     }
 
