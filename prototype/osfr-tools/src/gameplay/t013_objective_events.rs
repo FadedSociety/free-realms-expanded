@@ -302,6 +302,10 @@ fn gather_node(game: &Gameplay, name: &str, skip: usize) -> (u64, CharacterState
     )
 }
 
+// Client 26/8 CommandPacketInteractRequest: constructor 0x008b6bc0 calls 0x008a2820(8,0), stores
+// two 32-bit caller words (+0x10/+0x14) and one byte (+0x18); sender 0x0092efe0. The parser reads
+// the two words as the 8-byte target and the byte as the trailing flag
+// (`npc_interaction::decode_npc_interact_26_8`, 13 inner bytes, native capture).
 fn node_click(guid: u64) -> Vec<u8> {
     let mut packet = vec![26, 0, 8, 0];
     packet.extend(guid.to_le_bytes());
@@ -309,6 +313,8 @@ fn node_click(guid: u64) -> Vec<u8> {
     packet
 }
 
+// Client 39/5 RequestStartGame 0x009be7d0 -> writer 0x009bdc60, which builds the family header
+// as (subtype, current instance, -1, -1). Used for every minigame start/leave frame here.
 fn type8_frame(sub: u8, instance: i32) -> Vec<u8> {
     let mut packet = vec![39, 0, sub];
     packet.extend(instance.to_le_bytes());
@@ -317,19 +323,14 @@ fn type8_frame(sub: u8, instance: i32) -> Vec<u8> {
     packet
 }
 
+// Client 39/14 SendMiniGameFlashPayload 0x009be6b0 -> constructor 0x009b09d0(instance, -1, -1).
+// The body is the caller's byte count and then the exact bytes (the movie's string including its
+// NUL; the `add eax,1` is at 0x00c08519).
 fn type8_payload(instance: i32, text: &str) -> Vec<u8> {
     let mut packet = type8_frame(14, instance);
     packet.extend(((text.len() + 1) as i32).to_le_bytes());
     packet.extend(text.as_bytes());
     packet.push(0);
-    packet
-}
-
-fn cooking_movie_request(sub: u8, instance: i32) -> Vec<u8> {
-    let mut packet = vec![39, 0, sub];
-    packet.extend(instance.to_le_bytes());
-    packet.extend((-1i32).to_le_bytes());
-    packet.extend((-1i32).to_le_bytes());
     packet
 }
 
@@ -343,12 +344,7 @@ fn play_cooking(game: &mut Gameplay, character: &CharacterState, base_ms: u64) {
         .as_ref()
         .expect("cooking run")
         .instance_id;
-    send(
-        game,
-        character,
-        &cooking_movie_request(5, instance),
-        base_ms,
-    );
+    send(game, character, &type8_frame(5, instance), base_ms);
     send(
         game,
         character,
@@ -456,6 +452,7 @@ fn kart_gateway(scratch: &Scratch) -> crate::kart_gateway::KartGateway {
             ..Default::default()
         },
     };
+    // The 41/114 details frames are the captured layout checked by `KartGateway::load`.
     let details = |state: u32| {
         let mut bytes = vec![0u8; 391];
         bytes[..4].copy_from_slice(&[41, 0, 114, 0]);
@@ -538,6 +535,9 @@ fn kart_gateway(scratch: &Scratch) -> crate::kart_gateway::KartGateway {
         details_ready: details(4),
         vehicle_guid_offset: 0,
         race: Some(race),
+        // The 33/34 config words, 33/5 client data and 33/11 attribute block are opaque captured
+        // blocks with unrecovered interiors. `KartGateway::load` checks their sizes and the owned
+        // guid slots; these test bodies are deliberately synthetic.
         entry: RaceEntryContent {
             race_config: RaceConfig { words: vec![0; 21] },
             entry_vehicles: vec![ProxiedVehicle {
@@ -577,6 +577,10 @@ fn kart_gateway(scratch: &Scratch) -> crate::kart_gateway::KartGateway {
         .unwrap()
 }
 
+// Client 33/9 VehicleRacePacketRegisterVehicleRacePlayer: constructor 0x00b9c2d0 (base family
+// constructor 0x00b992d0(9)). SetVehicleRaceActive 0x00ba5eb0 fills u64 session + two u32 and
+// sends through 0x00ba4420; the two words' meanings are unrecovered, so the test leaves them zero
+// (shape from `kart_entry::decode_register`, capture field map in Kart Native Race Entry Contract).
 fn kart_register() -> Vec<u8> {
     let mut packet = vec![33, 0, 9, 0];
     packet.extend(1u64.to_le_bytes());
@@ -584,6 +588,9 @@ fn kart_register() -> Vec<u8> {
     packet
 }
 
+// Client 41/108 EncounterParticipantRequestEntrancePacket: constructor 0x008b6e70; the start
+// screen's Go path 0x00938f00 fills the encounter, instance and 8-byte player GUID. The 20-byte
+// inner shape is the captured frame `racing-24381-flow1-frame715-op41-sub108.bin`.
 fn kart_go(encounter: u32, instance: u32) -> Vec<u8> {
     let mut packet = vec![41, 0, 108, 0];
     packet.extend(encounter.to_le_bytes());
@@ -592,6 +599,9 @@ fn kart_go(encounter: u32, instance: u32) -> Vec<u8> {
     packet
 }
 
+// Client 33/7 VehicleRacePacketGateHit: constructor 0x00b9c130 (base family constructor
+// 0x00b992d0(7)); the per-frame sender 0x00ba48a0 writes the local GUID, a position and 1.0.
+// These are client position claims; the race service owns gate order, timing and lap counting.
 fn kart_gate(gate: f32) -> Vec<u8> {
     let mut packet = vec![33, 0, 7, 0];
     packet.extend(1u64.to_le_bytes());
@@ -647,6 +657,10 @@ fn station(game: &Gameplay, recipe_id: u32) -> CharacterState {
     }
 }
 
+// Client fishing family 138: BaseFishingPacket constructor 0x00b60910 writes opcode 138 and the
+// caller's subtype; the envelope is `u16 138 | u16 sub | body` (reader/dispatcher 0x00b66830,
+// writer 0x00b69550). Register is 138/2 (writer 0x00b6a400: u64 handle + u8), cast is 138/6
+// (writer 0x00b6a460: u64 handle + vec4 + u8), reel is 138/7 (writer 0x00b6a4d0: u64 handle + u8).
 fn fishing_request(sub: u16, body: &[u8]) -> Vec<u8> {
     let mut packet = vec![138, 0];
     packet.extend(sub.to_le_bytes());
@@ -974,7 +988,9 @@ fn kart_completion_reaches_quests_only_after_a_paid_claim() {
     install(
         &mut game,
         ObjectiveKind::FinishMinigame { minigame_id: 31 },
-        1,
+        // Two completions: the first paid finish leaves the objective at 1 of 2, so a replayed
+        // finish that leaked a second quest event would saturate it and be visible below.
+        2,
     );
     game.kart_entry = Some(kart);
 
@@ -1063,21 +1079,14 @@ fn kart_completion_reaches_quests_only_after_a_paid_claim() {
             .unwrap_or(0),
         60
     );
+    // One paid finish of a two-completion objective, so the objective is not yet saturated.
     count(&game, 1);
 
-    let paid = (
-        game.inventory.state().clone(),
-        game.profiles.as_ref().unwrap().state().clone(),
-        game.npc_quests.as_ref().unwrap().state().clone(),
-    );
+    let paid = game.state();
     now += 1_000;
     send(&mut game, &character, &kart_gate(4.0), now);
     assert_eq!(
-        (
-            game.inventory.state().clone(),
-            game.profiles.as_ref().unwrap().state().clone(),
-            game.npc_quests.as_ref().unwrap().state().clone(),
-        ),
+        game.state(),
         paid,
         "a replayed finish neither pays nor advances the quest"
     );
