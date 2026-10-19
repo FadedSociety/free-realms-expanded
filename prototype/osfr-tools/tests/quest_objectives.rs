@@ -3,7 +3,11 @@ use osfr_tools::quest_engine::{
     QuestMessage, QuestObjective, QuestRequirements,
 };
 use osfr_tools::rewards::{RewardDisplay, RewardGrant};
-use std::{collections::BTreeMap, fs, path::Path};
+use std::{
+    collections::BTreeMap,
+    fs,
+    path::{Path, PathBuf},
+};
 
 fn engine(kind: ObjectiveKind, required: u32) -> QuestEngine {
     let definitions = (1..=3)
@@ -207,17 +211,38 @@ fn no_offered_content_quest_has_zero_objectives() {
     }
 }
 
-fn split_fixture(goal: serde_json::Value, enabled: bool) -> std::path::PathBuf {
-    use std::sync::atomic::{AtomicU32, Ordering};
-    static NEXT: AtomicU32 = AtomicU32::new(0);
-    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-    let target = content
-        .join("../../../../../lab/build/w104/cases")
-        .join(format!(
+/// Per-run split-content copy; removed on drop, including while a test unwinds.
+struct Scratch(PathBuf);
+
+impl Scratch {
+    fn new() -> Self {
+        use std::sync::atomic::{AtomicU32, Ordering};
+        static NEXT: AtomicU32 = AtomicU32::new(0);
+        Self(PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
             "{}-{}",
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
+        )))
+    }
+}
+
+impl std::ops::Deref for Scratch {
+    type Target = Path;
+
+    fn deref(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Drop for Scratch {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+fn split_fixture(goal: serde_json::Value, enabled: bool) -> Scratch {
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let target = Scratch::new();
     fs::create_dir_all(target.join("quests")).unwrap();
     fs::create_dir_all(target.join("npcs")).unwrap();
     fs::copy(content.join("jobs.json"), target.join("jobs.json")).unwrap();

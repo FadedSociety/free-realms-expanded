@@ -227,15 +227,14 @@ struct SplitFixture(PathBuf);
 impl SplitFixture {
     fn new(requirements: Value, enabled: bool) -> Self {
         static NEXT: AtomicU32 = AtomicU32::new(0);
-        let manifest = Path::new(env!("CARGO_MANIFEST_DIR"));
-        let path = manifest.join("../../../lab/build/w114/cases").join(format!(
+        let path = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!(
             "{}-{}",
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir_all(path.join("quests")).unwrap();
         fs::create_dir_all(path.join("npcs")).unwrap();
-        let content = manifest.join("data/content");
+        let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
         fs::copy(content.join("jobs.json"), path.join("jobs.json")).unwrap();
         for folder in ["quests", "npcs"] {
             for entry in fs::read_dir(content.join(folder)).unwrap() {
@@ -266,6 +265,12 @@ impl SplitFixture {
         state: Option<QuestState>,
     ) -> std::io::Result<QuestEngine> {
         QuestEngine::from_split_content(&self.0, 1, context, state)
+    }
+}
+
+impl Drop for SplitFixture {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
     }
 }
 

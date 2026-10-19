@@ -1,5 +1,47 @@
 const E: u64 = 131000108001;
 const M: u64 = 131000108002;
+
+/// Per-run scratch content; removed on drop, including while a test unwinds.
+struct Scratch(PathBuf);
+
+impl Scratch {
+    fn path(name: &str) -> PathBuf {
+        static SERIAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
+            "{name}-{}-{}",
+            std::process::id(),
+            SERIAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ))
+    }
+
+    fn new(name: &str) -> Self {
+        let path = Self::path(name);
+        let _ = fs::remove_dir_all(&path);
+        fs::create_dir_all(&path).unwrap();
+        Self(path)
+    }
+}
+
+impl AsRef<Path> for Scratch {
+    fn as_ref(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl std::ops::Deref for Scratch {
+    type Target = Path;
+
+    fn deref(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Drop for Scratch {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
 mod unit {
     // W116 synthetic shared-field oracle. All combat rules here are (R).
     use super::E;
@@ -7,15 +49,9 @@ mod unit {
     use osfr_tools::opening_abilities::JobAbility;
     use serde_json::json;
     use sha2::{Digest, Sha256};
-    use std::{fs, path::PathBuf};
-    pub fn fixture() -> PathBuf {
-        static SERIAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-        let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "w116-{}-{}",
-            std::process::id(),
-            SERIAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-        ));
-        fs::create_dir_all(&dir).unwrap();
+    use std::fs;
+    pub fn fixture() -> super::Scratch {
+        let dir = super::Scratch::new("w116");
         let mut template = vec![0; 334];
         template[..4].copy_from_slice(&[35, 0, 2, 0]);
         template[133..137].copy_from_slice(&100_i32.to_le_bytes());
@@ -459,10 +495,8 @@ struct Fixture {
 
 impl Fixture {
     fn new() -> Self {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../..")
-            .join(format!("lab/build/w116/socket-{}", std::process::id()));
-        assert!(!root.exists(), "scratch fixture already exists");
+        let root = Scratch::path("socket");
+        let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(&root).unwrap();
         let reference = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../../lab/references/rust-gateway-reference");
@@ -579,7 +613,8 @@ impl Drop for Fixture {
         if let Some(handle) = self.handle.take() {
             handle.join().unwrap();
         }
-        // Keep the numeric-only scratch saves as review evidence.
+        // The scratch directory is removed after the server stops.
+        let _ = fs::remove_dir_all(&self.root);
     }
 }
 
@@ -1036,7 +1071,7 @@ fn two_bot_socket_shared_hp_route() {
     collect(&mut a, &mut b, Duration::from_millis(500));
     assert_eq!(f.host(|s| s.test_field_health(E)), Some(100));
     println!(
-        "W116 receipt: shared HP [200,100], early/unknown/truncated/foreign-instance requests refused; canonical run ids match saves and 41/114. Evidence {}",
+        "W116 receipt: shared HP [200,100], early/unknown/truncated/foreign-instance requests refused; canonical run ids match saves and 41/114. Scratch {}, removed when the fixture drops",
         f.root.display()
     );
 }

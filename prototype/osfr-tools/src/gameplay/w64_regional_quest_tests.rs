@@ -3,14 +3,36 @@ use super::*;
 const SAMANTHA_ID: u64 = 9_000_000_189;
 const INTRODUCE_YOURSELF_ID: u32 = 3_000_021;
 
+/// Per-run content copy; removed on drop, including while a test unwinds.
+struct Scratch(PathBuf);
+
+impl Scratch {
+    fn new(name: &str) -> Self {
+        let path = std::env::temp_dir().join(format!("{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&path);
+        std::fs::create_dir_all(&path).unwrap();
+        Self(path)
+    }
+}
+
+impl std::ops::Deref for Scratch {
+    type Target = std::path::Path;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Drop for Scratch {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
 #[test]
 fn live_quest_offers_require_real_level_and_the_active_job() {
     let source = bundled_content();
-    let scratch = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
-        "../../../lab/build/w120/eligibility-{}",
-        std::process::id()
-    ));
-    std::fs::create_dir_all(&scratch).unwrap();
+    let scratch = Scratch::new("eligibility");
     std::fs::copy(source.join("jobs.json"), scratch.join("jobs.json")).unwrap();
     for folder in ["quests", "npcs"] {
         std::fs::create_dir_all(scratch.join(folder)).unwrap();
@@ -96,19 +118,11 @@ fn live_quest_offers_require_real_level_and_the_active_job() {
             .offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
             .changed
     );
-    std::fs::remove_dir_all(scratch).unwrap();
 }
 
-fn level_three_world_game(label: &str) -> (Gameplay, CharacterState, PathBuf) {
+fn level_three_world_game(label: &str) -> (Gameplay, CharacterState, Scratch) {
     let source = bundled_content();
-    let scratch = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
-        "../../../lab/build/f111/{label}-{}",
-        std::process::id()
-    ));
-    if scratch.exists() {
-        std::fs::remove_dir_all(&scratch).unwrap();
-    }
-    std::fs::create_dir_all(&scratch).unwrap();
+    let scratch = Scratch::new(label);
     std::fs::copy(source.join("jobs.json"), scratch.join("jobs.json")).unwrap();
     for folder in ["quests", "npcs"] {
         std::fs::create_dir_all(scratch.join(folder)).unwrap();
@@ -160,7 +174,7 @@ fn level_three_world_game(label: &str) -> (Gameplay, CharacterState, PathBuf) {
 
 #[test]
 fn npc_request_path_refreshes_eligibility_after_a_request_handler_job_switch() {
-    let (mut game, character, scratch) = level_three_world_game("npc-refresh");
+    let (mut game, character, _scratch) = level_three_world_game("npc-refresh");
     let mut switch = vec![26, 0, 13, 0];
     switch.extend(43i32.to_le_bytes());
     assert!(
@@ -188,12 +202,11 @@ fn npc_request_path_refreshes_eligibility_after_a_request_handler_job_switch() {
         game.npc_quests.as_ref().unwrap().state().pending_offer,
         Some(INTRODUCE_YOURSELF_ID)
     );
-    std::fs::remove_dir_all(scratch).unwrap();
 }
 
 #[test]
 fn denied_accept_after_a_request_handler_job_switch_changes_nothing_and_requests_no_save() {
-    let (mut game, character, scratch) = level_three_world_game("npc-denied");
+    let (mut game, character, _scratch) = level_three_world_game("npc-denied");
     let mut switch = vec![26, 0, 13, 0];
     switch.extend(43i32.to_le_bytes());
     assert!(
@@ -251,7 +264,6 @@ fn denied_accept_after_a_request_handler_job_switch_changes_nothing_and_requests
             .any(|packet| packet.starts_with(&[49, 0, 3, 0])),
         "a denied accept must not activate the quest"
     );
-    std::fs::remove_dir_all(scratch).unwrap();
 }
 
 fn reference() -> PathBuf {
