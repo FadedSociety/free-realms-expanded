@@ -328,6 +328,17 @@ fn go(details: &[u8]) -> Vec<u8> {
     packet
 }
 
+/// 41/109 close (client constructor 0x008a31a0): the zero encounter id that
+/// LeaveMiniGameOrEncounter sends, then the launch instance from the screen.
+fn cancel_packet(instance: i32) -> Vec<u8> {
+    [
+        vec![41, 0, 109, 0],
+        0_i32.to_le_bytes().to_vec(),
+        instance.to_le_bytes().to_vec(),
+    ]
+    .concat()
+}
+
 fn melee(guid: u64) -> Vec<u8> {
     [
         vec![36, 0, 10, 0],
@@ -1221,6 +1232,255 @@ fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
         details(&repeated).expect("a refused Go keeps the start screen pending"),
         first_screen,
         "the same start screen is shown again"
+    );
+    assert_eq!(gateway.snapshot(), before_go);
+}
+
+/// Review F176 #2: the field-battle route must cover a mid-battle cancel
+/// (41/109), not just the cave encounter.
+#[test]
+fn cancel_mid_battle_returns_to_the_marker_without_paying() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, 12310);
+    let spawner_guid = u64_field(&row["spawner"], "guid");
+    let marker = position(&row["spawner"]["position"]);
+    let prize_ids: BTreeSet<i32> = row["prizes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|prize| i32_field(prize, "item_id"))
+        .collect();
+    let mut gateway = fixture.gateway(marker);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let screen = open_battle(&mut gateway, spawner_guid, row, 400);
+    let instance = i32_at(&screen, 8);
+    let before = economy(&gateway, &prize_ids);
+    enter_battle(&mut gateway, &screen, row, 500);
+
+    let cancelled = send(&mut gateway, &cancel_packet(instance), 1_100);
+    assert!(
+        cancelled.began_zoning,
+        "leaving the arena zones back to the world"
+    );
+    assert_eq!(gateway.state().zone_id, 0);
+    assert_eq!(gateway.state().position, marker);
+    assert_eq!(
+        economy(&gateway, &prize_ids),
+        before,
+        "a mid-battle cancel pays nothing"
+    );
+    assert!(
+        gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .encounter
+            .unwrap()
+            .active
+            .is_none(),
+        "a cancel releases the arena"
+    );
+
+    let after_cancel = gateway.snapshot();
+    let replay = send(&mut gateway, &cancel_packet(instance), 1_200);
+    assert!(!replay.began_zoning && !replay.state_changed);
+    assert_eq!(
+        gateway.snapshot(),
+        after_cancel,
+        "a replayed cancel changes nothing"
+    );
+}
+
+/// Review F176 #4: closing the start screen releases its pending Go, so a
+/// replayed 41/108 cannot start a battle the player dismissed.
+#[test]
+fn closing_the_start_screen_releases_the_pending_go() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, 12310);
+    let spawner_guid = u64_field(&row["spawner"], "guid");
+    let marker = position(&row["spawner"]["position"]);
+    let mut gateway = fixture.gateway(marker);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let screen = open_battle(&mut gateway, spawner_guid, row, 400);
+
+    // 26/42 is the four-byte end-screen Close (constructor 0x008a2eb0).
+    let closed = send(&mut gateway, &[26, 0, 42, 0], 500);
+    assert!(!closed.began_zoning);
+    let before_go = gateway.snapshot();
+    let replay = send(&mut gateway, &go(&screen), 600);
+    assert!(!replay.began_zoning && !replay.state_changed);
+    assert_eq!(gateway.state().zone_id, 0);
+    assert_eq!(
+        gateway.snapshot(),
+        before_go,
+        "a closed screen cannot be started by a replayed Go"
+    );
+    assert!(
+        gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .encounter
+            .unwrap()
+            .active
+            .is_none()
+    );
+
+    // The shared leave (41/109) can also dismiss the screen before Go.
+    let reopened = send(&mut gateway, &interact(spawner_guid), 700);
+    let screen = details(&reopened)
+        .expect("the marker reopens the start screen")
+        .to_vec();
+    let left = send(&mut gateway, &cancel_packet(i32_at(&screen, 8)), 800);
+    assert!(!left.began_zoning);
+    let before_go = gateway.snapshot();
+    let replay = send(&mut gateway, &go(&screen), 900);
+    assert!(!replay.began_zoning && !replay.state_changed);
+    assert!(
+        replay.replies.is_empty(),
+        "a leave closes the start screen for Go too"
+    );
+    assert_eq!(gateway.snapshot(), before_go);
+}
+
+/// Review F176 #4: any other start (here the activity portal) consumes the
+/// open start screen, so its later Go cannot reopen or replay it.
+#[test]
+fn another_begin_consumes_the_open_start_screen() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, 12310);
+    let spawner_guid = u64_field(&row["spawner"], "guid");
+    let marker = position(&row["spawner"]["position"]);
+    let mut gateway = fixture.gateway(marker);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let screen = open_battle(&mut gateway, spawner_guid, row, 400);
+
+    let mut play = vec![167, 0, 1, 2];
+    play.extend(12311_u32.to_le_bytes());
+    play.extend(0_u32.to_le_bytes());
+    let started = send(&mut gateway, &play, 500);
+    assert!(started.began_zoning, "the portal starts the other battle");
+    assert_eq!(gateway.state().zone_id, 9600);
+    arena_spawned(&mut gateway, 550);
+    let instance = gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .encounter
+        .unwrap()
+        .active
+        .unwrap()
+        .instance_id;
+
+    // Return to the marker, where the old screen's Go would be in reach.
+    let cancelled = send(&mut gateway, &cancel_packet(instance), 600);
+    assert!(cancelled.began_zoning);
+    assert_eq!(gateway.state().position, marker);
+    arena_spawned(&mut gateway, 650);
+    let before_go = gateway.snapshot();
+    let replay = send(&mut gateway, &go(&screen), 700);
+    assert!(!replay.began_zoning && !replay.state_changed);
+    assert!(
+        replay.replies.is_empty(),
+        "the consumed screen does not reopen"
+    );
+    assert_eq!(gateway.snapshot(), before_go);
+}
+
+/// Review F176 #4: Go revalidates the marker distance, so a pending screen
+/// left open while the player walks away cannot start the arena.
+#[test]
+fn go_from_outside_the_marker_radius_is_inert() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, 12310);
+    let spawner_guid = u64_field(&row["spawner"], "guid");
+    let marker = position(&row["spawner"]["position"]);
+    let mut gateway = fixture.gateway(marker);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let screen = open_battle(&mut gateway, spawner_guid, row, 400);
+
+    let player_guid = gateway.state().guid;
+    let mut now = 500;
+    walk(
+        &mut gateway,
+        player_guid,
+        [marker[0] + 50.0, marker[1], marker[2]],
+        &mut now,
+    );
+    let before_go = gateway.snapshot();
+    let out = send(&mut gateway, &go(&screen), now + 100);
+    assert!(!out.began_zoning && !out.state_changed);
+    assert_eq!(gateway.state().zone_id, 0);
+    assert_eq!(
+        gateway.snapshot(),
+        before_go,
+        "an out-of-reach Go starts nothing"
+    );
+}
+
+/// Review F176 #5: a knocked-out player's Go is a chat refusal that reopens
+/// the screen, not a session error that disconnects the player.
+#[test]
+fn go_while_knocked_out_refuses_instead_of_ending_the_session() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, 12310);
+    let spawner_guid = u64_field(&row["spawner"], "guid");
+    let marker = position(&row["spawner"]["position"]);
+    let mut gateway = fixture.gateway(marker);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let screen = open_battle(&mut gateway, spawner_guid, row, 400);
+    // The shared-field damage path (the live server's) knocks the player out.
+    gateway.receive_field_damage(u32::MAX, 500, true).unwrap();
+    assert_eq!(
+        gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .encounter
+            .unwrap()
+            .player_health,
+        0
+    );
+
+    let before_go = gateway.snapshot();
+    let refused = gateway
+        .handle_at(&wrap(&go(&screen)), 600)
+        .expect("a knocked-out Go is a chat refusal, not a session-ending error");
+    assert!(!refused.began_zoning && !refused.state_changed);
+    assert!(
+        chat_text(&refused).contains("knocked out"),
+        "{}",
+        chat_text(&refused)
+    );
+    assert_eq!(
+        details(&refused).expect("the start screen reopens"),
+        screen.as_slice(),
+        "the same start screen is shown again"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before_go,
+        "a refused Go changes no saved state"
+    );
+
+    // The screen stays pending, so a replay refuses again with the same screen.
+    let repeated = gateway
+        .handle_at(&wrap(&go(&screen)), 700)
+        .expect("the repeated Go is still a refusal");
+    assert!(!repeated.began_zoning && !repeated.state_changed);
+    assert!(
+        chat_text(&repeated).contains("knocked out"),
+        "{}",
+        chat_text(&repeated)
+    );
+    assert_eq!(
+        details(&repeated).expect("the start screen stays open"),
+        screen.as_slice()
     );
     assert_eq!(gateway.snapshot(), before_go);
 }

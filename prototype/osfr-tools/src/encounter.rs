@@ -739,6 +739,8 @@ pub struct EncounterEngine {
     knocked_out_at: Option<u64>,
     battles: Vec<FieldBattle>,
     /// Start screen shown for (battle id, instance id); Go (41/108) starts it.
+    /// Session-local: cleared by a successful `begin`, by a close/leave
+    /// packet, and by Go once the player has left the marker; never saved.
     pending_battle: Option<(u32, i32)>,
     // Ground heights (osfr-terrain grids); without them enemies keep the
     // heights they interpolate.
@@ -1404,6 +1406,9 @@ impl EncounterEngine {
             .next_instance_id
             .checked_add(1)
             .ok_or_else(|| invalid("encounter instance exhausted"))?;
+        // Every start (portal, quest, Go or simulator) consumes the open
+        // start screen; a later Go must not replay it.
+        self.pending_battle = None;
         self.state.active = Some(ActiveEncounter {
             encounter_id: id,
             instance_id: self.state.next_instance_id,
@@ -1621,6 +1626,8 @@ impl EncounterEngine {
                 {
                     self.exit()
                 } else {
+                    // Closing the start screen releases its pending Go.
+                    self.pending_battle = None;
                     Ok(EncounterOutcome::default())
                 }
             }
@@ -1641,6 +1648,10 @@ impl EncounterEngine {
                     {
                         return self.exit();
                     }
+                }
+                if self.state.active.is_none() {
+                    // Leaving the start screen releases its pending Go.
+                    self.pending_battle = None;
                 }
                 Ok(EncounterOutcome::default())
             }

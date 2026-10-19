@@ -23,6 +23,10 @@ pub(super) const WANDER_SEEN: f32 = 90.0;
 /// Closer than this it stops and faces the player (an easy click target).
 pub(super) const WANDER_NOTICE: f32 = 8.0;
 
+/// Battle-marker interaction radius: the start screen opens, and its Go
+/// (41/108) may start the battle, only within this distance of the marker.
+pub(super) const BATTLE_SCREEN_RADIUS: f32 = 8.0;
+
 /// The one level rule for a published battle: the active job level must reach
 /// the row's configured floor. Portal admission, the battle marker and
 /// `EncounterEngine::begin` all call this; `Some(required)` means refused.
@@ -505,9 +509,24 @@ impl EncounterEngine {
         }
     }
 
-    /// The battle whose start screen is open, consumed by Go (41/108).
-    pub fn take_pending_battle(&mut self) -> Option<u32> {
-        self.pending_battle.take().map(|(id, _)| id)
+    /// The battle whose start screen is open, consumed by Go (41/108). The
+    /// player must still stand within `BATTLE_SCREEN_RADIUS` of the marker:
+    /// an out-of-reach screen is dropped so Go cannot start a battle after
+    /// walking away. `None` covers no open screen and a dropped one.
+    pub fn take_pending_battle(&mut self, position: [f32; 3]) -> Option<u32> {
+        let (id, _) = self.pending_battle.take()?;
+        let near =
+            self.battles.iter().find(|b| b.id == id).is_some_and(|b| {
+                distance(position, self.marker_position(b)) <= BATTLE_SCREEN_RADIUS
+            });
+        near.then_some(id)
+    }
+
+    /// The marker's current spot: where its walk has taken it, else home.
+    fn marker_position(&self, battle: &FieldBattle) -> [f32; 3] {
+        self.wander
+            .get(&battle.id)
+            .map_or(battle.spawner.position, |w| w.position)
     }
 
     pub fn is_battle_spawner(&self, guid: u64) -> bool {
@@ -534,11 +553,8 @@ impl EncounterEngine {
         let Some(b) = self.battles.iter().find(|b| b.spawner.guid == guid) else {
             return EncounterOutcome::default();
         };
-        let at = self
-            .wander
-            .get(&b.id)
-            .map_or(b.spawner.position, |w| w.position);
-        if distance(position, at) > 8.0 {
+        let at = self.marker_position(b);
+        if distance(position, at) > BATTLE_SCREEN_RADIUS {
             return EncounterOutcome::default();
         }
         let instance = self.state.next_instance_id;

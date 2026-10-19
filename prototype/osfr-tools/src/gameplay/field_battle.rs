@@ -78,7 +78,7 @@ impl Gameplay {
         let Some(battle) = self
             .encounter
             .as_mut()
-            .and_then(|encounter| encounter.take_pending_battle())
+            .and_then(|encounter| encounter.take_pending_battle(character.position))
         else {
             return Ok(false);
         };
@@ -97,11 +97,21 @@ impl Gameplay {
             );
             return Ok(true);
         }
-        let result = self
-            .encounter
-            .as_mut()
-            .unwrap()
-            .begin(battle, character.clone(), profile)?;
+        let result =
+            match self
+                .encounter
+                .as_mut()
+                .unwrap()
+                .begin(battle, character.clone(), profile)
+            {
+                Ok(result) => result,
+                // A refused `begin` (knocked out, busy) is a chat refusal with the
+                // same screen, not a session error that ends the connection.
+                Err(error) => {
+                    self.refuse_battle(battle, profile, &error.to_string(), out);
+                    return Ok(true);
+                }
+            };
         self.apply_encounter(result, out)?;
         Ok(true)
     }
