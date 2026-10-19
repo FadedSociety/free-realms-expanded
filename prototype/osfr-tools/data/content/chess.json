@@ -4,6 +4,18 @@
   "human_side": "white",
   "daily_reward_coins": 1000,
   "near_equal_margin": 25,
+  "scoring": {
+    "mate": 1000000,
+    "check": 5000,
+    "draw": -100000,
+    "pawn": 100,
+    "rook": 500,
+    "knight": 300,
+    "bishop": 320,
+    "queen": 900,
+    "king": 10000,
+    "centralisation": 1
+  },
   "rows": [
     {
       "row_id": 20,

@@ -19,7 +19,7 @@
 
 use crate::{
     activity_portal::ChessActivity,
-    chess::{self, ChessParticipant, ChessTables, Mode, Side},
+    chess::{self, ChessParticipant, ChessScoring, ChessTables, Mode, Side},
     minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, RunState},
     rewards::{RewardDisplay, RewardGrant, RewardState},
 };
@@ -108,6 +108,9 @@ pub struct ChessContent {
     /// move choice. Larger values make the computer less predictable.
     #[serde(default = "default_near_equal_margin")]
     pub near_equal_margin: u32,
+    /// (R) Weights for the server's one-ply move chooser.
+    #[serde(default)]
+    pub scoring: ChessScoring,
     pub rows: Vec<ChessRow>,
 }
 
@@ -141,6 +144,7 @@ impl ChessContent {
         if i64::from(self.near_equal_margin) > chess::MAX_NEAR_EQUAL_MARGIN {
             return Err(invalid("chess near-equal window exceeds the local bound"));
         }
+        self.scoring.validate()?;
         let mut seen = BTreeSet::new();
         for row in &self.rows {
             if row.row_id == 0 || row.row_id > i32::MAX as u32 || !seen.insert(row.row_id) {
@@ -249,12 +253,20 @@ impl ChessService {
         Self::with_tables(content, ChessTables::with_seed(seed), None)
     }
 
+    /// (R) A deterministic table stream for tests and offline fixtures. Only
+    /// tables opened after this call use it; the gateway's constructors seed
+    /// from OS entropy and never call this.
+    pub fn reseed(&mut self, seed: u64) {
+        self.tables.reseed(seed);
+    }
+
     fn with_tables(
         content: ChessContent,
-        tables: ChessTables,
+        mut tables: ChessTables,
         saved: Option<ChessRewardLedger>,
     ) -> io::Result<Self> {
         content.validate()?;
+        tables.set_scoring(content.scoring);
         let mut service = Self {
             tables,
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,

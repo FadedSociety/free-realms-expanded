@@ -13,6 +13,10 @@ use osfr_tools::{
 };
 use std::path::PathBuf;
 
+#[path = "support/chess_bot.rs"]
+mod chess_bot;
+use chess_bot::{EndOfGame, Human};
+
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 /// Easy single-player row; the portal id is the client minigame row id.
 const CHESS_ROW: u32 = 20;
@@ -41,8 +45,10 @@ fn game() -> Gameplay {
     Gameplay::load(&content(), None).unwrap()
 }
 
-/// A Chef at the stove with the starter stew learned and supplied.
-fn cooking_game() -> (Gameplay, CharacterState) {
+/// A Chef at the stove with the starter stew learned and supplied. Also
+/// accepts the tutorial's cooking objective so the 26/10 station interaction
+/// can start the cooking movie, and returns the station's runtime GUID.
+fn cooking_game() -> (Gameplay, CharacterState, u64) {
     let directory = content();
     let base = Gameplay::load(&directory, None).unwrap();
     let mut state = base.state();
@@ -65,6 +71,48 @@ fn cooking_game() -> (Gameplay, CharacterState) {
         });
     }
     let opening = OpeningEngine::load(&directory, state.opening.clone()).unwrap();
+    let (stage_id, objective_index) = opening
+        .stages()
+        .iter()
+        .find_map(|stage| {
+            stage
+                .objectives
+                .iter()
+                .position(|goal| matches!(goal.trigger, OpeningTrigger::Craft { recipe_id: 2001 }))
+                .map(|index| (stage.id, index))
+        })
+        .expect("tutorial cooking objective");
+    for stage in opening.stages() {
+        let progress = state
+            .opening
+            .as_mut()
+            .unwrap()
+            .stages
+            .get_mut(&stage.id)
+            .unwrap();
+        if stage.id < stage_id {
+            progress.accepted = true;
+            progress.completed = true;
+            progress.rewarded = true;
+            progress.counts = stage.objectives.iter().map(|goal| goal.required).collect();
+        } else if stage.id == stage_id {
+            progress.accepted = true;
+            progress.completed = false;
+            progress.rewarded = false;
+            progress.counts = stage
+                .objectives
+                .iter()
+                .enumerate()
+                .map(|(index, goal)| {
+                    if index < objective_index {
+                        goal.required
+                    } else {
+                        0
+                    }
+                })
+                .collect();
+        }
+    }
     let station = opening
         .actors()
         .iter()
@@ -80,7 +128,7 @@ fn cooking_game() -> (Gameplay, CharacterState) {
     who.zone_id = station.zone_id;
     who.position = station.position;
     let game = Gameplay::load(&directory, Some(state)).unwrap();
-    (game, who)
+    (game, who, station.guid)
 }
 
 fn play(activity: u32) -> Vec<u8> {
@@ -159,6 +207,17 @@ fn paid_won(out: &Outcome) -> bool {
 
 fn coins(game: &Gameplay) -> u32 {
     game.state().inventory.coins
+}
+
+fn chess_row_coins() -> u32 {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/chess.json");
+    osfr_tools::chess_service::ChessContent::load(&path)
+        .unwrap()
+        .rows
+        .into_iter()
+        .find(|row| row.row_id == CHESS_ROW)
+        .expect("shipped chess row")
+        .success_coins
 }
 
 /// The instance id of the single 39/16 offer.
@@ -365,9 +424,90 @@ fn entry_request_uses_a_server_reply_and_ignores_client_opponent_moves() {
 }
 
 #[test]
+fn a_single_player_win_pays_once_after_acknowledgement_and_closes_cleanly() {
+    let mut game = game();
+    // (R) Deterministic table stream so the greedy line is a known win.
+    game.seed_chess(22);
+    let who = character();
+    game.initialize_world(&who, 500).unwrap();
+    let instance = running_game(&mut game);
+    let payout = chess_row_coins();
+    let before = coins(&game);
+    let mut human = Human::new();
+    let mut end = None;
+    let mut last = None;
+    for ply in 0..400u64 {
+        let mv = human.choose();
+        let text = human.move_text(&mv);
+        human.position.apply(&mv).unwrap();
+        human.remember();
+        let out = game
+            .handle_in_world(&movie(instance, &text), &who, 2_000 + ply * 10)
+            .unwrap();
+        if let Some(game_end) = human.apply_events(&texts(&out)) {
+            end = Some(game_end);
+            last = Some(out);
+            break;
+        }
+    }
+    assert_eq!(end, Some(EndOfGame::Won), "seed 22 must win");
+    let won = last.unwrap();
+    assert!(
+        texts(&won).contains(&"OnGameWonMsg".to_owned()),
+        "the winning result message"
+    );
+    assert!(
+        texts(&won).contains(&"OnChessEventMsg\t15".to_owned()),
+        "the checkmate event"
+    );
+    // The result screen and the payout wait for the client acknowledgement.
+    assert!(packets(&won, &[39, 0, 18]).is_empty());
+    assert_eq!(coins(&game), before);
+
+    let ack = game
+        .handle_in_world(&movie(instance, "FRServer_GameOver"), &who, 9_000)
+        .unwrap();
+    assert!(paid_won(&ack), "the acknowledged win pays");
+    assert_eq!(packets(&ack, &[39, 0, 47]).len(), 1, "the score row");
+    assert_eq!(packets(&ack, &[39, 0, 19]).len(), 1, "state removal");
+    let results: Vec<u8> = ack
+        .replies
+        .iter()
+        .filter_map(|packet| {
+            (packet.starts_with(&[39, 0]) && matches!(packet.get(2), Some(18 | 47 | 19)))
+                .then(|| packet[2])
+        })
+        .collect();
+    assert_eq!(results, [18, 47, 19], "ordered result packets");
+    let state = game.state();
+    assert_eq!(coins(&game), before + payout, "exactly one content award");
+    assert_eq!(state.chess.map(|ledger| ledger.paid_coins), Some(payout));
+
+    // A duplicate acknowledgement and late movie traffic cannot pay again.
+    let replay = game
+        .handle_in_world(&movie(instance, "FRServer_GameOver"), &who, 9_100)
+        .unwrap();
+    assert!(!replay.changed && replay.replies.is_empty());
+    assert_eq!(game.state(), state);
+    let late = game
+        .handle_in_world(&movie(instance, "OnMoveMsg\t52\t36"), &who, 9_200)
+        .unwrap();
+    assert!(!late.changed && late.replies.is_empty());
+    assert_eq!(game.state(), state);
+
+    // Results Close retires the finished run; the next Play is a fresh table.
+    let close = game.handle_in_world(&[26, 0, 42, 0], &who, 9_300).unwrap();
+    assert!(close.changed, "Close retires the finished run");
+    assert_eq!(game.state(), state);
+    let again = game.handle_in_world(&play(CHESS_ROW), &who, 9_400).unwrap();
+    assert_eq!(packets(&again, &[39, 0, 16]).len(), 1);
+    assert_ne!(offer_instance(&again), instance);
+}
+
+#[test]
 fn active_chess_blocks_recipe_start_and_preserves_both_activities() {
     // Prove the fixture itself can start the learned recipe when idle.
-    let (mut idle, idle_who) = cooking_game();
+    let (mut idle, idle_who, _) = cooking_game();
     idle.initialize_world(&idle_who, 500).unwrap();
     let started = idle
         .handle_in_world(&recipe_start(GUMBO), &idle_who, 1_000)
@@ -377,7 +517,7 @@ fn active_chess_blocks_recipe_start_and_preserves_both_activities() {
 
     // With chess open, the same request is admitted nowhere and changes
     // neither the activity set nor the saved gameplay snapshot.
-    let (mut game, who) = cooking_game();
+    let (mut game, who, _) = cooking_game();
     let instance = running_game_at(&mut game, &who);
     let before = game.state();
     let refused = game
@@ -397,17 +537,36 @@ fn active_chess_blocks_recipe_start_and_preserves_both_activities() {
     assert!(has_event(&live, "OnChessEventMsg\t31"), "MOVE_DATA");
 }
 
+fn interact(guid: u64) -> Vec<u8> {
+    let mut inner = vec![26, 0, 10, 0];
+    inner.extend(guid.to_le_bytes());
+    inner.extend(1i32.to_le_bytes());
+    inner
+}
+
 #[test]
-fn active_chess_refuses_world_interaction_starts_and_remains_playable() {
-    let mut game = game();
-    let who = character();
-    let instance = running_game(&mut game);
+fn active_chess_refuses_a_real_crafting_interaction_and_remains_playable() {
+    // The idle request must start the cooking movie, or the refusal below
+    // would not prove that chess prevented a real conflicting activity.
+    let (mut idle, idle_who, station) = cooking_game();
+    idle.initialize_world(&idle_who, 500).unwrap();
+    let started = idle
+        .handle_in_world(&interact(station), &idle_who, 1_000)
+        .unwrap();
+    assert!(
+        started.changed,
+        "the idle station interaction starts cooking"
+    );
+    assert!(cooking_active(&idle));
+
+    let (mut game, who, station) = cooking_game();
+    let instance = running_game_at(&mut game, &who);
     let before = game.state();
-    let mut interaction = vec![26, 0, 10, 0];
-    interaction.extend(0u64.to_le_bytes());
-    interaction.extend(1i32.to_le_bytes());
-    let refused = game.handle_in_world(&interaction, &who, 2_000).unwrap();
+    let refused = game
+        .handle_in_world(&interact(station), &who, 2_000)
+        .unwrap();
     assert!(!refused.changed);
+    assert!(!cooking_active(&game));
     assert_eq!(game.state(), before);
     assert!(chat_text(&refused).contains("Finish the chess game before interacting"));
     assert!(packets(&refused, &[39, 0, 16]).is_empty());

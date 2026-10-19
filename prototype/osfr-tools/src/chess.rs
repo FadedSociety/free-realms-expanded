@@ -12,6 +12,7 @@ use crate::{
     minigame::{Activity, ActivityFinish, MinigameRuns, RunOutcome},
     rewards::{RewardGrant, RewardState},
 };
+use serde::Deserialize;
 use std::{
     collections::{HashMap, HashSet},
     hash::{BuildHasher, Hasher},
@@ -133,10 +134,89 @@ const MAX_TEXT_BYTES: usize = 127;
 pub const DEFAULT_NEAR_EQUAL_MARGIN: i64 = 25;
 /// (R) Content sanity bound for [`DEFAULT_NEAR_EQUAL_MARGIN`].
 pub const MAX_NEAR_EQUAL_MARGIN: i64 = 500;
+/// (R) Content sanity bounds for the reconstructed chooser weights.
+pub const MAX_SCORE_VALUE: i64 = 100_000_000;
+pub const MAX_CENTRALISATION: i64 = 1_000;
 const FLAG_EN_PASSANT: u8 = 0x64;
 const FLAG_DOUBLE_PUSH: u8 = 0x80;
 const FLAG_CAPTURE: u8 = 0x60;
 const FLAG_PROMOTION: u8 = 0x40;
+
+/// (R) Weights for the server's one-ply computer move chooser. The defaults are
+/// the reconstructed values reviewed in F116; content may tune them within
+/// [`MAX_SCORE_VALUE`] and [`MAX_CENTRALISATION`].
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(default, deny_unknown_fields)]
+pub struct ChessScoring {
+    /// Score added for a move that mates the opponent.
+    pub mate: i64,
+    /// Score added for a move that gives check.
+    pub check: i64,
+    /// Score added for a move that draws (a penalty).
+    pub draw: i64,
+    pub pawn: i64,
+    pub rook: i64,
+    pub knight: i64,
+    pub bishop: i64,
+    pub queen: i64,
+    pub king: i64,
+    /// Weight of the destination-centre term; the origin term is half.
+    pub centralisation: i64,
+}
+
+impl Default for ChessScoring {
+    fn default() -> Self {
+        Self {
+            mate: 1_000_000,
+            check: 5_000,
+            draw: -100_000,
+            pawn: 100,
+            rook: 500,
+            knight: 300,
+            bishop: 320,
+            queen: 900,
+            king: 10_000,
+            centralisation: 1,
+        }
+    }
+}
+
+impl ChessScoring {
+    pub fn value(self, kind: Kind) -> i64 {
+        match kind {
+            Kind::Pawn => self.pawn,
+            Kind::Rook => self.rook,
+            Kind::Knight => self.knight,
+            Kind::Bishop => self.bishop,
+            Kind::Queen => self.queen,
+            Kind::King => self.king,
+        }
+    }
+
+    /// Reject a content block outside the local bounds, never clamp it.
+    pub fn validate(self) -> io::Result<()> {
+        let values = [
+            self.mate,
+            self.pawn,
+            self.rook,
+            self.knight,
+            self.bishop,
+            self.queen,
+            self.king,
+        ];
+        if values
+            .iter()
+            .any(|value| !(0..=MAX_SCORE_VALUE).contains(value))
+            || self.check < 0
+            || self.check > MAX_SCORE_VALUE
+            || !(-MAX_SCORE_VALUE..=0).contains(&self.draw)
+            || !(0..=MAX_CENTRALISATION).contains(&self.centralisation)
+        {
+            return Err(invalid("chess scoring is outside the local bounds"));
+        }
+        Ok(())
+    }
+}
 
 /// Shipped row ids classify nine single-player rows and three two-player rows.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -962,6 +1042,8 @@ pub struct ChessTable {
     settled: HashSet<u64>,
     /// (R) Per-table random stream for the computer's near-equal move choice.
     rng: u64,
+    /// (R) Content-supplied chooser weights for this table.
+    scoring: ChessScoring,
 }
 
 impl ChessTable {
@@ -974,6 +1056,7 @@ impl ChessTable {
         human_side: Side,
         skill: u8,
         near_equal_margin: i64,
+        scoring: ChessScoring,
         seed: u64,
     ) -> io::Result<ChessTable> {
         if !matches!(Mode::for_row(row_id), Some(Mode::Single { .. }))
@@ -1014,6 +1097,7 @@ impl ChessTable {
             game_over: HashSet::new(),
             settled: HashSet::new(),
             rng: seed,
+            scoring,
         })
     }
 
@@ -1022,6 +1106,7 @@ impl ChessTable {
         row_id: u32,
         white: ChessParticipant,
         black: ChessParticipant,
+        scoring: ChessScoring,
         seed: u64,
     ) -> io::Result<ChessTable> {
         if Mode::for_row(row_id) != Some(Mode::TwoPlayer) {
@@ -1048,6 +1133,7 @@ impl ChessTable {
             game_over: HashSet::new(),
             settled: HashSet::new(),
             rng: seed,
+            scoring,
         })
     }
 
@@ -1244,25 +1330,25 @@ impl ChessTable {
         };
         let mut score = 0;
         match outcome.status {
-            Status::WhiteMated | Status::BlackMated => score += 1_000_000,
-            Status::Draw => score -= 100_000,
+            Status::WhiteMated | Status::BlackMated => score += self.scoring.mate,
+            Status::Draw => score += self.scoring.draw,
             Status::InProgress => {}
         }
         if outcome.check {
-            score += 5_000;
+            score += self.scoring.check;
         }
         if let Some(kind) = outcome.captured {
-            score += piece_value(kind);
+            score += self.scoring.value(kind);
         }
         if let Some(kind) = mv.promote {
-            score += piece_value(kind);
+            score += self.scoring.value(kind);
         }
         let centre = |square: u8| {
             7 - (i64::from(square % 8) - 3)
                 .abs()
                 .max((i64::from(square / 8) - 3).abs())
         };
-        score + centre(mv.to) - centre(mv.from) / 2
+        score + (centre(mv.to) - centre(mv.from) / 2) * self.scoring.centralisation
     }
 
     fn handle_text(&mut self, player_id: u64, message: &str) -> io::Result<ChessOutcome> {
@@ -1662,6 +1748,8 @@ pub struct ChessTables {
     /// open counter, so replaying a game cannot reproduce the computer's moves.
     seed: u64,
     opened: u64,
+    /// (R) Chooser weights handed to every table this catalogue opens.
+    scoring: ChessScoring,
 }
 
 impl Default for ChessTables {
@@ -1678,7 +1766,20 @@ impl ChessTables {
             tables: HashMap::new(),
             seed,
             opened: 0,
+            scoring: ChessScoring::default(),
         }
+    }
+
+    /// (R) The chooser weights every table opened after this call uses.
+    pub fn set_scoring(&mut self, scoring: ChessScoring) {
+        self.scoring = scoring;
+    }
+
+    /// (R) A deterministic stream for tests and offline fixtures. Only tables
+    /// opened after this call use the new seed.
+    pub fn reseed(&mut self, seed: u64) {
+        self.seed = seed;
+        self.opened = 0;
     }
 
     fn open_seed(&mut self, table_id: u64) -> u64 {
@@ -1709,6 +1810,7 @@ impl ChessTables {
                 human_side,
                 skill,
                 DEFAULT_NEAR_EQUAL_MARGIN,
+                self.scoring,
                 seed,
             )?,
         );
@@ -1739,6 +1841,7 @@ impl ChessTables {
                 human_side,
                 skill,
                 near_equal_margin,
+                self.scoring,
                 seed,
             )?,
         );
@@ -1758,7 +1861,7 @@ impl ChessTables {
         let seed = self.open_seed(table_id);
         self.tables.insert(
             table_id,
-            ChessTable::two_player(table_id, row_id, white, black, seed)?,
+            ChessTable::two_player(table_id, row_id, white, black, self.scoring, seed)?,
         );
         Ok(())
     }
@@ -1958,17 +2061,6 @@ fn validate_participant(participant: ChessParticipant) -> io::Result<()> {
     Ok(())
 }
 
-fn piece_value(kind: Kind) -> i64 {
-    match kind {
-        Kind::Pawn => 100,
-        Kind::Knight => 300,
-        Kind::Bishop => 320,
-        Kind::Rook => 500,
-        Kind::Queen => 900,
-        Kind::King => 10_000,
-    }
-}
-
 /// (R) OS-seeded SipHash keys plus a process counter: each call differs and
 /// a client cannot predict it from anything it sends.
 fn entropy_seed() -> u64 {
@@ -1996,4 +2088,88 @@ fn append_outcome(out: &mut ChessOutcome, next: ChessOutcome) {
 
 fn invalid(message: &'static str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Black queen on d4 can take the white bishop on c5 or the rook on e5.
+    fn scoring_table(scoring: ChessScoring) -> ChessTable {
+        let mut table = ChessTable::single_with_skill(
+            1,
+            20,
+            ChessParticipant {
+                player_id: 1,
+                instance_id: 1,
+            },
+            Side::White,
+            100,
+            0,
+            scoring,
+            7,
+        )
+        .unwrap();
+        table.position = Position::from_fen("7k/8/8/2B1R3/3q4/8/8/7K b - - 0 1").unwrap();
+        table
+    }
+
+    #[test]
+    fn content_piece_values_choose_the_computer_reply() {
+        let mut defaults = scoring_table(ChessScoring {
+            check: 0,
+            centralisation: 0,
+            ..ChessScoring::default()
+        });
+        assert_eq!(
+            defaults.server_move(),
+            Some(ChessMove {
+                from: 35,
+                to: 28,
+                promote: None
+            }),
+            "the default scoring takes the rook"
+        );
+        let mut flipped = scoring_table(ChessScoring {
+            check: 0,
+            centralisation: 0,
+            rook: 1,
+            bishop: 999,
+            ..ChessScoring::default()
+        });
+        assert_eq!(
+            flipped.server_move(),
+            Some(ChessMove {
+                from: 35,
+                to: 26,
+                promote: None
+            }),
+            "content piece values decide the capture"
+        );
+    }
+
+    #[test]
+    fn content_scoring_is_bounded() {
+        ChessScoring::default().validate().unwrap();
+        for scoring in [
+            ChessScoring {
+                mate: -1,
+                ..ChessScoring::default()
+            },
+            ChessScoring {
+                draw: 1,
+                ..ChessScoring::default()
+            },
+            ChessScoring {
+                queen: MAX_SCORE_VALUE + 1,
+                ..ChessScoring::default()
+            },
+            ChessScoring {
+                centralisation: MAX_CENTRALISATION + 1,
+                ..ChessScoring::default()
+            },
+        ] {
+            assert!(scoring.validate().is_err());
+        }
+    }
 }

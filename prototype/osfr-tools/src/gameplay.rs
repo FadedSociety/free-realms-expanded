@@ -3640,6 +3640,14 @@ impl Gameplay {
         Ok(Some(out))
     }
 
+    /// (R) Deterministic chess replies for tests and offline fixtures. The
+    /// gateway loads tables from OS entropy and never calls this.
+    pub fn seed_chess(&mut self, seed: u64) {
+        if let Some(chess) = &mut self.chess {
+            chess.reseed(seed);
+        }
+    }
+
     /// T022: chess movie and lifecycle packets while this character's chess run exists.
     /// The packet is staged on a clone; a refusal or a structural error leaves the table
     /// (and the wallet) unchanged. `None` leaves the packet to the other handlers.
@@ -4762,11 +4770,8 @@ impl Gameplay {
         // learned recipe, active job, idle services, a server-known station in
         // range, rank and exact inputs before the service's own `begin_recipe`.
         if let Some(recipe_id) = crate::recipe_book::decode(inner)? {
-            if self.activity_busy() {
-                out.replies
-                    .push(crate::recipe_book::Refusal::Busy.feedback());
-                return Ok(out);
-            }
+            // `recipe_book::start` owns the busy refusal, so there is no second
+            // check here that a canary could bypass or duplicate.
             let profile = self.profiles.as_ref().unwrap().active();
             let available = self.available_ingredients();
             let player = crate::recipe_book::Player {
