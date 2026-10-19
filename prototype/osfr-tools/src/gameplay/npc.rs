@@ -497,16 +497,8 @@ impl Gameplay {
                             .first()
                             .and_then(|packet| packet.get(14..18))
                             .map(|id| u32::from_le_bytes(id.try_into().unwrap()));
-                        // Offset 6 is an actor GUID, not the quest id: ShowQuestEndScreen
-                        // looks it up in the actor table (00984960) to expand
-                        // [*player*] in the end text and to play the NPC animation.
-                        // With the quest id there, run 224000 showed "[*player*]" literally.
                         let mut held = held;
-                        for packet in &mut held {
-                            if packet.len() >= 14 {
-                                packet[6..14].copy_from_slice(&runtime_guid.to_le_bytes());
-                            }
-                        }
+                        set_end_screen_actor(&mut held, runtime_guid);
                         match quest_id {
                             Some(quest_id) => {
                                 self.pending_quest_choice = Some((runtime_guid, key, quest_id));
@@ -651,6 +643,7 @@ impl Gameplay {
                         )
                     });
                     self.append_npc_quest_outcome(quest, &mut out)?;
+                    set_end_screen_actor(&mut out.replies, runtime_guid);
                     npc_event(serde_json::json!({
                         "event": "npc_select",
                         "guid": runtime_guid,
@@ -1027,4 +1020,19 @@ pub(super) fn quest_offer_packet_with(
         trailing_float_bits: 0,
         trailing_flags: [false; 2],
     })
+}
+
+/// 49/13 offset 6 is the actor GUID, not the quest id: `ShowQuestEndScreen`
+/// (`00a95420`) looks it up in the actor table (`00984960`) to expand
+/// `[*player*]` in the end text and to play the NPC animation. With the quest
+/// id there, native run 224000 showed `[*player*]` literally. Both live NPC
+/// paths (Talk and the menu TurnInQuest choice) set the runtime actor here;
+/// the reconnect replay patches the same field in `append_pending_turnin_screen`.
+fn set_end_screen_actor(packets: &mut [Vec<u8>], actor_id: u64) {
+    for packet in packets
+        .iter_mut()
+        .filter(|packet| packet.starts_with(&[49, 0, 13, 0]) && packet.len() >= 14)
+    {
+        packet[6..14].copy_from_slice(&actor_id.to_le_bytes());
+    }
 }

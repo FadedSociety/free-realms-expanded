@@ -29275,8 +29275,24 @@
       "quests_given_text": [
         "Brawler: Bad Business target; Brawler: Given to Guard (job offer to Petra, Brawler)"
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3030008,
+          "title": "Brawler: Bad Business",
+          "title_string_id": 103354,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), rows C5-C6: Bad Business searches for Sabastian Cabet in Blackspore; C6 is given by Sabastian."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T101: C5 completes when the player talks to Sabastian, so the normal turn-in NPC is Sabastian rather than the giver."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "C5's only objective sends the player to Sabastian and the next quest is given by Sabastian; the hand-in NPC is reconstructed (R).",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],

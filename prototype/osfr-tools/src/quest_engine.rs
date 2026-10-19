@@ -373,6 +373,8 @@ pub struct QuestDefinition {
     pub title: String,
     pub description: String,
     pub giver_npc_id: u64,
+    /// NPC that validates `begin_turnin` and presents the 49/13 end screen.
+    /// NPC content binds it with a `quests_accepted` row; it defaults to the giver.
     pub turnin_npc_id: u64,
     pub prerequisite_quest_ids: Vec<u32>,
     pub requirements: QuestRequirements,

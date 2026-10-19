@@ -3937,8 +3937,24 @@
       "quests_given_text": [
         "Brawler: Delinquent Dilemma (recover the stolen artifacts; \"Return the artifacts to Jones\" 710022440), Brawler: Bad Business (find Sabastian Cabet in Blackspore, 2093587189). The Brawler line then goes on to Brawler: Given to Guard (Sabastian)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3030006,
+          "title": "Brawler: Building your Rep (wiki: \"Building Your Rep\")",
+          "title_string_id": 94295,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C3: the objective sends the player to Jones; row C4 is given by Jones."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T101: C3 completes when the player talks to Jones, so the normal turn-in NPC is Jones rather than the giver."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "C3's only objective sends the player to Jones and the next quest is given by Jones; the hand-in NPC is reconstructed (R).",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],

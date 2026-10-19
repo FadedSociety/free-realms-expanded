@@ -221,20 +221,18 @@ fn gateway_reconnect_orders_spawn_before_screen(
     );
 }
 
-fn interact_npc(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) {
+fn interact_npc(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) -> Vec<u8> {
     let menu = game
         .handle_in_world(&npc_interact(npc_id), character, now)
         .expect("NPC interaction is valid");
-    assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
-        "NPC {npc_id} did not open its menu"
-    );
+    menu.replies
+        .into_iter()
+        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
+        .unwrap_or_else(|| panic!("NPC {npc_id} did not open its menu"))
 }
 
 fn talk(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) {
-    interact_npc(game, character, npc_id, now);
+    let _ = interact_npc(game, character, npc_id, now);
     let dialogue = game
         .handle_in_world(&npc_select(npc_id, 1), character, now + 1)
         .expect("NPC Talk selection is valid");
@@ -245,6 +243,19 @@ fn talk(game: &mut Gameplay, character: &CharacterState, npc_id: u64, now: u64) 
             .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
         "NPC {npc_id} did not open dialogue"
     );
+}
+
+fn turn_in_option(menu: &[u8], title_string_id: u32) -> i32 {
+    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
+    assert!(count > 0);
+    (0..count)
+        .find_map(|index| {
+            let offset = 17 + usize::try_from(index).unwrap() * 28;
+            let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
+            let string_id = u32::from_le_bytes(menu[offset + 8..offset + 12].try_into().unwrap());
+            (string_id == title_string_id).then_some(id)
+        })
+        .expect("native menu contains the quest turn-in option")
 }
 
 fn choose_quest_row(
@@ -342,6 +353,86 @@ fn finish_turnin(game: &mut Gameplay, character: &CharacterState, quest_id: u32,
     assert_eq!(quests.quests[&quest_id].status, QuestStatus::Completed);
 }
 
+fn assert_pending_screen_recovery(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    npc_id: u64,
+    quest_id: u32,
+    title_string_id: u32,
+    now: &mut u64,
+) {
+    let before = saved(game);
+    let menu = interact_npc(game, character, npc_id, *now);
+    let option = turn_in_option(&menu, title_string_id);
+    *now += 1;
+    let selected = game
+        .handle_in_world(&npc_select(npc_id, option), character, *now)
+        .expect("menu turn-in recovery is valid");
+    let by_menu = selected
+        .replies
+        .iter()
+        .find(|packet| has_family(packet, 49, 13, Some(quest_id)))
+        .expect("the menu turn-in reopens the pending end screen");
+    assert_eq!(
+        u64::from_le_bytes(by_menu[6..14].try_into().unwrap()),
+        npc_id,
+        "the menu-reopened end screen carries the actual turn-in actor"
+    );
+    assert_eq!(
+        saved(game),
+        before,
+        "the menu turn-in changed the saved state"
+    );
+
+    let reopened = open_end_screen(game, character, npc_id, quest_id, now);
+    assert_eq!(
+        u64::from_le_bytes(reopened[6..14].try_into().unwrap()),
+        npc_id,
+        "the reopened end screen carries the actual turn-in actor"
+    );
+    assert_eq!(
+        saved(game),
+        before,
+        "reopening pending quest {quest_id} changed the saved state"
+    );
+
+    let mut reconnected = load_game(Some(game.state()));
+    assert_eq!(
+        saved(&reconnected),
+        before,
+        "loading the saved state for pending quest {quest_id} changed it"
+    );
+    *now += 100;
+    let initialized = reconnected
+        .initialize_world(character, *now)
+        .expect("reconnected gameplay initializes");
+    assert!(
+        !initialized
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, Some(quest_id))),
+        "login synchronization must not open the pending end screen before the speaker spawn"
+    );
+    let restored = reconnected
+        .update_npc_visibility(character)
+        .expect("reconnected NPC visibility updates");
+    let restored = restored
+        .iter()
+        .find(|packet| has_family(packet, 49, 13, Some(quest_id)))
+        .unwrap_or_else(|| panic!("reconnect must reopen pending quest {quest_id}"));
+    assert_eq!(
+        u64::from_le_bytes(restored[6..14].try_into().unwrap()),
+        npc_id,
+        "the recovered end screen carries the actual turn-in actor"
+    );
+    assert_eq!(
+        saved(&reconnected),
+        before,
+        "reconnect changed the saved state for pending quest {quest_id}"
+    );
+    *game = reconnected;
+}
+
 fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
     // A far-away location lets the production tick publish quest-gated spawns
     // without advancing any actor before the test reaches it.
@@ -351,7 +442,8 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
     game.tick(&character, *now)
         .expect("field quests synchronize");
 
-    for (guid, position) in field_hooligans() {
+    let hooligans = field_hooligans();
+    for (guid, position) in hooligans.iter().copied() {
         character.position = position;
         *now += 100;
         let menu = game
@@ -494,6 +586,14 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     );
     character.position = jones;
     let _ = open_end_screen(&mut game, &character, JONES, REFERRAL_TO_JONES, &mut now);
+    assert_pending_screen_recovery(
+        &mut game,
+        &character,
+        JONES,
+        REFERRAL_TO_JONES,
+        94_295,
+        &mut now,
+    );
     // C3's exact five-coin payout is asserted by `finish_turnin`; the review of
     // c65b2b2 found the old test only checked the chapter total.
     finish_turnin(&mut game, &character, REFERRAL_TO_JONES, &mut now);
@@ -650,6 +750,14 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
         SEARCH_BLACKSPORE,
         &mut now,
     );
+    assert_pending_screen_recovery(
+        &mut game,
+        &character,
+        SABASTIAN,
+        SEARCH_BLACKSPORE,
+        103_354,
+        &mut now,
+    );
     finish_turnin(&mut game, &character, SEARCH_BLACKSPORE, &mut now);
 
     assert_eq!(
@@ -662,6 +770,23 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
             quests.quests[&quest_id].status,
             QuestStatus::Completed,
             "quest {quest_id} did not reach the final outcome"
+        );
+    }
+
+    // Completed chapter state must survive serialization and a fresh gameplay load.
+    let reloaded = load_game(Some(game.state()));
+    let reloaded = reloaded.state();
+    assert_eq!(
+        reloaded.inventory.coins,
+        initial_coins + 3 * QUEST_REWARD_COINS
+    );
+    let quests = reloaded.npc_quests.unwrap();
+    assert_eq!(quests.pending_turnin, None);
+    for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
+        assert_eq!(
+            quests.quests[&quest_id].status,
+            QuestStatus::Completed,
+            "quest {quest_id} was not restored as completed"
         );
     }
 }
