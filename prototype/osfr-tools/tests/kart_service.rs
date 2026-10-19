@@ -561,8 +561,8 @@ fn native_boost_award_is_owned_persistent_and_queue_bounded() {
 
 /// A frame whose clock predates Go must not refill, use or collect: `saturating_sub` alone would
 /// read it as elapsed zero. The refusal is the shared clock-regression edge (`ClaimRate`), and it
-/// leaves the queue, the legacy epoch, the anchor, the pickups and the observation budget
-/// untouched - fresh and restored.
+/// leaves the queue, the legacy epoch, the anchor, the pickups and the saved snapshot untouched -
+/// fresh and restored. The pre-Go pickup still spends one per-session observation slot.
 #[test]
 fn before_go_clock_cannot_refill_use_or_collect() {
     let (mut service, context) = started();
@@ -574,6 +574,7 @@ fn before_go_clock_cannot_refill_use_or_collect() {
         &gate_hit_payload(context.player_guid, [0.0, 0.0, 0.0]),
     );
     let before = service.snapshot().unwrap();
+    let observed = service.observations();
     for frame in [&award, &use_item] {
         assert_eq!(
             refusal(&service.handle_inner(frame, start - 1).unwrap()),
@@ -592,7 +593,12 @@ fn before_go_clock_cannot_refill_use_or_collect() {
     assert_eq!(
         service.snapshot().unwrap(),
         before,
-        "a pre-Go pickup claim moves nothing either"
+        "a pre-Go pickup claim moves no saved state either"
+    );
+    assert_eq!(
+        service.observations(),
+        observed + 1,
+        "the per-session observation guard still spends one slot"
     );
     // The exact Go boundary is in-window: the refill works and its entry is immediately usable.
     assert_eq!(
@@ -1073,9 +1079,9 @@ fn captured_seventeen_use_requests_only_consume_awarded_items() {
     assert!(!service.finish_flag());
 }
 
-/// Without pickup content a `33/17` claim is a bounded observation: it spends the observation
-/// budget, refuses `NoPickupInRange` and moves nothing else. Foreign, malformed and over-budget
-/// claims refuse without touching the queue or the session.
+/// Without pickup content a `33/17` claim is a bounded observation: it spends one per-session
+/// observation slot, refuses `NoPickupInRange` and leaves the saved snapshot untouched. Foreign,
+/// malformed and over-budget claims refuse without touching the queue, the session or a save.
 #[test]
 fn pickup_claims_without_content_refuse_and_move_nothing() {
     let (mut service, context) = started();
@@ -1088,14 +1094,16 @@ fn pickup_claims_without_content_refuse_and_move_nothing() {
     assert!(outcome.replies().is_empty(), "no content, no grant");
     assert_eq!(refusal(&outcome), &ServiceRefusal::NoPickupInRange);
     assert!(!outcome.reward_ready());
-    let after = service.snapshot().unwrap();
-    assert_eq!(after.observations, before.observations + 1);
-    assert!(
-        after.queued_items.is_empty(),
-        "no item is granted by a claim"
+    assert_eq!(
+        service.snapshot().unwrap(),
+        before,
+        "an in-window observation refusal changes no saved state"
     );
-    assert_eq!(after.session, before.session);
-    assert_eq!(after.attempts, before.attempts);
+    assert_eq!(
+        service.observations(),
+        1,
+        "the per-session guard still counts it"
+    );
     assert!(matches!(
         service
             .handle_inner(
@@ -2377,6 +2385,7 @@ fn observation_budget_is_separate_from_the_gate_budget() {
     service.begin(context.clone(), BEGIN_MS).unwrap();
     service.tick(at(14_505)).unwrap();
     let bulk = vec![0x2au8; SERVER_DATA_PAYLOAD_LEN];
+    let before = service.snapshot().unwrap();
     for step in 0..4u64 {
         let outcome = service
             .handle_inner(&inner(SERVER_DATA_SUBTYPE, &bulk), at(15_000 + step))
@@ -2388,12 +2397,22 @@ fn observation_budget_is_separate_from_the_gate_budget() {
     }
     assert_eq!(service.observations(), 4);
     assert_eq!(
+        service.snapshot().unwrap(),
+        before,
+        "accepted observations change no saved state"
+    );
+    assert_eq!(
         refusal(
             &service
                 .handle_inner(&inner(SERVER_DATA_SUBTYPE, &bulk), at(15_004))
                 .unwrap()
         ),
         &ServiceRefusal::ObservationBudget { observations: 4 }
+    );
+    assert_eq!(
+        service.snapshot().unwrap(),
+        before,
+        "the budget refusal changes no saved state either"
     );
     // The high-rate bulk stream never consumed the gate budget: a real gate still advances.
     assert_eq!(service.snapshot().unwrap().attempts, 0);
@@ -2555,6 +2574,7 @@ fn gate_claim_after_the_race_window_is_refused_before_the_tick_aborts() {
 fn bulk_observations_are_bounded_and_inert() {
     let (mut service, context) = started();
     let before = service.phase();
+    let saved = service.snapshot().unwrap();
     let bulk = vec![0x2au8; SERVER_DATA_PAYLOAD_LEN];
     let outcome = service
         .handle_inner(&inner(SERVER_DATA_SUBTYPE, &bulk), at(15_000))
@@ -2562,6 +2582,11 @@ fn bulk_observations_are_bounded_and_inert() {
     assert!(replies(&outcome).is_empty(), "33/6 carries no reply");
     assert_eq!(service.phase(), before);
     assert_eq!(service.observations(), 1);
+    assert_eq!(
+        service.snapshot().unwrap(),
+        saved,
+        "an accepted bulk observation changes no saved state"
+    );
     assert_eq!(
         service
             .handle_inner(&inner(SERVER_DATA_SUBTYPE, &bulk[..10]), at(15_100))
@@ -2577,11 +2602,16 @@ fn bulk_observations_are_bounded_and_inert() {
         &gate_hit_payload(context.player_guid, [1.0, 2.0, 3.0]),
     );
     // With no pickup content the claim is a bounded observation that still changes nothing: the
-    // observation budget counts it, and the refusal carries no replies.
+    // per-session observation guard counts it, and the refusal carries no replies.
     let outcome = service.handle_inner(&pickup, at(15_200)).unwrap();
     assert!(outcome.replies().is_empty());
     assert_eq!(refusal(&outcome), &ServiceRefusal::NoPickupInRange);
     assert_eq!(service.observations(), 2);
+    assert_eq!(
+        service.snapshot().unwrap(),
+        saved,
+        "a refused pickup observation changes no saved state"
+    );
     assert_eq!(
         refusal(
             &service
@@ -2681,13 +2711,6 @@ fn pickup_content_without_a_later_state9_keeps_countdown_zero_spawns() {
     );
 }
 
-/// A refused claim may still spend the observation budget, so equality checks on "nothing moved"
-/// normalise that one allowed difference.
-fn ignoring_observations(mut snapshot: ServiceSnapshot) -> ServiceSnapshot {
-    snapshot.observations = 0;
-    snapshot
-}
-
 #[test]
 fn pickups_spawn_once_at_state9_and_only_a_new_race_announces_them_again() {
     let content = pickup_content();
@@ -2758,8 +2781,9 @@ fn pickup_claim_awards_one_boost_and_never_moves_the_session() {
         &ServiceRefusal::NoPickupInRange
     );
     assert_eq!(
-        ignoring_observations(service.snapshot().unwrap()),
-        ignoring_observations(before)
+        service.snapshot().unwrap(),
+        before,
+        "a replayed pickup refusal moves no saved state"
     );
     // The granted entry is a normal use-item request away from the boost.
     let use_item = inner(USE_ITEM_SUBTYPE, &context.player_guid.to_le_bytes());
@@ -2812,8 +2836,8 @@ fn a_full_item_queue_refuses_before_any_box_is_consumed() {
         &ServiceRefusal::ItemQueueFull
     );
     assert_eq!(
-        ignoring_observations(service.snapshot().unwrap()),
-        ignoring_observations(before),
+        service.snapshot().unwrap(),
+        before,
         "a full queue leaves the box, the queue and the credit alone"
     );
     // Draining one slot frees the same box.
@@ -2843,7 +2867,7 @@ fn a_full_item_queue_refuses_before_any_box_is_consumed() {
 }
 
 #[test]
-fn pickup_refusals_move_nothing() {
+fn pickup_refusals_move_nothing_but_the_observation_budget() {
     let (mut service, context) = racing(pickup_content());
     let start = service.snapshot().unwrap().race_started_ms;
     let before = service.snapshot().unwrap();
@@ -2904,32 +2928,47 @@ fn pickup_refusals_move_nothing() {
         PICKUP_HIT_SUBTYPE,
         &gate_hit_payload(owned, [0.0, 0.0, 0.0]),
     );
-    let before_timeout = service.snapshot().unwrap();
     assert!(matches!(
         service.handle_inner(&timed, start + 600_001).unwrap(),
         ServiceOutcome::Refused(ServiceRefusal::RaceTimeout { .. })
     ));
     assert_eq!(
         service.snapshot().unwrap(),
-        before_timeout,
-        "a timeout refusal must leave the complete race snapshot unchanged"
+        before,
+        "every pickup refusal leaves the complete saved race unchanged"
     );
-    let after = service.snapshot().unwrap();
-    assert!(after.queued_items.is_empty());
-    assert!(after.pickups_consumed.is_empty(), "no box was consumed");
-    assert_eq!(after.last_position, before.last_position, "no anchor moved");
+    // The per-session observation guard still spends one slot per evaluated frame: the three
+    // in-window refusals and the timed one. Foreign and malformed frames do not reach it.
+    assert_eq!(service.observations(), 4);
+}
+
+/// F181: the observation guard is per-session but a timed pickup frame still spends it, so a
+/// hostile client cannot dodge the budget by timing claims after the race window. The refusals
+/// leave the saved race unchanged because the guard is never persisted.
+#[test]
+fn timed_pickup_frames_still_spend_the_observation_budget() {
+    let mut content = synthetic_content();
+    content.bounds.max_observations = 1;
+    let (mut service, context) = racing(content);
+    let start = service.snapshot().unwrap().race_started_ms;
+    let before = service.snapshot().unwrap();
+    let claim = inner(
+        PICKUP_HIT_SUBTYPE,
+        &gate_hit_payload(context.player_guid, [0.0, 0.0, 0.0]),
+    );
+    assert!(matches!(
+        service.handle_inner(&claim, start + 600_001).unwrap(),
+        ServiceOutcome::Refused(ServiceRefusal::RaceTimeout { .. })
+    ));
     assert_eq!(
-        after.last_claim_ms, before.last_claim_ms,
-        "no credit was spent"
+        refusal(&service.handle_inner(&claim, start + 1_000).unwrap()),
+        &ServiceRefusal::ObservationBudget { observations: 1 }
     );
-    assert_eq!(after.session, before.session);
     assert_eq!(
-        after.attempts, before.attempts,
-        "the gate budget is untouched"
+        service.snapshot().unwrap(),
+        before,
+        "spending the session guard never dirties the saved race"
     );
-    // Only the three in-window refused pickup frames spend the observation budget; the timed
-    // refusal is a precondition refusal and spends nothing.
-    assert_eq!(after.observations, before.observations + 3);
 }
 
 #[test]
@@ -3203,8 +3242,7 @@ fn full_queue_refusal_schedules_no_respawn() {
     );
     let after = service.snapshot().unwrap();
     assert_eq!(
-        ignoring_observations(after),
-        ignoring_observations(before),
+        after, before,
         "a refused claim leaves the box, the queue and the schedule alone"
     );
 }
@@ -3592,6 +3630,16 @@ fn snapshot_restore_round_trips_and_preserves_the_one_shot() {
     assert_eq!(
         KartService::restore(synthetic_content(), corrupt).unwrap_err(),
         ServiceError::CorruptSnapshot { field: "attempts" }
+    );
+    // An old save still carries the legacy observation count; it loads but never persists again.
+    let mut legacy = snapshot.clone();
+    legacy.observations = 7;
+    let restored_legacy =
+        KartService::restore(synthetic_content(), legacy).expect("legacy save loads");
+    assert_eq!(
+        restored_legacy.snapshot().unwrap().observations,
+        0,
+        "the legacy observation count is not written back"
     );
 
     let taken = restored.take_finished_session();

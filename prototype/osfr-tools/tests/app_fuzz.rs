@@ -1536,6 +1536,11 @@ fn t3_active_movies_reject_hostile_headers_and_out_of_phase_rewards() {
 #[test]
 fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
     let fixture = Fixture::new();
+    // Isolate the observation accounting: with the reconstructed weapon simulation on, an
+    // accepted `33/6` frame legitimately moves the saved weapon pose.
+    let mut content = read_json(&fixture.content.join("kart_entry.json"));
+    content["race"]["weapon_effects"] = json!(false);
+    write_json(&fixture.content.join("kart_entry.json"), &content);
     let mut gateway = fixture.active("kart");
     let active = gateway
         .snapshot()
@@ -1614,8 +1619,8 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
     );
 
     // The sibling `33/17` pickup claim carries the same 24-byte block and the same race window.
-    // A post-window pickup must be just as pure, or it dirties the saved race through
-    // `observations` and re-triggers the save the gate fix closed.
+    // A post-window pickup must be just as pure, or it dirties the saved race through the
+    // observation counter and re-triggers the save the gate fix closed.
     let mut pickup = words(33, 17, &[guid as u32, (guid >> 32) as u32]);
     for _ in 0..3 {
         pickup.extend(0.0f32.to_le_bytes());
@@ -1637,6 +1642,59 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
         gateway.snapshot(),
         before,
         "a timed pickup refusal must leave the complete gateway snapshot unchanged"
+    );
+
+    // F181: the observation guard is per-session, so an in-window observation refusal spends it
+    // without changing any saved state. This is the frame that used to persist the counter.
+    let mut refused = words(33, 17, &[guid as u32, (guid >> 32) as u32]);
+    for value in [f32::NAN, 0.0, 0.0, 1.0] {
+        refused.extend(value.to_le_bytes());
+    }
+    let out = gateway
+        .handle_at(&wrap(&refused), race.race_started_ms + 1_000)
+        .unwrap();
+    assert_eq!(out.applications, vec![refused]);
+    assert!(out.replies.is_empty());
+    assert!(
+        !out.state_changed && !out.gameplay_changed,
+        "an in-window observation refusal must not trigger a character save"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "an in-window observation refusal must leave the gateway snapshot unchanged"
+    );
+
+    // An accepted `33/6` bulk observation is equally save-inert while it only spends that guard.
+    // The body is a valid weapon pose at the race anchor, so with the simulation on it would move
+    // the saved pose; the fixture above turns the simulation off to isolate the observation
+    // accounting.
+    let mut bulk = words(33, 6, &[]);
+    let mut body = vec![0u8; 85];
+    for (index, value) in [1.0f32, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+        .iter()
+        .enumerate()
+    {
+        body[index * 4..index * 4 + 4].copy_from_slice(&value.to_le_bytes());
+    }
+    for (index, value) in race.last_position.iter().enumerate() {
+        body[36 + index * 4..40 + index * 4].copy_from_slice(&value.to_le_bytes());
+    }
+    body[81..85].copy_from_slice(&1u32.to_le_bytes());
+    bulk.extend(body);
+    let out = gateway
+        .handle_at(&wrap(&bulk), race.race_started_ms + 1_100)
+        .unwrap();
+    assert_eq!(out.applications, vec![bulk]);
+    assert!(out.replies.is_empty());
+    assert!(
+        !out.state_changed && !out.gameplay_changed,
+        "an accepted bulk observation must not trigger a character save"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "an accepted bulk observation must leave the gateway snapshot unchanged"
     );
 }
 

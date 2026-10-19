@@ -306,8 +306,9 @@ pub struct RaceBounds {
     pub max_step_ms: u64,
     pub max_race_ms: u64,
     pub max_claims: u32,
-    /// Separate budget for the high-rate send-only observations (`33/6`, `33/17`): the capture
-    /// carries thousands of bulk frames, so they must never consume the gate claim budget.
+    /// Separate per-session budget for the high-rate send-only observations (`33/6`, `33/17`): the
+    /// capture carries thousands of bulk frames, so they must never consume the gate claim budget.
+    /// The counter is a per-session flood guard and is never saved (F181).
     ///
     /// Older content that predates this field loads with the default: 600 s at 200 Hz.
     #[serde(default = "default_max_observations")]
@@ -790,9 +791,10 @@ pub struct ServiceSnapshot {
     /// Every in-window `33/7` claim attempt, accepted or refused: the bounded flood guard. The
     /// phase, budget-ceiling and race-window refusals are pure and spend nothing.
     pub attempts: u32,
-    /// An accepted `33/6` bulk frame, or an in-window `33/17` pickup attempt, accepted or refused:
-    /// the bounded observation guard. The phase, budget-ceiling and race-window refusals spend
-    /// nothing.
+    /// LEGACY save slot (F181). Saves written before F181 kept the observation flood guard here;
+    /// restore still bounds-checks the value so those saves load as before, and new saves write
+    /// zero. The live guard is `KartService::observations`, a per-session counter that is never
+    /// saved: spending it must not dirty the saved race or trigger a character save.
     pub observations: u32,
     pub countdown_sent: Option<u32>,
     /// LEGACY server-clock refill epoch. Retained so pre-repair saves keep loading and so the
@@ -861,6 +863,8 @@ pub struct KartService {
     last_position: [f32; 3],
     last_claim_ms: u64,
     attempts: u32,
+    /// Per-session observation flood guard (F181): never saved. `ServiceSnapshot::observations` is
+    /// the legacy persisted slot and must stay zero.
     observations: u32,
     countdown_sent: Option<u32>,
     last_boost_epoch: u64,
@@ -1411,7 +1415,8 @@ impl KartService {
         self.context.map(|context| context.player_guid)
     }
 
-    /// Bounded observation counter for the send-only bulk/pickup blocks; never authority.
+    /// Bounded observation flood counter for the send-only bulk/pickup blocks; never authority and
+    /// deliberately not saved (F181), so spending it cannot dirty the race.
     pub fn observations(&self) -> u32 {
         self.observations
     }
@@ -1819,14 +1824,14 @@ impl KartService {
                         observations: self.observations,
                     }));
                 }
-                // Pickups share the race-window edges; the movement guard then bounds the leg. The
-                // window is a precondition like the gate budget: a timeout or clock regression
-                // must not spend it, or the refusal would dirty the saved race (F148).
+                // The guard counts every evaluated pickup frame, pre-Go and timed included; it is
+                // per-session and unsaved, so spending it leaves the saved race intact (F181).
+                self.observations = self.observations.saturating_add(1);
+                // Pickups share the race-window edges; the movement guard then bounds the leg.
                 let _elapsed = match self.race_elapsed(now_ms) {
                     Ok(elapsed) => elapsed,
                     Err(refusal) => return Ok(ServiceOutcome::Refused(refusal)),
                 };
-                self.observations = self.observations.saturating_add(1);
                 if !self.pickups_spawned {
                     return Ok(ServiceOutcome::Refused(ServiceRefusal::PickupsNotSpawned));
                 }
@@ -2007,7 +2012,8 @@ impl KartService {
             last_claim_ms: self.last_claim_ms,
             race_started_ms: self.race_started_ms,
             attempts: self.attempts,
-            observations: self.observations,
+            // LEGACY slot: the live guard is per-session and unsaved (F181), so write zero.
+            observations: 0,
             countdown_sent: self.countdown_sent,
             last_boost_epoch: self.last_boost_epoch,
             claim_credit_m: self.claim_credit_m,
@@ -2290,7 +2296,8 @@ impl KartService {
             last_position: snapshot.last_position,
             last_claim_ms: snapshot.last_claim_ms,
             attempts: snapshot.attempts,
-            observations: snapshot.observations,
+            // A restored race starts a fresh per-session guard; the legacy saved count is ignored.
+            observations: 0,
             countdown_sent: snapshot.countdown_sent,
             last_boost_epoch: snapshot.last_boost_epoch,
             claim_credit_m: snapshot.claim_credit_m,
