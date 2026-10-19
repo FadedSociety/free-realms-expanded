@@ -1014,7 +1014,7 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
     play.extend(0_u32.to_le_bytes());
     let portal = send(&mut gateway, &play, 600);
     assert!(
-        chat_text(&portal).contains("one of its rewards is missing"),
+        chat_text(&portal).contains("one of its rewards cannot be granted"),
         "{}",
         chat_text(&portal)
     );
@@ -1027,7 +1027,7 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
         700,
     );
     assert!(
-        chat_text(&dev).contains("one of its rewards is missing"),
+        chat_text(&dev).contains("one of its rewards cannot be granted"),
         "{}",
         chat_text(&dev)
     );
@@ -1036,7 +1036,7 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
     let before_sim = gateway.snapshot();
     let sim = send(&mut gateway, &chat::local_request("realm sim 12310"), 800);
     assert!(
-        chat_text(&sim).contains("one of its rewards is missing"),
+        chat_text(&sim).contains("one of its rewards cannot be granted"),
         "{}",
         chat_text(&sim)
     );
@@ -1048,7 +1048,7 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
     assert!(!refused.began_zoning);
     assert!(!refused.state_changed);
     assert!(
-        chat_text(&refused).contains("one of its rewards is missing"),
+        chat_text(&refused).contains("one of its rewards cannot be granted"),
         "{}",
         chat_text(&refused)
     );
@@ -1076,7 +1076,144 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
     let repeated = send(&mut gateway, &go(&start), 1_100);
     assert!(!repeated.state_changed && !repeated.began_zoning);
     assert!(
-        chat_text(&repeated).contains("one of its rewards is missing"),
+        chat_text(&repeated).contains("one of its rewards cannot be granted"),
+        "{}",
+        chat_text(&repeated)
+    );
+    assert_eq!(
+        details(&repeated).expect("a refused Go keeps the start screen pending"),
+        first_screen,
+        "the same start screen is shown again"
+    );
+    assert_eq!(gateway.snapshot(), before_go);
+}
+
+#[test]
+fn a_reward_grant_failure_is_refused_without_changing_the_save() {
+    let fixture = Fixture::new();
+    let content = fixture.content_copy();
+    let encounters = content.join("encounters.json");
+    let mut doc = read_json(&encounters);
+    let dungeon = doc["dungeons"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|dungeon| dungeon["id"] == 411)
+        .unwrap();
+    dungeon["reward_items"] = json!([[2_147_483_647_i64, 1]]);
+    // `content_copy` hard-links the shared runtime package. Break the link
+    // before writing so this fixture cannot edit the reference content.
+    fs::remove_file(&encounters).unwrap();
+    fs::write(&encounters, serde_json::to_vec(&doc).unwrap()).unwrap();
+
+    let mut gateway = fixture.gateway_from(&content, [0.0; 3]);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let entered = send(&mut gateway, &chat::local_request("realm battle 411"), 400);
+    assert!(
+        chat_text(&entered).contains("Entering the opening cave"),
+        "{}",
+        chat_text(&entered)
+    );
+    assert_eq!(gateway.state().zone_id, 411);
+    arena_spawned(&mut gateway, 500);
+    let before = gateway.snapshot();
+    // A bundled request keeps the handler error (a single request is logged
+    // and dropped by the gateway). Either way, the player's state must survive.
+    let mut bundle = vec![0, 25];
+    for child in [wrap(&chat::local_request("realm win"))] {
+        bundle.push(u8::try_from(child.len()).unwrap());
+        bundle.extend(child);
+    }
+    let failed = gateway.handle_at(&bundle, 600);
+    assert!(
+        failed.is_err(),
+        "the invalid reward must be an error, not a panic"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a failed payout changes no coins, items, XP or positions"
+    );
+    let active = gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .encounter
+        .unwrap()
+        .active;
+    assert!(
+        active.is_some_and(|active| {
+            active.phase == EncounterPhase::Fighting && active.enemies.len() == 4
+        }),
+        "a failed payout must not finish the encounter"
+    );
+}
+
+#[test]
+fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
+    let fixture = Fixture::new();
+    let valid = battles();
+    let row = battle(&valid, 12310);
+    let marker = position(&row["spawner"]["position"]);
+    let spawner_guid = u64_field(&row["spawner"], "guid");
+    let (_, max_stack) = runtime_inventory()
+        .trade_flags(1)
+        .expect("fixture item 1 is in the runtime catalogue");
+    assert_eq!(max_stack, Some(1), "item 1 must be a one-item stack");
+
+    let mut invalid = valid.clone();
+    let invalid_row = invalid["battles"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|battle| battle["id"] == 12310)
+        .unwrap();
+    invalid_row["prizes"][0] = json!({
+        "item_id": 1,
+        "quantity": 2,
+        "name_id": 6666,
+        "icon_id": 973
+    });
+    let content = fixture.content_copy();
+    fs::write(
+        content.join("field_battles.json"),
+        serde_json::to_vec(&invalid).unwrap(),
+    )
+    .unwrap();
+
+    let mut gateway = fixture.gateway_from(&content, marker);
+    send(&mut gateway, &switch_job(BRAWLER), 300);
+    let before_dev = gateway.snapshot();
+    let dev = send(
+        &mut gateway,
+        &chat::local_request("realm battle 12310"),
+        400,
+    );
+    assert!(
+        chat_text(&dev).contains("one of its rewards cannot be granted"),
+        "{}",
+        chat_text(&dev)
+    );
+    assert_eq!(gateway.snapshot(), before_dev);
+
+    let start = open_battle(&mut gateway, spawner_guid, row, 500);
+    let before_go = gateway.snapshot();
+    let refused = send(&mut gateway, &go(&start), 600);
+    assert!(!refused.began_zoning && !refused.state_changed);
+    assert!(
+        chat_text(&refused).contains("one of its rewards cannot be granted"),
+        "{}",
+        chat_text(&refused)
+    );
+    let first_screen = details(&refused)
+        .expect("the refused start screen remains open")
+        .to_vec();
+    assert_eq!(gateway.snapshot(), before_go);
+
+    let repeated = send(&mut gateway, &go(&start), 700);
+    assert!(!repeated.began_zoning && !repeated.state_changed);
+    assert!(
+        chat_text(&repeated).contains("one of its rewards cannot be granted"),
         "{}",
         chat_text(&repeated)
     );

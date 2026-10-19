@@ -370,13 +370,19 @@ impl EncounterEngine {
             .collect()
     }
 
-    /// A field battle is playable only when every previewed prize resolves.
+    /// A field battle is playable only when every previewed prize can be
+    /// granted: the definition resolves and its quantity fits one stack.
     /// Cave encounters have no `battles` row and are not subject to this check.
-    pub fn battle_prizes_available(&self, id: u32, has_item: impl Fn(i32) -> bool) -> bool {
+    pub fn battle_prizes_available(&self, id: u32, accepts: impl Fn(i32, u32) -> bool) -> bool {
         self.battles
             .iter()
             .find(|battle| battle.id == id)
-            .is_none_or(|battle| battle.prizes.iter().all(|prize| has_item(prize.item_id)))
+            .is_none_or(|battle| {
+                battle
+                    .prizes
+                    .iter()
+                    .all(|prize| accepts(prize.item_id, prize.quantity))
+            })
     }
 
     /// Developer hot reload of `field_battles.json` (outside encounters).

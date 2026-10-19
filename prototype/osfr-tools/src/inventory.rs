@@ -181,6 +181,12 @@ struct Definition {
 }
 
 impl Definition {
+    /// Whether `count` of this definition fits one inventory stack. The wire
+    /// count is a signed i32; a non-positive `max_stack` means uncapped.
+    fn fits_one_stack(&self, count: u32) -> bool {
+        count <= i32::MAX as u32 && (self.max_stack <= 0 || count <= self.max_stack as u32)
+    }
+
     fn decode(mut self) -> io::Result<Self> {
         self.bytes = decode_hex(&self.serialized_hex)?;
         if self.bytes.len() < 4
@@ -484,6 +490,18 @@ impl Inventory {
     /// content bindings that must not reference unknown reward definitions.
     pub fn has_definition(&self, definition_id: i32) -> bool {
         self.content.definitions.contains_key(&definition_id)
+    }
+
+    /// Whether this catalogue can grant `quantity` of `definition_id` as one
+    /// stack, using the same bound as `grant_with_tint`. A content preflight
+    /// uses this to refuse an unpayable reward before entry or a payout.
+    pub fn accepts_reward(&self, definition_id: i32, quantity: u32) -> bool {
+        quantity > 0
+            && self
+                .content
+                .definitions
+                .get(&definition_id)
+                .is_some_and(|definition| definition.fits_one_stack(quantity))
     }
 
     /// Whether the login 35/37 catalogue already carried this row to the client.
@@ -888,11 +906,7 @@ impl Inventory {
             .definitions
             .get(&definition_id)
             .ok_or_else(|| invalid("unknown reward definition"))?;
-        let fits = |count: u32| {
-            count <= i32::MAX as u32
-                && (definition.max_stack <= 0 || count <= definition.max_stack as u32)
-        };
-        if !fits(quantity) {
+        if !definition.fits_one_stack(quantity) {
             return Err(invalid("reward exceeds maximum stack"));
         }
         if !staged
@@ -911,7 +925,10 @@ impl Inventory {
             item.definition_id == definition_id
                 && item.tint == tint
                 && item.rental.is_none()
-                && item.count.checked_add(quantity).is_some_and(fits)
+                && item
+                    .count
+                    .checked_add(quantity)
+                    .is_some_and(|count| definition.fits_one_stack(count))
         }) {
             item.count += quantity;
             outcome.replies.push(item_update(item));

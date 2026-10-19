@@ -8,7 +8,7 @@ use super::*;
 
 /// (R) Local copy: no recovered client locale row exists for this refusal.
 pub(super) const UNAVAILABLE_BATTLE_PRIZE: &str =
-    "This battle is unavailable because one of its rewards is missing.";
+    "This battle is unavailable because one of its rewards cannot be granted.";
 
 /// Result of a production field-battle start attempt.
 pub(super) enum BattleStart {
@@ -20,11 +20,14 @@ pub(super) enum BattleStart {
 }
 
 impl Gameplay {
-    /// A field battle is playable only when every previewed prize resolves
-    /// against the loaded item catalogue.
+    /// A field battle is playable only when every previewed prize can be
+    /// granted by the loaded item catalogue: a known definition whose quantity
+    /// fits one stack.
     pub(super) fn battle_prizes_available(&self, id: u32) -> bool {
         self.encounter.as_ref().is_some_and(|encounter| {
-            encounter.battle_prizes_available(id, |item| self.inventory.has_definition(item))
+            encounter.battle_prizes_available(id, |item, quantity| {
+                self.inventory.accepts_reward(item, quantity)
+            })
         })
     }
 
