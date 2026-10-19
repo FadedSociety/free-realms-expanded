@@ -294,6 +294,16 @@ fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
             .unwrap();
     }
     session.recent.clear();
+    // Drain the rest of the budget at a future instant: the bundle's charge then sees zero elapsed
+    // time, so no token can refill however slowly this machine ran the requests above.
+    {
+        let later = Instant::now() + std::time::Duration::from_secs(5);
+        let mut security = rig.world.security.lock().unwrap_or_else(|e| e.into_inner());
+        while security
+            .budgets
+            .allow(session.account_guid, &ClaimWindow::list_request(), later)
+        {}
+    }
 
     let mut bundle = vec![0, 25];
     for request in [
