@@ -89,19 +89,80 @@
     },
     {
       "id": 3010003,
+      "job": 35,
       "title_string_id": 22075,
       "giver_npc_id": 9000000387,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000289,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0 (Lugabow, Greenwood Camp), row 1; locale 991005917 (Speak to each of Lugabow's new archer recruits in the Greenwood Chugawug Camp), step texts 1507268342 / 3778780281 / 4154333971; recruit names in locale ids 22168 / 22169 / 22170 (verified in lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194: objective ordinal 1 and target content key 9500000289 (Bollylog) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000309,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0 (Lugabow, Greenwood Camp), row 1; locale 991005917 (Speak to each of Lugabow's new archer recruits in the Greenwood Chugawug Camp), step texts 1507268342 / 3778780281 / 4154333971; recruit names in locale ids 22168 / 22169 / 22170 (verified in lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194: objective ordinal 2 and target content key 9500000309 (Hrugagu) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000290,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0 (Lugabow, Greenwood Camp), row 1; locale 991005917 (Speak to each of Lugabow's new archer recruits in the Greenwood Chugawug Camp), step texts 1507268342 / 3778780281 / 4154333971; recruit names in locale ids 22168 / 22169 / 22170 (verified in lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194: objective ordinal 3 and target content key 9500000290 (Brugadug) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "35": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194: the guide row 1 reward cell is unknown. Five coins use the W110 small-referral fallback and 15 Archer (profile 35) job XP follows the same fallback policy. No item, membership bonus or random loot is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 1; name 'Path of the Archer'; title id cell ucdt 346916944 / ugdt 956709502"
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0 (Lugabow, Greenwood Camp), row 1; name 'Path of the Archer'; title 22075 verified in lab/reports/locale-id-to-text.json; title ids ucdt 346916944 / ugdt 956709502; intro 22074 / description 22076."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 1; name 'Path of the Archer'; title id cell ucdt 346916944 / ugdt 956709502"
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0, row 1; name 'Path of the Archer'; Lugabow at Greenwood Camp."
         },
         {
           "kind": "reconstructed",
@@ -109,23 +170,15 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T194: job 35 (Archer) gate. The client quest unlocks the job, but this server's trainer 9000000387 already unlocks Archer, so the chapter is offered only after learning and activating Archer. The gate is explicit content data, not inferred from the file name."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T194: the three-recruit on-screen order is not recovered; the objective array order is Bollylog, Hrugagu, Brugadug. The runtime targets are existing Legacy Greenwood archer actors bound to the recruit content keys."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T194: the historical coin/XP payout is unknown; 5 coins and 15 Archer XP are the W110 referral fallback. The reward is paid once by the existing idempotent quest grant key."
         },
         {
           "kind": "reconstructed",
@@ -134,7 +187,7 @@
       ],
       "description_string_id": 22076,
       "intro_text_string_id": 22074,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3010004,
@@ -241,21 +294,52 @@
     },
     {
       "id": 3010006,
+      "job": 35,
       "title_string_id": 77036,
       "giver_npc_id": 9000000387,
       "prerequisite_quest_ids": [
-        3010005
+        3010003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000106,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0, row 4; locale 824954949 (Carve your name into the tree stump near the lake in the northern end of Greenwood Forest, then report to Hilforn), 1299662855 and 2608851878."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194: the stump geometry is not in content, so the carve-the-stump step is skipped and recorded here; the only objective is the recovered report-to-Hilforn talk step (Hilforn 9000000106). Guide text ids 824954949 and 1299662855 carry the skipped stump instruction; no visit_position geometry is invented."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "35": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194: the guide row 4 reward cell is unknown. Ten coins and 20 Archer (profile 35) job XP follow the W110 fallback. The Amateur Archer Bow is a starter weapon (definition 4266) and is not re-issued as a quest reward."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 4; name 'Archer: Oath of Honor'; title id cell ucdt 1282410106 / ugdt 3515266682"
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0, row 4; name 'Archer: Oath of Honor'; title 77036 verified in lab/reports/locale-id-to-text.json; title ids ucdt 1282410106 / ugdt 3515266682; intro 77035 / description 77037 / end 77038."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 4; name 'Archer: Oath of Honor'; title id cell ucdt 1282410106 / ugdt 3515266682"
+          "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0, row 4; name 'Archer: Oath of Honor'; giver Lugabow."
         },
         {
           "kind": "reconstructed",
@@ -263,23 +347,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T194: prerequisite is 3010003 (Path of the Archer), not the disabled 3010005 (Taking Aim) chain, so the chapter is playable without the skipped Test of Agility minigame and Taking Aim field-enemy hunt."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T194: the stump carve step is not in content; the objective is the recovered report-to-Hilforn talk step only (guide text ids 824954949 / 1299662855 record the skipped stump)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          "evidence": "(R) T194: the guide's giver is Lugabow; the client text names Hilforn as the next trainer, not the hand-in NPC, so turn-in remains Lugabow. No second giver or stump position is added."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T194: the historical payout is unknown; 10 coins and 20 Archer XP are the W110 fallback. No Amateur Archer Bow (starter definition 4266) is granted."
         },
         {
           "kind": "reconstructed",
@@ -289,7 +369,7 @@
       "description_string_id": 77037,
       "intro_text_string_id": 77035,
       "end_text_string_id": 77038,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3010007,

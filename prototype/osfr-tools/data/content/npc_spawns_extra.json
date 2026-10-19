@@ -34855,10 +34855,11 @@
     {
       "spawn_guid": 100000003468,
       "legacy_npc_id": 3468,
+      "content_key": 9500000289,
       "model_id": 214,
       "model_file_name": "chugawug_m_greenwood_archer_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bollylog",
+      "name_string_id": 22168,
       "position": [
         -1926.984,
         -38.42006,
@@ -34870,6 +34871,14 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2211; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3468 (ModelId=214, ModelFileName=chugawug_m_greenwood_archer_01.adr, NameId=None)."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json id 22168 = 'Bollylog'; Legacy Npcs.json Id=3468 has NameId None."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T194: content_key 9500000289 binds the existing unnamed Legacy Greenwood archer actor 3468 (FabledRealms.lua:2211) to the Bollylog content row. The actor, model and transform are unchanged. The three-actor cluster in front of Lugabow (3468-3470) is bound in order to Bollylog/Hrugagu/Brugadug using the adjacent client locale name ids 22168-22170."
         }
       ],
       "position_w": null
@@ -34877,10 +34886,11 @@
     {
       "spawn_guid": 100000003469,
       "legacy_npc_id": 3469,
+      "content_key": 9500000309,
       "model_id": 214,
       "model_file_name": "chugawug_m_greenwood_archer_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Hrugagu",
+      "name_string_id": 22169,
       "position": [
         -1929.462,
         -38.55289,
@@ -34892,6 +34902,14 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2212; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3469 (ModelId=214, ModelFileName=chugawug_m_greenwood_archer_01.adr, NameId=None)."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json id 22169 = 'Hrugagu'; Legacy Npcs.json Id=3469 has NameId None."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T194: content_key 9500000309 binds the existing unnamed Legacy Greenwood archer actor 3469 (FabledRealms.lua:2212) to the Hrugagu content row. The actor, model and transform are unchanged. The three-actor cluster in front of Lugabow (3468-3470) is bound in order to Bollylog/Hrugagu/Brugadug using the adjacent client locale name ids 22168-22170."
         }
       ],
       "position_w": null
@@ -34899,10 +34917,11 @@
     {
       "spawn_guid": 100000003470,
       "legacy_npc_id": 3470,
+      "content_key": 9500000290,
       "model_id": 215,
       "model_file_name": "chugawug_f_greenwood_archer_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Brugadug",
+      "name_string_id": 22170,
       "position": [
         -1923.512,
         -38.58187,
@@ -34914,6 +34933,14 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2213; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3470 (ModelId=215, ModelFileName=chugawug_f_greenwood_archer_01.adr, NameId=None)."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json id 22170 = 'Brugadug'; Legacy Npcs.json Id=3470 has NameId None."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T194: content_key 9500000290 binds the existing unnamed Legacy Greenwood archer actor 3470 (FabledRealms.lua:2213) to the Brugadug content row. The actor, model and transform are unchanged. The three-actor cluster in front of Lugabow (3468-3470) is bound in order to Bollylog/Hrugagu/Brugadug using the adjacent client locale name ids 22168-22170."
         }
       ],
       "position_w": null

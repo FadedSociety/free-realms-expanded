@@ -102,8 +102,15 @@ impl Gameplay {
             // the quest row is first, so accept either form.
             if selected == npc_interaction::QUEST_CHOICE_RESPONSE || selected == 0 {
                 if let Some((runtime_guid, key, quest_id)) = self.pending_quest_choice.take() {
-                    let held = std::mem::take(&mut self.pending_choice_packets);
+                    let mut held = std::mem::take(&mut self.pending_choice_packets);
                     if !held.is_empty() {
+                        // 49/13 names the turn-in speaker by runtime actor GUID. The quest
+                        // Talk named the content NPC key, which differs for an extra-spawn
+                        // actor bound through a content_key, so patch the speaker here where
+                        // the clicked runtime GUID is still known.
+                        for packet in &mut held {
+                            set_dialog_camera_target(packet, runtime_guid);
+                        }
                         npc_event(
                             serde_json::json!({"event": "quest_end_from_choice", "quest_id": quest_id}),
                         );
@@ -906,7 +913,9 @@ impl Gameplay {
 ///   `009f5ae0` reads object +0x18/+0x1c).
 /// - 49/1 QuestInfo: the u64 after the reward bundle, i.e. the packet's last 14
 ///   bytes start with it (dispatcher `00c7cea2` passes object +0xe0/+0xe4).
-/// The 49/13 end screen carries it at offset 6 (set where the turn-in is held).
+/// - 49/13 QuestEnd: the turn-in speaker at offset 6. A quest Talk event names the
+///   content NPC key, which differs from the runtime actor for an extra-spawn NPC
+///   bound through a `content_key`; the held screen is patched when 26/6 releases it.
 pub(super) fn set_dialog_camera_target(packet: &mut [u8], npc_guid: u64) {
     let guid = npc_guid.to_le_bytes();
     if packet.starts_with(&[26, 0, 3, 0]) && packet.len() >= 20 {
@@ -914,6 +923,8 @@ pub(super) fn set_dialog_camera_target(packet: &mut [u8], npc_guid: u64) {
     } else if packet.starts_with(&[49, 0, 1, 0]) && packet.len() >= 14 {
         let at = packet.len() - 14;
         packet[at..at + 8].copy_from_slice(&guid);
+    } else if packet.starts_with(&[49, 0, 13, 0]) && packet.len() >= 14 {
+        packet[6..14].copy_from_slice(&guid);
     }
 }
 

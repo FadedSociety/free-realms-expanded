@@ -3120,9 +3120,14 @@
       "reference_ids": [],
       "name": "Bollylog",
       "name_reason": null,
-      "name_string_id": null,
-      "name_string_ids": [],
-      "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
+      "name_string_id": 22168,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 22168
+        }
+      ],
+      "name_string_id_reason": "Client locale 22168 is 'Bollylog' (lab/reports/locale-id-to-text.json); the guide's ucdt/ugdt ids are dialog-table ids.",
       "zone": "Greenwood Forest",
       "zone_id": 6,
       "zone_reason": null,
@@ -3153,9 +3158,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1587.218194,
-        -45.37643,
-        -550.195086
+        -1926.984,
+        -38.42006,
+        -633.9166
       ],
       "position_w": null,
       "rotation": [
@@ -3165,17 +3170,11 @@
         0.9941277658931138
       ],
       "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
+      "placement_source": "reconstructed_unanchored_default",
       "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 6,
-          "poi_name": "Greenwood Forest",
-          "match_score": 0
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "(R) T194: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 3468 (FabledRealms.lua:2211), one of the three unnamed Greenwood archer actors standing in front of Lugabow, so NPC range checks use the actor the client actually sees.",
       "source": [
         {
           "kind": "client",
@@ -3232,19 +3231,19 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json id 22168 = 'Bollylog'; the guide row 67 supplies ucdt/ugdt dialog-table ids, not the client_locale name entry."
           }
         ],
         "name_string_ids": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json id 22168 = 'Bollylog'; table client_locale."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "kind": "reconstructed",
+            "evidence": "(R) T194: the guide's ucdt/ugdt ids name dialog rows; the client_locale id is the NPC name entry."
           }
         ],
         "zone": [
@@ -3377,18 +3376,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2211 (spawnNpcWithGuid 3468); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3468 (ModelId=214, NameId=None)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) T194: the position is the existing Legacy extra-spawn transform bound to this content key; the regional row remains unanchored and does not spawn."
           }
         ],
         "position_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) T194: the regional row stays unanchored scaffolding; only the range anchor is aligned to the bound Legacy actor so a client click on that actor resolves to this content key."
           }
         ],
         "position_w": [
@@ -3416,19 +3415,19 @@
         "placement_source": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) T194: reclassified from reconstructed_zone_center to reconstructed_unanchored_default because the position is a Legacy actor binding, not a zone-centre offset; the regional row is still unspawned."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) T194: low; the actor-to-recruit identity and order are inferred from the three-actor cluster in front of Lugabow and the adjacent client locale name ids 22168-22170."
           }
         ],
         "placement_candidates": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) T194: no POI candidate applies; the range anchor comes from the bound Legacy actor."
           }
         ],
         "capture_match": [
@@ -3445,34 +3444,14 @@
       "reference_ids": [],
       "name": "Brugadug",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 22170,
       "name_string_ids": [
         {
-          "table": "ucdt",
-          "id": 2860114892
-        },
-        {
-          "table": "ucdt",
-          "id": 530627751
-        },
-        {
-          "table": "ucdt",
-          "id": 4197659172
-        },
-        {
-          "table": "ugdt",
-          "id": 2503806234
-        },
-        {
-          "table": "ugdt",
-          "id": 2476875556
-        },
-        {
-          "table": "ugdt",
-          "id": 998226818
+          "table": "client_locale",
+          "id": 22170
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale 22170 is 'Brugadug' (lab/reports/locale-id-to-text.json); the guide's ucdt/ugdt ids are dialog-table ids.",
       "zone": "Greenwood Forest",
       "zone_id": 6,
       "zone_reason": null,
@@ -3503,9 +3482,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1578.397201,
-        -45.37643,
-        -548.873981
+        -1923.512,
+        -38.58187,
+        -632.8393
       ],
       "position_w": null,
       "rotation": [
@@ -3515,17 +3494,11 @@
         0.9941277658931138
       ],
       "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
+      "placement_source": "reconstructed_unanchored_default",
       "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 6,
-          "poi_name": "Greenwood Forest",
-          "match_score": 0
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "(R) T194: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 3470 (FabledRealms.lua:2213), one of the three unnamed Greenwood archer actors standing in front of Lugabow, so NPC range checks use the actor the client actually sees.",
       "source": [
         {
           "kind": "client",
@@ -3582,19 +3555,19 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json id 22170 = 'Brugadug'; the guide row 67 supplies ucdt/ugdt dialog-table ids, not the client_locale name entry."
           }
         ],
         "name_string_ids": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json id 22170 = 'Brugadug'; table client_locale."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "kind": "reconstructed",
+            "evidence": "(R) T194: the guide's ucdt/ugdt ids name dialog rows; the client_locale id is the NPC name entry."
           }
         ],
         "zone": [
@@ -3727,18 +3700,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2213 (spawnNpcWithGuid 3470); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3470 (ModelId=215, NameId=None)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) T194: the position is the existing Legacy extra-spawn transform bound to this content key; the regional row remains unanchored and does not spawn."
           }
         ],
         "position_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) T194: the regional row stays unanchored scaffolding; only the range anchor is aligned to the bound Legacy actor so a client click on that actor resolves to this content key."
           }
         ],
         "position_w": [
@@ -3766,19 +3739,19 @@
         "placement_source": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) T194: reclassified from reconstructed_zone_center to reconstructed_unanchored_default because the position is a Legacy actor binding, not a zone-centre offset; the regional row is still unspawned."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) T194: low; the actor-to-recruit identity and order are inferred from the three-actor cluster in front of Lugabow and the adjacent client locale name ids 22168-22170."
           }
         ],
         "placement_candidates": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) T194: no POI candidate applies; the range anchor comes from the bound Legacy actor."
           }
         ],
         "capture_match": [
@@ -13944,9 +13917,14 @@
       "reference_ids": [],
       "name": "Hrugagu",
       "name_reason": null,
-      "name_string_id": null,
-      "name_string_ids": [],
-      "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
+      "name_string_id": 22169,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 22169
+        }
+      ],
+      "name_string_id_reason": "Client locale 22169 is 'Hrugagu' (lab/reports/locale-id-to-text.json); the guide's ucdt/ugdt ids are dialog-table ids.",
       "zone": "Greenwood Forest",
       "zone_id": 6,
       "zone_reason": null,
@@ -13977,9 +13955,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1581.969643,
-        -45.37643,
-        -541.02434
+        -1929.462,
+        -38.55289,
+        -633.9215
       ],
       "position_w": null,
       "rotation": [
@@ -13989,17 +13967,11 @@
         0.9941277658931138
       ],
       "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
+      "placement_source": "reconstructed_unanchored_default",
       "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 6,
-          "poi_name": "Greenwood Forest",
-          "match_score": 0
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "(R) T194: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 3469 (FabledRealms.lua:2212), one of the three unnamed Greenwood archer actors standing in front of Lugabow, so NPC range checks use the actor the client actually sees.",
       "source": [
         {
           "kind": "client",
@@ -14056,19 +14028,19 @@
         "name_string_id": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json id 22169 = 'Hrugagu'; the guide row 67 supplies ucdt/ugdt dialog-table ids, not the client_locale name entry."
           }
         ],
         "name_string_ids": [
           {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json id 22169 = 'Hrugagu'; table client_locale."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 67; source cell: [client]"
+            "kind": "reconstructed",
+            "evidence": "(R) T194: the guide's ucdt/ugdt ids name dialog rows; the client_locale id is the NPC name entry."
           }
         ],
         "zone": [
@@ -14201,18 +14173,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2212 (spawnNpcWithGuid 3469); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3469 (ModelId=214, NameId=None)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) T194: the position is the existing Legacy extra-spawn transform bound to this content key; the regional row remains unanchored and does not spawn."
           }
         ],
         "position_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) T194: the regional row stays unanchored scaffolding; only the range anchor is aligned to the bound Legacy actor so a client click on that actor resolves to this content key."
           }
         ],
         "position_w": [
@@ -14240,19 +14212,19 @@
         "placement_source": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "evidence": "(R) T194: reclassified from reconstructed_zone_center to reconstructed_unanchored_default because the position is a Legacy actor binding, not a zone-centre offset; the regional row is still unspawned."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) T194: low; the actor-to-recruit identity and order are inferred from the three-actor cluster in front of Lugabow and the adjacent client locale name ids 22168-22170."
           }
         ],
         "placement_candidates": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) T194: no POI candidate applies; the range anchor comes from the bound Legacy actor."
           }
         ],
         "capture_match": [
