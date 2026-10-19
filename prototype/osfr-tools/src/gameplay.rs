@@ -10,6 +10,7 @@ use crate::{
     encounter::{EncounterEngine, EncounterOutcome, EncounterState, ZoneTransition},
     forging::{Forging, ForgingOutcome, ForgingState},
     game_rules::GameRuleSet,
+    harvest_nodes::Gather,
     harvesting,
     identity::CharacterIdentity,
     inventory::{Inventory, InventoryState},
@@ -1980,34 +1981,35 @@ impl Gameplay {
             }
             return Ok(out);
         }
-        if self.mining.as_ref().is_some_and(Type8Engine::active) {
+        if self.type8(Gather::Mining).is_some_and(Type8Engine::active) {
             let previous = self.type8_tick_ms.unwrap_or(now_ms);
             let elapsed = now_ms.saturating_sub(previous);
             // Bound snapshot writes while refreshing the authoritative timer.
             // The gateway persists this state before replies just like input.
             if elapsed >= 250 {
                 let result = self
-                    .mining
-                    .as_mut()
+                    .type8_mut(Gather::Mining)
                     .unwrap()
                     .tick(elapsed.min(u32::MAX as u64) as u32)?;
-                self.apply_mining(result, &mut out)?;
+                self.apply_type8(Gather::Mining, result, &mut out)?;
                 self.type8_tick_ms = Some(now_ms);
             }
             return Ok(out);
         }
-        if self.harvesting.as_ref().is_some_and(Type8Engine::active) {
+        if self
+            .type8(Gather::Harvesting)
+            .is_some_and(Type8Engine::active)
+        {
             let previous = self.type8_tick_ms.unwrap_or(now_ms);
             let elapsed = now_ms.saturating_sub(previous);
             // Bound snapshot writes while refreshing the authoritative timer.
             // The gateway persists this state before replies just like input.
             if elapsed >= 250 {
                 let result = self
-                    .harvesting
-                    .as_mut()
+                    .type8_mut(Gather::Harvesting)
                     .unwrap()
                     .tick(elapsed.min(u32::MAX as u64) as u32)?;
-                self.apply_harvesting(result, &mut out)?;
+                self.apply_type8(Gather::Harvesting, result, &mut out)?;
                 self.type8_tick_ms = Some(now_ms);
             }
             return Ok(out);
@@ -2537,7 +2539,7 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        use crate::harvest_nodes::{Gather, Visitor, payout_fits};
+        use crate::harvest_nodes::{Visitor, payout_fits};
         if !inner.starts_with(&[26, 0, 8, 0]) || inner.len() < 12 {
             return Ok(None);
         }
@@ -2565,11 +2567,7 @@ impl Gameplay {
                 return Ok(Some(out));
             }
         };
-        let engine = match gather {
-            Gather::Mining => self.mining.as_ref(),
-            Gather::Harvesting => self.harvesting.as_ref(),
-        };
-        let Some(engine) = engine else {
+        let Some(engine) = self.type8(gather) else {
             out.replies
                 .push(chat::system("Gathering is not available in this campaign."));
             return Ok(Some(out));
@@ -2583,16 +2581,8 @@ impl Gameplay {
         let mut staged = self.clone();
         staged.type8_tick_ms = Some(now_ms);
         staged.gathering_nodes.as_mut().unwrap().begin(target);
-        match gather {
-            Gather::Mining => {
-                let result = staged.mining.as_mut().unwrap().begin(gather.job())?;
-                staged.apply_mining(result, &mut out)?;
-            }
-            Gather::Harvesting => {
-                let result = staged.harvesting.as_mut().unwrap().begin(gather.job())?;
-                staged.apply_harvesting(result, &mut out)?;
-            }
-        }
+        let result = staged.type8_mut(gather).unwrap().begin(gather.job())?;
+        staged.apply_type8(gather, result, &mut out)?;
         *self = staged;
         Ok(Some(out))
     }
@@ -4300,15 +4290,15 @@ impl Gameplay {
     /// Developer-only `realm mine`: starts the reconstructed Mining18 board for
     /// the accepted Miner job. The launcher must have enabled dev tools, the
     /// Miner job must be unlocked and active, and no other live activity may
-    /// compete. Reward authority stays server-side in `apply_mining`.
+    /// compete. Reward authority stays server-side in `apply_type8`.
     fn developer_mining(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
-        let Some(mining) = self.mining.as_ref() else {
+        let Some(engine) = self.type8(Gather::Mining) else {
             out.replies.push(chat::system(
                 "Mining content is not loaded in this campaign.",
             ));
             return Ok(());
         };
-        if mining.active() {
+        if engine.active() {
             out.replies.push(chat::system(
                 "A mining test is already running. Type realm exit to cancel it.",
             ));
@@ -4346,12 +4336,11 @@ impl Gameplay {
             return Ok(());
         }
         let result = self
-            .mining
-            .as_mut()
+            .type8_mut(Gather::Mining)
             .unwrap()
             .begin(mining::MINER_PROFILE_ID)?;
         self.type8_tick_ms = Some(now_ms);
-        self.apply_mining(result, out)?;
+        self.apply_type8(Gather::Mining, result, out)?;
         out.replies.push(chat::system(
             "Mining test started; type realm exit to cancel.",
         ));
@@ -4361,15 +4350,15 @@ impl Gameplay {
     /// Developer-only `realm harvest`: starts the reconstructed Harvesting111
     /// candidate for the accepted Chef job. Dev tools must be enabled, Chef
     /// must be unlocked and active, and no other live activity may compete.
-    /// Reward authority stays server-side in `apply_harvesting`.
+    /// Reward authority stays server-side in `apply_type8`.
     fn developer_harvesting(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
-        let Some(harvesting) = self.harvesting.as_ref() else {
+        let Some(engine) = self.type8(Gather::Harvesting) else {
             out.replies.push(chat::system(
                 "Harvesting content is not loaded in this campaign.",
             ));
             return Ok(());
         };
-        if harvesting.active() {
+        if engine.active() {
             out.replies.push(chat::system(
                 "A harvesting test is already running. Type realm exit to cancel it.",
             ));
@@ -4378,7 +4367,7 @@ impl Gameplay {
         if self.forging.as_ref().is_some_and(Forging::active)
             || self.smelting.as_ref().is_some_and(Smelting::active)
             || self.cooking.as_ref().is_some_and(Cooking::active)
-            || self.mining.as_ref().is_some_and(Type8Engine::active)
+            || self.type8(Gather::Mining).is_some_and(Type8Engine::active)
             || self.encounter.as_ref().is_some_and(EncounterEngine::active)
         {
             out.replies.push(chat::system(
@@ -4408,12 +4397,11 @@ impl Gameplay {
             return Ok(());
         }
         let result = self
-            .harvesting
-            .as_mut()
+            .type8_mut(Gather::Harvesting)
             .unwrap()
             .begin(harvesting::CHEF_PROFILE_ID)?;
         self.type8_tick_ms = Some(now_ms);
-        self.apply_harvesting(result, out)?;
+        self.apply_type8(Gather::Harvesting, result, out)?;
         out.replies.push(chat::system(
             "Harvesting test started; type realm exit to cancel.",
         ));
@@ -4573,19 +4561,19 @@ impl Gameplay {
                 return Ok(out);
             }
         }
-        if self.mining.as_ref().is_some_and(Type8Engine::active) {
+        if self.type8(Gather::Mining).is_some_and(Type8Engine::active) {
             if inner.starts_with(&[26, 0, 42, 0]) {
                 if inner.len() != 4 {
                     return Err(invalid("invalid mining leave request"));
                 }
-                let result = self.mining.as_mut().unwrap().cancel();
-                self.apply_mining(result, &mut out)?;
+                let result = self.type8_mut(Gather::Mining).unwrap().cancel();
+                self.apply_type8(Gather::Mining, result, &mut out)?;
                 self.type8_tick_ms = None;
                 return Ok(out);
             }
             if inner.starts_with(&[39, 0]) {
-                let result = self.mining.as_mut().unwrap().handle(inner)?;
-                self.apply_mining(result, &mut out)?;
+                let result = self.type8_mut(Gather::Mining).unwrap().handle(inner)?;
+                self.apply_type8(Gather::Mining, result, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[26, 0, 13, 0])
@@ -4601,8 +4589,8 @@ impl Gameplay {
             }
             if let Some(text) = chat::request(inner, character.guid)? {
                 if text.trim().eq_ignore_ascii_case("realm exit") {
-                    let result = self.mining.as_mut().unwrap().cancel();
-                    self.apply_mining(result, &mut out)?;
+                    let result = self.type8_mut(Gather::Mining).unwrap().cancel();
+                    self.apply_type8(Gather::Mining, result, &mut out)?;
                     self.type8_tick_ms = None;
                 } else if text.trim().to_ascii_lowercase().starts_with("realm ") {
                     out.replies.push(chat::system(
@@ -4612,19 +4600,22 @@ impl Gameplay {
                 return Ok(out);
             }
         }
-        if self.harvesting.as_ref().is_some_and(Type8Engine::active) {
+        if self
+            .type8(Gather::Harvesting)
+            .is_some_and(Type8Engine::active)
+        {
             if inner.starts_with(&[26, 0, 42, 0]) {
                 if inner.len() != 4 {
                     return Err(invalid("invalid harvesting leave request"));
                 }
-                let result = self.harvesting.as_mut().unwrap().cancel();
-                self.apply_harvesting(result, &mut out)?;
+                let result = self.type8_mut(Gather::Harvesting).unwrap().cancel();
+                self.apply_type8(Gather::Harvesting, result, &mut out)?;
                 self.type8_tick_ms = None;
                 return Ok(out);
             }
             if inner.starts_with(&[39, 0]) {
-                let result = self.harvesting.as_mut().unwrap().handle(inner)?;
-                self.apply_harvesting(result, &mut out)?;
+                let result = self.type8_mut(Gather::Harvesting).unwrap().handle(inner)?;
+                self.apply_type8(Gather::Harvesting, result, &mut out)?;
                 return Ok(out);
             }
             if inner.starts_with(&[26, 0, 13, 0])
@@ -4640,8 +4631,8 @@ impl Gameplay {
             }
             if let Some(text) = chat::request(inner, character.guid)? {
                 if text.trim().eq_ignore_ascii_case("realm exit") {
-                    let result = self.harvesting.as_mut().unwrap().cancel();
-                    self.apply_harvesting(result, &mut out)?;
+                    let result = self.type8_mut(Gather::Harvesting).unwrap().cancel();
+                    self.apply_type8(Gather::Harvesting, result, &mut out)?;
                     self.type8_tick_ms = None;
                 } else if text.trim().to_ascii_lowercase().starts_with("realm ") {
                     out.replies.push(chat::system(
@@ -5366,17 +5357,47 @@ impl Gameplay {
         Ok(())
     }
 
-    /// Stage a TYPE8 outcome. The only reward path is the engine's server-side
-    /// transaction derived from the configured `outputs` and the collected
-    /// quota; client score or win reports never reach it. Grants commit inside
-    /// the staged gameplay clone, which the gateway saves before sending.
-    fn apply_mining(&mut self, result: Type8Outcome, out: &mut Outcome) -> io::Result<()> {
+    /// The Type8 engine for one gather game. Mining and Harvesting keep
+    /// separate runs; `Gather` is the only key their shared paths need.
+    fn type8(&self, gather: Gather) -> Option<&Type8Engine> {
+        match gather {
+            Gather::Mining => self.mining.as_ref(),
+            Gather::Harvesting => self.harvesting.as_ref(),
+        }
+    }
+
+    fn type8_mut(&mut self, gather: Gather) -> Option<&mut Type8Engine> {
+        match gather {
+            Gather::Mining => self.mining.as_mut(),
+            Gather::Harvesting => self.harvesting.as_mut(),
+        }
+    }
+
+    /// Stage a TYPE8 outcome (Mining18 or Harvesting111). The only reward path is
+    /// the engine's server-side transaction derived from the configured
+    /// `outputs` and the collected quota; client score or win reports never
+    /// reach it. Grants commit inside the staged gameplay clone, which the
+    /// gateway saves before sending.
+    fn apply_type8(
+        &mut self,
+        gather: Gather,
+        result: Type8Outcome,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
         if let Some(transaction) = result.transaction {
-            let grant = crate::mining::lifecycle::reward_grant(Some(&transaction), 0)?;
-            if self.profiles.as_ref().map(Profiles::active) != Some(mining::MINER_PROFILE_ID) {
-                return Err(invalid(
-                    "mining completion is outside the accepted Miner job",
-                ));
+            let grant = match gather {
+                Gather::Mining => crate::mining::lifecycle::reward_grant(Some(&transaction), 0)?,
+                Gather::Harvesting => crate::harvesting::lifecycle::reward_grant(
+                    Some(&transaction),
+                    HARVESTING_GAME_ID,
+                    0,
+                )?,
+            };
+            if self.profiles.as_ref().map(Profiles::active) != Some(gather.job()) {
+                return Err(invalid(match gather {
+                    Gather::Mining => "mining completion is outside the accepted Miner job",
+                    Gather::Harvesting => "harvesting completion is outside the accepted Chef job",
+                }));
             }
             self.consume_materials(transaction.consumes, out)?;
             let grants: Vec<_> = grant
@@ -5387,53 +5408,6 @@ impl Gameplay {
             self.grant_reward(0, &grants, out)?;
             // (R) TYPE8 resource keys use the configured output item definition;
             // no retail regional resource-to-quest table has been recovered.
-            for item in &grant.items {
-                self.npc_quest_event(
-                    crate::quest_engine::QuestEvent::GatherResource {
-                        resource_id: item.definition_id as u32,
-                        quantity: item.count,
-                    },
-                    out,
-                )?;
-            }
-            self.npc_minigame_win(&result.replies, out)?;
-            for amount in grant.job_xp.values() {
-                self.award_job_xp(*amount, out)?;
-            }
-            if let Some(nodes) = self.gathering_nodes.as_mut() {
-                nodes.paid();
-            }
-        }
-        out.changed |= result.changed;
-        out.replies.extend(result.replies);
-        Ok(())
-    }
-
-    /// Stage a Harvesting111 outcome. The only reward path is the engine's
-    /// server-side transaction derived from the configured outputs and the
-    /// collected quota; client score or win reports never reach it. Grants and
-    /// any consumption commit inside the staged gameplay clone, which the
-    /// gateway saves before sending.
-    fn apply_harvesting(&mut self, result: Type8Outcome, out: &mut Outcome) -> io::Result<()> {
-        if let Some(transaction) = result.transaction {
-            let grant = crate::harvesting::lifecycle::reward_grant(
-                Some(&transaction),
-                HARVESTING_GAME_ID,
-                0,
-            )?;
-            if self.profiles.as_ref().map(Profiles::active) != Some(harvesting::CHEF_PROFILE_ID) {
-                return Err(invalid(
-                    "harvesting completion is outside the accepted Chef job",
-                ));
-            }
-            self.consume_materials(transaction.consumes, out)?;
-            let grants: Vec<_> = grant
-                .items
-                .iter()
-                .map(|item| (item.definition_id, item.count))
-                .collect();
-            self.grant_reward(0, &grants, out)?;
-            // (R) Resource identity is the configured output item definition.
             for item in &grant.items {
                 self.npc_quest_event(
                     crate::quest_engine::QuestEvent::GatherResource {

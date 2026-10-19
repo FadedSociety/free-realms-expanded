@@ -177,12 +177,13 @@ fn gathering_payout_hook_and_minigame_hook() {
         .select(45, &game.inventory)
         .unwrap();
     let mut out = Outcome::default();
-    game.apply_harvesting(Type8Outcome::default(), &mut out)
+    game.apply_type8(Gather::Harvesting, Type8Outcome::default(), &mut out)
         .unwrap();
     count(&game, 0);
     let mut win = mining::payload_packet(111_000_001, "OnGameWonMsg").unwrap();
     win[11..15].copy_from_slice(&111i32.to_le_bytes());
-    game.apply_harvesting(
+    game.apply_type8(
+        Gather::Harvesting,
         Type8Outcome {
             transaction: Some(crate::mining::Type8Transaction {
                 consumes: vec![],
@@ -206,7 +207,8 @@ fn gathering_payout_hook_and_minigame_hook() {
         .unwrap();
     // A server result without a payout never emits a completion event.
     minigame
-        .apply_harvesting(
+        .apply_type8(
+            Gather::Harvesting,
             Type8Outcome {
                 replies: vec![win.clone()],
                 ..Default::default()
@@ -216,7 +218,8 @@ fn gathering_payout_hook_and_minigame_hook() {
         .unwrap();
     count(&minigame, 0);
     minigame
-        .apply_harvesting(
+        .apply_type8(
+            Gather::Harvesting,
             Type8Outcome {
                 transaction: Some(crate::mining::Type8Transaction {
                     consumes: vec![],
