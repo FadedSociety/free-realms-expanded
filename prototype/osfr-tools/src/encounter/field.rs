@@ -41,7 +41,7 @@ impl EncounterEngine {
     }
 
     /// Load the overworld enemies (`field_enemies.json`). Their GUIDs must not
-    /// collide with opening or dungeon actors.
+    /// collide with opening, dungeon or battle-spawner actors.
     pub fn load_field_enemies(&mut self, path: &Path) -> io::Result<()> {
         let bytes = fs::read(path)?;
         if bytes.len() > 128 * 1024 {
@@ -137,6 +137,7 @@ impl EncounterEngine {
                     .map(|a| a.guid)
                     .chain(d.guide.iter().map(|g| g.guid))
             }))
+            .chain(self.battles.iter().map(|b| b.spawner.guid))
             .collect();
         let mut field = Vec::with_capacity(enemies.len());
         let mut areas = BTreeSet::new();

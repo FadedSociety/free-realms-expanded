@@ -268,6 +268,28 @@ fn position(value: &Value) -> [f32; 3] {
     ]
 }
 
+fn field_enemy_file(guid: u64) -> Value {
+    json!({
+        "schema_version": 1,
+        "enemies": [{
+            "guid": guid,
+            "definition_id": 400,
+            "model_id": 3,
+            "name_id": 100,
+            "name": "Synthetic field actor",
+            "texture_alias": "",
+            "position": [3.0, 0.0, 4.0],
+            "max_health": 100,
+            "damage": 7,
+            "boss": false,
+            "level": 1,
+            "zone_id": 0,
+            "respawn_seconds": 30,
+            "aggro_range": 8.0
+        }]
+    })
+}
+
 fn wrap(inner: &[u8]) -> Vec<u8> {
     let mut bytes = vec![5, 0, 1];
     bytes.extend((inner.len() as u32).to_le_bytes());
@@ -888,6 +910,66 @@ fn marker_collision_is_rejected_without_replacing_the_roster() {
         "a rejected marker collision must not replace a valid battle"
     );
     assert_eq!(collision_engine.state(), &before_collision_state);
+}
+
+#[test]
+fn field_enemy_reload_refuses_a_battle_spawner_guid_collision() {
+    let fixture = Fixture::new();
+    let mut engine = fixture.empty_engine();
+    engine.load_field_battles(&battle_path()).unwrap();
+
+    let spawner_guid = u64_field(&battle(&battles(), 12310)["spawner"], "guid");
+    let first_guid = 9_000_001;
+    let first = fixture.write("field-enemies.json", &field_enemy_file(first_guid));
+    engine.load_field_enemies(&first).unwrap();
+
+    let second_guid = 9_000_002;
+    let second = fixture.write("field-enemies-second.json", &field_enemy_file(second_guid));
+    engine.reload_field_enemies(&second).unwrap();
+    assert_eq!(
+        engine.field_guids(),
+        vec![second_guid],
+        "a reload with no collision still succeeds"
+    );
+
+    let collision_path = fixture.write(
+        "field-enemies-collision.json",
+        &field_enemy_file(spawner_guid),
+    );
+    let state = engine.state().clone();
+    let guids = engine.field_guids();
+    let targets = engine.field_teleport_targets();
+    let spawners = engine.battle_spawners();
+    let behaviour = engine.behaviour(second_guid).cloned();
+    let error = engine
+        .reload_field_enemies(&collision_path)
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("duplicate field enemy GUID"), "{error}");
+    assert_eq!(engine.state(), &state);
+    assert_eq!(engine.field_guids(), guids);
+    assert_eq!(engine.field_teleport_targets(), targets);
+    assert_eq!(engine.battle_spawners(), spawners);
+    assert_eq!(engine.behaviour(second_guid), behaviour.as_ref());
+}
+
+#[test]
+fn startup_loads_field_enemies_before_battles_and_refuses_a_spawner_collision() {
+    let fixture = Fixture::new();
+    let mut engine = fixture.empty_engine();
+    let field_guid = 9_000_003;
+    let field = fixture.write("startup-field-enemies.json", &field_enemy_file(field_guid));
+    engine.load_field_enemies(&field).unwrap();
+
+    let mut colliding = battles();
+    let mut row = battle(&colliding, 12310).clone();
+    row["spawner"]["guid"] = json!(field_guid);
+    colliding["battles"] = json!([row]);
+    let path = fixture.write("startup-field-battle-collision.json", &colliding);
+    let error = engine.load_field_battles(&path).unwrap_err().to_string();
+    assert!(error.contains("duplicate field battle GUID"), "{error}");
+    assert_eq!(engine.field_guids(), vec![field_guid]);
+    assert!(engine.battle_spawners().is_empty());
 }
 
 #[test]
