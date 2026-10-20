@@ -459,9 +459,6 @@ struct Session {
     received: u64,
     trace: Option<trace::Trace>,
     bundle_budget: BundleBudget,
-    /// Test-only: `(released bytes, budget after)` for a refused precommit transfer (F264).
-    #[cfg(test)]
-    bundle_refusal: Option<(usize, usize)>,
 }
 
 #[derive(Clone, Debug)]
@@ -1092,8 +1089,6 @@ impl Session {
             received: 0,
             trace,
             bundle_budget: BundleBudget::outside(),
-            #[cfg(test)]
-            bundle_refusal: None,
         })
     }
 
@@ -1734,7 +1729,7 @@ impl Session {
         outcome.pets_changed |= ended.pets_changed;
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
-        let charged = self.bundle_budget.stage(&outcome.replies)?;
+        self.bundle_budget.stage(&outcome.replies)?;
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
         let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
@@ -1945,16 +1940,7 @@ impl Session {
             Ok(staged) => staged,
             // (R) A precommit transfer refusal keeps the live session/location/members.
             // Postcommit queue errors below still disconnect; they cannot roll back saves.
-            Err(_) if transfer => {
-                // Those replies are discarded, not queued: release their charge so a later
-                // child in the split bundle is not refused for bytes nobody received (F264).
-                self.bundle_budget.release(charged);
-                #[cfg(test)]
-                {
-                    self.bundle_refusal = Some((charged, self.bundle_budget.used().unwrap_or(0)));
-                }
-                return Ok(false);
-            }
+            Err(_) if transfer => return Ok(false),
             Err(error) => return Err(error),
         };
         if let Some(change) = change {

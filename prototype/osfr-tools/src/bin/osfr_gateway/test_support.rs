@@ -105,6 +105,31 @@ pub fn vendor_content(scratch: &Scratch) -> PathBuf {
     content
 }
 
+/// Writes an item catalogue with one synthetic definition per `(id, serialized size)` row. Each
+/// record starts with its id and repeats `0x5a` to `size`, so a caller controls the 165/2
+/// definition reply sizes it exercises.
+pub fn item_catalogue(content: &Path, rows: &[(u32, usize)]) {
+    use sha2::{Digest, Sha256};
+    let definitions: Vec<serde_json::Value> = rows
+        .iter()
+        .map(|(id, size)| {
+            let mut bytes = (*id as i32).to_le_bytes().to_vec();
+            bytes.resize(*size, 0x5a);
+            json!({
+                "id": *id as i32, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 10,
+                "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
+                "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
+                "sha256": format!("{:x}", Sha256::digest(&bytes))
+            })
+        })
+        .collect();
+    fs::write(
+        content.join("item-catalogue.json"),
+        serde_json::to_vec(&json!({"schema_version":1,"definitions":definitions})).unwrap(),
+    )
+    .unwrap();
+}
+
 /// True when `options` names the private lab fixture pair a session rig loads: the
 /// reference manifest plus the top-level content files `Server::new` opens. A clean
 /// checkout has neither, and a partial copy must be recognised here before the rig panics

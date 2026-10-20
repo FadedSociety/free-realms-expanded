@@ -588,31 +588,15 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
 /// commits it, so the assertion proves the split ran rather than a whole-bundle `handle_at`.
 #[test]
 fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
-    use sha2::{Digest, Sha256};
-
     let scratch = test_support::Scratch::new("f179-split");
     let content = test_support::vendor_content(&scratch);
     // 43 maximum-size rows are ~2.7 MiB per child: two children stay under the 8 MiB bundle
     // budget, the third pushes the split bundle over it.
     let ids: Vec<u32> = (0..43).map(|index| 930_000 + index).collect();
-    let definitions: Vec<serde_json::Value> = ids
-        .iter()
-        .map(|id| {
-            let mut bytes = (*id as i32).to_le_bytes().to_vec();
-            bytes.resize(65_536, 0x5a);
-            json!({
-                "id": *id as i32, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 10,
-                "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
-                "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
-                "sha256": format!("{:x}", Sha256::digest(&bytes))
-            })
-        })
-        .collect();
-    fs::write(
-        content.join("item-catalogue.json"),
-        serde_json::to_vec(&json!({"schema_version":1,"definitions":definitions})).unwrap(),
-    )
-    .unwrap();
+    test_support::item_catalogue(
+        &content,
+        &ids.iter().map(|id| (*id, 65_536)).collect::<Vec<_>>(),
+    );
 
     let mut options = test_support::options(scratch.state());
     options.content = Some(content);
@@ -711,15 +695,17 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
         error.to_string().contains("outbound budget"),
         "expected the reply budget refusal, got {error}"
     );
+    let mut expected = before.clone();
+    expected.character.position[0] = start.position[0] + 0.75;
     assert_eq!(
         session.gateway.state().position[0],
-        start.position[0] + 0.75,
+        expected.character.position[0],
         "the split's first child must commit before the crossing child is refused"
     );
     assert_eq!(
-        session.gateway.snapshot().gameplay,
-        before.gameplay,
-        "the refused read changed gameplay state"
+        session.gateway.snapshot(),
+        expected,
+        "the refused read changed character or gameplay state"
     );
     assert_eq!(
         session.bundle_budget.used(),
@@ -739,7 +725,7 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
             None,
         )
         .unwrap();
-    assert_eq!(session.gateway.snapshot().gameplay, before.gameplay);
+    assert_eq!(session.gateway.snapshot(), expected);
 
     // A whole (non-split) bundle still answers after a refused split: the budget is reset for
     // every top-level message, so the refused message's bytes cannot charge the next one.
@@ -760,31 +746,50 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
             None,
         )
         .expect("a whole bundle under the 8 MiB budget must not be charged twice");
-    assert_eq!(session.gateway.snapshot().gameplay, before.gameplay);
+    assert_eq!(
+        session.gateway.snapshot(),
+        expected,
+        "a whole bundle must change nothing"
+    );
     // The reset, not the next dispatch arming the budget again, must leave it outside: a tick's
     // replies after a successful bundle would otherwise charge an already-finished message.
     assert_eq!(session.bundle_budget.used(), None);
 }
 
-/// F264: a begin-zoning child that refuses before its commit discards its staged replies;
-/// those bytes must not stay charged against the later children of the same split bundle
-/// (F179 finding 4). `realm race` is a real zone transfer; deleting the save directory makes
-/// its precommit save fail, which is the `Err(_) if transfer` refusal path.
+/// F286 (F179 finding 4, the documented-accounting alternative): a begin-zoning child that refuses
+/// before its commit keeps its staged replies charged to the message's bundle budget until the
+/// dispatch ends; `dispatch_message` then releases the message budget (final assertion). The test
+/// name is the F264 one, kept because `lab/autopilot/protected-pass.txt` pins it. `BundleBudget`
+/// owns the rule: the ceiling bounds bytes staged for one message, not bytes the sender queues.
+/// `realm race` is a real zone transfer; deleting the save directory makes its precommit save fail,
+/// which is the `Err(_) if transfer` refusal path. The control bundle's last read fits by 528
+/// bytes; in the real bundle the same read is over by 371 because the refused transfer's 899
+/// staged bytes stayed charged. A refund (F264's `release`) would make the last read fit, so this
+/// test would fail.
 #[test]
 fn a_refused_precommit_transfer_releases_its_reply_budget() {
-    let scratch = test_support::Scratch::new("f264-transfer");
+    let scratch = test_support::Scratch::new("f286-transfer");
     let content = test_support::vendor_content(&scratch);
-
+    // 43 maximum-size rows: two reads are ~2.7 MiB each; the 41-row read leaves 62,567 bytes of
+    // the 8 MiB budget, and the 62,000-byte row's read charges 62,039.
+    let ids: Vec<u32> = (0..43).map(|index| 930_000 + index).collect();
+    test_support::item_catalogue(
+        &content,
+        &ids.iter()
+            .map(|id| (*id, 65_536))
+            .chain([(930_100, 62_000)])
+            .collect::<Vec<_>>(),
+    );
     let mut options = test_support::options(scratch.state());
     options.content = Some(content);
     // `realm race` is the developer entry to the recovered kart scene transfer.
     options.dev_tools = true;
     let mut server = Server::new(options).unwrap();
     let mut session = Session::new(
-        SessionId(264),
-        "127.0.0.1:12348".parse().unwrap(),
+        SessionId(286),
+        "127.0.0.1:12349".parse().unwrap(),
         SessionRequest {
-            id: 264,
+            id: 286,
             crc_length: 3,
             buffer_size: 512,
         },
@@ -795,7 +800,7 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
     )
     .unwrap();
     let mut login = 1u16.to_le_bytes().to_vec();
-    for (i, value) in ["f264", "1.910.1.530630", ""].into_iter().enumerate() {
+    for (i, value) in ["f286", "1.910.1.530630", ""].into_iter().enumerate() {
         login.extend((value.len() as u32).to_le_bytes());
         login.extend(value.as_bytes());
         if i == 0 {
@@ -806,28 +811,34 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
     session.gateway.handle(&wrap(&[13, 0])).unwrap();
     session.gateway.handle(&wrap(&[10, 0])).unwrap();
     let zone_id = session.gateway.state().zone_id;
-    // The transfer cannot commit: its precommit save has nowhere to write.
-    fs::remove_dir_all(scratch.path()).unwrap();
+    let before = session.gateway.snapshot();
+    let read = |ids: &[u32]| {
+        let mut request = vec![165, 0, 2, 0];
+        request.extend((ids.len() as i32).to_le_bytes());
+        ids.iter().for_each(|id| request.extend(id.to_le_bytes()));
+        wrap(&request)
+    };
     let mut trigger = vec![26, 0, 10, 0];
     trigger.extend(u64::MAX.to_le_bytes());
     trigger.extend(0i32.to_le_bytes());
-    // A later child the discarded charge must not refuse: one small definition read.
-    let mut read = vec![165, 0, 2, 0];
-    read.extend(1i32.to_le_bytes());
-    read.extend(8u32.to_le_bytes());
-    let mut bundle = vec![0, 25];
-    for child in [
-        wrap(&osfr_tools::chat::local_request("realm race")),
-        wrap(&trigger),
-        wrap(&read),
-    ] {
-        assert!(child.len() < 255);
-        bundle.push(child.len() as u8);
-        bundle.extend(child);
-    }
-    session
-        .dispatch_message(
-            &bundle,
+    let bundle = |transfer: bool| {
+        let mut children = vec![read(&ids), read(&ids), read(&ids[..41])];
+        if transfer {
+            children.push(wrap(&osfr_tools::chat::local_request("realm race")));
+        }
+        children.push(wrap(&trigger));
+        children.push(read(&[930_100]));
+        let mut bundle = vec![0, 25];
+        for child in children {
+            assert!(child.len() < 255);
+            bundle.push(child.len() as u8);
+            bundle.extend(child);
+        }
+        bundle
+    };
+    let mut dispatch = |session: &mut Session, message: &[u8]| {
+        session.dispatch_message(
+            message,
             &server.options,
             1000,
             &mut server.world,
@@ -835,22 +846,33 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
             &mut server.sessions,
             None,
         )
-        .unwrap();
-    let (released, used) = session
-        .bundle_refusal
-        .expect("the split bundle must reach the precommit transfer refusal");
-    assert!(
-        released > 0,
-        "the refused transfer staged no replies to release"
-    );
+    };
+    // The same children without the transfer child fit the budget: the last read is accepted.
+    dispatch(&mut session, &bundle(false))
+        .expect("the control bundle must fit the 8 MiB bundle budget");
     assert_eq!(
-        used, 0,
-        "the refused transfer's staged replies stayed charged to the split bundle"
+        session.gateway.snapshot(),
+        before,
+        "the control bundle changed character or gameplay state"
+    );
+    // The transfer cannot commit: its precommit save has nowhere to write. Its staged bytes stay
+    // charged to the message, so the identical last read is now over the budget.
+    fs::remove_dir_all(scratch.path()).unwrap();
+    let error = dispatch(&mut session, &bundle(true))
+        .expect_err("the refused transfer's staged replies must stay charged");
+    assert!(
+        error.to_string().contains("outbound budget"),
+        "expected the reply budget refusal, got {error}"
     );
     assert_eq!(
         session.gateway.state().zone_id,
         zone_id,
         "a refused precommit transfer must not commit the move"
+    );
+    assert_eq!(
+        session.gateway.snapshot(),
+        before,
+        "the refused transfer's bundle changed character or gameplay state"
     );
     assert_eq!(
         session.bundle_budget.used(),

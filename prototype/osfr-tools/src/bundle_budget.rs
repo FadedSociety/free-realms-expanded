@@ -5,6 +5,13 @@
 //! gives that split path the same ceiling. This is server memory policy below the sender's 32 MiB
 //! queue, not a recovered client limit; the lead accepted the value on 2026-10-19. A refusal ends
 //! only that player's session.
+//!
+//! The charge is taken when replies are staged, before that child's transaction commits. A
+//! precommit transfer refusal discards its staged replies but leaves their bytes charged for the
+//! rest of the bundle (F179 finding 4; F286 documents this as the deliberate accounting the
+//! review accepted in place of a refund): the ceiling bounds the bytes one message stages, not
+//! the bytes the sender queues. Refunding them would change the lead-signed budget policy and
+//! needs lead sign-off, so builders must not add a release here.
 
 use std::io;
 
@@ -31,28 +38,19 @@ impl BundleBudget {
     }
 
     /// Charge replies about to be staged; a bundle over the budget is refused before commit.
-    /// Returns the bytes charged so a caller that discards them can [`Self::release`] them.
-    pub fn stage(&mut self, replies: &[Vec<u8>]) -> io::Result<usize> {
+    /// The charge stays even if the staged child's transaction then refuses (module note).
+    pub fn stage(&mut self, replies: &[Vec<u8>]) -> io::Result<()> {
         let Some(used) = &mut self.0 else {
-            return Ok(0);
+            return Ok(());
         };
-        let charged = replies.iter().map(Vec::len).sum::<usize>();
-        *used = used.saturating_add(charged);
+        *used = used.saturating_add(replies.iter().map(Vec::len).sum::<usize>());
         if *used > MAX_BUNDLE_REPLY_BYTES {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "bundled application response exceeds the outbound budget",
             ));
         }
-        Ok(charged)
-    }
-
-    /// Drop a charge whose replies were discarded before queueing (a refused precommit
-    /// transfer). A refusal must not charge later children for replies nobody receives.
-    pub fn release(&mut self, bytes: usize) {
-        if let Some(used) = &mut self.0 {
-            *used = used.saturating_sub(bytes);
-        }
+        Ok(())
     }
 
     /// Reply bytes charged so far; None outside a bundle.
