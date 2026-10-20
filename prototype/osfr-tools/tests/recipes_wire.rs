@@ -10,6 +10,9 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
 fn hex(bytes: &str) -> Vec<u8> {
     bytes
         .split_whitespace()
@@ -39,7 +42,8 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 /// A scratch copy of the catalogue fixture with the captured recipe-51 product
 /// definition merged in. Item 21825 is in the deployed item catalogue but not
-/// in the checked-in inventory fixture.
+/// in the checked-in inventory fixture. The fixture copy uses the canonical
+/// `tests/common/content_copy.rs` helper.
 struct CapturedProductContent(PathBuf);
 
 impl CapturedProductContent {
@@ -49,12 +53,7 @@ impl CapturedProductContent {
             std::process::id(),
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::create_dir_all(&path).unwrap();
-        fs::copy(
-            reference_content().join("inventory.json"),
-            path.join("inventory.json"),
-        )
-        .unwrap();
+        content_copy::copy_tree(&reference_content(), &path);
         let definition = definition_with_presentation(21_825, 38_663, 1_006, 0);
         fs::write(
             path.join("item-catalogue.json"),
@@ -192,12 +191,18 @@ fn learned_catalog_recipes_encode_add_and_replace_all() {
 }
 
 #[test]
-fn a_proven_recipe_row_matches_the_captured_product_fields() {
+fn a_captured_recipe_row_emits_the_product_fields_at_the_native_offsets() {
     // Captured `RecipeData` row 4: `PacketSendSelfToClient.json` Recipes[0] and
     // the raw bytes in lab/references/rust-gateway-reference/0007-login.bin
     // (body offset 189344; this row starts at file offset 189361). Its product
     // words are name 104, icon 462, tint 0 and item 21785. The pattern row 381
     // presents 333/2148/0, so the assertions pin product over pattern.
+    //
+    // This is product-field coverage, not a byte-identical replay of the
+    // captured row: description_id, unknown_1c, component
+    // description/inventory_key/unknown_20 and row 4's component order still
+    // differ (open gap in notes/Autopilot/T255.md). A future raw-capture replay
+    // needs those fields recovered first.
     let (catalog, inventory) = loaded();
     let row = emitted_row(&catalog, &inventory, 4);
     assert_eq!(
@@ -284,7 +289,7 @@ fn a_missing_pattern_presentation_still_uses_the_product() {
 }
 
 #[test]
-fn both_missing_presents_zero_fields_but_keeps_the_recipe_and_product_ids() {
+fn a_missing_product_definition_falls_back_to_the_pattern_item_id() {
     let (catalog, inventory) = loaded();
     assert!(!inventory.has_definition(848));
     assert!(!inventory.has_definition(21_812));
@@ -295,19 +300,25 @@ fn both_missing_presents_zero_fields_but_keeps_the_recipe_and_product_ids() {
     );
     assert_eq!(row.item_definition_id, 848, "pattern id is the fallback");
     assert!(!row.components.is_empty());
+    // The record still carries product 21812; only the emitted row falls back
+    // because the loaded catalogue has no definition for it.
     assert!(
-        catalog.records.iter().any(|recipe| {
-            recipe.recipe_id == Some(38) && recipe.output.definition_id == 21_812
-        })
+        catalog
+            .records
+            .iter()
+            .any(|recipe| recipe.recipe_id == Some(38) && recipe.output.definition_id == 21_812)
     );
     let frame = encode_recipe_add(&row).unwrap();
     assert_eq!(frame.len(), 3 + 42 + 32 * row.components.len());
 }
 
 #[test]
-fn the_filter_column_is_unchanged_or_equals_the_proven_capture() {
-    // Captured rows group by job: Miner rows 4/5 carry filter 9, Chef rows
-    // 33-59 carry 10 and Blacksmith rows 155/165 carry 12.
+fn the_filter_column_matches_the_captured_and_inferred_mapping() {
+    // Captured rows: Miner 4/5 carry filter 9 and Chef 33-59 carry 10. The
+    // Blacksmith leg is (R) inferred: captured rows 155/165 carry 12 but their
+    // job is a candidate (`recipes_unresolved.json`), no loaded Blacksmith row
+    // is in the capture, and T033's audit maps the same 9/10/12. Recipe 11 is
+    // the loaded Blacksmith weapon that this mapping sends as 12.
     assert_eq!(
         (
             CraftingJob::Chef.recipe_filter(),

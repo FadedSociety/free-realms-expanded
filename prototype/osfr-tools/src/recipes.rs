@@ -27,11 +27,15 @@ impl CraftingJob {
         }
     }
 
-    /// The filter column of the native recipe row. Proven by the preserved
-    /// `RecipeData` rows: Miner rows 4/5 carry 9, Chef rows 33-59 carry 10 and
-    /// Blacksmith rows 155/165 carry 12 (`PacketSendSelfToClient.json`; raw
-    /// bytes in `lab/references/rust-gateway-reference/0007-login.bin`, body
-    /// offset 189344). This is not the profile id (14/45/16).
+    /// The filter column of the native recipe row. The preserved `RecipeData`
+    /// rows prove Miner rows 4/5 carry 9 and Chef rows 33-59 carry 10
+    /// (`PacketSendSelfToClient.json`; raw bytes in
+    /// `lab/references/rust-gateway-reference/0007-login.bin`, body offset
+    /// 189344). Blacksmith 12 is (R) inferred: captured rows 155/165 carry 12
+    /// but their job is only a candidate from build guides/locale
+    /// (`recipes_unresolved.json`), no loaded Blacksmith row is in the capture,
+    /// and T033's audit maps the same 9/10/12. This is not the profile id
+    /// (14/45/16).
     pub const fn recipe_filter(self) -> u32 {
         match self {
             Self::Chef => 10,
@@ -265,7 +269,8 @@ impl RecipeCatalog {
     /// the product or the pattern.
     ///
     /// The client row has no recovered description, membership or `+0x1c`
-    /// policy fields; those values remain local defaults (R).
+    /// policy fields; those values remain local defaults (R), so an emitted row
+    /// is not byte-identical to a preserved capture row.
     pub fn wire_rows(
         &self,
         learned: &HashSet<u32>,
@@ -283,16 +288,14 @@ impl RecipeCatalog {
                 .presentation(recipe.output.definition_id)
                 .or_else(|_| inventory.presentation(pattern_id))
                 .ok();
-            let output_id = u32::try_from(recipe.output.definition_id).unwrap_or(0);
             // The captured row's final item word is the product id (reader
             // 0090a720); the pattern id is only the fallback when the output
             // has no catalogue row.
-            let item_definition_id =
-                if output_id > 0 && inventory.has_definition(recipe.output.definition_id) {
-                    output_id
-                } else {
-                    u32::try_from(pattern_id).unwrap_or(0)
-                };
+            let item_definition_id = if inventory.has_definition(recipe.output.definition_id) {
+                u32::try_from(recipe.output.definition_id).unwrap_or(0)
+            } else {
+                u32::try_from(pattern_id).unwrap_or(0)
+            };
             let components = recipe
                 .ingredients
                 .iter()

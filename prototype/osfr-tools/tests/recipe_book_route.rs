@@ -73,7 +73,11 @@ fn count(g: &Gateway, id: i32) -> u32 {
         .sum()
 }
 /// Compare two snapshots; on mismatch name the changed paths, not the dump.
-fn assert_same(a: &osfr_tools::game_store::Snapshot, b: &osfr_tools::game_store::Snapshot, what: &str) {
+fn assert_same(
+    a: &osfr_tools::game_store::Snapshot,
+    b: &osfr_tools::game_store::Snapshot,
+    what: &str,
+) {
     fn walk(path: String, a: &Value, b: &Value, out: &mut Vec<String>) {
         if a == b {
             return;
@@ -81,13 +85,21 @@ fn assert_same(a: &osfr_tools::game_store::Snapshot, b: &osfr_tools::game_store:
         match (a, b) {
             (Value::Object(x), Value::Object(y)) => {
                 for k in x.keys().chain(y.keys()) {
-                    walk(format!("{path}/{k}"), &x.get(k).unwrap_or(&Value::Null), y.get(k).unwrap_or(&Value::Null), out);
+                    walk(
+                        format!("{path}/{k}"),
+                        &x.get(k).unwrap_or(&Value::Null),
+                        y.get(k).unwrap_or(&Value::Null),
+                        out,
+                    );
                 }
             }
             _ => out.push(path),
         }
     }
-    let (a, b) = (serde_json::to_value(a).unwrap(), serde_json::to_value(b).unwrap());
+    let (a, b) = (
+        serde_json::to_value(a).unwrap(),
+        serde_json::to_value(b).unwrap(),
+    );
     let mut diff = Vec::new();
     walk(String::new(), &a, &b, &mut diff);
     diff.dedup();
@@ -194,10 +206,24 @@ fn recipe_book_refusals_change_nothing() {
     let away = g.snapshot();
     book_start(&mut g, GUMBO);
     assert_eq!(g.snapshot(), away);
-    // Wrong active job.
+    // Wrong active job. Profile 1 has no equipped Chest/Legs, so the switch is
+    // refused and the player stays Chef; profile 43 has the required outfit
+    // slots and actually switches, which is the case this block must exercise.
     position(&mut g, station, 2_000_000);
-    select(&mut g, 1);
+    select(&mut g, 43);
     let other_job = g.snapshot();
+    assert_eq!(
+        other_job
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .profiles
+            .as_ref()
+            .unwrap()
+            .active,
+        43,
+        "the wrong-job fixture must actually switch jobs"
+    );
     book_start(&mut g, GUMBO);
     assert_eq!(g.snapshot(), other_job);
     // Malformed lengths never start a run.
@@ -225,9 +251,8 @@ fn recipe_book_cooks_a_learned_recipe_once() {
     assert_eq!(count(&g, GUMBO_ITEM), 0);
     movie::start(&mut g, 1000);
     movie::rounds(&mut g, 1000);
-    let win =
-        osfr_tools::cooking::payload_packet(movie::instance(&g), "FRServer_GameWon\t900\t0")
-            .unwrap();
+    let win = osfr_tools::cooking::payload_packet(movie::instance(&g), "FRServer_GameWon\t900\t0")
+        .unwrap();
     // Walking away mid-movie cannot complete the craft remotely.
     let at_station = g.snapshot().character.position;
     position(&mut g, [0.0; 3], 1_000_000);
@@ -241,7 +266,16 @@ fn recipe_book_cooks_a_learned_recipe_once() {
     }
     assert_eq!(count(&g, GUMBO_ITEM), 1);
     let won = g.snapshot();
-    assert_eq!(won.gameplay.as_ref().unwrap().cooking.as_ref().unwrap().completed, 1);
+    assert_eq!(
+        won.gameplay
+            .as_ref()
+            .unwrap()
+            .cooking
+            .as_ref()
+            .unwrap()
+            .completed,
+        1
+    );
     send(&mut g, &win, 1000);
     assert_eq!(g.snapshot(), won);
     // Ordinary exit restores the world; the recipe cannot be re-run without inputs.
