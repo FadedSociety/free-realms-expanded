@@ -1,8 +1,8 @@
 ---
 type: research-note
-task: T008 / F266 / F290 / F309 (integrates the D09 draft)
+task: T008 / F266 / F290 / F309 / F323 (integrates the D09 draft)
 updated: 2026-10-20
-status: implemented; F266 blockers fixed in F290 and the F290 review blockers fixed in F309; focused gates green; native two-client acceptance pending
+status: implemented; F266 blockers fixed in F290, F290 blockers in F309 and its review blockers in F323; focused gates green; native two-client acceptance pending
 ---
 
 # Jump Relay (Opcode 164)
@@ -35,12 +35,14 @@ every address is in `lab/working/ida/FreeRealms.exe.i64`.
   constructs the jump record (`008b3b70`), reads it, rejects a short/trailing
   body (the bounded reader's cursor must reach the end), looks up the actor by
   the 8-byte id (`sub_984960`), rejects a missing actor or the local player
-  (`[edi+0xc8]`), then applies the motion. At `0x0090e5f5` it tests
-  `state >> 2 & 1`; bit 2 set uses the packet velocity, bit 2 clear substitutes
-  0.0 (`0x0090e60e`). It also computes bit 1 (`state >> 1 & 1`, `0x0090e5ec`):
-  the apply path at `0x0090e614` is taken when bit 2 (`test al,al`) or bit 1
-  (`test cl,cl`) is set, and `0x0090e622` tests bit 0 (`state & 1`) to choose
-  between 0.0 and `sub_8B3180`.
+  (`[edi+0xc8]`), then applies the motion. At `0x0090e5f5` (`shr al,2`) and
+  `0x0090e5f8` (`and al,1`) it tests bit 2; `0x0090e5fe jz 0x0090e60e`: bit 2
+  set uses the packet velocity (`[esp+78h]`), bit 2 clear stores the `xmm0`
+  zeroed at `0x0090e5cc`. Bit 1 is `0x0090e5ec mov cl,dl`, `0x0090e5ee shr
+  cl,1`, `0x0090e5f2 and cl,1`; the apply path at `0x0090e614` is taken when
+  bit 2 (`test al,al`) or bit 1 (`test cl,cl`) is set. At `0x0090e622 test
+  dl,1; 0x0090e625 jz 0x0090e62f`: bit 0 **set** stores 0.0 (`0x0090e627`),
+  bit 0 **clear** calls `sub_8B3180` (`0x0090e62f`) for the derived value.
 - Sender `0092e670`: writes the local actor id into the record's `+8/+0xc`
   from the actor vtable, the character position `+0x10..+0x1c`, the direction
   `+0x20..+0x2c`, a state byte at `+0x30` (bit 0 from a norm compare, bit 2
@@ -82,10 +84,11 @@ u8 unknown, f32 vertical_velocity`.
 - Relay only to the sender's directed visible peers (nearby grid plus
   `PlayerRegistry::knows_character`); the sender never receives its own jump.
 - (R) A per-character relay budget of 10 relays/second with a burst of 4,
-  through the shared `net_policy::KeyedBuckets` limiter. Over budget the extra
-  164 is dropped silently; the accepted pose still fans out through opcode 125.
-  The key is forgotten when the character's session ends. A normal jump cadence
-  (about one per 0.5 s) is far below the budget.
+  through the shared `net_policy::KeyedBuckets` limiter, on the server's
+  monotonic wall clock. Over budget the extra 164 is dropped silently; the
+  accepted pose still fans out through opcode 125. The key is forgotten when
+  the character's session ends. A normal jump cadence (about one per 0.5 s) is
+  far below the budget.
 - The client's 50 ms sender gate (`0092e670`, `+0x868 = clock + 50`) is not a
   server boundary and is not replicated; the budget is.
 
@@ -106,14 +109,16 @@ u8 unknown, f32 vertical_velocity`.
   delivery hook.
 - `src/bin/osfr_gateway/delivery.rs`: `jump_fanout` applies the directed
   visibility rule and the per-character budget; `post_commit` queues the
-  broadcast and the relay only after a successful commit. F309 clocks the relay
-  budget from the dispatch's `now_ms` anchored at the session start, not from
-  the wall clock, so a slow host cannot refill the window mid-flood.
+  broadcast and the relay only after a successful commit. The budget uses the
+  server's monotonic wall clock (`Instant::now()`), the lead-accepted F290
+  behaviour; F309 briefly anchored it to the dispatch clock and F323 reverted
+  that unsigned clock change.
 - Tests: `src/bin/osfr_gateway/tests.rs` (real `dispatch_message`: accepted
   relay and decoded wire body, directed cap, no sender echo, flood cap, pose
   fanout while relays drop, normal-cadence recovery, refusal cases with an
-  unchanged pose, clamp, `[164, 125]` state/pose bundle, pre-Ready gate, and the
-  F309 `end_session` leave cleanup plus reconnect burst),
+  unchanged pose, clamp, `[164, 125]` state/pose bundle, pre-Ready gate, the
+  F309/F323 `end_session` leave cleanup, the saved-pose reconnect and the
+  wall-clock pin),
   `src/jump_relay.rs` (byte layout, budget), `tests/gateway.rs` (reset and a
   later application child), and `tests/app_fuzz.rs` (hostile 164 seed).
 
@@ -132,6 +137,6 @@ u8 unknown, f32 vertical_velocity`.
   both poses are validated and the final pose is what observers receive through
   the normal 125 fanout.
 - The state/unknown bytes are relayed opaque beyond the recovered bits (bit 2
-  velocity selector; bits 2/1 select the apply path and bit 0 the 0-vs-derived
-  value in `0090e470`).
+  velocity selector; bits 2/1 select the apply path; in `0090e470` bit 0 set
+  selects 0.0 and bit 0 clear selects the `sub_8B3180` value).
 

@@ -1298,8 +1298,8 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     );
     // T266: a soft-over-speed jump is corrected for the sender and still relays
     // the pose the server committed (the clamp target), not the client's P62.
-    // The sleep refills the shared account action budget (wall clock), not the
-    // relay budget, which follows the dispatch's `now_ms` (F309).
+    // The sleep refills the per-character relay budget (one token per 100 ms);
+    // opcode 125/164 movement is not part of the account action budget.
     std::thread::sleep(std::time::Duration::from_millis(120));
     sender
         .dispatch_message(
@@ -1334,7 +1334,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     );
     // T266: a finite velocity over the relay bound is clamped, not refused (a
     // refused body would end the session); the pose is still validated. The
-    // sleep refills the account action budget, not the dispatch-clock relay.
+    // sleep refills the per-character relay budget so the relay is not dropped.
     std::thread::sleep(std::time::Duration::from_millis(120));
     sender
         .dispatch_message(
@@ -1364,12 +1364,14 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             .vertical_velocity,
         osfr_tools::jump_relay::MAX_VERTICAL_SPEED
     );
-    // T266/F290/F309: a 164 flood from one character is capped by the relay
-    // budget, while every accepted pose still fans out through opcode 125. The
-    // relay budget is clocked from the dispatch's `now_ms`, so the burst is
-    // deterministic even when these ten dispatches take longer than 100 ms under
-    // load. The sleep only refills the shared account action budget.
-    std::thread::sleep(std::time::Duration::from_millis(400));
+    // T266/F290: a 164 flood from one character is capped by the per-character
+    // relay budget, while every accepted pose still fans out through opcode 125.
+    // The budget uses the server's monotonic wall clock (the lead-accepted F290
+    // behaviour), so the deterministic bound is the burst plus the tokens that
+    // can refill while this loop runs: no host load can flake it, and bypassing
+    // the limiter still fails it. The sleep refills the relay budget to full.
+    std::thread::sleep(std::time::Duration::from_millis(500));
+    let flood_started = std::time::Instant::now();
     for step in 0..10u64 {
         sender
             .dispatch_message(
@@ -1383,6 +1385,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             )
             .unwrap();
     }
+    let flood_seconds = flood_started.elapsed().as_secs_f64();
     let flood = super::f120_fishing_hour_reconnect::drain_replies(
         sessions.get_mut(&recipient_key).unwrap(),
         1_890,
@@ -1397,10 +1400,16 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             })
             .count()
     };
-    assert_eq!(
-        count(&[164, 0]),
-        osfr_tools::jump_relay::RELAY_BURST as usize,
-        "a 164 flood relays exactly the per-character burst on the dispatch clock"
+    let burst = osfr_tools::jump_relay::RELAY_BURST as usize;
+    let refilled = (flood_seconds * osfr_tools::jump_relay::RELAY_RATE_PER_SECOND).ceil() as usize;
+    assert!(
+        count(&[164, 0]) >= burst,
+        "the full relay burst always relays"
+    );
+    assert!(
+        count(&[164, 0]) <= burst + refilled,
+        "a 164 flood relays at most the burst plus the {refilled} tokens its \
+         {flood_seconds:.3}s could refill"
     );
     assert_eq!(count(&[125, 0]), 10, "every accepted pose still fans out");
     // A normal ~0.5 s jump cadence is never dropped.
@@ -1424,6 +1433,43 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         .len(),
         1,
         "a normal jump after the flood relays"
+    );
+    // F323 pins the signed budget clock: three jumps with the same dispatch
+    // time, 120 ms apart, relay on the server wall clock. The session-anchored
+    // dispatch clock F309 introduced refills zero tokens between them and drops
+    // the third. The bounded re-drain only covers reliable-sender timing.
+    std::thread::sleep(std::time::Duration::from_millis(120));
+    for iteration in 0..3u64 {
+        sender
+            .dispatch_message(
+                &jump(10.0 + iteration as f32 * 0.1),
+                &options,
+                2_100,
+                &mut world,
+                &mut membership,
+                &mut sessions,
+                None,
+            )
+            .unwrap();
+        std::thread::sleep(std::time::Duration::from_millis(120));
+    }
+    let mut relayed = Vec::new();
+    for attempt in 0..5u64 {
+        relayed.extend(jump_bodies(
+            super::f120_fishing_hour_reconnect::drain_replies(
+                sessions.get_mut(&recipient_key).unwrap(),
+                2_130 + attempt * 10,
+            ),
+        ));
+        if relayed.len() >= 3 {
+            break;
+        }
+    }
+    assert_eq!(
+        relayed.len(),
+        3,
+        "the wall clock refills 1.2 tokens per 120 ms while the dispatch clock \
+         only refills between dispatch times"
     );
     // The world-entry gate is shared with opcode 125: a jump before Ready is refused.
     let mut early = new_session(20);
@@ -1459,10 +1505,12 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
 
 /// F309: ending the owning session forgets the character's per-character relay
 /// budget. This charges `Security::jump_relays` through the real dispatch/commit
-/// path, then calls `Server::end_session`; a deleted or mis-keyed
-/// `forget_jump_relay` call leaves the key behind, so a reconnecting character
-/// inherits an exhausted budget and its jumps are silently dropped. The relay
-/// clock is the dispatch clock (`now_ms`), so the five-jump burst is deterministic.
+/// path, then calls `Server::end_session`. The `is_empty` assertion after the
+/// leave is the cleanup guard: a deleted or mis-keyed `forget_jump_relay` call
+/// leaves the character's key behind. The relay budget uses the server's
+/// monotonic wall clock (the lead-accepted F290 behaviour), so a stalled host
+/// may refill one token mid-burst; the reconnect jump is a smoke check on top of
+/// the empty-bucket guard, not a second proof of the cleanup.
 #[test]
 fn end_session_forgets_the_character_jump_relay_budget() {
     let scratch = test_support::Scratch::new("f309-jump-leave");
@@ -1581,7 +1629,9 @@ fn end_session_forgets_the_character_jump_relay_budget() {
         })
         .count()
     };
-    // Four jumps spend the burst; the fifth is over budget and drops only the relay.
+    // Four jumps spend the burst; the fifth is the over-budget probe. On the
+    // wall clock a stalled host may refill one token, so the range is
+    // timing-proof; a limiter bypass relays all five.
     for step in 0..5u64 {
         sender
             .dispatch_message(
@@ -1595,11 +1645,13 @@ fn end_session_forgets_the_character_jump_relay_budget() {
             )
             .unwrap();
     }
-    assert_eq!(
-        relays(&mut server, 1_050),
-        osfr_tools::jump_relay::RELAY_BURST as usize,
-        "the dispatch clock pins the burst: the fifth jump is over budget"
+    let relayed = relays(&mut server, 1_050);
+    assert!(
+        (osfr_tools::jump_relay::RELAY_BURST as usize..=5).contains(&relayed),
+        "the burst relays and the fifth jump is dropped ({relayed} of 5)"
     );
+    // `len` only proves one bucket was charged; `KeyedBuckets` exposes no keys
+    // (net_policy is lead-only), so the empty check after the leave is the guard.
     assert_eq!(server.world.security.lock().unwrap().jump_relays.len(), 1);
     // End the owning session: the leave path must forget the character's key.
     let sender_key = SessionKey {
@@ -1626,11 +1678,6 @@ fn end_session_forgets_the_character_jump_relay_budget() {
         None,
     )
     .unwrap();
-    assert_eq!(
-        reconnected.gateway.state().guid,
-        character,
-        "the reconnect loads the saved character"
-    );
     for (message, now) in [
         (login, 2_000u64),
         (wrap(&[13, 0]), 2_100),
@@ -1648,6 +1695,19 @@ fn end_session_forgets_the_character_jump_relay_budget() {
             )
             .unwrap();
     }
+    assert_eq!(
+        reconnected.gateway.state().guid,
+        character,
+        "the reconnect loads the saved character"
+    );
+    // The first jump's save captured the starting pose (step 0) and the later
+    // jumps were deferred by POSITION_SAVE_MS, so only the leave path's save
+    // puts the last committed pose (step 4) on disk.
+    assert_eq!(
+        reconnected.gateway.state().position[0],
+        start[0] + 4.0,
+        "the leave path saved the pose of the last committed jump"
+    );
     assert!(
         server
             .world

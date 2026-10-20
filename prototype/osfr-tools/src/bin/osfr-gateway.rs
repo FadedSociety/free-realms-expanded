@@ -508,7 +508,7 @@ struct ChatMember {
 struct Security {
     budgets: social_chat::ActionBudgets,
     combat: KeyedBuckets<u64>,
-    // (R) Per-character opcode-164 relay budget; over budget only the relay drops.
+    // (R) Per-character opcode-164 relay budget on the wall clock; extras drop only the relay.
     jump_relays: KeyedBuckets<u64>,
     log: Option<SecurityLog>,
 }
@@ -1672,7 +1672,7 @@ impl Session {
             now_ms,
         )?;
         if committed {
-            delivery::post_commit(self, sessions, world, broadcast, jump, now_ms)?;
+            delivery::post_commit(self, sessions, world, broadcast, jump)?;
         }
         Ok(())
     }
