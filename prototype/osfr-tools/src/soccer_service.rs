@@ -38,6 +38,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io;
+use std::sync::atomic::{AtomicI32, Ordering};
 
 use crate::minigame::{
     Activity, ActivityFinish, MinigameRuns, RunMode, RunOutcome, RunSpec, RunState,
@@ -68,6 +69,17 @@ pub const ENTRY_SKY: &str = "sky_wilds24.xml";
 pub const ENTRY_UNKNOWN: u8 = 1;
 /// R candidate geometry id.
 pub const ENTRY_GEOMETRY_ID: i32 = 107;
+/// (R) Server-owned scene/instance id for the soccer arena. The candidate frame
+/// used `0`, which is also the public overworld instance id, so a match shared
+/// public-world presence and proximity. The client reader `0x008e4ae0` reads
+/// this field as the 4-byte i32 after the tutorial and unknown bytes; the value
+/// itself is server policy, not a recovered client fact.
+pub const SCENE_ID: i32 = 47_000_000;
+/// (R) First lifecycle instance id. A fresh id per match keeps a replayed `39/*`
+/// packet from an earlier match from matching a later run.
+pub const FIRST_INSTANCE_ID: i32 = 47_000_001;
+/// Process-wide lifecycle id source: match runs outlive one `SoccerService`.
+static NEXT_INSTANCE_ID: AtomicI32 = AtomicI32::new(FIRST_INSTANCE_ID);
 /// R candidate server registration marker.
 pub const REGISTER_MARKER: [u8; 2] = [0, 1];
 /// R candidate possession flag.
@@ -92,7 +104,6 @@ struct ParticipantRun {
     runs: MinigameRuns,
     instance_id: i32,
     team: u32,
-    rewards: RewardState,
     grant: RewardGrant,
 }
 
@@ -468,7 +479,6 @@ pub struct SoccerService {
     sessions: BTreeMap<u64, SessionEntry>,
     runs: BTreeMap<u64, ParticipantRun>,
     bots: BTreeSet<u64>,
-    next_instance_id: i32,
     bots_filled: bool,
     cancelled: bool,
     /// R relay bookkeeping: last holder reported on the service wire (`0` none).
@@ -486,7 +496,6 @@ impl SoccerService {
             sessions: BTreeMap::new(),
             runs: BTreeMap::new(),
             bots: BTreeSet::new(),
-            next_instance_id: 1,
             bots_filled: false,
             cancelled: false,
             last_holder: NO_HOLDER,
@@ -568,10 +577,6 @@ impl SoccerService {
         self.runs.get(&session).map(|run| run.instance_id)
     }
 
-    pub fn reward_state(&self, session: u64) -> Option<&RewardState> {
-        self.runs.get(&session).map(|run| &run.rewards)
-    }
-
     /// Server-side roster entry. Emits R registration and team assignment
     /// relays for the joining session. Duplicate joins, an
     /// out-of-range team and a taken slot are refused before any mutation.
@@ -646,12 +651,13 @@ impl SoccerService {
     /// Offer the type-12 Soccer run through the shared lifecycle. `game_id`,
     /// `encounter_id`, the 39/16 defaults and the reward grant are caller data
     /// or R policy; the native soccer completion/reward exchange is unknown.
+    /// The run id is process-wide unique (R), so a stale lifecycle packet from
+    /// an earlier match can never address a later run.
     pub fn offer_minigame(
         &mut self,
         session: u64,
         game_id: i32,
         encounter_id: i32,
-        rewards: RewardState,
         grant: RewardGrant,
     ) -> io::Result<RunOutcome> {
         if self.cancelled
@@ -663,10 +669,9 @@ impl SoccerService {
         {
             return Err(invalid("soccer minigame offer is invalid"));
         }
-        let instance_id = self.next_instance_id;
-        let next_instance_id = instance_id
-            .checked_add(1)
-            .ok_or_else(|| invalid("soccer minigame instance counter exhausted"))?;
+        let instance_id = NEXT_INSTANCE_ID
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+            .map_err(|_| invalid("soccer minigame instance counter exhausted"))?;
         let mut runs = MinigameRuns::new(instance_id)?;
         let offered = runs.offer(RunSpec::empty(
             game_id,
@@ -680,14 +685,12 @@ impl SoccerService {
             return Err(invalid("soccer minigame offer was refused"));
         }
         let team = self.sessions[&session].team;
-        self.next_instance_id = next_instance_id;
         self.runs.insert(
             session,
             ParticipantRun {
                 runs,
                 instance_id,
                 team,
-                rewards,
                 grant,
             },
         );
@@ -744,10 +747,12 @@ impl SoccerService {
         }
     }
 
-    /// Settle the terminal score through MinigameRuns and rewards. The
-    /// configured win grant, per-team outcome mapping and tie-as-loss rule are
-    /// R; no historical Soccer reward amount is known.
-    pub fn finish_minigame(&mut self, session: u64) -> io::Result<RunOutcome> {
+    /// Settle the terminal score through MinigameRuns and rewards. The grant is
+    /// applied to the caller's live inventory and profiles, never to a snapshot
+    /// taken at entry, so a claim or trade made during the match survives the
+    /// payout. The configured win grant, per-team outcome mapping and
+    /// tie-as-loss rule are R; no historical Soccer reward amount is known.
+    pub fn finish_minigame(&mut self, session: u64, live: &RewardState) -> io::Result<RunOutcome> {
         let run = self
             .runs
             .get_mut(&session)
@@ -759,14 +764,11 @@ impl SoccerService {
             authority: &self.authority,
             team: run.team,
         };
-        let settlement = self.authority.outcome().and_then(|outcome| {
-            (outcome.winner == Some(run.team)).then_some((&run.rewards, &run.grant))
-        });
-        let outcome = run.runs.finish(run.instance_id, &activity, settlement)?;
-        if let Some(next) = outcome.reward_state.as_ref() {
-            run.rewards = next.clone();
-        }
-        Ok(outcome)
+        let settlement = self
+            .authority
+            .outcome()
+            .and_then(|outcome| (outcome.winner == Some(run.team)).then_some((live, &run.grant)));
+        run.runs.finish(run.instance_id, &activity, settlement)
     }
 
     /// Session departure. The roster entry is removed; if the leaver held the
@@ -1006,7 +1008,9 @@ fn unit(value: [f32; 3]) -> io::Result<[f32; 3]> {
 }
 
 /// Encode a candidate opcode-31 `ClientBeginZoning` frame. The native layout
-/// is shared; scene/config values below are R candidates, not client facts.
+/// is shared (reader `0x008e4ae0`); the scene/config values below are R
+/// candidates, not client facts. `SCENE_ID` keeps a match out of the public
+/// instance that zone `0` names.
 pub fn entry_scene(position: [f32; 4], rotation: [f32; 4]) -> io::Result<ZoneTransition> {
     let scene = ZoneTransition {
         envelope_flag: ENTRY_FLAG,
@@ -1017,7 +1021,7 @@ pub fn entry_scene(position: [f32; 4], rotation: [f32; 4]) -> io::Result<ZoneTra
         sky: ENTRY_SKY.to_string(),
         tutorial: false,
         unknown: ENTRY_UNKNOWN,
-        id: 0,
+        id: SCENE_ID,
         update_radius: 0.0,
         geometry_id: ENTRY_GEOMETRY_ID,
         override_update_radius: true,

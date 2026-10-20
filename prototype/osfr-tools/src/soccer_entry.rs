@@ -14,9 +14,9 @@
 //!
 //! Everything in this module is the gateway adapter around those modules:
 //! content admission, roster setup, packet wrapping, auto-resume/second-half
-//! transitions, and committing the shared result's reward state. The original
-//! soccer launch/result exchange is not recovered, so the shared lifecycle
-//! remains a reconstructed compatibility adapter (R).
+//! transitions, and settling the shared result's grant on the caller's live
+//! reward state. The original soccer launch/result exchange is not recovered,
+//! so the shared lifecycle remains a reconstructed compatibility adapter (R).
 
 use crate::activity_portal::Activity;
 use crate::character_store::CharacterState;
@@ -266,8 +266,13 @@ pub struct Session {
     human: u64,
     pending: Vec<ServiceEvent>,
     offer: Vec<Vec<u8>>,
+    /// The server-owned arena scene this match entered; the gateway stages it
+    /// and reports it as the runtime zone while the session lives.
+    scene: ZoneTransition,
     sequence: u64,
     last_tick_ms: Option<u64>,
+    /// True once the terminal score was settled; a settled match never pays
+    /// again, and the flag is session-only like the match itself.
     settled: bool,
     return_zone: u32,
     return_position: [f32; 3],
@@ -278,31 +283,35 @@ pub struct Session {
 pub struct LifecycleResult {
     pub replies: Vec<Vec<u8>>,
     pub state: Option<RunState>,
-    pub reward_state: Option<RewardState>,
 }
 
+/// One tick's staged output. `settlement_due` means full time was reached and
+/// the caller must call [`Session::settle`] with its live reward state.
 #[derive(Default)]
 pub struct TickResult {
     pub replies: Vec<Vec<u8>>,
     pub reward_state: Option<RewardState>,
     pub changed: bool,
     pub finished: bool,
+    pub settlement_due: bool,
 }
 
 impl Session {
     /// Join the authenticated player, fill the solo roster with passive bots,
     /// and create the shared type-12 offer. The caller stages the scene change
     /// and sends [`Self::loaded_replies`] after the client's Loaded packet.
+    /// No reward snapshot is taken here: the payout reads the caller's live
+    /// inventory when the match settles.
     pub fn begin(
         content: &Content,
         activity_id: u32,
         character: &CharacterState,
-        rewards: RewardState,
     ) -> io::Result<Self> {
         let game = content
             .game(activity_id)
             .cloned()
             .ok_or_else(|| invalid("soccer activity is not configured"))?;
+        let scene = content.entry_scene()?;
         let mut service = SoccerService::new(content.config(), content.policy())?;
         let mut pending = service.join(character.guid, 0, 0)?;
         pending.extend(service.fill_bots_for_solo(character.guid)?);
@@ -310,7 +319,6 @@ impl Session {
             character.guid,
             game.id as i32,
             game.encounter_id,
-            rewards,
             content.grant(&game, character.guid),
         )?;
         if !offered.accepted {
@@ -322,6 +330,7 @@ impl Session {
             human: character.guid,
             pending,
             offer: offered.replies,
+            scene,
             sequence: 0,
             last_tick_ms: None,
             settled: false,
@@ -354,16 +363,24 @@ impl Session {
         self.service.run_state(self.human)
     }
 
-    pub fn reward_state(&self) -> Option<&RewardState> {
-        self.service.reward_state(self.human)
-    }
-
-    pub fn settled(&self) -> bool {
-        self.settled
+    /// The server-owned arena scene the gateway stages on entry.
+    pub fn scene(&self) -> &ZoneTransition {
+        &self.scene
     }
 
     pub fn return_location(&self) -> (u32, [f32; 3], [f32; 3]) {
         (self.return_zone, self.return_position, self.return_rotation)
+    }
+
+    /// L012: the character back at the pose it left for the match. A match belongs to one
+    /// connection, so saves and reconnects use this pose, never the arena scene.
+    pub fn return_character(&self, character: &CharacterState) -> CharacterState {
+        CharacterState {
+            zone_id: self.return_zone,
+            position: self.return_position,
+            rotation: self.return_rotation,
+            ..character.clone()
+        }
     }
 
     /// The shared `39/*`/`41/109`/`26/42` controls. A pre-win quit cancels the
@@ -379,7 +396,6 @@ impl Session {
         let mut result = LifecycleResult {
             replies: change.run.replies,
             state: change.run.state,
-            reward_state: change.run.reward_state,
         };
         result
             .replies
@@ -419,17 +435,17 @@ impl Session {
         Ok(events.iter().map(ServiceEvent::inner).collect())
     }
 
-    /// Advance the authoritative clock and settle once at full time. Restart
-    /// and interval transitions are automatic (R): the client has no recovered
-    /// resume packet, and the shared service exposes those transitions only as
-    /// server calls.
-    pub fn tick(&mut self, guid: u64, now_ms: u64) -> io::Result<TickResult> {
+    /// Advance the authoritative clock. Restart and interval transitions are
+    /// automatic (R): the client has no recovered resume packet, and the shared
+    /// service exposes those transitions only as server calls. Full time only
+    /// reports `settlement_due`; the caller settles on its live reward state via
+    /// [`Self::settle`] so no entry snapshot can replace later changes.
+    pub fn tick(&mut self, now_ms: u64) -> io::Result<TickResult> {
         let mut result = TickResult::default();
         let mut service = self.service.clone();
         if service.cancelled() {
             return Ok(result);
         }
-        let mut settled = self.settled;
         let mut last_tick_ms = self.last_tick_ms;
         if service.phase() == MatchPhase::Running {
             let previous = self.last_tick_ms.unwrap_or(now_ms);
@@ -458,22 +474,34 @@ impl Session {
                     .extend(events.iter().map(ServiceEvent::inner));
                 result.changed |= !events.is_empty();
             }
-            MatchPhase::Finished if !settled => {
-                let outcome = service.finish_minigame(guid)?;
-                if outcome.accepted {
-                    settled = true;
-                    result.replies.extend(outcome.replies);
-                    result.replies.extend(outcome.reward_packets);
-                    result.reward_state = outcome.reward_state;
-                    result.changed = true;
-                    result.finished = true;
-                }
+            MatchPhase::Finished if !self.settled => {
+                result.settlement_due = true;
             }
             _ => {}
         }
         self.service = service;
-        self.settled = settled;
         self.last_tick_ms = last_tick_ms;
+        Ok(result)
+    }
+
+    /// Settle the terminal score on the caller's live inventory and profiles.
+    ///
+    /// The win grant is applied on top of those live values, never to a
+    /// snapshot captured at entry: a claim or trade made during the match stays
+    /// in place. A loss pays nothing; a duplicate call is inert.
+    pub fn settle(&mut self, guid: u64, live: &RewardState) -> io::Result<TickResult> {
+        let mut result = TickResult::default();
+        let mut service = self.service.clone();
+        let outcome = service.finish_minigame(guid, live)?;
+        if outcome.accepted {
+            self.settled = true;
+            result.replies.extend(outcome.replies);
+            result.replies.extend(outcome.reward_packets);
+            result.reward_state = outcome.reward_state;
+            result.changed = true;
+            result.finished = true;
+        }
+        self.service = service;
         Ok(result)
     }
 }

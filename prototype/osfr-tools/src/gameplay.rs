@@ -1497,6 +1497,16 @@ impl Gameplay {
         self.fishing.reset_all();
     }
 
+    /// L012: saves carry the pre-match pose while a soccer match is active.
+    pub fn soccer_return(&self, character: &CharacterState) -> Option<CharacterState> {
+        Some(self.soccer.as_ref()?.return_character(character))
+    }
+
+    /// L012: a reconnect drops the match (no result, no reward) and returns to that pose.
+    pub fn abandon_soccer_for_reconnect(&mut self, c: &CharacterState) -> Option<CharacterState> {
+        Some(self.soccer.take()?.return_character(c))
+    }
+
     /// Race clocks belong to one connection. A reconnect returns to the saved
     /// world pose rather than resuming a race against a restarted clock.
     pub fn abandon_kart_for_reconnect(&mut self) -> Option<CharacterState> {
@@ -1599,6 +1609,21 @@ impl Gameplay {
     }
 
     pub fn current_zone(&self) -> Option<ZoneTransition> {
+        if let Some(soccer) = self.soccer.as_ref() {
+            // (R) A match owns its own arena scene; the public overworld zone
+            // must not stand in for it, or other players share its instance.
+            let scene = soccer.scene();
+            let zone_id = u32::try_from(scene.id).ok()?;
+            return Some(ZoneTransition {
+                zone_id,
+                name: scene.scene.clone(),
+                sky: scene.sky.clone(),
+                geometry_id: scene.geometry_id,
+                position: scene.position[..3].try_into().unwrap(),
+                rotation: scene.rotation[..3].try_into().unwrap(),
+                tutorial: scene.tutorial,
+            });
+        }
         if let Some(scene) = self.kart_entry.as_ref().and_then(|k| k.scene()) {
             return Some(ZoneTransition {
                 zone_id: scene.id as u32,
@@ -1825,19 +1850,26 @@ impl Gameplay {
     fn tick_world(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         if self.soccer.is_some() {
             let mut staged = self.clone();
-            let result = staged
-                .soccer
-                .as_mut()
-                .unwrap()
-                .tick(character.guid, now_ms)?;
+            let result = staged.soccer.as_mut().unwrap().tick(now_ms)?;
             // The match is session-local; periodic clock ticks must not force
             // a character save. Only an adopted reward marks a persisted change.
             let mut out = Outcome {
                 replies: result.replies,
                 ..Outcome::default()
             };
-            if let Some(rewards) = result.reward_state {
-                staged.adopt_reward_state(rewards, &mut out)?;
+            if result.settlement_due {
+                // Settle on the live bag and profiles, never the entry snapshot:
+                // a claim or trade made during the match must survive the payout.
+                let live = staged.reward_snapshot();
+                let settled = staged
+                    .soccer
+                    .as_mut()
+                    .unwrap()
+                    .settle(character.guid, &live)?;
+                out.replies.extend(settled.replies);
+                if let Some(rewards) = settled.reward_state {
+                    staged.adopt_reward_state(rewards, &mut out)?;
+                }
             }
             *self = staged;
             return Ok(out);
@@ -3356,19 +3388,10 @@ impl Gameplay {
                 .push(chat::system("Soccer is not available right now."));
             return Ok(());
         };
-        let scene = match content.entry_scene() {
-            Ok(scene) => scene,
-            Err(_) => {
-                out.replies
-                    .push(chat::system("Soccer is not available right now."));
-                return Ok(());
-            }
-        };
-        let rewards = self.reward_snapshot();
-        match crate::soccer_entry::Session::begin(&content, activity, character, rewards) {
+        match crate::soccer_entry::Session::begin(&content, activity, character) {
             Ok(session) => {
+                out.scene_zoning = Some(session.scene().clone());
                 self.soccer = Some(session);
-                out.scene_zoning = Some(scene);
                 out.changed = true;
             }
             Err(_) => out

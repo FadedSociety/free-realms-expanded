@@ -21,7 +21,7 @@ use osfr_tools::zone_transition;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use soccer_service::{
-    AdapterPolicy, R_ENTRY_POSITION, R_ENTRY_ROTATION, REGISTER_MARKER, ServiceEvent,
+    AdapterPolicy, R_ENTRY_POSITION, R_ENTRY_ROTATION, REGISTER_MARKER, SCENE_ID, ServiceEvent,
     SoccerService, emit_packet, entry_frame,
 };
 use std::{
@@ -161,7 +161,7 @@ fn minigame_request(sub: u8, instance: i32) -> Vec<u8> {
 
 fn offer_and_start(service: &mut SoccerService, session: u64) -> Vec<ServiceEvent> {
     let offer = service
-        .offer_minigame(session, 1201, 1, reward_state(), reward_grant(session, 0))
+        .offer_minigame(session, 1201, 1, reward_grant(session, 0))
         .expect("offer minigame");
     let instance = service.instance_id(session).expect("instance allocated");
     assert_eq!(offer.state, Some(RunState::Offered));
@@ -270,7 +270,11 @@ fn reconstructed_entry_frame_round_trips_its_candidate_values() {
     assert_eq!(packet.sky, "sky_wilds24.xml");
     assert!(!packet.tutorial);
     assert_eq!(packet.unknown, 1);
-    assert_eq!(packet.id, 0);
+    assert_eq!(packet.id, SCENE_ID);
+    assert_ne!(
+        packet.id, 0,
+        "the arena is not the public overworld instance"
+    );
     assert_eq!(packet.update_radius, 0.0);
     assert_eq!(packet.geometry_id, 107);
     assert!(packet.override_update_radius);
@@ -615,7 +619,7 @@ fn solo_bots_match_runs_through_shared_lifecycle_to_one_win_payment() {
 
     let initial = reward_state();
     let offered = service
-        .offer_minigame(KICKER, 1201, 1, initial.clone(), reward_grant(KICKER, 1))
+        .offer_minigame(KICKER, 1201, 1, reward_grant(KICKER, 1))
         .expect("offer Soccer lifecycle");
     assert_eq!(offered.state, Some(RunState::Offered));
     let instance = service.instance_id(KICKER).expect("run id");
@@ -680,7 +684,7 @@ fn solo_bots_match_runs_through_shared_lifecycle_to_one_win_payment() {
     assert_eq!(service.outcome().unwrap().winner, Some(0));
 
     let result = service
-        .finish_minigame(KICKER)
+        .finish_minigame(KICKER, &initial)
         .expect("settle generic result");
     assert_eq!(result.state, Some(RunState::Won));
     assert!(!result.replies.is_empty(), "generic result packets exist");
@@ -696,31 +700,13 @@ fn solo_bots_match_runs_through_shared_lifecycle_to_one_win_payment() {
         paid.applied_grant_keys
             .contains(&format!("minigame-run:{instance}"))
     );
-    assert_eq!(
-        service
-            .reward_state(KICKER)
-            .unwrap()
-            .inventory
-            .state()
-            .coins,
-        1
-    );
 
     let duplicate = service
-        .finish_minigame(KICKER)
+        .finish_minigame(KICKER, &initial)
         .expect("duplicate result attempt");
     assert!(!duplicate.accepted);
     assert!(duplicate.reward_packets.is_empty());
     assert!(duplicate.reward_state.is_none());
-    assert_eq!(
-        service
-            .reward_state(KICKER)
-            .unwrap()
-            .inventory
-            .state()
-            .coins,
-        1
-    );
     assert_eq!(
         initial.inventory.state().coins,
         0,
@@ -737,7 +723,7 @@ fn disconnect_mid_match_cancels_run_and_never_pays() {
         .expect("fill solo roster");
     let initial = reward_state();
     service
-        .offer_minigame(KICKER, 1201, 1, initial.clone(), reward_grant(KICKER, 1))
+        .offer_minigame(KICKER, 1201, 1, reward_grant(KICKER, 1))
         .expect("offer");
     let instance = service.instance_id(KICKER).unwrap();
     service
@@ -756,7 +742,7 @@ fn disconnect_mid_match_cancels_run_and_never_pays() {
     assert_eq!(initial.inventory.state().coins, 0);
     assert!(initial.applied_grant_keys.is_empty());
     let result = service
-        .finish_minigame(KICKER)
+        .finish_minigame(KICKER, &initial)
         .expect("cancelled run cannot settle");
     assert!(!result.accepted);
     assert!(result.reward_packets.is_empty());
@@ -998,7 +984,9 @@ fn full_match_finishes_with_a_missing_reward_and_no_result_body() {
         Evidence::Missing,
         "no native reward table is established"
     );
-    let result = service.finish_minigame(KICKER).expect("generic result");
+    let result = service
+        .finish_minigame(KICKER, &reward_state())
+        .expect("generic result");
     assert_eq!(result.state, Some(RunState::Lost));
     assert!(!result.replies.is_empty());
     assert!(result.reward_packets.is_empty());

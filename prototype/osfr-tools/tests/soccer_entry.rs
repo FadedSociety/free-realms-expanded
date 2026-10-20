@@ -12,10 +12,14 @@ use osfr_tools::{
     gameplay::Gameplay,
     gateway::{Gateway, GatewayOutcome},
     progression_extras,
+    rewards::{ItemGrant, RewardDisplay, RewardGrant},
     soccer::{self, SoccerPacket},
+    soccer_service::FIRST_INSTANCE_ID,
+    world::{World, WorldPose},
 };
 use serde_json::json;
 use std::{
+    collections::BTreeMap,
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -24,6 +28,11 @@ use std::{
 const GUID: u64 = 0x0000_0010_0080_06b2;
 const SOCCER_ACTIVITY: u32 = 43;
 static NEXT: AtomicU64 = AtomicU64::new(0);
+/// Trusted server claim issued to this session while a match runs.
+const CLAIM: u64 = 0x0f26_0000_0000_0001;
+const CLAIM_TRACKER: u32 = 0xBEEF;
+const CLAIM_COINS: u32 = 25;
+const CLAIM_ITEMS: u32 = 3;
 
 fn source_content() -> PathBuf {
     std::env::var_os("OSFR_SOCCER_CONTENT")
@@ -443,34 +452,33 @@ fn gateway_inner(out: &GatewayOutcome) -> Vec<Vec<u8>> {
         .collect()
 }
 
-/// Login, play the short paid match through the activity portal and shoot until
-/// the server settles a win. The win pays 50 job XP from `Gameplay::tick`, the
-/// tick-only path the achievement repair covers.
-fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Vec<u8>>, u64) {
-    fs::write(
-        fixture.0.join("soccer.json"),
-        soccer_content_with_reward(50),
-    )
-    .unwrap();
+fn reference_dir() -> PathBuf {
+    std::env::var_os("OSFR_GATEWAY_REFERENCE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../lab/references/rust-gateway-reference")
+        })
+}
+
+fn client_version(reference: &Path) -> String {
+    serde_json::from_slice::<serde_json::Value>(&fs::read(reference.join("manifest.json")).unwrap())
+        .unwrap()["client_version"]
+        .as_str()
+        .unwrap()
+        .to_owned()
+}
+
+/// Login, world entry and world load. The next portal Play opens soccer.
+fn enter_world(fixture: &Fixture, xp: u32, ticket: &str) -> Gateway {
     let mut state = Gameplay::load(&fixture.0, None).unwrap().state();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.active = 1;
     profiles.unlocked.insert(1);
     profiles.experience.insert(1, xp);
 
-    let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/rust-gateway-reference")
-        });
-    let version = serde_json::from_slice::<serde_json::Value>(
-        &fs::read(reference.join("manifest.json")).unwrap(),
-    )
-    .unwrap()["client_version"]
-        .as_str()
-        .unwrap()
-        .to_owned();
+    let reference = reference_dir();
+    let version = client_version(&reference);
     let character = fixture.character();
     let mut gateway =
         Gateway::load_gameplay(&reference, character.clone(), &fixture.0, Some(state)).unwrap();
@@ -487,20 +495,28 @@ fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Ve
     gateway.handle_at(&login, 0).unwrap();
     gateway_send(&mut gateway, &13u16.to_le_bytes(), 100);
     gateway_send(&mut gateway, &10u16.to_le_bytes(), 200);
+    gateway
+}
 
-    let played = gateway_send(&mut gateway, &play(SOCCER_ACTIVITY), 1_000);
+/// Portal Play through Loaded: returns the offered lifecycle instance id and
+/// the Loaded time.
+fn enter_match(gateway: &mut Gateway, at: u64) -> (i32, u64) {
+    let played = gateway_send(gateway, &play(SOCCER_ACTIVITY), at);
     assert!(played.began_zoning, "Play zones into the soccer scene");
-    gateway_send(&mut gateway, &13u16.to_le_bytes(), 1_100);
-    let loaded = gateway_send(&mut gateway, &10u16.to_le_bytes(), 1_200);
-    let instance = offer_instance(&gateway_inner(&loaded));
+    gateway_send(gateway, &13u16.to_le_bytes(), at + 100);
+    let loaded = gateway_send(gateway, &10u16.to_le_bytes(), at + 200);
+    (offer_instance(&gateway_inner(&loaded)), at + 200)
+}
 
-    gateway_send(&mut gateway, &lifecycle(5, instance), 1_300);
+/// Shoot until the server settles the win. Returns the inner replies and the
+/// time of the settling tick.
+fn settle_win(gateway: &mut Gateway, at: u64) -> (Vec<Vec<u8>>, u64) {
     let guid = gateway.state().guid;
-    gateway_send(&mut gateway, &position(guid, [0.0, 0.0, 0.0]), 1_300);
-    gateway.tick_at(1_450).unwrap();
-    gateway_send(&mut gateway, &shot(guid), 1_450);
+    gateway_send(gateway, &position(guid, [0.0, 0.0, 0.0]), at);
+    gateway.tick_at(at + 150).unwrap();
+    gateway_send(gateway, &shot(guid), at + 150);
 
-    let mut now = 1_450;
+    let mut now = at + 150;
     let mut packets = Vec::new();
     let mut won = false;
     for _ in 0..80 {
@@ -519,6 +535,90 @@ fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Ve
         }
     }
     assert!(won, "the server-scored goal settles as a win");
+    (packets, now)
+}
+
+fn coins(gateway: &Gateway) -> u32 {
+    gateway
+        .snapshot()
+        .gameplay
+        .expect("gameplay")
+        .inventory
+        .coins
+}
+
+fn item_count(gateway: &Gateway, definition_id: i32) -> u32 {
+    gateway
+        .snapshot()
+        .gameplay
+        .expect("gameplay")
+        .inventory
+        .items
+        .iter()
+        .filter(|item| item.definition_id == definition_id)
+        .map(|item| item.count)
+        .sum()
+}
+
+fn claimed(gateway: &Gateway) -> Vec<u64> {
+    gateway
+        .snapshot()
+        .gameplay
+        .expect("gameplay")
+        .progression_extras
+        .map(|state| state.claimed_ids.into_iter().collect())
+        .unwrap_or_default()
+}
+
+/// First definition of the private opening inventory fixture; the claim grants
+/// that real catalogue item so the bag diff is observable.
+fn fixture_definition(fixture: &Fixture) -> i32 {
+    let bytes = fs::read(fixture.0.join("inventory.json")).unwrap();
+    let content: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    i32::try_from(content["definitions"][0]["id"].as_i64().unwrap()).unwrap()
+}
+
+fn claim_grant(definition_id: i32) -> RewardGrant {
+    RewardGrant {
+        coins: CLAIM_COINS,
+        items: vec![ItemGrant {
+            definition_id,
+            count: CLAIM_ITEMS,
+        }],
+        job_xp: BTreeMap::new(),
+        display: RewardDisplay {
+            source_guid: 0,
+            player_guid: GUID,
+            reward_kind: 0,
+            icon_id: 0,
+            name_id: 0,
+            rows: Vec::new(),
+        },
+    }
+}
+
+/// The 108/4 result row: tracker u32 then the success byte.
+fn claim_reply(replies: &[Vec<u8>]) -> &[u8] {
+    replies
+        .iter()
+        .find(|reply| reply.starts_with(&[108, 0, 4, 0]))
+        .map(Vec::as_slice)
+        .expect("claim result packet")
+}
+
+/// Login, play the short paid match through the activity portal and shoot until
+/// the server settles a win. The win pays 50 job XP from `Gameplay::tick`, the
+/// tick-only path the achievement repair covers.
+fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Vec<u8>>, u64) {
+    fs::write(
+        fixture.0.join("soccer.json"),
+        soccer_content_with_reward(50),
+    )
+    .unwrap();
+    let mut gateway = enter_world(fixture, xp, ticket);
+    let (instance, loaded_at) = enter_match(&mut gateway, 1_000);
+    gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
+    let (packets, now) = settle_win(&mut gateway, loaded_at + 100);
     (gateway, packets, now)
 }
 
@@ -631,5 +731,275 @@ fn progress_only_tick_reward_does_not_emit_achievement_progress() {
     assert!(
         (1_800..1_900).contains(&xp),
         "the win must move the rank counter without crossing level 20: {xp}"
+    );
+}
+
+/// T021 review (F226): the win payout used to replace the bag with the entry
+/// snapshot, so a trusted claim redeemed mid-match was wiped. The settlement
+/// now applies its grant on the live wallet and bag.
+#[test]
+fn a_claim_made_during_a_match_survives_the_payout() {
+    let fixture = Fixture::new();
+    let definition = fixture_definition(&fixture);
+    let mut gateway = enter_world(&fixture, 0, "soccer-claim-during-match");
+    let (instance, loaded_at) = enter_match(&mut gateway, 1_000);
+    gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
+
+    let coins_before = coins(&gateway);
+    let items_before = item_count(&gateway, definition);
+    gateway.issue_claim(CLAIM, claim_grant(definition)).unwrap();
+    let claimed_out = gateway_send(
+        &mut gateway,
+        &progression_extras::claim_request(CLAIM_TRACKER, &[CLAIM]).unwrap(),
+        loaded_at + 200,
+    );
+    let claimed_replies = gateway_inner(&claimed_out);
+    let reply = claim_reply(&claimed_replies);
+    assert_eq!(&reply[4..8], &CLAIM_TRACKER.to_le_bytes());
+    assert_eq!(reply[8], 1, "the trusted claim is paid: {reply:?}");
+    assert_eq!(coins(&gateway), coins_before + CLAIM_COINS);
+    assert_eq!(item_count(&gateway, definition), items_before + CLAIM_ITEMS);
+    assert_eq!(claimed(&gateway), vec![CLAIM]);
+
+    let (_, now) = settle_win(&mut gateway, loaded_at + 300);
+    assert_eq!(
+        coins(&gateway),
+        coins_before + CLAIM_COINS + 10,
+        "the win grant lands on the live wallet, not the entry snapshot"
+    );
+    assert_eq!(
+        item_count(&gateway, definition),
+        items_before + CLAIM_ITEMS,
+        "the claim's item survives the payout"
+    );
+    assert_eq!(
+        claimed(&gateway),
+        vec![CLAIM],
+        "the claim ledger survives the payout"
+    );
+
+    let after = gateway_inner(&gateway.tick_at(now + 250).unwrap());
+    assert!(
+        after.is_empty(),
+        "a settled match does not pay twice: {after:?}"
+    );
+    assert_eq!(coins(&gateway), coins_before + CLAIM_COINS + 10);
+}
+
+/// A claim request that names no queued claim is refused without touching the
+/// wallet, the bag, the ledger or the running match.
+#[test]
+fn a_refused_claim_during_a_match_changes_nothing() {
+    let fixture = Fixture::new();
+    let mut gateway = enter_world(&fixture, 0, "soccer-refused-claim");
+    let (instance, loaded_at) = enter_match(&mut gateway, 1_000);
+    gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
+    let coins_before = coins(&gateway);
+
+    let before = gateway.snapshot();
+    let refused = gateway_send(
+        &mut gateway,
+        &progression_extras::claim_request(0x1111, &[CLAIM]).unwrap(),
+        loaded_at + 200,
+    );
+    let refused_replies = gateway_inner(&refused);
+    let reply = claim_reply(&refused_replies);
+    assert_eq!(&reply[4..8], &0x1111u32.to_le_bytes());
+    assert_eq!(reply[8], 0, "an unqueued claim id is refused: {reply:?}");
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a refused claim changes nothing"
+    );
+    assert_eq!(coins(&gateway), coins_before);
+    assert!(claimed(&gateway).is_empty(), "no claim was recorded");
+
+    // The refusal consumed neither the match nor its single payout.
+    settle_win(&mut gateway, loaded_at + 300);
+    assert_eq!(coins(&gateway), coins_before + 10);
+}
+
+/// T021 review (F226): each match used a fresh service whose lifecycle counter
+/// started at 1, so a replayed quit from match A cancelled match B.
+#[test]
+fn consecutive_matches_get_fresh_instance_ids_and_ignore_stale_lifecycle_packets() {
+    let fixture = Fixture::new();
+    let mut gateway = enter_world(&fixture, 0, "soccer-two-matches");
+    let coins_before = coins(&gateway);
+
+    let (first, first_loaded) = enter_match(&mut gateway, 1_000);
+    gateway_send(&mut gateway, &lifecycle(5, first), first_loaded + 100);
+    let quit = gateway_send(&mut gateway, &lifecycle(6, first), first_loaded + 200);
+    let quit_replies = gateway_inner(&quit);
+    assert!(
+        quit_replies
+            .iter()
+            .any(|reply| reply.starts_with(&[39, 0, 19])),
+        "the first quit removes its run: {quit_replies:?}"
+    );
+    assert!(quit.began_zoning, "quitting returns to the world");
+
+    // The client loads the return scene before it can use the portal again.
+    gateway_send(&mut gateway, &13u16.to_le_bytes(), first_loaded + 300);
+    gateway_send(&mut gateway, &10u16.to_le_bytes(), first_loaded + 400);
+    let (second, second_loaded) = enter_match(&mut gateway, first_loaded + 500);
+    assert_ne!(
+        second, first,
+        "a later match must not reuse the earlier lifecycle id"
+    );
+    assert!(
+        first >= FIRST_INSTANCE_ID && second >= FIRST_INSTANCE_ID,
+        "lifecycle ids come from the shared counter: {first}, {second}"
+    );
+
+    gateway_send(&mut gateway, &lifecycle(5, second), second_loaded + 100);
+    let stale_quit = gateway_send(&mut gateway, &lifecycle(6, first), second_loaded + 200);
+    assert!(
+        !stale_quit.began_zoning,
+        "a stale quit must not zone the player out"
+    );
+    let stale_quit_replies = gateway_inner(&stale_quit);
+    assert!(
+        stale_quit_replies
+            .iter()
+            .all(|reply| !reply.starts_with(&[39, 0, 19])),
+        "a stale quit cancelled the new run: {stale_quit_replies:?}"
+    );
+    let stale_start = gateway_send(&mut gateway, &lifecycle(5, first), second_loaded + 300);
+    assert!(!stale_start.began_zoning);
+    let stale_start_replies = gateway_inner(&stale_start);
+    assert!(
+        stale_start_replies
+            .iter()
+            .all(|reply| !reply.starts_with(&[41, 0, 2, 0])),
+        "a stale start restarted the new run: {stale_start_replies:?}"
+    );
+
+    settle_win(&mut gateway, second_loaded + 400);
+    assert_eq!(
+        coins(&gateway),
+        coins_before + 10,
+        "the untouched second match settles once"
+    );
+}
+
+/// T021 review (F226): scene id 0 named the public overworld instance. The
+/// arena now carries its own server-owned scene id and the membership path
+/// gives each entry its own instance.
+#[test]
+fn soccer_scene_is_not_a_public_zone_and_gets_its_own_instance() {
+    let fixture = Fixture::new();
+    let mut gateway = enter_world(&fixture, 0, "soccer-scene-instance");
+    let (_, _) = enter_match(&mut gateway, 1_000);
+    let zone = gateway.state().zone_id;
+    assert_ne!(
+        zone, 0,
+        "soccer must not alias the public overworld instance"
+    );
+
+    let zones: serde_json::Value = serde_json::from_slice(
+        &fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/zones.json"))
+            .unwrap(),
+    )
+    .unwrap();
+    for record in zones["records"].as_array().unwrap() {
+        assert_ne!(
+            u64::from(zone),
+            record["id"].as_u64().unwrap(),
+            "the soccer scene id is a public zone id"
+        );
+    }
+
+    let runtime = gateway.runtime_zone().unwrap();
+    assert_eq!(
+        runtime.id, zone,
+        "runtime-zone metadata reports the match scene"
+    );
+    assert_eq!(runtime.name, "sg_soccer");
+
+    let mut world = World::runtime();
+    world.register_runtime_zone(runtime).unwrap();
+    assert_eq!(
+        world.public_instance(zone),
+        None,
+        "the arena has no public instance"
+    );
+    let first = world
+        .prepare_membership(1, zone, None, WorldPose::ORIGIN, true, 10)
+        .unwrap();
+    let first_instance = first.instance_id();
+    assert_ne!(
+        first_instance, 0,
+        "the public instance must not host the match"
+    );
+    world.commit_membership(first);
+    let second = world
+        .prepare_membership(2, zone, None, WorldPose::ORIGIN, true, 20)
+        .unwrap();
+    assert_ne!(
+        second.instance_id(),
+        first_instance,
+        "each entry gets its own arena instance"
+    );
+}
+
+/// L012 (lead, from the T021 review): a save taken mid-match must reload and
+/// put the player back in the pre-match world. Before L012 the arena scene id
+/// stopped the load at `saved zone differs from gameplay encounter`.
+#[test]
+fn a_mid_match_save_reloads_back_into_the_world() {
+    let fixture = Fixture::new();
+    let mut gateway = enter_world(&fixture, 0, "soccer-reconnect");
+    let start = gateway.state().clone();
+    let (instance, loaded_at) = enter_match(&mut gateway, 1_000);
+    gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
+
+    let path = fixture.0.join("mid-match-save.json");
+    gateway.save_with_pet_roster(&path).unwrap();
+    let saved = game_store::load_or_create(&path, fixture.character()).unwrap();
+    let reloaded = Gateway::load_gameplay(
+        &reference_dir(),
+        saved.character,
+        &fixture.0,
+        saved.gameplay,
+    )
+    .expect("L012: a save taken mid-match must load");
+    assert_eq!(
+        reloaded.state().zone_id,
+        start.zone_id,
+        "L012: the pre-match zone is recovered before location validation"
+    );
+    assert_eq!(
+        reloaded.state().position,
+        start.position,
+        "L012: the pre-match pose is recovered"
+    );
+}
+
+/// L012: a reconnect inside the same process drops the match (no result, no
+/// reward) and returns the player to the pre-match pose, as kart does.
+#[test]
+fn a_reconnect_mid_match_drops_the_match_and_restores_the_pre_match_pose() {
+    let fixture = Fixture::new();
+    let mut gateway = enter_world(&fixture, 0, "soccer-reset");
+    let start = gateway.state().clone();
+    let (instance, loaded_at) = enter_match(&mut gateway, 1_000);
+    gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
+    assert!(gateway.gameplay().unwrap().is_soccer_active());
+    let coins = gateway.snapshot().gameplay.unwrap().inventory.coins;
+
+    gateway.reset_session();
+
+    assert!(
+        !gateway.gameplay().unwrap().is_soccer_active(),
+        "the match ends with the connection"
+    );
+    assert_eq!(gateway.state().zone_id, start.zone_id);
+    assert_eq!(gateway.state().position, start.position);
+    assert_eq!(gateway.state().rotation, start.rotation);
+    assert_eq!(
+        gateway.snapshot().gameplay.unwrap().inventory.coins,
+        coins,
+        "no reward"
     );
 }

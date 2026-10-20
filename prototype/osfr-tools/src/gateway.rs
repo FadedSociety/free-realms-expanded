@@ -1247,7 +1247,12 @@ impl Gateway {
 
     pub fn snapshot(&self) -> Snapshot {
         Snapshot {
-            character: self.state.clone(),
+            // L012: a save taken mid-match stores the pre-match pose, never the arena scene.
+            character: self
+                .gameplay
+                .as_ref()
+                .and_then(|game| game.soccer_return(&self.state))
+                .unwrap_or_else(|| self.state.clone()),
             gameplay: self.gameplay.as_ref().map(Gameplay::state),
         }
     }
@@ -1376,6 +1381,9 @@ impl Gateway {
         self.loaded = false;
         if let Some(game) = self.gameplay.as_mut() {
             if let Some(return_location) = game.abandon_kart_for_reconnect() {
+                self.state = return_location;
+            }
+            if let Some(return_location) = game.abandon_soccer_for_reconnect(&self.state) {
                 self.state = return_location;
             }
             game.reset_session();
