@@ -73,7 +73,9 @@ pub struct DerbyGates {
 
 /// Predecessor derby save shapes. T023 wrote the job a connection-local match replaced; F117
 /// wrote a paid-run epoch. F164 grants no derby reward, so neither is written again, but both
-/// must still load. `last_paid_unix` is accepted and ignored; `previous_job` is restored at load.
+/// must still load. `last_paid_unix` is accepted and ignored; `previous_job` is restored at load,
+/// and the unlock it left in the profile snapshot is dropped when content retired that job
+/// (`Profiles::load_with_retired_job`).
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayState {

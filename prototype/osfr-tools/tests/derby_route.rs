@@ -12,7 +12,7 @@ use osfr_tools::{
         DerbyConfig, DerbyMessage, DerbyRules, DerbyVehicleTemplate, ParticipantKey,
         VehicleHitReport, decode_inner, encode_inner,
     },
-    derby_gateway::{DerbyGates, DerbyGateway, DerbyGatewayContent},
+    derby_gateway::{DEMO_DERBY_DRIVER_PROFILE, DerbyGates, DerbyGateway, DerbyGatewayContent},
     game_store,
     gameplay::Gameplay,
     harvesting,
@@ -21,7 +21,7 @@ use osfr_tools::{
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::{
-    fs,
+    fs, io,
     path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
 };
@@ -545,6 +545,15 @@ fn load_saved_state(
     derby: serde_json::Value,
     active: i32,
 ) -> Gameplay {
+    try_load_saved_state(fixture, state, derby, active).unwrap()
+}
+
+fn try_load_saved_state(
+    fixture: &GameplayFixture,
+    state: &osfr_tools::gameplay::GameplayState,
+    derby: serde_json::Value,
+    active: i32,
+) -> io::Result<Gameplay> {
     let character = character();
     let mut value = serde_json::to_value(state).unwrap();
     value["profiles"]["active"] = json!(active);
@@ -561,7 +570,7 @@ fn load_saved_state(
     )
     .unwrap();
     let snapshot = game_store::load_or_create(&path, character).unwrap();
-    Gameplay::load(&fixture.path, snapshot.gameplay).unwrap()
+    Gameplay::load(&fixture.path, snapshot.gameplay)
 }
 
 #[test]
@@ -588,7 +597,7 @@ fn predecessor_and_paid_epoch_derby_saves_load_and_restore_the_job() {
         &fixture,
         &live,
         json!({"previous_job": before_job}),
-        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
+        DEMO_DERBY_DRIVER_PROFILE,
     );
     assert_eq!(legacy.active_profile(), Some(before_job));
     assert!(!legacy.derby_active());
@@ -609,7 +618,7 @@ fn a_predecessor_job_the_profile_content_rejects_is_skipped() {
     let fixture = GameplayFixture::new();
     let base = Gameplay::load(&fixture.path, None).unwrap();
     let active = base.active_profile().unwrap();
-    assert_ne!(active, osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE);
+    assert_ne!(active, DEMO_DERBY_DRIVER_PROFILE);
     for previous_job in [999_999, 0] {
         // Neither id is in this fixture's profiles.json and 0 is malformed. The old restore
         // returned Err out of Gameplay::load, so one stale marker bricked the character.
@@ -626,6 +635,151 @@ fn a_predecessor_job_the_profile_content_rejects_is_skipped() {
         );
         assert!(!game.derby_active());
     }
+}
+
+/// F206 review: T023 unlocked the pre-derby job as well as naming it in the marker. If the
+/// operator retires that job from `profiles.json`, the save must still load: only the marker-named
+/// id and its experience are dropped, and the restore keeps the saved active job.
+#[test]
+fn a_previous_job_removed_from_content_still_loads_the_t023_save() {
+    let fixture = GameplayFixture::new();
+    let base = Gameplay::load(&fixture.path, None).unwrap();
+    let mut state = base.state();
+    let path = fixture.path.join("profiles.json");
+    let mut content: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let retired = content["profiles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|profile| profile["id"].as_i64())
+        .map(|id| id as i32)
+        .find(|id| {
+            !state.profiles.as_ref().unwrap().unlocked.contains(id)
+                && *id != DEMO_DERBY_DRIVER_PROFILE
+        })
+        .unwrap();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.insert(retired);
+    profiles.unlocked.insert(DEMO_DERBY_DRIVER_PROFILE);
+    profiles.experience.insert(retired, 250);
+    content["profiles"] = serde_json::Value::Array(
+        content["profiles"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|profile| profile["id"].as_i64() != Some(i64::from(retired)))
+            .cloned()
+            .collect(),
+    );
+    fs::write(&path, serde_json::to_vec(&content).unwrap()).unwrap();
+
+    let game = load_saved_state(
+        &fixture,
+        &state,
+        json!({"previous_job": retired}),
+        DEMO_DERBY_DRIVER_PROFILE,
+    );
+    assert_eq!(game.active_profile(), Some(DEMO_DERBY_DRIVER_PROFILE));
+    assert!(!game.derby_active(), "a save marker is never a live match");
+    let visible = game.public_look().unwrap().profiles;
+    assert!(
+        !visible.iter().any(|(job, _)| *job == retired),
+        "the retired job is dropped from the saved unlocks"
+    );
+    assert!(
+        visible
+            .iter()
+            .any(|(job, _)| *job == DEMO_DERBY_DRIVER_PROFILE),
+        "the saved active job stays"
+    );
+    let saved = game.state().profiles.unwrap();
+    assert!(
+        !saved.unlocked.contains(&retired) && !saved.experience.contains_key(&retired),
+        "the next save carries the repaired snapshot, so a reconnect does not repair again"
+    );
+}
+
+/// F206 review: a T023 save has the temporary Derby Driver active. When the marker's job is in
+/// content but locked, the load keeps the saved job and logs the skip, without unlocking it.
+#[test]
+fn a_t023_save_keeps_the_temporary_job_when_the_previous_job_is_locked() {
+    let fixture = GameplayFixture::new();
+    let base = Gameplay::load(&fixture.path, None).unwrap();
+    let mut state = base.state();
+    let content: serde_json::Value =
+        serde_json::from_slice(&fs::read(fixture.path.join("profiles.json")).unwrap()).unwrap();
+    let unlocked = state.profiles.as_ref().unwrap().unlocked.clone();
+    let locked = content["profiles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|profile| profile["id"].as_i64())
+        .map(|id| id as i32)
+        .find(|id| !unlocked.contains(id) && *id != DEMO_DERBY_DRIVER_PROFILE)
+        .unwrap();
+    state
+        .profiles
+        .as_mut()
+        .unwrap()
+        .unlocked
+        .insert(DEMO_DERBY_DRIVER_PROFILE);
+
+    let game = load_saved_state(
+        &fixture,
+        &state,
+        json!({"previous_job": locked}),
+        DEMO_DERBY_DRIVER_PROFILE,
+    );
+    assert_eq!(
+        game.active_profile(),
+        Some(DEMO_DERBY_DRIVER_PROFILE),
+        "the logged skip keeps the job the save selected"
+    );
+    assert!(!game.derby_active());
+    let visible = game.public_look().unwrap().profiles;
+    assert!(
+        !visible.iter().any(|(job, _)| *job == locked),
+        "the skipped job is not unlocked by the repair"
+    );
+    assert!(
+        visible
+            .iter()
+            .any(|(job, _)| *job != DEMO_DERBY_DRIVER_PROFILE),
+        "another unlocked job stays selectable"
+    );
+}
+
+/// The repair is scoped to the marker-named id: an unrelated unknown unlock still fails the load.
+#[test]
+fn the_retired_job_repair_leaves_other_unknown_unlocks_fail_closed() {
+    let fixture = GameplayFixture::new();
+    let base = Gameplay::load(&fixture.path, None).unwrap();
+    let mut state = base.state();
+    let content: serde_json::Value =
+        serde_json::from_slice(&fs::read(fixture.path.join("profiles.json")).unwrap()).unwrap();
+    let unlocked = state.profiles.as_ref().unwrap().unlocked.clone();
+    let marker = content["profiles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|profile| profile["id"].as_i64())
+        .map(|id| id as i32)
+        .find(|id| !unlocked.contains(id) && *id != DEMO_DERBY_DRIVER_PROFILE)
+        .unwrap();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.insert(DEMO_DERBY_DRIVER_PROFILE);
+    // Not the marker-named job, so the repair must not drop it.
+    profiles.unlocked.insert(999_998);
+
+    let error = try_load_saved_state(
+        &fixture,
+        &state,
+        json!({"previous_job": marker}),
+        DEMO_DERBY_DRIVER_PROFILE,
+    )
+    .err()
+    .expect("an unrelated unknown unlock still fails the snapshot check");
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData, "{error}");
 }
 
 /// F117 content carried a `reward` row and `reward_cooldown_s`. F164 removed both; the decoder

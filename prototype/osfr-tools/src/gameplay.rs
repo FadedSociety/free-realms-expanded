@@ -650,7 +650,10 @@ impl Gameplay {
             ),
         };
         let mut profiles = if directory.join("profiles.json").is_file() {
-            Some(Profiles::load(directory, profiles)?)
+            let retired = saved_derby.as_ref().and_then(|derby| derby.previous_job);
+            Some(Profiles::load_with_retired_job(
+                directory, profiles, retired,
+            )?)
         } else if profiles.is_some() {
             return Err(invalid("class snapshot requires its opening content"));
         } else {

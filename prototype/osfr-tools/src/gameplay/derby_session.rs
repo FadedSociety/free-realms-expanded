@@ -4,7 +4,9 @@ use super::*;
 /// Predecessor saves recorded the job a connection-local match replaced. Current saves keep the
 /// profile itself on that job (`saved_profile_state`), so only an older save carries this marker.
 /// A marker the current profile content rejects is logged and skipped: a stale legacy field must
-/// not stop the character from loading (F206).
+/// not stop the character from loading (F206). The saved job stays active in that case (a T023
+/// save therefore keeps the temporary Derby Driver); the player's other unlocked jobs stay
+/// selectable through the ordinary 26/13 switch.
 pub(super) fn restore_saved_derby_job(
     saved: &crate::derby_gateway::DerbyGatewayState,
     profiles: &mut Option<Profiles>,
@@ -19,7 +21,10 @@ pub(super) fn restore_saved_derby_job(
     if let Some(profiles) = profiles.as_mut()
         && let Err(error) = profiles.activate(job)
     {
-        eprintln!("derby: keeping the saved job; previous job {job} is not available: {error}");
+        eprintln!(
+            "derby: previous job {job} is unavailable ({error}); keeping saved job {}",
+            profiles.active()
+        );
     }
 }
 

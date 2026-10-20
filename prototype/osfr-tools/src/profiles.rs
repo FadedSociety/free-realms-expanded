@@ -127,6 +127,19 @@ fn decode(text: &str) -> io::Result<Vec<u8>> {
 
 impl Profiles {
     pub fn load(directory: &Path, state: Option<ProfileState>) -> io::Result<Self> {
+        Self::load_with_retired_job(directory, state, None)
+    }
+
+    /// Load a saved snapshot that may still carry a predecessor derby marker naming
+    /// `retired_job`. T023 unlocked the pre-derby job, so content that no longer ships it would
+    /// otherwise fail the subset check below before `Gameplay::load` can skip the marker (F206
+    /// review). Only that one unknown id and its experience are dropped, and only when it was
+    /// actually unlocked; every other unknown id still fails closed.
+    pub(crate) fn load_with_retired_job(
+        directory: &Path,
+        state: Option<ProfileState>,
+        retired_job: Option<i32>,
+    ) -> io::Result<Self> {
         let bytes = fs::read(directory.join("profiles.json"))?;
         if bytes.len() > 1_048_576 {
             return Err(invalid("profile content exceeds bounds"));
@@ -153,7 +166,13 @@ impl Profiles {
                 return Err(invalid("profile proof or bounds differ"));
             }
         }
-        let state = state.unwrap_or_else(|| content.default_state.clone());
+        let mut state = state.unwrap_or_else(|| content.default_state.clone());
+        if let Some(job) = retired_job.filter(|job| *job > 0 && !ids.contains(job))
+            && state.unlocked.remove(&job)
+        {
+            state.experience.remove(&job);
+            eprintln!("profiles: dropped retired job {job} from the saved progression");
+        }
         if state.version != 1
             || !state.unlocked.contains(&state.active)
             || !state.unlocked.is_subset(&ids)
