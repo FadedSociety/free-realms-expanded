@@ -1,13 +1,15 @@
-//! F270: Reed Stillwater's Fisherman entry chapter ("Learn to Fish!" 3070003 and
+//! F287: Reed Stillwater's Fisherman entry chapter ("Learn to Fish!" 3070003 and
 //! "Testing the Waters" 3070004) driven through the real NPC -> quest -> fishing path.
 //!
-//! T244 gated both records on the *active* Fisherman profile 137. The shipped content
-//! cannot activate 137: Reed's trainer row unlocks it, but `profiles.json` has no
-//! `starter_items[137]` and the 26/13 switch is refused with "outfit is missing". F270
-//! follows the reviewed fallback: the two records have no `job` gate, and a normal
-//! character learns 137 at Reed through the production trainer menu (unlocked, not
-//! active) before taking the chapter. Every test starts from the real `initial_state`
-//! (active Adventurer 1, unlocked {1,43}); none seeds `active: 137`.
+//! T244 gated both records on the *active* Fisherman profile 137. F270 removed the gate
+//! on a false premise: the active play package
+//! (`lab/bundles/playtest-20261016T115811Z/content/profiles.json`) grants
+//! `starter_items.137 = [68430, 68360, 68465, 68395]`. Learning 137 at Reed therefore
+//! equips the Chest (68360) and Legs (68465), the 26/13 switch succeeds, and the chapter
+//! is offered only while Fisherman is active. F287 restores the gate; the fixture starts
+//! from the reviewed opening `initial_state` (active Adventurer 1, unlocked {1,43}) and
+//! replaces only the stale opening `profiles.json` with the active package's starter
+//! tables, so no test seeds `active` or `unlocked`.
 //!
 //! Client evidence (2014 client, IDA database `lab/working/ida/FreeRealms.exe.i64`):
 //! - 26/8 interact constructor `008b6bc0`: u64 actor + one flag byte.
@@ -22,18 +24,28 @@
 //! - Opcode 138 fishing requests: cast writer `00b6a460` (handle + vector + flag),
 //!   reel writer `00b6a4d0` (handle + flag); result reader `00b66be0` carries no
 //!   coin or XP field, so the quest count cannot come from a client result.
+//! - Family 39 base `008a4420`: family, subtype, then id, `-1`, game id.
+//! - 39/5 start `009be7d0` and 39/6 quit `009be8e0` both call `009bdc60(sub, -1, -1)`.
+//! - 39/16 offer constructor `009b9c70`; body reader `009bfc50` / record `009bdd70`.
+//! - 39/18 game-over reader `009b7ec0`, handler `009ad480`: won byte + three i32.
+//! - 39/14 payload reader `009b89e0`: a length-prefixed NUL-terminated string passed to
+//!   `MiniGameFlash:OnMessage`. The server's `OnGameWonMsg` payload is `(R)`: no client
+//!   `OnGameWonMsg` literal exists, and the test only proves the server ignores it.
 //!
-//! The forged 39/18 and 39/14 forms are built from the server's own writers
-//! (`mining::game_over` and `payload_packet_for`): a client cannot reach
+//! The forged 39/18 and 39/14 forms are built byte-for-byte from the server's own
+//! writers (`mining::game_over`, `mining::payload_packet_for`): a client cannot reach
 //! `npc_minigame_win`, which only inspects server-generated replies after a paid catch.
 //!
 //! The catch event is the server's own `QuestEvent::FinishMinigame { minigame_id }`
 //! from `fishing_service::settle_catch`, where `minigame_id` is the spot's
 //! `game_id` (599 for Reed's Sacred Grove Shallows), never the framework type 21.
 
+#[path = "support/fishing_packets.rs"]
+mod fishing_packets;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
+use fishing_packets::{cast_at, handle_bytes, lifecycle, reel, register, request};
 use npc_quest_chain::*;
 use osfr_tools::{
     character_store::CharacterState,
@@ -44,7 +56,11 @@ use osfr_tools::{
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::{collections::BTreeSet, fs, io, path::Path};
+use std::{
+    collections::BTreeSet,
+    fs, io,
+    path::{Path, PathBuf},
+};
 
 const REED: u64 = 9_000_000_181;
 /// An ordinary spawned Stillwater Crossing vendor near Reed: a real in-range
@@ -57,7 +73,6 @@ const LEARN_TO_FISH: u32 = 3_070_003;
 const TESTING_THE_WATERS: u32 = 3_070_004;
 const SACRED_GROVE_GAME_ID: i32 = 599;
 const STILLWATER_ZONE: u32 = 14;
-const GOODBYE_CHOICE: u32 = 300;
 const ACTOR: Handle = Handle {
     id: 0x1122_3344,
     seq: 0x5566_7788,
@@ -115,6 +130,26 @@ fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
+/// The active play package named by the F270 review. Only its `profiles.json` is used:
+/// the reviewed opening fixture supplies the inventory, opening and campaign content.
+fn active_play_profiles() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/bundles/playtest-20261016T115811Z/content/profiles.json")
+}
+
+/// Replace the stale opening starter table with the active package's. The stale fixture
+/// has only six starter tables and no 137, which is what made F270 remove the gate.
+fn use_active_starter_tables(fixture: &Fixture) {
+    let source = active_play_profiles();
+    let profiles = read_json(&source);
+    assert_eq!(
+        profiles["starter_items"]["137"],
+        json!([68_430, 68_360, 68_465, 68_395]),
+        "the active package dresses Fisherman (137)"
+    );
+    fs::copy(&source, fixture.path().join("profiles.json")).unwrap();
+}
+
 /// Widen the fixture inventory with a stub definition for every fish item the real
 /// spot file binds, so a catch can be stored. The spot file itself is shipped content.
 fn add_fish_definitions(directory: &Path) {
@@ -150,62 +185,28 @@ fn add_fish_definitions(directory: &Path) {
     fs::write(&path, serde_json::to_vec(&inventory).unwrap()).unwrap();
 }
 
-// ---- packets ------------------------------------------------------------------------------
+// ---- forged / server-shaped completion frames ---------------------------------------------
 
-fn fishing_request(sub: u16, body: &[u8]) -> Vec<u8> {
-    let mut packet = vec![138, 0];
-    packet.extend(sub.to_le_bytes());
-    packet.extend(body);
-    packet
-}
-
-fn handle_bytes() -> Vec<u8> {
-    [ACTOR.id.to_le_bytes(), ACTOR.seq.to_le_bytes()].concat()
-}
-
-fn register() -> Vec<u8> {
-    let mut body = handle_bytes();
-    body.push(0);
-    fishing_request(2, &body)
-}
-
-fn cast_at(origin: [f32; 3], distance: f32) -> Vec<u8> {
-    let mut body = handle_bytes();
-    for coordinate in [origin[0] + distance, origin[1], origin[2], 1.0f32] {
-        body.extend(coordinate.to_le_bytes());
-    }
-    body.push(0);
-    fishing_request(6, &body)
-}
-
-fn reel() -> Vec<u8> {
-    let mut body = handle_bytes();
-    body.push(1);
-    fishing_request(7, &body)
-}
-
-fn lifecycle(sub: u8, instance: i32) -> Vec<u8> {
-    // Family 39 is u16 opcode + u8 subtype + i32 instance + -1 + game id.
-    let mut packet = vec![39, 0, sub];
-    packet.extend(instance.to_le_bytes());
-    packet.extend((-1i32).to_le_bytes());
-    packet.extend((-1i32).to_le_bytes());
-    packet
-}
-
-/// A forged framework game-over, byte-for-byte the server's `mining::game_over`
-/// writer shape (39/18): instance, -1, the real 599 game id, won byte.
+/// A forged framework game-over, the full server writer shape (39/18): instance, -1,
+/// the real 599 game id, won byte, then `0`, elapsed, score. Client reader `009b7ec0`
+/// (shared record reader) and handler `009ad480` read a won byte plus three i32.
 fn forged_game_over(instance: i32) -> Vec<u8> {
     let mut packet = vec![39, 0, 18];
     for value in [instance, -1, SACRED_GROVE_GAME_ID] {
         packet.extend(value.to_le_bytes());
     }
     packet.push(1);
+    for value in [0_i32, 0, 0] {
+        packet.extend(value.to_le_bytes());
+    }
     packet
 }
 
-/// A forged 39/14 `OnGameWonMsg`, byte-for-byte the server's `payload_packet_for`
-/// writer shape: instance, -1, the real 599 game id, length, text, terminator.
+/// A forged 39/14 `OnGameWonMsg`, the full server writer shape
+/// (`mining::payload_packet_for`): instance, -1, the real 599 game id, length, text,
+/// terminator. Client reader `009b89e0` passes the string to
+/// `MiniGameFlash:OnMessage`; `OnGameWonMsg` is the movie's own event name, so this
+/// server payload form is `(R)`. The test only proves the server ignores the frame.
 fn forged_game_won(instance: i32) -> Vec<u8> {
     let text = b"OnGameWonMsg";
     let mut packet = vec![39, 0, 14];
@@ -257,20 +258,26 @@ struct Rig {
 }
 
 impl Rig {
-    /// The reviewed opening fixture plus the repository's real fishing spot file and
-    /// fish definitions; the profile/inventory `initial_state` is untouched.
     fn new() -> Self {
-        let fixture = Fixture::new();
+        Self::for_character(CHARACTER)
+    }
+
+    /// The reviewed opening fixture plus the active package's starter tables, the real
+    /// fishing spot file and fish definitions; the profile/inventory `initial_state` is
+    /// the reviewed opening snapshot.
+    fn for_character(guid: u64) -> Self {
+        let fixture = Fixture::for_character(guid);
+        use_active_starter_tables(&fixture);
         fs::copy(
             content_dir().join("fishing_spots.json"),
             fixture.path().join("fishing_spots.json"),
         )
         .unwrap();
         add_fish_definitions(fixture.path());
-        let game = fixture.game_as(CHARACTER, None);
+        let game = fixture.game_as(guid, None);
         Self {
             game,
-            character: character_at(STILLWATER_ZONE, reed_position()),
+            character: character_at_for(guid, STILLWATER_ZONE, reed_position()),
             fixture,
             now: 10_000,
         }
@@ -315,8 +322,9 @@ impl Rig {
         dialogue_rows(dialogue)
     }
 
-    /// Learn Fisherman through Reed's production trainer menu. The job is unlocked,
-    /// never activated: the shipped content has no 137 starter outfit.
+    /// Learn Fisherman through Reed's production trainer menu, then activate it with the
+    /// real 26/13 switch. The active package dresses 137, so the switch succeeds; F270's
+    /// "outfit is unavailable" refusal was a stale-fixture artefact.
     fn learn_fisherman(&mut self) {
         assert_eq!(
             active_job(&self.game),
@@ -329,8 +337,12 @@ impl Rig {
         assert!(learned.changed, "Reed's trainer choice must commit");
         let text = String::from_utf8_lossy(&learned.replies.concat()).into_owned();
         assert!(
-            text.contains("cannot be selected yet"),
-            "the fixture must still report the missing Fisherman outfit: {text}"
+            text.contains("You learned the Fisherman job"),
+            "Reed must confirm the trainer unlock: {text}"
+        );
+        assert!(
+            !text.contains("cannot be selected yet"),
+            "the active package dresses 137, so the trainer must not report a missing outfit: {text}"
         );
         let state = self.game.state();
         let profiles = state.profiles.as_ref().unwrap();
@@ -342,20 +354,33 @@ impl Rig {
             profiles.active, DEFAULT_PROFILE,
             "learning a job must not activate it"
         );
+        for slot in [3, 4] {
+            assert!(
+                state
+                    .inventory
+                    .equipment
+                    .iter()
+                    .any(|entry| entry.profile_id == FISHERMAN_PROFILE
+                        && entry.slot == slot
+                        && entry.item_id != 0),
+                "the learned job must equip starter slot {slot}"
+            );
+        }
 
-        // The 26/13 switch is still refused by the pre-existing missing outfit. The
-        // chapter no longer depends on it, so this is the canary for the content gap.
-        let before = saved(&self.game);
-        let refused = self.send(&select_job(FISHERMAN_PROFILE));
-        assert!(!refused.changed, "an outfit-less switch must be refused");
+        // The 26/13 switch now succeeds and sends the 38/21 activation.
+        let switched = self.send(&select_job(FISHERMAN_PROFILE));
         assert!(
-            !refused
+            switched.changed,
+            "a dressed, unlocked Fisherman must activate"
+        );
+        assert!(
+            switched
                 .replies
                 .iter()
                 .any(|packet| packet.starts_with(&[38, 0, 21, 0])),
-            "a refused switch must not send an activation"
+            "the switch must send the 38/21 activation"
         );
-        assert_eq!(saved(&self.game), before);
+        assert_eq!(active_job(&self.game), FISHERMAN_PROFILE);
     }
 
     /// A real 26/13 switch to the Brawler (its starter outfit is complete).
@@ -523,7 +548,7 @@ fn start_round(rig: &mut Rig) -> i32 {
         find(&go.replies, &[41, 0, 2]).is_some(),
         "39/5 starts the encounter (41/2), not an empty run"
     );
-    let registered = rig.send(&register());
+    let registered = rig.send(&register(ACTOR));
     assert!(
         find(&registered.replies, &[138, 0, 3, 0]).is_some(),
         "138/2 registration is acknowledged"
@@ -533,7 +558,7 @@ fn start_round(rig: &mut Rig) -> i32 {
 
 fn cast_and_hook(rig: &mut Rig) {
     let now = FISH_T0 + 10;
-    rig.send_at(&cast_at(reed_position(), 10.0), now)
+    rig.send_at(&cast_at(ACTOR, reed_position(), 10.0), now)
         .expect("cast accepted");
     rig.tick(FISH_T0 + 1_510);
     rig.tick(FISH_T0 + 2_410);
@@ -561,6 +586,19 @@ fn a_normal_character_learns_fisherman_and_reaches_the_chapter() {
             "the fixture must not seed Fisherman"
         );
     }
+
+    // The active-job gate is the only way in: before Reed's trainer, a Talk has
+    // nothing eligible and changes nothing.
+    let mut now = rig.stamp();
+    assert_no_offer(
+        &mut rig.game,
+        &rig.character,
+        REED,
+        &mut now,
+        "before learning Fisherman",
+    );
+    rig.now = now;
+
     rig.learn_fisherman();
 
     let coins = rig.coins();
@@ -569,7 +607,7 @@ fn a_normal_character_learns_fisherman_and_reaches_the_chapter() {
     assert_eq!(
         quest_choice_title(&rows),
         Some(417_055),
-        "Learn to Fish! is offered after the real trainer path"
+        "Learn to Fish! is offered after the real trainer and job switch"
     );
     let offer = rig.offer(LEARN_TO_FISH);
     assert_eq!(
@@ -587,15 +625,33 @@ fn a_normal_character_learns_fisherman_and_reaches_the_chapter() {
 }
 
 #[test]
-fn the_chapter_is_offered_on_another_active_job_and_pays_fisherman_xp() {
+fn the_chapter_is_gated_on_the_active_fisherman() {
     let mut rig = Rig::new();
     rig.learn_fisherman();
     rig.switch_to_brawler();
-    let brawler_xp = profile_xp(&rig.game, BRAWLER_PROFILE);
     let xp = rig.fisherman_xp();
+    let brawler_xp = profile_xp(&rig.game, BRAWLER_PROFILE);
 
-    // T244's Brawler edge case was "no quest"; F270 removes the active-job gate, so
-    // the chapter is offered on another job and still pays the explicit 137 profile.
+    // Fisherman is unlocked but no longer active: the content job gate hides the chapter,
+    // and the refusal keeps the open menu usable and the save bytes unchanged.
+    let mut now = rig.stamp();
+    assert_no_offer(
+        &mut rig.game,
+        &rig.character,
+        REED,
+        &mut now,
+        "Fisherman unlocked, Brawler active",
+    );
+    rig.now = now;
+    assert!(
+        rig.progress(LEARN_TO_FISH).is_none(),
+        "a gated quest is not even known"
+    );
+
+    // Switching back to the dressed Fisherman opens the chapter again, and the reward
+    // pays the explicit 137 profile, never the active Brawler.
+    let switched = rig.send(&select_job(FISHERMAN_PROFILE));
+    assert!(switched.changed, "the dressed Fisherman must re-activate");
     let rows = rig.talk_at(REED);
     assert_eq!(quest_choice_title(&rows), Some(417_055));
     rig.offer(LEARN_TO_FISH);
@@ -606,7 +662,7 @@ fn the_chapter_is_offered_on_another_active_job_and_pays_fisherman_xp() {
     assert_eq!(
         profile_xp(&rig.game, BRAWLER_PROFILE),
         brawler_xp,
-        "the active Brawler must not gain Fisherman quest XP"
+        "the Brawler must not gain Fisherman quest XP"
     );
 }
 
@@ -635,11 +691,15 @@ fn reed_offers_the_two_fisherman_quests_in_order() {
         "3070004 is not even offered before 3070003 completes"
     );
 
-    // A forged 49/2 for the follow-up is refused with a byte-identical save.
-    let before = rig.save();
-    let forged = rig.send(&quest_reply(TESTING_THE_WATERS, true));
-    assert!(find(&forged.replies, &[49, 0, 3, 0]).is_none());
-    assert_eq!(rig.save(), before);
+    // A forged 49/2 for the follow-up is refused without changing the save.
+    let now = rig.stamp();
+    assert_packet_changes_nothing(
+        &mut rig.game,
+        &rig.character,
+        &quest_reply(TESTING_THE_WATERS, true),
+        now,
+        "forged 49/2 before 3070003 completes",
+    );
 
     // 3070003 has no end-text id, so its 49/13 end text is 0.
     rig.take_end(LEARN_TO_FISH, 0);
@@ -672,7 +732,7 @@ fn learning_then_catching_and_turning_in_pays_once() {
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
     let caught = rig
-        .send_at(&reel(), FISH_T0 + 2_420)
+        .send_at(&reel(ACTOR), FISH_T0 + 2_420)
         .expect("reel accepted");
     assert!(
         find(&caught.replies, &[138, 0, 14, 0]).is_some(),
@@ -780,7 +840,7 @@ fn a_quit_escape_or_disconnect_does_not_count_the_catch() {
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
     let caught = rig
-        .send_at(&reel(), FISH_T0 + 2_420)
+        .send_at(&reel(ACTOR), FISH_T0 + 2_420)
         .expect("reel accepted");
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
@@ -796,28 +856,41 @@ fn a_forged_or_missing_completion_changes_nothing() {
     let coins = rig.coins();
     let xp = rig.fisherman_xp();
 
-    // A real, in-range NPC that is not Reed cannot advance the return step.
-    let before = rig.save();
+    // A real, in-range NPC that is not Reed cannot advance the return step: the refusal
+    // keeps the menu usable and the save bytes equal.
     rig.character.position = newman_position();
-    let rows = rig.talk_at(NEWMAN);
-    assert_eq!(rows, vec![[GOODBYE_CHOICE, 17, 8_075, 0, 18]]);
-    let closed = rig.send(&dialogue_choice(QUEST_CHOICE));
-    assert!(find(&closed.replies, &[49, 0, 13, 0]).is_none());
+    let mut now = rig.stamp();
+    assert_no_offer(
+        &mut rig.game,
+        &rig.character,
+        NEWMAN,
+        &mut now,
+        "wrong in-range NPC",
+    );
     rig.character.position = reed_position();
-    assert_eq!(rig.save(), before, "a wrong NPC changes nothing");
+    rig.now = now;
 
     // A replayed 49/14 with no open end screen is refused.
-    let replayed = rig.send(&quest_end_reply(TESTING_THE_WATERS));
-    assert!(find(&replayed.replies, &[49, 0, 4, 0]).is_none());
-    assert_eq!(rig.save(), before, "replayed 49/14 changes nothing");
+    let now = rig.stamp();
+    assert_packet_changes_nothing(
+        &mut rig.game,
+        &rig.character,
+        &quest_end_reply(TESTING_THE_WATERS),
+        now,
+        "replayed 49/14",
+    );
 
     // A character who never learned Fisherman has no pending end screen to settle.
     let mut stranger = Rig::new();
-    let stranger_before = stranger.save();
     let stranger_coins = stranger.coins();
-    let refused = stranger.send(&quest_end_reply(LEARN_TO_FISH));
-    assert!(find(&refused.replies, &[49, 0, 4, 0]).is_none());
-    assert_eq!(stranger.save(), stranger_before);
+    let now = stranger.stamp();
+    assert_packet_changes_nothing(
+        &mut stranger.game,
+        &stranger.character,
+        &quest_end_reply(LEARN_TO_FISH),
+        now,
+        "a stranger's 49/14",
+    );
     assert_eq!(stranger.coins(), stranger_coins);
     assert_eq!(stranger.fisherman_xp(), 0);
 
@@ -837,31 +910,43 @@ fn a_forged_or_missing_completion_changes_nothing() {
         before_busy,
         "a refused Reed menu changes nothing"
     );
-    let live = rig.save();
 
     // A client-sent fishing result is server-to-client only; 138/14 must be refused.
-    let mut body = handle_bytes();
+    let mut body = handle_bytes(ACTOR);
     body.extend(5u32.to_le_bytes());
-    let forged_result = fishing_request(14, &body);
-    let _ = rig.send_at(&forged_result, FISH_T0 + 2_420);
-    assert_eq!(rig.save(), live, "forged 138/14 changes nothing");
+    let now = rig.stamp();
+    assert_packet_changes_nothing(
+        &mut rig.game,
+        &rig.character,
+        &request(14, &body),
+        now,
+        "forged 138/14",
+    );
 
-    // The forged frames carry the real 599 game id in both server-written forms, so
+    // The forged 39 frames carry the real 599 game id in both server-written forms, so
     // they would match a 599 objective if any client frame reached `npc_minigame_win`.
-    let _ = rig.send_at(&forged_game_over(1), FISH_T0 + 2_430);
-    assert_eq!(rig.save(), live, "forged 39/18 (game 599) changes nothing");
+    let now = rig.stamp();
+    assert_packet_changes_nothing(
+        &mut rig.game,
+        &rig.character,
+        &forged_game_over(1),
+        now,
+        "forged 39/18 (game 599)",
+    );
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
-    let _ = rig.send_at(&forged_game_won(1), FISH_T0 + 2_435);
-    assert_eq!(
-        rig.save(),
-        live,
-        "forged 39/14 OnGameWonMsg (game 599) changes nothing"
+    let now = rig.stamp();
+    assert_packet_changes_nothing(
+        &mut rig.game,
+        &rig.character,
+        &forged_game_won(1),
+        now,
+        "forged 39/14 OnGameWonMsg (game 599)",
     );
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
 
     // The forged frames did not damage the live round: the real catch still counts.
     let caught = rig
-        .send_at(&reel(), FISH_T0 + 2_440)
+        .send_at(&reel(ACTOR), FISH_T0 + 2_440)
         .expect("reel accepted");
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
@@ -883,9 +968,10 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
 
     let learn = find_record(LEARN_TO_FISH);
     assert_eq!(learn["enabled"], json!(true));
-    assert!(
-        learn.get("job").is_none(),
-        "F270: the chapter has no active-job gate; 137 cannot be activated"
+    assert_eq!(
+        learn["job"],
+        json!(FISHERMAN_PROFILE),
+        "the chapter is gated on the active Fisherman profile"
     );
     assert_eq!(learn["giver_npc_id"], json!(REED));
     assert_eq!(learn["prerequisite_quest_ids"], json!([]));
@@ -899,9 +985,10 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
 
     let testing = find_record(TESTING_THE_WATERS);
     assert_eq!(testing["enabled"], json!(true));
-    assert!(
-        testing.get("job").is_none(),
-        "F270: the follow-up has no active-job gate either"
+    assert_eq!(
+        testing["job"],
+        json!(FISHERMAN_PROFILE),
+        "the follow-up carries the same active-job gate"
     );
     assert_eq!(testing["giver_npc_id"], json!(REED));
     assert_eq!(testing["prerequisite_quest_ids"], json!([LEARN_TO_FISH]));
@@ -999,9 +1086,9 @@ fn assert_reward_shape(record: &Value) {
 }
 
 #[test]
-fn two_fishermen_fish_the_same_spot_independently() {
-    let mut first = Rig::new();
-    let mut second = Rig::new();
+fn two_independent_sessions_fish_the_same_spot() {
+    let mut first = Rig::for_character(CHARACTER);
+    let mut second = Rig::for_character(CHARACTER + 1);
     for rig in [&mut first, &mut second] {
         rig.learn_fisherman();
     }
@@ -1028,7 +1115,7 @@ fn two_fishermen_fish_the_same_spot_independently() {
     leave_round(&mut first, first_instance);
     assert_eq!(first.fishing_items(), 0);
     let caught = second
-        .send_at(&reel(), FISH_T0 + 2_420)
+        .send_at(&reel(ACTOR), FISH_T0 + 2_420)
         .expect("reel accepted");
     assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(second.fishing_items(), 1);

@@ -23,6 +23,11 @@ const ACTOR: Handle = Handle {
 const T0: u64 = 1_000_000;
 static FIXTURE_ID: AtomicU64 = AtomicU64::new(0);
 
+#[path = "support/fishing_packets.rs"]
+mod fishing_packets;
+
+use fishing_packets::{handle_bytes, request};
+
 struct InventoryFixture(PathBuf);
 
 impl InventoryFixture {
@@ -112,36 +117,16 @@ fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
-fn handle_bytes(handle: Handle) -> Vec<u8> {
-    [handle.id.to_le_bytes(), handle.seq.to_le_bytes()].concat()
-}
-
-fn request(sub: u16, body: &[u8]) -> Vec<u8> {
-    let mut packet = vec![138, 0];
-    packet.extend(sub.to_le_bytes());
-    packet.extend(body);
-    packet
-}
-
 fn register_request() -> Vec<u8> {
-    let mut body = handle_bytes(ACTOR);
-    body.push(0);
-    request(2, &body)
+    fishing_packets::register(ACTOR)
 }
 
 fn cast_request() -> Vec<u8> {
-    let mut body = handle_bytes(ACTOR);
-    for coordinate in [10.0f32, 0.0, 0.0, 1.0] {
-        body.extend(coordinate.to_le_bytes());
-    }
-    body.push(0);
-    request(6, &body)
+    fishing_packets::cast_at(ACTOR, [0.0, 0.0, 0.0], 10.0)
 }
 
 fn reel_request() -> Vec<u8> {
-    let mut body = handle_bytes(ACTOR);
-    body.push(1);
-    request(7, &body)
+    fishing_packets::reel(ACTOR)
 }
 
 fn packet_ids(change: &Change) -> Vec<(u16, u16)> {

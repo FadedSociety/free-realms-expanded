@@ -2680,8 +2680,9 @@ impl Gameplay {
                 .push(chat::system(EntryDenied::Unavailable.message()));
             return Ok(out);
         };
-        // (R) The Fisherman chapter is built (quests/fisherman.json); the first trip only
-        // unlocks the job, and no shipped starter outfit can activate 137 (T244/F270 review).
+        // (R) The Fisherman chapter is built (quests/fisherman.json) and gated on the
+        // active job by its content. The trip unlocks 137; the player activates it from
+        // the job list (26/13), whose starter outfit the active play package supplies.
         let _ = profiles.unlock(FISHERMAN_PROFILE);
         let level = self.job_level(FISHERMAN_PROFILE);
         // (R) Same bag floor as quest turn-ins: never below what the player already holds.

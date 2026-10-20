@@ -33,6 +33,8 @@ const SPOT: [f32; 3] = [100.0, 5.0, -40.0];
 const T0: u64 = 1_000_000;
 static FIXTURE_ID: AtomicU64 = AtomicU64::new(0);
 
+#[path = "support/fishing_packets.rs"]
+mod fishing_packets;
 #[path = "../src/bin/osfr_gateway/fishing_fixtures.rs"]
 mod fixtures;
 
@@ -146,52 +148,19 @@ fn hex(bytes: &[u8]) -> String {
 
 // ---- packets ----------------------------------------------------------------------------
 
-fn handle_bytes(handle: Handle) -> Vec<u8> {
-    [handle.id.to_le_bytes(), handle.seq.to_le_bytes()].concat()
-}
-
-fn request(sub: u16, body: &[u8]) -> Vec<u8> {
-    let mut packet = vec![138, 0];
-    packet.extend(sub.to_le_bytes());
-    packet.extend(body);
-    packet
-}
+use fishing_packets::{encounter_close, handle_bytes, lifecycle, request};
 
 fn register() -> Vec<u8> {
-    let mut body = handle_bytes(ACTOR);
-    body.push(0);
-    request(2, &body)
+    fishing_packets::register(ACTOR)
 }
 
 fn cast_at(distance: f32) -> Vec<u8> {
-    let mut body = handle_bytes(ACTOR);
     // The service measures from the spot, so aim relative to it.
-    for coordinate in [SPOT[0] + distance, SPOT[1], SPOT[2], 1.0f32] {
-        body.extend(coordinate.to_le_bytes());
-    }
-    body.push(0);
-    request(6, &body)
+    fishing_packets::cast_at(ACTOR, SPOT, distance)
 }
 
 fn reel() -> Vec<u8> {
-    let mut body = handle_bytes(ACTOR);
-    body.push(1);
-    request(7, &body)
-}
-
-fn lifecycle(sub: u8, instance: i32) -> Vec<u8> {
-    let mut packet = vec![39, 0, sub];
-    packet.extend(instance.to_le_bytes());
-    packet.extend((-1i32).to_le_bytes());
-    packet.extend((-1i32).to_le_bytes());
-    packet
-}
-
-fn encounter_close(instance: i32) -> Vec<u8> {
-    let mut packet = vec![41, 0, 109, 0];
-    packet.extend(0i32.to_le_bytes());
-    packet.extend(instance.to_le_bytes());
-    packet
+    fishing_packets::reel(ACTOR)
 }
 
 fn ids(replies: &[Vec<u8>]) -> Vec<(u16, u16)> {
