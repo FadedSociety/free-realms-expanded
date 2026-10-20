@@ -1659,8 +1659,9 @@ fn kart_timeout_refusal_is_save_inert_at_the_gateway() {
     );
 
     // The sibling `33/17` pickup claim carries the same 24-byte block and the same race window.
-    // A post-window pickup still spends one persisted observation slot (F207: the guard is saved,
-    // so reconnecting cannot reset it) but must not trigger a character save.
+    // A post-window pickup still spends one observation slot that the saved race carries (a login
+    // abandons the race, so this bounds only the race it belongs to) but must not trigger a
+    // character save.
     let mut pickup = words(33, 17, &[guid as u32, (guid >> 32) as u32]);
     for _ in 0..3 {
         pickup.extend(0.0f32.to_le_bytes());

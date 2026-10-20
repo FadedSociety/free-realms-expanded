@@ -308,8 +308,9 @@ pub struct RaceBounds {
     pub max_claims: u32,
     /// Separate budget for the high-rate send-only observations (`33/6`, `33/17`): the capture
     /// carries thousands of bulk frames, so they must never consume the gate claim budget. The
-    /// used count is persisted so a reconnect cannot hand the client a fresh allowance; spending
-    /// one slot still writes no character save (`KartGatewayState::changed_for_save`).
+    /// used count round-trips through the saved race; spending one slot still writes no character
+    /// save (`KartGatewayState::changed_for_save`). A login abandons the saved race
+    /// (`Gameplay::abandon_kart_for_reconnect`), so a fresh entry starts a fresh budget either way.
     ///
     /// Older content that predates this field loads with the default: 600 s at 200 Hz.
     #[serde(default = "default_max_observations")]
@@ -794,9 +795,10 @@ pub struct ServiceSnapshot {
     pub attempts: u32,
     /// The observation flood guard: every evaluated `33/17` pickup frame (pre-Go and timed
     /// included) and every accepted `33/6` bulk frame spends one slot; phase, budget and
-    /// malformed refusals spend nothing. It is persisted with the race so a reconnect cannot
-    /// reset the bound, but a spend is not a save trigger (`KartGatewayState::changed_for_save`):
-    /// the count is written by the next real change and by the end-of-session save.
+    /// malformed refusals spend nothing. It round-trips with the saved race, but a spend is not a
+    /// save trigger (`KartGatewayState::changed_for_save`): the count is written by the next real
+    /// change and by the end-of-session save. A login abandons the saved race
+    /// (`Gameplay::abandon_kart_for_reconnect`), so the count bounds only the race it belongs to.
     pub observations: u32,
     pub countdown_sent: Option<u32>,
     /// LEGACY server-clock refill epoch. Retained so pre-repair saves keep loading and so the
@@ -938,7 +940,8 @@ pub struct KartService {
     last_claim_ms: u64,
     attempts: u32,
     /// Observation flood guard, persisted through [`ServiceSnapshot::observations`]. Spending it
-    /// is not a save trigger, so a bulk frame cannot write a character save.
+    /// is not a save trigger, so a bulk frame cannot write a character save. It bounds one saved
+    /// race: a login abandons that race, and a new entry starts a fresh guard.
     observations: u32,
     countdown_sent: Option<u32>,
     last_boost_epoch: u64,
@@ -1490,7 +1493,7 @@ impl KartService {
     }
 
     /// Bounded observation flood counter for the send-only bulk/pickup blocks; never authority.
-    /// Persisted with the snapshot; spending it writes no character save.
+    /// Round-trips with the snapshot; spending it writes no character save.
     pub fn observations(&self) -> u32 {
         self.observations
     }
@@ -1899,8 +1902,8 @@ impl KartService {
                     }));
                 }
                 // The guard counts every evaluated pickup frame, pre-Go and timed included. The
-                // count is persisted (a reconnect must not reset the bound) but a spend is not a
-                // save trigger, so the refusal still writes no character save.
+                // count round-trips with the saved race, but a spend is not a save trigger, so
+                // the refusal still writes no character save.
                 self.observations = self.observations.saturating_add(1);
                 // Pickups share the race-window edges; the movement guard then bounds the leg.
                 let _elapsed = match self.race_elapsed(now_ms) {

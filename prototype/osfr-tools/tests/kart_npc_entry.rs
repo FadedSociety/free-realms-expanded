@@ -1087,8 +1087,10 @@ fn enter_to_green(game: &mut Gameplay, character: &CharacterState) -> u64 {
     green
 }
 
-/// F207: an accepted observation commits its spent flood-budget slot (the saved race carries the
-/// bound across a reconnect) but requests no character save, and a reload resumes it.
+/// F207: an accepted observation commits its spent flood-budget slot but requests no character
+/// save, and a `Gameplay::load` round trip resumes it. A production login does not resume a race:
+/// it abandons the saved one (see the reconnect assertions below), so the persisted count bounds
+/// only the race it belongs to.
 #[test]
 fn an_observation_commits_the_persisted_budget_without_a_save() {
     let fixture = GameplayFixture::with_weapon_effects(false);
@@ -1132,8 +1134,10 @@ fn an_observation_commits_the_persisted_budget_without_a_save() {
         1,
         "the committed frame carries the spent slot"
     );
-    // The same state is what a disconnect writes; loading it resumes the spent slot.
-    let restored = fixture.load(Some(saved));
+    // The same state is what a disconnect writes; a save/load round trip resumes the spent slot.
+    // This is the save contract, not the production login: `Gateway::load_internal` calls
+    // `Gameplay::abandon_kart_for_reconnect`, so a real reconnect aborts the saved race.
+    let mut restored = fixture.load(Some(saved));
     assert_eq!(
         restored
             .state()
@@ -1145,7 +1149,41 @@ fn an_observation_commits_the_persisted_budget_without_a_save() {
             .unwrap()
             .observations,
         1,
-        "a reconnect must not refresh the observation allowance"
+        "a save/load round trip resumes the spent slot"
+    );
+    assert_eq!(
+        restored.abandon_kart_for_reconnect(),
+        Some(character.clone()),
+        "a reconnect returns the player to the pre-race location"
+    );
+    let abandoned = restored.state();
+    assert_eq!(
+        abandoned.profiles.as_ref().map(|profiles| profiles.active),
+        Some(PRIOR_JOB),
+        "a reconnect restores the prior job"
+    );
+    assert!(
+        abandoned
+            .kart_entry
+            .as_ref()
+            .is_none_or(|kart| kart.active.is_none()),
+        "a reconnect abandons the saved race, so its observation budget bounds nothing"
+    );
+    // With the race gone the next observation is inert: no slot, no reply, no save.
+    let mut bulk = vec![33, 0, 6, 0];
+    bulk.extend([0u8; 85]);
+    let out = restored
+        .handle_in_world(&bulk, &character, green + 2)
+        .unwrap();
+    assert!(out.replies.is_empty(), "an abandoned race answers nothing");
+    assert!(
+        !out.changed,
+        "an observation after a reconnect must not request a save"
+    );
+    assert_eq!(
+        restored.state(),
+        abandoned,
+        "an observation after a reconnect moves nothing"
     );
 }
 
@@ -1160,8 +1198,8 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     let green = enter_to_green(&mut game, &character);
     assert_eq!(game.state().profiles.unwrap().active, KART_JOB);
     // The green tick requested a save, so this is the last persisted snapshot. The next two
-    // ticks are clock-only and would never be written; a real reconnect restores this older
-    // state, not the live `game.state()`.
+    // ticks are clock-only and would never be written; a server save/restore checkpoint (not the
+    // login path, which abandons the race) starts from this older state, not `game.state()`.
     let saved = game.state();
     assert_eq!(race_clock(&game), green);
 
@@ -1190,8 +1228,9 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
         "the saved snapshot must be older than the live clock"
     );
 
-    // A disconnect between two clock-only ticks restores the last persisted snapshot: the older
-    // clock and the prior job survive, and the next racing ticks still request no save.
+    // A server save/restore checkpoint between two clock-only ticks restores the last persisted
+    // snapshot: the older clock and the prior job survive, and the next racing ticks still request
+    // no save. A login is different: it abandons the race (F231).
     let mut restored = fixture.load(Some(saved));
     assert_eq!(race_phase(&restored), RacePhase::Racing);
     assert_eq!(

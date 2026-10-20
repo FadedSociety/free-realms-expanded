@@ -3660,14 +3660,25 @@ fn snapshot_restore_round_trips_and_preserves_the_one_shot() {
         KartService::restore(synthetic_content(), corrupt).unwrap_err(),
         ServiceError::CorruptSnapshot { field: "attempts" }
     );
-    // The flood budget round-trips: a save written after a flood resumes its spent slots, so a
-    // reconnect cannot refresh the allowance (F207).
+    // The flood budget round-trips: a save written after a flood restores its spent slots. A
+    // production login abandons the saved race (`Gameplay::abandon_kart_for_reconnect`), so this
+    // pins the save/restore contract, not a reconnect allowance (F231).
     let mut saved_budget = snapshot.clone();
     saved_budget.observations = 7;
     let restored_budget =
         KartService::restore(synthetic_content(), saved_budget).expect("budget save loads");
     assert_eq!(restored_budget.observations(), 7);
     assert_eq!(restored_budget.snapshot().unwrap().observations, 7);
+    // A saved count above the content bound is corrupt, never a silently clamped flood budget.
+    let max = synthetic_content().bounds.max_observations;
+    let mut over_budget = snapshot.clone();
+    over_budget.observations = max + 1;
+    assert_eq!(
+        KartService::restore(synthetic_content(), over_budget).unwrap_err(),
+        ServiceError::CorruptSnapshot {
+            field: "observations"
+        }
+    );
 
     let taken = restored.take_finished_session();
     assert!(taken.is_some());
@@ -3680,8 +3691,9 @@ fn snapshot_restore_round_trips_and_preserves_the_one_shot() {
     assert!(restored.take_finished_session().is_none());
 }
 
-/// F207: the observation flood guard is part of the saved race. A reconnect resumes the spent
-/// slots and still refuses once the content budget is gone, so a flood cannot reset by relogging.
+/// F207: the observation flood guard is part of the saved race. A restored race resumes the spent
+/// slots and still refuses once the content budget is gone. A production login abandons the saved
+/// race (`Gameplay::abandon_kart_for_reconnect`), so this pins the save contract, not a relog.
 #[test]
 fn restored_race_resumes_the_observation_budget_and_still_refuses_a_flood() {
     let mut content = synthetic_content();
