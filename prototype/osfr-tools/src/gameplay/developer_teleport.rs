@@ -162,7 +162,7 @@ fn realm_place_adds_saves_and_removes_npcs_live() {
         reply_text(&out)
     );
     assert!(has(&out, 2, first), "AddNpc sent at once");
-    let saved = game.load_placements();
+    let saved = game.load_placements().unwrap();
     assert_eq!(saved.len(), 1);
     assert_eq!((saved[0].model_id, saved[0].name_string_id), (168, 15623));
     assert_eq!(saved[0].position, start.position);
@@ -185,7 +185,7 @@ fn realm_place_adds_saves_and_removes_npcs_live() {
         .handle_in_world(&chat(&format!("realm place 182 at {x} {z}")), &start, 1_002)
         .unwrap();
     assert!(has(&out, 2, second), "{}", reply_text(&out));
-    let placed = game.load_placements();
+    let placed = game.load_placements().unwrap();
     assert_eq!(placed[1].position, [x, 12.0, z]);
     // Where you stand, with terrain: on the ground, not at your height.
     let raised = CharacterState {
@@ -194,7 +194,7 @@ fn realm_place_adds_saves_and_removes_npcs_live() {
     };
     game.handle_in_world(&chat("realm place 166"), &raised, 1_002)
         .unwrap();
-    assert_eq!(game.load_placements()[2].position[1], 12.0);
+    assert_eq!(game.load_placements().unwrap()[2].position[1], 12.0);
     game.handle_in_world(
         &chat(&format!("realm unplace {}", second + 1)),
         &start,
@@ -216,7 +216,7 @@ fn realm_place_adds_saves_and_removes_npcs_live() {
         .handle_in_world(&chat("realm unplace nearest"), &start, 1_004)
         .unwrap();
     assert!(has(&out, 3, first), "RemoveNpc sent: {}", reply_text(&out));
-    assert_eq!(game.load_placements().len(), 1);
+    assert_eq!(game.load_placements().unwrap().len(), 1);
 
     // Editing the file then reloading swaps the placed NPCs live.
     std::fs::write(
@@ -251,7 +251,7 @@ fn live_world_keeps_builds_out_of_content_and_across_restarts() {
         let out = game
             .handle_in_world(&chat("realm place 168 named Bob the Lost"), &start, 1_000)
             .unwrap();
-        let placed = game.load_placements();
+        let placed = game.load_placements().unwrap();
         assert_eq!(placed.len(), 1, "{}", reply_text(&out));
         assert_eq!(placed[0].name.as_deref(), Some("Bob the Lost"), "case kept");
         guid = placed[0].guid;

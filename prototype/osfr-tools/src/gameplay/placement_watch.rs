@@ -22,6 +22,10 @@ enum Stamp {
     Unknown,
     /// The last check found no file; its reappearance is a change.
     Absent,
+    /// The file at this mtime was read and refused (malformed, oversized or not
+    /// a regular file). The refusal is reported once, not once per poll, and is
+    /// retried only when a writer changes the stamp.
+    Rejected(SystemTime),
     Modified(SystemTime),
 }
 
@@ -58,8 +62,9 @@ impl PlacementWatch {
     }
 
     /// Stat at most once per second. `Some(records)` is a changed table to
-    /// apply (empty after a deletion); `None` means nothing changed. A parse or
-    /// I/O error leaves the stamp so a later tick retries.
+    /// apply (empty after a deletion); `None` means nothing changed. A refused
+    /// file is reported once per stamp, so a broken table cannot log once per
+    /// second per session; the caller keeps the view it already has.
     pub fn poll(
         &mut self,
         path: &Path,
@@ -84,58 +89,54 @@ impl PlacementWatch {
         let Ok(modified) = metadata.modified() else {
             return Ok(None);
         };
-        if self.stamp == Stamp::Modified(modified) {
+        if self.stamp == Stamp::Modified(modified) || self.stamp == Stamp::Rejected(modified) {
             return Ok(None);
         }
-        let records = crate::world::read_placements(path)?;
-        self.stamp = Stamp::Modified(modified);
-        Ok(Some(records))
+        match crate::world::read_placements(path) {
+            Ok(records) => {
+                self.stamp = Stamp::Modified(modified);
+                Ok(Some(records))
+            }
+            Err(error) => {
+                self.stamp = Stamp::Rejected(modified);
+                Err(error)
+            }
+        }
     }
 }
 
 impl Gameplay {
-    /// Apply this session's own saved placement file as a delta: drop placed
-    /// rows the file no longer has, add rows another admin wrote since this
-    /// session's last poll, then stamp the file so the next poll does not redo
-    /// it. The command's own row is new here, so it is added too.
+    /// Apply the acting session's saved table with the canonical swap, so a
+    /// same-GUID model/name/position edit is not mistaken for an unchanged row.
+    /// The file is already saved; the stamp is recorded only after the view
+    /// applied, so a failed apply is retried by the next watch poll.
     pub(super) fn apply_own_placement_write(
         &mut self,
         records: &[crate::world::Placement],
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        if let Some(mut visibility) = self.npc_visibility.clone() {
+            let mut packets = visibility.replace_placements(records)?;
+            packets.extend(visibility.update(character.zone_id, character.position)?);
+            self.npc_visibility = Some(visibility);
+            out.replies.extend(packets);
+        }
         self.placement_watch.observe(&self.placements_path());
-        let Some(visibility) = self.npc_visibility.as_mut() else {
-            return Ok(());
-        };
-        let stale = visibility
-            .placed_guids()
-            .iter()
-            .copied()
-            .filter(|guid| !records.iter().any(|record| record.guid == *guid))
-            .collect::<Vec<_>>();
-        for guid in stale {
-            visibility.remove(guid);
-        }
-        for record in records {
-            if !visibility.placed_guids().contains(&record.guid) {
-                visibility.place(record);
-            }
-        }
-        out.replies
-            .extend(visibility.update(character.zone_id, character.position)?);
         Ok(())
     }
 
     /// Apply a changed live placement table to this session's `NpcVisibility`.
     ///
-    /// Placement visibility is world state, not a character change: no save and
-    /// no `Outcome::changed`. The reload runs on a clone so a malformed file or
-    /// a failed packet build keeps the previous view, and one player's bad file
-    /// is logged instead of ending the session.
+    /// The poll covers `placements_path()`, which is the `--world` layer or the
+    /// content folder when no world is configured; `realm place` writes to that
+    /// same path in both modes. Placement visibility is world state, not a
+    /// character change: no save and no `Outcome::changed`. The reload runs on a
+    /// clone so a malformed file or a failed packet build keeps the previous
+    /// view, and one player's bad file is logged instead of ending the session.
     pub(super) fn tick_live_placements(&mut self, now_ms: u64, out: &mut Outcome) {
-        if self.world_dir.is_none() || !self.placement_watch.due(now_ms) {
-            return; // Without --world, `realm reload placements` is the only reload.
+        if !self.placement_watch.due(now_ms) {
+            return; // No path allocation and no stat while the window is closed.
         }
         let path = self.placements_path();
         let records = match self.placement_watch.poll(&path, now_ms) {
@@ -183,8 +184,36 @@ mod tests {
         path
     }
 
+    fn content_directory() -> PathBuf {
+        std::env::var_os("OSFR_OPENING_REFERENCE")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| {
+                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                    .join("../../../lab/references/rust-opening-cooking-original-assets")
+            })
+    }
+
+    fn character() -> CharacterState {
+        CharacterState {
+            guid: 1,
+            zone_id: crate::world::OPEN_WORLD_ZONE,
+            position: [0.0; 3],
+            rotation: [1.0, 0.0, 0.0],
+        }
+    }
+
     fn records() -> &'static str {
         r#"{"schema_version":1,"records":[{"guid":130000000001,"model_id":168,"position":[1.0,2.0,3.0]}]}"#
+    }
+
+    fn adds(replies: &[Vec<u8>], guid: u64) -> usize {
+        replies
+            .iter()
+            .filter(|packet| {
+                packet.starts_with(&[35, 0, 2, 0])
+                    && packet.get(4..12) == Some(&guid.to_le_bytes()[..])
+            })
+            .count()
     }
 
     /// Rewrite the file until the watch sees a new stamp. Filesystem timestamps
@@ -221,6 +250,10 @@ mod tests {
         let _ = fs::remove_dir_all(&dir);
     }
 
+    /// Historical test id kept for the integration test inventory: a malformed
+    /// table is refused and a later write applies. The refusal is now remembered
+    /// as a `Rejected` stamp, so the second poll reports nothing instead of
+    /// re-erroring (and re-logging) every second.
     #[test]
     fn malformed_file_errors_without_stamping_so_a_later_write_applies() {
         let dir = directory("malformed");
@@ -228,9 +261,28 @@ mod tests {
         fs::write(&path, "{\"records\":[").unwrap();
         let mut watch = PlacementWatch::default();
         assert!(watch.poll(&path, 1_000).is_err());
-        assert_eq!(watch.stamp, Stamp::Unknown, "a failed parse is not stamped");
-        assert!(watch.poll(&path, 2_000).is_err(), "the later tick retries");
+        assert!(
+            matches!(watch.stamp, Stamp::Rejected(_)),
+            "a refused file is stamped"
+        );
+        assert_eq!(
+            watch.poll(&path, 2_000).unwrap(),
+            None,
+            "one report per stamp, not one per second"
+        );
         assert_eq!(rewrite_until_seen(&mut watch, &path).len(), 1);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_non_regular_file_is_refused_once() {
+        let dir = directory("non-regular");
+        let path = dir.join("npc_placements.json");
+        fs::create_dir(&path).unwrap();
+        let mut watch = PlacementWatch::default();
+        assert!(watch.poll(&path, 1_000).is_err());
+        assert!(matches!(watch.stamp, Stamp::Rejected(_)));
+        assert_eq!(watch.poll(&path, 2_000).unwrap(), None);
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -272,25 +324,15 @@ mod tests {
     /// no character state changes and no save is requested.
     #[test]
     fn applying_a_changed_file_sends_packets_without_a_character_change() {
-        let dir = directory("apply");
-        let content = std::env::var_os("OSFR_OPENING_REFERENCE")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                    .join("../../../lab/references/rust-opening-cooking-original-assets")
-            });
+        let content = content_directory();
         assert!(
             content.join("opening.json").is_file(),
             "missing private opening content"
         );
+        let dir = directory("apply");
         let mut game = Gameplay::load(&content, None).unwrap();
         game.set_world_dir(Some(dir.clone())).unwrap();
-        let character = CharacterState {
-            guid: 1,
-            zone_id: crate::world::OPEN_WORLD_ZONE,
-            position: [0.0; 3],
-            rotation: [1.0, 0.0, 0.0],
-        };
+        let character = character();
         game.update_npc_visibility(&character).unwrap();
         let before = game.state();
         fs::write(dir.join("npc_placements.json"), records()).unwrap();
@@ -304,6 +346,52 @@ mod tests {
         );
         assert!(!out.changed, "visibility is not a character change");
         assert_eq!(game.state(), before, "no character state is touched");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    /// With no `--world`, `live_dir()` is the content folder and `realm place`
+    /// still writes there; another session must see that row without a relog.
+    #[test]
+    fn the_content_folder_fallback_is_watched_without_a_world_dir() {
+        let content = content_directory();
+        assert!(
+            content.join("opening.json").is_file(),
+            "missing private opening content"
+        );
+        let dir = directory("content-fallback");
+        let session = || {
+            let mut game = Gameplay::load(&content, None).unwrap();
+            game.content_dir = dir.clone(); // no --world: live_dir() is this folder
+            game.set_world_dir(None).unwrap();
+            game
+        };
+        let character = character();
+        let mut admin = session();
+        admin.set_dev_tools(true);
+        admin.set_role(crate::account_store::AccountRole::Admin);
+        admin.update_npc_visibility(&character).unwrap();
+        let mut friend = session();
+        friend.update_npc_visibility(&character).unwrap();
+
+        let out = admin
+            .handle_in_world(&chat::local_request("realm place 168"), &character, 900)
+            .unwrap();
+        let guid = out
+            .replies
+            .iter()
+            .find(|packet| packet.starts_with(&[35, 0, 2, 0]) && packet.len() >= 12)
+            .map(|packet| u64::from_le_bytes(packet[4..12].try_into().unwrap()))
+            .expect("the acting session sees its placement");
+        assert!(
+            dir.join("npc_placements.json").is_file(),
+            "written beside the content"
+        );
+        let first = friend.tick(&character, 1_000).unwrap();
+        assert_eq!(
+            adds(&first.replies, guid),
+            1,
+            "another session's tick applies the content-folder write"
+        );
         let _ = fs::remove_dir_all(&dir);
     }
 }

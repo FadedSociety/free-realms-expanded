@@ -4,12 +4,15 @@
 //! Two `Gameplay` values share one temp live directory (the World Builder
 //! `--world` layer); the fixture content is the shared private opening package
 //! that `gameplay/developer_teleport.rs` also uses, because `realm place` is
-//! routed only while opening content is loaded. The session-side view is the
+//! routed only while opening content is loaded. The same file is the content
+//! folder's `npc_placements.json` when the server has no `--world`, so the
+//! watch also covers `realm place` in that mode. The session-side view is the
 //! existing solo `update_npc_visibility` (35/2 and 35/3) and the gateway's
 //! `shared_npc_view` (revision-driven), not a new packet path.
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
+    chat,
     gameplay::{Gameplay, Outcome},
     world::{PLACEMENT_GUID_BASE, Placement, PlacementFile},
 };
@@ -21,9 +24,12 @@ use std::{
 };
 
 const ZONE: u32 = 0;
-/// A zone that owns no placed actors. Private instances are filtered by the
-/// gateway's session view (`Session::known_npcs` and instance membership), not
-/// by `NpcVisibility`, so this fixture can only move between zones.
+/// A zone that owns no placed actors. `NpcVisibility` is zone-keyed, like every
+/// content NPC; private-instance filtering is the gateway view loop
+/// (`Server::sync_field_views` skips a session whose membership instance differs),
+/// and production child instances take the dungeon's own zone id
+/// (`World::enter_dungeon`), never the open-world zone. This fixture can only
+/// move between zones; `shared_world_membership` covers instance membership.
 const OTHER_ZONE: u32 = 5;
 
 fn content_directory() -> PathBuf {
@@ -70,23 +76,9 @@ fn fixture(live: &Path) -> (Gameplay, CharacterState) {
     (game, character)
 }
 
-fn chat(text: &str) -> Vec<u8> {
-    let mut p = vec![15, 0, 1, 0, 0, 0];
-    p.extend(1u64.to_le_bytes());
-    p.extend(0u64.to_le_bytes());
-    for _ in 0..2 {
-        p.extend([0; 12]);
-        p.extend(0u32.to_le_bytes());
-        p.extend(0u32.to_le_bytes());
-    }
-    p.extend((text.len() as u32).to_le_bytes());
-    p.extend(text.as_bytes());
-    p.extend([0; 28]);
-    p
-}
-
 fn say(game: &mut Gameplay, character: &CharacterState, text: &str, now: u64) -> Outcome {
-    game.handle_in_world(&chat(text), character, now).unwrap()
+    game.handle_in_world(&chat::local_request(text), character, now)
+        .unwrap()
 }
 
 fn reply_text(out: &Outcome) -> String {
@@ -432,7 +424,7 @@ fn two_admins_converge_to_the_final_rows() {
 }
 
 #[test]
-fn sessions_in_another_zone_or_instance_do_not_see_it() {
+fn sessions_in_another_zone_do_not_see_it() {
     let live = live_dir("zone");
     let (mut admin, character) = fixture(&live);
     let (mut friend, _) = fixture(&live);
@@ -459,6 +451,131 @@ fn sessions_in_another_zone_or_instance_do_not_see_it() {
         changes(&friend.update_npc_visibility(&character).unwrap(), guid),
         0
     );
+    let _ = fs::remove_dir_all(&live);
+}
+
+/// World Builder edits keep the GUID and change the row fields. The watcher
+/// and the acting session's own write must swap the stale actor, not skip it.
+#[test]
+fn a_same_guid_edit_replaces_the_actor_for_the_writer_and_a_poller() {
+    let live = live_dir("same-guid");
+    let (mut admin, character) = fixture(&live);
+    let (mut friend, _) = fixture(&live);
+    let guid = place(&mut admin, &character, "realm place 168", 900);
+    let seen = friend.tick(&character, 1_000).unwrap();
+    assert_eq!(adds(&seen.replies, guid), 1);
+
+    // Another writer edits the existing row: same GUID, new fields.
+    rest();
+    let mut rows = file_records(&live);
+    rows[0].model_id = 182;
+    rows[0].name = Some("Edited".into());
+    let moved = [
+        character.position[0] + 3.0,
+        character.position[1],
+        character.position[2],
+    ];
+    rows[0].position = moved;
+    fs::write(
+        live.join("npc_placements.json"),
+        serde_json::to_string(&PlacementFile {
+            schema_version: 1,
+            records: rows,
+        })
+        .unwrap(),
+    )
+    .unwrap();
+
+    let applied = friend.tick(&character, 2_000).unwrap();
+    assert_eq!(removes(&applied.replies, guid), 1, "the stale actor goes");
+    assert_eq!(adds(&applied.replies, guid), 1, "the edited actor arrives");
+    let add = applied
+        .replies
+        .iter()
+        .find(|packet| added(packet) == Some(guid))
+        .unwrap();
+    let spawn = osfr_tools::startup_world::parse_add_npc(add).unwrap();
+    assert_eq!(spawn.model_id, 182);
+    assert_eq!(spawn.npc_name, "Edited");
+    assert_eq!(&spawn.position[..3], &moved);
+
+    // The acting admin has not polled; its own `realm place` must still apply
+    // the edited row from the table it just saved.
+    rest();
+    let out = say(&mut admin, &character, "realm place 166", 2_100);
+    assert!(
+        reply_text(&out).contains("Placed NPC"),
+        "{}",
+        reply_text(&out)
+    );
+    assert_eq!(removes(&out.replies, guid), 1);
+    let add = out
+        .replies
+        .iter()
+        .find(|packet| added(packet) == Some(guid))
+        .unwrap();
+    let spawn = osfr_tools::startup_world::parse_add_npc(add).unwrap();
+    assert_eq!(spawn.model_id, 182, "the same-GUID edit is not skipped");
+    assert_eq!(spawn.npc_name, "Edited");
+    assert_eq!(&spawn.position[..3], &moved);
+    assert_eq!(file_records(&live).len(), 2, "the file keeps both rows");
+    let _ = fs::remove_dir_all(&live);
+}
+
+/// A table the bounded reader refuses must refuse every command that reads it,
+/// with no save, no view change and no rewritten file.
+#[test]
+fn an_unreadable_table_refuses_the_commands_without_changing_anything() {
+    let live = live_dir("refuse");
+    let (mut admin, character) = fixture(&live);
+    let path = live.join("npc_placements.json");
+    fs::write(&path, b"{\"schema_version\":1,\"records\":[").unwrap();
+    let before = fs::read(&path).unwrap();
+    let state = admin.state();
+    let revision = admin.npc_visibility_revision();
+
+    for command in [
+        "realm place 168",
+        "realm unplace nearest",
+        "realm placements",
+    ] {
+        let out = say(&mut admin, &character, command, 1_000);
+        let text = reply_text(&out);
+        assert!(
+            text.contains("Could not read the placements"),
+            "{command}: {text}"
+        );
+        assert_eq!(
+            fs::read(&path).unwrap(),
+            before,
+            "{command} rewrote the file"
+        );
+        assert_eq!(admin.state(), state, "{command} changed character state");
+        assert_eq!(
+            admin.npc_visibility_revision(),
+            revision,
+            "{command} changed the view"
+        );
+        assert!(!out.changed, "{command} requested a save");
+        assert!(
+            out.replies
+                .iter()
+                .all(|packet| !(packet.starts_with(&[35, 0, 2, 0])
+                    || packet.starts_with(&[35, 0, 3, 0]))),
+            "{command} published placement packets"
+        );
+    }
+
+    // Oversized is refused by the same bounded reader, before any parse.
+    fs::write(&path, vec![b' '; 16 * 1024 * 1024 + 1]).unwrap();
+    let before = fs::read(&path).unwrap();
+    let out = say(&mut admin, &character, "realm place 168", 2_000);
+    assert!(
+        reply_text(&out).contains("Could not read the placements"),
+        "{}",
+        reply_text(&out)
+    );
+    assert_eq!(fs::read(&path).unwrap(), before);
     let _ = fs::remove_dir_all(&live);
 }
 

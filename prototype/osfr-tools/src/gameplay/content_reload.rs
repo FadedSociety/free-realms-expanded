@@ -100,16 +100,9 @@ impl Gameplay {
             }
         }
         if all || what == "placements" {
-            let path = self.placements_path();
+            // Same bounded reader and refusal as the watch and the commands.
+            let records = self.load_placements()?;
             if let Some(visibility) = self.npc_visibility.as_mut() {
-                let records = if path.is_file() {
-                    let bytes = std::fs::read(&path)?;
-                    serde_json::from_slice::<crate::world::PlacementFile>(&bytes)
-                        .map_err(|e| invalid(format!("npc_placements.json: {e}")))?
-                        .records
-                } else {
-                    Vec::new()
-                };
                 out.replies.extend(visibility.replace_placements(&records)?);
                 done.push("placed NPCs");
             }

@@ -170,6 +170,14 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     assert_eq!(server.sessions.len(), 2);
 
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
+    // Loading the movie content twice above can outlast the 60 s idle budget on
+    // a loaded host. The two survivors send nothing in this test, so refresh
+    // their liveness; the step below must keep them for the movie error alone.
+    for key in &keys[1..] {
+        if let Some(session) = server.sessions.get_mut(key) {
+            session.last_activity = std::time::Instant::now();
+        }
+    }
     server.next_tick_ms = 0;
     server.step().unwrap();
     assert_eq!(server.sessions.len(), 2);

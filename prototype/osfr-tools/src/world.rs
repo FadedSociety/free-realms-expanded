@@ -412,12 +412,6 @@ impl NpcVisibility {
         self.placed.insert(placement.guid);
     }
 
-    /// The placed GUIDs this view holds. Placement visibility is world state;
-    /// a session applies a saved placement file as a delta against this set.
-    pub fn placed_guids(&self) -> &BTreeSet<u64> {
-        &self.placed
-    }
-
     /// Swap every placed NPC for `placements` (a reload of
     /// `npc_placements.json`), returning the 35/3 removals and 35/2 additions.
     pub fn replace_placements(&mut self, placements: &[Placement]) -> io::Result<Vec<Vec<u8>>> {
@@ -636,6 +630,9 @@ fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {
 }
 
 fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {
+    if !fs::metadata(path)?.is_file() {
+        return Err(invalid("NPC content file is not a regular file"));
+    }
     let file = fs::File::open(path)?;
     if file.metadata()?.len() > MAX_NPC_DATA_BYTES {
         return Err(invalid("NPC content file exceeds 16 MiB"));
@@ -649,9 +646,9 @@ fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {
         .map_err(|error| invalid(format!("invalid NPC content JSON: {error}")))
 }
 
-/// Read the live placement table with the startup loader's size bound and row
-/// schema. A malformed or oversized file is an error, not an empty table: the
-/// caller keeps the rows it already has.
+/// Read the live placement table with the startup loader's bounds (regular
+/// file, 16 MiB) and row schema. A malformed, oversized or non-regular file is
+/// an error, not an empty table: the caller keeps the rows it already has.
 pub fn read_placements(path: &Path) -> io::Result<Vec<Placement>> {
     Ok(read_rows::<Placement>(path)?.records)
 }
@@ -1532,6 +1529,16 @@ mod tests {
             row.kind = InstanceKind::Encounter { encounter_id: 0 };
             world.instances.insert(id, row);
         }
+    }
+
+    #[test]
+    fn placement_reader_refuses_a_non_regular_file() {
+        let dir = std::env::temp_dir().join(format!("osfr-read-placements-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(dir.join("npc_placements.json")).unwrap();
+        let error = read_placements(&dir.join("npc_placements.json")).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        let _ = fs::remove_dir_all(&dir);
     }
 
     /// F234 BLOCKER: the public-id probe used to be an unbounded `1..` scan

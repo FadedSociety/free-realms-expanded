@@ -2959,7 +2959,13 @@ impl Gameplay {
             }
             ["placements"] => {
                 let p = character.position;
-                let mut rows = self.load_placements();
+                let mut rows = match self.load_placements() {
+                    Ok(rows) => rows,
+                    Err(error) => {
+                        say(out, format!("Could not read the placements: {error}."));
+                        return Ok(true);
+                    }
+                };
                 rows.sort_by(|a, b| {
                     flat_distance(a.position, p).total_cmp(&flat_distance(b.position, p))
                 });
@@ -3870,7 +3876,7 @@ impl Gameplay {
             std::fs::create_dir_all(dir)?;
         }
         self.world_dir = dir;
-        let records = self.load_placements();
+        let records = self.load_placements()?;
         if let Some(visibility) = self.npc_visibility.as_mut() {
             visibility.replace_placements(&records)?;
         }
@@ -3882,12 +3888,14 @@ impl Gameplay {
         self.live_dir().join("npc_placements.json")
     }
 
-    fn load_placements(&self) -> Vec<crate::world::Placement> {
-        std::fs::read(self.placements_path())
-            .ok()
-            .and_then(|bytes| serde_json::from_slice::<crate::world::PlacementFile>(&bytes).ok())
-            .map(|file| file.records)
-            .unwrap_or_default()
+    /// A missing table is empty; a malformed, oversized or non-regular one is
+    /// refused, so no command overwrites rows it could not read.
+    fn load_placements(&self) -> io::Result<Vec<crate::world::Placement>> {
+        match crate::world::read_placements(&self.placements_path()) {
+            Ok(records) => Ok(records),
+            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(Vec::new()),
+            Err(error) => Err(error),
+        }
     }
 
     fn save_placements(&self, mut records: Vec<crate::world::Placement>) -> io::Result<()> {
@@ -3973,7 +3981,14 @@ impl Gameplay {
                 (at, character.rotation[0].atan2(character.rotation[2]))
             }
         };
-        let mut records = self.load_placements();
+        let mut records = match self.load_placements() {
+            Ok(records) => records,
+            Err(error) => {
+                return Ok(format!(
+                    "Could not read the placements: {error}. Nothing changed."
+                ));
+            }
+        };
         let guid = records
             .iter()
             .map(|r| r.guid)
@@ -4014,7 +4029,14 @@ impl Gameplay {
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<String> {
-        let mut records = self.load_placements();
+        let mut records = match self.load_placements() {
+            Ok(records) => records,
+            Err(error) => {
+                return Ok(format!(
+                    "Could not read the placements: {error}. Nothing changed."
+                ));
+            }
+        };
         let me = character.position;
         let guid = if which == "nearest" {
             records
