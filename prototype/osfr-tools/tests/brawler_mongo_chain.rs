@@ -1046,16 +1046,17 @@ fn refusals_and_replay_change_nothing() {
 
 #[test]
 fn the_battle_and_quest_content_load_with_real_targets() {
-    // The real loader accepts the seventh battle.
+    // The real loader accepts the Brawling Ring. Battle ids, not the
+    // repository-wide count, are the contract: battle order is not semantic and
+    // other content slices add rows (T282 adds 12340).
     let mut engine = EncounterEngine::load(&gameplay_content(), None).expect("encounter content");
     engine
         .load_field_battles(&content_dir().join("field_battles.json"))
         .expect("field battles load");
     let spawners = engine.battle_spawners();
-    assert_eq!(
-        spawners.len(),
-        7,
-        "six shipped battles plus the Brawling Ring"
+    assert!(
+        spawners.len() >= 7,
+        "the shipped battles and the Brawling Ring all load"
     );
     let gate = spawners
         .iter()
@@ -1155,13 +1156,19 @@ fn the_battle_and_quest_content_load_with_real_targets() {
     assert_eq!(mongo["boss"], true);
     assert_eq!(position(&mongo["position"]), [136.0, -0.6, 175.0]);
 
-    // No other battle or Brawler record moved.
+    // No pre-existing battle or Brawler record was removed or duplicated.
+    // Other content slices add rows, so pin this slice's seven battles by id
+    // instead of asserting the repository-wide set.
     let rows = battles();
-    let ids: Vec<u32> = rows
-        .iter()
-        .map(|row| row["id"].as_u64().unwrap() as u32)
-        .collect();
-    assert_eq!(ids, [96, 12301, 12302, 12303, 12310, 12311, BATTLE]);
+    for id in [96, 12301, 12302, 12303, 12310, 12311, BATTLE] {
+        assert_eq!(
+            rows.iter()
+                .filter(|row| row["id"].as_u64() == Some(u64::from(id)))
+                .count(),
+            1,
+            "battle {id} disappeared or was duplicated"
+        );
+    }
     for id in [96, 12301, 12302, 12303, 12310, 12311] {
         let row = battle_row(id);
         let pinned = match id {

@@ -221,6 +221,148 @@
       ]
     },
     {
+      "id": 12340,
+      "title_id": 90703,
+      "description_id": 90704,
+      "objective_id": 90715,
+      "difficulty": 3,
+      "required_combat_level": 5,
+      "spawner": {
+        "guid": 100001234000,
+        "definition_id": 1234000,
+        "model_id": 199,
+        "name_id": 103031,
+        "name": "Thugamug",
+        "texture_alias": "",
+        "position": [
+          -1581.39915,
+          -45.29,
+          -552.22302
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001234001,
+          "definition_id": 1234001,
+          "model_id": 199,
+          "name_id": 103031,
+          "name": "Thugamug",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 220,
+          "damage": 12,
+          "boss": true
+        },
+        {
+          "guid": 100001234002,
+          "definition_id": 1234002,
+          "model_id": 199,
+          "name_id": 103726,
+          "name": "Thugamug Henchman",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 9,
+          "boss": false
+        },
+        {
+          "guid": 100001234003,
+          "definition_id": 1234003,
+          "model_id": 199,
+          "name_id": 103726,
+          "name": "Thugamug Henchman",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 140,
+          "damage": 9,
+          "boss": false
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text ids 90703 'Chapter 1: Thugamug's Thievery', 90704 'Geoffrey sends you forth to defeat the thieving Thugawugs and help restore safety to the Greenwood.', 90715 'Defeat Thugamug and his two Hands', 103031 'Thugamug' and 103726 'Thugamug Henchman' (lab/reports/locale-id-to-text.json, rows also present in the native en_us_data.dat). Quest record 3000032 uses title 90703; the battle title and description are that record's client text. The guide's ucdt title ids 1685133772/3420205720 and Left/Right Hand ids 1244861177/836346018 do not resolve in the report and are not used."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md Part D: Thugamug is a bandit with two 'Hands', encounter 144, who 'has taken over a bridge and is charging tolls'. notes/Build Guides/Content/Jobs/Adventurer.md E4 'Chapter 1: Thugamug's Thievery': 'Thugamug has taken over a bridge and is charging tolls! Knock this thieving thugawug out!' and 'Defeat Thugamug and his two Hands'; the guide records no original roster count, arena, health, damage, level or reward."
+        },
+        {
+          "kind": "video",
+          "evidence": "Owner Field Notes: the tracked goal is 'Defeat Thugamug' and the toll alert bubble is 'You're not crossing this bridge without a fight!' (db53WZqLX58/00048, hmx3WC_T-V8/00014); the battle itself was not recorded, so it is represented by the existing field-battle route."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/greenwood_forest.json record 9500000322 'Thugamug' is a poi_anchor at [-1580.39915,-45.37643,-555.223024] on the Greenwood bridge/toll road (placement_source poi_anchor; recording it does not spawn the NPC). Models.txt rows '199^chugawug_m_bandit_01.adr' and '200^chugawug_f_bandit_01.adr' (file lines 200-201); model 199 maps to catalog.tsv pack_04/000765.adr and model 200 to pack_04/000894.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Local battle id 12340, actor GUIDs 100001234000-403 and definition ids 1234000-403. The roster (Thugamug plus two Hands), difficulty 3, required combat level 5, 220 HP / 12 damage for Thugamug and 140 HP / 9 damage for each Hand are local balance, not a recovered original roster; the loader scales them through the existing difficulty-3 template. The reward is the existing 25-coin battle payout and one draw from the existing four-item prize pool. Model 199 is used for Thugamug and both Hands because the guide gives no gender evidence for the pair and the guide's Left/Right Hand ucdt ids do not resolve; model 200 is a recovered female bandit body but not selected. Marker adaptation: the visible bandit model replaces a non-rendering tent spawner, and overhead image 11970 reuses native battle 96. The battle reuses zone 9600 sg_random_encounter_clearing with battle 96's arrival [136,-0.5,155]."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Placement: the bridge point's full 5 m wander disc reaches 40.06 degrees of slope against the project's 25 degree authoring rule, so the marker moved 3.16 m to [-1581.39915,-45.29,-552.22302], the nearest point on a 1 m grid whose full disc is terrain-covered and at most 24.81 degrees; the chosen y is the bilinear terrain height -45.2933 rounded to -45.29 (delta 0.0033 m). The scan used lab/terrain/zone_0.hgt: 105 disc samples, 24 ring samples, 37.9 m to the nearest spawnable legacy_data NPC, 897.3 m to the nearest field enemy and 638.6 m to another battle marker. Object collision, water and a native walkable route remain unverified."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": -1,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
+    },
+    {
       "id": 12301,
       "title_id": 75452,
       "description_id": 76503,
