@@ -1,7 +1,7 @@
 use osfr_tools::{
     account_store::AccountRole,
     chat,
-    encounter::{EncounterEngine, EncounterPhase},
+    encounter::{EncounterEngine, EncounterPhase, MAX_PRIZE_QUANTITY},
     enemies::EnemyEngine,
     game_store,
     gateway::{Gateway, GatewayOutcome},
@@ -491,37 +491,19 @@ fn runtime_inventory() -> &'static Inventory {
     })
 }
 
-#[derive(serde::Deserialize)]
-struct StackCatalogue {
-    definitions: Vec<StackRow>,
-}
-
-#[derive(serde::Deserialize)]
-struct StackRow {
-    id: i32,
-    max_stack: i32,
-}
-
 /// A real catalogue item with a bounded stack, and that bound. The shipped
 /// field-battle prizes are all uncapped, so the over-stack regression has to
-/// introduce a bounded item; deriving both values keeps no stack size pinned
-/// to a regenerated runtime package.
+/// introduce a bounded item. `Inventory` owns the catalogue, so the scan reads
+/// its loaded definitions instead of re-parsing `item-catalogue.json`, and the
+/// bound comes from the validator's limit so the modified row still loads.
 fn bounded_stack_item() -> (i32, u32) {
-    let catalogue: StackCatalogue = serde_json::from_slice(
-        &fs::read(
-            manifest_dir()
-                .join(RUNTIME_CATALOGUE)
-                .join("item-catalogue.json"),
-        )
-        .unwrap(),
-    )
-    .expect("the runtime item catalogue must parse");
-    catalogue
-        .definitions
-        .iter()
-        .find_map(|row| {
-            let max_stack = u32::try_from(row.max_stack).ok()?;
-            (max_stack > 0 && max_stack < 100).then_some((row.id, max_stack))
+    let inventory = runtime_inventory();
+    inventory
+        .definition_ids()
+        .find_map(|id| {
+            let (_, max_stack) = inventory.trade_flags(id)?;
+            let max_stack = max_stack?;
+            (max_stack < MAX_PRIZE_QUANTITY).then_some((id, max_stack))
         })
         .expect("the runtime catalogue has a bounded stack below the prize limit")
 }
@@ -1229,11 +1211,14 @@ fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
     invalid_row["prizes"][0]["item_id"] = json!(item_id);
     invalid_row["prizes"][0]["quantity"] = json!(max_stack + 1);
     let content = fixture.content_copy();
-    fs::write(
-        content.join("field_battles.json"),
-        serde_json::to_vec(&invalid).unwrap(),
-    )
-    .unwrap();
+    let path = content.join("field_battles.json");
+    fs::write(&path, serde_json::to_vec(&invalid).unwrap()).unwrap();
+    // The modified row must still be valid content: the refusal is the
+    // inventory stack preflight, not a rejected `field_battles.json`.
+    let mut engine = fixture.empty_engine();
+    engine
+        .load_field_battles(&path)
+        .expect("the over-stack prize row must pass content validation");
 
     let mut gateway = fixture.gateway_from(&content, marker);
     send(&mut gateway, &switch_job(BRAWLER), 300);

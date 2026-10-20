@@ -310,7 +310,7 @@ impl EncounterEngine {
                     p.item_id <= 0
                         || p.name_id <= 0
                         || p.icon_id <= 0
-                        || !(1..=100).contains(&p.quantity)
+                        || !(1..=MAX_PRIZE_QUANTITY).contains(&p.quantity)
                 })
             {
                 return Err(invalid("invalid field battle prizes"));

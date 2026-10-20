@@ -596,6 +596,11 @@ struct FieldBattle {
     source: serde_json::Value,
 }
 
+/// The largest quantity one battle prize row may preview. The content validator
+/// enforces it; the stack preflight additionally caps each row at the item's
+/// own `max_stack`.
+pub const MAX_PRIZE_QUANTITY: u32 = 100;
+
 /// A prize shown on the battle start screen and won at random on victory
 /// (the battle's "prize wheel"; the owner: prizes spin like a loot box). Item
 /// definition, name and icon ids come from the client item catalogue.

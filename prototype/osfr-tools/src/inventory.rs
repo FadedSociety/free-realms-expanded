@@ -492,6 +492,12 @@ impl Inventory {
         self.content.definitions.contains_key(&definition_id)
     }
 
+    /// Every item definition id the loaded catalogue defines, ascending. A
+    /// content check can pick a real row without re-parsing the catalogue.
+    pub fn definition_ids(&self) -> impl Iterator<Item = i32> + '_ {
+        self.content.definitions.keys().copied()
+    }
+
     /// Whether this catalogue can grant `quantity` of `definition_id` as one
     /// stack, using the same bound as `grant_with_tint`. A content preflight
     /// uses this to refuse an unpayable reward before entry or a payout.
