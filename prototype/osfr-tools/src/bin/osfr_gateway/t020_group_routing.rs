@@ -137,6 +137,17 @@ fn rig(name: &str) -> Rig {
     }
 }
 
+/// The private lab fixtures `options` points at. A checkout without them cannot build a
+/// `Server` rig; tests outside the lab skip visibly through this instead of failing setup.
+pub(super) fn fixtures_present() -> bool {
+    let options = options(&std::env::temp_dir());
+    options.reference.join("manifest.json").is_file()
+        && options
+            .content
+            .as_ref()
+            .is_some_and(|content| content.join("inventory.json").is_file())
+}
+
 pub(super) fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
     let scratch = std::env::temp_dir().join(format!("osfr-t020-{name}-{}", std::process::id()));
     fs::create_dir_all(&scratch).unwrap();
