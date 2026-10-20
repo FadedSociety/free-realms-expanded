@@ -499,6 +499,15 @@ fn two_bot_socket_membership_and_transfer() {
     );
     f.host(move |s| s.test_transfer(202, i1, false)).unwrap();
     let mut together = f.ready(202, &mut a, &mut b);
+    // The final reunion is a full leave/rejoin into 101's instance too: the three views must
+    // still agree after it, not only after the earlier transfers.
+    for guid in [101, 202] {
+        assert_eq!(
+            f.host(move |s| s.test_membership(guid)),
+            Some((true, true, true)),
+            "reunion membership for {guid}"
+        );
+    }
     settle(&mut a, &mut b, &mut together, |m| {
         actor_packets(&m[0], 1, 202) >= 1 && actor_packets(&m[1], 1, 101) >= 1
     });
