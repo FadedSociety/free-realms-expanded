@@ -798,6 +798,9 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         locale.extend(b"en_US");
         result.push(("merchant", locale));
     }
+    // T006: family 129 (guilds) is routed by the gateway's guild router; an unknown
+    // subtype is understood and refused without a reply or a guild change.
+    result.push(("guilds", words(129, 0xffff, &[u32::MAX; 2])));
     result.push(("class_selection", words(26, 13, &[u32::MAX])));
     result.push(("encounter_exit", words(41, 109, &[u32::MAX; 2])));
     for sub in [5, 6, 7, 14] {

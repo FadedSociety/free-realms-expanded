@@ -73,6 +73,8 @@ impl ActionBudgets {
                 | (40, 1 | 3 | 4 | 6 | 14 | 16)
                 | (108, 1 | 3 | 5)
                 | (152, 4 | 5)
+                // T006: every family-129 guild request shares the account action budget.
+                | (129, _)
         ) {
             return true;
         }
@@ -1420,6 +1422,9 @@ mod action_budget_tests {
             [40, 0, 3, 0],
             [40, 0, 4, 0],
             [40, 0, 6, 0],
+            // T006: guild requests share the same account action budget.
+            [129, 0, 1, 0],
+            [129, 0, 0xff, 0xff],
         ] {
             let mut budgets = ActionBudgets::default();
             assert!((0..ACTION_BURST as usize).all(|_| budgets.allow(9, &header, now)));

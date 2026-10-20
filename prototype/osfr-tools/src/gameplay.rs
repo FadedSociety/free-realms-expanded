@@ -1214,6 +1214,11 @@ impl Gameplay {
         self.profiles.as_ref().map(|p| p.state().active)
     }
 
+    /// (R) Client locale: any unlocked job at rank 15 or higher may create a guild.
+    pub fn guild_eligible(&self) -> bool {
+        self.profiles.as_ref().is_some_and(|p| p.has_job_rank(15))
+    }
+
     /// What other players may see on Inspect (W143): unlocked jobs with their
     /// ranks and the active job's worn items. Coins, quests, stats and titles
     /// are never included (R).
@@ -5819,12 +5824,9 @@ impl Gameplay {
     /// Job level on the local rank curve (R): one base rank, one per 100 XP,
     /// capped at 20 (as `character_eligibility` uses).
     fn job_level(&self, profile: i32) -> u32 {
-        let xp = self
-            .profiles
+        self.profiles
             .as_ref()
-            .and_then(|p| p.state().experience.get(&profile).copied())
-            .unwrap_or(0);
-        (1 + xp / 100).min(20)
+            .map_or(1, |profiles| profiles.rank(profile))
     }
 
     /// Max health and weapon damage follow the active combat job's level

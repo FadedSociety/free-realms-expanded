@@ -228,6 +228,14 @@ impl Profiles {
         (1 + self.state.experience.get(&profile).copied().unwrap_or(0) / 100).min(20)
     }
 
+    /// (R) Any unlocked job at `rank` or higher; the client locale's guild-creation rule.
+    pub fn has_job_rank(&self, rank: u32) -> bool {
+        self.state
+            .unlocked
+            .iter()
+            .any(|&profile| self.rank(profile) >= rank)
+    }
+
     /// W176: read the optional `job_trainers.json`. Absent means no trainers. A row naming a job
     /// the profile content lacks is a content error, so a typo cannot silently offer nothing.
     pub fn load_trainers(&self, directory: &Path) -> io::Result<Vec<Trainer>> {

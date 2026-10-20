@@ -36,6 +36,8 @@ use osfr_tools::world::{NpcVisibility, World, WorldPose};
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
 use delivery::{chat_error_delivery, jump_fanout, wrap_application};
+#[path = "osfr_gateway/t006_guilds.rs"]
+mod t006_guilds;
 
 /// Studio savestates sit next to the character save.
 fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
@@ -485,6 +487,7 @@ struct SharedWorld {
     chat_history: ChatHistory,
     /// W173: each joined character's channel switches and bubble colour (26/32, 26/33, 26/18).
     chat_settings: social_chat::ChatSettingsBook,
+    guilds: t006_guilds::GuildWorld,
     security: Arc<Mutex<Security>>,
 }
 
@@ -566,6 +569,7 @@ impl SharedWorld {
             chat_sessions: BTreeMap::new(),
             chat_history: ChatHistory::default(),
             chat_settings: social_chat::ChatSettingsBook::default(),
+            guilds: Default::default(),
             security: Arc::default(),
         }
     }
@@ -655,6 +659,7 @@ impl SharedWorld {
                 }
             }
         }
+        deliveries.extend(self.guild_login(session));
         Ok(deliveries)
     }
 
@@ -831,10 +836,10 @@ impl SharedWorld {
             name: member.name.clone(),
             zone_id: player.zone.zone_id,
             position: player.position,
-            // (R) No tracked area/guild id: the resolver refuses both channels.
+            // (R) Area is not tracked; guild membership comes from T006's server-wide store.
             chat_area_id: None,
             group_id: self.social.group_of(player.character_guid).map(u64::from),
-            guild_id: None,
+            guild_id: self.guilds.store().guild_guid_for(player.character_guid),
             is_member: member.is_member,
         })
     }
@@ -1940,6 +1945,7 @@ impl Session {
             staged_world
                 .chat_settings
                 .save_changed(&world.chat_settings)?;
+            staged_world.guilds.save_changed()?;
             let deliveries = staged_world.with_rides(deliveries);
             let deliveries = staged_world.with_pets(deliveries);
             Ok((staged_world, deliveries, change, deferred))
@@ -2131,6 +2137,9 @@ impl Session {
         // no shared-world delivery is composed here.
         if matches!(inner, [108, 0, 1 | 3 | 5, 0, ..]) || matches!(inner, [152, 0, 4 | 5, 0, ..]) {
             return Vec::new();
+        }
+        if inner.starts_with(&[129, 0]) {
+            return self.route_guild(inner, world, now_ms);
         }
         if inner.starts_with(&[15, 0, 1, 0]) {
             return self.route_typed_chat(inner, world);
@@ -3364,6 +3373,7 @@ impl Server {
         world
             .social
             .set_group_invite_ttl(options.group_invite_ttl_ms)?;
+        world.guilds = t006_guilds::GuildWorld::load(&options.state, options.group_invite_ttl_ms)?;
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {
@@ -4437,6 +4447,7 @@ impl Server {
             }
         }
         if owns_active {
+            deliveries.extend(self.world.guild_logout(session.character_guid));
             self.membership.leave(
                 session.character_guid,
                 self.start.elapsed().as_millis() as u64,
@@ -4657,3 +4668,9 @@ fn shared_combat_budget_cannot_be_refunded_by_staging() {
 fn shared_combat_budget_pins_rate_burst_and_session_cap() {
     spine_pins::shared_combat_budget_pins_rate_burst_and_session_cap();
 }
+
+/// T006: family-129 guild routing through `Session::route_application`, with sessions and
+/// no sockets. The tests drive the same dispatch path the gateway uses.
+#[cfg(test)]
+#[path = "osfr_gateway/t006_guild_routing.rs"]
+mod t006_guild_routing;

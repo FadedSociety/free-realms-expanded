@@ -1,6 +1,6 @@
 use guilds::{
-    GuildError, GuildNoticeKind, GuildRank, GuildResultCode, GuildStore, decode_request,
-    error_message,
+    GuildError, GuildMemberName, GuildNoticeKind, GuildRank, GuildResultCode, GuildStore,
+    decode_request, error_message,
 };
 use osfr_tools::{guilds, social_chat};
 use social_chat::{
@@ -36,14 +36,20 @@ impl Drop for TempDir {
 
 fn three_members() -> (GuildStore, u64) {
     let mut store = GuildStore::new();
-    let guild = store.create_guild(1, "Guild-A", true).unwrap();
+    let guild = store.create_guild(1, "Guild-A", &member(1), true).unwrap();
     for guid in [2, 3] {
         store
             .invite(1, guild, guid, false, false, 0, 60_000)
             .unwrap();
-        store.accept_invite(guid, guild, 1, false).unwrap();
+        store
+            .accept_invite(guid, guild, 1, false, &member(guid))
+            .unwrap();
     }
     (store, guild)
+}
+
+fn member(guid: u64) -> GuildMemberName {
+    GuildMemberName::new(format!("First{guid}"), "Last".to_string())
 }
 
 fn request_header(sub: u16) -> Vec<u8> {
@@ -216,9 +222,9 @@ fn server_wide_store_roundtrips_and_reloads_members_offline() {
 #[test]
 fn duplicate_guild_name_is_rejected_case_insensitively() {
     let mut store = GuildStore::new();
-    assert_eq!(store.create_guild(1, "guild-a", true), Ok(1));
+    assert_eq!(store.create_guild(1, "guild-a", &member(1), true), Ok(1));
     assert_eq!(
-        store.create_guild(2, "GUILD-A", true),
+        store.create_guild(2, "GUILD-A", &member(2), true),
         Err(GuildError::Client(GuildResultCode::NameAlreadyExists))
     );
 }
@@ -226,7 +232,7 @@ fn duplicate_guild_name_is_rejected_case_insensitively() {
 #[test]
 fn invite_honors_ignore_and_autorefuse_and_expires() {
     let mut store = GuildStore::new();
-    let guild = store.create_guild(1, "Guild-A", true).unwrap();
+    let guild = store.create_guild(1, "Guild-A", &member(1), true).unwrap();
     assert_eq!(
         store.invite(1, guild, 2, true, false, 0, 100),
         Err(GuildError::Client(GuildResultCode::InvitePlayerNotFound))
@@ -237,7 +243,7 @@ fn invite_honors_ignore_and_autorefuse_and_expires() {
         GuildNoticeKind::InviteDeclined { target_guid: 2 }
     );
     store.invite(1, guild, 2, false, false, 0, 100).unwrap();
-    let ignored = store.accept_invite(2, guild, 1, true).unwrap();
+    let ignored = store.accept_invite(2, guild, 1, true, &member(2)).unwrap();
     assert_eq!(
         ignored[0].kind,
         GuildNoticeKind::InviteDeclined { target_guid: 2 }
@@ -249,7 +255,9 @@ fn invite_honors_ignore_and_autorefuse_and_expires() {
         GuildNoticeKind::InviteDeclined { target_guid: 2 }
     );
     store.invite(1, guild, 2, false, false, 0, 100).unwrap();
-    let timed_out = store.accept_invite(2, guild, 100, false).unwrap();
+    let timed_out = store
+        .accept_invite(2, guild, 100, false, &member(2))
+        .unwrap();
     assert_eq!(
         timed_out[0].kind,
         GuildNoticeKind::InviteTimedOut { target_guid: 2 }

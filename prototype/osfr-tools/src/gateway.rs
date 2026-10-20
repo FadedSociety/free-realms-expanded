@@ -482,6 +482,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         return "warp";
     }
     match (word(0), word(2)) {
+        // T006: family 129 (guilds) is answered by the binary's guild router; naming it here
+        // keeps an understood refusal out of the "unknown application message" log.
+        (Some(129), _) => "guilds",
         // T007: the matchmaking list/stats/join, the empty in-progress list, and the
         // lobby close. Family 101 has a one-byte subtype, so 101/9 is matched on body[2].
         (Some(101), _) if body.get(2) == Some(&9) => "matchmaking",

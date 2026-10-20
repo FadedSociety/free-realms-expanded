@@ -120,10 +120,11 @@ pub fn family_subtype_name(family: u16, subtype: u16) -> Option<&'static str> {
 }
 
 /// The one rule for which packet bodies a trace must never show as hex (credentials, chat,
-/// friends, mail and other player text). Every tracer uses it; do not copy it.
+/// friends, mail and other player text). Every tracer uses it; do not copy it. Family 129 is
+/// here because its roster, invite and MOTD messages carry player names and player-written text.
 pub fn sensitive_payload(family: u16, subtype: u16) -> bool {
     family == 1
-        || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 149 | 175)
+        || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 129 | 149 | 175)
         || (family == 26 && matches!(subtype, 14 | 15 | 16 | 17 | 30))
         || (family == 53 && subtype == 6)
 }
@@ -239,6 +240,11 @@ mod tests {
             (26, 17),
             (26, 30),
             (53, 6),
+            // T006: guild roster, invite and MOTD bodies carry player names and text.
+            (129, 11),
+            (129, 22),
+            (129, 24),
+            (129, 27),
         ] {
             assert!(
                 sensitive_payload(family, subtype),
