@@ -1206,3 +1206,11 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
 /// hub file is at its line ceiling.
 #[path = "f161_pet_adoption_persist.rs"]
 mod f161_pet_adoption_persist;
+
+/// L011 (S12/L8): a vendor purchase whose character save fails changes nothing and ends
+/// only that session. Test-only proof; no production code changes. The `#[cfg(test)]`
+/// marker also lets `tests/spine_rules.rs` recognise this test-only file, so its fixture
+/// copies do not count against the production `fs::write` ratchet.
+#[cfg(test)]
+#[path = "l011_vendor_save_failure.rs"]
+mod l011_vendor_save_failure;
