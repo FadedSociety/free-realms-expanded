@@ -190,6 +190,9 @@ pub struct PlayerRegistry {
     // W167: the ride a seated player shows in later AddPc frames (the native pending-mount
     // block). Absent means `MountTail::NONE`.
     mounts: BTreeMap<SessionId, MountTail>,
+    // (R) Last relayed opcode-164 jump per session; one broadcast per
+    // `jump_relay::MIN_INTERVAL_MS`. `leave` removes the entry with the session.
+    jump_ms: BTreeMap<SessionId, u64>,
 }
 
 impl PlayerRegistry {
@@ -202,6 +205,7 @@ impl PlayerRegistry {
             cells: BTreeMap::new(),
             views: BTreeMap::new(),
             mounts: BTreeMap::new(),
+            jump_ms: BTreeMap::new(),
         }
     }
 
@@ -229,6 +233,20 @@ impl PlayerRegistry {
                 .get(&viewer)
                 .is_some_and(|view| view.members.contains(owner))
         })
+    }
+
+    /// (R) Consume `session`'s jump-relay window. False throttles this jump for
+    /// observers; the caller still commits the pose it validated. The caller
+    /// checks that `session` is registered, so no ghost window is recorded.
+    pub fn allow_jump(&mut self, session: SessionId, now_ms: u64) -> bool {
+        let due = self
+            .jump_ms
+            .get(&session)
+            .is_none_or(|last| now_ms.saturating_sub(*last) >= crate::jump_relay::MIN_INTERVAL_MS);
+        if due {
+            self.jump_ms.insert(session, now_ms);
+        }
+        due
     }
 
     pub fn join(
@@ -313,6 +331,7 @@ impl PlayerRegistry {
         self.sessions.remove(&session_id);
         self.views.remove(&session_id);
         self.mounts.remove(&session_id);
+        self.jump_ms.remove(&session_id);
         for (owners, guid) in [
             (&mut self.account_owners, removed.account_guid),
             (&mut self.character_owners, removed.character_guid),

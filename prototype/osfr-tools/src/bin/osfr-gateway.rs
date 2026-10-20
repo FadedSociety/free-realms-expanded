@@ -35,7 +35,7 @@ use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
-use delivery::{chat_error_delivery, wrap_application};
+use delivery::{chat_error_delivery, jump_fanout, wrap_application};
 
 /// Studio savestates sit next to the character save.
 fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
@@ -1869,6 +1869,8 @@ impl Session {
                     bytes: message.bytes,
                 }));
             }
+            let jump = outcome.jump.take();
+            deliveries.extend(jump_fanout(&mut staged_world, self.id, jump, now_ms));
 
             if staged_world.joined.contains(&self.id) {
                 self.emote = staged_gateway.emote_context(now_ms);

@@ -37,6 +37,7 @@ pub use inventory::instance_ids as inventory_ids;
 pub mod harvest_nodes;
 pub mod item_bar;
 pub mod item_categories;
+pub mod jump_relay;
 pub mod kart_entry;
 pub mod kart_gateway;
 pub mod kart_lobby_native;

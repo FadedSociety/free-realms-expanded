@@ -778,6 +778,429 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
 #[path = "test_support.rs"]
 pub(crate) mod test_support;
 
+/// T008: the opcode-164 jump body reaches exactly the sessions whose directed
+/// view contains the sender, and the relay window is throttled per session.
+#[test]
+fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+    let scratch = std::env::temp_dir().join(format!("osfr-jump-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&scratch);
+    fs::create_dir_all(&scratch).unwrap();
+    let options = Options {
+        bind: "127.0.0.1:0".parse().unwrap(),
+        reference: root.join("references/rust-gateway-reference"),
+        state: scratch.join("character.json"),
+        content: None,
+        identity: None,
+        account_store: None,
+        gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
+        handoff_key: Vec::new(),
+        seconds: 1,
+        dev_tools: false,
+        studio_port: 0,
+        client_logs: None,
+        terrain: None,
+        world: None,
+        stock_text: None,
+        allow_lan: false,
+        security_log: None,
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+    };
+    let new_session = |id: u64| {
+        Session::new(
+            SessionId(id),
+            format!("127.0.0.1:{}", 30_000 + id).parse().unwrap(),
+            SessionRequest {
+                id: id as u32,
+                crc_length: 3,
+                buffer_size: 512,
+            },
+            &options,
+            CRC_SEED,
+            None,
+            None,
+        )
+        .unwrap()
+    };
+    let mut sender = new_session(17);
+    let recipient = new_session(18);
+    let non_viewer = new_session(19);
+    let mut world = SharedWorld::new();
+    // One directed slot: a nearby session can fall outside the sender's view.
+    world.players = PlayerRegistry::new(InterestPolicy::new(50.0, 1).unwrap());
+    let mut membership = World::runtime();
+    let mut sessions = SessionMap::new();
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["jump-relay", "1.910.1.530630", ""].into_iter().enumerate() {
+        login.extend((text.len() as u32).to_le_bytes());
+        login.extend(text.as_bytes());
+        if index == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    for (message, now) in [(login, 0), (wrap(&[13, 0]), 100), (wrap(&[10, 0]), 200)] {
+        sender
+            .dispatch_message(
+                &message,
+                &options,
+                now,
+                &mut world,
+                &mut membership,
+                &mut sessions,
+                None,
+            )
+            .unwrap();
+    }
+    let joined = world
+        .players
+        .get(sender.id)
+        .expect("sender entered the world");
+    let zone = joined.zone;
+    let start = joined.position;
+    let character = joined.character_guid;
+    for (session, guid, dx) in [(&recipient, 2u64, 1.0f32), (&non_viewer, 3, 5.0)] {
+        let mut presentation = osfr_tools::players::PlayerPresentation::default();
+        presentation.character_guid = guid;
+        world
+            .players
+            .join_with_presentation(
+                session.id,
+                guid + 10_000,
+                guid,
+                zone,
+                [start[0] + dx, start[1], start[2]],
+                0.0,
+                presentation,
+            )
+            .unwrap();
+        world.joined.insert(session.id);
+        world.session_keys.insert(
+            session.id,
+            SessionKey {
+                peer: session.peer,
+                connection_id: session.request.id,
+            },
+        );
+    }
+    assert!(world.players.knows_character(recipient.id, character));
+    assert!(!world.players.knows_character(non_viewer.id, character));
+    let recipient_key = SessionKey {
+        peer: recipient.peer,
+        connection_id: recipient.request.id,
+    };
+    let non_viewer_key = SessionKey {
+        peer: non_viewer.peer,
+        connection_id: non_viewer.request.id,
+    };
+    sessions.insert(recipient_key, recipient);
+    sessions.insert(non_viewer_key, non_viewer);
+    let jump_body = |guid: u64, position: [f32; 3], direction: [f32; 3], velocity: f32| {
+        let mut inner = 164u16.to_le_bytes().to_vec();
+        inner.extend(guid.to_le_bytes());
+        for value in position.into_iter().chain(direction) {
+            inner.extend(value.to_le_bytes());
+        }
+        inner.extend([2, 255]);
+        inner.extend(velocity.to_le_bytes());
+        assert_eq!(inner.len(), osfr_tools::jump_relay::BODY_LEN);
+        inner
+    };
+    let jump = |dx: f32| {
+        let position = [start[0] + dx, start[1], start[2]];
+        wrap(&jump_body(character, position, [0.0, 0.0, 1.0], 0.5))
+    };
+    let jump_bodies = |messages: Vec<Vec<u8>>| -> Vec<Vec<u8>> {
+        messages
+            .into_iter()
+            .filter_map(|message| message.get(7..).map(<[u8]>::to_vec))
+            .filter(|inner| inner.starts_with(&[164, 0]))
+            .collect()
+    };
+    sender
+        .dispatch_message(
+            &jump(0.5),
+            &options,
+            1_000,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    let relayed = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+        sessions.get_mut(&recipient_key).unwrap(),
+        1_000,
+    ));
+    assert_eq!(relayed.len(), 1, "the visible peer receives one jump");
+    let relay = osfr_tools::jump_relay::decode(&relayed[0], character).unwrap();
+    assert_eq!(relay.position, [start[0] + 0.5, start[1], start[2]]);
+    assert_eq!(relay.vertical_velocity, 0.5);
+    assert_eq!((relay.state, relay.unknown), (2, 255));
+    assert!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            sessions.get_mut(&non_viewer_key).unwrap(),
+            1_000,
+        ))
+        .is_empty(),
+        "a nearby session outside the directed view receives nothing"
+    );
+    assert!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            &mut sender,
+            1_000,
+        ))
+        .is_empty(),
+        "the sender never receives its own jump"
+    );
+    // 50 ms later the relay is throttled, but the validated pose still applies.
+    sender
+        .dispatch_message(
+            &jump(1.0),
+            &options,
+            1_050,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    assert!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            sessions.get_mut(&recipient_key).unwrap(),
+            1_050,
+        ))
+        .is_empty(),
+        "one relay per session window"
+    );
+    assert_eq!(sender.gateway.state().position[0], start[0] + 1.0);
+    // The next window publishes the jump again.
+    sender
+        .dispatch_message(
+            &jump(1.5),
+            &options,
+            1_100,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    let again = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+        sessions.get_mut(&recipient_key).unwrap(),
+        1_100,
+    ));
+    assert_eq!(again.len(), 1);
+    assert_eq!(
+        osfr_tools::jump_relay::decode(&again[0], character)
+            .unwrap()
+            .position[0],
+        start[0] + 1.5
+    );
+    // A refusal is discarded before the staged transaction commits: the pose,
+    // the world and the relay window are unchanged.
+    let settled = sender.gateway.state().clone();
+    let direction = [0.0, 0.0, 1.0];
+    let exact = jump_body(
+        character,
+        [start[0] + 2.0, start[1], start[2]],
+        direction,
+        0.5,
+    );
+    let refusals = [
+        (
+            "foreign guid",
+            jump_body(
+                character + 1,
+                [start[0] + 2.0, start[1], start[2]],
+                direction,
+                0.5,
+            ),
+        ),
+        (
+            "excessive velocity",
+            jump_body(
+                character,
+                [start[0] + 2.0, start[1], start[2]],
+                direction,
+                osfr_tools::jump_relay::MAX_VERTICAL_SPEED + 1.0,
+            ),
+        ),
+        (
+            "nonfinite position",
+            jump_body(character, [f32::NAN, start[1], start[2]], direction, 0.5),
+        ),
+        (
+            "nonfinite direction",
+            jump_body(
+                character,
+                [start[0] + 2.0, start[1], start[2]],
+                [f32::INFINITY, 0.0, 1.0],
+                0.5,
+            ),
+        ),
+        (
+            "out-of-bounds position",
+            jump_body(
+                character,
+                [
+                    osfr_tools::movement::MAX_POSITION_COMPONENT + 1.0,
+                    start[1],
+                    start[2],
+                ],
+                direction,
+                0.5,
+            ),
+        ),
+        ("short body", exact[..39].to_vec()),
+        ("trailing byte", [exact, vec![0]].concat()),
+    ];
+    for (label, inner) in refusals {
+        assert!(
+            sender
+                .dispatch_message(
+                    &wrap(&inner),
+                    &options,
+                    1_200,
+                    &mut world,
+                    &mut membership,
+                    &mut sessions,
+                    None,
+                )
+                .is_err(),
+            "{label} is refused"
+        );
+        assert_eq!(
+            sender.gateway.state(),
+            &settled,
+            "{label} changed the sender"
+        );
+        assert!(
+            jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+                sessions.get_mut(&recipient_key).unwrap(),
+                1_200,
+            ))
+            .is_empty(),
+            "{label} relayed"
+        );
+    }
+    // A refused jump consumed no relay window: this is 100 ms after the last
+    // accepted jump, so the viewer still receives it.
+    sender
+        .dispatch_message(
+            &jump(2.5),
+            &options,
+            1_200,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    assert_eq!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            sessions.get_mut(&recipient_key).unwrap(),
+            1_200,
+        ))
+        .len(),
+        1,
+        "a refusal did not consume the relay window"
+    );
+    // A later 125 in the same bundle supersedes the earlier 164 pose: observers
+    // must not receive the stale jump after the final pose fanout.
+    let mut newer = 125u16.to_le_bytes().to_vec();
+    newer.extend(character.to_le_bytes());
+    for value in [start[0] + 4.0, start[1], start[2], 0.0, 0.0, 1.0] {
+        newer.extend(value.to_le_bytes());
+    }
+    newer.extend([2, 255]);
+    let mut bundle = vec![0, 25];
+    for child in [
+        wrap(&jump_body(
+            character,
+            [start[0] + 3.0, start[1], start[2]],
+            direction,
+            3.0,
+        )),
+        wrap(&newer),
+    ] {
+        bundle.push(child.len() as u8);
+        bundle.extend(child);
+    }
+    sender
+        .dispatch_message(
+            &bundle,
+            &options,
+            1_300,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    assert_eq!(sender.gateway.state().position[0], start[0] + 4.0);
+    assert!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            sessions.get_mut(&recipient_key).unwrap(),
+            1_300,
+        ))
+        .is_empty(),
+        "a later 125 superseded the jump relay"
+    );
+    // A soft-over-speed jump is corrected for the sender and is not relayed.
+    sender
+        .dispatch_message(
+            &jump(62.0),
+            &options,
+            1_400,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    assert!(sender.gateway.state().position[0] < start[0] + 62.0);
+    assert!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            sessions.get_mut(&recipient_key).unwrap(),
+            1_400,
+        ))
+        .is_empty(),
+        "a clamped jump is not relayed"
+    );
+    assert!(
+        super::f120_fishing_hour_reconnect::drain_replies(&mut sender, 1_400)
+            .iter()
+            .any(|message| message[7..].starts_with(&[38, 0, 12, 0])),
+        "the clamped sender receives the location correction"
+    );
+    // The world-entry gate is shared with opcode 125: a jump before Ready is refused.
+    let mut early = new_session(20);
+    let before_ready = early.gateway.state().clone();
+    let early_guid = early.gateway.state().guid;
+    assert!(
+        early
+            .dispatch_message(
+                &wrap(&jump_body(
+                    early_guid,
+                    [start[0] + 0.5, start[1], start[2]],
+                    direction,
+                    0.5,
+                )),
+                &options,
+                1_500,
+                &mut world,
+                &mut membership,
+                &mut sessions,
+                None,
+            )
+            .is_err(),
+        "a jump before Ready is refused"
+    );
+    assert_eq!(early.gateway.state(), &before_ready);
+    drop(world);
+    let _ = fs::remove_dir_all(&scratch);
+}
+
 /// F161: a pet adoption spends a certificate and adds a pet in one atomic document; a refused
 /// replacement leaves the document and the live session unchanged. Declared here because the
 /// hub file is at its line ceiling.

@@ -10,6 +10,46 @@ pub(super) fn wrap_application(inner: &[u8]) -> Vec<u8> {
     out
 }
 
+/// T008: one opcode-164 jump body to the sessions whose directed view contains
+/// the sender. `PlayerRegistry::allow_jump` throttles the relay per session; a
+/// throttled jump publishes nothing. The sender never receives its own jump.
+pub(super) fn jump_fanout(
+    world: &mut SharedWorld,
+    sender: SessionId,
+    jump: Option<Vec<u8>>,
+    now_ms: u64,
+) -> Vec<Delivery> {
+    let Some(jump) = jump else {
+        return Vec::new();
+    };
+    if !world.joined.contains(&sender) {
+        return Vec::new();
+    }
+    let Some((zone, position, character)) = world
+        .players
+        .get(sender)
+        .map(|player| (player.zone, player.position, player.character_guid))
+    else {
+        return Vec::new();
+    };
+    if !world.players.allow_jump(sender, now_ms) {
+        return Vec::new();
+    }
+    let bytes = wrap_application(&jump);
+    world
+        .players
+        .nearby_sessions(zone, position)
+        .into_iter()
+        .filter(|recipient| {
+            *recipient != sender && world.players.knows_character(*recipient, character)
+        })
+        .map(|recipient| Delivery {
+            recipient,
+            bytes: bytes.clone(),
+        })
+        .collect()
+}
+
 /// One client-refusal reply, or nothing when the error has no client form.
 pub(super) fn chat_error_delivery(
     error: osfr_tools::social_chat::ChatError,

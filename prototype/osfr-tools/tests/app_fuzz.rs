@@ -860,6 +860,11 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     movement.extend([0; 24]);
     movement.extend([0, 0]);
     result.push(("movement", movement));
+    // T008: the separate jump update is a 40-byte body; a foreign GUID must refuse atomically.
+    let mut jump = 164u16.to_le_bytes().to_vec();
+    jump.extend(u64::MAX.to_le_bytes());
+    jump.extend([0; 30]);
+    result.push(("movement", jump));
     let mut camera = 126u16.to_le_bytes().to_vec();
     camera.extend([0; 24]);
     result.push(("gateway.camera", camera));

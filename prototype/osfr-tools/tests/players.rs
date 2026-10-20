@@ -689,3 +689,30 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
         assert!(join(&mut registry, 1, 101, 1001, zone(8, 13), [0.0; 3], 0.0).is_empty());
     }
 }
+
+#[test]
+fn jump_relay_window_is_per_session_and_clears_on_leave() {
+    const INTERVAL: u64 = osfr_tools::jump_relay::MIN_INTERVAL_MS;
+    let mut registry = registry(50.0, 10);
+    join(&mut registry, 1, 101, 1001, zone(8, 13), [0.0; 3], 0.0);
+    join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        zone(8, 13),
+        [1.0, 0.0, 0.0],
+        0.0,
+    );
+    assert!(registry.allow_jump(SessionId(1), 1_000));
+    assert!(!registry.allow_jump(SessionId(1), 1_000 + INTERVAL - 1));
+    assert!(
+        registry.allow_jump(SessionId(2), 1_000),
+        "windows are per session"
+    );
+    assert!(registry.allow_jump(SessionId(1), 1_000 + INTERVAL));
+    // A reconnect under the same session id starts a fresh window.
+    registry.leave(SessionId(1));
+    join(&mut registry, 1, 101, 1001, zone(8, 13), [0.0; 3], 0.0);
+    assert!(registry.allow_jump(SessionId(1), 1_000 + INTERVAL));
+}

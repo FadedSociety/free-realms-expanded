@@ -130,6 +130,8 @@ pub struct GatewayOutcome {
     pub broadcast: Option<String>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
+    /// Validated opcode-164 body for directed viewers (throttled there); a later child clears it.
+    pub jump: Option<Vec<u8>>,
     pub state_changed: bool,
     pub entered_world: bool,
     pub gameplay_changed: bool,
@@ -384,7 +386,8 @@ enum Event {
     Login,
     Ready,
     Loaded,
-    Position(MovementUpdate),
+    /// `Some(vertical_velocity)` is the native opcode-164 jump update.
+    Position(MovementUpdate, Option<f32>),
     Camera,
     Time,
     Application(Vec<u8>),
@@ -432,13 +435,13 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
         Event::Login => "gateway.login",
         Event::Ready => "gateway.ready",
         Event::Loaded => "gateway.loaded",
-        Event::Position(_) => "movement",
+        Event::Position(..) => "movement",
         Event::Camera => "gateway.camera",
         Event::Time => "gateway.time_sync",
         Event::Application(_) => application_handler(body),
     };
     GatewayTraceEvent {
-        event: if matches!(event, Event::Position(_)) {
+        event: if matches!(event, Event::Position(..)) {
             "movement"
         } else {
             "packet"
@@ -613,12 +616,19 @@ fn parse_message(message: &[u8], state: &CharacterState, version: &str) -> io::R
                     }
                     let position = reader.vector()?;
                     let direction = reader.vector()?;
-                    Event::Position(MovementUpdate {
+                    let update = MovementUpdate {
                         position,
                         direction,
                         state: reader.u8()?,
                         unknown: reader.u8()?,
-                    })
+                    };
+                    Event::Position(update, None)
+                }
+                164 => {
+                    // Native jump reader 008e5ba0 / writer 009127f0: 40-byte body.
+                    let jump = crate::jump_relay::decode(inner, state.guid)?;
+                    reader.take(38)?;
+                    Event::Position(jump.movement(), Some(jump.vertical_velocity))
                 }
                 126 => {
                     reader.vector()?;
@@ -1485,7 +1495,7 @@ impl Gateway {
                     }
                     loaded = true;
                 }
-                Event::Position(update) => {
+                Event::Position(update, jump) => {
                     if !ready {
                         // Movement from the prior scene can already be queued
                         // when a begin-zoning reply is emitted.
@@ -1568,11 +1578,16 @@ impl Gateway {
                             state.rotation = validated.state.direction;
                             movement_state = validated.state;
                             last_movement_ms = Some(now_ms);
+                            outcome.jump = None;
                             if clamped {
                                 outcome.replies.push(wrapped(&dev_teleport::location_packet(
                                     state.position,
                                     state.rotation,
                                 )));
+                            } else if let Some(velocity) = jump {
+                                let pose = validated.state;
+                                outcome.jump =
+                                    Some(crate::jump_relay::relay(state.guid, &pose, velocity));
                             }
                         }
                     }
