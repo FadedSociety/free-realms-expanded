@@ -4,7 +4,9 @@
 //! killed through the field Attack menu; Cleetus' Copper Collection (3000016) counts five
 //! Copper Ore (item definition 2739) gathered from the Snowhill copper-vein nodes through
 //! the ordinary Type8 mining round. Both are offered by Cleetus Farnum (9000000050) and
-//! turned in through the real 26/8 -> 26/10 -> 26/6 -> 49/13 -> 49/14 sequence.
+//! turned in through the real 26/8 -> 26/10 -> 26/6 -> 49/13 -> 49/14 sequence. The
+//! shared fixture, packet builders and refusal/offer helpers come from
+//! `tests/support/npc_quest_chain.rs`.
 //!
 //! Client packet layouts used here (IDA native map):
 //! - 26/8 CommandPacketInteractRequest constructor `008b6bc0`: two u32 target words and a
@@ -13,34 +15,43 @@
 //!   an i32 choice.
 //! - 26/6 PacketDialogResponse constructor `009f5890`: one i32 row (the quest row is 301).
 //! - 49/2 QuestReply constructor `00a86400`: u32 quest id and a u8 accept flag.
-//! - 49/1 QuestInfo reader `00c7bb60`; the field order is pinned by the T202 route test:
-//!   quest at 6, intro at 10, title at 14/18, description at 22.
+//! - 49/1 QuestInfo reader `00c7b7a0`: six dwords end at offset 30, members-only at 30,
+//!   then the 69-byte reward bundle at 31 read by `008e7930`; quest at 6, intro at 10,
+//!   title at 14/18, description at 22. The offer still carries the zeroed placeholder
+//!   bundle: populating it is an S15/S16 `npc.rs` follow-up (accepted gap, see
+//!   `assert_offer_bundle_is_the_known_placeholder`).
 //! - 49/13 QuestEnd reader `00c7b990`: u64 actor, quest i32, end-text u32, a reserved u32,
 //!   then the 69-byte reward bundle (success, coins, XP stars) and a trailing float.
 //! - 49/14 QuestEndReply constructor `00a864c0`: one u32 quest id.
-//! - 35/2 AddNpc body reader `00921a10` starts with the actor u64; 35/3 is the removal the
-//!   hostile test below reads to prove the wolf died.
+//! - 35/3 removal body reader `008d69f0` (base reader `008d6830`, wrapper `008f7700`,
+//!   packet constructor `008b3840`): u16 flag at 4..6, then the actor u64 at 6..14. The
+//!   hostile test reads it to prove the wolf died.
 
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+
+use npc_quest_chain::{
+    CHARACTER, Fixture as ChainFixture, accept, active_job, assert_no_offer,
+    assert_packet_changes_nothing, character_at_for, coins, content_dir, content_position, counts,
+    finish_quest, has_family, npc_interact, npc_select, offer, profile_xp,
+    quest_end_reply as npc_quest_end_reply, quest_reply as npc_quest_reply, quest_status,
+    read_json, release_end_screen, saved, select_job, send, talk,
+};
 use osfr_tools::{
     character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState, Outcome},
+    game_store,
+    gameplay::{Gameplay, Outcome},
     harvest_nodes::GatheringNodes,
     mining::{self, Type8BoardSpec, Type8Goal, Type8Kind, Type8Output},
     profiles::ProfileState,
     quest_engine::QuestStatus,
 };
 use serde_json::{Value, json};
-use std::{
-    collections::BTreeMap,
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-};
+use std::{collections::BTreeMap, fs, path::Path};
 
-static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
-
-const CHARACTER: u64 = 241_017;
 const CLEETUS: u64 = 9_000_000_050;
+/// A placed quest giver who gives neither live Farnum quest (wrong-NPC refusal).
+const ANNE: u64 = 9_500_000_266;
 const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
@@ -48,6 +59,9 @@ const FIGHTING_THE_PACK: u32 = 3_000_009;
 const COPPER_COLLECTION: u32 = 3_000_016;
 /// The authored predecessor; it stays disabled, so 3000009 is a playtest entry (R).
 const YOUR_FIRST_WEAPON: u32 = 3_000_008;
+/// A 3000020+ row this slice must not touch; pinned by id/title/enabled.
+const UNTOUCHED_RECORD: u32 = 3_000_020;
+const UNTOUCHED_TITLE: u32 = 94_247;
 const WOLF_DEFINITION: u32 = 3_156;
 /// (R) The live copper-vein node emits the mined item definition, Copper Ore 2739.
 const COPPER_ORE: u32 = 2_739;
@@ -60,8 +74,6 @@ const COPPER_INTRO: u32 = 5_100_482;
 const COPPER_DESCRIPTION: u32 = 5_100_484;
 const COPPER_END_TEXT: u32 = 5_100_485;
 const ATTACK_CHOICE: i32 = 103;
-const QUEST_CHOICE: i32 = 301;
-const TALK_LABEL: u32 = 3_300;
 const MINING_XP_PER_WIN: u32 = mining::lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN;
 /// 39/6 Quit: leave the offered run without a payout.
 const QUIT_FRAME_SUB: u8 = 6;
@@ -70,32 +82,14 @@ const CLOSE_GAME: [u8; 4] = [26, 0, 42, 0];
 /// The authored `starting_farnum_wolves` group respawn timer.
 const WOLF_RESPAWN_MS: u64 = 46_000;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-fn copy_dir(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_dir(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), &target).unwrap();
-        }
-    }
-}
-
 /// One-goal Mining18 stand-in so a gather is exactly one Copper Ore. The board is the
 /// established synthetic W140/W171 fixture; node entry, payout and the quest event are the
-/// production path. The shipped `mining.json` pays a multi-ore batch per win, which cannot
-/// exercise the five separate gathers this quest defines.
+/// production path. Limitation: the shipped `mining.json` pays a multi-ore batch per win
+/// and needs six quota clusters in each of its two goals, so five separate single-ore
+/// gathers cannot be counted on it. This suite therefore proves the 2739 binding on a
+/// synthetic board; the shipped board's own 2739 output is pinned in
+/// `the_two_new_records_load_and_their_targets_exist`, and
+/// `gameplay::t013_objective_events` drives the same production apply path.
 fn synthetic_mining() -> Value {
     const LEFT: usize = 3;
     const TOP: usize = 3;
@@ -163,34 +157,26 @@ fn synthetic_mining() -> Value {
     })
 }
 
-struct Fixture {
-    root: PathBuf,
-}
+/// The canonical opening fixture with the synthetic one-goal mining board on top.
+struct Fixture(ChainFixture);
 
 impl Fixture {
     fn new() -> Self {
-        let source = gameplay_dir();
-        assert!(
-            source.join("opening.json").is_file() && source.join("inventory.json").is_file(),
-            "the opening reference content is required at {}",
-            source.display()
-        );
-        let root = std::env::temp_dir().join(format!(
-            "osfr-t241-{}-{}",
-            std::process::id(),
-            NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
-        ));
-        copy_dir(&source, &root);
+        let fixture = ChainFixture::new();
         fs::write(
-            root.join(mining::CONTENT_FILE),
+            fixture.path().join(mining::CONTENT_FILE),
             synthetic_mining().to_string(),
         )
-        .unwrap();
-        Self { root }
+        .expect("synthetic mining board writes");
+        Self(fixture)
+    }
+
+    fn path(&self) -> &Path {
+        self.0.path()
     }
 
     fn game(&self, active: i32, unlocked: &[i32]) -> Gameplay {
-        let mut state = Gameplay::load(&self.root, None)
+        let mut state = Gameplay::load(self.path(), None)
             .expect("opening reference loads")
             .state();
         state.profiles = Some(ProfileState {
@@ -199,47 +185,31 @@ impl Fixture {
             unlocked: unlocked.iter().copied().collect(),
             experience: BTreeMap::new(),
         });
-        self.load(state)
+        self.0.game_as(CHARACTER, Some(state))
     }
 
-    /// The shipped `Fixture::load` sequence: the saved character state plus the split quest
-    /// catalogue exactly as `bind_npc_quest_catalogue` binds it in production.
-    fn load(&self, state: GameplayState) -> Gameplay {
-        let mut game = Gameplay::load(&self.root, Some(state)).expect("saved state loads");
-        game.bind_npc_quest_catalogue(&content_dir(), CHARACTER)
-            .expect("split quest content loads");
-        game
+    /// The production save envelope, not a `GameplayState` proxy: one JSON document
+    /// holding the character and the gameplay payload, written by `game_store`.
+    fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
+        let path = self.path().join("character.json");
+        let snapshot = game_store::Snapshot {
+            character: character.clone(),
+            gameplay: Some(game.state()),
+        };
+        game_store::save(&path, &snapshot).expect("the save envelope writes");
+        let loaded =
+            game_store::load_or_create(&path, character.clone()).expect("the envelope loads");
+        assert_eq!(loaded.character, *character);
+        self.0.game_as(CHARACTER, loaded.gameplay)
     }
-
-    fn save(&self, game: &Gameplay) -> Gameplay {
-        let bytes = serde_json::to_vec(&game.state()).unwrap();
-        self.load(serde_json::from_slice(&bytes).unwrap())
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.root);
-    }
-}
-
-fn read_content(relative: &str) -> Value {
-    serde_json::from_slice(&fs::read(content_dir().join(relative)).unwrap())
-        .unwrap_or_else(|error| panic!("{relative} is valid JSON: {error}"))
 }
 
 fn cleetus_position() -> [f32; 3] {
-    let document = read_content("npcs/farnum_farmstead.json");
-    let npc = document["records"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|record| record["npc_id"].as_u64() == Some(CLEETUS))
-        .expect("Cleetus Farnum is a split NPC record");
-    assert_eq!(npc["name"], "Cleetus Farnum");
-    // Only data-backed placements spawn; a POI anchor is not a drawable actor.
-    assert_eq!(npc["placement"], "legacy_data");
-    serde_json::from_value(npc["position"].clone()).expect("the giver has a spawn position")
+    content_position("farnum_farmstead.json", CLEETUS)
+}
+
+fn character_at(position: [f32; 3]) -> CharacterState {
+    character_at_for(CHARACTER, 0, position)
 }
 
 /// The always-on Hooligan Wolves (definition 3156). Empty `quest_ids` is
@@ -247,8 +217,7 @@ fn cleetus_position() -> [f32; 3] {
 /// by definition id, so T245's level-5 `MID-F` camp is part of this population:
 /// five live wolves, not three.
 fn wolves() -> Vec<(u64, [f32; 3])> {
-    let document = read_content("field_enemies.json");
-    document["enemies"]
+    read_json(&content_dir().join("field_enemies.json"))["enemies"]
         .as_array()
         .unwrap()
         .iter()
@@ -280,34 +249,6 @@ fn copper_nodes() -> Vec<(u64, [f32; 3])> {
     found
 }
 
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: CHARACTER,
-        zone_id: 0,
-        position,
-        rotation: [0.0, 0.0, 1.0],
-    }
-}
-
-fn saved(game: &Gameplay) -> Vec<u8> {
-    serde_json::to_vec(&game.state()).unwrap()
-}
-
-fn coins(game: &Gameplay) -> u32 {
-    game.state().inventory.coins
-}
-
-fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
-    game.state()
-        .profiles
-        .as_ref()
-        .unwrap()
-        .experience
-        .get(&profile)
-        .copied()
-        .unwrap_or(0)
-}
-
 fn copper_ore(game: &Gameplay) -> u32 {
     game.state()
         .inventory
@@ -318,78 +259,43 @@ fn copper_ore(game: &Gameplay) -> u32 {
         .sum()
 }
 
-fn quest(game: &Gameplay, quest_id: u32) -> Option<(QuestStatus, Vec<u32>)> {
-    let state = game.state();
-    let progress = state.npc_quests.as_ref()?.quests.get(&quest_id)?;
-    Some((progress.status.clone(), progress.counts.clone()))
+fn has_quest(game: &Gameplay, quest_id: u32) -> bool {
+    game.state()
+        .npc_quests
+        .as_ref()
+        .is_some_and(|state| state.quests.contains_key(&quest_id))
 }
 
 fn count(game: &Gameplay, quest_id: u32, objective: usize) -> u32 {
-    quest(game, quest_id)
-        .unwrap_or_else(|| panic!("quest {quest_id} has state"))
-        .1[objective]
+    counts(game, quest_id)[objective]
 }
 
-fn send(game: &mut Gameplay, character: &CharacterState, packet: &[u8], now: u64) -> Outcome {
-    game.handle_in_world(packet, character, now)
-        .unwrap_or_else(|error| {
-            panic!(
-                "packet {:?} was refused: {error}",
-                &packet[..packet.len().min(4)]
-            )
-        })
-}
-
-fn has_family(packet: &[u8], family: u16, subtype: u16) -> bool {
-    packet.len() >= 4
-        && packet[..2] == family.to_le_bytes()
-        && packet[2..4] == subtype.to_le_bytes()
-}
-
-fn quest_packet(outcome: &Outcome, subtype: u16, quest_id: u32) -> Option<&Vec<u8>> {
-    outcome.replies.iter().find(|packet| {
-        has_family(packet, 49, subtype)
-            && packet.get(6..10) == Some(quest_id.to_le_bytes().as_slice())
-    })
+/// A Talk holds the completed quest's 49/13, and the 26/6 dialogue choice releases it;
+/// sending 26/6 alone has nothing to release.
+fn open_end_screen(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    quest_id: u32,
+    end_text: u32,
+    now: u64,
+) -> Vec<u8> {
+    let dialogue = talk(game, character, CLEETUS, now);
+    assert!(
+        !dialogue
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, None)),
+        "the end screen opens only after the dialogue choice"
+    );
+    release_end_screen(game, character, quest_id, CLEETUS, end_text, now + 2)
 }
 
 fn word(packet: &[u8], offset: usize) -> u32 {
     u32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
 }
 
-// Client constructors: 26/8 `008b6bc0`, 26/10 `00a36f80`, 26/6 `009f5890`, 49/2
-// `00a86400`, 49/14 `00a864c0`.
-fn npc_interact(target: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(target.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn npc_select(target: u64, choice: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(target.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-fn dialogue_choice(row: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 6, 0];
-    packet.extend(row.to_le_bytes());
-    packet
-}
-
-fn quest_reply(quest_id: u32, accept: bool) -> Vec<u8> {
-    let mut packet = vec![49, 0, 2, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet.push(u8::from(accept));
-    packet
-}
-
-fn quest_end_reply(quest_id: u32) -> Vec<u8> {
-    let mut packet = vec![49, 0, 14, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet
+fn signed_word(packet: &[u8], offset: usize) -> i32 {
+    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
 }
 
 // Client 39/5 RequestStartGame `009be7d0` writes subtype, current instance and two -1 words;
@@ -410,168 +316,75 @@ fn type8_payload(instance: i32, text: &str) -> Vec<u8> {
     packet
 }
 
-fn menu_option(outcome: &Outcome, label: u32) -> i32 {
-    let menu = outcome
+fn offer_packet(outcome: &Outcome, quest_id: u32) -> Vec<u8> {
+    outcome
         .replies
         .iter()
-        .find(|packet| has_family(packet, 26, 9))
-        .expect("26/8 returns the 26/9 interaction menu");
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    assert!(count > 0, "the interaction menu has options");
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
-            let string_id = word(menu, offset + 8);
-            (string_id == label).then_some(id)
-        })
-        .unwrap_or_else(|| panic!("menu label {label} is absent"))
+        .find(|packet| has_family(packet, 49, 1, Some(quest_id)))
+        .cloned()
+        .expect("49/1 quest offer")
 }
 
-/// The Talk option. It also completes a quest's final talk objective and holds its end
-/// screen in the same production request, exactly as the client does.
-fn talk(game: &mut Gameplay, character: &CharacterState, npc: u64, now: u64) -> Outcome {
-    let menu = send(game, character, &npc_interact(npc), now);
-    let choice = menu_option(&menu, TALK_LABEL);
-    send(game, character, &npc_select(npc, choice), now + 1)
+/// 49/1 quest at 6, intro at 10, title at 14/18, description at 22 (`00c7b7a0`).
+fn assert_offer_ids(packet: &[u8], quest_id: u32, intro: u32, title: u32, description: u32) {
+    assert_eq!(word(packet, 6), quest_id);
+    assert_eq!(word(packet, 10), intro, "49/1 intro id");
+    assert_eq!(word(packet, 14), title, "49/1 title id");
+    assert_eq!(word(packet, 18), title, "49/1 title id (card)");
+    assert_eq!(word(packet, 22), description, "49/1 description id");
 }
 
-/// Talk, then choose the quest row: the 49/1 offer.
-fn offered(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    npc: u64,
-    quest_id: u32,
-    now: u64,
-) -> Vec<u8> {
-    let dialogue = talk(game, character, npc, now);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 26, 3)),
-        "Talk opens the 26/3 dialogue"
-    );
-    let replies = send(game, character, &dialogue_choice(QUEST_CHOICE), now + 2);
-    quest_packet(&replies, 1, quest_id)
-        .unwrap_or_else(|| panic!("quest {quest_id} was not offered"))
-        .clone()
-}
-
-fn assert_offer_ids(offer: &[u8], quest_id: u32, intro: u32, title: u32, description: u32) {
-    assert_eq!(word(offer, 6), quest_id);
-    assert_eq!(word(offer, 10), intro, "49/1 intro id");
-    assert_eq!(word(offer, 14), title, "49/1 title id");
-    assert_eq!(word(offer, 18), title, "49/1 title id (card)");
-    assert_eq!(word(offer, 22), description, "49/1 description id");
-}
-
-fn accept(game: &mut Gameplay, character: &CharacterState, quest_id: u32, now: u64) {
-    let accepted = send(game, character, &quest_reply(quest_id, true), now);
-    assert!(
-        quest_packet(&accepted, 3, quest_id).is_some(),
-        "49/2 accept answers QuestAdd"
-    );
+/// (R) Accepted gap, lead-deferred: the 49/1 card's 69-byte ClientRewardBundle
+/// (`00c7b7a0` -> `008e7930`, packet offset 31) is the pre-existing zeroed placeholder,
+/// so the client reads 0 coins/0 XP on the offer card. Populating it from the authored
+/// reward is an S15/S16 `src/gameplay/npc.rs` change and needs lead ownership
+/// (F267 review finding 4, alternative "amend the gate and note the gap"); the exact
+/// coins/XP are shown on the 49/13 screen and asserted by `assert_end_reward`.
+fn assert_offer_bundle_is_the_known_placeholder(packet: &[u8]) {
     assert_eq!(
-        quest(game, quest_id).expect("accepted quest state").0,
-        QuestStatus::Active
+        packet.len(),
+        114,
+        "49/1 is 114 bytes with the 69-byte empty bundle"
     );
-}
-
-/// Open the 49/13 end screen through Talk and the dialogue row; it must not arrive on the
-/// first request because the client draws it over an open dialog.
-fn open_end_screen(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    npc: u64,
-    quest_id: u32,
-    now: u64,
-) -> Vec<u8> {
-    let dialogue = talk(game, character, npc, now);
     assert!(
-        !dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 13)),
-        "the end screen opens only after the dialogue choice"
+        packet[31..100].iter().all(|byte| *byte == 0),
+        "the 49/1 reward bundle is still the zeroed placeholder"
     );
-    let released = send(game, character, &dialogue_choice(QUEST_CHOICE), now + 2);
-    let end = released
-        .replies
-        .iter()
-        .find(|packet| {
-            has_family(packet, 49, 13)
-                && packet.get(14..18) == Some(quest_id.to_le_bytes().as_slice())
-        })
-        .unwrap_or_else(|| panic!("quest {quest_id} did not release its 49/13 end screen"));
-    end.clone()
 }
 
-/// 49/13: actor u64 at 6, quest at 14, end text at 18, then the reward bundle: success at
-/// 26, coins at 27, XP stars at 31 (client reader `00c7b990`, `008e7930`).
-fn assert_end_screen(
-    packet: &[u8],
-    quest_id: u32,
-    end_text: u32,
-    expected_coins: u32,
-    expected_xp: u32,
-) {
+/// 49/13: actor at 6, quest at 14, end text at 18, bundle success at 26, coins at 27,
+/// XP stars at 31 (client reader `00c7b990`, `008e7930`).
+fn assert_end_reward(packet: &[u8], quest_id: u32, expected_coins: u32, expected_xp: u32) {
     assert_eq!(
         u64::from_le_bytes(packet[6..14].try_into().unwrap()),
         CLEETUS,
         "the end screen names the runtime turn-in actor"
     );
     assert_eq!(word(packet, 14), quest_id);
-    assert_eq!(word(packet, 18), end_text, "49/13 end-text id");
     assert_eq!(packet[26], 1, "reward bundle success flag");
     assert_eq!(
-        i32::from_le_bytes(packet[27..31].try_into().unwrap()),
+        signed_word(packet, 27),
         expected_coins as i32,
         "49/13 displayed coins"
     );
     assert_eq!(
-        i32::from_le_bytes(packet[31..35].try_into().unwrap()),
+        signed_word(packet, 31),
         expected_xp as i32,
         "49/13 displayed XP stars"
     );
 }
 
-fn finish_turnin(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    quest_id: u32,
-    profile: i32,
-    expected_coins: u32,
-    expected_xp: u32,
-    now: u64,
-) {
-    let coins_before = coins(game);
-    let xp_before = profile_xp(game, profile);
-    let completed = send(game, character, &quest_end_reply(quest_id), now);
-    assert!(
-        quest_packet(&completed, 4, quest_id).is_some(),
-        "49/14 answers QuestComplete"
-    );
-    assert_eq!(coins(game), coins_before + expected_coins);
-    assert_eq!(profile_xp(game, profile), xp_before + expected_xp);
-    assert_eq!(
-        quest(game, quest_id).expect("completed state").0,
-        QuestStatus::Completed
-    );
-    assert_eq!(
-        game.state().npc_quests.as_ref().unwrap().pending_turnin,
-        None
-    );
-}
-
 /// One field kill through the real 26/8 -> Attack menu -> 26/10 path. The packet loop is
-/// bounded and stops on the removal packet or on the counted objective.
+/// bounded and stops on the removal packet (`008d69f0` reads the actor at 6..14) or on the
+/// counted objective.
 fn kill_wolf(game: &mut Gameplay, position: [f32; 3], guid: u64, now: &mut u64) -> bool {
     let character = character_at(position);
     *now += 100;
     let menu = send(game, &character, &npc_interact(guid), *now);
     assert!(
-        menu.replies.iter().any(|packet| has_family(packet, 26, 9)),
+        menu.replies
+            .iter()
+            .any(|packet| has_family(packet, 26, 9, None)),
         "wolf {guid} exposes the field interaction menu"
     );
     let before = count(game, FIGHTING_THE_PACK, 0);
@@ -579,7 +392,8 @@ fn kill_wolf(game: &mut Gameplay, position: [f32; 3], guid: u64, now: &mut u64) 
         *now += 700;
         let attack = send(game, &character, &npc_select(guid, ATTACK_CHOICE), *now);
         if attack.replies.iter().any(|packet| {
-            has_family(packet, 35, 3) && packet.get(6..14) == Some(guid.to_le_bytes().as_slice())
+            has_family(packet, 35, 3, None)
+                && packet.get(6..14) == Some(guid.to_le_bytes().as_slice())
         }) {
             return true;
         }
@@ -650,107 +464,71 @@ fn gather_copper(game: &mut Gameplay, position: [f32; 3], guid: u64, now: &mut u
     true
 }
 
-fn assert_refused_without_change(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    packet: &[u8],
-    now: u64,
-    label: &str,
-) {
-    let before = saved(game);
-    match game.handle_in_world(packet, character, now) {
-        Ok(outcome) => {
-            assert!(!outcome.changed, "{label} changed gameplay");
-            assert!(
-                !outcome.replies.iter().any(|reply| {
-                    has_family(reply, 49, 4)
-                        || has_family(reply, 49, 13)
-                        || has_family(reply, 50, 1)
-                }),
-                "{label} answered with a completion or reward"
-            );
-        }
-        Err(_) => {}
-    }
-    assert_eq!(saved(game), before, "{label} changed the saved state");
-}
-
 #[test]
 fn cleetus_offers_both_quests_to_the_right_job() {
     let fixture = Fixture::new();
-    let cleetus = cleetus_position();
-    let character = character_at(cleetus);
+    let character = character_at(cleetus_position());
 
     // Two clients at the same giver: each keeps its own offer state.
     let mut brawler = fixture.game(BRAWLER, &[ADVENTURER, MINER, BRAWLER]);
     let mut miner = fixture.game(MINER, &[ADVENTURER, MINER, BRAWLER]);
 
-    let offer = offered(&mut brawler, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
+    let offered = offer(&mut brawler, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
+    let packet = offer_packet(&offered, FIGHTING_THE_PACK);
     assert_offer_ids(
-        &offer,
+        &packet,
         FIGHTING_THE_PACK,
         FIGHTING_INTRO,
         FIGHTING_TITLE,
         FIGHTING_DESCRIPTION,
     );
+    assert_offer_bundle_is_the_known_placeholder(&packet);
     assert_eq!(
-        quest(&brawler, FIGHTING_THE_PACK).unwrap().0,
+        quest_status(&brawler, FIGHTING_THE_PACK),
         QuestStatus::Offered
     );
 
-    let offer = offered(&mut miner, &character, CLEETUS, COPPER_COLLECTION, 1_000);
+    let offered = offer(&mut miner, &character, CLEETUS, COPPER_COLLECTION, 1_000);
+    let packet = offer_packet(&offered, COPPER_COLLECTION);
     assert_offer_ids(
-        &offer,
+        &packet,
         COPPER_COLLECTION,
         COPPER_INTRO,
         COPPER_TITLE,
         COPPER_DESCRIPTION,
     );
+    assert_offer_bundle_is_the_known_placeholder(&packet);
     assert_eq!(
-        quest(&miner, COPPER_COLLECTION).unwrap().0,
+        quest_status(&miner, COPPER_COLLECTION),
         QuestStatus::Offered
     );
 
     // The offers are independent: neither client sees the other quest, and a third
-    // client on another active job is offered neither.
-    assert!(quest(&brawler, COPPER_COLLECTION).is_none());
-    assert!(quest(&miner, FIGHTING_THE_PACK).is_none());
+    // client on another active job is offered neither. The refusal leaves its open
+    // menu usable and the save unchanged.
+    assert!(!has_quest(&brawler, COPPER_COLLECTION));
+    assert!(!has_quest(&miner, FIGHTING_THE_PACK));
     let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER, MINER, BRAWLER]);
-    let before = saved(&adventurer);
-    let dialogue = talk(&mut adventurer, &character, CLEETUS, 2_000);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 26, 3))
-    );
-    let replies = send(
+    let mut now = 2_000;
+    assert_no_offer(
         &mut adventurer,
         &character,
-        &dialogue_choice(QUEST_CHOICE),
-        2_002,
+        CLEETUS,
+        &mut now,
+        "a non-Brawler, non-Miner",
     );
-    assert!(
-        !replies
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1)),
-        "a non-Brawler, non-Miner is offered neither live quest"
-    );
-    assert_eq!(saved(&adventurer), before, "the refusal changed the save");
 
     accept(&mut brawler, &character, FIGHTING_THE_PACK, 3_000);
     accept(&mut miner, &character, COPPER_COLLECTION, 3_000);
-    assert!(quest(&brawler, COPPER_COLLECTION).is_none());
-    assert!(quest(&miner, FIGHTING_THE_PACK).is_none());
+    assert!(!has_quest(&brawler, COPPER_COLLECTION));
+    assert!(!has_quest(&miner, FIGHTING_THE_PACK));
 }
 
 #[test]
 fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     let fixture = Fixture::new();
     let mut game = fixture.game(BRAWLER, &[ADVENTURER, MINER, BRAWLER]);
-    let cleetus = cleetus_position();
-    let character = character_at(cleetus);
+    let character = character_at(cleetus_position());
     let wolves = wolves();
     assert_eq!(
         wolves.len(),
@@ -758,10 +536,13 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
         "five always-on wolves are live: three starter plus the two level-5 MID-F camp"
     );
 
-    let offer = offered(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
-    assert_eq!(word(&offer, 14), FIGHTING_TITLE);
+    let offered = offer(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
+    assert_eq!(
+        word(&offer_packet(&offered, FIGHTING_THE_PACK), 14),
+        FIGHTING_TITLE
+    );
     accept(&mut game, &character, FIGHTING_THE_PACK, 1_100);
-    assert_eq!(quest(&game, FIGHTING_THE_PACK).unwrap().1, [0, 0]);
+    assert_eq!(counts(&game, FIGHTING_THE_PACK), [0, 0]);
 
     let mut now = 2_000;
     // All five are live at once. Production credits every 3156 defeat, so the
@@ -777,12 +558,34 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     }
     assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 5);
 
+    // The reward map names Brawler. Switching the active job must not switch the payer:
+    // the support rule is explicit-profile, pinned by
+    // `quest_job_xp::xp_follows_the_quest_job_not_the_active_job`. Miner's starter
+    // outfit exists in this opening fixture, so the production swap gate can wear it.
+    now += 100;
+    let switched = send(&mut game, &character, &select_job(MINER), now);
+    assert!(switched.changed, "the job switch commits");
+    assert_eq!(active_job(&game), MINER);
+    let active_before = profile_xp(&game, MINER);
+
     let coins_before = coins(&game);
     let xp_before = profile_xp(&game, BRAWLER);
-    let end = open_end_screen(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, now + 100);
-    assert_end_screen(&end, FIGHTING_THE_PACK, FIGHTING_END_TEXT, 18, 25);
+    let end = open_end_screen(
+        &mut game,
+        &character,
+        FIGHTING_THE_PACK,
+        FIGHTING_END_TEXT,
+        now + 100,
+    );
+    assert_end_reward(&end, FIGHTING_THE_PACK, 18, 25);
     assert_eq!(coins(&game), coins_before, "the end screen pays nothing");
-    finish_turnin(
+
+    // (R) Accepted gap, lead-deferred: 49/14 is keyed only by `pending_turnin` and does
+    // not recheck the speaker or the player's range. `scavenger_hunt_quest`'s
+    // `a_completed_final_talk_is_turned_in_away_from_the_giver_today` (F272 review
+    // finding 7, commit `8c55a69`) pins that current behavior; enforcing a turn-in range
+    // is a separate lead-approved change, so this suite does not claim the gate.
+    finish_quest(
         &mut game,
         &character,
         FIGHTING_THE_PACK,
@@ -796,19 +599,37 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
         xp_before + 25,
         "the quest pays the Brawler profile once"
     );
+    assert_eq!(
+        profile_xp(&game, MINER),
+        active_before,
+        "the active job receives no quest XP"
+    );
 
-    // Replayed 49/14 pays nothing.
+    // Replayed 49/14 pays nothing, and the completed quest is not offered again.
     let finished = saved(&game);
     let finished_coins = coins(&game);
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut game,
         &character,
-        &quest_end_reply(FIGHTING_THE_PACK),
+        &npc_quest_end_reply(FIGHTING_THE_PACK),
         now + 300,
         "a replayed 49/14",
     );
     assert_eq!(saved(&game), finished);
     assert_eq!(coins(&game), finished_coins);
+    // Back on Brawler, the only other live quest is Miner-gated, so a Talk at the giver
+    // has nothing eligible: the completed quest is not offered again.
+    let switched = send(&mut game, &character, &select_job(BRAWLER), now + 350);
+    assert!(switched.changed, "the job switches back");
+    assert_eq!(active_job(&game), BRAWLER);
+    let mut reoffer = now + 400;
+    assert_no_offer(
+        &mut game,
+        &character,
+        CLEETUS,
+        &mut reoffer,
+        "a completed Fighting the Pack",
+    );
 
     // A sixth live kill after turn-in changes nothing.
     respawn_wolves(&mut game, &mut now);
@@ -830,14 +651,13 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
 fn copper_collection_counts_five_gathers_from_the_node_path() {
     let fixture = Fixture::new();
     let mut game = fixture.game(MINER, &[ADVENTURER, MINER, BRAWLER]);
-    let cleetus = cleetus_position();
-    let character = character_at(cleetus);
+    let character = character_at(cleetus_position());
     let nodes = copper_nodes();
     assert!(nodes.len() >= 2, "the copper pool has live spawns");
 
-    offered(&mut game, &character, CLEETUS, COPPER_COLLECTION, 1_000);
+    offer(&mut game, &character, CLEETUS, COPPER_COLLECTION, 1_000);
     accept(&mut game, &character, COPPER_COLLECTION, 1_100);
-    assert_eq!(quest(&game, COPPER_COLLECTION).unwrap().1, [0, 0]);
+    assert_eq!(counts(&game, COPPER_COLLECTION), [0, 0]);
 
     // An abandoned round pays and counts nothing.
     let (first_guid, first_position) = nodes[0];
@@ -884,9 +704,15 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
 
     let xp_before = profile_xp(&game, MINER);
     assert_eq!(xp_before, 5 * MINING_XP_PER_WIN);
-    let end = open_end_screen(&mut game, &character, CLEETUS, COPPER_COLLECTION, now + 100);
-    assert_end_screen(&end, COPPER_COLLECTION, COPPER_END_TEXT, 5, 15);
-    finish_turnin(
+    let end = open_end_screen(
+        &mut game,
+        &character,
+        COPPER_COLLECTION,
+        COPPER_END_TEXT,
+        now + 100,
+    );
+    assert_end_reward(&end, COPPER_COLLECTION, 5, 15);
+    finish_quest(
         &mut game,
         &character,
         COPPER_COLLECTION,
@@ -909,10 +735,10 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
         now + 300,
     );
     assert_eq!(saved(&game), finished, "a replayed win changed the save");
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut game,
         &character,
-        &quest_end_reply(COPPER_COLLECTION),
+        &npc_quest_end_reply(COPPER_COLLECTION),
         now + 400,
         "a replayed 49/14",
     );
@@ -921,107 +747,118 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
 #[test]
 fn wrong_job_wrong_target_and_replay_change_nothing() {
     let fixture = Fixture::new();
-    let cleetus = cleetus_position();
-    let character = character_at(cleetus);
+    let character = character_at(cleetus_position());
 
-    // A non-Brawler, non-Miner sees no offer and keeps an unchanged save.
+    // A non-Brawler, non-Miner sees no offer; the open menu survives and the save stays.
     let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER, MINER, BRAWLER]);
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut adventurer,
         &character,
-        &quest_reply(FIGHTING_THE_PACK, true),
+        &npc_quest_reply(FIGHTING_THE_PACK, true),
         100,
         "a forged accept on the wrong job",
     );
-    let before = saved(&adventurer);
-    let dialogue = talk(&mut adventurer, &character, CLEETUS, 200);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 26, 3))
-    );
-    let replies = send(
+    let mut now = 200;
+    assert_no_offer(
         &mut adventurer,
         &character,
-        &dialogue_choice(QUEST_CHOICE),
-        202,
+        CLEETUS,
+        &mut now,
+        "a non-Brawler, non-Miner at Cleetus",
     );
-    assert!(
-        !replies
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1))
-    );
-    assert_eq!(saved(&adventurer), before);
 
     // The disabled predecessor and an unopened end screen are both refused.
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut adventurer,
         &character,
-        &quest_reply(YOUR_FIRST_WEAPON, true),
+        &npc_quest_reply(YOUR_FIRST_WEAPON, true),
         300,
         "a forged 3000008 accept",
     );
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut adventurer,
         &character,
-        &quest_end_reply(YOUR_FIRST_WEAPON),
+        &npc_quest_end_reply(YOUR_FIRST_WEAPON),
         400,
         "a forged 3000008 turn-in",
     );
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut adventurer,
         &character,
-        &quest_end_reply(FIGHTING_THE_PACK),
+        &npc_quest_end_reply(FIGHTING_THE_PACK),
         500,
         "a forged 49/14 with no end screen",
     );
 
-    // The real active quest is still not payable while its kill step is open, and neither
-    // the menu nor the end reply reaches it from outside interaction range.
+    // The real active quest is still not payable while its kill step is open.
     let mut brawler = fixture.game(BRAWLER, &[ADVENTURER, MINER, BRAWLER]);
-    let offer = offered(&mut brawler, &character, CLEETUS, FIGHTING_THE_PACK, 600);
-    assert_eq!(word(&offer, 14), FIGHTING_TITLE);
+    let offered = offer(&mut brawler, &character, CLEETUS, FIGHTING_THE_PACK, 600);
+    assert_eq!(
+        word(&offer_packet(&offered, FIGHTING_THE_PACK), 14),
+        FIGHTING_TITLE
+    );
     accept(&mut brawler, &character, FIGHTING_THE_PACK, 602);
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut brawler,
         &character,
-        &quest_end_reply(FIGHTING_THE_PACK),
+        &npc_quest_end_reply(FIGHTING_THE_PACK),
         700,
         "a turn-in before the kill step is complete",
     );
 
+    // A wrong quest giver offers neither live quest and changes nothing.
+    let anne = character_at(content_position("farnum_farmstead.json", ANNE));
+    let mut now = 800;
+    assert_no_offer(&mut brawler, &anne, ANNE, &mut now, "a wrong quest giver");
+
+    // An unknown target is a clean no-op on both request types.
+    assert_packet_changes_nothing(
+        &mut brawler,
+        &character,
+        &npc_interact(u64::MAX),
+        now + 100,
+        "an unknown NPC interact target",
+    );
+    assert_packet_changes_nothing(
+        &mut brawler,
+        &character,
+        &npc_select(u64::MAX, 1),
+        now + 101,
+        "an unknown NPC menu choice",
+    );
+
+    // Out-of-range NPC interaction returns the router's error and changes nothing; a
+    // 49/14 without a server-opened end screen is a clean refusal from anywhere.
     let far = character_at([10_000.0, 0.0, 10_000.0]);
     let before = saved(&brawler);
     assert!(
         brawler
-            .handle_in_world(&npc_interact(CLEETUS), &far, 800)
+            .handle_in_world(&npc_interact(CLEETUS), &far, now + 200)
             .is_err(),
         "an out-of-range NPC interaction is refused"
     );
     assert_eq!(saved(&brawler), before);
     assert!(
         brawler
-            .handle_in_world(&quest_end_reply(FIGHTING_THE_PACK), &far, 801)
+            .handle_in_world(&npc_quest_end_reply(FIGHTING_THE_PACK), &far, now + 201)
             .is_ok(),
         "a 49/14 without a server-opened end screen is a clean refusal"
     );
     assert_eq!(saved(&brawler), before);
 
     // A disabled-record replay does not unlock the authored chain either.
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut brawler,
         &character,
-        &quest_reply(YOUR_FIRST_WEAPON, true),
-        900,
+        &npc_quest_reply(YOUR_FIRST_WEAPON, true),
+        now + 300,
         "a 3000008 accept on a Brawler",
     );
 }
 
 #[test]
 fn the_two_new_records_load_and_their_targets_exist() {
-    let document = read_content("quests/adventurer.json");
+    let document = read_json(&content_dir().join("quests/adventurer.json"));
     let records = document["records"].as_array().unwrap();
     let record = |id: u32| {
         records
@@ -1067,7 +904,8 @@ fn the_two_new_records_load_and_their_targets_exist() {
             "quest {id} carries its T241 (R) decision"
         );
     }
-    // The crafting records and every 3000020+ row stay out of this slice.
+    // The crafting records stay out of this slice, and one known 3000020+ row is pinned
+    // here so a concurrent rewrite of that range fails this suite.
     for id in [3_000_006, 3_000_007, YOUR_FIRST_WEAPON] {
         assert_eq!(
             record(id)["enabled"],
@@ -1075,6 +913,15 @@ fn the_two_new_records_load_and_their_targets_exist() {
             "quest {id} stays hollow"
         );
     }
+    assert_eq!(
+        record(UNTOUCHED_RECORD)["title_string_id"].as_u64(),
+        Some(u64::from(UNTOUCHED_TITLE))
+    );
+    assert_eq!(
+        record(UNTOUCHED_RECORD)["enabled"].as_bool(),
+        Some(true),
+        "the pinned 3000020+ record is unchanged"
+    );
 
     // The kill target is a real always-on field population. T245's two level-5
     // MID-F camp wolves share the definition, so production counts five.
@@ -1084,8 +931,9 @@ fn the_two_new_records_load_and_their_targets_exist() {
         "five always-on 3156 wolves: three starter plus the MID-F camp"
     );
 
-    // The gather target exists in the Snowhill copper pool.
-    let mining = read_content("mining_nodes.json");
+    // The gather target exists in the Snowhill copper pool, and the shipped Mining18
+    // board's outputs emit the same item definition the objective listens to.
+    let mining = read_json(&content_dir().join("mining_nodes.json"));
     let pool = mining["pools"]
         .as_array()
         .unwrap()
@@ -1100,8 +948,26 @@ fn the_two_new_records_load_and_their_targets_exist() {
             .iter()
             .any(|spawn| spawn["pool_key"] == "snowhill-copper")
     );
+    let board = read_json(&content_dir().join(mining::CONTENT_FILE));
+    assert!(
+        board["spec"]["outputs"]
+            .as_array()
+            .is_some_and(|outputs| outputs
+                .iter()
+                .any(|output| output["definition_id"].as_u64() == Some(u64::from(COPPER_ORE)))),
+        "the shipped Mining18 board emits Copper Ore 2739"
+    );
 
-    // The giver is spawned and drawn by the production visibility loader.
+    // The giver is a data placement drawn by the production visibility loader.
+    let cleetus = read_json(&content_dir().join("npcs/farnum_farmstead.json"))["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|npc| npc["npc_id"].as_u64() == Some(CLEETUS))
+        .expect("Cleetus is a split NPC record")
+        .clone();
+    assert_eq!(cleetus["name"], "Cleetus Farnum");
+    assert_eq!(cleetus["placement"], "legacy_data");
     let position = cleetus_position();
     let mut visibility = osfr_tools::world::NpcVisibility::load(&content_dir())
         .expect("NPC visibility content loads");
@@ -1120,43 +986,38 @@ fn the_two_new_records_load_and_their_targets_exist() {
 fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
     let fixture = Fixture::new();
     let mut game = fixture.game(BRAWLER, &[ADVENTURER, MINER, BRAWLER]);
-    let cleetus = cleetus_position();
-    let character = character_at(cleetus);
+    let character = character_at(cleetus_position());
     let wolves = wolves();
     assert_eq!(wolves.len(), 5);
 
-    offered(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
+    offer(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
     accept(&mut game, &character, FIGHTING_THE_PACK, 1_100);
     let mut now = 2_000;
     for (guid, position) in wolves.iter().copied().take(2) {
         assert!(kill_wolf(&mut game, position, guid, &mut now));
     }
-    assert_eq!(quest(&game, FIGHTING_THE_PACK).unwrap().1, [2, 0]);
+    assert_eq!(counts(&game, FIGHTING_THE_PACK), [2, 0]);
     let coins_before = coins(&game);
     let xp_before = profile_xp(&game, BRAWLER);
     let save_bytes = saved(&game);
 
-    // Disconnect and reload the same character document.
-    let mut game = fixture.save(&game);
+    // Disconnect and reload through the production save envelope, not a state proxy.
+    let mut game = fixture.save_and_reload(&game, &character);
     assert_eq!(
-        quest(&game, FIGHTING_THE_PACK).unwrap(),
-        (QuestStatus::Active, vec![2, 0]),
+        quest_status(&game, FIGHTING_THE_PACK),
+        QuestStatus::Active,
         "the kill progress survives the reload"
     );
-    assert_eq!(
-        game.state().npc_quests.as_ref().unwrap().pending_turnin,
-        None
-    );
-    assert_eq!(
-        game.state().npc_quests.as_ref().unwrap().pending_offer,
-        None
-    );
+    assert_eq!(counts(&game, FIGHTING_THE_PACK), [2, 0]);
+    let quest_state = game.state().npc_quests.as_ref().unwrap().clone();
+    assert_eq!(quest_state.pending_turnin, None);
+    assert_eq!(quest_state.pending_offer, None);
     assert_eq!(coins(&game), coins_before, "the reload paid nothing");
     assert_eq!(profile_xp(&game, BRAWLER), xp_before);
     assert_eq!(
-        serde_json::to_vec(&game.state()).unwrap(),
+        saved(&game),
         save_bytes,
-        "the reload round-trips the quest save"
+        "the reload round-trips the gameplay payload"
     );
 
     // Finish the hunt after the reload; the panel still starts from the restored
@@ -1166,9 +1027,15 @@ fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
         assert!(kill_wolf(&mut game, position, guid, &mut now));
     }
     assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 5);
-    let end = open_end_screen(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, now + 100);
-    assert_end_screen(&end, FIGHTING_THE_PACK, FIGHTING_END_TEXT, 18, 25);
-    finish_turnin(
+    let end = open_end_screen(
+        &mut game,
+        &character,
+        FIGHTING_THE_PACK,
+        FIGHTING_END_TEXT,
+        now + 100,
+    );
+    assert_end_reward(&end, FIGHTING_THE_PACK, 18, 25);
+    finish_quest(
         &mut game,
         &character,
         FIGHTING_THE_PACK,
@@ -1179,17 +1046,17 @@ fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
     );
 
     // A reconnect after the turn-in does not pay again.
-    let mut game = fixture.save(&game);
+    let mut game = fixture.save_and_reload(&game, &character);
     assert_eq!(
-        quest(&game, FIGHTING_THE_PACK).unwrap().0,
+        quest_status(&game, FIGHTING_THE_PACK),
         QuestStatus::Completed
     );
     let after_turnin = saved(&game);
     let after_coins = coins(&game);
-    assert_refused_without_change(
+    assert_packet_changes_nothing(
         &mut game,
         &character,
-        &quest_end_reply(FIGHTING_THE_PACK),
+        &npc_quest_end_reply(FIGHTING_THE_PACK),
         now + 300,
         "a turn-in replayed after reconnect",
     );
