@@ -195,6 +195,18 @@ fn recipients(deliveries: Vec<Delivery>) -> Vec<u64> {
     ids
 }
 
+/// Spend the rest of an account's action budget at a future instant (L006, L016). The budget
+/// refills at 5 tokens/s against the real clock, and a later real-time charge then sees zero
+/// elapsed time, so no token can refill however slowly a loaded machine runs the test.
+fn drain_budget_later(world: &SharedWorld, account: u64) {
+    let later = Instant::now() + std::time::Duration::from_secs(5);
+    let mut security = world.security.lock().unwrap_or_else(|e| e.into_inner());
+    while security
+        .budgets
+        .allow(account, &ClaimWindow::list_request(), later)
+    {}
+}
+
 fn send(session: &mut Session, world: &mut SharedWorld, packet: &[u8]) -> Vec<Delivery> {
     session.route_application(packet, world, 1_000)
 }
@@ -318,16 +330,7 @@ fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
             .unwrap();
     }
     session.recent.clear();
-    // Drain the rest of the budget at a future instant: the bundle's charge then sees zero elapsed
-    // time, so no token can refill however slowly this machine ran the requests above.
-    {
-        let later = Instant::now() + std::time::Duration::from_secs(5);
-        let mut security = rig.world.security.lock().unwrap_or_else(|e| e.into_inner());
-        while security
-            .budgets
-            .allow(session.account_guid, &ClaimWindow::list_request(), later)
-        {}
-    }
+    drain_budget_later(&rig.world, session.account_guid);
 
     let mut bundle = vec![0, 25];
     for request in [
@@ -448,12 +451,14 @@ fn mixed_bundle_is_dropped_whole_when_its_budgeted_child_is_refused() {
             &mut sessions,
         );
     }
-    assert_eq!(
-        out_rows(session),
-        11,
+    // At least the portal reply plus the burst; a loaded machine may refill one more token
+    // during the loop (the exact burst size is not this test's subject).
+    assert!(
+        out_rows(session) >= 11,
         "the portal reply plus the allowed list burst"
     );
     session.recent.clear();
+    drain_budget_later(&rig.world, session.account_guid);
 
     let before = session.gateway.snapshot();
     let mut bundle = vec![0, 25];
@@ -522,6 +527,8 @@ fn account_budget_is_shared_across_sessions_and_not_across_accounts() {
         );
     }
     assert_eq!(out_rows(first), 10, "the first session spends the burst");
+    // No refill between the two sessions, however slowly the machine runs (L016).
+    drain_budget_later(&rig.world, first.account_guid);
 
     // The budget refills at 5/s on the wall clock, so one refilled token can admit
     // a single request while the account is still effectively exhausted. A bundle
