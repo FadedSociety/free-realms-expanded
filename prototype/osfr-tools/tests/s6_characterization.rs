@@ -22,7 +22,7 @@ mod s6;
 #[path = "common/smelting_movie.rs"]
 mod smelting_movie;
 
-use gateway_packets::{chat, interact, login as login_request, select};
+use gateway_packets::{blocked_families, chat, login as login_request, select};
 use osfr_tools::{
     account_store::AccountRole,
     gateway::{Gateway, GatewayOutcome},
@@ -352,34 +352,7 @@ fn assert_movie_gate(case: Station) {
         "Close the {} game before changing jobs, equipment or interacting.",
         case.noun
     );
-    // Client ability writer 0x00a342e0: i32 bar, i32 slot, i32 target mode,
-    // then a u64 target id when the mode is 0. The 24-byte form is the one a
-    // real attack request sends; a 20-byte packet would be rejected by the
-    // combat parser instead of proving the movie gate handled it.
-    let attack = [
-        vec![36, 0, 10, 0],
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        UNKNOWN_ACTOR.to_le_bytes().to_vec(),
-    ]
-    .concat();
-    let equip = [
-        vec![42, 0, 3, 0],
-        i32::MAX.to_le_bytes().to_vec(), // unowned item id
-        1_i32.to_le_bytes().to_vec(),    // profile id
-        0_i32.to_le_bytes().to_vec(),    // equip slot
-    ]
-    .concat();
-    let mut job = vec![26, 0, 13, 0];
-    job.extend(1_i32.to_le_bytes());
-    for packet in [
-        job,
-        interact(UNKNOWN_ACTOR),
-        select(UNKNOWN_ACTOR, 1),
-        attack,
-        equip,
-    ] {
+    for packet in blocked_families(UNKNOWN_ACTOR) {
         let before = fixture.game.snapshot();
         let out = send(&mut fixture.game, &packet, NOW);
         assert_eq!(chat_texts(&out.replies), vec![expected.clone()]);

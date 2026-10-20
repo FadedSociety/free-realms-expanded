@@ -47,6 +47,7 @@ mod encounter_rewards;
 mod field_battle;
 mod jobs;
 mod matchmaking_route;
+mod movie;
 mod npc;
 mod npc_quests;
 mod npc_turnin;
@@ -60,8 +61,8 @@ mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
+use self::movie::{Movie, elapsed_if_due};
 use self::npc::{dialogue_packet, quest_offer_packet_with};
-use self::occupation::Occupation;
 
 #[derive(Clone)]
 struct DisappearingActor {
@@ -137,8 +138,6 @@ pub struct GameplayState {
 const HARVESTING_GAME_ID: i32 = 111;
 /// (R) Minimum gap between answered activity-portal refreshes (167/1/4).
 const PORTAL_REFRESH_MS: u64 = 250;
-/// The server step for the five crafting and gathering movie clocks.
-const MOVIE_TICK_MS: u64 = 250;
 
 #[derive(Clone)]
 pub struct Gameplay {
@@ -399,59 +398,6 @@ fn apply_node_changes(
 
 fn npc_event(value: serde_json::Value) {
     println!("{value}");
-}
-
-/// The five crafting and gathering movies. One gate and one tick path serve
-/// all of them, so a change to the leave, refusal or clock order cannot
-/// diverge between engines.
-#[derive(Clone, Copy)]
-enum Movie {
-    Forging,
-    Cooking,
-    Smelting,
-    Mining,
-    Harvesting,
-}
-
-impl Movie {
-    /// The order the five per-engine blocks were checked in. Only one movie
-    /// runs at a time; a hand-made state with two keeps the earlier answer.
-    const ALL: [Movie; 5] = [
-        Movie::Forging,
-        Movie::Cooking,
-        Movie::Smelting,
-        Movie::Mining,
-        Movie::Harvesting,
-    ];
-
-    /// The service noun every reply and error names the movie by.
-    fn noun(self) -> &'static str {
-        match self {
-            Movie::Forging => "forging",
-            Movie::Cooking => "cooking",
-            Movie::Smelting => "smelting",
-            Movie::Mining => "mining",
-            Movie::Harvesting => "harvesting",
-        }
-    }
-
-    /// The busy-table row that detects this movie (see `Gameplay::is_occupied`).
-    fn occupation(self) -> Occupation {
-        match self {
-            Movie::Forging => Occupation::Forging,
-            Movie::Cooking => Occupation::Cooking,
-            Movie::Smelting => Occupation::Smelting,
-            Movie::Mining => Occupation::Mining,
-            Movie::Harvesting => Occupation::Harvesting,
-        }
-    }
-}
-
-/// The elapsed milliseconds a movie clock is due for, in `MOVIE_TICK_MS`
-/// steps. A missing clock means the movie does not tick.
-fn elapsed_if_due(clock: Option<u64>, now_ms: u64) -> Option<u32> {
-    let elapsed = now_ms.saturating_sub(clock?);
-    (elapsed >= MOVIE_TICK_MS).then(|| elapsed.min(u32::MAX as u64) as u32)
 }
 
 impl Gameplay {
@@ -2008,8 +1954,8 @@ impl Gameplay {
         let mut out = Outcome::default();
         // Any running movie replaces the world tick. Cooking and smelting run on
         // client input alone, so `movie_tick` has nothing due for them.
-        if self.running_movie().is_some() {
-            self.movie_tick(character, now_ms, &mut out)?;
+        if let Some(movie) = self.running_movie() {
+            self.movie_tick(movie, character, now_ms, &mut out)?;
             return Ok(out);
         }
         self.sync_field_quests(&mut out)?;
@@ -4546,26 +4492,26 @@ impl Gameplay {
         Ok(())
     }
 
-    /// Ticks the running movie once its 250 ms step is due, in the tick order
-    /// the three blocks used (forging, mining, harvesting). Cooking and
-    /// smelting run on client input alone, so the caller still ends the world
-    /// tick for them.
+    /// Ticks the running movie once its 250 ms step is due. Cooking and
+    /// smelting run on client input alone, so they only end the world tick.
     fn movie_tick(
         &mut self,
+        movie: Movie,
         character: &CharacterState,
         now_ms: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        if self.is_occupied(Occupation::Forging) {
-            if let Some(elapsed) = elapsed_if_due(self.forging_tick_ms, now_ms) {
-                let result = self.forging.as_mut().unwrap().tick(elapsed)?;
-                self.apply_craft(CraftingJob::Blacksmith, result, character, out)?;
-                self.forging_tick_ms = Some(now_ms);
+        match movie {
+            Movie::Forging => {
+                if let Some(elapsed) = elapsed_if_due(self.forging_tick_ms, now_ms) {
+                    let result = self.forging.as_mut().unwrap().tick(elapsed)?;
+                    self.apply_craft(CraftingJob::Blacksmith, result, character, out)?;
+                    self.forging_tick_ms = Some(now_ms);
+                }
             }
-        } else if self.is_occupied(Occupation::Mining) {
-            self.tick_gather(Gather::Mining, now_ms, out)?;
-        } else if self.is_occupied(Occupation::Harvesting) {
-            self.tick_gather(Gather::Harvesting, now_ms, out)?;
+            Movie::Mining => self.tick_gather(Gather::Mining, now_ms, out)?,
+            Movie::Harvesting => self.tick_gather(Gather::Harvesting, now_ms, out)?,
+            Movie::Cooking | Movie::Smelting => {}
         }
         Ok(())
     }
@@ -4578,10 +4524,9 @@ impl Gameplay {
     ) -> io::Result<Outcome> {
         let mut out = Outcome::default();
         if let Some(movie) = self.running_movie() {
-            let noun = movie.noun();
             if inner.starts_with(&[26, 0, 42, 0]) {
                 if inner.len() != 4 {
-                    return Err(invalid(format!("invalid {noun} leave request")));
+                    return Err(invalid(movie.leave_error()));
                 }
                 self.cancel_movie(movie, character, &mut out)?;
                 return Ok(out);
@@ -4596,18 +4541,14 @@ impl Gameplay {
                 || inner.starts_with(&[36, 0, 10, 0])
                 || inner.starts_with(&[42, 0])
             {
-                out.replies.push(chat::system(&format!(
-                    "Close the {noun} game before changing jobs, equipment or interacting."
-                )));
+                out.replies.push(chat::system(movie.blocked_message()));
                 return Ok(out);
             }
             if let Some(text) = chat::request(inner, character.guid)? {
                 if text.trim().eq_ignore_ascii_case("realm exit") {
                     self.cancel_movie(movie, character, &mut out)?;
                 } else if text.trim().to_ascii_lowercase().starts_with("realm ") {
-                    out.replies.push(chat::system(&format!(
-                        "Close the {noun} game before other opening actions."
-                    )));
+                    out.replies.push(chat::system(movie.realm_message()));
                 }
                 return Ok(out);
             }

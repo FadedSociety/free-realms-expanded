@@ -6,7 +6,7 @@
 //! transport duplicate check runs too; the other cases drive `Session::dispatch_message`.
 use super::f120_fishing_hour_reconnect::drain_replies;
 use super::*;
-use fixtures::{copy_tree, wrap};
+use fixtures::{bundle, copy_tree, wrap};
 use osfr_tools::account_store::AccountRole;
 use sha2::{Digest, Sha256};
 
@@ -331,17 +331,6 @@ fn echoes_command(messages: &[Vec<u8>], text: &str) -> bool {
 
 fn broadcast(text: &str) -> Vec<u8> {
     osfr_tools::chat::local_request(&format!("realm broadcast {text}"))
-}
-
-/// One combined SOE application bundle (`0/25`) of wrapped child messages.
-fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
-    let mut bytes = vec![0, 25];
-    for message in messages {
-        let child = wrap(message);
-        bytes.push(child.len() as u8);
-        bytes.extend(child);
-    }
-    bytes
 }
 
 #[test]

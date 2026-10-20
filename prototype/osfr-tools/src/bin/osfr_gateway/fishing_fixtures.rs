@@ -11,6 +11,19 @@ pub fn wrap(inner: &[u8]) -> Vec<u8> {
     bytes
 }
 
+/// One combined application bundle (`0/25`) of wrapped child messages.
+#[allow(dead_code)] // Some include sites (fishing_entry) only use `wrap`.
+pub fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for child in children {
+        let child = wrap(child);
+        assert!(child.len() < 255, "bundle child exceeds one-byte length");
+        bytes.push(child.len() as u8);
+        bytes.extend(child);
+    }
+    bytes
+}
+
 pub fn login(name: &str) -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (index, value) in [name, "1.910.1.530630", ""].into_iter().enumerate() {

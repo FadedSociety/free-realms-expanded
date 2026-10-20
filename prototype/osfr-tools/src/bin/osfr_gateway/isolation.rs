@@ -1,6 +1,11 @@
 //! The isolation boundary: one session's panic ends that session alone.
 use super::*;
+use fixtures::{bundle, wrap};
 use std::cell::Cell;
+
+#[path = "fishing_fixtures.rs"]
+#[allow(dead_code)]
+mod fixtures;
 
 thread_local! {
     /// Test-only: the session whose next tick panics, standing in for any feature bug.
@@ -68,36 +73,20 @@ fn a_failing_tick_save_ends_alone_and_the_server_keeps_running() {
     let _ = fs::remove_dir_all(scratch);
 }
 
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut application = vec![5, 0, 1];
-    application.extend((inner.len() as u32).to_le_bytes());
-    application.extend(inner);
-    application
-}
-
-/// A bundled client message: a handler error in a bundle child is returned to
-/// the server instead of being dropped as a single-request refusal.
-fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
-    let mut message = vec![0, 25];
-    for child in children {
-        let child = wrap(child);
-        assert!(child.len() < 255);
-        message.push(child.len() as u8);
-        message.extend(child);
-    }
-    message
-}
-
 /// A gateway whose Harvesting run is live, started through the real dev command
 /// so the movie gate (not a test hook) produces the malformed-close error.
-fn movie_gateway(reference: &std::path::Path) -> Gateway {
+/// `None` when the private W104 fixture is absent (a clean checkout or a cleaned
+/// lab build): the test skips instead of failing for an environment reason.
+fn movie_gateway(reference: &std::path::Path) -> Option<Gateway> {
     let content =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/build/w104/scratch/content");
-    assert!(
-        content.join("harvesting.json").is_file(),
-        "the W104 harvesting fixture is missing at {}",
-        content.display()
-    );
+    if !content.join("harvesting.json").is_file() {
+        eprintln!(
+            "skipping: the private W104 harvesting fixture is missing at {}",
+            content.display()
+        );
+        return None;
+    }
     let mut state = Gameplay::load(&content, None).unwrap().state();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.active = 45;
@@ -138,37 +127,59 @@ fn movie_gateway(reference: &std::path::Path) -> Gateway {
             .is_some_and(|harvesting| harvesting.active.is_some()),
         "the fixture must leave a live harvesting run"
     );
-    gateway
+    Some(gateway)
 }
 
 #[test]
 fn a_movie_error_ends_only_that_session_and_not_the_server() {
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("movie-error");
     let reference = server.options.reference.clone();
+    let Some(gateway) = movie_gateway(&reference) else {
+        let _ = fs::remove_dir_all(scratch);
+        return;
+    };
+    // A real client socket at the session's peer address; the malformed close
+    // arrives over the production reliable transport and `Server::step` path.
+    let client = UdpSocket::bind("127.0.0.1:0").expect("client socket binds");
     let victim = server.sessions.get_mut(&keys[0]).unwrap();
-    victim.gateway = movie_gateway(&reference);
+    victim.gateway = gateway;
     victim.selected_character = true;
     victim.state_path = scratch.join("victim.json");
+    let victim_guid = victim.character_guid;
+    let victim_id = victim.id;
     let mut victim = server.sessions.remove(&keys[0]).unwrap();
+    victim.peer = client.local_addr().expect("client address");
+    let key = SessionKey {
+        peer: victim.peer,
+        connection_id: victim.request.id,
+    };
+    server.world.session_keys.insert(victim_id, key);
+    server.sessions.insert(key, victim);
 
-    // A 26/42 with a trailing byte is a handler error; the server turns that
-    // into an end for this session alone (see `Server::step`). A bundle makes
-    // the child error surface instead of a silent single-request refusal.
-    let error = victim
-        .dispatch_message(
-            &bundle(&[vec![26, 0, 42, 0, 0]]),
-            &server.options,
-            400,
-            &mut server.world,
-            &mut server.membership,
-            &mut server.sessions,
-            None,
-        )
-        .unwrap_err();
-    assert_eq!(error.to_string(), "invalid harvesting leave request");
-    server.end_session(keys[0], victim, &error.to_string());
-    assert_eq!(server.sessions.len(), 2);
+    // A 26/42 with a trailing byte is a handler error; a bundle makes the child
+    // error surface instead of a silent single-request refusal, and the server
+    // turns it into an end for this session alone (see `Server::step`).
+    let wire = {
+        let session = &server.sessions[&key];
+        let mut payload = 0u16.to_be_bytes().to_vec();
+        payload.extend(bundle(&[vec![26, 0, 42, 0, 0]]));
+        session
+            .codec
+            .encode(RELIABLE_DATA, &payload)
+            .expect("malformed close datagram encodes")
+    };
+    client
+        .send_to(&wire, server.local_addr().expect("server address"))
+        .expect("malformed close datagram sends");
+    server
+        .step()
+        .expect("one handler error must not stop the server");
 
+    assert!(!server.sessions.contains_key(&key));
+    assert!(
+        !server.world.active_sessions.contains_key(&victim_guid),
+        "no ghost left behind"
+    );
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
     // Loading the movie content twice above can outlast the 60 s idle budget on
     // a loaded host. The two survivors send nothing in this test, so refresh

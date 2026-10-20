@@ -13,16 +13,20 @@ use osfr_tools::{
         FIRST_INSTANCE_ID,
     },
     mining::{
-        self, Type8BoardSpec, Type8Engine, Type8Goal, Type8Kind, Type8Output,
-        FIRST_MINING_INSTANCE, MINER_PROFILE_ID, MINING_GAME_ID, SIDE,
+        self, FIRST_MINING_INSTANCE, MINER_PROFILE_ID, MINING_GAME_ID, SIDE, Type8BoardSpec,
+        Type8Engine, Type8Goal, Type8Kind, Type8Output,
     },
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
 };
+
+#[path = "../src/bin/osfr_gateway/fishing_fixtures.rs"]
+#[allow(dead_code)]
+mod fishing_fixtures;
 
 const HARVESTING_GAME_ID: i32 = 111;
 const LEFT: usize = 3;
@@ -659,6 +663,45 @@ fn active_harvesting_blocks_other_games_and_unrelated_actions() {
     assert_eq!(active_instance(&gateway), Some(i64::from(instance)));
 }
 
+/// The non-ignored gate path: a malformed Results Close is refused with the
+/// movie's exact error and changes nothing; the valid four-byte close cancels
+/// the run without a grant. This is the S6 movie gate reached through the real
+/// gateway dispatch, so the default full suite covers it even though the
+/// private W104 matrix is ignored.
+#[test]
+fn malformed_and_valid_movie_close_go_through_the_consolidated_gate() {
+    let fixture = Fixture::new(&winning_spec());
+    let state = fixture.chef_state();
+    let mut gateway = fixture.gateway(state, true);
+    say(&mut gateway, "realm harvest", 2_000);
+    let instance = active_instance(&gateway).expect("active run");
+    let before = gateway.snapshot();
+    let before_inventory = before.gameplay.as_ref().unwrap().inventory.clone();
+
+    let error = gateway
+        .handle_at(&fishing_fixtures::bundle(&[vec![26, 0, 42, 0, 0]]), 2_100)
+        .err()
+        .expect("the malformed close must be refused");
+    assert_eq!(error.to_string(), "invalid harvesting leave request");
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "the refused close changed state"
+    );
+    assert_eq!(active_instance(&gateway), Some(instance));
+
+    send(&mut gateway, &[26, 0, 42, 0], 2_200);
+    assert!(
+        active_instance(&gateway).is_none(),
+        "the valid close left the run live"
+    );
+    assert_eq!(
+        gateway.snapshot().gameplay.unwrap().inventory,
+        before_inventory,
+        "the valid close paid an item"
+    );
+}
+
 #[test]
 fn save_reconnect_cancel_and_restart_rebind_the_run() {
     let fixture = Fixture::new(&winning_spec());
@@ -984,13 +1027,15 @@ fn harvesting_content_loads_fail_closed_and_binds_region_111() {
     assert!(active_instance(&gateway).is_some());
     let snapshot = gateway.snapshot();
     fs::remove_file(fixture.directory.join(CONTENT_FILE)).unwrap();
-    assert!(Gateway::load_gameplay(
-        &fixture.reference,
-        snapshot.character,
-        &fixture.directory,
-        snapshot.gameplay,
-    )
-    .is_err());
+    assert!(
+        Gateway::load_gameplay(
+            &fixture.reference,
+            snapshot.character,
+            &fixture.directory,
+            snapshot.gameplay,
+        )
+        .is_err()
+    );
 }
 
 impl Fixture {

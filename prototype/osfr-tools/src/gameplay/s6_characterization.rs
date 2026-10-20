@@ -7,8 +7,11 @@
 //! two files cannot drift.
 //!
 //! Wire prefixes here are the shipped client's request shapes: 26/10
-//! constructor 0x00a36f80 and 26/8 builder 0x008b6bc0 for the NPC ordering
-//! check; the chat request reader is 0x00b11600.
+//! constructor 0x00a36f80, 26/8 builder 0x008b6bc0, 26/13 CommandPacketSetProfile
+//! sender 0x00938e10 (constructor 0x008a29f0), 36/10 ability writer 0x00a342e0,
+//! 42/3 InventoryPacketEquipByGuid writer 0x00bdb450 (sender 0x00bda510) and
+//! the four-byte 26/42 Results Close writer 0x0092f300; the chat request reader
+//! is 0x00b11600.
 
 use super::*;
 #[path = "../../tests/common/gateway_packets.rs"]
@@ -20,7 +23,7 @@ use crate::{
     recipes::CraftingJob,
     smelting::{SmeltingOutcome, SmeltingTransaction},
 };
-use gateway_packets::{chat, interact, select};
+use gateway_packets::{blocked_families, chat, interact, select};
 use s6::{chat_texts, w104_content};
 use serde_json::Value;
 use std::fs;
@@ -389,8 +392,9 @@ const COOKING_PROFILE: i32 = 45;
 const SMELTING_PROFILE: i32 = 14;
 
 /// The five crafting and gathering movies in the gate's intercept order. This
-/// table is the test's own copy, so the same matrix characterized the five
-/// per-engine blocks before they became one gate.
+/// is deliberately the test's own copy, not production `Movie`: the same
+/// matrix compiles against the parent commit for the before/after baseline, and
+/// a production rename or reorder cannot make the oracle agree by construction.
 #[derive(Clone, Copy)]
 enum Engine {
     Forging,
@@ -509,28 +513,6 @@ fn running_movie_fixture(engine: Engine) -> (Gameplay, CharacterState) {
     (game, test_character())
 }
 
-/// The five families a live movie refuses, one per blocked request shape. The
-/// ability writer 0x00a342e0 sends i32 bar, i32 slot, i32 target mode and a u64
-/// target id for mode 0.
-fn blocked_families() -> [Vec<u8>; 5] {
-    let mut job = vec![26, 0, 13, 0];
-    job.extend(1_i32.to_le_bytes());
-    let mut attack = vec![36, 0, 10, 0];
-    attack.extend([0; 12]);
-    attack.extend(UNKNOWN_ACTOR.to_le_bytes());
-    let mut equip = vec![42, 0, 3, 0];
-    equip.extend(i32::MAX.to_le_bytes());
-    equip.extend(1_i32.to_le_bytes());
-    equip.extend(0_i32.to_le_bytes());
-    [
-        job,
-        interact(UNKNOWN_ACTOR),
-        select(UNKNOWN_ACTOR, 1),
-        attack,
-        equip,
-    ]
-}
-
 #[test]
 #[ignore = "requires the private W104 content"]
 fn two_active_engines_keep_the_gate_intercept_order() {
@@ -541,7 +523,6 @@ fn two_active_engines_keep_the_gate_intercept_order() {
     let mut game = w104_game();
     start(&mut game, Engine::Forging);
     start(&mut game, Engine::Mining);
-    assert!(matches!(game.running_movie(), Some(Movie::Forging)));
     let out = game
         .handle_in_world(&interact(UNKNOWN_ACTOR), &character, NOW)
         .unwrap();
@@ -553,7 +534,6 @@ fn two_active_engines_keep_the_gate_intercept_order() {
     let mut game = w104_game();
     start(&mut game, Engine::Cooking);
     start(&mut game, Engine::Smelting);
-    assert!(matches!(game.running_movie(), Some(Movie::Cooking)));
     let out = game
         .handle_in_world(&interact(UNKNOWN_ACTOR), &character, NOW)
         .unwrap();
@@ -561,6 +541,23 @@ fn two_active_engines_keep_the_gate_intercept_order() {
         chat_texts(&out.replies),
         vec!["Close the cooking game before changing jobs, equipment or interacting.".to_owned()]
     );
+}
+
+/// The direct production-API assertions are after-only: they name `Movie` and
+/// `running_movie`, which the parent commit does not have. The behavioral tests
+/// above still compile there, so they can be the before/after baseline.
+#[test]
+#[ignore = "requires the private W104 content"]
+fn running_movie_reports_the_first_active_engine_in_gate_order() {
+    let mut game = w104_game();
+    start(&mut game, Engine::Forging);
+    start(&mut game, Engine::Mining);
+    assert!(matches!(game.running_movie(), Some(Movie::Forging)));
+
+    let mut game = w104_game();
+    start(&mut game, Engine::Cooking);
+    start(&mut game, Engine::Smelting);
+    assert!(matches!(game.running_movie(), Some(Movie::Cooking)));
 }
 
 #[test]
@@ -585,7 +582,7 @@ fn one_movie_gate_keeps_the_five_blocks_refusals_and_cancel() {
         );
 
         // Every blocked family answers with that movie's text and stages nothing.
-        for packet in blocked_families() {
+        for packet in blocked_families(UNKNOWN_ACTOR) {
             let out = game.handle_in_world(&packet, &character, NOW).unwrap();
             assert_eq!(
                 chat_texts(&out.replies),
@@ -644,6 +641,25 @@ fn one_movie_gate_keeps_the_five_blocks_refusals_and_cancel() {
             &before.inventory,
             "{noun}: exit paid an item"
         );
+
+        // The valid four-byte Results Close cancels too, clears both clocks and
+        // still grants nothing.
+        start(&mut game, engine);
+        let out = game
+            .handle_in_world(&[26, 0, 42, 0], &character, NOW)
+            .unwrap();
+        assert!(out.changed, "{noun}: the valid close changed nothing");
+        assert!(
+            !engine.is_active(&game),
+            "{noun}: the valid close left the movie active"
+        );
+        assert_eq!(game.forging_tick_ms, None, "{noun}: forging clock left");
+        assert_eq!(game.type8_tick_ms, None, "{noun}: type8 clock left");
+        assert_eq!(
+            &game.state().inventory,
+            &before.inventory,
+            "{noun}: the valid close paid an item"
+        );
     }
 }
 
@@ -699,5 +715,68 @@ fn movie_tick_keeps_the_250ms_rule_for_every_engine() {
     let out = game.tick(&character, NOW + 5_000).unwrap();
     assert!(out.replies.is_empty());
     assert_eq!(game.forging_tick_ms, None);
+    assert_eq!(game.state(), before);
+}
+
+#[test]
+#[ignore = "requires the private W104 content"]
+fn movie_tick_reads_only_the_running_movies_clock() {
+    let character = test_character();
+
+    // Forging + Mining: only the forging clock is set, so the Type8 engine must
+    // not advance and must not gain a stamp.
+    let mut game = w104_game();
+    start(&mut game, Engine::Forging);
+    start(&mut game, Engine::Mining);
+    game.forging_tick_ms = Some(NOW);
+    game.type8_tick_ms = None;
+    let mining = game.state().mining;
+    game.tick(&character, NOW + 250).unwrap();
+    assert_eq!(game.forging_tick_ms, Some(NOW + 250));
+    assert_eq!(game.type8_tick_ms, None);
+    assert_eq!(
+        game.state().mining,
+        mining,
+        "the forging clock drove mining"
+    );
+
+    // Mining + Harvesting: the first engine in gate order advances, the other
+    // does not, even though they share one clock field.
+    let mut game = w104_game();
+    start(&mut game, Engine::Mining);
+    start(&mut game, Engine::Harvesting);
+    game.type8_tick_ms = Some(NOW);
+    let mining = game.state().mining;
+    let harvesting = game.state().harvesting;
+    game.tick(&character, NOW + 250).unwrap();
+    assert_eq!(game.type8_tick_ms, Some(NOW + 250));
+    assert_ne!(game.state().mining, mining, "mining did not advance");
+    assert_eq!(
+        game.state().harvesting,
+        harvesting,
+        "the mining tick drove harvesting"
+    );
+
+    // Missing clocks mean no tick, and the other movie's clock is not read:
+    // harvesting must not use the forging clock.
+    let mut game = w104_game();
+    start(&mut game, Engine::Harvesting);
+    game.type8_tick_ms = None;
+    game.forging_tick_ms = Some(NOW);
+    let before = game.state();
+    game.tick(&character, NOW + 5_000).unwrap();
+    assert_eq!(game.type8_tick_ms, None);
+    assert_eq!(game.forging_tick_ms, Some(NOW));
+    assert_eq!(game.state(), before);
+
+    // Mirror for forging: a Type8 clock cannot drive it.
+    let mut game = w104_game();
+    start(&mut game, Engine::Forging);
+    game.forging_tick_ms = None;
+    game.type8_tick_ms = Some(NOW);
+    let before = game.state();
+    game.tick(&character, NOW + 5_000).unwrap();
+    assert_eq!(game.forging_tick_ms, None);
+    assert_eq!(game.type8_tick_ms, Some(NOW));
     assert_eq!(game.state(), before);
 }
