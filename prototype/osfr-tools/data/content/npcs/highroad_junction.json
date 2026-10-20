@@ -8422,11 +8422,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1683; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2940 (ModelId=969, ModelFileName=human_m_ranger_ricardo.agr, NameId=103808)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T315: en_us_data.dat Global.Text.104137, JenkinsLookup2 hash 1310252094, line 34689. First-person quest intro/offer for Chef: Fireworks Frenzy! bound in data/content/quests/chef.json quest 3050012 (giver_npc_id 9000000178, intro_text_string_id 104137), and the region guide's quest row names Ranger Ricardo as the giver. Guide: notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md line 118 (NPC row line 57). See notes/Autopilot/T315.md for the locale text and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T315: use this verified speaker's locale line as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.850863,
       "model_id": 969,
-      "model_file_name": "human_m_ranger_ricardo.agr"
+      "model_file_name": "human_m_ranger_ricardo.agr",
+      "greeting_string_id": 104137
     },
     {
       "npc_id": 9500000336,
