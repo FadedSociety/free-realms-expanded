@@ -242,7 +242,8 @@ fn cleetus_position() -> [f32; 3] {
     serde_json::from_value(npc["position"].clone()).expect("the giver has a spawn position")
 }
 
-/// The always-on wolves: empty `quest_ids` is production's "present without a quest" rule.
+/// The always-on W102 wolves: empty `quest_ids` is production's "present without a
+/// quest" rule, and T245's level 5-10 camps reuse the definition on `MID-*` areas.
 fn wolves() -> Vec<(u64, [f32; 3])> {
     let document = read_content("field_enemies.json");
     document["enemies"]
@@ -254,6 +255,9 @@ fn wolves() -> Vec<(u64, [f32; 3])> {
                 && enemy["quest_ids"]
                     .as_array()
                     .is_some_and(|ids| ids.is_empty())
+                && enemy["spawn_area"]["id"]
+                    .as_str()
+                    .is_some_and(|area| area.starts_with("W102-"))
         })
         .map(|enemy| {
             (
@@ -1077,19 +1081,7 @@ fn the_two_new_records_load_and_their_targets_exist() {
     }
 
     // The kill target is a real always-on field population.
-    let field = read_content("field_enemies.json");
-    let wolves: Vec<_> = field["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|enemy| {
-            enemy["definition_id"].as_u64() == Some(u64::from(WOLF_DEFINITION))
-                && enemy["quest_ids"]
-                    .as_array()
-                    .is_some_and(|ids| ids.is_empty())
-        })
-        .collect();
-    assert_eq!(wolves.len(), 3, "three always-on 3156 wolves");
+    assert_eq!(wolves().len(), 3, "three always-on W102 3156 wolves");
 
     // The gather target exists in the Snowhill copper pool.
     let mining = read_content("mining_nodes.json");

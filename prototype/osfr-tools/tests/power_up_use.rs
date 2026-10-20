@@ -26,6 +26,9 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 /// present (no quest gate).
 const TARGET: u64 = 131_000_102_001;
 const TARGET_AT: [f32; 3] = [-1899.204, -50.59, 307.902];
+/// A clear point 40 m east of the F1 camp. T245 appends a level-5 wolf on the
+/// same F1 centre, so the Flame Wave is cast here where nothing is in range.
+const CLEAR_AT: [f32; 3] = [-1859.204, -50.59, 307.902];
 /// A second always-present Hooligan, where the player walks after the pickup;
 /// its own position is inside the Flame Wave radius.
 const SECOND: u64 = 131_000_102_004;
@@ -286,13 +289,12 @@ fn a_held_power_up_uses_its_own_key_once_and_restores_the_job_bar() {
         slot.icon_id
     );
 
-    // The client's key request (bar 1, slot 2) consumes the kind, hits the
-    // surrounding enemies once and restores the authored job row.
-    // Nothing stands within the Flame Wave radius of the pickup, so this use
-    // proves the consume and bar restore without spawning another drop.
+    // The client's key request (bar 1, slot 2) consumes the kind and restores
+    // the authored job row. The T245 mid-level camp shares the F1 centre, so
+    // this cast happens at a clear point with no target in the Flame Wave radius.
     let use_at = kill + 1_000;
     let used = game
-        .handle_in_world(&cast(2, 1), &location, use_at)
+        .handle_in_world(&cast(2, 1), &at(CLEAR_AT), use_at)
         .unwrap();
     assert_eq!(game.held_power_up(), None);
     let restored = toolbar(&used).expect("the use resends the restored bar");

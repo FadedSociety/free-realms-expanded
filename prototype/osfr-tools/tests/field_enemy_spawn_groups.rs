@@ -148,7 +148,7 @@ fn starting_regions_have_grouped_reconstructed_placements_and_presets() {
             60,
         ),
     ];
-    assert_eq!(groups.len(), expected.len());
+    assert!(groups.len() >= expected.len());
 
     let enemies = field["enemies"].as_array().unwrap();
     let mut grouped = BTreeSet::new();
@@ -194,13 +194,23 @@ fn starting_regions_have_grouped_reconstructed_placements_and_presets() {
         }
     }
     assert_eq!(grouped.len(), 12);
-    assert_eq!(
-        enemies
-            .iter()
-            .filter(|actor| actor["quest_ids"] == json!([]))
-            .count(),
-        grouped.len()
-    );
+    // Every always-on actor belongs to a group. T245's mid-level camps are
+    // appended groups too; this test pins the four starter groups above.
+    let all_grouped: BTreeSet<u64> = groups
+        .iter()
+        .flat_map(|group| group["members"].as_array().unwrap())
+        .map(|member| member.as_u64().unwrap())
+        .collect();
+    for actor in enemies
+        .iter()
+        .filter(|actor| actor["quest_ids"] == json!([]))
+    {
+        assert!(
+            all_grouped.contains(&actor["guid"].as_u64().unwrap()),
+            "{} is always-on but ungrouped",
+            actor["guid"]
+        );
+    }
 }
 
 #[test]
@@ -208,7 +218,10 @@ fn group_spawns_roam_kill_and_respawn_on_the_authored_timer() {
     let fixture = Fixture::new();
     let mut e = fixture.load();
     let spawned = spawned(&e.on_zone_ready(11, 0).unwrap());
-    assert_eq!(spawned.len(), 12);
+    assert!(spawned.len() >= 12);
+    for guid in 131000102001..=131000102012 {
+        assert!(spawned.contains(&guid), "starter {guid} must still spawn");
+    }
     assert!(spawned.contains(&GUID));
     let behaviour = e.behaviour(GUID).unwrap();
     assert_eq!(behaviour.mode, Mode::Melee);

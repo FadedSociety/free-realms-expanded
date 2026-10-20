@@ -112,6 +112,114 @@
           "evidence": "(R) Three full-size field shamans are placed away from the Troll Summoner battle and referral corridor; T3 is an additional actor anchored on NPC 3149. Battle 96, its summons and friendly trolls are unchanged."
         }
       ]
+    },
+    {
+      "id": "mid_farnum_wolves",
+      "zone_id": 0,
+      "region": "Farnum outskirts",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "level_band": [
+        5,
+        6
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102013,
+        131000102014
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_farnum_wolves and notes/Design/Field Enemies.md > Placement table. The same W102 terrain-checked centres and 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two always-on Farnum wolves repeat a verified W102 centre; level band 5-6 and 90 s respawn are a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates. Count, respawn and rates are local policy."
+        }
+      ]
+    },
+    {
+      "id": "mid_highroad_hooligans",
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "level_band": [
+        7,
+        8
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102015,
+        131000102016
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_highroad_hooligans and notes/Design/Field Enemies.md > Placement table. The same W102 terrain-checked centres and 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two always-on Highroad Hooligans repeat a verified W102 centre; level band 7-8 and 90 s respawn are a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates. Count, respawn and rates are local policy."
+        }
+      ]
+    },
+    {
+      "id": "mid_wilds_shamans",
+      "zone_id": 0,
+      "region": "Lakeshore / northeast Wilds",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "level_band": [
+        9,
+        10
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102017,
+        131000102018
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_wilds_shamans and notes/Design/Field Enemies.md > Placement table. The same W102 terrain-checked centres and 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two always-on field shamans repeat a verified W102 centre; level band 9-10 and 120 s respawn are a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates. Count, respawn and rates are local policy."
+        }
+      ]
+    },
+    {
+      "id": "mid_queensfields_bixies",
+      "zone_id": 0,
+      "region": "Sanctuary / Queensfields",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "level_band": [
+        10,
+        10
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102019,
+        131000102020
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_queensfields_bixies and notes/Design/Field Enemies.md > Placement table. The same W102 terrain-checked centres and 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two always-on Queensfields bixies repeat a verified W102 centre; level band 10-10 and 120 s respawn are a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates. Count, respawn and rates are local policy."
+        }
+      ]
     }
   ],
   "enemies": [
@@ -868,6 +976,390 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Third troll is an additional actor using NPC 3149 as a location anchor, not a third recovered community spawn. Friendly troll patrollers, Troll Summoner battle 96 and its small summoned trolls are unchanged."
+        }
+      ]
+    },
+    {
+      "guid": 131000102013,
+      "definition_id": 3156,
+      "model_id": 3284,
+      "name_id": 5100200,
+      "name": "Hooligan Wolf",
+      "texture_alias": "",
+      "position": [
+        -1899.204,
+        -50.59,
+        307.902
+      ],
+      "max_health": 180,
+      "damage": 25,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 5,
+      "spawn_area": {
+        "id": "MID-F1",
+        "centre": [
+          -1899.204,
+          -50.59,
+          307.902
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004164,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 2470: model 3284 = wolf_generic.adr; lab/reports/locale-id-to-text.json row 83073: locale 5100200 = Hooligan Wolf. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102001 (area W102-F1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2830, NPC row 4164, position [-1923.204, -49.37827, 295.9019]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102014,
+      "definition_id": 3156,
+      "model_id": 3284,
+      "name_id": 5100200,
+      "name": "Hooligan Wolf",
+      "texture_alias": "",
+      "position": [
+        -1887.867,
+        -51.14,
+        291.159
+      ],
+      "max_health": 180,
+      "damage": 25,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 5,
+      "spawn_area": {
+        "id": "MID-F2",
+        "centre": [
+          -1887.867,
+          -51.14,
+          291.159
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004165,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 2470: model 3284 = wolf_generic.adr; lab/reports/locale-id-to-text.json row 83073: locale 5100200 = Hooligan Wolf. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102002 (area W102-F2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2831, NPC row 4165, position [-1923.867, -48.80265, 299.1591]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102015,
+      "definition_id": 930060,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1779.455,
+        -28.88,
+        562.833
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 7,
+      "spawn_area": {
+        "id": "MID-H1",
+        "centre": [
+          -1779.455,
+          -28.88,
+          562.833
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004159,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 204: model 203 = human_m_hooligan_brawler_01.agr; lab/reports/locale-id-to-text.json row 83257: locale 5100401 = Hooligan. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102004 (area W102-H1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2825, NPC row 4159, position [-1779.455, -28.78084, 562.8329]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102004 (W102-H1); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102016,
+      "definition_id": 930060,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1792.921,
+        -29.33,
+        579.55
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 7,
+      "spawn_area": {
+        "id": "MID-H2",
+        "centre": [
+          -1792.921,
+          -29.33,
+          579.55
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004160,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 204: model 203 = human_m_hooligan_brawler_01.agr; lab/reports/locale-id-to-text.json row 83257: locale 5100401 = Hooligan. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102005 (area W102-H2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2826, NPC row 4160, position [-1792.921, -29.21154, 571.5501]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102005 (W102-H2); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102017,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -347.084,
+        0.61,
+        1068.348
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 9,
+      "spawn_area": {
+        "id": "MID-T1",
+        "centre": [
+          -347.084,
+          0.61,
+          1068.348
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000003149,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 169: model 168 = troll_shaman.adr; lab/reports/locale-id-to-text.json row 27287: locale 72269 = Troll Bone Shaman. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102010 (area W102-T1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102010 (W102-T1); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102018,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -351.103,
+        2.33,
+        1048.674
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 9,
+      "spawn_area": {
+        "id": "MID-T2",
+        "centre": [
+          -351.103,
+          2.33,
+          1048.674
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000003150,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 169: model 168 = troll_shaman.adr; lab/reports/locale-id-to-text.json row 27287: locale 72269 = Troll Bone Shaman. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102011 (area W102-T2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1893, NPC row 3150, position [-259.1032, 0.5111136, 1120.674]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102011 (W102-T2); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102019,
+      "definition_id": 930053,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -664.762,
+        2.4,
+        299.608
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 10,
+      "spawn_area": {
+        "id": "MID-Q1",
+        "centre": [
+          -664.762,
+          2.4,
+          299.608
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000002920,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 221: model 220 = bixie_m_warrior.adr; lab/reports/locale-id-to-text.json row 79860: locale 440711 = Bixie Soldier. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102007 (area W102-Q1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1663, NPC row 2920, position [-672.7616, 2.510802, 299.6082]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102007 (W102-Q1); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102020,
+      "definition_id": 930053,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -692.141,
+        2.4,
+        220.373
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 10,
+      "spawn_area": {
+        "id": "MID-Q2",
+        "centre": [
+          -692.141,
+          2.4,
+          220.373
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000002932,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 221: model 220 = bixie_m_warrior.adr; lab/reports/locale-id-to-text.json row 79860: locale 440711 = Bixie Soldier. These prove resource identities, not the model/name pairing or free-field use."
+        },
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102008 (area W102-Q2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1675, NPC row 2932, position [-696.1415, 2.447089, 216.3727]. Position/count anchor only; no source code or combat rules reused."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102008 (W102-Q2); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
       ]
     }
