@@ -29,6 +29,9 @@ const TARGET_AT: [f32; 3] = [-1899.204, -50.59, 307.902];
 /// A clear point 40 m east of the F1 camp. T245 appends a level-5 wolf on the
 /// same F1 centre, so the Flame Wave is cast here where nothing is in range.
 const CLEAR_AT: [f32; 3] = [-1859.204, -50.59, 307.902];
+/// T245's level-5 MID-F1 wolf: the same centre as `TARGET`, so a cast at the
+/// authored F1 pickup point has a live target.
+const MID_F1: u64 = 131_000_102_013;
 /// A second always-present Hooligan, where the player walks after the pickup;
 /// its own position is inside the Flame Wave radius.
 const SECOND: u64 = 131_000_102_004;
@@ -301,6 +304,41 @@ fn a_held_power_up_uses_its_own_key_once_and_restores_the_job_bar() {
     assert_eq!(slot_ids(restored), before);
     assert!(!definition_ids(&used).contains(&slot.definition_id));
     assert!(hit_targets(&used).is_empty(), "no target in range");
+}
+
+#[test]
+fn the_f1_pickup_point_hits_the_co_located_mid_camp_wolf() {
+    // The authored scenario: the pickup is taken at F1, where T245's level-5
+    // MID-F1 wolf now stands beside the dead starter wolf. A level-1 Flame Wave
+    // hits it, leaves it alive and fabricates no drop.
+    let fixture = Fixture::new();
+    let (mut game, location, _) = fresh_game(&fixture, 0);
+    let kill = kill_target(&mut game, &location, 1_000);
+    game.tick(&location, kill + 200).unwrap();
+    assert_eq!(game.held_power_up(), Some("flame_wave"));
+
+    let used = game
+        .handle_in_world(&cast(2, 1), &at(TARGET_AT), kill + 1_000)
+        .unwrap();
+    assert_eq!(game.held_power_up(), None);
+    let hits = hit_targets(&used);
+    assert!(
+        hits.contains(&MID_F1),
+        "the F1 cast hits the co-located MID-F1 wolf: {hits:?}"
+    );
+    assert!(
+        !hits.contains(&TARGET),
+        "the dead starter wolf is not hit again"
+    );
+    let health = enemy_health(&used, MID_F1).expect("the hit reports the wolf's health");
+    assert!(
+        health > 0,
+        "a level-1 Flame Wave leaves the level-5 wolf alive"
+    );
+    assert!(
+        pickup_models(&used).is_empty(),
+        "a surviving wolf drops nothing"
+    );
 }
 
 #[test]

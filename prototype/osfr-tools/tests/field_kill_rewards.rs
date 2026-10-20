@@ -24,6 +24,9 @@ const ENEMY_TWO: u64 = 131000109002;
 const LEVEL_ONE: i32 = 930108;
 const WOLF: i32 = 3156;
 const NONCOMBAT: i32 = 45;
+/// T245's level-5 MID-F1 camp wolf. The shipped row keeps definition 3156, so
+/// the kind's override (not the level 5-8 band) owns its payout.
+const MID_F1: u64 = 131_000_102_013;
 /// `encounter::CREDIT_TTL_MS`; the constant is private to the engine.
 const CREDIT_TTL_MS: u64 = 10_000;
 static SERIAL: AtomicU64 = AtomicU64::new(0);
@@ -172,6 +175,36 @@ fn player(
     game.initialize_world(&character_at(guid, position), 0)
         .unwrap();
     game
+}
+
+/// The shipped field row with its shipped spawn group's policy applied inline,
+/// because this fixture carries no `spawn_groups`.
+fn shipped_field_actor(guid: u64) -> (Value, [f32; 3]) {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/field_enemies.json");
+    let field: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    let mut row = field["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["guid"].as_u64() == Some(guid))
+        .unwrap_or_else(|| panic!("shipped field actor {guid}"))
+        .clone();
+    let group = field["spawn_groups"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|group| group["members"].as_array().unwrap().contains(&json!(guid)))
+        .unwrap_or_else(|| panic!("shipped spawn group for {guid}"));
+    for key in [
+        "respawn_seconds",
+        "aggro_range",
+        "leash_radius",
+        "behaviour",
+    ] {
+        row[key] = group[key].clone();
+    }
+    let position = serde_json::from_value(row["position"].clone()).unwrap();
+    (row, position)
 }
 
 /// The production reconnect reads the character snapshot back through
@@ -352,6 +385,38 @@ fn a_solo_field_kill_pays_once_and_only_the_active_job() {
     assert_eq!(fs::read(&path).unwrap(), saved_before);
     let stored = game_store::load_or_create(&path, character.clone()).unwrap();
     assert_eq!(stored.gameplay, Some(state_before));
+}
+
+#[test]
+fn the_mid_level_farnum_camp_pays_the_kind_override_rate() {
+    // The level-5 MID-F camp reuses definition 3156. The override exists so the
+    // kind's rate cannot be retuned by a level edit; it wins over the level 5-8
+    // band for this camp, so the payout stays 2 coins / 5 job XP.
+    let (row, home) = shipped_field_actor(MID_F1);
+    assert_eq!(row["level"], 5);
+    let fixture = Fixture::new(vec![row]);
+    let at = [home[0] + 1.0, home[1], home[2]];
+    let character = character_at(101, at);
+    let mut game = player(&fixture, 101, 43, at, 0, None);
+    let mut field = game.take_shared_fields().unwrap();
+    let known = BTreeSet::from([MID_F1]);
+
+    let (lethal, _) = kill(&mut game, &mut field, &character, &known, MID_F1, 0);
+    assert_eq!(
+        packet(&lethal.replies, 38, 19),
+        [38u8, 0, 19, 0, 2, 0, 0, 0].as_slice(),
+        "definition 3156 keeps its 2 coins at level 5, not the band's 7"
+    );
+    assert_eq!(
+        packet(&lethal.replies, 38, 14),
+        carrier(38, 14, &[43, 1, 5, 0, 0, 0]).as_slice(),
+        "and its 5 job XP, not the level 5-8 band's 15"
+    );
+    assert_eq!(game.state().inventory.coins, 2);
+    assert_eq!(
+        game.state().profiles.as_ref().unwrap().experience.get(&43),
+        Some(&5)
+    );
 }
 
 #[test]

@@ -242,8 +242,10 @@ fn cleetus_position() -> [f32; 3] {
     serde_json::from_value(npc["position"].clone()).expect("the giver has a spawn position")
 }
 
-/// The always-on W102 wolves: empty `quest_ids` is production's "present without a
-/// quest" rule, and T245's level 5-10 camps reuse the definition on `MID-*` areas.
+/// The always-on Hooligan Wolves (definition 3156). Empty `quest_ids` is
+/// production's "present without a quest" rule. Production credits every defeat
+/// by definition id, so T245's level-5 `MID-F` camp is part of this population:
+/// five live wolves, not three.
 fn wolves() -> Vec<(u64, [f32; 3])> {
     let document = read_content("field_enemies.json");
     document["enemies"]
@@ -255,9 +257,6 @@ fn wolves() -> Vec<(u64, [f32; 3])> {
                 && enemy["quest_ids"]
                     .as_array()
                     .is_some_and(|ids| ids.is_empty())
-                && enemy["spawn_area"]["id"]
-                    .as_str()
-                    .is_some_and(|area| area.starts_with("W102-"))
         })
         .map(|enemy| {
             (
@@ -753,7 +752,11 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     let cleetus = cleetus_position();
     let character = character_at(cleetus);
     let wolves = wolves();
-    assert_eq!(wolves.len(), 3, "three always-on wolves are live");
+    assert_eq!(
+        wolves.len(),
+        5,
+        "five always-on wolves are live: three starter plus the two level-5 MID-F camp"
+    );
 
     let offer = offered(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
     assert_eq!(word(&offer, 14), FIGHTING_TITLE);
@@ -761,23 +764,16 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     assert_eq!(quest(&game, FIGHTING_THE_PACK).unwrap().1, [0, 0]);
 
     let mut now = 2_000;
+    // All five are live at once. Production credits every 3156 defeat, so the
+    // two level-5 MID-F camp wolves count and the quest completes without
+    // waiting for the authored 45 s respawn: the production rule the previous
+    // W102-area filter hid.
     for (index, (guid, position)) in wolves.iter().copied().enumerate() {
         assert!(
             kill_wolf(&mut game, position, guid, &mut now),
             "wolf {index} died through the production attack path"
         );
         assert_eq!(count(&game, FIGHTING_THE_PACK, 0), index as u32 + 1);
-    }
-    assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 3);
-
-    // The authored 45 s respawn supplies live wolves four and five.
-    respawn_wolves(&mut game, &mut now);
-    for (index, (guid, position)) in wolves.iter().copied().take(2).enumerate() {
-        assert!(
-            kill_wolf(&mut game, position, guid, &mut now),
-            "respawned wolf {index} died"
-        );
-        assert_eq!(count(&game, FIGHTING_THE_PACK, 0), index as u32 + 4);
     }
     assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 5);
 
@@ -1080,8 +1076,13 @@ fn the_two_new_records_load_and_their_targets_exist() {
         );
     }
 
-    // The kill target is a real always-on field population.
-    assert_eq!(wolves().len(), 3, "three always-on W102 3156 wolves");
+    // The kill target is a real always-on field population. T245's two level-5
+    // MID-F camp wolves share the definition, so production counts five.
+    assert_eq!(
+        wolves().len(),
+        5,
+        "five always-on 3156 wolves: three starter plus the MID-F camp"
+    );
 
     // The gather target exists in the Snowhill copper pool.
     let mining = read_content("mining_nodes.json");
@@ -1122,7 +1123,7 @@ fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
     let cleetus = cleetus_position();
     let character = character_at(cleetus);
     let wolves = wolves();
-    assert_eq!(wolves.len(), 3);
+    assert_eq!(wolves.len(), 5);
 
     offered(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
     accept(&mut game, &character, FIGHTING_THE_PACK, 1_100);
@@ -1158,8 +1159,10 @@ fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
         "the reload round-trips the quest save"
     );
 
-    // Finish the hunt after the reload; the panel still starts from the restored wolves.
-    for (guid, position) in wolves.iter().copied() {
+    // Finish the hunt after the reload; the panel still starts from the restored
+    // wolves. The first two kills were credited before the reconnect, so three
+    // more reach the five-goal.
+    for (guid, position) in wolves.iter().copied().take(3) {
         assert!(kill_wolf(&mut game, position, guid, &mut now));
     }
     assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 5);

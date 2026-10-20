@@ -1,86 +1,13 @@
 use osfr_tools::encounter::{EncounterEngine, EncounterOutcome, Mode};
 use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
-use std::{
-    collections::BTreeSet,
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-};
+use std::{collections::BTreeSet, fs};
+
+#[path = "common/field_enemy_fixture.rs"]
+mod field_enemy_fixture;
+
+use field_enemy_fixture::{Fixture, content_dir, spawned};
 
 const GUID: u64 = 131000102001;
-static SERIAL: AtomicU64 = AtomicU64::new(0);
-
-struct Fixture(PathBuf);
-
-impl Fixture {
-    fn new() -> Self {
-        let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "t014-{}-{}",
-            std::process::id(),
-            SERIAL.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(&dir).unwrap();
-        let mut template = vec![0; 334];
-        template[..4].copy_from_slice(&[35, 0, 2, 0]);
-        template[133..137].copy_from_slice(&100_i32.to_le_bytes());
-        template[224] = 1;
-        fs::write(dir.join("npc.bin"), &template).unwrap();
-        let zone = json!({"zone_id":0,"name":"SyntheticWorld","sky":"","geometry_id":214,"position":[0,0,0],"rotation":[0,0,0],"tutorial":false});
-        let mut cave = zone.clone();
-        cave["zone_id"] = json!(411);
-        let other = json!({"guid":200,"definition_id":400,"model_id":3,"name_id":100,"name":"Synthetic wolf","texture_alias":"","position":[0,0,0],"max_health":100,"damage":7,"boss":false});
-        fs::write(
-            dir.join("encounters.json"),
-            json!({
-                "schema_version":1,
-                "template_file":"npc.bin",
-                "template_sha256":format!("{:x}",Sha256::digest(&template)),
-                "world":zone,
-                "world_enemies":[],
-                "dungeons":[{
-                    "id":411,
-                    "title_id":12,
-                    "description_id":13,
-                    "objective_id":14,
-                    "zone":cave,
-                    "guide":null,
-                    "enemies":[other],
-                    "reward_coins":0,
-                    "reward_items":[]
-                }]
-            })
-            .to_string(),
-        )
-        .unwrap();
-        fs::copy(
-            content_dir().join("field_enemies.json"),
-            dir.join("field_enemies.json"),
-        )
-        .unwrap();
-        Self(dir)
-    }
-
-    fn load(&self) -> EncounterEngine {
-        let mut e = EncounterEngine::load(&self.0, None).unwrap();
-        // Production loads presets before the actors that name them.
-        e.load_behaviours(&content_dir().join("behaviours.json"))
-            .unwrap();
-        e.load_field_enemies(&self.0.join("field_enemies.json"))
-            .unwrap();
-        e
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
 
 fn at(e: &EncounterEngine, guid: u64) -> [f32; 3] {
     e.field_teleport_targets()
@@ -104,14 +31,6 @@ fn hp(out: &EncounterOutcome, guid: u64) -> Option<(u32, u32)> {
                 u32::from_le_bytes(packet[16..20].try_into().unwrap()),
             )
         })
-}
-
-fn spawned(out: &EncounterOutcome) -> BTreeSet<u64> {
-    out.replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]) && packet.len() >= 12)
-        .map(|packet| u64::from_le_bytes(packet[4..12].try_into().unwrap()))
-        .collect()
 }
 
 #[test]
@@ -215,7 +134,7 @@ fn starting_regions_have_grouped_reconstructed_placements_and_presets() {
 
 #[test]
 fn group_spawns_roam_kill_and_respawn_on_the_authored_timer() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::copied();
     let mut e = fixture.load();
     let spawned = spawned(&e.on_zone_ready(11, 0).unwrap());
     assert!(spawned.len() >= 12);
@@ -295,7 +214,7 @@ fn group_spawns_roam_kill_and_respawn_on_the_authored_timer() {
 
 #[test]
 fn malformed_group_reload_is_atomic() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::copied();
     let mut e = fixture.load();
     let before = e
         .field_teleport_targets()
@@ -304,7 +223,7 @@ fn malformed_group_reload_is_atomic() {
         .collect::<Vec<_>>();
     let behaviour = e.behaviour(GUID).cloned().unwrap();
 
-    let path = fixture.0.join("field_enemies.json");
+    let path = fixture.field_path().to_path_buf();
     let mut field: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
     field["spawn_groups"][0]["members"] = json!([GUID, GUID]);
     fs::write(&path, field.to_string()).unwrap();
