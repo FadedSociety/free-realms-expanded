@@ -1353,11 +1353,7 @@ impl Gameplay {
             inventory: self.inventory.state().clone(),
             quests: self.quests.state().clone(),
             combat: self.combat.state(),
-            npc_quests: self
-                .npc_quests
-                .as_ref()
-                .map(|engine| engine.state().clone())
-                .or_else(|| self.saved_npc_quests.clone()),
+            npc_quests: self.npc_quest_state(),
             learned_recipes: self.learned_recipes.clone(),
             profiles: self.saved_profile_state(),
             identity_fingerprint: self.identity_fingerprint.clone(),

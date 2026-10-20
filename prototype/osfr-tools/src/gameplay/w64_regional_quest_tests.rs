@@ -145,6 +145,40 @@ fn live_quest_offers_require_real_level_and_the_active_job() {
     );
 }
 
+/// Save serialization and a live rebind must read the same quest-state source:
+/// the bound engine outranks a saved copy that predates it.
+#[test]
+fn the_save_and_a_live_rebind_read_the_same_bound_quest_state() {
+    let (mut game, _) = quest_game();
+    assert!(
+        game.npc_quests
+            .as_mut()
+            .unwrap()
+            .offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
+            .changed
+    );
+    let live = quest_state(&game);
+    // A reconnect leaves the saved copy beside the bound engine until the bind
+    // consumes it; this one predates the offer.
+    let mut stale = live.clone();
+    stale.quests.clear();
+    stale.pending_offer = None;
+    game.saved_npc_quests = Some(stale);
+    assert_eq!(game.npc_quest_state(), Some(live.clone()));
+    assert_eq!(
+        game.state().npc_quests,
+        Some(live.clone()),
+        "the save took the stale saved copy instead of the bound engine"
+    );
+    game.bind_npc_quest_catalogue(&bundled_content(), 1)
+        .unwrap();
+    assert_eq!(
+        quest_state(&game),
+        live,
+        "a live rebind rebuilt from the stale saved copy"
+    );
+}
+
 fn level_three_world_game(label: &str) -> (Gameplay, CharacterState, Scratch) {
     let source = bundled_content();
     let scratch = Scratch::new(label);

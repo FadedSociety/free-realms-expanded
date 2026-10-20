@@ -7,8 +7,8 @@ impl Gameplay {
     ///
     /// Both loads are fallible, so build them before touching live state: a refused
     /// rebind (corrupt content) keeps the bound catalogue and the saved progress.
-    /// A live rebind rebuilds from the bound engine (the saved copy was consumed by
-    /// the load-time bind), so it keeps in-flight quests instead of clearing them.
+    /// A live rebind rebuilds from `npc_quest_state` (the bound engine outranks the
+    /// saved copy), so it keeps in-flight quests instead of clearing them.
     pub fn bind_npc_quest_catalogue(
         &mut self,
         content_dir: &Path,
@@ -32,11 +32,7 @@ impl Gameplay {
             return Ok(());
         };
         let crosswalk = crate::quest_journal::load_crosswalk(source)?;
-        let state = self
-            .npc_quests
-            .as_ref()
-            .map(|engine| engine.state().clone())
-            .or_else(|| self.saved_npc_quests.clone());
+        let state = self.npc_quest_state();
         let engine = crate::quest_engine::QuestEngine::from_split_content(
             source,
             character_id,
@@ -48,6 +44,19 @@ impl Gameplay {
         self.register_breadcrumb_crosswalk(crosswalk);
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         Ok(())
+    }
+
+    /// The character's quest state source: the bound engine outranks the saved copy
+    /// (a reconnect loads the save before the catalogue binds).
+    ///
+    /// `Gameplay::state` (save serialization) and `bind_npc_quest_catalogue` (a live
+    /// rebind) both read it here, so a fallback change cannot make the save and the
+    /// engine rebuild from different state.
+    pub(super) fn npc_quest_state(&self) -> Option<crate::quest_engine::QuestState> {
+        self.npc_quests
+            .as_ref()
+            .map(|engine| engine.state().clone())
+            .or_else(|| self.saved_npc_quests.clone())
     }
 
     /// Allow `quest_ids` to be started by a 49/15 breadcrumb request. Ids without a quest
