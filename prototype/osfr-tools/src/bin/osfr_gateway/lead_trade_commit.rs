@@ -1,37 +1,10 @@
+use super::tests::test_support::{self, Scratch};
 use super::*;
 use osfr_tools::inventory::InventoryState;
 use osfr_tools::trade::{SettlementSide, TradeSettlement};
 
-fn scratch(name: &str) -> PathBuf {
-    let path =
-        std::env::temp_dir().join(format!("osfr-trade-commit-{name}-{}", std::process::id()));
-    let _ = fs::remove_dir_all(&path);
-    fs::create_dir_all(&path).unwrap();
-    path
-}
-
-fn party(scratch: &Path, id: u64, guid: u64) -> Session {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-    let options = Options {
-        bind: "127.0.0.1:0".parse().unwrap(),
-        reference: root.join("references/rust-gateway-reference"),
-        state: scratch.join(format!("{guid}.json")),
-        content: Some(root.join("references/rust-opening-cooking-original-assets")),
-        identity: None,
-        account_store: None,
-        gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
-        handoff_key: Vec::new(),
-        seconds: 1,
-        dev_tools: false,
-        studio_port: 0,
-        client_logs: None,
-        terrain: None,
-        world: None,
-        stock_text: None,
-        allow_lan: false,
-        security_log: None,
-        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
-    };
+fn party(scratch: &Scratch, id: u64, guid: u64) -> Session {
+    let options = test_support::options(scratch.path().join(format!("{guid}.json")));
     let mut session = Session::new(
         SessionId(id),
         format!("127.0.0.1:{}", 20_000 + id).parse().unwrap(),
@@ -96,7 +69,7 @@ fn leftovers(directory: &Path) -> Vec<String> {
 
 #[test]
 fn a_settled_trade_moves_coins_in_both_saves_and_both_live_sessions() {
-    let dir = scratch("ok");
+    let dir = Scratch::new("trade-ok");
     let mut a = party(&dir, 1, 101);
     let mut b = party(&dir, 2, 202);
     let before_a = with_coins(&mut a, 25);
@@ -118,13 +91,16 @@ fn a_settled_trade_moves_coins_in_both_saves_and_both_live_sessions() {
         assert!(deliveries.iter().any(|delivery| delivery.recipient == id
             && delivery.bytes.windows(4).any(|w| w == [38, 0, 19, 0])));
     }
-    assert!(leftovers(&dir).is_empty(), "{:?}", leftovers(&dir));
-    fs::remove_dir_all(dir).unwrap();
+    assert!(
+        leftovers(dir.path()).is_empty(),
+        "{:?}",
+        leftovers(dir.path())
+    );
 }
 
 #[test]
 fn a_stale_trade_moves_nothing_and_writes_nothing() {
-    let dir = scratch("stale");
+    let dir = Scratch::new("trade-stale");
     let mut a = party(&dir, 3, 101);
     let mut b = party(&dir, 4, 202);
     let before_a = with_coins(&mut a, 25);
@@ -145,7 +121,7 @@ fn a_stale_trade_moves_nothing_and_writes_nothing() {
     assert_eq!(a.gateway.inventory_state().unwrap().coins, 24);
     assert_eq!(taken[0].1.gateway.inventory_state().unwrap().coins, 5);
     assert_eq!(saves(&a, &taken[0].1), before_saves);
-    assert!(leftovers(&dir).is_empty());
+    assert!(leftovers(dir.path()).is_empty());
     // Canary: the same settlement against the state it was made for does commit.
     with_coins(&mut a, 25);
     assert!(
@@ -153,12 +129,11 @@ fn a_stale_trade_moves_nothing_and_writes_nothing() {
             .unwrap()
             .is_some()
     );
-    fs::remove_dir_all(dir).unwrap();
 }
 
 #[test]
 fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
-    let dir = scratch("recover");
+    let dir = Scratch::new("trade-recover");
     let mut a = party(&dir, 5, 101);
     let mut b = party(&dir, 6, 202);
     with_coins(&mut a, 15);
@@ -172,17 +147,21 @@ fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
         })
         .collect();
     fs::write(
-        dir.join(format!("trade-7-1.{TRADE_JOURNAL_EXTENSION}")),
+        dir.path()
+            .join(format!("trade-7-1.{TRADE_JOURNAL_EXTENSION}")),
         serde_json::to_vec(&journal).unwrap(),
     )
     .unwrap();
     // A half-written journal means the trade never started writing saves.
-    fs::write(dir.join("trade-8-2.tmp"), b"{ half").unwrap();
-    assert_eq!(recover_trade_journals(&dir).unwrap(), 1);
+    fs::write(dir.path().join("trade-8-2.tmp"), b"{ half").unwrap();
+    assert_eq!(recover_trade_journals(dir.path()).unwrap(), 1);
     assert_eq!(saved_coins(&a.state_path), 15);
     assert_eq!(saved_coins(&b.state_path), 15);
-    assert!(leftovers(&dir).is_empty(), "{:?}", leftovers(&dir));
+    assert!(
+        leftovers(dir.path()).is_empty(),
+        "{:?}",
+        leftovers(dir.path())
+    );
     // Running recovery again is harmless.
-    assert_eq!(recover_trade_journals(&dir).unwrap(), 0);
-    fs::remove_dir_all(dir).unwrap();
+    assert_eq!(recover_trade_journals(dir.path()).unwrap(), 0);
 }

@@ -577,6 +577,10 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
     }));
 }
 
+/// Session-test scratch directory and `Options` builder, shared with `lead_trade_commit`.
+#[path = "test_support.rs"]
+pub(crate) mod test_support;
+
 /// F161: a pet adoption spends a certificate and adds a pet in one atomic document; a refused
 /// replacement leaves the document and the live session unchanged. Declared here because the
 /// hub file is at its line ceiling.

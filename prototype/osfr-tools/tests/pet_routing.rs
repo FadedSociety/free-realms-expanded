@@ -11,6 +11,10 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+mod pet_wire;
+use pet_wire::{summon, summon_by_item};
+
 static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 const OWNER: u64 = 77;
@@ -44,10 +48,6 @@ fn owned_pet(service: &mut PetService) -> u32 {
     service.adopt_vendor_grant(1, &definition(), 0).unwrap()
 }
 
-fn summon(pet_id: u32) -> Vec<u8> {
-    [vec![53, 0, 4], pet_id.to_le_bytes().to_vec(), vec![1]].concat()
-}
-
 /// Client `Pet.Dismiss` shape: writer 00b5a650 always emits a u32 id followed by
 /// the action byte, and 00c07420 sets only the action (the id word is whatever
 /// the stack held), so the id must never select a pet.
@@ -60,16 +60,6 @@ fn name_request(name: &str) -> Vec<u8> {
         vec![53, 0, 6],
         (name.len() as u32).to_le_bytes().to_vec(),
         name.as_bytes().to_vec(),
-    ]
-    .concat()
-}
-
-/// Client `ItemRecord`: definition id then tint (Items guide; `00a1ec00`).
-fn summon_by_item(definition_id: u32, tint: u32) -> Vec<u8> {
-    [
-        vec![53, 0, 32],
-        definition_id.to_le_bytes().to_vec(),
-        tint.to_le_bytes().to_vec(),
     ]
     .concat()
 }

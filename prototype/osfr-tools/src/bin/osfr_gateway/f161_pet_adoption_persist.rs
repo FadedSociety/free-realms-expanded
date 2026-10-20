@@ -2,64 +2,16 @@
 //! Both halves must reach one atomic document (never two writes), and a refused replacement must
 //! leave the document and the live session untouched. The requests below run through
 //! `Session::dispatch_message`, the same staging/commit/save path a socket datagram takes.
+use super::test_support::{self, Scratch};
 use super::*;
 use osfr_tools::inventory::InventoryItem;
+
+#[path = "pet_wire.rs"]
+mod pet_wire;
 
 /// Bundled `pets.json`: species 1000015 (Char) is adopted from item 70352.
 const ADOPTION_ITEM: i32 = 70_352;
 const PET_SPECIES: u32 = 1_000_015;
-
-struct Scratch(PathBuf);
-
-impl Scratch {
-    fn new(tag: &str) -> Self {
-        let directory = std::env::temp_dir().join(format!(
-            "osfr-f161-{tag}-{}-{}",
-            std::process::id(),
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ));
-        let _ = fs::remove_dir_all(&directory);
-        fs::create_dir_all(&directory).unwrap();
-        Self(directory)
-    }
-
-    fn state(&self) -> PathBuf {
-        self.0.join("character.json")
-    }
-}
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
-fn options(scratch: &Scratch) -> Options {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-    Options {
-        bind: "127.0.0.1:0".parse().unwrap(),
-        reference: root.join("references/rust-gateway-reference"),
-        state: scratch.state(),
-        content: Some(root.join("references/rust-opening-cooking-original-assets")),
-        identity: None,
-        account_store: None,
-        gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
-        handoff_key: Vec::new(),
-        seconds: 1,
-        dev_tools: false,
-        studio_port: 0,
-        client_logs: None,
-        terrain: None,
-        world: None,
-        stock_text: None,
-        allow_lan: false,
-        security_log: None,
-        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
-    }
-}
 
 /// A selected, world-loaded session, as `Session::new` + the handshake leave it.
 fn enter(options: &Options, id: u32) -> Session {
@@ -180,21 +132,6 @@ fn pose(session: &Session) -> Vec<u8> {
     bytes
 }
 
-/// Client `SendPetSummonByItemId` (`00b60110`): the `ItemRecord` definition then tint
-/// (`00a1ec00` passes record +4 and +8), never a pet or instance id.
-fn adopt_request() -> Vec<u8> {
-    [
-        vec![53, 0, 32],
-        ADOPTION_ITEM.to_le_bytes().to_vec(),
-        0u32.to_le_bytes().to_vec(),
-    ]
-    .concat()
-}
-
-fn summon_request(pet_id: u32) -> Vec<u8> {
-    [vec![53, 0, 4], pet_id.to_le_bytes().to_vec(), vec![1]].concat()
-}
-
 fn document(path: &Path) -> serde_json::Value {
     serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
 }
@@ -211,9 +148,17 @@ fn carries_certificate(document: &serde_json::Value, defined: i32) -> bool {
 
 /// The gateway source is embedded by five integration tests, which compile this module too.
 /// `CARGO_BIN_NAME` is set only for the binary's own test target, so the scenario runs once
-/// there instead of starting six gateways; the embedded copies return at once.
+/// there. An embedded copy says so on stderr (libtest does not capture a direct fd write), so a
+/// green integration-target line is not mistaken for a real run.
 fn bin_test_target() -> bool {
-    option_env!("CARGO_BIN_NAME").is_some()
+    if option_env!("CARGO_BIN_NAME").is_some() {
+        return true;
+    }
+    use std::io::Write as _;
+    let _ = std::io::stderr().write_all(
+        b"f161: embedded gateway copy skipped; run `cargo test --bin osfr-gateway f161_`\n",
+    );
+    false
 }
 
 #[test]
@@ -221,9 +166,9 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
     if !bin_test_target() {
         return;
     }
-    let scratch = Scratch::new("adopt");
+    let scratch = Scratch::new("f161-adopt");
     let state = scratch.state();
-    let options = options(&scratch);
+    let options = test_support::options(state.clone());
     let mut scene = Scene::new(&options, 611);
     grant_certificate(&mut scene.session);
     let movement = pose(&scene.session);
@@ -236,8 +181,9 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
         "the certificate must be on disk before adoption"
     );
 
+    let adopt = pet_wire::summon_by_item(ADOPTION_ITEM as u32, 0);
     scene
-        .send(&options, &adopt_request(), 11_000)
+        .send(&options, &adopt, 11_000)
         .expect("adoption commits");
     assert!(
         !owns_certificate(&scene.session),
@@ -276,7 +222,7 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
         "the active actor is session state, not save state"
     );
     scene
-        .send(&options, &summon_request(pet_id), 20_000)
+        .send(&options, &pet_wire::summon(pet_id), 20_000)
         .expect("the restored roster accepts a summon");
     assert_eq!(
         scene.session.gateway.pet_view().map(|pet| pet.species_id),
@@ -295,9 +241,9 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
     if !bin_test_target() {
         return;
     }
-    let scratch = Scratch::new("adopt-refused");
+    let scratch = Scratch::new("f161-adopt-refused");
     let state = scratch.state();
-    let options = options(&scratch);
+    let options = test_support::options(state.clone());
     let mut scene = Scene::new(&options, 621);
     grant_certificate(&mut scene.session);
     let movement = pose(&scene.session);
@@ -315,7 +261,8 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
     // The save reads the document before it replaces it; that read must still succeed here, so
     // the refusal below is the replacement (rename), not a failure to read.
     assert_eq!(fs::read(&state).unwrap(), before);
-    let refused = scene.send(&options, &adopt_request(), 11_000);
+    let adopt = pet_wire::summon_by_item(ADOPTION_ITEM as u32, 0);
+    let refused = scene.send(&options, &adopt, 11_000);
     drop(held);
     assert!(
         refused.is_err(),
@@ -340,7 +287,7 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
         "live gameplay is unchanged by a refused commit"
     );
     // The live roster is still empty, read back through the production combined save.
-    let probe = scratch.0.join("live-roster.json");
+    let probe = scratch.path().join("live-roster.json");
     scene.session.gateway.save_with_pet_roster(&probe).unwrap();
     assert_eq!(
         document(&probe)["pets"]["pets"].as_array().unwrap().len(),
@@ -348,10 +295,18 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
         "a refused commit leaves no live roster entry"
     );
 
-    // Control: with the reader gone, the identical request commits; the refusal was the save.
+    // Production ends the sender's session when `commit_outcome` returns Err (`Server::step` ->
+    // `contain` -> `end_session`), so the client's retry is a reconnect, not the same session.
+    // Drop the failed scene and load the same save in a fresh one, as the restart test does.
+    drop(scene);
+    let mut scene = Scene::new(&options, 622);
+    assert!(
+        owns_certificate(&scene.session),
+        "the refused commit left the certificate on disk for the reconnect"
+    );
     scene
-        .send(&options, &adopt_request(), 12_000)
-        .expect("the same request commits");
+        .send(&options, &adopt, 12_000)
+        .expect("the same request commits after the reconnect");
     assert!(!owns_certificate(&scene.session));
     assert_eq!(
         scene.session.gateway.pet_view().map(|pet| pet.species_id),
