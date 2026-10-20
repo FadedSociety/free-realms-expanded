@@ -3565,6 +3565,14 @@ impl Gameplay {
         }
     }
 
+    /// (R) A fixed UTC day for the chess reward ledger in tests and offline
+    /// fixtures. The gateway follows the wall clock and never calls this.
+    pub fn seed_chess_day(&mut self, day: u64) {
+        if let Some(chess) = &mut self.chess {
+            chess.set_day(day);
+        }
+    }
+
     /// T022: chess movie and lifecycle packets while this character's chess run exists.
     /// The packet is staged on a clone; a refusal or a structural error leaves the table
     /// (and the wallet) unchanged. `None` leaves the packet to the other handlers.

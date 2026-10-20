@@ -16,7 +16,7 @@ use std::{
 
 #[path = "support/chess_bot.rs"]
 mod chess_bot;
-use chess_bot::{EndOfGame, Human, terminal};
+use chess_bot::{EndOfGame, play_line, terminal};
 
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
@@ -739,7 +739,8 @@ fn chess_mode_and_move_encoding_cover_client_castling_events() {
 
 const SINGLE_ROW: u32 = 20;
 const CHESS_PLAYER: u64 = 71;
-const DAY_MS: u64 = 86_400_000;
+/// Test clock day: proves the ledger follows the wall clock, not `now_ms`.
+const TODAY: u64 = 20_000;
 
 fn service_content(daily_reward_coins: u32) -> ChessContent {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/chess.json");
@@ -803,41 +804,30 @@ fn open_service_game(service: &mut ChessService, rewards: &RewardState, now_ms: 
     instance
 }
 
-/// Plays the greedy human to the end. The returned texts are the human's own
-/// move messages; the outcome is the client's `FRServer_GameOver` acknowledgement.
+/// Plays the greedy human to the end through the shared bot. The returned
+/// texts are the human's own move messages; the outcome is the client's
+/// `FRServer_GameOver` acknowledgement.
 fn play_to_end(
     service: &mut ChessService,
     rewards: &RewardState,
     now_ms: u64,
-) -> (
-    Option<EndOfGame>,
-    chess_service::ChessActivityOutcome,
-    Vec<String>,
-) {
+) -> (EndOfGame, chess_service::ChessActivityOutcome, Vec<String>) {
     let instance = open_service_game(service, rewards, now_ms);
-    let mut human = Human::new();
-    let mut line = Vec::new();
-    for ply in 0..400u64 {
-        let mv = human.choose();
-        let text = human.move_text(&mv);
-        human.position.apply(&mv).unwrap();
-        human.remember();
-        line.push(text.clone());
-        let now = now_ms + 10 + ply * 10;
-        let outcome = route(service, instance, &text, now, rewards);
-        if let Some(end) = human.apply_events(&service_texts(&outcome)) {
-            let ack = if end == EndOfGame::Stopped {
-                chess_service::ChessActivityOutcome::default()
-            } else {
-                route(service, instance, "FRServer_GameOver", now + 5, rewards)
-            };
-            service
-                .route(CHESS_PLAYER, &[26, 0, 42, 0], now + 6, rewards)
-                .unwrap();
-            return (Some(end), ack, line);
-        }
-    }
-    (None, chess_service::ChessActivityOutcome::default(), line)
+    let mut now = now_ms;
+    let (end, line) = play_line(|text| {
+        now += 10;
+        let outcome = route(service, instance, text, now, rewards);
+        service_texts(&outcome)
+    });
+    let ack = if end == EndOfGame::Stopped {
+        chess_service::ChessActivityOutcome::default()
+    } else {
+        route(service, instance, "FRServer_GameOver", now + 5, rewards)
+    };
+    service
+        .route(CHESS_PLAYER, &[26, 0, 42, 0], now + 6, rewards)
+        .unwrap();
+    (end, ack, line)
 }
 
 /// Replays recorded human move messages against a fresh service. `None` means
@@ -1013,7 +1003,7 @@ fn a_recorded_winning_game_does_not_replay_against_fresh_tables() {
     let fixture = RewardFixture::new(CHESS_PLAYER);
     let mut original = ChessService::with_seed(service_content(1_000), 22).unwrap();
     let (end, ack, line) = play_to_end(&mut original, &fixture.state(), 1_000);
-    assert_eq!(end, Some(EndOfGame::Won), "the seeded game must be a win");
+    assert_eq!(end, EndOfGame::Won, "the seeded game must be a win");
     assert!(ack.reward_state.is_some(), "the seeded win pays once");
     assert!(line.len() > 2, "the recorded line is a real game");
 
@@ -1035,6 +1025,15 @@ fn a_recorded_winning_game_does_not_replay_against_fresh_tables() {
         outcomes.iter().any(|end| *end != Some(EndOfGame::Won)),
         "the recorded line still won every fresh game: {outcomes:?}"
     );
+
+    // The production OS-entropy constructor is still exercised: a table seeded
+    // by `with_state` must not reproduce the recorded line either.
+    let mut entropy = ChessService::with_state(service_content(1_000), None).unwrap();
+    assert_ne!(
+        replay(&mut entropy, &fixture.state(), &line, 20_000),
+        Some(EndOfGame::Won),
+        "an OS-seeded table replayed the recorded winning line"
+    );
 }
 
 #[test]
@@ -1042,12 +1041,13 @@ fn the_daily_cap_stops_payouts_survives_restore_and_refusals_change_nothing() {
     let fixture = RewardFixture::new(CHESS_PLAYER);
     let content = service_content(10);
     let mut service = ChessService::with_seed(content.clone(), 22).unwrap();
+    service.set_day(TODAY);
     // Coins earned before the game stay, and the payout adds to them.
     let mut live = fixture.state();
     live.inventory.grant_coins(7).unwrap();
     assert_eq!(live.inventory.state().coins, 7);
     let (end, ack, _) = play_to_end(&mut service, &live, 1_000);
-    assert_eq!(end, Some(EndOfGame::Won));
+    assert_eq!(end, EndOfGame::Won);
     assert_eq!(
         ack.reward_state.as_ref().unwrap().inventory.state().coins,
         17
@@ -1056,17 +1056,19 @@ fn the_daily_cap_stops_payouts_survives_restore_and_refusals_change_nothing() {
     assert_eq!(
         ledger,
         ChessRewardLedger {
-            day: 0,
+            day: TODAY,
             paid_coins: 10
-        }
+        },
+        "the ledger day is the clock day, not now_ms"
     );
 
     // Reconnect: the same game against the saved ledger pays nothing, but the
     // result still settles and nothing about the ledger changes.
     let mut restored = ChessService::with_seed(content.clone(), 22).unwrap();
+    restored.set_day(TODAY);
     restored.restore_ledger(Some(ledger)).unwrap();
     let (end, capped, _) = play_to_end(&mut restored, &fixture.state(), 50_000);
-    assert_eq!(end, Some(EndOfGame::Won));
+    assert_eq!(end, EndOfGame::Won);
     assert!(capped.reward_state.is_none(), "a capped win must not pay");
     assert!(capped.reward_packets.is_empty());
     assert!(
@@ -1104,14 +1106,15 @@ fn the_daily_cap_stops_payouts_survives_restore_and_refusals_change_nothing() {
 
     // The next UTC day starts a fresh allowance for the restored ledger.
     let mut next_day = ChessService::with_seed(content.clone(), 22).unwrap();
+    next_day.set_day(TODAY + 1);
     next_day.restore_ledger(Some(ledger)).unwrap();
-    let (end, paid_again, _) = play_to_end(&mut next_day, &fixture.state(), DAY_MS + 10);
-    assert_eq!(end, Some(EndOfGame::Won));
+    let (end, paid_again, _) = play_to_end(&mut next_day, &fixture.state(), 2_000);
+    assert_eq!(end, EndOfGame::Won);
     assert!(paid_again.reward_state.is_some(), "a new day pays again");
     assert_eq!(
         next_day.ledger(),
         Some(ChessRewardLedger {
-            day: 1,
+            day: TODAY + 1,
             paid_coins: 10
         })
     );

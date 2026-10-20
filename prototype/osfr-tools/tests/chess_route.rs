@@ -6,7 +6,7 @@
 use osfr_tools::{
     character_store::CharacterState,
     chess,
-    chess_service::ChessRewardLedger,
+    chess_service::{ChessContent, ChessRewardLedger},
     gameplay::{Gameplay, Outcome},
     inventory::InventoryItem,
     opening::{OpeningEngine, OpeningTrigger},
@@ -19,7 +19,7 @@ use std::{
 
 #[path = "support/chess_bot.rs"]
 mod chess_bot;
-use chess_bot::{EndOfGame, Human};
+use chess_bot::{EndOfGame, Human, play_line};
 
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 /// Easy single-player row; the portal id is the client minigame row id.
@@ -227,14 +227,21 @@ fn npc_content() -> PathBuf {
     }
 }
 
+fn chess_content() -> ChessContent {
+    ChessContent::load(&npc_content().join("chess.json")).unwrap()
+}
+
 fn chess_row_coins() -> u32 {
-    osfr_tools::chess_service::ChessContent::load(&npc_content().join("chess.json"))
-        .unwrap()
+    chess_content()
         .rows
         .into_iter()
         .find(|row| row.row_id == CHESS_ROW)
         .expect("shipped chess row")
         .success_coins
+}
+
+fn daily_reward_coins() -> u32 {
+    chess_content().daily_reward_coins
 }
 
 /// The instance id of the single 39/16 offer.
@@ -753,36 +760,37 @@ fn results_close_without_chess_is_inert_and_start_is_malformed_safe() {
 /// Plays the deterministic greedy line through the real gameplay route,
 /// acknowledges the terminal message and closes the results screen.
 fn play_greedy_game(game: &mut Gameplay, instance: i32, now_ms: u64) -> (EndOfGame, Outcome) {
-    let mut human = Human::new();
-    for ply in 0..400u64 {
-        let movement = human.choose();
-        let message = human.move_text(&movement);
-        human.position.apply(&movement).unwrap();
-        human.remember();
-        let now = now_ms + ply * 10;
+    let mut now = now_ms;
+    let (end, _line) = play_line(|message| {
+        now += 10;
         let out = game
-            .handle_in_world(&movie(instance, &message), &character(), now)
+            .handle_in_world(&movie(instance, message), &character(), now)
             .unwrap();
-        if let Some(end) = human.apply_events(&texts(&out)) {
-            let ack = if end == EndOfGame::Stopped {
-                Outcome::default()
-            } else {
-                game.handle_in_world(&movie(instance, "FRServer_GameOver"), &character(), now + 5)
-                    .unwrap()
-            };
-            game.handle_in_world(&[26, 0, 42, 0], &character(), now + 6)
-                .unwrap();
-            return (end, ack);
-        }
-    }
-    panic!("the seeded game must finish within 400 plies");
+        texts(&out)
+    });
+    let ack = if end == EndOfGame::Stopped {
+        Outcome::default()
+    } else {
+        game.handle_in_world(&movie(instance, "FRServer_GameOver"), &character(), now + 5)
+            .unwrap()
+    };
+    game.handle_in_world(&[26, 0, 42, 0], &character(), now + 6)
+        .unwrap();
+    (end, ack)
 }
+
+/// (R) Test clock day for the ledger. The gateway passes process uptime as
+/// `now_ms`, so a day derived from it would reset the cap on every restart.
+const TODAY: u64 = 20_000;
 
 #[test]
 fn the_daily_cap_applies_after_a_real_win_and_a_save_round_trip() {
     let directory = content();
+    let award = chess_row_coins();
+    let cap = daily_reward_coins();
     let mut game = Gameplay::load(&directory, None).unwrap();
     game.seed_chess(22);
+    game.seed_chess_day(TODAY);
     let instance = running_game(&mut game);
     let start_coins = game.state().inventory.coins;
     let (end, ack) = play_greedy_game(&mut game, instance, 2_000);
@@ -790,7 +798,7 @@ fn the_daily_cap_applies_after_a_real_win_and_a_save_round_trip() {
     assert_eq!(packets(&ack, &[39, 0, 18]).len(), 1, "the win settles once");
     assert_eq!(
         game.state().inventory.coins,
-        start_coins + 10,
+        start_coins + award,
         "the content award is paid through the real route"
     );
     let today = game
@@ -800,23 +808,26 @@ fn the_daily_cap_applies_after_a_real_win_and_a_save_round_trip() {
     assert_eq!(
         today,
         ChessRewardLedger {
-            day: 0,
-            paid_coins: 10
-        }
+            day: TODAY,
+            paid_coins: award
+        },
+        "the ledger day follows the wall clock, not the uptime now_ms"
     );
 
-    // Reconnect: the character save carries the day's used allowance. A win
-    // that no longer fits settles without a grant and changes nothing.
+    // Reconnect: the character save carries the day's used allowance; the
+    // reload restarts `now_ms` but the same wall-clock day still applies the
+    // cap. A win that no longer fits settles without a grant.
     let mut saved = game.state();
     saved.chess = Some(ChessRewardLedger {
-        day: 0,
-        paid_coins: 995,
+        day: TODAY,
+        paid_coins: cap.saturating_sub(award).saturating_add(1),
     });
     let reloaded: osfr_tools::gameplay::GameplayState =
         serde_json::from_slice(&serde_json::to_vec(&saved).unwrap()).unwrap();
     let mut game = Gameplay::load(&directory, Some(reloaded)).unwrap();
     assert_eq!(game.state().chess, saved.chess, "the ledger survives load");
     game.seed_chess(22);
+    game.seed_chess_day(TODAY);
     let instance = running_game(&mut game);
     let before = game.state().inventory.coins;
     let (end, capped) = play_greedy_game(&mut game, instance, 30_000);
@@ -835,5 +846,39 @@ fn the_daily_cap_applies_after_a_real_win_and_a_save_round_trip() {
         game.state().chess,
         saved.chess,
         "the capped win changed the ledger"
+    );
+
+    // The next UTC day resets the allowance even though `now_ms` is still
+    // small uptime and the saved ledger is unchanged.
+    let mut next = game.state();
+    next.chess = Some(ChessRewardLedger {
+        day: TODAY - 1,
+        paid_coins: cap,
+    });
+    let reloaded: osfr_tools::gameplay::GameplayState =
+        serde_json::from_slice(&serde_json::to_vec(&next).unwrap()).unwrap();
+    let mut game = Gameplay::load(&directory, Some(reloaded)).unwrap();
+    game.seed_chess(22);
+    game.seed_chess_day(TODAY);
+    let instance = running_game(&mut game);
+    let before = game.state().inventory.coins;
+    let (end, _paid) = play_greedy_game(&mut game, instance, 70_000);
+    assert_eq!(
+        end,
+        EndOfGame::Won,
+        "the same seeded line wins on the new day"
+    );
+    assert_eq!(
+        game.state().inventory.coins,
+        before + award,
+        "a new UTC day pays again"
+    );
+    assert_eq!(
+        game.state().chess,
+        Some(ChessRewardLedger {
+            day: TODAY,
+            paid_coins: award
+        }),
+        "the new day starts a fresh ledger"
     );
 }

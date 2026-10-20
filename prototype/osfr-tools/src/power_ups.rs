@@ -251,9 +251,12 @@ impl Roll {
 }
 
 /// Small seedable generator (SplitMix64) shared by drop rolls and the chess
-/// computer's move choice; both need a reproducible stream in tests. Not for
-/// anything security-relevant: drops are not an economy secret, but the seed
-/// comes from the OS in production so players cannot predict them.
+/// computer's move choice; both need a reproducible stream in tests. This is
+/// not a CSPRNG: in chess it is only an anti-replay stream (an observer that
+/// recovered the state could predict the computer's replies, and the bounded
+/// daily coin cap limits what that is worth), and drops are not an economy
+/// secret. The seed comes from the OS in production, so a new game is not
+/// predictable before its first replies.
 #[derive(Clone, Debug)]
 pub struct Rng(u64);
 

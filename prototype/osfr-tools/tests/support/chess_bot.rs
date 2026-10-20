@@ -182,6 +182,26 @@ impl Human {
     }
 }
 
+/// Plays the deterministic greedy human through `send` until the server
+/// reports a terminal message, returning the result and the move texts sent.
+/// The acknowledgement and the results close stay with the caller, whose
+/// outcome types differ.
+pub fn play_line(mut send: impl FnMut(&str) -> Vec<String>) -> (EndOfGame, Vec<String>) {
+    let mut human = Human::new();
+    let mut line = Vec::new();
+    for _ in 0..400 {
+        let movement = human.choose();
+        let text = human.move_text(&movement);
+        human.position.apply(&movement).unwrap();
+        human.remember();
+        line.push(text.clone());
+        if let Some(end) = human.apply_events(&send(&text)) {
+            return (end, line);
+        }
+    }
+    panic!("the seeded game must finish within 400 plies");
+}
+
 /// The last terminal message in the server's text stream, if any.
 pub fn terminal(texts: &[String]) -> Option<EndOfGame> {
     texts.iter().rev().find_map(|text| match text.as_str() {

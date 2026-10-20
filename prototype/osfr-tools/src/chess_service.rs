@@ -29,6 +29,7 @@ use std::{
     fs,
     io::{self, Read},
     path::Path,
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 /// Optional content next to `field_battles.json`. Absent file = no chess rows.
@@ -43,6 +44,14 @@ const MAX_COINS_PER_WIN: u32 = 10_000;
 pub const MAX_DAILY_REWARD_COINS: u32 = 100_000;
 /// (R) UTC day length used by the persisted daily ledger.
 const DAY_MS: u64 = 86_400_000;
+
+/// (R) The wall-clock UTC day index. The ledger must not use the gateway's
+/// monotonic uptime (`now_ms`): restarting the process would reset the cap.
+fn utc_day() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_millis() as u64 / DAY_MS)
+}
 
 fn default_daily_reward_coins() -> u32 {
     1_000
@@ -210,7 +219,8 @@ pub struct ChessActivityOutcome {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ChessRewardLedger {
-    /// UTC day index (`now_ms / 86_400_000`).
+    /// UTC day index from the wall clock (`unix_ms / 86_400_000`), independent
+    /// of the process uptime the gateway reports as `now_ms`.
     pub day: u64,
     /// Coins already paid on `day`; a new day starts from zero.
     pub paid_coins: u32,
@@ -233,41 +243,71 @@ impl ChessRewardLedger {
 /// discard it on refusal, exactly like the other activity adapters.
 #[derive(Clone)]
 pub struct ChessService {
-    tables: ChessTables,
+    /// `None` when the OS seed was unavailable at load. The rows stay
+    /// published, `begin` answers `Unavailable`, and the character/world load
+    /// still succeeds.
+    tables: Option<ChessTables>,
     runs: MinigameRuns,
     content: ChessContent,
     current: Option<ChessRow>,
     started_ms: Option<u64>,
     ledger: ChessRewardLedger,
+    /// (R) Test/offline UTC day. Production leaves it `None` and follows the
+    /// wall clock; the gateway never sets it.
+    day: Option<u64>,
 }
 
 impl ChessService {
-    /// Rebuild a character's service, restore the saved daily ledger, and seed
-    /// the computer from OS entropy.
+    /// Rebuild a character's service and restore the saved daily ledger. An
+    /// unavailable OS seed leaves chess closed instead of failing the load.
     pub fn with_state(content: ChessContent, saved: Option<ChessRewardLedger>) -> io::Result<Self> {
-        Self::with_tables(content, ChessTables::entropy()?, saved)
+        Self::with_entropy(content, ChessTables::entropy(), saved)
     }
 
     /// (R) Deterministic table seeds for tests and offline fixtures. The
     /// gateway's [`Self::with_state`] uses OS entropy; no client value reaches either.
     pub fn with_seed(content: ChessContent, seed: u64) -> io::Result<Self> {
-        Self::with_tables(content, ChessTables::with_seed(seed), None)
+        Self::with_entropy(content, Ok(ChessTables::with_seed(seed)), None)
+    }
+
+    /// (R) A fixed UTC day for tests and offline fixtures. The gateway never
+    /// calls this; production reads the wall clock.
+    pub fn set_day(&mut self, day: u64) {
+        self.day = Some(day);
+    }
+
+    fn today(&self) -> u64 {
+        self.day.unwrap_or_else(utc_day)
     }
 
     /// (R) A deterministic table stream for tests and offline fixtures. Only
     /// tables opened after this call use it; the gateway's constructors seed
     /// from OS entropy and never call this.
     pub(crate) fn reseed(&mut self, seed: u64) {
-        self.tables.reseed(seed);
+        let mut tables = self
+            .tables
+            .take()
+            .unwrap_or_else(|| ChessTables::with_seed(seed));
+        tables.reseed(seed);
+        self.tables = Some(tables);
     }
 
-    fn with_tables(
+    /// Build from the OS seed result. A failed source leaves chess closed
+    /// rather than failing the character or world load; content errors still
+    /// propagate.
+    fn with_entropy(
         content: ChessContent,
-        mut tables: ChessTables,
+        tables: io::Result<ChessTables>,
         saved: Option<ChessRewardLedger>,
     ) -> io::Result<Self> {
         content.validate()?;
-        tables.set_scoring(content.scoring)?;
+        let tables = match tables {
+            Ok(mut tables) => {
+                tables.set_scoring(content.scoring)?;
+                Some(tables)
+            }
+            Err(_) => None,
+        };
         let mut service = Self {
             tables,
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
@@ -275,6 +315,7 @@ impl ChessService {
             current: None,
             started_ms: None,
             ledger: ChessRewardLedger::default(),
+            day: None,
         };
         service.restore_ledger(saved)?;
         Ok(service)
@@ -317,6 +358,9 @@ impl ChessService {
         }
         if self.is_active() {
             return Err(EntryDenied::Busy);
+        }
+        if self.tables.is_none() {
+            return Err(EntryDenied::Unavailable);
         }
         let Some(row) = self
             .content
@@ -426,6 +470,8 @@ impl ChessService {
         }
         let table = self
             .tables
+            .as_mut()
+            .ok_or_else(|| invalid("chess tables are not seeded"))?
             .handle_payload(instance as u64, player_id, packet)?;
         let terminal = table.terminal.is_some();
         let mut out = ChessActivityOutcome {
@@ -452,17 +498,20 @@ impl ChessService {
             .current
             .as_ref()
             .ok_or_else(|| invalid("chess offer has no row"))?;
-        self.tables.open_single_with_skill(
-            instance as u64,
-            row.row_id,
-            ChessParticipant {
-                player_id,
-                instance_id: instance,
-            },
-            self.content.side(),
-            row.skill as u8,
-            i64::from(self.content.near_equal_margin),
-        )?;
+        self.tables
+            .as_mut()
+            .ok_or_else(|| invalid("chess tables are not seeded"))?
+            .open_single_with_skill(
+                instance as u64,
+                row.row_id,
+                ChessParticipant {
+                    player_id,
+                    instance_id: instance,
+                },
+                self.content.side(),
+                row.skill as u8,
+                i64::from(self.content.near_equal_margin),
+            )?;
         self.started_ms = Some(now_ms);
         Ok(())
     }
@@ -480,7 +529,8 @@ impl ChessService {
         };
         let won = self
             .tables
-            .table(instance as u64)
+            .as_ref()
+            .and_then(|tables| tables.table(instance as u64))
             .and_then(|table| table.result())
             .and_then(|result| result.winner)
             == Some(player_id);
@@ -492,7 +542,7 @@ impl ChessService {
         // shows zero while the coin award comes from content.
         // The daily cap is checked before the grant is staged: a capped win
         // still settles the run but pays nothing.
-        let day = now_ms / DAY_MS;
+        let day = self.today();
         let remaining = self
             .content
             .daily_reward_coins
@@ -504,15 +554,19 @@ impl ChessService {
         // nominal award, so a future grant adjustment cannot skew the cap.
         let paid_coins = grant.as_ref().map(|grant| grant.coins);
         let settlement = grant.as_ref().map(|grant| (rewards, grant));
-        let settled = self.tables.settle_player(
-            instance as u64,
-            player_id,
-            &mut self.runs,
-            0,
-            0,
-            elapsed,
-            settlement,
-        )?;
+        let settled = self
+            .tables
+            .as_mut()
+            .ok_or_else(|| invalid("chess tables are not seeded"))?
+            .settle_player(
+                instance as u64,
+                player_id,
+                &mut self.runs,
+                0,
+                0,
+                elapsed,
+                settlement,
+            )?;
         out.accepted |= settled.accepted;
         out.changed |= settled.changed;
         out.replies.extend(settled.replies);
@@ -527,7 +581,9 @@ impl ChessService {
     }
 
     fn close_table(&mut self, instance: i32) {
-        self.tables.close(instance as u64);
+        if let Some(tables) = &mut self.tables {
+            tables.close(instance as u64);
+        }
         self.current = None;
         self.started_ms = None;
     }
@@ -611,5 +667,39 @@ mod tests {
             serde_json::from_value::<ChessContent>(partial).is_err(),
             "a partial scoring block is refused"
         );
+    }
+
+    #[test]
+    fn an_unavailable_os_seed_closes_chess_without_failing_the_load() {
+        // `with_state` delegates to this constructor with the `getrandom`
+        // result; a failure must disable chess, not the character/world load.
+        let content = ChessContent::load(&shipped_path()).unwrap();
+        let failed = Err(io::Error::other("no OS randomness"));
+        let mut service = ChessService::with_entropy(content, failed, None).unwrap();
+        assert!(!service.is_active());
+        let rows = service.activities();
+        assert!(!rows.is_empty(), "the portal rows stay published");
+        assert!(matches!(
+            service.begin(20, 71),
+            Err(EntryDenied::Unavailable)
+        ));
+        assert!(!service.is_active(), "the refusal opened nothing");
+        assert_eq!(service.activities(), rows, "the refusal changed the rows");
+        assert_eq!(service.ledger(), None);
+    }
+
+    #[test]
+    fn the_ledger_day_follows_the_clock_not_the_gateway_uptime() {
+        let content = ChessContent::load(&shipped_path()).unwrap();
+        // A real character starts on the wall-clock day, not on day zero.
+        let unseeded = ChessService::with_seed(content.clone(), 22).unwrap();
+        assert!(
+            unseeded.today() > 0,
+            "the wall clock supplies a real UTC day"
+        );
+        // Tests and offline fixtures can pin the day without the clock.
+        let mut pinned = ChessService::with_seed(content, 22).unwrap();
+        pinned.set_day(20_000);
+        assert_eq!(pinned.today(), 20_000);
     }
 }
