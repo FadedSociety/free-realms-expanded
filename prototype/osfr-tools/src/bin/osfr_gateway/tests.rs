@@ -576,3 +576,9 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
         delivery.recipient == SessionId(3) && delivery.bytes.ends_with(&nearby)
     }));
 }
+
+/// F161: a pet adoption spends a certificate and adds a pet in one atomic document; a refused
+/// replacement leaves the document and the live session unchanged. Declared here because the
+/// hub file is at its line ceiling.
+#[path = "f161_pet_adoption_persist.rs"]
+mod f161_pet_adoption_persist;

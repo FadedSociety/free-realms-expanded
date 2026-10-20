@@ -67,7 +67,9 @@ fn pet_state_uses_the_current_schema_constant() {
 }
 
 /// Lead (persistence): a pet change that also changes the character (adoption consumes an item)
-/// is written as one atomic document, keeps housing, and a refused write changes nothing.
+/// is written as one atomic document, keeps housing, and a refused write changes nothing. The
+/// production adoption path (session commit, restart, refused replacement) is pinned by the
+/// gateway binary's `f161_pet_adoption_persist` tests; this one covers the envelope itself.
 #[test]
 fn save_with_pets_writes_character_and_roster_in_one_document() {
     let dir =
