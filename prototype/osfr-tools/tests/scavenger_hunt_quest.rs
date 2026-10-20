@@ -1,4 +1,4 @@
-//! T247/F272: the playable starting-road scavenger hunt (content-only).
+//! T247/F272/T281: the playable starting-road scavenger hunt (content-only).
 //!
 //! The tests drive the production in-world NPC router (`Gameplay::handle_in_world`
 //! -> `gameplay/npc.rs` -> `QuestEngine`), the real `Gameplay::on_location`
@@ -8,19 +8,22 @@
 //! content checks.
 //!
 //! Client evidence (2014 client, checked with `lab/autopilot/ida_query.py`):
-//! - 26/8 NPC interact constructor `008b6bc0`: u64 target + one bool.
+//! - 26/8 NPC interact constructor `008b6bc0`: two GUID dwords + one bool.
 //! - 26/10 menu select constructor `00a36f80`: two GUID dwords + i32 choice.
 //! - 26/6 dialogue response `009f5890`: i32 row (301 is the quest row).
 //! - 49/2 QuestReply constructor `00a86400`: quest id + accept byte.
 //! - 49/14 QuestEndReply constructor `00a864c0`: one quest id.
-//! - 49/1 QuestInfo reader `00c7bb60` / `00c7b7a0`: quest id, five screen dwords,
-//!   bool, reward bundle, u64, f32-bits dword, two bools.
+//! - 49/1 QuestInfo reader `00c7bb60` -> `00c7b7a0`: quest id, five screen
+//!   dwords, bool, reward bundle, u64, f32-bits dword, two bools.
 //! - 49/3 QuestAdd reader `0093c840` (fixed prefix and objective count) ->
 //!   `0092b050` (count and per-objective loop) -> `008fd770` (the 107-byte
 //!   record; its leading id dword is read in `0092b050`). `00c7bd10` is only an
 //!   apply entry that calls `009225d0`, not the record layout.
 //! - 49/13 QuestEnd reader `00c7b990`: u64 actor, three dwords, reward bundle,
 //!   trailing dword.
+//! - 35/2 AddNpc reader `00921a10` (`0091cac0` is its caller-side constructor):
+//!   Jacque's existing `legacy_data` row supplies the actor; no new actor or
+//!   spawn packet is added.
 //! `visit_position` is a server-side objective; the client only receives the
 //! ordinary 49/9/49/10 objective updates and the 49/8 activation, so there is no
 //! new wire shape to match.
@@ -29,10 +32,10 @@
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    Fixture, accept, assert_no_offer, assert_packet_changes_nothing, character_at_for as character,
-    coins, content_dir, counts, finish_quest, has_family, offer, pending_offer, pending_turnin,
-    profile_xp, quest_end_reply, quest_reply, quest_status, read_json, release_end_screen, saved,
-    send, talk,
+    Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
+    character_at_for as character, coins, content_dir, counts, finish_quest, has_family,
+    npc_interact, offer, pending_offer, pending_turnin, profile_xp, quest_end_reply, quest_reply,
+    quest_status, read_json, release_end_screen, saved, select_job, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -40,6 +43,7 @@ use osfr_tools::{
     npc_interaction::NpcInteraction,
     profiles::ProfileState,
     quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
+    world::NpcVisibility,
 };
 use serde_json::{Value, json};
 use std::{
@@ -49,13 +53,23 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-const CHARACTER: u64 = 247_001;
-const OTHER_CHARACTER: u64 = 247_002;
+const CHARACTER: u64 = 281_001;
+const OTHER_CHARACTER: u64 = 281_002;
 const QUEST: u32 = 3_000_200;
-/// Samantha's existing Cobblestone referral; it is her first 49/1 offer, so the
-/// tests accept it through the real menu before the hunt becomes the next offer.
+/// Samantha's existing Cobblestone referral. It is unchanged; Ricky Danger is its
+/// Talk target, so a player carrying it resolves it at Ricky, not at the hunt host.
 const REFERRAL: u32 = 3_000_021;
+/// Ricky Danger's pre-existing original chain. Both records name him as giver; the
+/// hunt must never be inserted ahead of them.
+const CALL_THE_CREW: u32 = 3_000_059;
+const BACK_FOR_MORE: u32 = 3_000_060;
 const SAMANTHA: u64 = 9_000_000_189;
+const RICKY: u64 = 9_500_000_254;
+/// Jacque 9500000497 is the event host and the return target. His `legacy_data`
+/// Sanctuary row at Jacque's Cafe (Pixiewood Hills, the southern entrance street)
+/// has empty `quest_ids_given`/`quests_given` and no quest record names him as
+/// giver, so the first Talk offers the hunt with no competing offer.
+const JACQUE: u64 = 9_500_000_497;
 /// The generic stock "Scavenger Hunt " label. The Greenwood Forest minigame title
 /// (429342) belongs to a different retail activity and is not reused.
 const TITLE_ID: u32 = 3_374;
@@ -63,8 +77,11 @@ const HUNT_OBJECTIVE_BYTES: usize = 107;
 const PAPPY: u64 = 9_000_000_165;
 const CARLOS: u64 = 9_000_000_042;
 const MERIGOLD: u64 = 9_000_000_402;
-/// A positioned Cobblestone vendor with no quest binding; a nearby non-target NPC.
+/// A positioned Cobblestone pet vendor with no quest binding; a non-target NPC.
 const GLORIA: u64 = 9_500_000_246;
+const ADVENTURER: i32 = 1;
+/// Used only by the reward-profile assertion; the hunt itself has no job gate.
+const BRAWLER: i32 = 43;
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
 fn eligibility() -> CharacterEligibility {
@@ -77,13 +94,14 @@ fn eligibility() -> CharacterEligibility {
 }
 
 /// A fresh character with the Adventurer profile active, bound to the real
-/// bundled split quest content exactly as production binds it.
+/// bundled split quest content exactly as production binds it. The Brawler
+/// profile is unlocked so the turn-in test can switch the active job.
 fn fresh(fixture: &Fixture, character_id: u64) -> Gameplay {
     let mut state = fixture.game_as(character_id, None).state();
     state.profiles = Some(ProfileState {
         version: 1,
-        active: 1,
-        unlocked: BTreeSet::from([1]),
+        active: ADVENTURER,
+        unlocked: BTreeSet::from([ADVENTURER, BRAWLER]),
         experience: BTreeMap::new(),
     });
     fixture.game_as(character_id, Some(state))
@@ -107,23 +125,17 @@ fn has_objective(replies: &[Vec<u8>], subtype: u16, objective_id: u32) -> bool {
     })
 }
 
-/// Accept Samantha's existing Cobblestone referral, then obtain the hunt's 49/1
-/// offer. The referral is her first offer (`quest_ids_given` is consulted before
-/// `QuestEngine::quest_ids_for_giver`), so accepting it is the production order
-/// that makes the hunt the next offer, not a test-only shortcut.
-fn offer_hunt(game: &mut Gameplay, samantha: &CharacterState, now: &mut u64) -> Outcome {
-    offer(game, samantha, SAMANTHA, REFERRAL, *now);
-    *now += 4;
-    accept(game, samantha, REFERRAL, *now);
-    *now += 4;
-    let offered = offer(game, samantha, SAMANTHA, QUEST, *now);
+/// Jacque has no competing quest offer, so one Talk offers the hunt directly
+/// through the production Talk/26/6 path.
+fn offer_hunt(game: &mut Gameplay, jacque: &CharacterState, now: &mut u64) -> Outcome {
+    let offered = offer(game, jacque, JACQUE, QUEST, *now);
     *now += 4;
     assert_eq!(pending_offer(game), Some(QUEST));
     offered
 }
 
-fn accept_hunt(game: &mut Gameplay, samantha: &CharacterState, now: &mut u64) {
-    let accepted = accept(game, samantha, QUEST, *now);
+fn accept_hunt(game: &mut Gameplay, jacque: &CharacterState, now: &mut u64) {
+    let accepted = accept(game, jacque, QUEST, *now);
     *now += 2;
     let add = accepted
         .replies
@@ -150,6 +162,26 @@ fn accept_hunt(game: &mut Gameplay, samantha: &CharacterState, now: &mut u64) {
     );
     assert_eq!(counts(game, QUEST), [0, 0, 0, 0]);
     assert_eq!(pending_offer(game), None);
+}
+
+/// One complete hunt through the final Talk and the held 49/13 end screen, so
+/// a test can exercise the 49/14 turn-in (or refuse it) at that exact point.
+fn open_hunt_end_screen(game: &mut Gameplay, jacque: &CharacterState, now: &mut u64) {
+    offer_hunt(game, jacque, now);
+    accept_hunt(game, jacque, now);
+    for (position, expected) in [
+        (npc_position(PAPPY), [1, 0, 0, 0]),
+        (npc_position(CARLOS), [1, 1, 0, 0]),
+        (npc_position(MERIGOLD), [1, 1, 1, 0]),
+    ] {
+        visit(game, jacque.guid, position, now, expected);
+    }
+    let final_talk = talk(game, jacque, JACQUE, *now);
+    *now += 2;
+    assert!(has_objective(&final_talk.replies, 10, 4));
+    release_end_screen(game, jacque, QUEST, JACQUE, 0, *now);
+    *now += 2;
+    assert_eq!(pending_turnin(game), Some(QUEST));
 }
 
 fn visit(
@@ -187,30 +219,63 @@ fn assert_move_changes_nothing(
     assert_eq!(saved(game), before_bytes, "{label} changed the save bytes");
 }
 
-#[test]
-fn samantha_offers_her_referral_then_the_hunt() {
-    let record = read_json(&content_dir().join("quests/scavenger_hunt.json"))["records"][0].clone();
-    assert_eq!(record["objectives"].as_array().unwrap().len(), 4);
-    assert_eq!(record["rewards"][0]["coins"], json!(50));
-    assert_eq!(record["rewards"][0]["job_xp"], json!({"1": 25}));
+/// A refused packet changes neither the whole `GameplayState` nor its serialized
+/// save bytes. The shared helper owns the packet/reply checks; this wrapper adds
+/// the state snapshot the event's refusal gates require.
+fn refused(game: &mut Gameplay, speaker: &CharacterState, packet: &[u8], now: u64, label: &str) {
+    let before_state = game.state();
+    let before_bytes = saved(game);
+    assert_packet_changes_nothing(game, speaker, packet, now, label);
+    assert_eq!(game.state(), before_state, "{label} changed the state");
+    assert_eq!(saved(game), before_bytes, "{label} changed the save bytes");
+}
 
+/// An out-of-range 26/8 is refused before any menu, offer or save change.
+fn refused_interaction(
+    game: &mut Gameplay,
+    speaker: &CharacterState,
+    target: u64,
+    now: u64,
+    label: &str,
+) {
+    let before_state = game.state();
+    let before_bytes = saved(game);
+    assert!(
+        game.handle_in_world(&npc_interact(target), speaker, now)
+            .is_err(),
+        "{label} must be refused"
+    );
+    assert_eq!(game.state(), before_state, "{label} changed the state");
+    assert_eq!(saved(game), before_bytes, "{label} changed the save bytes");
+}
+
+#[test]
+fn jacque_offers_the_hunt_first_to_a_new_character() {
     let fixture = Fixture::minimal(CHARACTER);
     let mut game = fresh(&fixture, CHARACTER);
-    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
+    let jacque = character(CHARACTER, 0, npc_position(JACQUE));
     let mut now = 1_000;
 
-    let offer = offer_hunt(&mut game, &samantha, &mut now);
-    let offers: Vec<_> = offer
+    let offered = offer_hunt(&mut game, &jacque, &mut now);
+    let offers: Vec<_> = offered
         .replies
         .iter()
-        .filter(|packet| has_family(packet, 49, 1, Some(QUEST)))
+        .filter(|packet| has_family(packet, 49, 1, None))
         .collect();
-    assert_eq!(offers.len(), 1, "the hunt offer appears once");
+    assert_eq!(offers.len(), 1, "one Talk offers exactly one quest");
     let offer = offers[0];
     // 49/1 layout (reader 0x00c7b7a0): quest, intro, wire dword 2, name,
     // description, wire dword 5. The builder puts the stock title in 2/name/5.
-    assert_eq!(u32::from_le_bytes(offer[6..10].try_into().unwrap()), QUEST);
-    assert_eq!(u32::from_le_bytes(offer[10..14].try_into().unwrap()), 0);
+    assert_eq!(
+        u32::from_le_bytes(offer[6..10].try_into().unwrap()),
+        QUEST,
+        "the first offer is the hunt, not the Samantha referral"
+    );
+    assert_eq!(
+        u32::from_le_bytes(offer[10..14].try_into().unwrap()),
+        0,
+        "intro text is not authored; it stays 0 under the hollow-text policy"
+    );
     assert_eq!(
         u32::from_le_bytes(offer[14..18].try_into().unwrap()),
         TITLE_ID
@@ -224,87 +289,51 @@ fn samantha_offers_her_referral_then_the_hunt() {
         0,
         "description text is not authored; it stays 0 under the hollow-text policy"
     );
+    assert_eq!(
+        u32::from_le_bytes(offer[26..30].try_into().unwrap()),
+        TITLE_ID
+    );
+    assert!(
+        !offered
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(REFERRAL))),
+        "Jacque must not offer Samantha's referral"
+    );
     assert_eq!(pending_offer(&game), Some(QUEST));
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Offered);
     assert_eq!(counts(&game, QUEST), [0, 0, 0, 0]);
+    assert!(
+        !game
+            .state()
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .quests
+            .contains_key(&REFERRAL),
+        "a fresh character has not received Samantha's referral"
+    );
 
     // A pending offer is not repeated and the save stays equal.
-    assert_no_offer(
-        &mut game,
-        &samantha,
-        SAMANTHA,
-        &mut now,
-        "a pending hunt offer",
-    );
+    assert_no_offer(&mut game, &jacque, JACQUE, &mut now, "a pending hunt offer");
 
-    accept_hunt(&mut game, &samantha, &mut now);
-    let first = game.state();
-    let first_bytes = saved(&game);
-
-    // A second character independently resolves the same giver, referral and
-    // hunt offer; the first character's state is untouched.
-    let mut other = fresh(&fixture, OTHER_CHARACTER);
-    let other_samantha = character(OTHER_CHARACTER, 0, npc_position(SAMANTHA));
-    let mut other_now = 2_000;
-    offer_hunt(&mut other, &other_samantha, &mut other_now);
-    assert_eq!(pending_offer(&other), Some(QUEST));
-    assert_eq!(quest_status(&other, QUEST), QuestStatus::Offered);
-    assert_eq!(
-        other.state().npc_quests.as_ref().unwrap().character_id,
-        OTHER_CHARACTER
-    );
-    assert_eq!(game.state(), first);
-    assert_eq!(saved(&game), first_bytes);
+    accept_hunt(&mut game, &jacque, &mut now);
+    // The active hunt is not re-offered either.
+    assert_no_offer(&mut game, &jacque, JACQUE, &mut now, "an active hunt");
 }
 
 #[test]
-fn a_declined_referral_is_reoffered_before_the_hunt() {
+fn the_four_stops_complete_and_pay_once() {
     let fixture = Fixture::minimal(CHARACTER);
     let mut game = fresh(&fixture, CHARACTER);
-    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
-    let mut now = 11_000;
-
-    offer(&mut game, &samantha, SAMANTHA, REFERRAL, now);
-    now += 4;
-    let declined = send(&mut game, &samantha, &quest_reply(REFERRAL, false), now);
-    assert!(declined.changed, "declining clears the pending offer");
-    assert_eq!(pending_offer(&game), None);
-    now += 4;
-
-    // (R) Pre-existing offer order: a declined quest is removed and is eligible
-    // again, so the next Talk re-offers the referral and the hunt stays hidden.
-    // The event runbook therefore tells players to accept and talk again.
-    offer(&mut game, &samantha, SAMANTHA, REFERRAL, now);
-    now += 4;
-    accept(&mut game, &samantha, REFERRAL, now);
-    now += 4;
-    let hunt = offer(&mut game, &samantha, SAMANTHA, QUEST, now);
-    assert!(
-        hunt.replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1, Some(QUEST))),
-        "the hunt follows the accepted referral"
-    );
-}
-
-#[test]
-fn the_three_landmarks_and_return_complete_the_hunt_once() {
-    let fixture = Fixture::minimal(CHARACTER);
-    let mut game = fresh(&fixture, CHARACTER);
-    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
+    let jacque = character(CHARACTER, 0, npc_position(JACQUE));
     let mut now = 3_000;
-    offer_hunt(&mut game, &samantha, &mut now);
-    accept_hunt(&mut game, &samantha, &mut now);
+    offer_hunt(&mut game, &jacque, &mut now);
+    accept_hunt(&mut game, &jacque, &mut now);
 
-    // A Talk at Samantha before the three stops neither completes the final
-    // objective nor opens the end screen, and changes nothing.
-    assert_no_offer(
-        &mut game,
-        &samantha,
-        SAMANTHA,
-        &mut now,
-        "an early return Talk",
-    );
+    // An early return Talk neither completes the final objective nor opens the
+    // end screen, and changes nothing.
+    assert_no_offer(&mut game, &jacque, JACQUE, &mut now, "an early return Talk");
     assert_eq!(counts(&game, QUEST), [0, 0, 0, 0]);
 
     // Stop 1: Pappy Farnum's farm.
@@ -317,6 +346,15 @@ fn the_three_landmarks_and_return_complete_the_hunt_once() {
     );
     assert!(has_objective(&pappy.replies, 10, 1), "goal 1 completes");
     assert!(has_objective(&pappy.replies, 8, 2), "goal 2 activates");
+    // Re-entering the completed stop changes nothing.
+    assert_move_changes_nothing(
+        &mut game,
+        CHARACTER,
+        0,
+        npc_position(PAPPY),
+        now + 1,
+        "a replayed visit",
+    );
     // Stop 2: the Cobblestone brawling ring.
     let ring = visit(
         &mut game,
@@ -341,9 +379,17 @@ fn the_three_landmarks_and_return_complete_the_hunt_once() {
         "the return Talk activates"
     );
 
-    // Return to Samantha: the final Talk completes goal 4 and holds the end
+    // The reward row names Adventurer (profile 1) even when another profile is
+    // active at turn-in. Switch through the production 26/13 path first.
+    let switched = send(&mut game, &jacque, &select_job(BRAWLER), now);
+    now += 2;
+    assert!(switched.changed, "the job switch commits");
+    assert_eq!(active_job(&game), BRAWLER);
+    let brawler_xp_before = profile_xp(&game, BRAWLER);
+
+    // Return to Jacque: the final Talk completes goal 4 and holds the end
     // screen until the client chooses the dialogue row.
-    let final_talk = talk(&mut game, &samantha, SAMANTHA, now);
+    let final_talk = talk(&mut game, &jacque, JACQUE, now);
     now += 2;
     assert!(has_objective(&final_talk.replies, 10, 4));
     assert!(
@@ -357,15 +403,15 @@ fn the_three_landmarks_and_return_complete_the_hunt_once() {
     assert_eq!(pending_turnin(&game), Some(QUEST));
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
 
-    let screen = release_end_screen(&mut game, &samantha, QUEST, SAMANTHA, 0, now);
+    let screen = release_end_screen(&mut game, &jacque, QUEST, JACQUE, 0, now);
     now += 2;
     assert_eq!(screen.len(), 99);
     assert_eq!(i32::from_le_bytes(screen[27..31].try_into().unwrap()), 50);
     assert_eq!(i32::from_le_bytes(screen[31..35].try_into().unwrap()), 25);
 
     let coins_before = coins(&game);
-    let xp_before = profile_xp(&game, 1);
-    let completed = finish_quest(&mut game, &samantha, QUEST, 1, 50, 25, now);
+    let xp_before = profile_xp(&game, ADVENTURER);
+    let completed = finish_quest(&mut game, &jacque, QUEST, ADVENTURER, 50, 25, now);
     now += 2;
     let count = completed
         .replies
@@ -373,69 +419,194 @@ fn the_three_landmarks_and_return_complete_the_hunt_once() {
         .find(|packet| has_family(packet, 49, 12, None))
         .expect("the completed count follows");
     assert_eq!(i32::from_le_bytes(count[6..10].try_into().unwrap()), 1);
+    assert_eq!(coins(&game), coins_before + 50);
+    assert_eq!(profile_xp(&game, ADVENTURER), xp_before + 25);
+    assert_eq!(
+        profile_xp(&game, BRAWLER),
+        brawler_xp_before,
+        "the active job receives no XP from the hunt's explicit profile-1 row"
+    );
+    assert_eq!(active_job(&game), BRAWLER);
 
     // A post-completion Talk offers nothing and pays nothing.
     let paid = game.state();
     let paid_bytes = saved(&game);
     assert_no_offer(
         &mut game,
-        &samantha,
-        SAMANTHA,
+        &jacque,
+        JACQUE,
         &mut now,
         "a post-completion Talk",
     );
     assert_eq!(game.state(), paid);
     assert_eq!(saved(&game), paid_bytes);
 
-    // A repeated 49/14 (or 49/2) after the payout changes nothing.
-    let paid = game.state();
-    let paid_bytes = saved(&game);
-    assert_packet_changes_nothing(
+    // A replayed 49/14, 49/2 or visit after the payout changes nothing.
+    refused(
         &mut game,
-        &samantha,
+        &jacque,
         &quest_end_reply(QUEST),
         now + 1,
-        "repeated turn-in",
+        "a replayed turn-in",
     );
-    assert_packet_changes_nothing(
+    refused(
         &mut game,
-        &samantha,
+        &jacque,
         &quest_reply(QUEST, true),
         now + 2,
-        "repeated accept",
+        "a replayed accept",
+    );
+    assert_move_changes_nothing(
+        &mut game,
+        CHARACTER,
+        0,
+        npc_position(PAPPY),
+        now + 3,
+        "a post-payout visit",
     );
     assert_eq!(game.state(), paid);
     assert_eq!(saved(&game), paid_bytes);
     assert_eq!(coins(&game), coins_before + 50);
-    assert_eq!(profile_xp(&game, 1), xp_before + 25);
+    assert_eq!(profile_xp(&game, ADVENTURER), xp_before + 25);
 }
 
 #[test]
-fn a_wrong_position_or_npc_changes_nothing() {
+fn samantha_still_offers_introduce_yourself_and_the_hunt_does_not_cross() {
     let fixture = Fixture::minimal(CHARACTER);
-    let mut game = fresh(&fixture, CHARACTER);
-    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
-    let mut now = 5_000;
-    offer_hunt(&mut game, &samantha, &mut now);
-    accept_hunt(&mut game, &samantha, &mut now);
+    let mut a = fresh(&fixture, CHARACTER);
+    let a_samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
+    let a_ricky = character(CHARACTER, 0, npc_position(RICKY));
+    let a_jacque = character(CHARACTER, 0, npc_position(JACQUE));
+    let mut now = 20_000;
 
-    // Outside the 8 m search radius, same zone and landmark height.
-    let mut outside = npc_position(PAPPY);
-    outside[2] += 30.0;
-    assert_move_changes_nothing(&mut game, CHARACTER, 0, outside, now + 1, "outside radius");
+    // Samantha's referral record is unchanged: one Talk target, Ricky Danger.
+    // `offer` asserts the first (and only) 49/1 is the referral, not the hunt, so
+    // an original quest keeps priority at its giver.
+    let referral = offer(&mut a, &a_samantha, SAMANTHA, REFERRAL, now);
+    now += 4;
+    assert!(
+        referral
+            .replies
+            .iter()
+            .all(|packet| !has_family(packet, 49, 1, Some(QUEST))),
+        "Samantha must not offer the hunt"
+    );
+    assert_eq!(quest_status(&a, REFERRAL), QuestStatus::Offered);
+    accept(&mut a, &a_samantha, REFERRAL, now);
+    now += 4;
+    assert_eq!(quest_status(&a, REFERRAL), QuestStatus::Active);
 
-    // Inside the copied position but in a different zone.
-    assert_move_changes_nothing(
-        &mut game,
-        CHARACTER,
-        1,
-        npc_position(PAPPY),
-        now + 2,
-        "wrong zone",
+    // The active referral (target Ricky) does not suppress the hunt at Jacque.
+    offer_hunt(&mut a, &a_jacque, &mut now);
+    accept_hunt(&mut a, &a_jacque, &mut now);
+    assert_eq!(quest_status(&a, REFERRAL), QuestStatus::Active);
+    assert_eq!(quest_status(&a, QUEST), QuestStatus::Active);
+
+    // Complete the referral at its actual target; the active hunt is untouched
+    // and the finished referral is not re-offered.
+    let referral_talk = talk(&mut a, &a_ricky, RICKY, now);
+    now += 2;
+    assert!(referral_talk.changed);
+    assert_eq!(counts(&a, REFERRAL), [1]);
+    assert_eq!(pending_turnin(&a), Some(REFERRAL));
+    release_end_screen(&mut a, &a_ricky, REFERRAL, RICKY, 0, now);
+    now += 2;
+    finish_quest(&mut a, &a_ricky, REFERRAL, ADVENTURER, 5, 20, now);
+    now += 2;
+    assert_eq!(quest_status(&a, REFERRAL), QuestStatus::Completed);
+    assert_eq!(quest_status(&a, QUEST), QuestStatus::Active);
+    assert_eq!(counts(&a, QUEST), [0, 0, 0, 0]);
+    assert_no_offer(
+        &mut a,
+        &a_samantha,
+        SAMANTHA,
+        &mut now,
+        "Samantha after the referral is completed",
     );
 
-    // A nearby positioned NPC that is not a hunt target and gives no quest: the
-    // whole real conversation leaves the saved state equal.
+    // An active hunt does not suppress the still-unaccepted referral at
+    // Samantha for a second character.
+    let mut b = fresh(&fixture, OTHER_CHARACTER);
+    let b_jacque = character(OTHER_CHARACTER, 0, npc_position(JACQUE));
+    let b_samantha = character(OTHER_CHARACTER, 0, npc_position(SAMANTHA));
+    let mut b_now = 30_000;
+    offer_hunt(&mut b, &b_jacque, &mut b_now);
+    accept_hunt(&mut b, &b_jacque, &mut b_now);
+    assert_eq!(quest_status(&b, QUEST), QuestStatus::Active);
+    let referral_offer = offer(&mut b, &b_samantha, SAMANTHA, REFERRAL, b_now);
+    assert!(
+        referral_offer
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(REFERRAL))),
+        "Samantha still offers Introduce Yourself"
+    );
+    assert!(
+        referral_offer
+            .replies
+            .iter()
+            .all(|packet| !has_family(packet, 49, 1, Some(QUEST))),
+        "Samantha does not offer the active hunt"
+    );
+    assert_eq!(quest_status(&b, QUEST), QuestStatus::Active);
+    assert_eq!(counts(&b, QUEST), [0, 0, 0, 0]);
+}
+
+#[test]
+fn refusals_and_reconnect_change_nothing() {
+    let fixture = Fixture::minimal(CHARACTER);
+    let mut game = fresh(&fixture, CHARACTER);
+    let jacque = character(CHARACTER, 0, npc_position(JACQUE));
+    let mut now = 40_000;
+
+    // A declined offer is removed, and repeating the stale decline changes
+    // nothing. This is the one accepted change: decline clears the offer.
+    offer_hunt(&mut game, &jacque, &mut now);
+    let declined = send(&mut game, &jacque, &quest_reply(QUEST, false), now);
+    now += 2;
+    assert!(declined.changed, "declining clears the pending offer");
+    assert_eq!(pending_offer(&game), None);
+    assert!(
+        !game
+            .state()
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .quests
+            .contains_key(&QUEST),
+        "a declined offer is removed"
+    );
+    let declined_state = game.state();
+    let declined_bytes = saved(&game);
+    refused(
+        &mut game,
+        &jacque,
+        &quest_reply(QUEST, false),
+        now,
+        "a repeated decline",
+    );
+    assert_eq!(game.state(), declined_state);
+    assert_eq!(saved(&game), declined_bytes);
+
+    // Re-offer, then forge a duplicate accept and a 49/14 with no end screen.
+    offer_hunt(&mut game, &jacque, &mut now);
+    accept_hunt(&mut game, &jacque, &mut now);
+    refused(
+        &mut game,
+        &jacque,
+        &quest_reply(QUEST, true),
+        now,
+        "a duplicate accept",
+    );
+    refused(
+        &mut game,
+        &jacque,
+        &quest_end_reply(QUEST),
+        now + 1,
+        "a 49/14 with no end screen",
+    );
+
+    // Wrong NPC: a positioned Cobblestone pet vendor with no quest binding.
     let gloria = character(CHARACTER, 0, npc_position(GLORIA));
     let before_state = game.state();
     let before_bytes = saved(&game);
@@ -449,103 +620,35 @@ fn a_wrong_position_or_npc_changes_nothing() {
     assert_eq!(game.state(), before_state);
     assert_eq!(saved(&game), before_bytes);
 
-    // Forged accept without a new offer, and a forged 49/14 without a pending
-    // end screen, are both refused without a state change.
-    assert_packet_changes_nothing(
-        &mut game,
-        &samantha,
-        &quest_reply(QUEST, true),
-        now + 1,
-        "forged 49/2",
-    );
-    assert_packet_changes_nothing(
-        &mut game,
-        &samantha,
-        &quest_end_reply(QUEST),
-        now + 2,
-        "forged 49/14",
-    );
-
-    // Out-of-range interaction is refused and mutates nothing.
-    let mut far = npc_position(SAMANTHA);
+    // Out-of-range 26/8, an outside-radius visit and a wrong-zone visit are
+    // all refused without state or save bytes.
+    let mut far = npc_position(JACQUE);
     far[2] += 100.0;
-    let before_state = game.state();
-    let before_bytes = saved(&game);
-    assert!(
-        game.handle_in_world(
-            &npc_quest_chain::npc_interact(SAMANTHA),
-            &character(CHARACTER, 0, far),
-            now + 3
-        )
-        .is_err(),
-        "an out-of-range 26/8 must be refused"
+    refused_interaction(
+        &mut game,
+        &character(CHARACTER, 0, far),
+        JACQUE,
+        now + 1,
+        "an out-of-range 26/8",
     );
-    assert_eq!(game.state(), before_state);
-    assert_eq!(saved(&game), before_bytes);
-
-    // The hunt is still Active with no progress and no payout.
+    let mut outside = npc_position(PAPPY);
+    outside[2] += 30.0;
+    assert_move_changes_nothing(&mut game, CHARACTER, 0, outside, now + 2, "outside radius");
+    assert_move_changes_nothing(
+        &mut game,
+        CHARACTER,
+        1,
+        npc_position(PAPPY),
+        now + 3,
+        "wrong zone",
+    );
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     assert_eq!(counts(&game, QUEST), [0, 0, 0, 0]);
     assert_eq!(coins(&game), 0);
-    assert_eq!(profile_xp(&game, 1), 0);
-}
+    assert_eq!(profile_xp(&game, ADVENTURER), 0);
 
-/// (R) Pre-existing behavior pinned by F272 review finding 7: 49/14 is keyed only
-/// by `pending_turnin`; it does not recheck the speaker or the player's range.
-/// Enforcing a turn-in range is a separate, lead-approved change, so this test
-/// records the current result rather than silently claiming a refusal.
-#[test]
-fn a_completed_final_talk_is_turned_in_away_from_the_giver_today() {
-    let fixture = Fixture::minimal(CHARACTER);
-    let mut game = fresh(&fixture, CHARACTER);
-    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
-    let mut now = 13_000;
-    offer_hunt(&mut game, &samantha, &mut now);
-    accept_hunt(&mut game, &samantha, &mut now);
-    for position in [
-        npc_position(PAPPY),
-        npc_position(CARLOS),
-        npc_position(MERIGOLD),
-    ] {
-        now += 1;
-        game.on_location(&character(CHARACTER, 0, position), now)
-            .expect("movement is accepted");
-    }
-    let final_talk = talk(&mut game, &samantha, SAMANTHA, now);
-    now += 2;
-    assert!(has_objective(&final_talk.replies, 10, 4));
-    release_end_screen(&mut game, &samantha, QUEST, SAMANTHA, 0, now);
-    now += 2;
-    assert_eq!(pending_turnin(&game), Some(QUEST));
-
-    // Walk 100 m away and send the turn-in from that position.
-    let mut far = npc_position(SAMANTHA);
-    far[0] += 100.0;
-    let walked = game
-        .on_location(&character(CHARACTER, 0, far), now)
-        .expect("movement is accepted");
-    assert!(!walked.changed, "walking away advances no objective");
-    now += 2;
-    finish_quest(
-        &mut game,
-        &character(CHARACTER, 0, far),
-        QUEST,
-        1,
-        50,
-        25,
-        now,
-    );
-}
-
-#[test]
-fn a_mid_hunt_reconnect_keeps_progress_and_pays_no_extra() {
-    let fixture = Fixture::minimal(CHARACTER);
-    let mut game = fresh(&fixture, CHARACTER);
-    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
-    let mut now = 7_000;
-    offer_hunt(&mut game, &samantha, &mut now);
-    accept_hunt(&mut game, &samantha, &mut now);
-
+    // Two stops, disconnect, reconnect: the saved counters survive and no
+    // reward is paid early.
     visit(
         &mut game,
         CHARACTER,
@@ -560,19 +663,25 @@ fn a_mid_hunt_reconnect_keeps_progress_and_pays_no_extra() {
         &mut now,
         [1, 1, 0, 0],
     );
-    let mid = saved(&game);
-    assert_eq!(coins(&game), 0);
-    assert_eq!(profile_xp(&game, 1), 0);
-
-    // Disconnect after two landmarks: the counters are in the save and are
-    // restored without a payout.
+    let mid_state = game.state();
+    let mid_bytes = saved(&game);
     game = fixture.reload(&game);
-    assert_eq!(saved(&game), mid, "reload changed the mid-hunt save");
+    assert_eq!(
+        game.state(),
+        mid_state,
+        "reconnect changed the mid-hunt state"
+    );
+    assert_eq!(
+        saved(&game),
+        mid_bytes,
+        "reconnect changed the mid-hunt save"
+    );
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     assert_eq!(counts(&game, QUEST), [1, 1, 0, 0]);
     assert_eq!(coins(&game), 0);
-    assert_eq!(profile_xp(&game, 1), 0);
+    assert_eq!(profile_xp(&game, ADVENTURER), 0);
 
+    // Finish the hunt through the real paths.
     visit(
         &mut game,
         CHARACTER,
@@ -580,35 +689,296 @@ fn a_mid_hunt_reconnect_keeps_progress_and_pays_no_extra() {
         &mut now,
         [1, 1, 1, 0],
     );
-    let final_talk = talk(&mut game, &samantha, SAMANTHA, now);
+    let final_talk = talk(&mut game, &jacque, JACQUE, now);
     now += 2;
     assert!(has_objective(&final_talk.replies, 10, 4));
-    release_end_screen(&mut game, &samantha, QUEST, SAMANTHA, 0, now);
+    release_end_screen(&mut game, &jacque, QUEST, JACQUE, 0, now);
     now += 2;
-    finish_quest(&mut game, &samantha, QUEST, 1, 50, 25, now);
+    finish_quest(&mut game, &jacque, QUEST, ADVENTURER, 50, 25, now);
     now += 2;
-    let paid = saved(&game);
+    let paid_state = game.state();
+    let paid_bytes = saved(&game);
 
-    // Reconnect after the turn-in does not pay again and a replayed 49/14
-    // changes nothing.
+    // Reconnect after the successful turn-in: the payout is saved once and a
+    // replayed 49/14 does not pay again.
     game = fixture.reload(&game);
-    assert_eq!(saved(&game), paid, "reload changed the paid save");
+    assert_eq!(game.state(), paid_state, "reconnect changed the paid state");
+    assert_eq!(saved(&game), paid_bytes, "reconnect changed the paid save");
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Completed);
     assert_eq!(coins(&game), 50);
-    assert_eq!(profile_xp(&game, 1), 25);
-    assert_packet_changes_nothing(
+    assert_eq!(profile_xp(&game, ADVENTURER), 25);
+    refused(
         &mut game,
-        &samantha,
+        &jacque,
         &quest_end_reply(QUEST),
         now + 1,
-        "turn-in replay after reconnect",
+        "a turn-in replay after reconnect",
     );
     assert_eq!(coins(&game), 50);
-    assert_eq!(profile_xp(&game, 1), 25);
+    assert_eq!(profile_xp(&game, ADVENTURER), 25);
 }
 
 #[test]
-fn the_quest_loads_with_real_targets_and_no_collision() {
+fn a_second_player_does_not_share_hunt_progress() {
+    let fixture = Fixture::minimal(CHARACTER);
+    let mut a = fresh(&fixture, CHARACTER);
+    let mut b = fresh(&fixture, OTHER_CHARACTER);
+    let a_jacque = character(CHARACTER, 0, npc_position(JACQUE));
+    let b_jacque = character(OTHER_CHARACTER, 0, npc_position(JACQUE));
+    let mut a_now = 50_000;
+    let mut b_now = 60_000;
+
+    offer_hunt(&mut a, &a_jacque, &mut a_now);
+    accept_hunt(&mut a, &a_jacque, &mut a_now);
+    offer_hunt(&mut b, &b_jacque, &mut b_now);
+    assert_eq!(pending_offer(&b), Some(QUEST));
+    assert_eq!(quest_status(&b, QUEST), QuestStatus::Offered);
+    assert_eq!(counts(&b, QUEST), [0, 0, 0, 0]);
+
+    visit(
+        &mut a,
+        CHARACTER,
+        npc_position(PAPPY),
+        &mut a_now,
+        [1, 0, 0, 0],
+    );
+    // B sees none of A's progress or ledger.
+    assert_eq!(counts(&b, QUEST), [0, 0, 0, 0]);
+    assert_eq!(
+        b.state().npc_quests.as_ref().unwrap().character_id,
+        OTHER_CHARACTER
+    );
+    assert_eq!(coins(&b), 0);
+    assert_eq!(profile_xp(&b, ADVENTURER), 0);
+
+    // A's stale/out-of-range request fails for A; B's session and hunt continue.
+    let mut far = npc_position(JACQUE);
+    far[2] += 100.0;
+    refused_interaction(
+        &mut a,
+        &character(CHARACTER, 0, far),
+        JACQUE,
+        a_now + 1,
+        "A's out-of-range 26/8",
+    );
+    assert_eq!(counts(&b, QUEST), [0, 0, 0, 0]);
+    accept_hunt(&mut b, &b_jacque, &mut b_now);
+    visit(
+        &mut b,
+        OTHER_CHARACTER,
+        npc_position(PAPPY),
+        &mut b_now,
+        [1, 0, 0, 0],
+    );
+    assert_eq!(counts(&a, QUEST), [1, 0, 0, 0]);
+    assert_eq!(counts(&b, QUEST), [1, 0, 0, 0]);
+
+    // A finishes first; B stays unpaid at its first stop.
+    let ring = visit(
+        &mut a,
+        CHARACTER,
+        npc_position(CARLOS),
+        &mut a_now,
+        [1, 1, 0, 0],
+    );
+    assert!(has_objective(&ring.replies, 10, 2));
+    let highroad = visit(
+        &mut a,
+        CHARACTER,
+        npc_position(MERIGOLD),
+        &mut a_now,
+        [1, 1, 1, 0],
+    );
+    assert!(has_objective(&highroad.replies, 10, 3));
+    let a_final = talk(&mut a, &a_jacque, JACQUE, a_now);
+    a_now += 2;
+    assert!(has_objective(&a_final.replies, 10, 4));
+    release_end_screen(&mut a, &a_jacque, QUEST, JACQUE, 0, a_now);
+    a_now += 2;
+    finish_quest(&mut a, &a_jacque, QUEST, ADVENTURER, 50, 25, a_now);
+    a_now += 2;
+    assert_eq!(quest_status(&a, QUEST), QuestStatus::Completed);
+    assert_eq!(coins(&a), 50);
+    assert_eq!(profile_xp(&a, ADVENTURER), 25);
+    assert_eq!(quest_status(&b, QUEST), QuestStatus::Active);
+    assert_eq!(counts(&b, QUEST), [1, 0, 0, 0]);
+    assert_eq!(coins(&b), 0);
+    assert_eq!(profile_xp(&b, ADVENTURER), 0);
+
+    // B completes independently and is paid once too.
+    visit(
+        &mut b,
+        OTHER_CHARACTER,
+        npc_position(CARLOS),
+        &mut b_now,
+        [1, 1, 0, 0],
+    );
+    visit(
+        &mut b,
+        OTHER_CHARACTER,
+        npc_position(MERIGOLD),
+        &mut b_now,
+        [1, 1, 1, 0],
+    );
+    let b_final = talk(&mut b, &b_jacque, JACQUE, b_now);
+    b_now += 2;
+    assert!(has_objective(&b_final.replies, 10, 4));
+    release_end_screen(&mut b, &b_jacque, QUEST, JACQUE, 0, b_now);
+    b_now += 2;
+    finish_quest(&mut b, &b_jacque, QUEST, ADVENTURER, 50, 25, b_now);
+    b_now += 2;
+    assert_eq!(quest_status(&b, QUEST), QuestStatus::Completed);
+    assert_eq!(coins(&b), 50);
+    assert_eq!(profile_xp(&b, ADVENTURER), 25);
+    assert_eq!(coins(&a), 50);
+    assert_eq!(profile_xp(&a, ADVENTURER), 25);
+
+    // Each payout is once only; a replayed 49/14 changes neither player.
+    refused(
+        &mut a,
+        &a_jacque,
+        &quest_end_reply(QUEST),
+        a_now,
+        "A's turn-in replay",
+    );
+    refused(
+        &mut b,
+        &b_jacque,
+        &quest_end_reply(QUEST),
+        b_now,
+        "B's turn-in replay",
+    );
+    assert_eq!(coins(&a), 50);
+    assert_eq!(profile_xp(&a, ADVENTURER), 25);
+    assert_eq!(coins(&b), 50);
+    assert_eq!(profile_xp(&b, ADVENTURER), 25);
+}
+
+/// (R) Original quests keep priority. The hunt is not bound to Samantha's NPC
+/// row, so a new character talking to her receives her original referral as the
+/// first (and only) 49/1. This is the guard for the rejected design that put the
+/// custom event ahead of an original quest at a shared giver.
+#[test]
+fn the_hunt_never_hides_an_original_quest_at_its_giver() {
+    let fixture = Fixture::minimal(CHARACTER);
+    let mut game = fresh(&fixture, CHARACTER);
+    let samantha = character(CHARACTER, 0, npc_position(SAMANTHA));
+    let now = 75_000;
+
+    // `offer` asserts exactly one 49/1 and that it decodes to the referral.
+    let offered = offer(&mut game, &samantha, SAMANTHA, REFERRAL, now);
+    assert!(
+        offered
+            .replies
+            .iter()
+            .all(|packet| !has_family(packet, 49, 1, Some(QUEST))),
+        "the hunt must not hide Samantha's original referral"
+    );
+    assert_eq!(quest_status(&game, REFERRAL), QuestStatus::Offered);
+    assert_eq!(pending_offer(&game), Some(REFERRAL));
+    assert!(
+        !game
+            .state()
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .quests
+            .contains_key(&QUEST),
+        "talking to an original giver must not start the hunt"
+    );
+}
+
+/// A wallet at the coin cap refuses the hunt's 50-coin grant for that player
+/// only, atomically: no coins, XP or save bytes change and the reward stays
+/// pending. The other player completes normally.
+#[test]
+fn an_over_cap_reward_is_refused_for_that_player_only() {
+    let fixture = Fixture::minimal(CHARACTER);
+    let mut a = fresh(&fixture, CHARACTER);
+    let mut b = fresh(&fixture, OTHER_CHARACTER);
+    let a_jacque = character(CHARACTER, 0, npc_position(JACQUE));
+    let b_jacque = character(OTHER_CHARACTER, 0, npc_position(JACQUE));
+    let mut a_now = 80_000;
+    let mut b_now = 90_000;
+    open_hunt_end_screen(&mut a, &a_jacque, &mut a_now);
+    open_hunt_end_screen(&mut b, &b_jacque, &mut b_now);
+
+    let mut state = a.state();
+    state.inventory.coins = i32::MAX as u32 - 49;
+    a = fixture.game_as(CHARACTER, Some(state));
+    let before_state = a.state();
+    let before_bytes = saved(&a);
+    assert!(
+        a.handle_in_world(&quest_end_reply(QUEST), &a_jacque, a_now)
+            .is_err(),
+        "an over-cap coin grant is refused for A"
+    );
+    assert_eq!(
+        a.state(),
+        before_state,
+        "A's over-cap refusal changed state"
+    );
+    assert_eq!(
+        saved(&a),
+        before_bytes,
+        "A's over-cap refusal changed save bytes"
+    );
+    assert_eq!(pending_turnin(&a), Some(QUEST), "A's reward stays pending");
+    assert_eq!(coins(&a), i32::MAX as u32 - 49);
+    assert_eq!(profile_xp(&a, ADVENTURER), 0);
+
+    // B's normal turn-in still pays; A's refusal does not affect B.
+    finish_quest(&mut b, &b_jacque, QUEST, ADVENTURER, 50, 25, b_now);
+    assert_eq!(coins(&b), 50);
+    assert_eq!(profile_xp(&b, ADVENTURER), 25);
+
+    // A retry still refuses and changes nothing.
+    let before_state = a.state();
+    let before_bytes = saved(&a);
+    assert!(
+        a.handle_in_world(&quest_end_reply(QUEST), &a_jacque, a_now + 1)
+            .is_err(),
+        "the over-cap retry is refused for A"
+    );
+    assert_eq!(a.state(), before_state);
+    assert_eq!(saved(&a), before_bytes);
+    assert_eq!(coins(&a), i32::MAX as u32 - 49);
+    assert_eq!(profile_xp(&a, ADVENTURER), 0);
+}
+
+/// (R) Pre-existing behavior pinned by F272 review finding 7: 49/14 is keyed only
+/// by `pending_turnin`; it does not recheck the speaker or the player's range.
+/// Enforcing a turn-in range is a separate, lead-approved change, so this test
+/// records the current result rather than silently claiming a refusal.
+#[test]
+fn a_completed_final_talk_is_turned_in_away_from_the_giver_today() {
+    let fixture = Fixture::minimal(CHARACTER);
+    let mut game = fresh(&fixture, CHARACTER);
+    let jacque = character(CHARACTER, 0, npc_position(JACQUE));
+    let mut now = 70_000;
+    open_hunt_end_screen(&mut game, &jacque, &mut now);
+
+    // Walk 100 m away and send the turn-in from that position.
+    let mut far = npc_position(JACQUE);
+    far[0] += 100.0;
+    let walked = game
+        .on_location(&character(CHARACTER, 0, far), now)
+        .expect("movement is accepted");
+    assert!(!walked.changed, "walking away advances no objective");
+    now += 2;
+    finish_quest(
+        &mut game,
+        &character(CHARACTER, 0, far),
+        QUEST,
+        ADVENTURER,
+        50,
+        25,
+        now,
+    );
+}
+
+#[test]
+fn the_hunt_identity_and_admin_script_are_recorded() {
     let content = content_dir();
     let quest_dir = content.join("quests");
     let mut files: Vec<PathBuf> = fs::read_dir(&quest_dir)
@@ -624,6 +994,7 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
 
     let mut seen = BTreeSet::new();
     let mut total_records = 0usize;
+    let mut host_givers = Vec::new();
     for path in &files {
         let document = read_json(path);
         for record in document["records"].as_array().unwrap() {
@@ -631,9 +1002,17 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
             assert!(id > 0, "{}: quest ids are positive", path.display());
             assert!(seen.insert(id), "duplicate quest id {id}");
             total_records += 1;
+            if record["giver_npc_id"] == json!(JACQUE) {
+                host_givers.push(id);
+            }
         }
     }
     assert_eq!(total_records, 654, "653 existing records plus the hunt");
+    assert_eq!(
+        host_givers,
+        vec![QUEST],
+        "the hunt is Jacque's only giver record"
+    );
 
     let hunt_path = quest_dir.join("scavenger_hunt.json");
     let hunt = read_json(&hunt_path);
@@ -642,14 +1021,14 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
     let record = &records[0];
     assert_eq!(record["id"], json!(QUEST));
     assert_eq!(record["title_string_id"], json!(TITLE_ID));
-    assert_eq!(record["giver_npc_id"], json!(SAMANTHA));
+    assert_eq!(record["giver_npc_id"], json!(JACQUE));
     assert_eq!(record["prerequisite_quest_ids"], json!([]));
     assert_ne!(record["enabled"], json!(false));
 
     // The loader requires the quest to be listed by a jobs.json quest_ids
-    // list; the giver offer itself comes from the record's giver_npc_id. This is
-    // a loader structural invariant, not a job gate: the record has no `job`
-    // field and is not Adventurer content.
+    // list; the giver offer itself comes from giver_npc_id. This is a loader
+    // structural invariant, not a job gate: the record has no `job` field and is
+    // not Adventurer content.
     let jobs = read_json(&content.join("jobs.json"));
     let job_refs: Vec<&str> = jobs["records"]
         .as_array()
@@ -668,8 +1047,10 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
         "the hunt has one loader-required job reference"
     );
 
-    // No NPC content row was edited to bind the quest; the giver is the quest
-    // record's field and the menu adds QuestEngine::quest_ids_for_giver.
+    // No NPC row binds the hunt at all. The offer comes only from the record's
+    // giver_npc_id through QuestEngine::quest_ids_for_giver, so no row's explicit
+    // first-offer list can reorder a pre-existing quest.
+    let mut binders = Vec::new();
     for path in fs::read_dir(content.join("npcs")).unwrap() {
         let path = path.unwrap().path();
         if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
@@ -677,35 +1058,103 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
         }
         let document = read_json(&path);
         for npc in document["records"].as_array().unwrap() {
+            let npc_id = npc["npc_id"].as_u64().unwrap();
             for field in ["quest_ids_given", "quests_given", "quests_accepted"] {
                 let bound = npc[field].as_array().is_some_and(|rows| {
                     rows.iter()
                         .any(|row| row["quest_id"] == json!(QUEST) || row == &json!(QUEST))
                 });
-                assert!(!bound, "{}: NPC {field} binds the hunt", path.display());
+                if bound {
+                    binders.push((npc_id, field));
+                }
             }
         }
     }
-
-    // The giver is spawned and drawable in the bundled NPC content.
-    let samantha = npc_row("cobblestone_village.json", SAMANTHA);
     assert!(
-        samantha["roles"]
+        binders.is_empty(),
+        "no NPC row may bind the hunt; found {binders:?}"
+    );
+
+    // The host row stays unchanged: drawable, no quest bindings, a quest giver.
+    let jacque = npc_row("sanctuary.json", JACQUE);
+    assert_eq!(jacque["placement"], json!("legacy_data"));
+    assert_eq!(jacque["model_id"], json!(134));
+    assert_eq!(jacque["name_string_id"], json!(7_575));
+    assert_eq!(jacque["greeting_string_id"], json!(15_500));
+    assert_eq!(jacque["quest_ids_given"], json!([]));
+    assert_eq!(jacque["quests_given"], json!([]));
+    assert_eq!(jacque["quests_accepted"], json!([]));
+    assert!(
+        jacque["roles"]
             .as_array()
             .unwrap()
             .contains(&json!("quest_giver")),
-        "Samantha is a quest giver"
+        "Jacque is a quest giver"
     );
-    assert!(samantha["model_id"].as_u64().unwrap() > 0);
-    let position: [f32; 3] = serde_json::from_value(samantha["position"].clone()).unwrap();
+    let position: [f32; 3] = serde_json::from_value(jacque["position"].clone()).unwrap();
+    assert_eq!(position, [-1212.878, -13.95695, 463.8414]);
     assert!(position.iter().all(|value| value.is_finite()));
-    assert!(
-        NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
-            .unwrap()
-            .location(SAMANTHA)
-            .is_some(),
-        "Samantha has a positioned content spawn"
+    let spawned: BTreeMap<u64, [f32; 3]> = NpcVisibility::load(&content)
+        .unwrap()
+        .teleport_targets(0)
+        .into_iter()
+        .map(|target| (target.guid, target.position))
+        .collect();
+    assert_eq!(
+        spawned.get(&JACQUE),
+        Some(&position),
+        "Jacque is spawned by the production visibility loader"
     );
+
+    // Ricky Danger's row stays byte-identical: his original chain still names
+    // him as giver and the hunt is not bound to him.
+    let original_quests = read_json(&quest_dir.join("adventurer.json"));
+    let original_records = original_quests["records"].as_array().unwrap();
+    for quest_id in [CALL_THE_CREW, BACK_FOR_MORE] {
+        let original = original_records
+            .iter()
+            .find(|record| record["id"] == json!(quest_id))
+            .expect("Ricky's original quest is in adventurer.json");
+        assert_eq!(original["giver_npc_id"], json!(RICKY));
+        assert_ne!(original["enabled"], json!(false));
+    }
+    let ricky = npc_row("cobblestone_village.json", RICKY);
+    assert_eq!(ricky["placement"], json!("legacy_data"));
+    assert_eq!(ricky["model_id"], json!(960));
+    assert_eq!(ricky["name_string_id"], json!(94_007));
+    assert_eq!(ricky["greeting_string_id"], json!(94_388));
+    assert_eq!(ricky["quest_ids_given"], json!([]));
+    assert_eq!(ricky["quests_given"], json!([]));
+    assert_eq!(ricky["quests_accepted"], json!([]));
+    assert!(
+        ricky["roles"]
+            .as_array()
+            .unwrap()
+            .contains(&json!("quest_giver")),
+        "Ricky is a quest giver"
+    );
+    let ricky_position: [f32; 3] = serde_json::from_value(ricky["position"].clone()).unwrap();
+    assert_eq!(ricky_position, [-1909.511, -44.3937, 462.83]);
+
+    // Samantha's referral is untouched: she still gives 3000021, which targets
+    // Ricky, and the hunt did not move onto her.
+    let samantha = npc_row("cobblestone_village.json", SAMANTHA);
+    assert!(
+        samantha["quest_ids_given"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(REFERRAL)),
+        "Samantha still gives the referral"
+    );
+    let referral = original_quests["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|record| record["id"] == json!(REFERRAL))
+        .expect("Introduce Yourself is in adventurer.json");
+    assert_eq!(referral["giver_npc_id"], json!(SAMANTHA));
+    assert_ne!(referral["enabled"], json!(false));
+    assert_eq!(referral["objectives"][0]["npc_id"], json!(RICKY));
 
     // The three stops copy the cited rows verbatim and use the open-world zone.
     let objectives = record["objectives"].as_array().unwrap();
@@ -737,7 +1186,7 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
         );
     }
     assert_eq!(objectives[3]["kind"], json!("talk_to_npc"));
-    assert_eq!(objectives[3]["npc_id"], json!(SAMANTHA));
+    assert_eq!(objectives[3]["npc_id"], json!(JACQUE));
 
     // Every record/objective/reward carries non-empty, correctly labelled
     // provenance; a reconstructed tag starts with (R).
@@ -769,6 +1218,18 @@ fn the_quest_loads_with_real_targets_and_no_collision() {
     assert_eq!(rewards[0]["coins"], json!(50));
     assert_eq!(rewards[0]["items"], json!([]));
     assert_eq!(rewards[0]["job_xp"], json!({"1": 25}));
+
+    // The operator script is part of this change; no code path reads it.
+    let note_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../notes/Autopilot/T281.md");
+    let note = fs::read_to_string(&note_path)
+        .unwrap_or_else(|error| panic!("{}: {error}", note_path.display()));
+    for line in [
+        "Talk to Jacque at Jacque's Cafe in Sanctuary to start The Great Scavenger Hunt.",
+        "Stops: Pappy Farnum's farm, the Cobblestone brawling ring, Highroad Junction;",
+        "then return to Jacque.",
+    ] {
+        assert!(note.contains(line), "the admin script is missing: {line}");
+    }
 
     // A malformed synthetic copy is a bounded load error, never a panic; the
     // unmodified copy in the same scratch directory loads as a control.
@@ -832,7 +1293,7 @@ struct Scratch(PathBuf);
 impl Scratch {
     fn new(name: &str) -> Self {
         let path = std::env::temp_dir().join(format!(
-            "osfr-t247-{name}-{}-{}",
+            "osfr-t281-{name}-{}-{}",
             std::process::id(),
             NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
         ));

@@ -4,7 +4,7 @@
     {
       "id": 3000200,
       "title_string_id": 3374,
-      "giver_npc_id": 9000000189,
+      "giver_npc_id": 9500000497,
       "prerequisite_quest_ids": [],
       "objectives": [
         {
@@ -73,15 +73,15 @@
         {
           "kind": "talk_to_npc",
           "id": 4,
-          "npc_id": 9000000189,
+          "npc_id": 9500000497,
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part A. Greeters and the new-player flow, row 39 (source cell [client] [video, weak] [wiki Samantha]): Samantha 9000000189 is the Cobblestone Village greeter and quest giver."
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:51 (source cell [client] [wiki]): Jacque 9500000497 is the Owner of Jacque's Cafe in Pixiewood Hills; data/content/npcs/sanctuary.json record 9500000497 carries the legacy_data spawn at [-1212.878,-13.95695,463.8414], model 134, name id 7575 and greeting 15500."
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T247: the final step returns to the giver Samantha. A Talk to the quest's giver or its named Talk target completes the final objective and opens the normal 49/13 end screen (src/quest_engine.rs on_event)."
+              "evidence": "(R) T281: the final step returns to the event host Jacque. A Talk to the quest's giver or its named Talk target completes the final objective and opens the normal 49/13 end screen (src/quest_engine.rs on_event)."
             }
           ]
         }
@@ -108,15 +108,23 @@
       "source": [
         {
           "kind": "client",
-          "evidence": "lab/reports/locale-id-to-text.json: Global.Text id 3374 is the generic stock string 'Scavenger Hunt '. The Greenwood Forest minigame title 429342 ('The Great Scavenger Hunt', notes/Research/original-activity-coverage.json activity 1038) belongs to a different retail activity and is deliberately not reused."
+          "evidence": "lab/reports/locale-id-to-text.json: Global.Text id 3374 is the generic stock string 'Scavenger Hunt '. The Greenwood Forest minigame title 429342 ('The Great Scavenger Hunt', notes/Research/original-activity-coverage.json activity 1038) belongs to a different retail activity."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T247/F272: authored admin-event scavenger hunt at existing starting-road landmarks. Three VisitPosition stops at copied NPC-row positions and a return Talk to Samantha; no new NPC spawn, objective kind, reward path, packet or realm command. The quest is offered after the giver's existing referral is accepted; the admin starts the event with a broadcast that names that step."
+          "evidence": "(R) T247/F272: the record keeps the generic stock Global.Text 3374 'Scavenger Hunt ' and deliberately does not reuse the Greenwood Forest minigame's 429342 title. The admin event is identified by its host and its three stops, not by a new title or locale line."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T247: the stop order (Pappy's farm, brawling ring, Highroad Junction, Samantha), the 8.0 m radius and the 50-coin / 25-Adventurer-XP reward are local event policy. Notes/Design/World Builder.md records the admin-hunt intent: the admin broadcasts hints and the quest is the objective."
+          "evidence": "(R) T247/F272/T281: authored admin-event scavenger hunt at existing starting-road landmarks. Three VisitPosition stops at copied NPC-row positions and a return Talk to Jacque; no new NPC spawn, objective kind, reward path, packet or realm command. The host is a drawable Sanctuary NPC with no authored quest, so the first Talk starts the hunt without a referral step. The admin starts the event with a broadcast that names the host and the three stops."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T281 host choice: Jacque 9500000497 is a drawable legacy_data NPC at Jacque's Cafe in Pixiewood Hills, the southern entrance street of Sanctuary (notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:15,51). At this tip he gives no quest: his row's quest_ids_given, quests_given and quests_accepted are empty, and no quest record names him giver_npc_id. He is the host and the final Talk target. This choice deliberately avoids the rejected Ricky Danger design (Call The Crew 3000059 and Back for More 3000060 name Ricky as giver, so an explicit first-offer binding would put the custom event ahead of an original chain); the NPC row's explicit quest_ids_given order is consulted before QuestEngine::quest_ids_for_giver, so original quests keep priority."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T247: the stop order (Pappy's farm, brawling ring, Highroad Junction, Jacque), the 8.0 m radius and the 50-coin / 25-Adventurer-XP reward are local event policy. Notes/Design/World Builder.md records the admin-hunt intent: the admin broadcasts hints and the quest is the objective."
         },
         {
           "kind": "reconstructed",
