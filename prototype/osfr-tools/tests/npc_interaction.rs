@@ -44,7 +44,15 @@ fn coin_shop(directory: &Path) -> CoinShop {
     let inventory = Inventory::load(directory, Some(state)).expect("test balance is valid");
     let catalogue = StoreCatalogue::load(&content_dir().join("stores.json"))
         .expect("store price catalogue loads");
-    CoinShop::new(directory, inventory, catalogue, usize::MAX, None).expect("coin shop loads")
+    CoinShop::new(
+        directory,
+        inventory,
+        catalogue,
+        usize::MAX,
+        None,
+        osfr_tools::station_cash::Wallet::default(),
+    )
+    .expect("coin shop loads")
 }
 
 fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {

@@ -1,6 +1,7 @@
 use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
     inventory::{Inventory, InventoryState},
+    station_cash,
 };
 use std::path::{Path, PathBuf};
 
@@ -25,7 +26,15 @@ fn inventory_with_coins(directory: &Path, coins: u32) -> Inventory {
 
 fn shop(directory: &Path, inventory: Inventory, capacity: usize) -> CoinShop {
     let catalogue = StoreCatalogue::load(&catalogue_path()).expect("store catalogue loads");
-    CoinShop::new(directory, inventory, catalogue, capacity, None).expect("shop state loads")
+    CoinShop::new(
+        directory,
+        inventory,
+        catalogue,
+        capacity,
+        None,
+        station_cash::Wallet::default(),
+    )
+    .expect("shop state loads")
 }
 
 fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
@@ -181,8 +190,33 @@ fn sell_then_buy_back_restores_item_and_coin_balance() {
     assert_eq!(count_definition(shop.inventory().state(), 8), 1);
 }
 
+/// One 66/3 order built exactly as the client serializer `00b3fc60`/`00b3af80` writes it.
+fn order_for(item_id: i32) -> Vec<u8> {
+    fn text(bytes: &mut Vec<u8>, value: &str) {
+        bytes.extend((value.len() as i32).to_le_bytes());
+        bytes.extend_from_slice(value.as_bytes());
+    }
+    let mut bytes = vec![66, 0, 3, 0];
+    text(&mut bytes, "");
+    text(&mut bytes, "");
+    bytes.extend(1u32.to_le_bytes());
+    text(&mut bytes, "en_US");
+    text(&mut bytes, "");
+    text(&mut bytes, "");
+    text(&mut bytes, "");
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend((item_id as u32).to_le_bytes());
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend(1u32.to_le_bytes());
+    text(&mut bytes, "0");
+    text(&mut bytes, "");
+    bytes
+}
+
 #[test]
 fn marketplace_purchase_is_disabled_and_does_not_change_inventory() {
+    // The historical name is retained. T230 enables Station Cash orders, but an item without a
+    // Station Cash row (item 8) is not purchasable: the order is refused and nothing changes.
     let directory = inventory_content();
     let mut shop = shop(
         &directory,
@@ -190,20 +224,22 @@ fn marketplace_purchase_is_disabled_and_does_not_change_inventory() {
         usize::MAX,
     );
     let before = shop.inventory().state().clone();
-    let request = [66u16.to_le_bytes(), 3u16.to_le_bytes()].concat();
+    let request = order_for(8);
 
     let result = shop
         .handle(&request)
-        .expect("disabled order request receives a reply");
+        .expect("unlisted order request receives a reply");
 
-    assert_eq!(result.result_code, coin_shop::MARKETPLACE_RESULT_DISABLED);
+    assert_eq!(result.result_code, station_cash::ORDER_FAILURE);
     assert!(!result.changed);
     assert_eq!(shop.inventory().state(), &before);
     let response = result.replies.first().expect("client receives failure");
     assert_eq!(u16::from_le_bytes(response[0..2].try_into().unwrap()), 66);
     assert_eq!(u16::from_le_bytes(response[2..4].try_into().unwrap()), 4);
-    assert_eq!(i32::from_le_bytes(response[4..8].try_into().unwrap()), 0);
-    assert!(String::from_utf8_lossy(response).contains("Not available in this restoration."));
+    assert_eq!(
+        u32::from_le_bytes(response[4..8].try_into().unwrap()),
+        station_cash::ORDER_FAILURE
+    );
 
     let fallback = shop.handle(&[66, 0, 43, 0]).unwrap();
     assert_eq!(fallback.result_code, coin_shop::MARKETPLACE_RESULT_DISABLED);

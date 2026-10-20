@@ -1,14 +1,18 @@
-//! W169: every ride in `mounts.json` can be bought from a vendor with coins, at a price inside
-//! the `ride_price_policy` bounds, and owning the bought item makes the mount service list the
-//! ride. Before W169 only 4 of 54 rides had a store row and none had vendor stock.
+//! T230: every ride is sourced from the Station Cash Marketplace, not a coin vendor.
+//!
+//! The two test names below are historical and deliberately retained for the protected-pass
+//! list: before T230 the rides were sold by Delvin and the Mysterious Merchant for coins. T230
+//! removed that stock and lists the rides for Station Cash instead. `Chrome Drake` and
+//! `Polar Bear` carry `earn_only` and must never be listed (slice 2 rewards).
 
 use osfr_tools::{
-    coin_shop::{self, CoinShop, StoreCatalogue},
+    coin_shop::{CoinShop, StoreCatalogue},
     inventory::Inventory,
     mounts::MountCatalog,
+    station_cash::{self, Wallet},
 };
 use serde_json::Value;
-use std::{collections::BTreeMap, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 fn content() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
@@ -28,98 +32,175 @@ fn json(name: &str) -> Value {
         .expect("content parses")
 }
 
+fn shop_with(wallet: Wallet, capacity: usize) -> CoinShop {
+    let directory = inventory_content();
+    let inventory = Inventory::load(&directory, None).expect("item content loads");
+    let catalogue = StoreCatalogue::load(&content().join("stores.json")).expect("stores load");
+    CoinShop::new(&directory, inventory, catalogue, capacity, None, wallet).expect("shop loads")
+}
+
+fn put_string(bytes: &mut Vec<u8>, value: &str) {
+    bytes.extend((value.len() as i32).to_le_bytes());
+    bytes.extend_from_slice(value.as_bytes());
+}
+
+/// The client order serializer `00b3fc60`/`00b3af80` (66/3), with one detail.
+fn order_packet(tracking: u32, bundle: u32, store: u32, quantity: u32) -> Vec<u8> {
+    let mut bytes = vec![66, 0, 3, 0];
+    put_string(&mut bytes, "");
+    put_string(&mut bytes, "");
+    bytes.extend(tracking.to_le_bytes());
+    put_string(&mut bytes, "en_US");
+    put_string(&mut bytes, "");
+    put_string(&mut bytes, "");
+    put_string(&mut bytes, "");
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend(bundle.to_le_bytes());
+    bytes.extend(store.to_le_bytes());
+    bytes.extend(quantity.to_le_bytes());
+    put_string(&mut bytes, "0");
+    put_string(&mut bytes, "");
+    bytes
+}
+
+fn store_row(stores: &Value, item_id: i32) -> Option<&Value> {
+    stores["items"]
+        .as_array()
+        .expect("store items are an array")
+        .iter()
+        .find(|row| row["item_id"].as_i64() == Some(i64::from(item_id)))
+}
+
 #[test]
 fn every_ride_is_sold_by_a_vendor_inside_the_price_bounds() {
     let stores = json("stores.json");
-    let policy = &stores["ride_price_policy"];
-    let (low, high) = (
-        policy["min_coins"].as_u64().expect("min_coins"),
-        policy["max_coins"].as_u64().expect("max_coins"),
-    );
-    assert!(0 < low && low < high && high <= i32::MAX as u64);
-    let prices: BTreeMap<i64, &Value> = stores["items"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|row| (row["item_id"].as_i64().unwrap(), row))
-        .collect();
+    let policy = &stores["station_cash"];
+    let scale = policy["sc_price_scale"].as_f64().expect("scale");
+    let low = policy["min_price_sc"].as_u64().expect("min_price_sc");
+    let high = policy["max_price_sc"].as_u64().expect("max_price_sc");
+    assert!(0 < low && low <= high && scale > 0.0);
+
     let vendors = json("vendors.json");
-    let stock: Vec<(u64, Vec<i64>)> = vendors["vendors"]
+    let stocked: Vec<i64> = vendors["vendors"]
         .as_array()
-        .unwrap()
+        .expect("vendors are an array")
         .iter()
-        .map(|vendor| {
-            (
-                vendor["npc_id"].as_u64().unwrap(),
-                vendor["item_ids"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .map(|id| id.as_i64().unwrap())
-                    .collect(),
-            )
+        .flat_map(|vendor| {
+            vendor["item_ids"]
+                .as_array()
+                .expect("stock is an array")
+                .clone()
         })
+        .filter_map(|id| id.as_i64())
         .collect();
+    for row in stores["items"].as_array().expect("store items") {
+        if row["sc_price"].as_u64().is_some() {
+            let id = row["item_id"].as_i64().expect("item id");
+            assert!(
+                !stocked.contains(&id),
+                "ride item {id} is still coin vendor stock"
+            );
+            assert!(
+                row["purchase_price_coins"].is_null(),
+                "ride item {id} still has a coin price"
+            );
+            assert!(row["sell_price_coins"].is_null());
+            assert_eq!(row["no_sale"], true);
+        }
+    }
 
     let catalog = MountCatalog::load(content().join("mounts.json")).expect("mounts load");
     let inventory = Inventory::load(&inventory_content(), None).expect("item content loads");
-    let mut unsold = Vec::new();
+    let catalogue = StoreCatalogue::load(&content().join("stores.json")).expect("stores load");
+    let shop = CoinShop::new(
+        &inventory_content(),
+        inventory,
+        catalogue,
+        usize::MAX,
+        None,
+        Wallet::default(),
+    )
+    .expect("shop loads");
+    let sc = shop.sc_catalogue();
+    let mut rides = 0usize;
     for ride in catalog.mounts() {
-        let sold = ride.item_definition_id_candidates.iter().any(|&item| {
-            let item = i64::from(item);
-            let on_sale = stock.iter().any(|(_, ids)| ids.contains(&item));
-            let priced = prices.get(&item).is_some_and(|row| {
-                row["purchase_price_coins"]
-                    .as_u64()
-                    .is_some_and(|p| (low..=high).contains(&p))
-                    && row["member_price_coins"].as_u64() <= row["purchase_price_coins"].as_u64()
-            });
-            on_sale && priced && inventory.has_definition(item as i32)
-        });
-        if !sold {
-            unsold.push(format!("{} ({})", ride.name, ride.id));
+        rides += 1;
+        let row = ride
+            .item_definition_id_candidates
+            .iter()
+            .find_map(|&item| store_row(&stores, item).map(|row| (item, row)))
+            .unwrap_or_else(|| panic!("{} has no Station Cash store row", ride.name));
+        let (item, row) = row;
+        let sc_price = row["sc_price"]
+            .as_u64()
+            .unwrap_or_else(|| panic!("{} has no sc_price", ride.name));
+        let scaled = (sc_price as f64 * scale).round() as u64;
+        assert!(
+            (low..=high).contains(&scaled),
+            "{} scaled price {scaled} is outside {low}..={high}",
+            ride.name
+        );
+        if row["earn_only"].as_bool() == Some(true) {
+            assert!(
+                sc.listing(item as u32).is_none(),
+                "{} is earn-only but listed",
+                ride.name
+            );
+            assert!(
+                sc.earn_only()
+                    .iter()
+                    .any(|listing| listing.item_id == item as i32),
+                "{} is not in the earn-only catalogue",
+                ride.name
+            );
+        } else {
+            let listing = sc
+                .listing(item as u32)
+                .unwrap_or_else(|| panic!("{} is not listed", ride.name));
+            assert_eq!(listing.price as u64, scaled, "{} price", ride.name);
         }
     }
-    assert!(unsold.is_empty(), "rides nobody sells: {unsold:?}");
+    assert_eq!(rides, 54, "the ride catalogue changed");
+    assert_eq!(shop.sc_catalogue().earn_only().len(), 2);
 }
 
 #[test]
 fn buying_each_ride_with_coins_grants_it() {
-    let directory = inventory_content();
+    // The historical name is retained; T230 pays with Station Cash and the old coin stock is
+    // gone. Every listed ride must be granted once for exactly the listed price.
     let catalog = MountCatalog::load(content().join("mounts.json")).expect("mounts load");
-    let vendors = json("vendors.json");
-    let sold: Vec<i64> = vendors["vendors"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .flat_map(|vendor| vendor["item_ids"].as_array().unwrap().clone())
-        .map(|id| id.as_i64().unwrap())
-        .collect();
-    for ride in catalog.mounts() {
-        let item = ride
-            .item_definition_id_candidates
-            .iter()
-            .copied()
-            .find(|&item| sold.contains(&i64::from(item)))
-            .unwrap_or_else(|| panic!("{} has no vendor stock", ride.name));
-        let loaded = Inventory::load(&directory, None).expect("item content loads");
-        let mut state = loaded.state().clone();
-        state.coins = 1_000_000;
-        let inventory = Inventory::load(&directory, Some(state)).expect("coins are valid");
-        let store = StoreCatalogue::load(&content().join("stores.json")).expect("stores load");
-        let mut shop = CoinShop::new(&directory, inventory, store, usize::MAX, None).expect("shop");
-        let bought = shop.buy_vendor(1, item, 1).expect("buy runs");
+    let mut wallet = Wallet::default();
+    wallet.balance = 1_000_000;
+    let mut shop = shop_with(wallet, usize::MAX);
+    let store = shop.sc_catalogue().config().store_id;
+    let listings: Vec<_> = shop.sc_catalogue().listings().to_vec();
+    assert!(!listings.is_empty());
+    let mut expected = 1_000_000u32;
+    for (index, listing) in listings.iter().enumerate() {
+        let ride = catalog
+            .mounts()
+            .find(|ride| {
+                ride.item_definition_id_candidates
+                    .contains(&listing.item_id)
+            })
+            .unwrap_or_else(|| panic!("item {} belongs to no ride", listing.item_id));
+        let packet = order_packet(index as u32 + 1, listing.bundle_id, store, 1);
+        let outcome = shop.handle(&packet).expect("order parses");
         assert_eq!(
-            bought.result_code,
-            coin_shop::RESULT_SUCCESS,
+            outcome.result_code,
+            station_cash::ORDER_SUCCESS,
             "{}",
             ride.name
         );
+        assert!(outcome.changed);
+        expected -= listing.price;
+        assert_eq!(shop.sc_wallet().balance, expected, "{}", ride.name);
         let owned = catalog.owned_mounts(shop.inventory().state());
         assert!(
-            owned.iter().any(|mount| mount.id == ride.id),
-            "{} is not owned after buying item {item}",
+            owned.iter().any(|owned| owned.id == ride.id),
+            "{} is not owned after its order",
             ride.name
         );
     }
+    assert!(listings.iter().all(|listing| listing.price > 0));
 }

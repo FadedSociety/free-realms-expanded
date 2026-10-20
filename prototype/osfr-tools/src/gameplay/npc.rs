@@ -815,7 +815,7 @@ impl Gameplay {
         }
 
         // Marketplace siblings (W172): wallet, status, SKU and code lists, account info, and the
-        // refused order rows. Stateless and payment-free; `handle_marketplace` replies or errors.
+        // Station Cash order rows. The shop answers; a paid order is one staged commit.
         if matches!(
             inner,
             [
@@ -826,12 +826,25 @@ impl Gameplay {
                 ..
             ]
         ) {
+            // T230: the shared busy table gates a Station Cash order exactly like an activity.
+            let busy = self.activity_busy();
             let Some(shop) = &mut self.npc_coin_shop else {
                 return Ok(None);
             };
+            // The shop was built with the login-time inventory; a reward earned since must not be
+            // lost by the order's staged grant (the coin buy path does the same). A preview or a
+            // wallet read never touches the inventory.
+            if inner.get(2..4) == Some(&[3, 0]) {
+                shop.sync_inventory(self.inventory.clone());
+            }
+            shop.set_busy(busy);
             let outcome = shop.handle_marketplace(inner)?;
+            if outcome.changed {
+                self.inventory = shop.inventory().clone();
+            }
             return Ok(Some(Outcome {
                 replies: outcome.replies,
+                changed: outcome.changed,
                 ..Outcome::default()
             }));
         }

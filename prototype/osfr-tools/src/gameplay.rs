@@ -131,6 +131,8 @@ pub struct GameplayState {
     /// in-flight definition trackers are session-only.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub progression_extras: Option<crate::progression_extras::ProgressionExtrasState>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sc_wallet: Option<crate::station_cash::Wallet>, // T230: save form; live value is in CoinShop.
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -245,6 +247,7 @@ pub struct Gameplay {
     /// W162: a field enemy is chasing this player (from the last `receive_field_damage`). This is
     /// the "combat start" signal for rides; set by the shared field tick and never saved.
     field_engaged: bool,
+    trading: bool, // T230: trade busy, derived per request; session-only, never saved.
     /// W177: the saved pet roster and session-only active actor. The roster stays in the
     /// canonical save's top-level `pets` payload; only the actor is reset on reconnect.
     pets: crate::pets::PetService,
@@ -610,6 +613,7 @@ impl Gameplay {
         let mut warp = piece_077::WarpRegistry::curated();
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
+        let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
@@ -971,20 +975,14 @@ impl Gameplay {
         } else {
             None
         };
-        let npc_coin_shop = if npc_interaction.is_some() {
-            let catalogue =
-                crate::coin_shop::StoreCatalogue::load(&npc_content.join("stores.json"))?;
-            // (R) Local bag capacity is 100 occupied stacks until an account capacity is wired.
-            Some(crate::coin_shop::CoinShop::new(
-                directory,
-                inventory.clone(),
-                catalogue,
-                100,
-                profiles.as_ref(),
-            )?)
-        } else {
-            None
-        };
+        let npc_coin_shop = crate::coin_shop::CoinShop::load(
+            directory,
+            &npc_content,
+            npc_interaction.is_some(),
+            inventory.clone(),
+            profiles.as_ref(),
+            saved_sc_wallet.clone(),
+        )?;
         // Harvesting111 is a separate opt-in candidate bound to Chef45 and the
         // recovered farming assets. A saved run without its content fails closed.
         let harvesting = if directory.join(harvesting::CONTENT_FILE).is_file() {
@@ -1149,6 +1147,7 @@ impl Gameplay {
             item_bar,
             mounts,
             field_engaged: false,
+            trading: false,
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             progression_extras,
             achievement_bindings,
@@ -1373,6 +1372,10 @@ impl Gameplay {
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
             item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
             progression_extras,
+            sc_wallet: self
+                .npc_coin_shop
+                .as_ref()
+                .and_then(crate::coin_shop::CoinShop::saved_wallet),
         }
     }
 

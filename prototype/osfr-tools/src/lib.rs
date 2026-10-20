@@ -91,6 +91,7 @@ pub mod startup_messages;
 pub mod startup_selfdata;
 pub mod startup_snapshot;
 pub mod startup_world;
+pub mod station_cash;
 pub mod studio;
 pub mod terrain;
 pub mod trace;

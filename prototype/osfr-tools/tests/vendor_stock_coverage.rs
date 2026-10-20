@@ -76,14 +76,18 @@ const ADDED_STOCK: &[(u64, i32)] = &[
     (9_500_000_972, 75_983),
 ];
 
-const BASELINE_GRANTABLE_STOCK_ROWS: usize = 1_081;
+/// T230 moved every ride row to the Station Cash Marketplace: 54 Seaside ride rows and 3
+/// Mysterious Merchant ride rows stopped being grantable coin stock. This tip measures 1,049
+/// after the move (1,103 before), so the fixed baseline stays 23 rows below the measured floor.
+const BASELINE_GRANTABLE_STOCK_ROWS: usize = 1_026;
 /// The brief's row floor. T108 added 22 rows; this only guards the row-level
 /// content, not the completion target (see the selected-hub test below).
 const REQUIRED_ADDITIONAL_ROWS: usize = 20;
 /// Reproduced from the pre-T108 vendor records: 96 of the 98 records were
-/// fully grantable. A later content change may raise this floor but must not
-/// lower it.
-const REPRODUCED_FULLY_GRANTABLE_VENDORS: usize = 96;
+/// fully grantable. T230 deliberately emptied Delvin and the Mysterious
+/// Merchant, both of which were fully grantable, so the reproduced floor drops
+/// to 94; a later content change may raise it but must not lower it.
+const REPRODUCED_FULLY_GRANTABLE_VENDORS: usize = 94;
 /// Every vendor-role record in the six selected-hub NPC files, split by the
 /// evidence available for its stock. The test asserts each count, so adding,
 /// removing or emptying a vendor needs a deliberate content change.

@@ -1,4 +1,4 @@
-//! Coin Shop purchases and a payment-free Marketplace handshake.
+//! Coin Shop purchases and the Station Cash Marketplace handshake.
 //!
 //! Client packet readers establish the family/opcode headers and transaction result fields.
 //! Numeric result-code meanings, buy idempotency's caller field, resale pricing, buy-back window,
@@ -15,9 +15,11 @@
 //! from client history; quantity zero clears the remainder. The Marketplace list replies 66/17,
 //! 19, 21 and 23 all start `u32 status` and, on status 1, carry a counted list (readers
 //! `00b416c0`, `00b41800`, `00b41760`, `00b41620`); 17, 21 and 23 put a text between the status
-//! and the list. Station Cash, wallet funding and membership stay refused or empty (R).
+//! and the list. T230 adds the per-character Station Cash wallet and ride orders; wallet funding,
+//! membership and real-money orders stay refused (R).
 
 use crate::inventory::Inventory;
+use crate::station_cash::{self, Wallet};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet, VecDeque},
@@ -73,6 +75,9 @@ pub struct StoreCatalogue {
     schema_version: u32,
     #[serde(default = "default_buy_back_window")]
     buy_back_window: usize,
+    /// T230 Station Cash policy. A missing block keeps the Marketplace payment-free.
+    #[serde(default)]
+    station_cash: station_cash::Config,
     marketplace: MarketplaceConfig,
     items: Vec<StoreItem>,
 }
@@ -97,6 +102,13 @@ struct StoreItem {
     member_price_coins: Option<u32>,
     sell_price_coins: Option<u32>,
     no_sale: bool,
+    /// T230: original Station Cash price (unscaled). Marketplace-only rows cannot also be
+    /// bought or sold for coins, so the two currencies never meet in one row.
+    #[serde(default)]
+    sc_price: Option<u32>,
+    /// T230: never listed in the Marketplace (slice 2 reward rides such as the Chrome Drake).
+    #[serde(default)]
+    earn_only: bool,
 }
 
 impl StoreCatalogue {
@@ -113,6 +125,7 @@ impl StoreCatalogue {
         }
         let catalogue: Self = serde_json::from_slice(&bytes)
             .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+        catalogue.station_cash.validate()?;
         if catalogue.schema_version != 1
             || catalogue.items.len() > 100_000
             || !(1..=MAX_BUY_BACK_WINDOW).contains(&catalogue.buy_back_window)
@@ -140,6 +153,14 @@ impl StoreCatalogue {
                     .member_discount_percent
                     .is_some_and(|discount| discount > 100)
                 || (item.no_sale && item.sell_price_coins.is_some())
+                || item
+                    .sc_price
+                    .is_some_and(|price| price == 0 || price > station_cash::MAX_PRICE_SC)
+                || (item.earn_only && item.sc_price.is_none())
+                || (item.sc_price.is_some()
+                    && (item.purchase_price_coins.is_some()
+                        || item.sell_price_coins.is_some()
+                        || !item.no_sale))
             {
                 return Err(invalid("invalid store item entry"));
             }
@@ -201,6 +222,12 @@ pub struct CoinShop {
     catalogue: Arc<StoreCatalogue>,
     bag_capacity: usize,
     is_member: bool,
+    /// T230: the per-character Station Cash wallet. `GameplayState::sc_wallet` is its save form.
+    sc_wallet: Wallet,
+    /// T230: the validated ride catalogue, shared with every staged clone.
+    sc_catalogue: Arc<station_cash::Catalogue>,
+    /// The shared busy table's answer for this request; never saved.
+    busy: bool,
     client_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
@@ -214,6 +241,7 @@ impl CoinShop {
         mut catalogue: StoreCatalogue,
         bag_capacity: usize,
         profiles: Option<&crate::profiles::Profiles>,
+        wallet: Wallet,
     ) -> io::Result<Self> {
         // F228: a starter outfit item is granted free whenever its job is learned or reselected,
         // so the store pays 0 for it however the player got a copy. Reuse the session's loaded
@@ -222,6 +250,15 @@ impl CoinShop {
         if let Some(profiles) = profiles {
             catalogue.zero_starter_sell_prices(&profiles.all_starter_items());
         }
+        let sc_catalogue = station_cash::Catalogue::build(
+            catalogue.station_cash.clone(),
+            &inventory,
+            catalogue.items.iter().filter_map(|item| {
+                item.sc_price
+                    .map(|price| (item.item_id, price, item.earn_only))
+            }),
+        )?;
+        let sc_wallet = Wallet::restore(Some(wallet), sc_catalogue.config());
         Ok(Self {
             inventory_content: inventory_content.to_path_buf(),
             inventory,
@@ -229,11 +266,42 @@ impl CoinShop {
             bag_capacity,
             // (R) The caller must set the verified account flag after construction.
             is_member: false,
+            sc_wallet,
+            sc_catalogue: Arc::new(sc_catalogue),
+            busy: false,
             client_transactions: BTreeMap::new(),
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
         })
+    }
+
+    /// Build the session's shop when the NPC package provides one. A saved Station Cash wallet
+    /// with no Marketplace to spend it in is refused, or the next save would drop it.
+    pub fn load(
+        inventory_content: &Path,
+        npc_content: &Path,
+        shop_enabled: bool,
+        inventory: Inventory,
+        profiles: Option<&crate::profiles::Profiles>,
+        wallet: Option<Wallet>,
+    ) -> io::Result<Option<Self>> {
+        let shop = if shop_enabled {
+            let catalogue = StoreCatalogue::load(&npc_content.join("stores.json"))?;
+            // (R) Local bag capacity is 100 occupied stacks until an account capacity is wired.
+            Some(Self::new(
+                inventory_content,
+                inventory,
+                catalogue,
+                100,
+                profiles,
+                wallet.clone().unwrap_or_default(),
+            )?)
+        } else {
+            None
+        };
+        station_cash::require_wallet_owner(&wallet, shop.is_some())?;
+        Ok(shop)
     }
 
     pub fn inventory(&self) -> &Inventory {
@@ -248,6 +316,26 @@ impl CoinShop {
 
     pub fn set_member_status(&mut self, is_member: bool) {
         self.is_member = is_member;
+    }
+
+    /// T230: read the live Station Cash wallet (the save field is `GameplayState::sc_wallet`).
+    pub fn sc_wallet(&self) -> &Wallet {
+        &self.sc_wallet
+    }
+
+    /// The wallet as it belongs in the save; `None` when a fresh character has no Station Cash.
+    pub fn saved_wallet(&self) -> Option<Wallet> {
+        (!self.sc_wallet.is_empty()).then(|| self.sc_wallet.clone())
+    }
+
+    pub fn sc_catalogue(&self) -> &station_cash::Catalogue {
+        &self.sc_catalogue
+    }
+
+    /// The shared busy table decides whether an order may start. Set per request by the hub;
+    /// a busy refusal changes nothing and is not persisted.
+    pub fn set_busy(&mut self, busy: bool) {
+        self.busy = busy;
     }
 
     /// Apply one 66/43 vendor buy using the store catalogue's server-side price.
@@ -964,7 +1052,8 @@ impl CoinShop {
         ]
     }
 
-    /// Answer gateway Marketplace requests without enabling any paid order (R).
+    /// Answer gateway Marketplace requests. A Station Cash order debits the wallet and grants
+    /// the ride in one staged commit; wallet funding, membership and paid orders stay off (R).
     pub fn handle_marketplace(&mut self, inner: &[u8]) -> io::Result<CoinShopOutcome> {
         if inner.len() < 4 || inner.len() > MAX_PACKET_BYTES {
             return Err(invalid("invalid Marketplace packet length"));
@@ -976,42 +1065,77 @@ impl CoinShop {
         if !marketplace_request_is_well_formed(opcode, inner) {
             return Err(invalid("malformed Marketplace request"));
         }
-        let (result_code, response) = match opcode {
-            1 => (MARKETPLACE_RESULT_DISABLED, preview_disabled_packet()),
-            3 => (
-                MARKETPLACE_RESULT_DISABLED,
-                order_disabled_packet(&self.catalogue.marketplace.not_available_message),
-            ),
-            10 => (1, wallet_packet()),
-            12 => (
-                1,
-                marketplace_bool_packet(13, self.catalogue.marketplace.enabled_on_handshake),
-            ),
-            14 => (1, empty_product_list(15)),
+        let mut changed = false;
+        let mut transaction_id = 0;
+        let (result_code, replies) = match opcode {
+            1 => {
+                if !self.sc_catalogue.config().enabled {
+                    (MARKETPLACE_RESULT_DISABLED, vec![preview_disabled_packet()])
+                } else {
+                    let order = station_cash::decode_order(inner, true)?;
+                    transaction_id = order.tracking_id;
+                    let outcome =
+                        station_cash::preview(&self.sc_catalogue, &self.sc_wallet, &order);
+                    (outcome.result_code, outcome.replies)
+                }
+            }
+            3 => {
+                if !self.sc_catalogue.config().enabled {
+                    (
+                        MARKETPLACE_RESULT_DISABLED,
+                        vec![order_disabled_packet(
+                            &self.catalogue.marketplace.not_available_message,
+                        )],
+                    )
+                } else {
+                    let order = station_cash::decode_order(inner, false)?;
+                    transaction_id = order.tracking_id;
+                    let outcome = station_cash::place_order(
+                        &self.sc_catalogue,
+                        &mut self.sc_wallet,
+                        &mut self.inventory,
+                        &order,
+                        self.bag_capacity,
+                        self.busy,
+                    );
+                    changed = outcome.changed;
+                    (outcome.result_code, outcome.replies)
+                }
+            }
+            10 => (1, vec![station_cash::wallet_packet(self.sc_wallet.balance)]),
+            12 => {
+                // The store screen asks for the server status when it opens. Answering with the
+                // catalogue here keeps the saved world entry untouched (R).
+                let enabled = self.catalogue.marketplace.enabled_on_handshake;
+                let mut replies = vec![station_cash::bool_packet(13, enabled)];
+                if enabled && self.sc_catalogue.config().enabled {
+                    replies.extend(station_cash::catalogue_packets(&self.sc_catalogue));
+                }
+                (1, replies)
+            }
+            14 => (1, vec![empty_product_list(15)]),
             // Status 1 with an empty list is the client's own "no data was available" path
-            // (`00b460c0`, `00b46a50`, `00b46200`, `00b45ba0`). A header-only reply read as an
-            // overrun and logged a serialize failure instead.
-            16 => (1, empty_list_with_text(17)),
-            18 => (1, empty_product_list(19)),
-            20 => (1, empty_list_with_text(21)),
-            22 => (1, empty_list_with_text(23)),
-            25 => (1, account_info_packet()),
-            // Bundle content (27) and item requirements (38): the Station Cash catalogue is empty
-            // (R), so the client has no bundle to ask about; the layouts of both requests are
-            // unrecovered. Refused with no reply and no state change.
+            // (`00b460c0`, `00b46a50`, `00b46200`, `00b45ba0`).
+            16 => (1, vec![empty_list_with_text(17)]),
+            18 => (1, vec![empty_product_list(19)]),
+            20 => (1, vec![empty_list_with_text(21)]),
+            22 => (1, vec![empty_list_with_text(23)]),
+            25 => (1, vec![account_info_packet()]),
+            // Bundle content (27) and item requirements (38): the store carries one-bundle
+            // definitions, so neither request has a row to ask about; refused with no reply.
             27 | 38 => return Ok(CoinShopOutcome::default()),
             // NpcMerchantV2 buy reply: every result other than 1 is a client-visible refusal.
             43 => (
                 MARKETPLACE_RESULT_DISABLED,
-                merchant_buy_result_packet(false),
+                vec![merchant_buy_result_packet(false)],
             ),
             _ => return Ok(CoinShopOutcome::default()),
         };
         Ok(CoinShopOutcome {
             result_code,
-            replies: vec![response],
-            changed: false,
-            ..CoinShopOutcome::default()
+            transaction_id,
+            replies,
+            changed,
         })
     }
 }
@@ -1110,19 +1234,6 @@ fn account_info_packet() -> Vec<u8> {
     bytes
 }
 
-fn wallet_packet() -> Vec<u8> {
-    // Wallet balance is zero and no payment action is available (R); match the client's fixed reader.
-    let mut bytes = header(MARKETPLACE_FAMILY, 11);
-    put_u32(&mut bytes, 1);
-    bytes.push(0);
-    put_u32(&mut bytes, 0);
-    put_u32(&mut bytes, 0);
-    put_text(&mut bytes, "");
-    put_text(&mut bytes, "");
-    bytes.push(0);
-    bytes
-}
-
 /// Status 1 and an empty counted list: Station Cash SKUs (15, `00b415c0`) and state codes (19,
 /// `00b41800`).
 fn empty_product_list(opcode: u16) -> Vec<u8> {
@@ -1147,6 +1258,9 @@ fn empty_list_with_text(opcode: u16) -> Vec<u8> {
 /// are only length-bounded (R).
 fn marketplace_request_is_well_formed(opcode: u16, inner: &[u8]) -> bool {
     match (opcode, inner.get(4..8)) {
+        // The order body is parsed strictly by `station_cash::decode_order`; 4 KiB bounds the
+        // six small strings, one detail and the preview's extra string before allocation.
+        (1 | 3, _) => inner.len() <= station_cash::MAX_ORDER_PACKET,
         (10 | 18, _) => inner.len() == 4,
         (16 | 20 | 25, Some(length)) => {
             let length = i32::from_le_bytes(length.try_into().unwrap());
@@ -1155,12 +1269,6 @@ fn marketplace_request_is_well_formed(opcode: u16, inner: &[u8]) -> bool {
         (16 | 20 | 25, None) => false,
         _ => inner.len() <= MAX_MARKETPLACE_REQUEST,
     }
-}
-
-fn marketplace_bool_packet(opcode: u16, enabled: bool) -> Vec<u8> {
-    let mut bytes = header(MARKETPLACE_FAMILY, opcode);
-    bytes.push(u8::from(enabled));
-    bytes
 }
 
 fn preview_disabled_packet() -> Vec<u8> {

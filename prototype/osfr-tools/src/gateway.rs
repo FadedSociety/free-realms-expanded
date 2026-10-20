@@ -29,6 +29,8 @@ use std::io::{self, Read};
 use std::path::{Component, Path};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+mod trade_bridge;
+
 const MAX_MESSAGE: usize = 1_048_576;
 const MAX_REFERENCE: usize = 16_777_216;
 const MAX_BUNDLE_CHILDREN: usize = 128;
@@ -1027,32 +1029,6 @@ impl Gateway {
     /// See `Gameplay::public_look` (W143 Inspect).
     pub fn public_look(&self) -> Option<crate::player_radial::PublicLook> {
         self.gameplay.as_ref()?.public_look()
-    }
-
-    /// See `Gameplay::in_encounter` (W163 player trade).
-    pub fn in_encounter(&self) -> bool {
-        self.gameplay.as_ref().is_some_and(Gameplay::in_encounter)
-    }
-
-    /// See `Gameplay::trade_inventory` (W163 player trade).
-    /// See `Gameplay::inventory_state` (trade commit).
-    pub fn inventory_state(&self) -> Option<&crate::inventory::InventoryState> {
-        self.gameplay.as_ref().map(Gameplay::inventory_state)
-    }
-
-    /// See `Gameplay::adopt_trade_inventory` (trade commit).
-    pub fn adopt_trade_inventory(
-        &mut self,
-        after: crate::inventory::InventoryState,
-    ) -> io::Result<Vec<Vec<u8>>> {
-        self.gameplay
-            .as_mut()
-            .ok_or_else(|| invalid("no gameplay to trade with"))?
-            .adopt_trade_inventory(after)
-    }
-
-    pub fn trade_inventory(&self) -> Option<crate::trade::TradeInventory> {
-        self.gameplay.as_ref()?.trade_inventory()
     }
 
     pub fn player_presentation(&self, member: bool) -> io::Result<PlayerPresentation> {

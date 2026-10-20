@@ -18,6 +18,7 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
     inventory::{Inventory, InventoryItem, InventoryState},
     npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
+    station_cash::{self, Wallet},
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -196,7 +197,15 @@ impl Counter {
         tweak(&mut state);
         let inventory = Inventory::load(&directory, Some(state)).expect("test state is valid");
         let catalogue = StoreCatalogue::load(&content_dir().join("stores.json")).unwrap();
-        let shop = CoinShop::new(&directory, inventory, catalogue, usize::MAX, None).unwrap();
+        let shop = CoinShop::new(
+            &directory,
+            inventory,
+            catalogue,
+            usize::MAX,
+            None,
+            Wallet::default(),
+        )
+        .unwrap();
         let data = content_dir();
         let mut service =
             NpcInteraction::load(&data.join("npcs"), &data.join("stores.json")).unwrap();
@@ -304,6 +313,10 @@ fn npc_request(sub: u16, choice: Option<u32>) -> Vec<u8> {
 
 fn write_json(path: &Path, value: &Value) {
     fs::write(path, serde_json::to_vec(value).unwrap()).unwrap();
+}
+
+fn read_json(path: &Path) -> Value {
+    serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
 }
 
 struct Fixture {
@@ -430,6 +443,55 @@ impl Fixture {
             reference,
             equipped,
         }
+    }
+
+    /// T230: enable the Station Cash Marketplace with one listed ride (item 14289, defined by the
+    /// round59 fixture) at 100 SC and one earn-only row (item 19522). The normal fixture keeps the
+    /// feature off, so the older "orders disabled" tests still exercise that path.
+    fn with_sc(self) -> Self {
+        let path = self.content.join("stores.json");
+        let mut stores = read_json(&path);
+        stores["marketplace"]["enabled_on_handshake"] = json!(true);
+        stores["station_cash"] = json!({
+            "enabled": true,
+            "store_id": 1,
+            "store_name_id": 0,
+            "store_description_id": 0,
+            "category_id": 1,
+            "category_name_id": 0,
+            "category_group_id": 1,
+            "sc_price_scale": 1.0,
+            "min_price_sc": 1,
+            "max_price_sc": 100_000,
+            "max_balance": 1_000,
+            "order_history": 8,
+            "currency_type": 0
+        });
+        for row in [
+            json!({
+                "item_id": 14289,
+                "purchase_price_coins": null,
+                "member_discount_percent": null,
+                "member_price_coins": null,
+                "sell_price_coins": null,
+                "no_sale": true,
+                "sc_price": 100
+            }),
+            json!({
+                "item_id": 19522,
+                "purchase_price_coins": null,
+                "member_discount_percent": null,
+                "member_price_coins": null,
+                "sell_price_coins": null,
+                "no_sale": true,
+                "sc_price": 50,
+                "earn_only": true
+            }),
+        ] {
+            stores["items"].as_array_mut().unwrap().push(row);
+        }
+        write_json(&path, &stores);
+        self
     }
 
     fn state(&self) -> GameplayState {
@@ -582,6 +644,57 @@ fn gift_packet() -> Vec<u8> {
 
 fn marketplace(sub: u16) -> Vec<u8> {
     [66u16.to_le_bytes(), sub.to_le_bytes()].concat()
+}
+
+const SC_RIDE_ITEM: i32 = 14_289;
+const SC_EARN_ONLY_ITEM: i32 = 19_522;
+const SC_RIDE_PRICE: u32 = 100;
+
+fn sc_put_string(bytes: &mut Vec<u8>, value: &str) {
+    bytes.extend((value.len() as i32).to_le_bytes());
+    bytes.extend_from_slice(value.as_bytes());
+}
+
+/// The client order serializer `00b3fc60`/`00b3af80` (66/3), with one detail.
+fn sc_order(tracking: u32, bundle: u32, quantity: u32) -> Vec<u8> {
+    let mut bytes = vec![66, 0, 3, 0];
+    sc_put_string(&mut bytes, "");
+    sc_put_string(&mut bytes, "");
+    bytes.extend(tracking.to_le_bytes());
+    sc_put_string(&mut bytes, "en_US");
+    sc_put_string(&mut bytes, "");
+    sc_put_string(&mut bytes, "");
+    sc_put_string(&mut bytes, "");
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend(bundle.to_le_bytes());
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend(quantity.to_le_bytes());
+    sc_put_string(&mut bytes, "0");
+    sc_put_string(&mut bytes, "");
+    bytes
+}
+
+fn sc_preview(tracking: u32, bundle: u32, quantity: u32) -> Vec<u8> {
+    let mut bytes = sc_order(tracking, bundle, quantity);
+    bytes[2] = 1;
+    sc_put_string(&mut bytes, "");
+    bytes
+}
+
+fn order_result(packets: &[Vec<u8>]) -> u32 {
+    packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 4, 0]))
+        .map(|packet| u32::from_le_bytes(packet[4..8].try_into().unwrap()))
+        .expect("order response exists")
+}
+
+fn wallet_balance(packets: &[Vec<u8>]) -> u32 {
+    packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 11, 0]))
+        .map(|packet| u32::from_le_bytes(packet[9..13].try_into().unwrap()))
+        .expect("wallet response exists")
 }
 
 fn locale_request(sub: u16, locale: &str) -> Vec<u8> {
@@ -866,7 +979,15 @@ fn buy_back_window_is_bounded_store_data() {
     });
     state.next_instance_id = Some(900_100);
     let inventory = Inventory::load(&inventory_path, Some(state)).unwrap();
-    let mut shop = CoinShop::new(&inventory_path, inventory, catalogue, usize::MAX, None).unwrap();
+    let mut shop = CoinShop::new(
+        &inventory_path,
+        inventory,
+        catalogue,
+        usize::MAX,
+        None,
+        Wallet::default(),
+    )
+    .unwrap();
     let ids: Vec<u32> = (0..4)
         .map(|_| shop.sell(900_030, 1).unwrap().transaction_id)
         .collect();
@@ -1102,7 +1223,15 @@ fn marketplace_replies_match_the_recovered_client_readers_byte_for_byte() {
         let outcome = counter.shop.handle(&request).unwrap();
         assert!(!outcome.changed, "{label}");
         assert_eq!(outcome.result_code, 1, "{label}");
-        assert_eq!(outcome.replies, vec![expected], "{label}");
+        assert_eq!(
+            outcome.replies.first(),
+            Some(&expected),
+            "{label}: first reply"
+        );
+        if label != "status 66/12" {
+            // The store-status answer also pushes the T230 catalogue after 66/13.
+            assert_eq!(outcome.replies, vec![expected], "{label}");
+        }
     }
     assert_eq!(counter.state(), before);
 }
@@ -1111,17 +1240,29 @@ fn marketplace_replies_match_the_recovered_client_readers_byte_for_byte() {
 fn marketplace_payment_like_rows_stay_refused_or_free() {
     let mut counter = Counter::new(100, |_| {});
     let before = counter.state();
-    // Order preview and place-order: never enabled, with the configured message (R).
-    let preview = counter.shop.handle(&marketplace(1)).unwrap();
-    assert_eq!(preview.result_code, coin_shop::MARKETPLACE_RESULT_DISABLED);
+    // T230: the shipped content enables Station Cash orders, but item 8 has no Station Cash row,
+    // so both preview and place-order are refused without touching state. The bare rows are
+    // malformed now that an order body is parsed.
+    assert!(counter.shop.handle(&marketplace(1)).is_err());
+    assert!(counter.shop.handle(&marketplace(3)).is_err());
+    let preview = counter
+        .shop
+        .handle(&sc_preview(21, 8, 1))
+        .expect("unlisted preview parses");
+    assert_eq!(preview.result_code, station_cash::ORDER_FAILURE);
+    assert_eq!(preview.replies[0][..4], [66, 0, 2, 0]);
+    assert!(!preview.changed);
+    let order = counter
+        .shop
+        .handle(&sc_order(22, 8, 1))
+        .expect("unlisted order parses");
+    assert_eq!(order.result_code, station_cash::ORDER_FAILURE);
+    assert_eq!(order.replies[0][..4], [66, 0, 4, 0]);
     assert_eq!(
-        preview.replies,
-        vec![[vec![66, 0, 2, 0], vec![0; 16]].concat()]
+        u32::from_le_bytes(order.replies[0][4..8].try_into().unwrap()),
+        station_cash::ORDER_FAILURE
     );
-    let order = counter.shop.handle(&marketplace(3)).unwrap();
-    assert_eq!(order.result_code, coin_shop::MARKETPLACE_RESULT_DISABLED);
-    assert!(order.replies[0].starts_with(&[66, 0, 4, 0, 0, 0, 0, 0]));
-    assert!(String::from_utf8_lossy(&order.replies[0]).contains("Not available"));
+    assert!(!order.changed);
     // The wallet is zero and both payment sources start off.
     let wallet = counter.shop.handle(&marketplace(10)).unwrap();
     assert_eq!(&wallet.replies[0][9..17], &[0; 8]);
@@ -1210,6 +1351,212 @@ fn the_login_time_marketplace_requests_each_get_one_reply_through_the_gateway() 
         assert_eq!(event.handler, "merchant", "{label}");
         assert_eq!(event.reason, None, "{label}");
     }
+}
+
+fn contains_u32(bytes: &[u8], value: u32) -> bool {
+    bytes
+        .windows(4)
+        .any(|window| u32::from_le_bytes(window.try_into().unwrap()) == value)
+}
+
+/// T230: the real gateway path shows the wallet, debits exactly the listed price and grants the
+/// ride once; a replay and an insufficient order leave the snapshot untouched.
+#[test]
+fn gateway_sc_wallet_and_ride_order_are_atomic_and_replay_once() {
+    let fixture = Fixture::new().with_sc();
+    let mut state = fixture.state();
+    state.sc_wallet = Some(Wallet {
+        balance: 150,
+        orders: Vec::new(),
+    });
+    let mut gateway = fixture.connect(state);
+    assert_eq!(wallet_balance(&send(&mut gateway, &marketplace(10))), 150);
+    let item_before = count_definition(&inventory_of(&gateway), SC_RIDE_ITEM);
+    let coins_before = inventory_of(&gateway).coins;
+
+    let outcome = gateway
+        .handle_at(&wrap(&sc_order(1, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    let packets = inner_packets(&outcome);
+    assert_eq!(order_result(&packets), station_cash::ORDER_SUCCESS);
+    assert_eq!(wallet_balance(&packets), 150 - SC_RIDE_PRICE);
+    assert!(outcome.state_changed);
+    let after = inventory_of(&gateway);
+    assert_eq!(count_definition(&after, SC_RIDE_ITEM), item_before + 1);
+    assert_eq!(after.coins, coins_before, "an SC order creates no coins");
+    assert_eq!(
+        gateway
+            .snapshot()
+            .gameplay
+            .expect("gameplay")
+            .sc_wallet
+            .expect("wallet")
+            .balance,
+        150 - SC_RIDE_PRICE
+    );
+
+    let once = gateway.snapshot();
+    let replay = gateway
+        .handle_at(&wrap(&sc_order(1, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&replay)),
+        station_cash::ORDER_SUCCESS
+    );
+    assert!(!replay.state_changed);
+    assert_eq!(gateway.snapshot(), once);
+
+    let short = gateway
+        .handle_at(&wrap(&sc_order(2, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&short)),
+        station_cash::ORDER_INSUFFICIENT_SC
+    );
+    assert!(!short.state_changed);
+    assert_eq!(gateway.snapshot(), once);
+}
+
+/// T230: the shared busy table refuses the order while the trade service owns the character.
+#[test]
+fn gateway_sc_order_during_a_trade_is_refused_by_the_busy_table() {
+    let fixture = Fixture::new().with_sc();
+    let mut state = fixture.state();
+    state.sc_wallet = Some(Wallet {
+        balance: 150,
+        orders: Vec::new(),
+    });
+    let mut gateway = fixture.connect(state);
+    gateway.set_trading(true);
+    let before = gateway.snapshot();
+    let refused = gateway
+        .handle_at(&wrap(&sc_order(3, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&refused)),
+        station_cash::ORDER_FAILURE
+    );
+    assert!(!refused.state_changed);
+    assert_eq!(gateway.snapshot(), before);
+
+    gateway.set_trading(false);
+    let allowed = gateway
+        .handle_at(&wrap(&sc_order(4, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&allowed)),
+        station_cash::ORDER_SUCCESS
+    );
+}
+
+/// T230: opening the store (66/12) pushes the catalogue; the listed ride carries the scaled
+/// price and the earn-only row is absent.
+#[test]
+fn gateway_sc_catalogue_lists_the_ride_and_skips_earn_only() {
+    let fixture = Fixture::new().with_sc();
+    let mut gateway = fixture.connect(fixture.state());
+    let packets = send(&mut gateway, &marketplace(12));
+    assert_eq!(&packets[0][..4], &[66, 0, 13, 0]);
+    assert_eq!(packets[0][4], 1, "marketplace enabled");
+    for opcode in [6u8, 7, 9, 24, 33] {
+        assert!(
+            packets
+                .iter()
+                .any(|packet| packet.starts_with(&[66, 0, opcode, 0])),
+            "missing catalogue push 66/{opcode}"
+        );
+    }
+    let store = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 5, 0]))
+        .expect("store bundle packet");
+    assert!(contains_u32(store, SC_RIDE_ITEM as u32));
+    assert!(contains_u32(store, SC_RIDE_PRICE));
+    assert!(!contains_u32(store, SC_EARN_ONLY_ITEM as u32));
+}
+
+/// T230: the wallet and the granted ride survive a reconnect through the character snapshot,
+/// and the persisted replay window still refuses the old packet.
+#[test]
+fn gateway_sc_balance_and_ride_survive_reload() {
+    let fixture = Fixture::new().with_sc();
+    let mut state = fixture.state();
+    state.sc_wallet = Some(Wallet {
+        balance: 150,
+        orders: Vec::new(),
+    });
+    let mut gateway = fixture.connect(state);
+    let bought = gateway
+        .handle_at(&wrap(&sc_order(5, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&bought)),
+        station_cash::ORDER_SUCCESS
+    );
+    let bought_count = count_definition(&inventory_of(&gateway), SC_RIDE_ITEM);
+    let saved = gateway.snapshot().gameplay.expect("gameplay snapshot");
+    // The wallet is a save field: encode and decode the character state before reconnecting.
+    let encoded = serde_json::to_vec(&saved).expect("character state serializes");
+    let saved: GameplayState = serde_json::from_slice(&encoded).expect("character state parses");
+    assert_eq!(
+        saved.sc_wallet.as_ref().expect("wallet is saved").balance,
+        50
+    );
+    assert_eq!(saved.sc_wallet.as_ref().unwrap().orders.len(), 1);
+    let mut again = fixture.connect(saved);
+    assert_eq!(wallet_balance(&send(&mut again, &marketplace(10))), 50);
+    assert_eq!(
+        count_definition(&inventory_of(&again), SC_RIDE_ITEM),
+        bought_count
+    );
+    let replay = again
+        .handle_at(&wrap(&sc_order(5, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&replay)),
+        station_cash::ORDER_SUCCESS
+    );
+    assert!(!replay.state_changed);
+    assert_eq!(wallet_balance(&inner_packets(&replay)), 50);
+}
+
+/// T230: a full bag refuses the order before the wallet or inventory changes.
+#[test]
+fn gateway_sc_full_bag_is_refused_atomically() {
+    let fixture = Fixture::new().with_sc();
+    let mut state = fixture.state();
+    state.sc_wallet = Some(Wallet {
+        balance: 150,
+        orders: Vec::new(),
+    });
+    let mut next = 1_000_000i32;
+    while state.inventory.items.len() < 100 {
+        state.inventory.items.push(InventoryItem {
+            id: next,
+            definition_id: 8,
+            tint: 0,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        next += 1;
+    }
+    state.inventory.next_instance_id = Some(i64::from(next));
+    let mut gateway = fixture.connect(state);
+    let before = gateway.snapshot();
+    let refused = gateway
+        .handle_at(&wrap(&sc_order(6, SC_RIDE_ITEM as u32, 1)), NOW)
+        .unwrap();
+    assert_eq!(
+        order_result(&inner_packets(&refused)),
+        station_cash::ORDER_FAILURE
+    );
+    assert!(!refused.state_changed);
+    assert_eq!(gateway.snapshot(), before);
 }
 
 #[test]
