@@ -1,8 +1,8 @@
 //! Shared fixture and packet helpers for the NPC quest-chain tests.
 //!
 //! `archer_entry.rs` (used by `archer_entry_chain.rs` and
-//! `archer_entry_content.rs`), `medic_entry_chain.rs` / `medic_entry_content.rs`
-//! and `quest_job_xp.rs` include this file with
+//! `archer_entry_content.rs`), `medic_entry_chain.rs` / `medic_entry_content.rs`,
+//! `quest_job_xp.rs` and `scavenger_hunt_quest.rs` include this file with
 //! `#[path = "support/npc_quest_chain.rs"] mod npc_quest_chain;`. Test-only;
 //! production never copies content. The fixture supplies profile/inventory
 //! content; the repository's `job_trainers.json` and split quest/NPC content are
@@ -85,6 +85,30 @@ impl Fixture {
         )
         .unwrap();
         Self { path, character_id }
+    }
+
+    /// A copy without the opening scene and the campaign files that require it,
+    /// so `Gameplay::on_location` cannot advance the opening story. Event-quest
+    /// tests use it when their objective and wallet deltas must be exact.
+    pub fn minimal(character_id: u64) -> Self {
+        let fixture = Self::for_character(character_id);
+        for name in [
+            "opening.json",
+            "opening-abilities.json",
+            "smelting.json",
+            "forging.json",
+            "forging-campaign.json",
+            "cooking.json",
+            "cooking-campaign.json",
+            "mining.json",
+            "harvesting.json",
+        ] {
+            let path = fixture.path.join(name);
+            if path.is_file() {
+                fs::remove_file(&path).unwrap();
+            }
+        }
+        fixture
     }
 
     pub fn path(&self) -> &Path {
@@ -329,7 +353,7 @@ pub fn finish_quest(
     expected_coins: u32,
     expected_xp: u32,
     now: u64,
-) {
+) -> Outcome {
     let coins_before = coins(game);
     let xp_before = profile_xp(game, profile);
     let completed = send(game, character, &quest_end_reply(quest_id), now);
@@ -348,6 +372,7 @@ pub fn finish_quest(
     assert_eq!(profile_xp(game, profile), xp_before + expected_xp);
     assert_eq!(quest_status(game, quest_id), QuestStatus::Completed);
     assert_eq!(pending_turnin(game), None);
+    completed
 }
 
 pub fn counts(game: &Gameplay, quest_id: u32) -> Vec<u32> {
@@ -360,6 +385,10 @@ pub fn quest_status(game: &Gameplay, quest_id: u32) -> QuestStatus {
     game.state().npc_quests.as_ref().unwrap().quests[&quest_id]
         .status
         .clone()
+}
+
+pub fn pending_offer(game: &Gameplay) -> Option<u32> {
+    game.state().npc_quests.as_ref().unwrap().pending_offer
 }
 
 pub fn pending_turnin(game: &Gameplay) -> Option<u32> {

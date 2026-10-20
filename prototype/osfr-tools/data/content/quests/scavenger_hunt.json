@@ -3,7 +3,7 @@
   "records": [
     {
       "id": 3000200,
-      "title_string_id": 429342,
+      "title_string_id": 3374,
       "giver_npc_id": 9000000189,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -108,11 +108,11 @@
       "source": [
         {
           "kind": "client",
-          "evidence": "lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat line 65769: raw locale hash 2499109421 resolves to Global.Text id 429342, the stock title 'The Great Scavenger Hunt', reused for this event quest. No new locale row is authored."
+          "evidence": "lab/reports/locale-id-to-text.json: Global.Text id 3374 is the generic stock string 'Scavenger Hunt '. The Greenwood Forest minigame title 429342 ('The Great Scavenger Hunt', notes/Research/original-activity-coverage.json activity 1038) belongs to a different retail activity and is deliberately not reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T247: authored admin-event scavenger hunt at existing starting-road landmarks. Three VisitPosition stops at copied NPC-row positions and a return Talk to Samantha; no new NPC spawn, objective kind, reward path, packet or realm command. The quest is always offered; the admin starts the event with a broadcast."
+          "evidence": "(R) T247/F272: authored admin-event scavenger hunt at existing starting-road landmarks. Three VisitPosition stops at copied NPC-row positions and a return Talk to Samantha; no new NPC spawn, objective kind, reward path, packet or realm command. The quest is offered after the giver's existing referral is accepted; the admin starts the event with a broadcast that names that step."
         },
         {
           "kind": "reconstructed",
@@ -120,7 +120,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T247: the split loader requires every quest to be referenced by a jobs.json quest_ids list (src/quest_engine.rs from_split_content), so the Adventurer job lists 3000200. The giver offer itself comes from this record's giver_npc_id through QuestEngine::quest_ids_for_giver; no NPC row was edited."
+          "evidence": "(R) T247/F272: the split loader requires the quest catalogue to equal the union of every jobs.json quest_ids list (src/quest_engine.rs from_split_content), so the Adventurer job lists 3000200. This is a loader structural invariant, not a job gate: the record has no job field, is not Adventurer content, and the giver offer comes only from giver_npc_id through QuestEngine::quest_ids_for_giver. No NPC row was edited; tests/scavenger_hunt_quest.rs pins the loader rejection of a standalone quest."
         }
       ],
       "enabled": true
