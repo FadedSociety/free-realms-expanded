@@ -53,6 +53,7 @@ mod occupation;
 #[path = "restoration/piece_077.rs"]
 #[allow(dead_code)]
 mod piece_077;
+mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
@@ -1284,38 +1285,6 @@ impl Gameplay {
     /// One profile's outfit as the native attachment list (count + rows).
     pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
         self.inventory.profile_attachments(profile_id)
-    }
-
-    /// (R) 35/7 EquippedItemsChange for a job switch: the new active outfit,
-    /// which the client applies as a profile-swap attachment group. Client
-    /// reader 0x0091af50 (ctor 0x0091d3b0).
-    fn profile_switch_packet(&self, guid: u64, attachments: &[u8]) -> Vec<u8> {
-        let mut packet = vec![35, 0, 7, 0];
-        packet.extend(guid.to_le_bytes());
-        packet.extend_from_slice(attachments);
-        packet.extend(0i32.to_le_bytes()); // (R) trailing value; the client reads one i32.
-        packet
-    }
-
-    /// Announce the active outfit after the complete profile operation, not
-    /// just a change of profile id: activating the same job can restore a
-    /// missing starter outfit.
-    fn announce_profile_outfit(
-        &self,
-        guid: u64,
-        before: &[u8],
-        switched: bool,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        let Some(profiles) = &self.profiles else {
-            return Ok(());
-        };
-        let after = self.inventory.profile_attachments(profiles.active())?;
-        if !switched && after == before {
-            return Ok(());
-        }
-        out.nearby.push(self.profile_switch_packet(guid, &after));
-        Ok(())
     }
 
     /// T027: whether an equip names an inactive job (whose 35/6 must not reach
@@ -6035,9 +6004,11 @@ impl Gameplay {
                 return Err(invalid("invalid class selection request"));
             }
             let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let outfit_before = self
-                .inventory
-                .profile_attachments(self.profiles.as_ref().unwrap().active())?;
+            // No class content: the same silent no-op `stage_job_selection` gives.
+            let Some(active) = self.active_profile() else {
+                return Ok(out);
+            };
+            let outfit_before = self.inventory.profile_attachments(active)?;
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 self.announce_profile_outfit(guid, &outfit_before, changed, &mut out)?;
             }

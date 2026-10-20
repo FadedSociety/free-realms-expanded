@@ -1,4 +1,5 @@
 use osfr_tools::{
+    gateway::Gateway,
     inventory::Inventory,
     profiles::{ProfileState, Profiles},
 };
@@ -19,6 +20,12 @@ fn hex(bytes: &[u8]) -> String {
 }
 fn signed(bytes: &[u8], offset: usize) -> i32 {
     i32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap())
+}
+fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut packet = vec![5, 0, 1];
+    packet.extend((inner.len() as u32).to_le_bytes());
+    packet.extend_from_slice(inner);
+    packet
 }
 
 struct Fixture {
@@ -382,4 +389,91 @@ fn private_all_opening_starters_and_fresh_identity_survive_activation_and_restor
         assert!(restored.apply_identity(&changed).is_err());
         assert_eq!(restored.state(), state);
     }
+}
+
+/// A supported content shape with no `profiles.json` and no `opening.json`:
+/// `Gameplay::load` accepts it, so a gateway can run without class content.
+struct NoProfiles(PathBuf);
+
+impl NoProfiles {
+    fn new() -> Self {
+        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+        let source = std::env::var_os("OSFR_OPENING_CONTENT")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| lab.join("references/rust-opening-cooking-original-assets"));
+        let directory = std::env::temp_dir().join(format!(
+            "osfr-profiles-no-class-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir(&directory).unwrap();
+        for file in [
+            "inventory.json",
+            "categories.json",
+            "quests.json",
+            "quest-journal.bin",
+            "combat.json",
+            "combat-template.bin",
+        ] {
+            fs::copy(source.join(file), directory.join(file)).unwrap();
+        }
+        Self(directory)
+    }
+}
+
+impl Drop for NoProfiles {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+/// F223: a 26/13 class selection on a pack with no class content is the no-op
+/// `stage_job_selection` already returns. Reading the active profile before
+/// that check panicked (c90ed46 review blocker 3); the request must refuse
+/// without a reply and without touching the save.
+#[test]
+fn class_selection_without_class_content_is_refused_and_keeps_the_save() {
+    let fixture = NoProfiles::new();
+    assert!(!fixture.0.join("profiles.json").exists());
+    assert!(!fixture.0.join("opening.json").exists());
+    let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+    let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| lab.join("references/rust-gateway-reference"));
+    let character = Gateway::reference_state(&reference).unwrap();
+    let mut gateway = Gateway::load_gameplay(&reference, character, &fixture.0, None).unwrap();
+    assert!(
+        gateway.gameplay().unwrap().active_profile().is_none(),
+        "the fixture must load without class content"
+    );
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (index, value) in ["f223", "1.910.1.530630", ""].into_iter().enumerate() {
+        login.extend((value.len() as u32).to_le_bytes());
+        login.extend(value.as_bytes());
+        if index == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    gateway.handle_at(&login, 0).unwrap();
+    gateway.handle_at(&wrap(&[13, 0]), 100).unwrap();
+    gateway.handle_at(&wrap(&[10, 0]), 200).unwrap();
+
+    let before = gateway.snapshot();
+    let mut selection = vec![26, 0, 13, 0];
+    selection.extend(43i32.to_le_bytes());
+    let refused = gateway.handle_at(&wrap(&selection), 300).unwrap();
+    assert!(!refused.state_changed, "the refusal changed the character");
+    assert!(
+        refused.replies.is_empty(),
+        "a contentless class selection must be silent"
+    );
+    assert_eq!(gateway.snapshot(), before, "the refusal changed the save");
+    // The same session answers the next request: the refusal did not fault it.
+    let next = gateway
+        .handle_at(
+            &wrap(&osfr_tools::chat::local_request("realm inventory")),
+            400,
+        )
+        .unwrap();
+    assert!(!next.replies.is_empty(), "the session stopped answering");
 }
