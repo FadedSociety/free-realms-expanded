@@ -132,6 +132,13 @@ impl Fixture {
     pub fn reload(&self, game: &Gameplay) -> Gameplay {
         self.game(Some(game.state()))
     }
+
+    /// Reload through a JSON round trip, so decoding the saved state is exercised too.
+    pub fn reload_serialized(&self, game: &Gameplay) -> Gameplay {
+        let bytes = serde_json::to_vec(&game.state()).unwrap();
+        let state: GameplayState = serde_json::from_slice(&bytes).unwrap();
+        self.game(Some(state))
+    }
 }
 
 impl Drop for Fixture {
@@ -286,11 +293,14 @@ pub fn offer(
         "Talk must open the 26/3 dialogue"
     );
     let offered = send(game, character, &dialogue_choice(QUEST_CHOICE), now + 2);
+    let offers: Vec<&Vec<u8>> = offered
+        .replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
+        .collect();
+    assert_eq!(offers.len(), 1, "one Talk offers exactly one quest");
     assert!(
-        offered
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1, Some(quest_id))),
+        has_family(offers[0], 49, 1, Some(quest_id)),
         "quest {quest_id} was not offered"
     );
     assert_eq!(quest_status(game, quest_id), QuestStatus::Offered);
@@ -305,6 +315,13 @@ pub fn accept(game: &mut Gameplay, character: &CharacterState, quest_id: u32, no
             .iter()
             .any(|packet| has_family(packet, 49, 3, Some(quest_id))),
         "quest {quest_id} did not send QuestAdd"
+    );
+    assert!(
+        accepted
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 8, Some(quest_id))),
+        "quest {quest_id} did not activate its first objective"
     );
     assert_eq!(quest_status(game, quest_id), QuestStatus::Active);
     accepted

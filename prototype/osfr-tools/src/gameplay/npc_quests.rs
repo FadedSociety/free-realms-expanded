@@ -4,6 +4,9 @@ use super::*;
 
 impl Gameplay {
     /// Bind the split quest catalogue and its character-owned eligibility.
+    ///
+    /// Both loads are fallible, so build them before touching live state: a refused
+    /// rebind (corrupt content) keeps the bound catalogue and the saved progress.
     pub fn bind_npc_quest_catalogue(
         &mut self,
         content_dir: &Path,
@@ -26,13 +29,16 @@ impl Gameplay {
             }
             return Ok(());
         };
-        self.npc_quests = Some(crate::quest_engine::QuestEngine::from_split_content(
+        let crosswalk = crate::quest_journal::load_crosswalk(source)?;
+        let engine = crate::quest_engine::QuestEngine::from_split_content(
             source,
             character_id,
             crate::quest_engine::CharacterEligibility::default(),
-            self.saved_npc_quests.take(),
-        )?);
-        self.register_breadcrumb_crosswalk(crate::quest_journal::load_crosswalk(source)?);
+            self.saved_npc_quests.clone(),
+        )?;
+        self.npc_quests = Some(engine);
+        self.saved_npc_quests = None;
+        self.register_breadcrumb_crosswalk(crosswalk);
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         Ok(())
     }

@@ -665,7 +665,13 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
         .err()
         .expect("A's stale quest save is refused");
     assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
-    assert!(a.state().npc_quests.is_none(), "A keeps no quest state");
+    // The refused bind keeps the stale save for a later retry instead of consuming
+    // it; no engine is bound, so A's kills still cannot credit it.
+    let kept = a
+        .state()
+        .npc_quests
+        .expect("the refused bind keeps the saved state");
+    assert_eq!(kept.character_id, B);
 
     let mut b = player(&fixture, B, b_at, 0);
     let mut field = a.take_shared_fields().unwrap();
@@ -680,6 +686,11 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
         "A's invalid position is refused"
     );
     assert_eq!(field.health(WOLF_GUID), Some(100));
+
+    // A's own accepted kill leaves the unbound stale state untouched.
+    let a_character = character_at(A, [1.0, 0.0, 0.0]);
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 650).expect("A's kill is accepted");
+    assert_eq!(counts(&a, QUEST), [0, 0], "A's stale quest is not credited");
 
     let b_out = attack(&mut b, &mut field, &b_character, &known, WOLF_TWO, 700)
         .expect("B's kill is still accepted");

@@ -36,7 +36,7 @@ mod wizard_entry;
 
 use osfr_tools::{
     character_store::CharacterState,
-    gameplay::{Gameplay, Outcome},
+    gameplay::{Gameplay, GameplayState, Outcome},
     quest_engine::QuestStatus,
 };
 use serde_json::Value;
@@ -454,7 +454,7 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
 
     // Disconnect after the first objective.
     let mid_bytes = saved(&game);
-    game = reconnect(&fixture, &game);
+    game = fixture.reload_serialized(&game);
     assert_eq!(
         saved(&game),
         mid_bytes,
@@ -479,7 +479,7 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
     assert_eq!(counts(&game, BOOK), vec![1, 1]);
     assert_eq!(pending_turnin(&game), Some(BOOK));
     let held_bytes = saved(&game);
-    game = reconnect(&fixture, &game);
+    game = fixture.reload_serialized(&game);
     assert_eq!(saved(&game), held_bytes, "reload changed the held turn-in");
     assert_eq!(pending_turnin(&game), Some(BOOK));
     assert_eq!(coins(&game), starting_coins, "a disconnect pays nothing");
@@ -553,7 +553,7 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
     let final_bytes = saved(&game);
     let final_coins = coins(&game);
     let final_xp = profile_xp(&game, WIZARD);
-    game = reconnect(&fixture, &game);
+    game = fixture.reload_serialized(&game);
     assert_eq!(
         saved(&game),
         final_bytes,
@@ -633,6 +633,77 @@ fn a_malformed_wizard_record_fails_at_load() {
         "unknown job profile",
         "quest XP references unknown job profile",
     );
+}
+
+/// A corrupt reconnect must not consume the saved NPC quest progress: the bind is
+/// transactional, and a retry with good content resumes the chapter.
+#[test]
+fn a_refused_rebind_keeps_the_bound_catalogue_and_saved_progress() {
+    let fixture = Fixture::new();
+    let character = avatar_at(FIZZLESTICKS);
+    let book_search = content_position("wilds.json", SQUEE);
+    let mut now = 6_000;
+    let mut game = wizard_game(&fixture);
+    now += 10;
+    offer(&mut game, &character, FIZZLESTICKS, BOOK, now);
+    now += 10;
+    accept(&mut game, &character, BOOK, now);
+    now += 10;
+    assert!(visit(&mut game, book_search, now).changed);
+    let in_progress = saved(&game);
+
+    // The live catalogue is not replaced by a refused rebind, so its next step still works.
+    let directory = synthetic_content(&record(3_999_001, vec![talk_goal(1, 0)], vec![]));
+    let refused = game.bind_npc_quest_catalogue(&directory, CHARACTER);
+    let _ = fs::remove_dir_all(&directory);
+    assert!(
+        refused.is_err(),
+        "a zero-target record must be refused at content load"
+    );
+    assert_eq!(
+        saved(&game),
+        in_progress,
+        "the refused rebind changed the game"
+    );
+    now += 10;
+    assert!(
+        talk(&mut game, &character, FIZZLESTICKS, now).changed,
+        "the still-bound catalogue must serve the next chapter step"
+    );
+    assert_eq!(pending_turnin(&game), Some(BOOK));
+
+    // A reconnect loads the save before binding: a refused bind must keep the saved
+    // progress for the retry instead of consuming it.
+    let state: GameplayState = serde_json::from_slice(&in_progress).unwrap();
+    let mut reconnecting = Gameplay::load(fixture.path(), Some(state)).expect("save loads");
+    let directory = synthetic_content(&record(3_999_001, vec![talk_goal(1, 0)], vec![]));
+    let refused = reconnecting.bind_npc_quest_catalogue(&directory, CHARACTER);
+    let _ = fs::remove_dir_all(&directory);
+    assert!(
+        refused.is_err(),
+        "the corrupt reconnect content must be refused"
+    );
+    assert_eq!(
+        saved(&reconnecting),
+        in_progress,
+        "the refused bind consumed the saved NPC quest progress"
+    );
+    reconnecting
+        .bind_npc_quest_catalogue(&content_dir(), CHARACTER)
+        .expect("the retry binds the good catalogue");
+    assert_eq!(
+        saved(&reconnecting),
+        in_progress,
+        "the retry did not restore the saved progress"
+    );
+    assert_eq!(counts(&reconnecting, BOOK), vec![1, 0]);
+    assert_eq!(quest_status(&reconnecting, BOOK), QuestStatus::Active);
+    now += 10;
+    assert!(
+        talk(&mut reconnecting, &character, FIZZLESTICKS, now).changed,
+        "the retried catalogue must serve the next chapter step"
+    );
+    assert_eq!(pending_turnin(&reconnecting), Some(BOOK));
 }
 
 fn talk_goal(id: u32, npc_id: u64) -> Value {

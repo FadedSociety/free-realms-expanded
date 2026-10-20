@@ -81,13 +81,6 @@ pub fn wizard_game(fixture: &Fixture) -> Gameplay {
     fixture.game(Some(wizard_state(fixture)))
 }
 
-/// Reconnect: round-trip the saved state through JSON, then load it again.
-pub fn reconnect(fixture: &Fixture, game: &Gameplay) -> Gameplay {
-    let bytes = serde_json::to_vec(&game.state()).unwrap();
-    let state: GameplayState = serde_json::from_slice(&bytes).unwrap();
-    fixture.game(Some(state))
-}
-
 /// Talk to the giver and decode the single 49/1 offer with the production reader.
 pub fn offered_card(
     game: &mut Gameplay,
@@ -97,13 +90,12 @@ pub fn offered_card(
     now: u64,
 ) -> QuestOfferPacket49_1 {
     let offered = offer(game, character, target, quest_id, now);
-    let offers: Vec<&Vec<u8>> = offered
+    let packet = offered
         .replies
         .iter()
-        .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
-        .collect();
-    assert_eq!(offers.len(), 1, "one quest choice offers exactly one quest");
-    let decoded = decode_quest_offer_49_1(offers[0]).expect("49/1 decodes");
+        .find(|packet| packet.starts_with(&[49, 0, 1, 0]))
+        .expect("the offer contains the 49/1");
+    let decoded = decode_quest_offer_49_1(packet).expect("49/1 decodes");
     assert_eq!(decoded.quest_id, quest_id);
     decoded
 }
