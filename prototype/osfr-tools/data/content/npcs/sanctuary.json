@@ -1658,11 +1658,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1110; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2367 (ModelId=12, ModelFileName=fairychild_m_pointyhair.adr, NameId=10111)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.37452, JenkinsLookup2 hash 501203270, line 13326. Speaker: Anura, the Sanctuary resident who asks about giant toads; the line is the first person response that follows the quest return objective 'Return to Anura in Sanctuary'. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 167. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the hand-in/speaker link is inferred from the client return objective 37450 (quoted in notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 167) and the first person response 37452 in the same locale block; it is not a recovered greeting binding."
+          }
         ]
       },
       "heading": -1.72528,
       "model_id": 12,
-      "model_file_name": "fairychild_m_pointyhair.adr"
+      "model_file_name": "fairychild_m_pointyhair.adr",
+      "greeting_string_id": 37452
     },
     {
       "npc_id": 9500000439,
@@ -2413,11 +2428,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1211; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2468 (ModelId=398, ModelFileName=fairy_sanctuary_m_01.adr, NameId=21429)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.22622, JenkinsLookup2 hash 113727630, line 2952. Speaker: Arnie, the Grand Exhibit Hall keeper; the line is the first person response ('You have found the artifacts?... These are priceless treasures') that follows the quest return objective 'Return to Arnie in the Memorial Caverns'. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 109. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the hand-in/speaker link is inferred from the client return objective 22620 (notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 109) and response 22622 in the same locale block; it is not a recovered greeting binding."
+          }
         ]
       },
       "heading": -0.94028,
       "model_id": 398,
-      "model_file_name": "fairy_sanctuary_m_01.adr"
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_string_id": 22622
     },
     {
       "npc_id": 9500000441,
@@ -14720,11 +14750,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1129; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2386 (ModelId=345, ModelFileName=fairy_royalguard_m.adr, NameId=74507)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.74526, JenkinsLookup2 hash 1379065920, line 36572. Speaker: Commander Kiggle, the Royal Guard commander who offers Hooligan Hassles; the line is first person ('our guards... we don't always have time') and the client quest description names him. Guide: notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 156. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 74527 (Hooligan Hassles), description_string_id 74528 'Commander Kiggle wants you to help Henry...', and this offer intro is locale row 74526 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 156 names Kiggle as the giver and quotes the intro."
+          }
         ]
       },
       "heading": 0.181571,
       "model_id": 345,
-      "model_file_name": "fairy_royalguard_m.adr"
+      "model_file_name": "fairy_royalguard_m.adr",
+      "greeting_string_id": 74526
     },
     {
       "npc_id": 9500000466,
@@ -19383,11 +19428,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1201; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2458 (ModelId=312, ModelFileName=human_m_freestyle_03.agr, NameId=21486)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.21785, JenkinsLookup2 hash 3806996357, line 100688. Speaker: Evan, the Memorial Caverns visitor whose son Marty is missing; the line is first person ('my son... I sent him to get a gift for his mom, Maria') and the client quest description names Evan. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 110. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale group: title_string_id 21779 (Missing Marty), description_string_id 21780 names Evan, and the recovered first-person offer is locale rows 21785-21786 in that quest text group. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 110."
+          }
         ]
       },
       "heading": 1.674406,
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_string_id": 21785
     },
     {
       "npc_id": 9500000475,
@@ -20060,11 +20120,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1162; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2419 (ModelId=763, ModelFileName=fairy_m_monty_dozen.agr, NameId=390781)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.390786, JenkinsLookup2 hash 3255903404, line 85999. Speaker: Feldman, the Fish Pro photographer who offers Looking for Lavender; the line is first person ('I want to be a famous journalist... Help me with this story') and the client quest description names Feldman. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 75. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 390787 (Looking for Lavender), description_string_id 390788 names Feldman, and this offer intro is locale row 390786 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 75."
+          }
         ]
       },
       "heading": -1.023965,
       "model_id": 763,
-      "model_file_name": "fairy_m_monty_dozen.agr"
+      "model_file_name": "fairy_m_monty_dozen.agr",
+      "greeting_string_id": 390786
     },
     {
       "npc_id": 9000000086,
@@ -21550,11 +21625,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1215; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2472 (ModelId=398, ModelFileName=fairy_sanctuary_m_01.adr, NameId=21423)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.21557, JenkinsLookup2 hash 570833766, line 15144. Speaker: Fhred, the Souvenir Stand keeper in the Memorial Caverns; the line is first person ('my partner, Flora... I have been working double shifts here at the souvenir shop') and the client quest description names Fhred. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 107. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale group: title_string_id 21551 (Food for Fhred), description_string_id 21554 names Fhred, and the offer is split across locale rows 21557-21558. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 107."
+          }
         ]
       },
       "heading": 2.260578,
       "model_id": 398,
-      "model_file_name": "fairy_sanctuary_m_01.adr"
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_string_id": 21557
     },
     {
       "npc_id": 9500000478,
@@ -25396,11 +25486,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1120; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2377 (ModelId=324, ModelFileName=fairy_generalglowlight_m.adr, NameId=7670)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.91895, JenkinsLookup2 hash 2241336804, line 58993. Speaker: General Glowlight, Royal Guard general; the job guide labels the line as the Glowlight side of Warrior W14 and it is first person ('when we built our Memorial Caverns... those marauders'). Guide: notes/Build Guides/Content/Jobs/Warrior.md line 105. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the speaker link is the guide quote in notes/Build Guides/Content/Jobs/Warrior.md line 105 (Warrior: General Concerns, Glowlight side), not a recovered greeting binding; used as the fixed default."
+          }
         ]
       },
       "heading": -0.77398,
       "model_id": 324,
-      "model_file_name": "fairy_generalglowlight_m.adr"
+      "model_file_name": "fairy_generalglowlight_m.adr",
+      "greeting_string_id": 91895
     },
     {
       "npc_id": 9000000330,
@@ -30547,11 +30652,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4249; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=32815 (ModelId=1692, ModelFileName=skeleton_m_01.adr, NameId=415047)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.415302, JenkinsLookup2 hash 2703417406, line 71158. Speaker: Halloween Harry, the candy-stall skeleton of the Super Spooktacular; the line is first person ('I'm sure it's just older kids... I'll make sure you're rewarded') and the client quest description names Halloween Harry. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 134. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 415303 (Bag Snatchers), description_string_id 415304 names Halloween Harry, and this offer intro is locale row 415302 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 134."
+          }
         ]
       },
       "heading": 0.031577,
       "model_id": 1692,
-      "model_file_name": "skeleton_m_01.adr"
+      "model_file_name": "skeleton_m_01.adr",
+      "greeting_string_id": 415302
     },
     {
       "npc_id": 9500000494,
@@ -32960,11 +33080,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1167; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2424 (ModelId=134, ModelFileName=floren.adr, NameId=7575)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.15500, JenkinsLookup2 hash 752124044, line 19804. Speaker: Jacque, owner of Jacque's Cafe; the line is first person ('Let's show 'em that Jacque's Cafe is the best in town!') and the guide row is his own vendor/delivery speech. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 51. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the speaker link is the client delivery speech cited in notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 51 (Jacque row, hash 752124044), not a recovered greeting binding."
+          }
         ]
       },
       "heading": -1.306295,
       "model_id": 134,
-      "model_file_name": "floren.adr"
+      "model_file_name": "floren.adr",
+      "greeting_string_id": 15500
     },
     {
       "npc_id": 9500000498,
@@ -34116,11 +34251,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1166; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2423 (ModelId=445, ModelFileName=fairy_f_freestyle_04.agr, NameId=7607)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.103560, JenkinsLookup2 hash 635925311, line 16842. Speaker: Jili, the Card Duelist tournament rival at Jacque's Cafe; the post-match line is first person ('You call that a win? I call it luck... Being the tournament winner means you get to meet Poe Tatters'). Guide: notes/Build Guides/Content/Jobs/Card Duelist.md line 67. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the speaker link is inferred from the Card Duelist quest row: notes/Build Guides/Content/Jobs/Card Duelist.md line 67 names Jili as the Sanctuary tournament opponent and line 68 cites client 635925311 after the match; it is not a recovered greeting binding."
+          }
         ]
       },
       "heading": -1.713788,
       "model_id": 445,
-      "model_file_name": "fairy_f_freestyle_04.agr"
+      "model_file_name": "fairy_f_freestyle_04.agr",
+      "greeting_string_id": 103560
     },
     {
       "npc_id": 9500000501,
@@ -37746,11 +37896,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1206; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2463 (ModelId=24, ModelFileName=humanelder_f_generic.adr, NameId=70770)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.70827, JenkinsLookup2 hash 3481579165, line 92199. Speaker: Lorna, the chess player in the Memorial Caverns; the line is first person ('I come to this quiet spot to whittle chess pieces...') and the client quest description names Lorna. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 113. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 70828 (A Plea for Peace and Quiet), description_string_id 70829 names Lorna, and this offer intro is locale row 70827 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 113."
+          }
         ]
       },
       "heading": -1.054984,
       "model_id": 24,
-      "model_file_name": "humanelder_f_generic.adr"
+      "model_file_name": "humanelder_f_generic.adr",
+      "greeting_string_id": 70827
     },
     {
       "npc_id": 9500000506,
@@ -39325,11 +39490,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1102; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2358 (ModelId=422, ModelFileName=fairy_f_nirvi.agr, NameId=10076)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.101215, JenkinsLookup2 hash 2980092336, line 78667. Speaker: Nirvi, Steelbloom's apprentice smith; the job guide labels it Nirvi: in Tools of the Trade and it is first person ('what Steelbloom told me... Here are the tools she's asking for'). Guide: notes/Build Guides/Content/Jobs/Blacksmith.md line 134. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the speaker link is the guide-labeled quote in notes/Build Guides/Content/Jobs/Blacksmith.md line 134 (quest 27 Tools of the Trade, hand-in to Anata Caliburn), not a recovered greeting binding."
+          }
         ]
       },
       "heading": -1.463941,
       "model_id": 422,
-      "model_file_name": "fairy_f_nirvi.agr"
+      "model_file_name": "fairy_f_nirvi.agr",
+      "greeting_string_id": 101215
     },
     {
       "npc_id": 9500000509,
@@ -39665,11 +39845,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1079; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2335 (ModelId=398, ModelFileName=fairy_sanctuary_m_01.adr, NameId=46272)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.46279, JenkinsLookup2 hash 1390791907, line 36924. Speaker: Nomi, the Sanctuary resident whose little brother Hasti ran off; the line is first person ('My little brother Hasti ran off... mom and dad are going to kill me') and the client quest title names Nomi. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 168. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 46280 (Nomi's Little Brother), description_string_id 46281, and this offer intro is locale row 46279 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 168."
+          }
         ]
       },
       "heading": 2.63724,
       "model_id": 398,
-      "model_file_name": "fairy_sanctuary_m_01.adr"
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_string_id": 46279
     },
     {
       "npc_id": 9000000161,
@@ -44476,11 +44671,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1169; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2426 (ModelId=384, ModelFileName=fairy_sanctuary_f.adr, NameId=23790)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.415266, JenkinsLookup2 hash 1547845466, line 40984. Speaker: Pucca De'Flor, the Pixiewood merchant who offers Apples!; the line is first person ('I make my famous candied apples... I ran out of caramel') and the client quest description names Pucca De'Flor. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 93. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 415267 (Apples!), description_string_id 415268 names Pucca De'Flor, and this offer intro is locale row 415266 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 93."
+          }
         ]
       },
       "heading": -2.236274,
       "model_id": 384,
-      "model_file_name": "fairy_sanctuary_f.adr"
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "greeting_string_id": 415266
     },
     {
       "npc_id": 9500000516,
@@ -46639,11 +46849,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1096; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2352 (ModelId=384, ModelFileName=fairy_sanctuary_f.adr, NameId=10083)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.428076, JenkinsLookup2 hash 3087743397, line 81536. Speaker: Quills, the Town Hall usher who offers Bundles of Balloons; the line is first person ('I need to tend to the Queen's visitors...') and the client quest description names Quills. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 34. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 428077 (Bundles of Balloons), description_string_id 428078 names Quills, and this offer intro is locale row 428076 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 34."
+          }
         ]
       },
       "heading": -1.95673,
       "model_id": 384,
-      "model_file_name": "fairy_sanctuary_f.adr"
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "greeting_string_id": 428076
     },
     {
       "npc_id": 9500000521,
@@ -47303,11 +47528,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2285; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3542 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=37012)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.37041, JenkinsLookup2 hash 81168942, line 2089. Speaker: Ridwan Lacsher, the squirrel researcher; the line is first person ('I saw a pink one once. Nobody believes me though') and the client quest description names Ridwan. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 182. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 37042 (Studying Squirrels), description_string_id 37043 names Ridwan, and this offer intro is locale row 37041 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 182."
+          }
         ]
       },
       "heading": 2.539995,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_string_id": 37041
     },
     {
       "npc_id": 9500000523,
@@ -50537,11 +50777,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1214; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2471 (ModelId=278, ModelFileName=changeling_scoutthief_f.adr, NameId=21421)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.21534, JenkinsLookup2 hash 3995278468, line 105649. Speaker: Saedi, the Changeling whose sister painted the memorial mural; the line is first person ('I want to repair it... I am just a Changeling after all') and the client quest description names her. Guide: notes/Build Guides/Content/Dungeons/Forgotten Caves.md line 95. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 21535 (The Missing Mural), description_string_id 21536 names Saedi, and this offer intro is locale row 21534 = title-1. Guide notes/Build Guides/Content/Dungeons/Forgotten Caves.md line 95 names her as the giver."
+          }
         ]
       },
       "heading": 2.684191,
       "model_id": 278,
-      "model_file_name": "changeling_scoutthief_f.adr"
+      "model_file_name": "changeling_scoutthief_f.adr",
+      "greeting_string_id": 21534
     },
     {
       "npc_id": 9500000529,
@@ -50884,11 +51139,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1149; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2406 (ModelId=384, ModelFileName=fairy_sanctuary_f.adr, NameId=10093)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.74933, JenkinsLookup2 hash 1469153882, line 38886. Speaker: Saffron, the Pixiewood exotic-pet shop owner; the line is first person ('I bet they'd make great pets for some of the younger pixies... Tag the turtles... This way I can track them') and the client quest text names her as the return target. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 95. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale group: Turtle Tag title_string_id 10186, description_string_id 10187, return objective 74931 'Return to Saffron in Pixiewood', and this offer is locale row 74933. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 95."
+          }
         ]
       },
       "heading": -0.913651,
       "model_id": 384,
-      "model_file_name": "fairy_sanctuary_f.adr"
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "greeting_string_id": 74933
     },
     {
       "npc_id": 9000000187,
@@ -54417,11 +54687,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:825; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2069 (ModelId=429, ModelFileName=human_f_simone.agr, NameId=15820)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.94274, JenkinsLookup2 hash 2496072465, line 65655. Speaker: Simone, the Chef trainer; the line is first person ('my Spiralmint Steak... I'll teach you how to cook it too') and data/content/quests/chef.json quest 3050006 binds giver_npc_id 9000000467 with intro_text_string_id 94274. Guide: notes/Build Guides/Content/Jobs/Chef.md line 78. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the giver/offer link comes from the recovered quest record data/content/quests/chef.json quest 3050006 (title_string_id 94275, description_string_id 94276, intro_text_string_id 94274); that record already marks its intro id reconstructed from the title-1 locale slot. Guide notes/Build Guides/Content/Jobs/Chef.md line 78."
+          }
         ]
       },
       "heading": -0.020538,
       "model_id": 429,
-      "model_file_name": "human_f_simone.agr"
+      "model_file_name": "human_f_simone.agr",
+      "greeting_string_id": 94274
     },
     {
       "npc_id": 9000000205,
@@ -60893,11 +61178,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1207; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2464 (ModelId=4, ModelFileName=robgoblin_m_basic.adr, NameId=21428)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T280: en_us_data.dat Global.Text.76061, JenkinsLookup2 hash 2852799536, line 75206. Speaker: Zobs, the robgoblin souvenir merchant; the line is first person ('I'm all out of the flyers I use to try and sell my one-of-a-kind souvenirs') and the client quest description names Zobs. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 108. See notes/Autopilot/T280.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: use this verified speaker's recovered locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale group: description_string_id 76063 'Find all the flyers... and return them to Zobs', objective 76937, and this offer is locale row 76061. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 108."
+          }
         ]
       },
       "heading": -1.285495,
       "model_id": 4,
-      "model_file_name": "robgoblin_m_basic.adr"
+      "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_string_id": 76061
     }
   ]
 }
